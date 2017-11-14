@@ -1,0 +1,139 @@
+defaults: &defaults
+  working_directory: ~/office365-cli
+  docker:
+    - image: circleci/node:6.11.5
+
+version: 2
+jobs:
+  build:
+    <<: *defaults
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/office365-cli
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run:
+          name: Restore dependencies
+          command: npm i
+      - save_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - ./node_modules
+      - run:
+          name: Build
+          command: npm run build
+      - persist_to_workspace:
+          root: .
+          paths: .
+  test:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/office365-cli
+      - run:
+          name: Test
+          command: npm test
+      - run:
+          name: Run coveralls
+          command: './node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls'
+      - store_artifacts:
+          path: coverage
+          prefix: coverage
+  publish_next:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/office365-cli
+      - run:
+          name: Write .npmrc
+          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+      - run:
+          name: Stamp beta to package version
+          command: node scripts/update-package-version.js $CIRCLE_SHA1
+      - run:
+          name: Publish @next
+          command: npm publish --tag next --access public
+  publish:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/office365-cli
+      - run:
+          name: Write .npmrc
+          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+      - run:
+          name: Publish
+          command: npm publish --access public
+  deploy_docs:
+    working_directory: ~/office365-cli/docs/manual
+    docker:
+      - image: circleci/python:2.7-jessie-node
+    steps:
+      - attach_workspace:
+          at: ~/office365-cli
+      - add_ssh_keys:
+          fingerprints:
+            - "06:39:32:e4:a1:64:01:19:0e:61:a0:ad:6a:53:37:32"
+      - run:
+          name: Install MkDocs
+          command: sudo pip install mkdocs
+      - run:
+          name: Avoid hosts unknown for github
+          command: echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+      - run:
+          name: Build docs
+          command: mkdocs gh-deploy
+
+workflows:
+  version: 2
+  release_next:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: dev
+      - test:
+          requires:
+            - build
+          filters:
+            branches:
+              only: dev
+      - publish_next:
+          requires:
+            - test
+          filters:
+            branches:
+              only: dev
+  release:
+    jobs:
+      - build:
+          filters:
+            tags:
+              only: /^v[0-9]+\.[0-9]+\.[0-9]+/
+            branches:
+              ignore: /.*/
+      - test:
+          requires:
+            - build
+          filters:
+            tags:
+              only: /^v[0-9]+\.[0-9]+\.[0-9]+/
+            branches:
+              ignore: /.*/
+      - publish:
+          requires:
+            - test
+          filters:
+            tags:
+              only: /^v[0-9]+\.[0-9]+\.[0-9]+/
+            branches:
+              ignore: /.*/
+      - deploy_docs:
+          requires:
+            - publish
+          filters:
+            tags:
+              only: /^v[0-9]+\.[0-9]+\.[0-9]+/
+            branches:
+              ignore: /.*/

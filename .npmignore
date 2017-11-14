@@ -1,0 +1,14 @@
+.circleci
+.nyc_output
+.vscode
+coverage
+docs
+node_modules
+scripts
+src
+types
+.gitignore
+npm-shrinkwrap.json
+tsconfig.json
+*.map
+*.spec.js

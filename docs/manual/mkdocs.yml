@@ -1,0 +1,26 @@
+site_name: Office 365 CLI
+pages:
+  - Home: 'index.md'
+  - Commands:
+    - SharePoint Online (spo):
+      - connect: 'cmd/spo/connect.md'
+      - disconnect: 'cmd/spo/disconnect.md'
+      - status: 'cmd/spo/status.md'
+      - storageentity get: 'cmd/spo/storageentity-get.md'
+      - storageentity list: 'cmd/spo/storageentity-list.md'
+      - storageentity remove: 'cmd/spo/storageentity-remove.md'
+      - storageentity set: 'cmd/spo/storageentity-set.md'
+      - tenant cdn get: 'cmd/spo/tenant-cdn-get.md'
+      - tenant cdn origin list: 'cmd/spo/tenant-cdn-origin-list.md'
+      - tenant cdn origin remove: 'cmd/spo/tenant-cdn-origin-remove.md'
+      - tenant cdn origin set: 'cmd/spo/tenant-cdn-origin-set.md'
+      - tenant cdn policy list: 'cmd/spo/tenant-cdn-policy-list.md'
+      - tenant cdn policy set: 'cmd/spo/tenant-cdn-policy-set.md'
+      - tenant cdn set: 'cmd/spo/tenant-cdn-set.md'
+  - About:
+    - 'Why this CLI': 'about/why-cli.md'
+    - 'Release notes': 'about/release-notes.md'
+    - License: 'about/license.md'
+theme: readthedocs
+repo_url: http://github.com/SharePoint/office365-cli
+edit_uri: blob/master/docs/manual/docs

@@ -1,0 +1,59 @@
+{
+  "name": "@pnp/office365-cli",
+  "version": "0.1.0",
+  "description": "CLI for managing Office 365 configuration",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "bin": {
+    "office365": "./dist/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SharePoint/office365-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SharePoint/office365-cli/issues"
+  },
+  "scripts": {
+    "build": "tsc -p .",
+    "watch": "tsc -w -p .",
+    "clean": "rm -rf dist",
+    "test": "nyc -r=lcov -r=text mocha 'dist/**/*.spec.js'"
+  },
+  "keywords": [
+    "office 365",
+    "o365",
+    "sharepoint online",
+    "sharepoint"
+  ],
+  "author": "https://github.com/SharePoint/office365-cli/graphs/contributors",
+  "maintainers": [
+    {
+      "name": "waldekm",
+      "email": "waldek@mastykarz.nl"
+    }
+  ],
+  "contributors": [
+    "Connell, Andrew <me@andrewconnell.com>",
+    "Mastykarz, Waldek <waldek@mastykarz.nl>"
+  ],
+  "dependencies": {
+    "applicationinsights": "^1.0.0",
+    "request": "^2.83.0",
+    "request-promise-native": "^1.0.5",
+    "vorpal": "^1.12.0"
+  },
+  "devDependencies": {
+    "@types/chalk": "^0.4.31",
+    "@types/mocha": "^2.2.43",
+    "@types/node": "^8.0.33",
+    "@types/request": "^2.0.4",
+    "@types/request-promise-native": "^1.0.9",
+    "@types/sinon": "^2.3.6",
+    "coveralls": "^3.0.0",
+    "mocha": "^4.0.1",
+    "nyc": "^11.2.1",
+    "sinon": "^4.0.1",
+    "typescript": "^2.6.1"
+  }
+}
