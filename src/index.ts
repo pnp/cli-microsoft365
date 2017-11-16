@@ -25,7 +25,7 @@ fs.realpath(__dirname, (err: NodeJS.ErrnoException, resolvedPath: string): void 
   const files: string[] = readdirR(commandsDir) as string[];
 
   files.forEach(file => {
-    if (file.indexOf('/commands/') > -1 &&
+    if (file.indexOf(`${path.sep}commands${path.sep}`) > -1 &&
       file.indexOf('.spec.js') === -1 &&
       file.indexOf('.js.map') === -1) {
       const cmd: any = require(file);
