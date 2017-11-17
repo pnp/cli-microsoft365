@@ -21,6 +21,18 @@ pages:
     - 'Why this CLI': 'about/why-cli.md'
     - 'Release notes': 'about/release-notes.md'
     - License: 'about/license.md'
-theme: readthedocs
+theme:
+  name: 'material'
+  palette:
+    primary: 'red'
+  logo: 'images/office.png'
+  feature:
+    tabs: true
+markdown_extensions:
+  - admonition
+  - codehilite:
+      guess_lang: false
+  - toc:
+      permalink: true
 repo_url: http://github.com/SharePoint/office365-cli
 edit_uri: blob/master/docs/manual/docs

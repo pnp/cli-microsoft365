@@ -16,7 +16,8 @@ Option|Description
 `-t, --type [type]`|Type of CDN to manage. `Public|Private`. Default `Public`
 `--verbose`|Runs command with verbose logging
 
-> **Important:** before using this command, connect to a SharePoint Online tenant admin site, using the [spo connect](connect.md) command.
+!!! important
+    Before using this command, connect to a SharePoint Online tenant admin site, using the [spo connect](connect.md) command.
 
 ## Remarks
 
@@ -44,4 +45,4 @@ shows if the Private CDN is currently enabled or not
 
 ## More information
 
-- General availability of Office 365 CDN: https://dev.office.com/blogs/general-availability-of-office-365-cdn
+- General availability of Office 365 CDN: [https://dev.office.com/blogs/general-availability-of-office-365-cdn](https://dev.office.com/blogs/general-availability-of-office-365-cdn)

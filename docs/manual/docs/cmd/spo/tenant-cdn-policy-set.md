@@ -18,7 +18,8 @@ Option|Description
 `-v, --value <value>`|Value for the policy to configure
 `--verbose`|Runs command with verbose logging
 
-> **Important:** before using this command, connect to a SharePoint Online tenant admin site, using the [spo connect](connect.md) command.
+!!! important
+    Before using this command, connect to a SharePoint Online tenant admin site, using the [spo connect](connect.md) command.
 
 ## Remarks
 
@@ -40,4 +41,4 @@ sets the list of extensions supported by the Public CDN
 
 ## More information
 
-- General availability of Office 365 CDN: https://dev.office.com/blogs/general-availability-of-office-365-cdn
+- General availability of Office 365 CDN: [https://dev.office.com/blogs/general-availability-of-office-365-cdn](https://dev.office.com/blogs/general-availability-of-office-365-cdn)

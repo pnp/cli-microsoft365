@@ -79,6 +79,9 @@ jobs:
           name: Install MkDocs
           command: sudo pip install mkdocs
       - run:
+          name: Install MkDocs theme
+          command: sudo pip install mkdocs-material
+      - run:
           name: Avoid hosts unknown for github
           command: echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
       - run:
