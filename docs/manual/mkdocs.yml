@@ -7,6 +7,7 @@ pages:
       - disconnect: 'cmd/spo/disconnect.md'
       - status: 'cmd/spo/status.md'
       - app:
+        - app add: 'cmd/spo/app/app-add.md'
         - app get: 'cmd/spo/app/app-get.md'
         - app list: 'cmd/spo/app/app-list.md'
       - cdn:
