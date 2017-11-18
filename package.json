@@ -36,7 +36,8 @@
   "contributors": [
     "Connell, Andrew <me@andrewconnell.com>",
     "Mastykarz, Waldek <waldek@mastykarz.nl>",
-    "Wilen, Wictor <wictor@wictorwilen.se>"
+    "Wilen, Wictor <wictor@wictorwilen.se>",
+    "van Hunen, Erwin <erwin.van.hunen@outlook.com>"
   ],
   "dependencies": {
     "applicationinsights": "^1.0.0",
