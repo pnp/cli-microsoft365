@@ -37,6 +37,9 @@ jobs:
       - run:
           name: Run coveralls
           command: './node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls'
+          environment:
+            - COVERALLS_REPO_TOKEN: "sEBDywv416GpQ2nphDjsv9W89MgtTMiIj"
+            - COVERALLS_SERVICE_NAME: "circle-ci"
       - store_artifacts:
           path: coverage
           prefix: coverage
@@ -90,6 +93,18 @@ jobs:
 
 workflows:
   version: 2
+  check_pr:
+    jobs:
+      - build:
+          filters:
+            branches:
+              ignore: /^(dev|master)/
+      - test:
+          requires:
+            - build
+          filters:
+            branches:
+              ignore: /^(dev|master)/
   release_next:
     jobs:
       - build:
