@@ -18,7 +18,8 @@ Option|Description
 `--confirm`|Don't prompt for confirming removal of a tenant property
 `--verbose`|Runs command with verbose logging
 
-> **Important:** before using this command, connect to a SharePoint Online tenant admin site, using the [spo connect](connect.md) command.
+!!! important
+    Before using this command, connect to a SharePoint Online tenant admin site, using the [spo connect](connect.md) command.
 
 ## Remarks
 
@@ -48,4 +49,4 @@ remove the AnalyticsId tenant property. Suppresses the confirmation prompt
 
 ## More information
 
-- SharePoint Framework Tenant Properties: https://docs.microsoft.com/en-us/sharepoint/dev/spfx/tenant-properties
+- SharePoint Framework Tenant Properties: [https://docs.microsoft.com/en-us/sharepoint/dev/spfx/tenant-properties](https://docs.microsoft.com/en-us/sharepoint/dev/spfx/tenant-properties)

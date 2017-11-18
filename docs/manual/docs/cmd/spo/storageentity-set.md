@@ -20,7 +20,8 @@ Option|Description
 `-c, --comment [comment]`|Comment to set for the property (optional)
 `--verbose`|Runs command with verbose logging
 
-> **Important:** before using this command, connect to a SharePoint Online tenant admin site, using the [spo connect](connect.md) command.
+!!! important
+    Before using this command, connect to a SharePoint Online tenant admin site, using the [spo connect](connect.md) command.
 
 ## Remarks
 
@@ -43,4 +44,4 @@ set _123_ as the value of the _AnalyticsId_ tenant property. Also include a desc
 
 ## More information
 
-- SharePoint Framework Tenant Properties: https://docs.microsoft.com/en-us/sharepoint/dev/spfx/tenant-properties
+- SharePoint Framework Tenant Properties: [https://docs.microsoft.com/en-us/sharepoint/dev/spfx/tenant-properties](https://docs.microsoft.com/en-us/sharepoint/dev/spfx/tenant-properties)

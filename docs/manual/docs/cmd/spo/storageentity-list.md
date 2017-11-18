@@ -16,7 +16,8 @@ Option|Description
 `-u, --appCatalogUrl <appCatalogUrl>`|URL of the app catalog site
 `--verbose`|Runs command with verbose logging
 
-> **Important:** before using this command, connect to a SharePoint Online site, using the [spo connect](connect.md) command.
+!!! important
+    Before using this command, connect to a SharePoint Online site, using the [spo connect](connect.md) command.
 
 ## Remarks
 
@@ -35,4 +36,4 @@ list all tenant properties stored in the https://contoso.sharepoint.com/sites/ap
 
 ## More information
 
-- SharePoint Framework Tenant Properties: https://docs.microsoft.com/en-us/sharepoint/dev/spfx/tenant-properties
+- SharePoint Framework Tenant Properties: [https://docs.microsoft.com/en-us/sharepoint/dev/spfx/tenant-properties](https://docs.microsoft.com/en-us/sharepoint/dev/spfx/tenant-properties)

@@ -6,7 +6,7 @@ Sharing is caring!
 
 ## You have an idea for a new command
 
-Awesome! Good ideas are invaluable for every product. Before you start hacking away, please check if there is no similar idea already listed in the [issue list](https://github.com/SharePoint/office365-cli/issues). If not, please create a new issue describing your idea. Once we agree on the feature scope and architecture, the feature will be ready for building. Don't hesitate to mention in the issue if you'd like to build the feature yourself. If it's the first time you're building a command see the [guidance article](./adding-command.md) explaining in detail what you will need at minimum.
+Awesome! Good ideas are invaluable for every product. Before you start hacking away, please check if there is no similar idea already listed in the [issue list](https://github.com/SharePoint/office365-cli/issues). If not, please create a new issue describing your idea. Once we agree on the feature scope and architecture, the feature will be ready for building. Don't hesitate to mention in the issue if you'd like to build the feature yourself. If it's the first time you're building a command see the [guidance article](./docs/guides/adding-command.md) explaining in detail what you will need at minimum.
 
 ## You have a suggestion for improving an existing command
 

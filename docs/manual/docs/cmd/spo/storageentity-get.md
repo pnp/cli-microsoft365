@@ -16,7 +16,8 @@ Option|Description
 `-k, --key <key>`|Name of the tenant property to retrieve
 `--verbose`|Runs command with verbose logging
 
-> **Important:** before using this command, connect to a SharePoint Online site, using the [spo connect](connect.md) command.
+!!! important
+    Before using this command, connect to a SharePoint Online site, using the [spo connect](connect.md) command.
 
 ## Remarks
 
@@ -35,4 +36,4 @@ show the value, description and comment of the _AnalyticsId_ tenant property
 
 ## More information
 
-- SharePoint Framework Tenant Properties: https://docs.microsoft.com/en-us/sharepoint/dev/spfx/tenant-properties
+- SharePoint Framework Tenant Properties: [https://docs.microsoft.com/en-us/sharepoint/dev/spfx/tenant-properties](https://docs.microsoft.com/en-us/sharepoint/dev/spfx/tenant-properties)
