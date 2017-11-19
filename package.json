@@ -5,7 +5,8 @@
   "license": "MIT",
   "main": "./dist/index.js",
   "bin": {
-    "office365": "./dist/index.js"
+    "office365": "./dist/index.js",
+    "o365": "./dist/index.js"
   },
   "repository": {
     "type": "git",
