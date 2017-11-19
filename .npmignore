@@ -8,7 +8,7 @@ scripts
 src
 types
 .gitignore
-npm-shrinkwrap.json
+CONTRIBUTING.md
 tsconfig.json
 *.map
 *.spec.js
