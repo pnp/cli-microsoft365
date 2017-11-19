@@ -18,6 +18,12 @@ or using yarn:
 yarn global add @pnp/office365-cli
 ```
 
+The beta version of the Office 365 CLI can be installed by using the `@next` tag:
+
+```sh
+npm i -g @pnp/office365-cli@next
+```
+
 ## Getting started
 
 Start the Office 365 CLI by typing in the command line:
