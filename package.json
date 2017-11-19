@@ -18,7 +18,7 @@
   "scripts": {
     "build": "tsc -p .",
     "watch": "tsc -w -p .",
-    "clean": "rm -rf dist",
+    "clean": "node scripts/clean.js",
     "test": "nyc -r=lcov -r=text mocha 'dist/**/*.spec.js'"
   },
   "keywords": [
