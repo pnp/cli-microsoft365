@@ -4,13 +4,12 @@ import config from '../../../config';
 import * as request from 'request-promise-native';
 import commands from '../commands';
 import VerboseOption from '../../../VerboseOption';
-import Command, {
-  CommandAction,
+import {
   CommandHelp,
   CommandOption,
   CommandValidate
 } from '../../../Command';
-import appInsights from '../../../appInsights';
+import SpoCommand from '../SpoCommand';
 
 const vorpal: Vorpal = require('../../../vorpal-init');
 
@@ -22,7 +21,7 @@ interface Options extends VerboseOption {
   type: string;
 }
 
-class SpoTenantCdnGetCommand extends Command {
+class SpoTenantCdnGetCommand extends SpoCommand {
   public get name(): string {
     return commands.TENANT_CDN_GET;
   }
@@ -31,104 +30,91 @@ class SpoTenantCdnGetCommand extends Command {
     return 'View current status of the specified Office 365 CDN';
   }
 
-  public get action(): CommandAction {
-    return function (args: CommandArgs, cb: () => void) {
-      const verbose: boolean = args.options.verbose || false;
-      const cdnTypeString: string = args.options.type || 'Public';
-      const cdnType: number = cdnTypeString === 'Private' ? 1 : 0;
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.cdnType = args.options.type || 'Public';
+    return telemetryProps;
+  }
 
-      appInsights.trackEvent({
-        name: commands.TENANT_CDN_GET,
-        properties: {
-          cdnType: cdnTypeString,
-          verbose: verbose.toString()
+  protected requiresTenantAdmin(): boolean {
+    return true;
+  }
+
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    const cdnTypeString: string = args.options.type || 'Public';
+    const cdnType: number = cdnTypeString === 'Private' ? 1 : 0;
+
+    auth
+      .ensureAccessToken(auth.service.resource, cmd, this.verbose)
+      .then((accessToken: string): Promise<ContextInfo> => {
+        if (this.verbose) {
+          cmd.log(`Retrieved access token ${accessToken}. Loading CDN settings for the ${auth.site.url} tenant...`);
         }
+
+        const requestOptions: any = {
+          url: `${auth.site.url}/_api/contextinfo`,
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+            accept: 'application/json;odata=nometadata'
+          },
+          json: true
+        }
+
+        if (this.verbose) {
+          cmd.log('Executing web request...');
+          cmd.log(requestOptions);
+          cmd.log('');
+        }
+
+        return request.post(requestOptions);
+      })
+      .then((res: ContextInfo): Promise<string> => {
+        if (this.verbose) {
+          cmd.log('Response:');
+          cmd.log(res);
+          cmd.log('');
+        }
+
+        cmd.log(`Retrieving status of ${(cdnType === 1 ? 'Private' : 'Public')} CDN...`);
+
+        const requestOptions: any = {
+          url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+          headers: {
+            authorization: `Bearer ${auth.service.accessToken}`,
+            'X-RequestDigest': res.FormDigestValue
+          },
+          body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="GetTenantCdnEnabled" Id="12" ObjectPathId="8"><Parameters><Parameter Type="Enum">${cdnType}</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="8" Name="${auth.site.tenantId}" /></ObjectPaths></Request>`
+        };
+
+        if (this.verbose) {
+          cmd.log('Executing web request...');
+          cmd.log(requestOptions);
+          cmd.log('');
+        }
+
+        return request.post(requestOptions);
+      })
+      .then((res: string): void => {
+        if (this.verbose) {
+          cmd.log('Response:');
+          cmd.log(res);
+          cmd.log('');
+        }
+
+        const json: ClientSvcResponse = JSON.parse(res);
+        const response: ClientSvcResponseContents = json[0];
+        if (response.ErrorInfo) {
+          cmd.log(vorpal.chalk.red(`Error: ${response.ErrorInfo.ErrorMessage}`));
+        }
+        else {
+          const result: boolean = json[json.length - 1];
+          cmd.log(`${(cdnType === 0 ? 'Public' : 'Private')} CDN at ${auth.site.url} is ${(result === true ? 'enabled' : 'disabled')}`);
+        }
+        cb();
+      }, (err: any): void => {
+        cmd.log(vorpal.chalk.red(`Error: ${err}`));
+        cb();
       });
-
-      if (!auth.site.connected) {
-        this.log('Connect to a SharePoint Online tenant admin site first');
-        cb();
-        return;
-      }
-
-      if (!auth.site.isTenantAdminSite()) {
-        this.log(`${auth.site.url} is not a tenant admin site. Connect to your tenant admin site and try again`);
-        cb();
-        return;
-      }
-
-      auth
-        .ensureAccessToken(auth.service.resource, this, verbose)
-        .then((accessToken: string): Promise<ContextInfo> => {
-          if (verbose) {
-            this.log(`Retrieved access token ${accessToken}. Loading CDN settings for the ${auth.site.url} tenant...`);
-          }
-
-          const requestOptions: any = {
-            url: `${auth.site.url}/_api/contextinfo`,
-            headers: {
-              authorization: `Bearer ${accessToken}`,
-              accept: 'application/json;odata=nometadata'
-            },
-            json: true
-          }
-
-          if (verbose) {
-            this.log('Executing web request...');
-            this.log(requestOptions);
-            this.log('');
-          }
-
-          return request.post(requestOptions);
-        })
-        .then((res: ContextInfo): Promise<string> => {
-          if (verbose) {
-            this.log('Response:');
-            this.log(res);
-            this.log('');
-          }
-
-          this.log(`Retrieving status of ${(cdnType === 1 ? 'Private' : 'Public')} CDN...`);
-
-          const requestOptions: any = {
-            url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
-            headers: {
-              authorization: `Bearer ${auth.service.accessToken}`,
-              'X-RequestDigest': res.FormDigestValue
-            },
-            body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="GetTenantCdnEnabled" Id="12" ObjectPathId="8"><Parameters><Parameter Type="Enum">${cdnType}</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="8" Name="${auth.site.tenantId}" /></ObjectPaths></Request>`
-          };
-
-          if (verbose) {
-            this.log('Executing web request...');
-            this.log(requestOptions);
-            this.log('');
-          }
-
-          return request.post(requestOptions);
-        })
-        .then((res: string): void => {
-          if (verbose) {
-            this.log('Response:');
-            this.log(res);
-            this.log('');
-          }
-
-          const json: ClientSvcResponse = JSON.parse(res);
-          const response: ClientSvcResponseContents = json[0];
-          if (response.ErrorInfo) {
-            this.log(vorpal.chalk.red(`Error: ${response.ErrorInfo.ErrorMessage}`));
-          }
-          else {
-            const result: boolean = json[json.length - 1];
-            this.log(`${(cdnType === 0 ? 'Public' : 'Private')} CDN at ${auth.site.url} is ${(result === true ? 'enabled' : 'disabled')}`);
-          }
-          cb();
-        }, (err: any): void => {
-          this.log(vorpal.chalk.red(`Error: ${err}`));
-          cb();
-        });
-    };
   }
 
   public options(): CommandOption[] {

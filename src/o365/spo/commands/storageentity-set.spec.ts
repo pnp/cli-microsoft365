@@ -83,7 +83,7 @@ describe(commands.STORAGEENTITY_SET, () => {
   });
 
   it('calls telemetry', (done) => {
-    cmdInstance.action = storageEntitySetCommand.action;
+    cmdInstance.action = storageEntitySetCommand.action();
     cmdInstance.action({ options: {}, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       try {
         assert(trackEvent.called);
@@ -96,7 +96,7 @@ describe(commands.STORAGEENTITY_SET, () => {
   });
 
   it('logs correct telemetry event', (done) => {
-    cmdInstance.action = storageEntitySetCommand.action;
+    cmdInstance.action = storageEntitySetCommand.action();
     cmdInstance.action({ options: {}, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       try {
         assert.equal(telemetry.name, commands.STORAGEENTITY_SET);
@@ -111,11 +111,11 @@ describe(commands.STORAGEENTITY_SET, () => {
   it('aborts when not connected to a SharePoint site', (done) => {
     auth.site = new Site();
     auth.site.connected = false;
-    cmdInstance.action = storageEntitySetCommand.action;
+    cmdInstance.action = storageEntitySetCommand.action();
     cmdInstance.action({ options: { verbose: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       let returnsCorrectValue: boolean = false;
       log.forEach(l => {
-        if (l && l.indexOf('Connect to a SharePoint Online tenant admin site first') > -1) {
+        if (l && l.indexOf('Connect to a SharePoint Online site first') > -1) {
           returnsCorrectValue = true;
         }
       });
@@ -133,7 +133,7 @@ describe(commands.STORAGEENTITY_SET, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = storageEntitySetCommand.action;
+    cmdInstance.action = storageEntitySetCommand.action();
     cmdInstance.action({ options: { verbose: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       let returnsCorrectValue: boolean = false;
       log.forEach(l => {
@@ -155,7 +155,7 @@ describe(commands.STORAGEENTITY_SET, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = storageEntitySetCommand.action;
+    cmdInstance.action = storageEntitySetCommand.action();
     cmdInstance.action({ options: { verbose: true, key: 'Property1', value: 'Lorem', description: 'ipsum', comment: 'dolor', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }}, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
@@ -209,7 +209,7 @@ describe(commands.STORAGEENTITY_SET, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = storageEntitySetCommand.action;
+    cmdInstance.action = storageEntitySetCommand.action();
     cmdInstance.action({ options: { verbose: true, key: 'Property1', value: 'Lorem', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }}, () => {
       let isDone = false;
       log.forEach(l => {
@@ -259,7 +259,7 @@ describe(commands.STORAGEENTITY_SET, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = storageEntitySetCommand.action;
+    cmdInstance.action = storageEntitySetCommand.action();
     cmdInstance.action({ options: { verbose: true, key: '<Property1>', value: '\'Lorem\'', description: '"ipsum"', comment: '<dolor & samet>', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }}, () => {
       let isDone = false;
       log.forEach(l => {
@@ -315,7 +315,7 @@ describe(commands.STORAGEENTITY_SET, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = storageEntitySetCommand.action;
+    cmdInstance.action = storageEntitySetCommand.action();
     cmdInstance.action({ options: { verbose: false, key: 'Property1', value: 'Lorem', description: 'ipsum', comment: 'dolor', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }}, () => {
       let genericErrorHandled = false;
       log.forEach(l => {
@@ -373,7 +373,7 @@ describe(commands.STORAGEENTITY_SET, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = storageEntitySetCommand.action;
+    cmdInstance.action = storageEntitySetCommand.action();
     cmdInstance.action({ options: { verbose: true, key: 'Property1', value: 'Lorem', description: 'ipsum', comment: 'dolor', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }}, () => {
       let accessDeniedErrorHandled = false;
       log.forEach(l => {
@@ -473,16 +473,15 @@ describe(commands.STORAGEENTITY_SET, () => {
     assert(actual);
   });
 
+  it('accepts valid SharePoint Online site URL', () => {
+    const actual = (storageEntitySetCommand.validate() as CommandValidate)({ options: { appCatalogUrl: 'https://contoso.sharepoint.com' }});
+    assert(actual);
+  });
+
   it('rejects invalid SharePoint Online URL', () => {
     const url = 'https://contoso.com';
     const actual = (storageEntitySetCommand.validate() as CommandValidate)({ options: { appCatalogUrl: url }});
-    assert.equal(actual, `${url} is not a valid SharePoint Online app catalog URL`);
-  });
-
-  it('rejects invalid SharePoint Online app catalog URL', () => {
-    const url = 'https://contoso.sharepoint.com';
-    const actual = (storageEntitySetCommand.validate() as CommandValidate)({ options: { appCatalogUrl: url }});
-    assert.equal(actual, `${url} is not a valid SharePoint Online app catalog URL`);
+    assert.equal(actual, `${url} is not a valid SharePoint Online site URL`);
   });
 
   it('fails validation when no SharePoint Online app catalog URL specified', () => {
@@ -525,7 +524,7 @@ describe(commands.STORAGEENTITY_SET, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = storageEntitySetCommand.action;
+    cmdInstance.action = storageEntitySetCommand.action();
     cmdInstance.action({ options: { verbose: true, confirm: true, key: 'existingproperty', appCatalogUrl: 'https://contoso-admin.sharepoint.com' }}, () => {
       let containsError = false;
       log.forEach(l => {

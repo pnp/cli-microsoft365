@@ -89,7 +89,7 @@ describe(commands.TENANT_CDN_ORIGIN_REMOVE, () => {
   });
 
   it('calls telemetry', (done) => {
-    cmdInstance.action = tenantCdnOriginRemoveCommand.action;
+    cmdInstance.action = tenantCdnOriginRemoveCommand.action();
     cmdInstance.action({ options: {}, url: 'https://contoso-admin.sharepoint.com' }, () => {
       try {
         assert(trackEvent.called);
@@ -102,7 +102,7 @@ describe(commands.TENANT_CDN_ORIGIN_REMOVE, () => {
   });
 
   it('logs correct telemetry event', (done) => {
-    cmdInstance.action = tenantCdnOriginRemoveCommand.action;
+    cmdInstance.action = tenantCdnOriginRemoveCommand.action();
     cmdInstance.action({ options: {}, url: 'https://contoso-admin.sharepoint.com' }, () => {
       try {
         assert.equal(telemetry.name, commands.TENANT_CDN_ORIGIN_REMOVE);
@@ -117,11 +117,11 @@ describe(commands.TENANT_CDN_ORIGIN_REMOVE, () => {
   it('aborts when not connected to a SharePoint site', (done) => {
     auth.site = new Site();
     auth.site.connected = false;
-    cmdInstance.action = tenantCdnOriginRemoveCommand.action;
+    cmdInstance.action = tenantCdnOriginRemoveCommand.action();
     cmdInstance.action({ options: { verbose: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       let returnsCorrectValue: boolean = false;
       log.forEach(l => {
-        if (l && l.indexOf('Connect to a SharePoint Online tenant admin site first') > -1) {
+        if (l && l.indexOf('Connect to a SharePoint Online site first') > -1) {
           returnsCorrectValue = true;
         }
       });
@@ -139,7 +139,7 @@ describe(commands.TENANT_CDN_ORIGIN_REMOVE, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = tenantCdnOriginRemoveCommand.action;
+    cmdInstance.action = tenantCdnOriginRemoveCommand.action();
     cmdInstance.action({ options: { verbose: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       let returnsCorrectValue: boolean = false;
       log.forEach(l => {
@@ -162,7 +162,7 @@ describe(commands.TENANT_CDN_ORIGIN_REMOVE, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
-    cmdInstance.action = tenantCdnOriginRemoveCommand.action;
+    cmdInstance.action = tenantCdnOriginRemoveCommand.action();
     cmdInstance.action({ options: { verbose: false, origin: '*/cdn', confirm: true, type: 'Public' } }, () => {
       let deleteRequestIssued = false;
       requests.forEach(r => {
@@ -190,7 +190,7 @@ describe(commands.TENANT_CDN_ORIGIN_REMOVE, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
-    cmdInstance.action = tenantCdnOriginRemoveCommand.action;
+    cmdInstance.action = tenantCdnOriginRemoveCommand.action();
     cmdInstance.action({ options: { verbose: false, origin: '*/cdn', confirm: true, type: 'Private' } }, () => {
       let deleteRequestIssued = false;
       requests.forEach(r => {
@@ -218,7 +218,7 @@ describe(commands.TENANT_CDN_ORIGIN_REMOVE, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
-    cmdInstance.action = tenantCdnOriginRemoveCommand.action;
+    cmdInstance.action = tenantCdnOriginRemoveCommand.action();
     cmdInstance.action({ options: { verbose: false, origin: '*/cdn', confirm: true } }, () => {
       let deleteRequestIssued = false;
       requests.forEach(r => {
@@ -245,7 +245,7 @@ describe(commands.TENANT_CDN_ORIGIN_REMOVE, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = tenantCdnOriginRemoveCommand.action;
+    cmdInstance.action = tenantCdnOriginRemoveCommand.action();
     cmdInstance.action({ options: { verbose: true, origin: '*/cdn' } }, () => {
       let promptIssued = false;
 
@@ -267,7 +267,7 @@ describe(commands.TENANT_CDN_ORIGIN_REMOVE, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = tenantCdnOriginRemoveCommand.action;
+    cmdInstance.action = tenantCdnOriginRemoveCommand.action();
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     };
@@ -287,7 +287,7 @@ describe(commands.TENANT_CDN_ORIGIN_REMOVE, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
-    cmdInstance.action = tenantCdnOriginRemoveCommand.action;
+    cmdInstance.action = tenantCdnOriginRemoveCommand.action();
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     };
@@ -347,7 +347,7 @@ describe(commands.TENANT_CDN_ORIGIN_REMOVE, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
-    cmdInstance.action = tenantCdnOriginRemoveCommand.action;
+    cmdInstance.action = tenantCdnOriginRemoveCommand.action();
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     };
@@ -468,7 +468,7 @@ describe(commands.TENANT_CDN_ORIGIN_REMOVE, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = tenantCdnOriginRemoveCommand.action;
+    cmdInstance.action = tenantCdnOriginRemoveCommand.action();
     cmdInstance.action({ options: { verbose: true, confirm: true, key: 'existingproperty' }, appCatalogUrl: 'https://contoso-admin.sharepoint.com' }, () => {
       let containsError = false;
       log.forEach(l => {

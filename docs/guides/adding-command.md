@@ -35,20 +35,18 @@ In the **./docs/manual/docs/cmd/[service]** folder, create new file for your com
 
 ## Implement command
 
-Each command in the Office 365 CLI is defined as a class extending the [Command](../../src/Command.ts) base class. At minimum a command must define `name`, `description`, `action` and `help`:
+Each command in the Office 365 CLI is defined as a class extending the [Command](../../src/Command.ts) base class. At minimum a command must define `name`, `description`, `commandAction` and `help`:
 
 ```ts
 import config from '../../../config';
 import commands from '../commands';
 import Command, {
-  CommandAction,
   CommandHelp
 } from '../../../Command';
-import appInsights from '../../../appInsights';
 
 const vorpal: Vorpal = require('../../../vorpal-init');
 
-class SpoMyCommand extends Command {
+class MyCommand extends Command {
   public get name(): string {
     return commands.MYCOMMAND;
   }
@@ -57,16 +55,10 @@ class SpoMyCommand extends Command {
     return 'My command';
   }
 
-  public get action(): CommandAction {
-    return function (this: CommandInstance, args: {}, cb: () => void) {
-      appInsights.trackEvent({
-        name: commands.MYCOMMAND
-      });
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    // command implementation goes here
 
-      // command implementation goes here
-
-      cb(); // notify that the command completed
-    };
+    cb(); // notify that the command completed
   }
 
   public help(): CommandHelp {
@@ -87,49 +79,23 @@ class SpoMyCommand extends Command {
   }
 }
 
-module.exports = new SpoMyCommand();
+module.exports = new MyCommand();
 ```
+
+Depending on your command and the service for which you're building the command, there might be a base class that you can use to simplify the implementation. For example for SPO, you can inherit from the [SpoCommand](../../src/o365/spo/SpoCommand.ts) base class. This class automatically checks if the user connected to SharePoint Online before running the command, simplifying your implementation.
 
 ### Tracking command usage
 
-The Office 365 CLI tracks usage of the different commands using Azure Application Insights. Each command action should begin with logging its usage, by including:
+The Office 365 CLI tracks usage of the different commands using Azure Application Insights. By default, for each command the CLI tracks its name and whether it's been executed in verbose mode or not. If your command has additional properties that should be included in the telemetry, you can define them by overriding the **getTelemetryProperties** property and adding your properties to the **telemetryProps** object:
 
 ```ts
 class SpoMyCommand extends Command {
   // ...
 
-  public get action(): CommandAction {
-    return function (this: CommandInstance, args: {}, cb: () => void) {
-      appInsights.trackEvent({
-        name: commands.MYCOMMAND
-      });
-
-      // ...
-    };
-  }
-
-  // ...
-}
-```
-
-If your command has additional parameters, you should include them in the telemetry as well:
-
-```ts
-class SpoMyCommand extends Command {
-  // ...
-
-  public get action(): CommandAction {
-    return function (this: CommandInstance, args: {}, cb: () => void) {
-      appInsights.trackEvent({
-        name: commands.TENANT_CDN_GET,
-        properties: {
-          cdnType: cdnTypeString,
-          verbose: verbose.toString()
-        }
-      });
-
-      // ...
-    };
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.cdnType = args.options.type || 'Public';
+    return telemetryProps;
   }
 
   // ...
@@ -140,22 +106,16 @@ class SpoMyCommand extends Command {
 
 ### Notifying when command action executed
 
-When executing the command completed, you should notify the CLI of it, by calling the callback method which is the last argument in the function returned in the **action** method:
+When executing the command completed, you should notify the CLI of it, by calling the callback method which is the last argument in the function returned in the **commandAction** method:
 
 ```ts
 class SpoMyCommand extends Command {
   // ...
 
-  public get action(): CommandAction {
-    return function (this: CommandInstance, args: {}, cb: () => void) {
-      appInsights.trackEvent({
-        name: commands.MYCOMMAND
-      });
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    // command implementation goes here
 
-      // command implementation goes here
-
-      cb(); // notify that the command completed
-    };
+    cb(); // notify that the command completed
   }
 
   // ...

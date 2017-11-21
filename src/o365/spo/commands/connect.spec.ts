@@ -83,7 +83,7 @@ describe(commands.CONNECT, () => {
   });
 
   it('calls telemetry', (done) => {
-    cmdInstance.action = connectCommand.action;
+    cmdInstance.action = connectCommand.action();
     cmdInstance.action({ options: {}, url: 'https://contoso-admin.sharepoint.com' }, () => {
       try {
         assert(trackEvent.called);
@@ -96,7 +96,7 @@ describe(commands.CONNECT, () => {
   });
 
   it('logs correct telemetry event', (done) => {
-    cmdInstance.action = connectCommand.action;
+    cmdInstance.action = connectCommand.action();
     cmdInstance.action({ options: {}, url: 'https://contoso-admin.sharepoint.com' }, () => {
       try {
         assert.equal(telemetry.name, commands.CONNECT);
@@ -110,7 +110,7 @@ describe(commands.CONNECT, () => {
 
   it('connects to a tenant admin site', (done) => {
     auth.site = new Site();
-    cmdInstance.action = connectCommand.action;
+    cmdInstance.action = connectCommand.action();
     cmdInstance.action({ options: { verbose: false }, url: 'https://contoso-admin.sharepoint.com' }, () => {
       try {
         assert(auth.site.connected);
@@ -124,7 +124,7 @@ describe(commands.CONNECT, () => {
 
   it('connects to a tenant admin site (verbose)', (done) => {
     auth.site = new Site();
-    cmdInstance.action = connectCommand.action;
+    cmdInstance.action = connectCommand.action();
     cmdInstance.action({ options: { verbose: true }, url: 'https://contoso-admin.sharepoint.com' }, () => {
       try {
         assert(auth.site.connected);
@@ -138,7 +138,7 @@ describe(commands.CONNECT, () => {
 
   it('connects to a regular SharePoint site', (done) => {
     auth.site = new Site();
-    cmdInstance.action = connectCommand.action;
+    cmdInstance.action = connectCommand.action();
     cmdInstance.action({ options: { verbose: false }, url: 'https://contoso.sharepoint.com' }, () => {
       try {
         assert(auth.site.connected);
@@ -152,7 +152,7 @@ describe(commands.CONNECT, () => {
 
   it('connects to a regular SharePoint site (verbose)', (done) => {
     auth.site = new Site();
-    cmdInstance.action = connectCommand.action;
+    cmdInstance.action = connectCommand.action();
     cmdInstance.action({ options: { verbose: true }, url: 'https://contoso.sharepoint.com' }, () => {
       try {
         assert(auth.site.connected);
@@ -172,7 +172,7 @@ describe(commands.CONNECT, () => {
   it('rejects invalid SharePoint Online URL', () => {
     const url = 'https://contoso.com';
     const actual = (connectCommand.validate() as CommandValidate)({ url: url });
-    assert.equal(actual, `${url} is not a valid SharePoint Online URL`);
+    assert.equal(actual, `${url} is not a valid SharePoint Online site URL`);
   });
 
   it('can be cancelled', () => {
@@ -228,7 +228,7 @@ describe(commands.CONNECT, () => {
     Utils.restore(auth.ensureAccessToken);
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
     auth.site = new Site();
-    cmdInstance.action = connectCommand.action;
+    cmdInstance.action = connectCommand.action();
     cmdInstance.action({ options: { verbose: false }, url: 'https://contoso-admin.sharepoint.com' }, () => {
       let containsError = false;
       log.forEach(l => {
@@ -251,7 +251,7 @@ describe(commands.CONNECT, () => {
     Utils.restore(auth.ensureAccessToken);
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
     auth.site = new Site();
-    cmdInstance.action = connectCommand.action;
+    cmdInstance.action = connectCommand.action();
     cmdInstance.action({ options: { verbose: true }, url: 'https://contoso-admin.sharepoint.com' }, () => {
       let containsError = false;
       log.forEach(l => {
