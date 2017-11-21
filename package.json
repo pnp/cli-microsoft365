@@ -19,7 +19,7 @@
     "build": "tsc -p .",
     "watch": "tsc -w -p .",
     "clean": "node scripts/clean.js",
-    "test": "nyc -r=lcov -r=text mocha 'dist/**/*.spec.js'"
+    "test": "nyc -r=lcov -r=text mocha dist/**/*.spec.js"
   },
   "keywords": [
     "office 365",
