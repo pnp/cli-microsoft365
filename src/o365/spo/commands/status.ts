@@ -2,10 +2,8 @@ import auth from '../SpoAuth';
 import config from '../../../config';
 import commands from '../commands';
 import Command, {
-  CommandAction,
   CommandHelp
 } from '../../../Command';
-import appInsights from '../../../appInsights';
 
 const vorpal: Vorpal = require('../../../vorpal-init');
 
@@ -17,20 +15,15 @@ class SpoStatusCommand extends Command {
   public get description(): string {
     return 'Shows SharePoint Online site connection status';
   }
+  
+  public commandAction(cmd: CommandInstance, args: {}, cb: () => void): void {
+    const chalk: any = vorpal.chalk;
 
-  public get action(): CommandAction {
-    return function (this: CommandInstance, args: {}, cb: () => void) {
-      const chalk: any = vorpal.chalk;
+    if (auth.site.connected) {
+      const expiresAtDate: Date = new Date(0);
+      expiresAtDate.setUTCSeconds(auth.service.expiresAt);
 
-      appInsights.trackEvent({
-        name: commands.STATUS
-      });
-
-      if (auth.site.connected) {
-        const expiresAtDate: Date = new Date(0);
-        expiresAtDate.setUTCSeconds(auth.service.expiresAt);
-
-        this.log(`
+      cmd.log(`
 Connected to ${auth.site.url}
 
 ${chalk.grey('Is tenant admin:')}  ${auth.site.isTenantAdminSite()}
@@ -39,14 +32,13 @@ ${chalk.grey('Access token:')}     ${auth.service.accessToken}
 ${chalk.grey('Refresh token:')}    ${auth.service.refreshToken}
 ${chalk.grey('Expires at:')}       ${expiresAtDate}
 `);
-      }
-      else {
-        this.log(`
+    }
+    else {
+      cmd.log(`
 Not connected to SharePoint Online
 `);
-      }
-      cb();
-    };
+    }
+    cb();
   }
 
   public help(): CommandHelp {

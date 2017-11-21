@@ -6,12 +6,11 @@ import * as request from 'request-promise-native';
 import commands from '../commands';
 import VerboseOption from '../../../VerboseOption';
 import Command, {
-  CommandAction,
   CommandCancel,
   CommandHelp,
   CommandValidate
 } from '../../../Command';
-import appInsights from '../../../appInsights';
+import SpoCommand from '../SpoCommand';
 
 const vorpal: Vorpal = require('../../../vorpal-init');
 
@@ -31,147 +30,131 @@ class SpoConnectCommand extends Command {
     return 'Connects to a SharePoint Online site';
   }
 
-  public get action(): CommandAction {
-    return function (this: CommandInstance, args: CommandArgs, cb: () => void) {
-      const chalk: any = vorpal.chalk;
-      const verbose: boolean = args.options.verbose || false;
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    const chalk: any = vorpal.chalk;
 
-      appInsights.trackEvent({
-        name: commands.CONNECT,
-        properties: {
-          verbose: verbose.toString()
-        }
-      });
-
-      // disconnect before re-connecting
-      if (verbose) {
-        this.log(`
+    // disconnect before re-connecting
+    if (this.verbose) {
+      cmd.log(`
 Disconnecting from SPO...
 `);
-      }
-      auth.site.disconnect();
+    }
+    auth.site.disconnect();
 
-      this.log(`
+    cmd.log(`
 Authenticating with SharePoint Online at ${args.url}...
 `);
 
-      const resource = Auth.getResourceFromUrl(args.url);
+    const resource = Auth.getResourceFromUrl(args.url);
 
-      auth
-        .ensureAccessToken(resource, this, args.options.verbose)
-        .then((accessToken: string): Promise<ContextInfo> => {
-          auth.service.resource = resource;
-          auth.site.url = args.url;
-          this.log(chalk.green('DONE'));
+    auth
+      .ensureAccessToken(resource, cmd, args.options.verbose)
+      .then((accessToken: string): Promise<ContextInfo> => {
+        auth.service.resource = resource;
+        auth.site.url = args.url;
+        cmd.log(chalk.green('DONE'));
 
-          if (verbose) {
-            this.log(`Checking if ${auth.site.url} is a tenant admin site...`);
-          }
-          if (auth.site.isTenantAdminSite()) {
-            const requestDigestRequestOptions: any = {
-              url: `${auth.site.url}/_api/contextinfo`,
-              headers: {
-                authorization: `Bearer ${accessToken}`,
-                accept: 'application/json;odata=nometadata'
-              },
-              json: true
-            };
-
-            if (verbose) {
-              this.log(`${auth.site.url} is a tenant admin site. Get tenant information...`);
-              this.log('');
-              this.log('Executing web request:');
-              this.log(requestDigestRequestOptions);
-              this.log('');
-            }
-
-            return request.post(requestDigestRequestOptions);
-          }
-          else {
-            if (verbose) {
-              this.log(`${auth.site.url} is not a tenant admin site`);
-              this.log('');
-            }
-
-            auth.site.connected = true;
-            this.log(`Successfully connected to ${args.url}`);
-            cb();
-            throw CONNECTION_SUCCEEDED;
-          }
-        })
-        .then((res: ContextInfo): Promise<string> => {
-          if (verbose) {
-            this.log('Response:');
-            this.log(res);
-            this.log('');
-          }
-
-          const tenantInfoRequestOptions = {
-            url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+        if (this.verbose) {
+          cmd.log(`Checking if ${auth.site.url} is a tenant admin site...`);
+        }
+        if (auth.site.isTenantAdminSite()) {
+          const requestDigestRequestOptions: any = {
+            url: `${auth.site.url}/_api/contextinfo`,
             headers: {
-              authorization: `Bearer ${auth.site.accessToken}`,
-              'X-RequestDigest': res.FormDigestValue,
+              authorization: `Bearer ${accessToken}`,
               accept: 'application/json;odata=nometadata'
             },
-            body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
+            json: true
           };
 
-          this.log('Retrieving tenant admin site information...');
-
-          if (verbose) {
-            this.log('Executing web request:');
-            this.log(tenantInfoRequestOptions);
-            this.log('');
+          if (this.verbose) {
+            cmd.log(`${auth.site.url} is a tenant admin site. Get tenant information...`);
+            cmd.log('');
+            cmd.log('Executing web request:');
+            cmd.log(requestDigestRequestOptions);
+            cmd.log('');
           }
 
-          return request.post(tenantInfoRequestOptions);
-        })
-        .then((res: string): void => {
-          if (verbose) {
-            this.log('Response:');
-            this.log(res);
-            this.log('');
+          return request.post(requestDigestRequestOptions);
+        }
+        else {
+          if (this.verbose) {
+            cmd.log(`${auth.site.url} is not a tenant admin site`);
+            cmd.log('');
           }
 
-          const json: string[] = JSON.parse(res);
-
-          auth.site.tenantId = (json[json.length - 1] as any)._ObjectIdentity_.replace('\n', '&#xA;');
           auth.site.connected = true;
-          this.log(chalk.green('DONE'));
-          this.log(`Successfully connected to ${args.url}
-`);
+          cmd.log(`Successfully connected to ${args.url}`);
           cb();
-        }, (rej: Error | string): void => {
-          if (rej instanceof Error) {
-            if (verbose) {
-              this.log('Error:');
-              this.log(rej);
-              this.log('');
-            }
+          throw CONNECTION_SUCCEEDED;
+        }
+      })
+      .then((res: ContextInfo): Promise<string> => {
+        if (this.verbose) {
+          cmd.log('Response:');
+          cmd.log(res);
+          cmd.log('');
+        }
 
-            this.log(chalk.red('Connecting to SharePoint Online failed'));
-            this.log(`The following error occurred: ${rej.message}`);
-            cb();
-            return;
+        const tenantInfoRequestOptions = {
+          url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+          headers: {
+            authorization: `Bearer ${auth.site.accessToken}`,
+            'X-RequestDigest': res.FormDigestValue,
+            accept: 'application/json;odata=nometadata'
+          },
+          body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
+        };
+
+        cmd.log('Retrieving tenant admin site information...');
+
+        if (this.verbose) {
+          cmd.log('Executing web request:');
+          cmd.log(tenantInfoRequestOptions);
+          cmd.log('');
+        }
+
+        return request.post(tenantInfoRequestOptions);
+      })
+      .then((res: string): void => {
+        if (this.verbose) {
+          cmd.log('Response:');
+          cmd.log(res);
+          cmd.log('');
+        }
+
+        const json: string[] = JSON.parse(res);
+
+        auth.site.tenantId = (json[json.length - 1] as any)._ObjectIdentity_.replace('\n', '&#xA;');
+        auth.site.connected = true;
+        cmd.log(chalk.green('DONE'));
+        cmd.log(`Successfully connected to ${args.url}
+`);
+        cb();
+      }, (rej: Error | string): void => {
+        if (rej instanceof Error) {
+          if (this.verbose) {
+            cmd.log('Error:');
+            cmd.log(rej);
+            cmd.log('');
           }
-          else {
-            if (verbose) {
-              this.log('Early exit of a promise chain');
-            }
+
+          cmd.log(chalk.red('Connecting to SharePoint Online failed'));
+          cmd.log(`The following error occurred: ${rej.message}`);
+          cb();
+          return;
+        }
+        else {
+          if (this.verbose) {
+            cmd.log('Early exit of a promise chain');
           }
-        });
-    }
+        }
+      });
   }
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (args.url.indexOf('https://') !== 0 ||
-        args.url.indexOf('.sharepoint.com') === -1) {
-        return `${args.url} is not a valid SharePoint Online URL`;
-      }
-      else {
-        return true;
-      }
+      return SpoCommand.isValidSharePointUrl(args.url);
     };
   }
 

@@ -4,13 +4,12 @@ import config from '../../../config';
 import * as request from 'request-promise-native';
 import commands from '../commands';
 import VerboseOption from '../../../VerboseOption';
-import Command, {
-  CommandAction,
+import {
   CommandHelp,
   CommandOption,
   CommandValidate
 } from '../../../Command';
-import appInsights from '../../../appInsights';
+import SpoCommand from '../SpoCommand';
 import Utils from '../../../Utils';
 
 const vorpal: Vorpal = require('../../../vorpal-init');
@@ -27,7 +26,7 @@ interface Options extends VerboseOption {
   comment?: string;
 }
 
-class SpoStorageEntitySetCommand extends Command {
+class SpoStorageEntitySetCommand extends SpoCommand {
   public get name(): string {
     return `${commands.STORAGEENTITY_SET}`;
   }
@@ -36,110 +35,91 @@ class SpoStorageEntitySetCommand extends Command {
     return 'Sets tenant property on the specified SharePoint Online app catalog';
   }
 
-  public get action(): CommandAction {
-    return function (args: CommandArgs, cb: () => void) {
-      const verbose: boolean = args.options.verbose || false;
+  protected requiresTenantAdmin(): boolean {
+    return true;
+  }
 
-      appInsights.trackEvent({
-        name: commands.STORAGEENTITY_SET,
-        properties: {
-          verbose: verbose.toString()
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    if (this.verbose) {
+      cmd.log(`key option set. Retrieving access token for ${auth.service.resource}...`);
+    }
+
+    auth
+      .ensureAccessToken(auth.service.resource, cmd, this.verbose)
+      .then((accessToken: string): Promise<ContextInfo> => {
+        if (this.verbose) {
+          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
         }
+
+        const requestOptions: any = {
+          url: `${auth.site.url}/_api/contextinfo`,
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+            accept: 'application/json;odata=nometadata'
+          },
+          json: true
+        };
+
+        if (this.verbose) {
+          cmd.log('Executing web request...');
+          cmd.log(requestOptions);
+          cmd.log('');
+        }
+
+        return request.post(requestOptions);
+      })
+      .then((res: ContextInfo): Promise<string> => {
+        if (this.verbose) {
+          cmd.log('Response:');
+          cmd.log(res);
+          cmd.log('');
+        }
+
+        cmd.log(`Setting tenant property ${args.options.key} in ${args.options.appCatalogUrl}...`);
+
+        const requestOptions: any = {
+          url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+          headers: {
+            authorization: `Bearer ${auth.service.accessToken}`,
+            'X-RequestDigest': res.FormDigestValue
+          },
+          body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="24" ObjectPathId="23" /><ObjectPath Id="26" ObjectPathId="25" /><ObjectPath Id="28" ObjectPathId="27" /><Method Name="SetStorageEntity" Id="29" ObjectPathId="27"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.key)}</Parameter><Parameter Type="String">${Utils.escapeXml(args.options.value)}</Parameter><Parameter Type="String">${Utils.escapeXml(args.options.description || '')}</Parameter><Parameter Type="String">${Utils.escapeXml(args.options.comment || '')}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="23" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="25" ParentId="23" Name="GetSiteByUrl"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.appCatalogUrl)}</Parameter></Parameters></Method><Property Id="27" ParentId="25" Name="RootWeb" /></ObjectPaths></Request>`
+        };
+
+        if (this.verbose) {
+          cmd.log('Executing web request...');
+          cmd.log(requestOptions);
+          cmd.log('');
+        }
+
+        return request.post(requestOptions);
+      })
+      .then((res: string): void => {
+        if (this.verbose) {
+          cmd.log('Response:');
+          cmd.log(res);
+          cmd.log('');
+        }
+
+        const json: ClientSvcResponse = JSON.parse(res);
+        const response: ClientSvcResponseContents = json[0];
+        if (response.ErrorInfo) {
+          cmd.log(vorpal.chalk.red(`Error: ${response.ErrorInfo.ErrorMessage}`));
+
+          if (response.ErrorInfo.ErrorMessage.indexOf('Access denied.') > -1) {
+            cmd.log('');
+            cmd.log(`This error is often caused by invalid URL of the app catalog site. Verify, that the URL you specified as an argument of the ${commands.STORAGEENTITY_SET} command is a valid app catalog URL and try again.`);
+            cmd.log('');
+          }
+        }
+        else {
+          cmd.log(vorpal.chalk.green('DONE'));
+        }
+        cb();
+      }, (err: any): void => {
+        cmd.log(vorpal.chalk.red(`Error: ${err}`));
+        cb();
       });
-
-      if (!auth.site.connected) {
-        this.log('Connect to a SharePoint Online tenant admin site first');
-        cb();
-        return;
-      }
-
-      if (!auth.site.isTenantAdminSite()) {
-        this.log(`${auth.site.url} is not a tenant admin site. Connect to your tenant admin site and try again`);
-        cb();
-        return;
-      }
-
-      if (verbose) {
-        this.log(`key option set. Retrieving access token for ${auth.service.resource}...`);
-      }
-
-      auth
-        .ensureAccessToken(auth.service.resource, this, verbose)
-        .then((accessToken: string): Promise<ContextInfo> => {
-          if (verbose) {
-            this.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-          }
-
-          const requestOptions: any = {
-            url: `${auth.site.url}/_api/contextinfo`,
-            headers: {
-              authorization: `Bearer ${accessToken}`,
-              accept: 'application/json;odata=nometadata'
-            },
-            json: true
-          };
-
-          if (verbose) {
-            this.log('Executing web request...');
-            this.log(requestOptions);
-            this.log('');
-          }
-
-          return request.post(requestOptions);
-        })
-        .then((res: ContextInfo): Promise<string> => {
-          if (verbose) {
-            this.log('Response:');
-            this.log(res);
-            this.log('');
-          }
-
-          this.log(`Setting tenant property ${args.options.key} in ${args.options.appCatalogUrl}...`);
-
-          const requestOptions: any = {
-            url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
-            headers: {
-              authorization: `Bearer ${auth.service.accessToken}`,
-              'X-RequestDigest': res.FormDigestValue
-            },
-            body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="24" ObjectPathId="23" /><ObjectPath Id="26" ObjectPathId="25" /><ObjectPath Id="28" ObjectPathId="27" /><Method Name="SetStorageEntity" Id="29" ObjectPathId="27"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.key)}</Parameter><Parameter Type="String">${Utils.escapeXml(args.options.value)}</Parameter><Parameter Type="String">${Utils.escapeXml(args.options.description || '')}</Parameter><Parameter Type="String">${Utils.escapeXml(args.options.comment || '')}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="23" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="25" ParentId="23" Name="GetSiteByUrl"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.appCatalogUrl)}</Parameter></Parameters></Method><Property Id="27" ParentId="25" Name="RootWeb" /></ObjectPaths></Request>`
-          };
-
-          if (verbose) {
-            this.log('Executing web request...');
-            this.log(requestOptions);
-            this.log('');
-          }
-
-          return request.post(requestOptions);
-        })
-        .then((res: string): void => {
-          if (verbose) {
-            this.log('Response:');
-            this.log(res);
-            this.log('');
-          }
-
-          const json: ClientSvcResponse = JSON.parse(res);
-          const response: ClientSvcResponseContents = json[0];
-          if (response.ErrorInfo) {
-            this.log(vorpal.chalk.red(`Error: ${response.ErrorInfo.ErrorMessage}`));
-
-            if (response.ErrorInfo.ErrorMessage.indexOf('Access denied.') > -1) {
-              this.log('');
-              this.log(`This error is often caused by invalid URL of the app catalog site. Verify, that the URL you specified as an argument of the ${commands.STORAGEENTITY_SET} command is a valid app catalog URL and try again.`);
-              this.log('');
-            }
-          }
-          else {
-            this.log(vorpal.chalk.green('DONE'));
-          }
-          cb();
-        }, (err: any): void => {
-          this.log(vorpal.chalk.red(`Error: ${err}`));
-          cb();
-        });
-    };
   }
 
   public options(): CommandOption[] {
@@ -177,18 +157,12 @@ class SpoStorageEntitySetCommand extends Command {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (args.options && args.options.appCatalogUrl) {
-        if (args.options.appCatalogUrl.indexOf('https://') !== 0 ||
-          args.options.appCatalogUrl.indexOf('.sharepoint.com') === -1 ||
-          args.options.appCatalogUrl.indexOf('/sites/') === -1) {
-          return `${args.options.appCatalogUrl} is not a valid SharePoint Online app catalog URL`;
-        }
-        else {
-          return true;
-        }
+      const result: boolean | string = SpoCommand.isValidSharePointUrl(args.options.appCatalogUrl);
+      if (result === false) {
+        return 'Missing required option appCatalogUrl';
       }
       else {
-        return 'Missing required option appCatalogUrl';
+        return result;
       }
     };
   }

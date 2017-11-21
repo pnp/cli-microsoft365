@@ -2,7 +2,6 @@ import auth from '../SpoAuth';
 import commands from '../commands';
 import config from '../../../config';
 import Command, {
-  CommandAction,
   CommandHelp,
 } from '../../../Command';
 import appInsights from '../../../appInsights';
@@ -18,17 +17,15 @@ class SpoDisconnectCommand extends Command {
     return 'Disconnects from a previously connected SharePoint Online site';
   }
 
-  public get action(): CommandAction {
-    return function (this: CommandInstance, args: {}, cb: () => void) {
-      const chalk = vorpal.chalk;
-      appInsights.trackEvent({
-        name: commands.DISCONNECT
-      });
-      this.log('Disconnecting from SharePoint Online...');
-      auth.site.disconnect();
-      this.log(chalk.green('DONE'));
-      cb();
-    }
+  public commandAction(cmd: CommandInstance, args: {}, cb: () => void): void {
+    const chalk = vorpal.chalk;
+    appInsights.trackEvent({
+      name: commands.DISCONNECT
+    });
+    cmd.log('Disconnecting from SharePoint Online...');
+    auth.site.disconnect();
+    cmd.log(chalk.green('DONE'));
+    cb();
   }
 
   public help(): CommandHelp {

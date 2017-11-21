@@ -4,13 +4,12 @@ import config from '../../../config';
 import * as request from 'request-promise-native';
 import commands from '../commands';
 import VerboseOption from '../../../VerboseOption';
-import Command, {
-  CommandAction,
+import {
   CommandHelp,
   CommandOption,
   CommandValidate
 } from '../../../Command';
-import appInsights from '../../../appInsights';
+import SpoCommand from '../SpoCommand';
 import Utils from '../../../Utils';
 
 const vorpal: Vorpal = require('../../../vorpal-init');
@@ -24,7 +23,7 @@ interface Options extends VerboseOption {
   origin: string;
 }
 
-class SpoTenantCdnOriginAddCommand extends Command {
+class SpoTenantCdnOriginAddCommand extends SpoCommand {
   public get name(): string {
     return commands.TENANT_CDN_ORIGIN_SET;
   }
@@ -33,109 +32,81 @@ class SpoTenantCdnOriginAddCommand extends Command {
     return 'Adds CDN origin to the current SharePoint Online tenant';
   }
 
-  public get action(): CommandAction {
-    return function (args: CommandArgs, cb: () => void) {
-      const verbose: boolean = args.options.verbose || false;
-      const cdnTypeString: string = args.options.type || 'Public';
-      const cdnType: number = cdnTypeString === 'Private' ? 1 : 0;
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.cdnType = args.options.type || 'Public';
+    return telemetryProps;
+  }
 
-      appInsights.trackEvent({
-        name: commands.TENANT_CDN_ORIGIN_SET,
-        properties: {
-          cdnType: cdnTypeString,
-          verbose: verbose.toString()
+  protected requiresTenantAdmin(): boolean {
+    return true;
+  }
+
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    const cdnTypeString: string = args.options.type || 'Public';
+    const cdnType: number = cdnTypeString === 'Private' ? 1 : 0;
+
+    if (this.verbose) {
+      cmd.log(`Retrieving access token for ${auth.service.resource}...`);
+    }
+
+    auth
+      .ensureAccessToken(auth.service.resource, cmd, this.verbose)
+      .then((accessToken: string): Promise<ContextInfo> => {
+        if (this.verbose) {
+          cmd.log('Response:');
+          cmd.log(accessToken);
+          cmd.log('');
         }
+
+        return this.getRequestDigest(cmd, this.verbose);
+      })
+      .then((res: ContextInfo): Promise<string> => {
+        if (this.verbose) {
+          cmd.log('Response:')
+          cmd.log(res);
+          cmd.log('');
+        }
+
+        cmd.log(`Adding origin ${args.options.origin} to the ${(cdnType === 1 ? 'Private' : 'Public')} CDN. Please wait, this might take a moment...`);
+
+        const requestOptions: any = {
+          url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+          headers: {
+            authorization: `Bearer ${auth.service.accessToken}`,
+            'X-RequestDigest': res.FormDigestValue
+          },
+          body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="AddTenantCdnOrigin" Id="27" ObjectPathId="23"><Parameters><Parameter Type="Enum">${cdnType}</Parameter><Parameter Type="String">${Utils.escapeXml(args.options.origin)}</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="23" Name="${auth.site.tenantId}" /></ObjectPaths></Request>`
+        };
+
+        if (this.verbose) {
+          cmd.log('Executing web request...');
+          cmd.log(requestOptions);
+          cmd.log('');
+        }
+
+        return request.post(requestOptions);
+      })
+      .then((res: string): void => {
+        if (this.verbose) {
+          cmd.log('Response:');
+          cmd.log(res);
+          cmd.log('');
+        }
+
+        const json: ClientSvcResponse = JSON.parse(res);
+        const response: ClientSvcResponseContents = json[0];
+        if (response.ErrorInfo) {
+          cmd.log(vorpal.chalk.red(`Error: ${response.ErrorInfo.ErrorMessage}`));
+        }
+        else {
+          cmd.log(vorpal.chalk.green('DONE'));
+        }
+        cb();
+      }, (err: any): void => {
+        cmd.log(vorpal.chalk.red(`Error: ${err}`));
+        cb();
       });
-
-      if (!auth.site.connected) {
-        this.log('Connect to a SharePoint Online tenant admin site first');
-        cb();
-        return;
-      }
-
-      if (!auth.site.isTenantAdminSite()) {
-        this.log(`${auth.site.url} is not a tenant admin site. Connect to your tenant admin site and try again`);
-        cb();
-        return;
-      }
-
-      if (verbose) {
-        this.log(`Retrieving access token for ${auth.service.resource}...`);
-      }
-
-      auth
-        .ensureAccessToken(auth.service.resource, this)
-        .then((accessToken: string): Promise<ContextInfo> => {
-          if (verbose) {
-            this.log('Response:');
-            this.log(accessToken);
-            this.log('');
-          }
-
-          const requestOptions: any = {
-            url: `${auth.site.url}/_api/contextinfo`,
-            headers: {
-              authorization: `Bearer ${accessToken}`,
-              accept: 'application/json;odata=nometadata'
-            },
-            json: true
-          };
-
-          if (verbose) {
-            this.log('Executing web request...');
-            this.log(requestOptions);
-            this.log('');
-          }
-
-          return request.post(requestOptions);
-        })
-        .then((res: ContextInfo): Promise<string> => {
-          if (verbose) {
-            this.log('Response:')
-            this.log(res);
-            this.log('');
-          }
-
-          this.log(`Adding origin ${args.options.origin} to the ${(cdnType === 1 ? 'Private' : 'Public')} CDN. Please wait, this might take a moment...`);
-
-          const requestOptions: any = {
-            url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
-            headers: {
-              authorization: `Bearer ${auth.service.accessToken}`,
-              'X-RequestDigest': res.FormDigestValue
-            },
-            body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="AddTenantCdnOrigin" Id="27" ObjectPathId="23"><Parameters><Parameter Type="Enum">${cdnType}</Parameter><Parameter Type="String">${Utils.escapeXml(args.options.origin)}</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="23" Name="${auth.site.tenantId}" /></ObjectPaths></Request>`
-          };
-
-          if (verbose) {
-            this.log('Executing web request...');
-            this.log(requestOptions);
-            this.log('');
-          }
-
-          return request.post(requestOptions);
-        })
-        .then((res: string): void => {
-          if (verbose) {
-            this.log('Response:');
-            this.log(res);
-            this.log('');
-          }
-
-          const json: ClientSvcResponse = JSON.parse(res);
-          const response: ClientSvcResponseContents = json[0];
-          if (response.ErrorInfo) {
-            this.log(vorpal.chalk.red(`Error: ${response.ErrorInfo.ErrorMessage}`));
-          }
-          else {
-            this.log(vorpal.chalk.green('DONE'));
-          }
-          cb();
-        }, (err: any): void => {
-          this.log(vorpal.chalk.red(`Error: ${err}`));
-          cb();
-        });
-    };
   }
 
   public options(): CommandOption[] {

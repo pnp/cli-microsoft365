@@ -83,7 +83,7 @@ describe(commands.TENANT_CDN_SET, () => {
   });
 
   it('calls telemetry', (done) => {
-    cmdInstance.action = tenantCdnSetCommand.action;
+    cmdInstance.action = tenantCdnSetCommand.action();
     cmdInstance.action({ options: {}, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       try {
         assert(trackEvent.called);
@@ -96,7 +96,7 @@ describe(commands.TENANT_CDN_SET, () => {
   });
 
   it('logs correct telemetry event', (done) => {
-    cmdInstance.action = tenantCdnSetCommand.action;
+    cmdInstance.action = tenantCdnSetCommand.action();
     cmdInstance.action({ options: {}, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       try {
         assert.equal(telemetry.name, commands.TENANT_CDN_SET);
@@ -111,11 +111,11 @@ describe(commands.TENANT_CDN_SET, () => {
   it('aborts when not connected to a SharePoint site', (done) => {
     auth.site = new Site();
     auth.site.connected = false;
-    cmdInstance.action = tenantCdnSetCommand.action;
+    cmdInstance.action = tenantCdnSetCommand.action();
     cmdInstance.action({ options: { verbose: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       let returnsCorrectValue: boolean = false;
       log.forEach(l => {
-        if (l && l.indexOf('Connect to a SharePoint Online tenant admin site first') > -1) {
+        if (l && l.indexOf('Connect to a SharePoint Online site first') > -1) {
           returnsCorrectValue = true;
         }
       });
@@ -133,7 +133,7 @@ describe(commands.TENANT_CDN_SET, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = tenantCdnSetCommand.action;
+    cmdInstance.action = tenantCdnSetCommand.action();
     cmdInstance.action({ options: { verbose: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       let returnsCorrectValue: boolean = false;
       log.forEach(l => {
@@ -156,7 +156,7 @@ describe(commands.TENANT_CDN_SET, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
-    cmdInstance.action = tenantCdnSetCommand.action;
+    cmdInstance.action = tenantCdnSetCommand.action();
     cmdInstance.action({ options: { verbose: true, enabled: 'true', type: 'Public' } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
@@ -184,7 +184,7 @@ describe(commands.TENANT_CDN_SET, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
-    cmdInstance.action = tenantCdnSetCommand.action;
+    cmdInstance.action = tenantCdnSetCommand.action();
     cmdInstance.action({ options: { verbose: true, enabled: 'false', type: 'Public' } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
@@ -212,7 +212,7 @@ describe(commands.TENANT_CDN_SET, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
-    cmdInstance.action = tenantCdnSetCommand.action;
+    cmdInstance.action = tenantCdnSetCommand.action();
     cmdInstance.action({ options: { verbose: true, enabled: 'true', type: 'Private' } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
@@ -240,7 +240,7 @@ describe(commands.TENANT_CDN_SET, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
-    cmdInstance.action = tenantCdnSetCommand.action;
+    cmdInstance.action = tenantCdnSetCommand.action();
     cmdInstance.action({ options: { verbose: false, enabled: 'true' } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
@@ -299,7 +299,7 @@ describe(commands.TENANT_CDN_SET, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
-    cmdInstance.action = tenantCdnSetCommand.action;
+    cmdInstance.action = tenantCdnSetCommand.action();
     cmdInstance.action({ options: { verbose: false, enabled: 'true' } }, () => {
       let genericErrorHandled = false;
       log.forEach(l => {
@@ -447,7 +447,7 @@ describe(commands.TENANT_CDN_SET, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = tenantCdnSetCommand.action;
+    cmdInstance.action = tenantCdnSetCommand.action();
     cmdInstance.action({ options: { verbose: true, confirm: true, key: 'existingproperty' }, appCatalogUrl: 'https://contoso-admin.sharepoint.com' }, () => {
       let containsError = false;
       log.forEach(l => {

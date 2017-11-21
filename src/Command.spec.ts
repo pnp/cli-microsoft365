@@ -1,7 +1,6 @@
 import * as sinon from 'sinon';
 import * as assert from 'assert';
 import Command, {
-  CommandAction,
   CommandValidate,
   CommandCancel,
   CommandHelp,
@@ -32,9 +31,7 @@ class MockCommand1 extends Command {
     }
   }
 
-  public get action(): CommandAction {
-    return function (this: CommandInstance, args: any, cb: () => void) {
-    }
+  public commandAction(): void {
   }
 
   public help(): CommandHelp | undefined {
@@ -58,7 +55,7 @@ class MockCommand1 extends Command {
     };
   }
 
-  public options(): CommandOption[] | undefined {
+  public options(): CommandOption[] {
     return [{
       option: '--verbose',
       description: 'Runs command with verbose logging'
@@ -68,20 +65,14 @@ class MockCommand1 extends Command {
 
 class MockCommand2 extends Command {
   public get name(): string {
-    return 'Mock command 2';
+    return 'Mock command 2 [opt]';
   }
 
   public get description(): string {
     return 'Mock command 2 description';
   }
 
-  public get action(): CommandAction {
-    return function (this: CommandInstance, args: any, cb: () => void) {
-    }
-  }
-
-  public options(): CommandOption[] | undefined {
-    return undefined;
+  public commandAction(): void {
   }
 }
 
@@ -189,14 +180,6 @@ describe('Command', () => {
     assert(optionSpy.calledOnce);
   });
 
-  it('doesn\'t configure options when unavailable', () => {
-    const cmd = new MockCommand2();
-    sinon.stub(vorpal, 'command').callsFake(() => vcmd);
-    cmd.init(vorpal);
-    Utils.restore(vorpal.command);
-    assert(optionSpy.notCalled);
-  });
-
   it('configures validation when available', () => {
     const cmd = new MockCommand1();
     sinon.stub(vorpal, 'command').callsFake(() => vcmd);
@@ -259,5 +242,10 @@ describe('Command', () => {
     cmd.init(vorpal);
     Utils.restore(vorpal.command);
     assert(typesSpy.notCalled);
+  });
+
+  it('returns command name without arguments', () => {
+    const cmd = new MockCommand2();
+    assert.equal(cmd.getCommandName(), 'Mock command 2');
   });
 });
