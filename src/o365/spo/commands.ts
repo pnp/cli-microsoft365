@@ -14,5 +14,13 @@ export default {
   TENANT_CDN_ORIGIN_SET: `${prefix} tenant cdn origin set`,
   TENANT_CDN_ORIGIN_REMOVE: `${prefix} tenant cdn origin remove`,
   TENANT_CDN_POLICY_LIST: `${prefix} tenant cdn policy list`,
-  TENANT_CDN_POLICY_SET: `${prefix} tenant cdn policy set`
+  TENANT_CDN_POLICY_SET: `${prefix} tenant cdn policy set`,
+  APP_LIST: `${prefix} app list`,
+  APP_INSTALL: `${prefix} app install`,
+  APP_UNINSTALL: `${prefix} app uninstall`,
+  APP_DEPLOY: `${prefix} app deploy`,
+  APP_RETRACT: `${prefix} app retract`,
+  APP_ADD: `${prefix} app add`,
+  APP_REMOVE: `${prefix} app remove`,
+  APP_UPGRADE: `${prefix} app upgrade`,
 };

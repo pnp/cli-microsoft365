@@ -37,7 +37,8 @@
   "contributors": [
     "Connell, Andrew <me@andrewconnell.com>",
     "Mastykarz, Waldek <waldek@mastykarz.nl>",
-    "Wilen, Wictor <wictor@wictorwilen.se>"
+    "Wilen, Wictor <wictor@wictorwilen.se>",
+    "van Hunen, Erwin <erwin.van.hunen@outlook.com>"
   ],
   "dependencies": {
     "applicationinsights": "^1.0.0",
@@ -47,12 +48,14 @@
   },
   "devDependencies": {
     "@types/chalk": "^0.4.31",
+    "@types/easy-table": "0.0.31",
     "@types/mocha": "^2.2.43",
     "@types/node": "^8.0.33",
     "@types/request": "^2.0.4",
     "@types/request-promise-native": "^1.0.9",
     "@types/sinon": "^2.3.6",
     "coveralls": "^3.0.0",
+    "easy-table": "^1.1.0",
     "mocha": "^4.0.1",
     "nyc": "^11.2.1",
     "sinon": "^4.0.1",
