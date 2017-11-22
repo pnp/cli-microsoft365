@@ -3,6 +3,13 @@ pages:
   - Home: 'index.md'
   - Commands:
     - SharePoint Online (spo):
+      - cdn get: 'cmd/spo/cdn-get.md'
+      - cdn origin list: 'cmd/spo/cdn-origin-list.md'
+      - cdn origin remove: 'cmd/spo/cdn-origin-remove.md'
+      - cdn origin set: 'cmd/spo/cdn-origin-set.md'
+      - cdn policy list: 'cmd/spo/cdn-policy-list.md'
+      - cdn policy set: 'cmd/spo/cdn-policy-set.md'
+      - cdn set: 'cmd/spo/cdn-set.md'
       - connect: 'cmd/spo/connect.md'
       - disconnect: 'cmd/spo/disconnect.md'
       - status: 'cmd/spo/status.md'
@@ -10,13 +17,6 @@ pages:
       - storageentity list: 'cmd/spo/storageentity-list.md'
       - storageentity remove: 'cmd/spo/storageentity-remove.md'
       - storageentity set: 'cmd/spo/storageentity-set.md'
-      - tenant cdn get: 'cmd/spo/tenant-cdn-get.md'
-      - tenant cdn origin list: 'cmd/spo/tenant-cdn-origin-list.md'
-      - tenant cdn origin remove: 'cmd/spo/tenant-cdn-origin-remove.md'
-      - tenant cdn origin set: 'cmd/spo/tenant-cdn-origin-set.md'
-      - tenant cdn policy list: 'cmd/spo/tenant-cdn-policy-list.md'
-      - tenant cdn policy set: 'cmd/spo/tenant-cdn-policy-set.md'
-      - tenant cdn set: 'cmd/spo/tenant-cdn-set.md'
   - About:
     - 'Why this CLI': 'about/why-cli.md'
     - 'Release notes': 'about/release-notes.md'

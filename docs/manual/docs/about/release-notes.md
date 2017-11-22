@@ -19,10 +19,10 @@ New commands:
 - [spo storageentity list](../cmd/spo/storageentity-list.md) - list all tenant properties
 - [spo storageentity remove](../cmd/spo/storageentity-remove.md) - remove a tenant property
 - [spo storageentity set](../cmd/spo/storageentity-set.md) - set a tenant property
-- [spo tenant cdn get](../cmd/spo/tenant-cdn-get.md) - get Office 365 CDN status
-- [spo tenant cdn origin list](../cmd/spo/tenant-cdn-origin-list.md) - list Office 365 CDN origins
-- [spo tenant cdn origin remove](../cmd/spo/tenant-cdn-origin-remove.md) - remove Office 365 CDN origin
-- [spo tenant cdn origin set](../cmd/spo/tenant-cdn-origin-set.md) - set Office 365 CDN origin
-- [spo tenant cdn policy list](../cmd/spo/tenant-cdn-policy-list.md) - list Office 365 CDN policies
-- [spo tenant cdn policy set](../cmd/spo/tenant-cdn-policy-set.md) - set Office 365 CDN policy
-- [spo tenant cdn set](../cmd/spo/tenant-cdn-set.md) - enable/disable Office 365 CDN
+- [spo cdn get](../cmd/spo/cdn-get.md) - get Office 365 CDN status
+- [spo cdn origin list](../cmd/spo/cdn-origin-list.md) - list Office 365 CDN origins
+- [spo cdn origin remove](../cmd/spo/cdn-origin-remove.md) - remove Office 365 CDN origin
+- [spo cdn origin set](../cmd/spo/cdn-origin-set.md) - set Office 365 CDN origin
+- [spo cdn policy list](../cmd/spo/cdn-policy-list.md) - list Office 365 CDN policies
+- [spo cdn policy set](../cmd/spo/cdn-policy-set.md) - set Office 365 CDN policy
+- [spo cdn set](../cmd/spo/cdn-set.md) - enable/disable Office 365 CDN

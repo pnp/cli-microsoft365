@@ -24,9 +24,9 @@ interface Options extends VerboseOption {
   confirm?: boolean;
 }
 
-class SpoTenantCdnOriginRemoveCommand extends SpoCommand {
+class SpoCdnOriginRemoveCommand extends SpoCommand {
   public get name(): string {
-    return commands.TENANT_CDN_ORIGIN_REMOVE;
+    return commands.CDN_ORIGIN_REMOVE;
   }
 
   public get description(): string {
@@ -178,7 +178,7 @@ class SpoTenantCdnOriginRemoveCommand extends SpoCommand {
   public help(): CommandHelp {
     return function (args: CommandArgs, log: (help: string) => void): void {
       const chalk = vorpal.chalk;
-      log(vorpal.find(commands.TENANT_CDN_ORIGIN_REMOVE).helpInformation());
+      log(vorpal.find(commands.CDN_ORIGIN_REMOVE).helpInformation());
       log(
         `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online tenant admin site,
   using the ${chalk.blue(commands.CONNECT)} command.
@@ -195,7 +195,7 @@ class SpoTenantCdnOriginRemoveCommand extends SpoCommand {
 
   Examples:
   
-    ${chalk.grey(config.delimiter)} ${commands.TENANT_CDN_ORIGIN_REMOVE} -t Public -o */CDN
+    ${chalk.grey(config.delimiter)} ${commands.CDN_ORIGIN_REMOVE} -t Public -o */CDN
       removes ${chalk.grey('*/CDN')} from the list of origins of the Public CDN
 
   More information:
@@ -207,4 +207,4 @@ class SpoTenantCdnOriginRemoveCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoTenantCdnOriginRemoveCommand();
+module.exports = new SpoCdnOriginRemoveCommand();

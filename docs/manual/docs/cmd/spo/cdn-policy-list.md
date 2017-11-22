@@ -1,11 +1,11 @@
-# spo tenant cdn policy set
+# spo cdn policy list
 
-Sets CDN policy value for the current SharePoint Online tenant
+Lists CDN policies settings for the current SharePoint Online tenant
 
 ## Usage
 
 ```sh
-spo tenant cdn policy set [options]
+spo cdn policy list [options]
 ```
 
 ## Options
@@ -14,8 +14,6 @@ Option|Description
 ------|-----------
 `--help`|output usage information
 `-t, --type [type]`|Type of CDN to manage. `Public|Private`. Default `Public`
-`-p, --policy <policy>`|CDN policy to configure. `IncludeFileExtensions|ExcludeRestrictedSiteClassifications`
-`-v, --value <value>`|Value for the policy to configure
 `--verbose`|Runs command with verbose logging
 
 !!! important
@@ -23,7 +21,7 @@ Option|Description
 
 ## Remarks
 
-To set the policy of an Office 365 CDN, you have to first connect to a tenant admin site using the
+To list the policies of an Office 365 CDN, you have to first connect to a tenant admin site using the
 [spo connect](connect.md) command, eg. `spo connect https://contoso-admin.sharepoint.com`.
 If you are connected to a different site and will try to manage tenant properties,
 you will get an error.
@@ -34,10 +32,16 @@ the Public (default) or Private CDN. If you don't use the option, the command wi
 ## Examples
 
 ```sh
-spo tenant cdn policy set -t Public -p IncludeFileExtensions -v CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON
+spo cdn policy list
 ```
 
-sets the list of extensions supported by the Public CDN
+shows the list of policies configured for the Public CDN
+
+```sh
+spo cdn policy list -t Private
+```
+
+shows the list of policies configured for the Private CDN
 
 ## More information
 

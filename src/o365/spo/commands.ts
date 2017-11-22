@@ -8,11 +8,11 @@ export default {
   STORAGEENTITY_GET: `${prefix} storageentity get`,
   STORAGEENTITY_SET: `${prefix} storageentity set`,
   STORAGEENTITY_REMOVE: `${prefix} storageentity remove`,
-  TENANT_CDN_GET: `${prefix} tenant cdn get`,
-  TENANT_CDN_SET: `${prefix} tenant cdn set`,
-  TENANT_CDN_ORIGIN_LIST: `${prefix} tenant cdn origin list`,
-  TENANT_CDN_ORIGIN_SET: `${prefix} tenant cdn origin set`,
-  TENANT_CDN_ORIGIN_REMOVE: `${prefix} tenant cdn origin remove`,
-  TENANT_CDN_POLICY_LIST: `${prefix} tenant cdn policy list`,
-  TENANT_CDN_POLICY_SET: `${prefix} tenant cdn policy set`
+  CDN_GET: `${prefix} cdn get`,
+  CDN_SET: `${prefix} cdn set`,
+  CDN_ORIGIN_LIST: `${prefix} cdn origin list`,
+  CDN_ORIGIN_SET: `${prefix} cdn origin set`,
+  CDN_ORIGIN_REMOVE: `${prefix} cdn origin remove`,
+  CDN_POLICY_LIST: `${prefix} cdn policy list`,
+  CDN_POLICY_SET: `${prefix} cdn policy set`
 };

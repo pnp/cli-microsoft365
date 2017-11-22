@@ -3,13 +3,13 @@ import Command, { CommandHelp, CommandValidate, CommandOption } from '../../../C
 import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
 import auth, { Site } from '../SpoAuth';
-const tenantCdnPolicySetCommand: Command = require('./tenant-cdn-policy-set');
+const command: Command = require('./cdn-policy-set');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import config from '../../../config';
 import Utils from '../../../Utils';
 
-describe(commands.TENANT_CDN_POLICY_SET, () => {
+describe(commands.CDN_POLICY_SET, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
@@ -75,15 +75,15 @@ describe(commands.TENANT_CDN_POLICY_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(tenantCdnPolicySetCommand.name.startsWith(commands.TENANT_CDN_POLICY_SET), true);
+    assert.equal(command.name.startsWith(commands.CDN_POLICY_SET), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(tenantCdnPolicySetCommand.description, null);
+    assert.notEqual(command.description, null);
   });
 
   it('calls telemetry', (done) => {
-    cmdInstance.action = tenantCdnPolicySetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: {}, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       try {
         assert(trackEvent.called);
@@ -96,10 +96,10 @@ describe(commands.TENANT_CDN_POLICY_SET, () => {
   });
 
   it('logs correct telemetry event', (done) => {
-    cmdInstance.action = tenantCdnPolicySetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: {}, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       try {
-        assert.equal(telemetry.name, commands.TENANT_CDN_POLICY_SET);
+        assert.equal(telemetry.name, commands.CDN_POLICY_SET);
         done();
       }
       catch (e) {
@@ -111,7 +111,7 @@ describe(commands.TENANT_CDN_POLICY_SET, () => {
   it('aborts when not connected to a SharePoint site', (done) => {
     auth.site = new Site();
     auth.site.connected = false;
-    cmdInstance.action = tenantCdnPolicySetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { verbose: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       let returnsCorrectValue: boolean = false;
       log.forEach(l => {
@@ -133,7 +133,7 @@ describe(commands.TENANT_CDN_POLICY_SET, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = tenantCdnPolicySetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { verbose: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       let returnsCorrectValue: boolean = false;
       log.forEach(l => {
@@ -156,7 +156,7 @@ describe(commands.TENANT_CDN_POLICY_SET, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
-    cmdInstance.action = tenantCdnPolicySetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { verbose: true, policy: 'IncludeFileExtensions', value: 'WOFF', type: 'Public' } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
@@ -184,7 +184,7 @@ describe(commands.TENANT_CDN_POLICY_SET, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
-    cmdInstance.action = tenantCdnPolicySetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { verbose: true, policy: 'IncludeFileExtensions', value: 'WOFF', type: 'Private' } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
@@ -212,7 +212,7 @@ describe(commands.TENANT_CDN_POLICY_SET, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
-    cmdInstance.action = tenantCdnPolicySetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { verbose: true, policy: 'IncludeFileExtensions', value: 'WOFF' } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
@@ -240,7 +240,7 @@ describe(commands.TENANT_CDN_POLICY_SET, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
-    cmdInstance.action = tenantCdnPolicySetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { verbose: false, policy: 'ExcludeRestrictedSiteClassifications', value: 'foo' } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
@@ -295,7 +295,7 @@ describe(commands.TENANT_CDN_POLICY_SET, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
-    cmdInstance.action = tenantCdnPolicySetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { verbose: false, policy: 'IncludeFileExtensions', value: '<WOFF' } }, () => {
       let isDone = false;
       log.forEach(l => {
@@ -350,7 +350,7 @@ describe(commands.TENANT_CDN_POLICY_SET, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
-    cmdInstance.action = tenantCdnPolicySetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { verbose: false, policy: 'IncludeFileExtensions', value: '<WOFF' } }, () => {
       let genericErrorHandled = false;
       log.forEach(l => {
@@ -373,7 +373,7 @@ describe(commands.TENANT_CDN_POLICY_SET, () => {
   });
 
   it('supports verbose mode', () => {
-    const options = (tenantCdnPolicySetCommand.options() as CommandOption[]);
+    const options = (command.options() as CommandOption[]);
     let containsVerboseOption = false;
     options.forEach(o => {
       if (o.option === '--verbose') {
@@ -384,7 +384,7 @@ describe(commands.TENANT_CDN_POLICY_SET, () => {
   });
 
   it('requires CDN policy name', () => {
-    const options = (tenantCdnPolicySetCommand.options() as CommandOption[]);
+    const options = (command.options() as CommandOption[]);
     let requiresCdnPolicyName = false;
     options.forEach(o => {
       if (o.option.indexOf('<policy>') > -1) {
@@ -395,7 +395,7 @@ describe(commands.TENANT_CDN_POLICY_SET, () => {
   });
 
   it('requires CDN policy value', () => {
-    const options = (tenantCdnPolicySetCommand.options() as CommandOption[]);
+    const options = (command.options() as CommandOption[]);
     let requiresCdnPolicyValue = false;
     options.forEach(o => {
       if (o.option.indexOf('<value>') > -1) {
@@ -407,50 +407,50 @@ describe(commands.TENANT_CDN_POLICY_SET, () => {
 
   it('doesn\'t fail if the parent doesn\'t define options', () => {
     sinon.stub(Command.prototype, 'options').callsFake(() => { return undefined; });
-    const options = (tenantCdnPolicySetCommand.options() as CommandOption[]);
+    const options = (command.options() as CommandOption[]);
     Utils.restore(Command.prototype.options);
     assert(options.length > 0);
   });
 
   it('accepts Public SharePoint Online CDN type', () => {
-    const actual = (tenantCdnPolicySetCommand.validate() as CommandValidate)({ options: { type: 'Public', policy: 'IncludeFileExtensions' } });
+    const actual = (command.validate() as CommandValidate)({ options: { type: 'Public', policy: 'IncludeFileExtensions' } });
     assert(actual);
   });
 
   it('accepts Private SharePoint Online CDN type', () => {
-    const actual = (tenantCdnPolicySetCommand.validate() as CommandValidate)({ options: { type: 'Private', policy: 'IncludeFileExtensions' } });
+    const actual = (command.validate() as CommandValidate)({ options: { type: 'Private', policy: 'IncludeFileExtensions' } });
     assert(actual);
   });
 
   it('rejects invalid SharePoint Online CDN type', () => {
     const type = 'foo';
-    const actual = (tenantCdnPolicySetCommand.validate() as CommandValidate)({ options: { type: type, policy: 'IncludeFileExtensions' } });
+    const actual = (command.validate() as CommandValidate)({ options: { type: type, policy: 'IncludeFileExtensions' } });
     assert.equal(actual, `${type} is not a valid CDN type. Allowed values are Public|Private`);
   });
 
   it('doesn\'t fail validation if the optional type option not specified', () => {
-    const actual = (tenantCdnPolicySetCommand.validate() as CommandValidate)({ options: { policy: 'IncludeFileExtensions' } });
+    const actual = (command.validate() as CommandValidate)({ options: { policy: 'IncludeFileExtensions' } });
     assert(actual);
   });
 
   it('accepts IncludeFileExtensions SharePoint Online CDN policy', () => {
-    const actual = (tenantCdnPolicySetCommand.validate() as CommandValidate)({ options: { policy: 'IncludeFileExtensions' } });
+    const actual = (command.validate() as CommandValidate)({ options: { policy: 'IncludeFileExtensions' } });
     assert(actual);
   });
 
   it('accepts ExcludeRestrictedSiteClassifications SharePoint Online CDN policy', () => {
-    const actual = (tenantCdnPolicySetCommand.validate() as CommandValidate)({ options: { policy: 'ExcludeRestrictedSiteClassifications' } });
+    const actual = (command.validate() as CommandValidate)({ options: { policy: 'ExcludeRestrictedSiteClassifications' } });
     assert(actual);
   });
 
   it('rejects invalid SharePoint Online CDN policy', () => {
     const policy = 'foo';
-    const actual = (tenantCdnPolicySetCommand.validate() as CommandValidate)({ options: { policy: policy } });
+    const actual = (command.validate() as CommandValidate)({ options: { policy: policy } });
     assert.equal(actual, `${policy} is not a valid CDN policy. Allowed values are IncludeFileExtensions|ExcludeRestrictedSiteClassifications`);
   });
 
   it('fails validation if the required policy option is not specified', () => {
-    const actual = (tenantCdnPolicySetCommand.validate() as CommandValidate)({ options: { } });
+    const actual = (command.validate() as CommandValidate)({ options: { } });
     assert.equal(actual, 'undefined is not a valid CDN policy. Allowed values are IncludeFileExtensions|ExcludeRestrictedSiteClassifications');
   });
 
@@ -461,8 +461,8 @@ describe(commands.TENANT_CDN_POLICY_SET, () => {
       helpInformation: () => { }
     };
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    (tenantCdnPolicySetCommand.help() as CommandHelp)({}, helpLog);
-    assert(find.calledWith(commands.TENANT_CDN_POLICY_SET));
+    (command.help() as CommandHelp)({}, helpLog);
+    assert(find.calledWith(commands.CDN_POLICY_SET));
   });
 
   it('has help with examples', () => {
@@ -472,7 +472,7 @@ describe(commands.TENANT_CDN_POLICY_SET, () => {
       helpInformation: () => { }
     };
     sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    (tenantCdnPolicySetCommand.help() as CommandHelp)({}, log);
+    (command.help() as CommandHelp)({}, log);
     let containsExamples: boolean = false;
     _log.forEach(l => {
       if (l && l.indexOf('Examples:') > -1) {
@@ -489,7 +489,7 @@ describe(commands.TENANT_CDN_POLICY_SET, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = tenantCdnPolicySetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { verbose: true, confirm: true, key: 'existingproperty' }, appCatalogUrl: 'https://contoso-admin.sharepoint.com' }, () => {
       let containsError = false;
       log.forEach(l => {

@@ -1,11 +1,11 @@
-# spo tenant cdn origin list
+# spo cdn origin list
 
 List CDN origins settings for the current SharePoint Online tenant
 
 ## Usage
 
 ```sh
-spo tenant cdn origin list [options]
+spo cdn origin list [options]
 ```
 
 ## Options
@@ -32,13 +32,13 @@ the Public (default) or Private CDN. If you don't use the option, the command wi
 ## Examples
 
 ```sh
-spo tenant cdn origin list
+spo cdn origin list
 ```
 
 shows the list of origins configured for the Public CDN
 
 ```sh
-spo tenant cdn origin list -t Private
+spo cdn origin list -t Private
 ```
 
 shows the list of origins configured for the Private CDN

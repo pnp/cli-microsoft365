@@ -3,19 +3,20 @@ import Command, { CommandHelp, CommandValidate, CommandOption } from '../../../C
 import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
 import auth, { Site } from '../SpoAuth';
-const tenantCdnSetCommand: Command = require('./tenant-cdn-set');
+const command: Command = require('./cdn-origin-remove');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import config from '../../../config';
 import Utils from '../../../Utils';
 
-describe(commands.TENANT_CDN_SET, () => {
+describe(commands.CDN_ORIGIN_REMOVE, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let trackEvent: any;
   let telemetry: any;
   let requests: any[];
+  let promptOptions: any;
 
   before(() => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
@@ -39,7 +40,7 @@ describe(commands.TENANT_CDN_SET, () => {
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers['X-RequestDigest'] &&
           opts.body) {
-          if (opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="CreateTenantCdnDefaultOrigins" Id="21" ObjectPathId="18"><Parameters><Parameter Type="Enum">0</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+          if (opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="RemoveTenantCdnOrigin" Id="33" ObjectPathId="29"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="String">*/cdn</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="29" Name="abc" /></ObjectPaths></Request>`) {
             return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": null, "TraceCorrelationId": "4456299e-d09e-4000-ae61-ddde716daa27" }, 31, { "IsNull": false }, 33, { "IsNull": false }, 35, { "IsNull": false }]));
           }
         }
@@ -55,11 +56,16 @@ describe(commands.TENANT_CDN_SET, () => {
     cmdInstance = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      prompt: (options: any, cb: (result: { continue: boolean }) => void) => {
+        promptOptions = options;
+        cb({ continue: false });
       }
     };
     auth.site = new Site();
     telemetry = null;
     requests = [];
+    promptOptions = undefined;
   });
 
   afterEach(() => {
@@ -75,16 +81,16 @@ describe(commands.TENANT_CDN_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(tenantCdnSetCommand.name.startsWith(commands.TENANT_CDN_SET), true);
+    assert.equal(command.name.startsWith(commands.CDN_ORIGIN_REMOVE), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(tenantCdnSetCommand.description, null);
+    assert.notEqual(command.description, null);
   });
 
   it('calls telemetry', (done) => {
-    cmdInstance.action = tenantCdnSetCommand.action();
-    cmdInstance.action({ options: {}, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: {}, url: 'https://contoso-admin.sharepoint.com' }, () => {
       try {
         assert(trackEvent.called);
         done();
@@ -96,10 +102,10 @@ describe(commands.TENANT_CDN_SET, () => {
   });
 
   it('logs correct telemetry event', (done) => {
-    cmdInstance.action = tenantCdnSetCommand.action();
-    cmdInstance.action({ options: {}, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: {}, url: 'https://contoso-admin.sharepoint.com' }, () => {
       try {
-        assert.equal(telemetry.name, commands.TENANT_CDN_SET);
+        assert.equal(telemetry.name, commands.CDN_ORIGIN_REMOVE);
         done();
       }
       catch (e) {
@@ -111,7 +117,7 @@ describe(commands.TENANT_CDN_SET, () => {
   it('aborts when not connected to a SharePoint site', (done) => {
     auth.site = new Site();
     auth.site.connected = false;
-    cmdInstance.action = tenantCdnSetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { verbose: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       let returnsCorrectValue: boolean = false;
       log.forEach(l => {
@@ -133,7 +139,7 @@ describe(commands.TENANT_CDN_SET, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = tenantCdnSetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { verbose: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       let returnsCorrectValue: boolean = false;
       log.forEach(l => {
@@ -151,26 +157,26 @@ describe(commands.TENANT_CDN_SET, () => {
     });
   });
 
-  it('enables public CDN when Public type specified and enabled set to true', (done) => {
+  it('removes existing CDN origin from the public CDN when Public type specified without prompting with confirmation argument', (done) => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
-    cmdInstance.action = tenantCdnSetCommand.action();
-    cmdInstance.action({ options: { verbose: true, enabled: 'true', type: 'Public' } }, () => {
-      let setRequestIssued = false;
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { verbose: false, origin: '*/cdn', confirm: true, type: 'Public' } }, () => {
+      let deleteRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
           r.headers['X-RequestDigest'] &&
-          r.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="CreateTenantCdnDefaultOrigins" Id="21" ObjectPathId="18"><Parameters><Parameter Type="Enum">0</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          setRequestIssued = true;
+          r.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="RemoveTenantCdnOrigin" Id="33" ObjectPathId="29"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="String">*/cdn</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="29" Name="abc" /></ObjectPaths></Request>`) {
+          deleteRequestIssued = true;
         }
       });
 
       try {
-        assert(setRequestIssued);
+        assert(deleteRequestIssued);
         done();
       }
       catch (e) {
@@ -179,26 +185,26 @@ describe(commands.TENANT_CDN_SET, () => {
     });
   });
 
-  it('disables public CDN when Public type specified and enabled set to false', (done) => {
+  it('removes existing CDN origin from the private CDN when Private type specified without prompting with confirmation argument', (done) => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
-    cmdInstance.action = tenantCdnSetCommand.action();
-    cmdInstance.action({ options: { verbose: true, enabled: 'false', type: 'Public' } }, () => {
-      let setRequestIssued = false;
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { verbose: false, origin: '*/cdn', confirm: true, type: 'Private' } }, () => {
+      let deleteRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
           r.headers['X-RequestDigest'] &&
-          r.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Name="CreateTenantCdnDefaultOrigins" Id="21" ObjectPathId="18"><Parameters><Parameter Type="Enum">0</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          setRequestIssued = true;
+          r.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="RemoveTenantCdnOrigin" Id="33" ObjectPathId="29"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="String">*/cdn</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="29" Name="abc" /></ObjectPaths></Request>`) {
+          deleteRequestIssued = true;
         }
       });
 
       try {
-        assert(setRequestIssued);
+        assert(deleteRequestIssued);
         done();
       }
       catch (e) {
@@ -207,26 +213,26 @@ describe(commands.TENANT_CDN_SET, () => {
     });
   });
 
-  it('enables private CDN when Private type specified and enabled set to true', (done) => {
+  it('removes existing CDN origin from the public CDN when no type specified without prompting with confirmation argument', (done) => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
-    cmdInstance.action = tenantCdnSetCommand.action();
-    cmdInstance.action({ options: { verbose: true, enabled: 'true', type: 'Private' } }, () => {
-      let setRequestIssued = false;
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { verbose: false, origin: '*/cdn', confirm: true } }, () => {
+      let deleteRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
           r.headers['X-RequestDigest'] &&
-          r.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="CreateTenantCdnDefaultOrigins" Id="21" ObjectPathId="18"><Parameters><Parameter Type="Enum">0</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          setRequestIssued = true;
+          r.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="RemoveTenantCdnOrigin" Id="33" ObjectPathId="29"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="String">*/cdn</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="29" Name="abc" /></ObjectPaths></Request>`) {
+          deleteRequestIssued = true;
         }
       });
 
       try {
-        assert(setRequestIssued);
+        assert(deleteRequestIssued);
         done();
       }
       catch (e) {
@@ -235,26 +241,20 @@ describe(commands.TENANT_CDN_SET, () => {
     });
   });
 
-  it('enables public CDN when no type specified and enabled set to true', (done) => {
+  it('prompts before removing CDN origin when confirmation argument not passed', (done) => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = tenantCdnSetCommand.action();
-    cmdInstance.action({ options: { verbose: false, enabled: 'true' } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers.authorization &&
-          r.headers.authorization.indexOf('Bearer ') === 0 &&
-          r.headers['X-RequestDigest'] &&
-          r.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="CreateTenantCdnDefaultOrigins" Id="21" ObjectPathId="18"><Parameters><Parameter Type="Enum">0</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { verbose: true, origin: '*/cdn' } }, () => {
+      let promptIssued = false;
+
+      if (promptOptions && promptOptions.type === 'confirm') {
+        promptIssued = true;
+      }
 
       try {
-        assert(setRequestIssued);
+        assert(promptIssued);
         done();
       }
       catch (e) {
@@ -263,7 +263,55 @@ describe(commands.TENANT_CDN_SET, () => {
     });
   });
 
-  it('correctly handles an error when setting tenant CDN settings', (done) => {
+  it('aborts removing CDN origin when prompt not confirmed', (done) => {
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: false });
+    };
+    cmdInstance.action({ options: { verbose: true, origin: '*/cdn' } }, () => {
+      try {
+        assert(requests.length === 0);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('removes CDN origin when prompt confirmed', (done) => {
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
+    cmdInstance.action({ options: { verbose: true, origin: '*/cdn' } }, () => {
+      let doneResponse = false;
+      log.forEach(l => {
+        if (l &&
+          typeof l === 'string' &&
+          l.indexOf('DONE') > -1) {
+          doneResponse = true;
+        }
+      });
+
+      try {
+        assert(doneResponse);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly handles an error when removing CDN origin', (done) => {
     Utils.restore(request.post);
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf('/_api/contextinfo') > -1) {
@@ -280,7 +328,7 @@ describe(commands.TENANT_CDN_SET, () => {
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers['X-RequestDigest'] &&
           opts.body) {
-          if (opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="CreateTenantCdnDefaultOrigins" Id="21" ObjectPathId="18"><Parameters><Parameter Type="Enum">0</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+          if (opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="RemoveTenantCdnOrigin" Id="33" ObjectPathId="29"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="String">*/cdn</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="29" Name="abc" /></ObjectPaths></Request>`) {
             return Promise.resolve(JSON.stringify([
               {
                 "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": {
@@ -299,8 +347,11 @@ describe(commands.TENANT_CDN_SET, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
-    cmdInstance.action = tenantCdnSetCommand.action();
-    cmdInstance.action({ options: { verbose: false, enabled: 'true' } }, () => {
+    cmdInstance.action = command.action();
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
+    cmdInstance.action({ options: { verbose: true, origin: '*/cdn' } }, () => {
       let genericErrorHandled = false;
       log.forEach(l => {
         if (l && typeof l === 'string' && l.indexOf('An error has occurred') > -1) {
@@ -322,7 +373,7 @@ describe(commands.TENANT_CDN_SET, () => {
   });
 
   it('supports verbose mode', () => {
-    const options = (tenantCdnSetCommand.options() as CommandOption[]);
+    const options = (command.options() as CommandOption[]);
     let containsVerboseOption = false;
     options.forEach(o => {
       if (o.option === '--verbose') {
@@ -332,84 +383,54 @@ describe(commands.TENANT_CDN_SET, () => {
     assert(containsVerboseOption);
   });
 
-  it('requires tenant enabled state', () => {
-    const options = (tenantCdnSetCommand.options() as CommandOption[]);
-    let requiresOption = false;
+  it('supports suppressing confirmation prompt', () => {
+    const options = (command.options() as CommandOption[]);
+    let containsConfirmOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('<enabled>') > -1) {
-        requiresOption = true;
+      if (o.option.indexOf('--confirm') > -1) {
+        containsConfirmOption = true;
       }
     });
-    assert(requiresOption);
+    assert(containsConfirmOption);
+  });
+
+  it('requires CDN origin name', () => {
+    const options = (command.options() as CommandOption[]);
+    let requiresCdnOriginName = false;
+    options.forEach(o => {
+      if (o.option.indexOf('<origin>') > -1) {
+        requiresCdnOriginName = true;
+      }
+    });
+    assert(requiresCdnOriginName);
   });
 
   it('doesn\'t fail if the parent doesn\'t define options', () => {
     sinon.stub(Command.prototype, 'options').callsFake(() => { return undefined; });
-    const options = (tenantCdnSetCommand.options() as CommandOption[]);
+    const options = (command.options() as CommandOption[]);
     Utils.restore(Command.prototype.options);
     assert(options.length > 0);
   });
 
   it('accepts Public SharePoint Online CDN type', () => {
-    const actual = (tenantCdnSetCommand.validate() as CommandValidate)({ options: { type: 'Public', enabled: 'true' } });
+    const actual = (command.validate() as CommandValidate)({ options: { type: 'Public' } });
     assert(actual);
   });
 
   it('accepts Private SharePoint Online CDN type', () => {
-    const actual = (tenantCdnSetCommand.validate() as CommandValidate)({ options: { type: 'Private', enabled: 'true' } });
+    const actual = (command.validate() as CommandValidate)({ options: { type: 'Private' } });
     assert(actual);
   });
 
   it('rejects invalid SharePoint Online CDN type', () => {
     const type = 'foo';
-    const actual = (tenantCdnSetCommand.validate() as CommandValidate)({ options: { type: type, enabled: 'true' } });
+    const actual = (command.validate() as CommandValidate)({ options: { type: type } });
     assert.equal(actual, `${type} is not a valid CDN type. Allowed values are Public|Private`);
   });
 
   it('doesn\'t fail validation if the optional type option not specified', () => {
-    const actual = (tenantCdnSetCommand.validate() as CommandValidate)({ options: { enabled: 'true' } });
+    const actual = (command.validate() as CommandValidate)({ options: {} });
     assert(actual);
-  });
-
-  it('accepts true SharePoint Online CDN enabled state', () => {
-    const actual = (tenantCdnSetCommand.validate() as CommandValidate)({ options: { enabled: 'true' } });
-    assert(actual);
-  });
-
-  it('accepts True SharePoint Online CDN enabled state', () => {
-    const actual = (tenantCdnSetCommand.validate() as CommandValidate)({ options: { enabled: 'True' } });
-    assert(actual);
-  });
-
-  it('accepts TRUE SharePoint Online CDN enabled state', () => {
-    const actual = (tenantCdnSetCommand.validate() as CommandValidate)({ options: { enabled: 'TRUE' } });
-    assert(actual);
-  });
-
-  it('accepts false SharePoint Online CDN enabled state', () => {
-    const actual = (tenantCdnSetCommand.validate() as CommandValidate)({ options: { enabled: 'false' } });
-    assert(actual);
-  });
-
-  it('accepts False SharePoint Online CDN enabled state', () => {
-    const actual = (tenantCdnSetCommand.validate() as CommandValidate)({ options: { enabled: 'False' } });
-    assert(actual);
-  });
-
-  it('accepts FALSE SharePoint Online CDN enabled state', () => {
-    const actual = (tenantCdnSetCommand.validate() as CommandValidate)({ options: { enabled: 'FALSE' } });
-    assert(actual);
-  });
-
-  it('rejects invalid SharePoint Online CDN enabled state', () => {
-    const enabled = 'foo';
-    const actual = (tenantCdnSetCommand.validate() as CommandValidate)({ options: { enabled: enabled } });
-    assert.equal(actual, `${enabled} is not a valid boolean value. Allowed values are true|false`);
-  });
-
-  it('fails validation if the required enabled state option is not specified', () => {
-    const actual = (tenantCdnSetCommand.validate() as CommandValidate)({ options: { } });
-    assert.equal(actual, 'undefined is not a valid boolean value. Allowed values are true|false');
   });
 
   it('has help referring to the right command', () => {
@@ -419,8 +440,8 @@ describe(commands.TENANT_CDN_SET, () => {
       helpInformation: () => { }
     };
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    (tenantCdnSetCommand.help() as CommandHelp)({}, helpLog);
-    assert(find.calledWith(commands.TENANT_CDN_SET));
+    (command.help() as CommandHelp)({}, helpLog);
+    assert(find.calledWith(commands.CDN_ORIGIN_REMOVE));
   });
 
   it('has help with examples', () => {
@@ -430,7 +451,7 @@ describe(commands.TENANT_CDN_SET, () => {
       helpInformation: () => { }
     };
     sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    (tenantCdnSetCommand.help() as CommandHelp)({}, log);
+    (command.help() as CommandHelp)({}, log);
     let containsExamples: boolean = false;
     _log.forEach(l => {
       if (l && l.indexOf('Examples:') > -1) {
@@ -447,7 +468,7 @@ describe(commands.TENANT_CDN_SET, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = tenantCdnSetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { verbose: true, confirm: true, key: 'existingproperty' }, appCatalogUrl: 'https://contoso-admin.sharepoint.com' }, () => {
       let containsError = false;
       log.forEach(l => {

@@ -20,23 +20,21 @@ interface CommandArgs {
 
 interface Options extends VerboseOption {
   type: string;
-  policy: string;
-  value: string;
+  origin: string;
 }
 
-class SpoTenantCdnPolicySetCommand extends SpoCommand {
+class SpoCdnOriginAddCommand extends SpoCommand {
   public get name(): string {
-    return commands.TENANT_CDN_POLICY_SET;
+    return commands.CDN_ORIGIN_SET;
   }
 
   public get description(): string {
-    return 'Sets CDN policy value for the current SharePoint Online tenant';
+    return 'Adds CDN origin to the current SharePoint Online tenant';
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.cdnType = args.options.type || 'Public';
-    telemetryProps.policy = args.options.policy;
     return telemetryProps;
   }
 
@@ -61,7 +59,7 @@ class SpoTenantCdnPolicySetCommand extends SpoCommand {
           cmd.log('');
         }
 
-        return this.getRequestDigest(cmd, this.verbose)
+        return this.getRequestDigest(cmd, this.verbose);
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
@@ -70,25 +68,15 @@ class SpoTenantCdnPolicySetCommand extends SpoCommand {
           cmd.log('');
         }
 
-        cmd.log(`Configuring policy on the ${(cdnType === 1 ? 'Private' : 'Public')} CDN. Please wait, this might take a moment...`);
-
-        let policyId: number = -1;
-        switch (args.options.policy) {
-          case "IncludeFileExtensions":
-            policyId = 0;
-            break;
-          case "ExcludeRestrictedSiteClassifications":
-            policyId = 1;
-            break;
-        }
+        cmd.log(`Adding origin ${args.options.origin} to the ${(cdnType === 1 ? 'Private' : 'Public')} CDN. Please wait, this might take a moment...`);
 
         const requestOptions: any = {
           url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
-            authorization: `Bearer ${auth.site.accessToken}`,
+            authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': res.FormDigestValue
           },
-          body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetTenantCdnPolicy" Id="12" ObjectPathId="8"><Parameters><Parameter Type="Enum">${cdnType}</Parameter><Parameter Type="Enum">${policyId}</Parameter><Parameter Type="String">${Utils.escapeXml(args.options.value)}</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="8" Name="${auth.site.tenantId}" /></ObjectPaths></Request>`
+          body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="AddTenantCdnOrigin" Id="27" ObjectPathId="23"><Parameters><Parameter Type="Enum">${cdnType}</Parameter><Parameter Type="String">${Utils.escapeXml(args.options.origin)}</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="23" Name="${auth.site.tenantId}" /></ObjectPaths></Request>`
         };
 
         if (this.verbose) {
@@ -101,7 +89,7 @@ class SpoTenantCdnPolicySetCommand extends SpoCommand {
       })
       .then((res: string): void => {
         if (this.verbose) {
-          cmd.log('Response:')
+          cmd.log('Response:');
           cmd.log(res);
           cmd.log('');
         }
@@ -129,13 +117,8 @@ class SpoTenantCdnPolicySetCommand extends SpoCommand {
         autocomplete: ['Public', 'Private']
       },
       {
-        option: '-p, --policy <policy>',
-        description: 'CDN policy to configure. IncludeFileExtensions|ExcludeRestrictedSiteClassifications',
-        autocomplete: ['IncludeFileExtensions', 'ExcludeRestrictedSiteClassifications']
-      },
-      {
-        option: '-v, --value <value>',
-        description: 'Value for the policy to configure'
+        option: '-o, --origin <origin>',
+        description: 'Origin to add to the current CDN configuration'
       }
     ];
 
@@ -157,12 +140,6 @@ class SpoTenantCdnPolicySetCommand extends SpoCommand {
         }
       }
 
-      if (!args.options.policy ||
-        (args.options.policy !== 'IncludeFileExtensions' &&
-        args.options.policy !== 'ExcludeRestrictedSiteClassifications')) {
-        return `${args.options.policy} is not a valid CDN policy. Allowed values are IncludeFileExtensions|ExcludeRestrictedSiteClassifications`;
-      }
-
       return true;
     };
   }
@@ -170,14 +147,14 @@ class SpoTenantCdnPolicySetCommand extends SpoCommand {
   public help(): CommandHelp {
     return function (args: CommandArgs, log: (help: string) => void): void {
       const chalk = vorpal.chalk;
-      log(vorpal.find(commands.TENANT_CDN_POLICY_SET).helpInformation());
+      log(vorpal.find(commands.CDN_ORIGIN_SET).helpInformation());
       log(
         `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online tenant admin site,
   using the ${chalk.blue(commands.CONNECT)} command.
         
   Remarks:
 
-    To set the policy of an Office 365 CDN, you have to first connect to a tenant admin site using the
+    To add origins to an Office 365 CDN, you have to first connect to a tenant admin site using the
     ${chalk.blue(commands.CONNECT)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso-admin.sharepoint.com`)}.
     If you are connected to a different site and will try to manage tenant properties,
     you will get an error.
@@ -187,8 +164,8 @@ class SpoTenantCdnPolicySetCommand extends SpoCommand {
 
   Examples:
   
-    ${chalk.grey(config.delimiter)} ${commands.TENANT_CDN_POLICY_SET} -t Public -p IncludeFileExtensions -v CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON
-      sets the list of extensions supported by the Public CDN
+    ${chalk.grey(config.delimiter)} ${commands.CDN_ORIGIN_SET} -t Public -o */CDN
+      adds ${chalk.grey('*/CDN')} to the list of origins of the Public CDN
 
   More information:
 
@@ -199,4 +176,4 @@ class SpoTenantCdnPolicySetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoTenantCdnPolicySetCommand();
+module.exports = new SpoCdnOriginAddCommand();

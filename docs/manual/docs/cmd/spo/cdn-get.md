@@ -1,11 +1,11 @@
-# spo tenant cdn origin set
+# spo cdn get
 
-Adds CDN origin to the current SharePoint Online tenant
+View current status of the specified Office 365 CDN
 
 ## Usage
 
 ```sh
-spo tenant cdn origin set [options]
+spo cdn get [options]
 ```
 
 ## Options
@@ -14,7 +14,6 @@ Option|Description
 ------|-----------
 `--help`|output usage information
 `-t, --type [type]`|Type of CDN to manage. `Public|Private`. Default `Public`
-`-o, --origin <origin>`|Origin to add to the current CDN configuration
 `--verbose`|Runs command with verbose logging
 
 !!! important
@@ -22,7 +21,7 @@ Option|Description
 
 ## Remarks
 
-To add origins to an Office 365 CDN, you have to first connect to a tenant admin site using the
+To view the status of an Office 365 CDN, you have to first connect to a tenant admin site using the
 [spo connect](connect.md) command, eg. `spo connect https://contoso-admin.sharepoint.com`.
 If you are connected to a different site and will try to manage tenant properties,
 you will get an error.
@@ -33,10 +32,16 @@ the Public (default) or Private CDN. If you don't use the option, the command wi
 ## Examples
 
 ```sh
-spo tenant cdn origin set -t Public -o */CDN
+spo cdn get
 ```
 
-adds */CDN to the list of origins of the Public CDN
+shows if the Public CDN is currently enabled or not
+
+```sh
+spo cdn get -t Private
+```
+
+shows if the Private CDN is currently enabled or not
 
 ## More information
 

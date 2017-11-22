@@ -10,7 +10,6 @@ import {
   CommandValidate
 } from '../../../Command';
 import SpoCommand from '../SpoCommand';
-import Utils from '../../../Utils';
 
 const vorpal: Vorpal = require('../../../vorpal-init');
 
@@ -20,16 +19,15 @@ interface CommandArgs {
 
 interface Options extends VerboseOption {
   type: string;
-  origin: string;
 }
 
-class SpoTenantCdnOriginAddCommand extends SpoCommand {
+class SpoCdnGetCommand extends SpoCommand {
   public get name(): string {
-    return commands.TENANT_CDN_ORIGIN_SET;
+    return commands.CDN_GET;
   }
 
   public get description(): string {
-    return 'Adds CDN origin to the current SharePoint Online tenant';
+    return 'View current status of the specified Office 365 CDN';
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -46,29 +44,38 @@ class SpoTenantCdnOriginAddCommand extends SpoCommand {
     const cdnTypeString: string = args.options.type || 'Public';
     const cdnType: number = cdnTypeString === 'Private' ? 1 : 0;
 
-    if (this.verbose) {
-      cmd.log(`Retrieving access token for ${auth.service.resource}...`);
-    }
-
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.verbose)
       .then((accessToken: string): Promise<ContextInfo> => {
         if (this.verbose) {
-          cmd.log('Response:');
-          cmd.log(accessToken);
+          cmd.log(`Retrieved access token ${accessToken}. Loading CDN settings for the ${auth.site.url} tenant...`);
+        }
+
+        const requestOptions: any = {
+          url: `${auth.site.url}/_api/contextinfo`,
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+            accept: 'application/json;odata=nometadata'
+          },
+          json: true
+        }
+
+        if (this.verbose) {
+          cmd.log('Executing web request...');
+          cmd.log(requestOptions);
           cmd.log('');
         }
 
-        return this.getRequestDigest(cmd, this.verbose);
+        return request.post(requestOptions);
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
-          cmd.log('Response:')
+          cmd.log('Response:');
           cmd.log(res);
           cmd.log('');
         }
 
-        cmd.log(`Adding origin ${args.options.origin} to the ${(cdnType === 1 ? 'Private' : 'Public')} CDN. Please wait, this might take a moment...`);
+        cmd.log(`Retrieving status of ${(cdnType === 1 ? 'Private' : 'Public')} CDN...`);
 
         const requestOptions: any = {
           url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
@@ -76,7 +83,7 @@ class SpoTenantCdnOriginAddCommand extends SpoCommand {
             authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': res.FormDigestValue
           },
-          body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="AddTenantCdnOrigin" Id="27" ObjectPathId="23"><Parameters><Parameter Type="Enum">${cdnType}</Parameter><Parameter Type="String">${Utils.escapeXml(args.options.origin)}</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="23" Name="${auth.site.tenantId}" /></ObjectPaths></Request>`
+          body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="GetTenantCdnEnabled" Id="12" ObjectPathId="8"><Parameters><Parameter Type="Enum">${cdnType}</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="8" Name="${auth.site.tenantId}" /></ObjectPaths></Request>`
         };
 
         if (this.verbose) {
@@ -100,7 +107,8 @@ class SpoTenantCdnOriginAddCommand extends SpoCommand {
           cmd.log(vorpal.chalk.red(`Error: ${response.ErrorInfo.ErrorMessage}`));
         }
         else {
-          cmd.log(vorpal.chalk.green('DONE'));
+          const result: boolean = json[json.length - 1];
+          cmd.log(`${(cdnType === 0 ? 'Public' : 'Private')} CDN at ${auth.site.url} is ${(result === true ? 'enabled' : 'disabled')}`);
         }
         cb();
       }, (err: any): void => {
@@ -110,17 +118,11 @@ class SpoTenantCdnOriginAddCommand extends SpoCommand {
   }
 
   public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-t, --type [type]',
-        description: 'Type of CDN to manage. Public|Private. Default Public',
-        autocomplete: ['Public', 'Private']
-      },
-      {
-        option: '-o, --origin <origin>',
-        description: 'Origin to add to the current CDN configuration'
-      }
-    ];
+    const options: CommandOption[] = [{
+      option: '-t, --type [type]',
+      description: 'Type of CDN to manage. Public|Private. Default Public',
+      autocomplete: ['Public', 'Private']
+    }];
 
     const parentOptions: CommandOption[] | undefined = super.options();
     if (parentOptions) {
@@ -147,14 +149,14 @@ class SpoTenantCdnOriginAddCommand extends SpoCommand {
   public help(): CommandHelp {
     return function (args: CommandArgs, log: (help: string) => void): void {
       const chalk = vorpal.chalk;
-      log(vorpal.find(commands.TENANT_CDN_ORIGIN_SET).helpInformation());
+      log(vorpal.find(commands.CDN_GET).helpInformation());
       log(
         `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online tenant admin site,
   using the ${chalk.blue(commands.CONNECT)} command.
         
   Remarks:
 
-    To add origins to an Office 365 CDN, you have to first connect to a tenant admin site using the
+    To view the status of an Office 365 CDN, you have to first connect to a tenant admin site using the
     ${chalk.blue(commands.CONNECT)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso-admin.sharepoint.com`)}.
     If you are connected to a different site and will try to manage tenant properties,
     you will get an error.
@@ -164,8 +166,11 @@ class SpoTenantCdnOriginAddCommand extends SpoCommand {
 
   Examples:
   
-    ${chalk.grey(config.delimiter)} ${commands.TENANT_CDN_ORIGIN_SET} -t Public -o */CDN
-      adds ${chalk.grey('*/CDN')} to the list of origins of the Public CDN
+    ${chalk.grey(config.delimiter)} ${commands.CDN_GET}
+      shows if the Public CDN is currently enabled or not
+
+    ${chalk.grey(config.delimiter)} ${commands.CDN_GET} -t Private
+      shows if the Private CDN is currently enabled or not
 
   More information:
 
@@ -176,4 +181,4 @@ class SpoTenantCdnOriginAddCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoTenantCdnOriginAddCommand();
+module.exports = new SpoCdnGetCommand();

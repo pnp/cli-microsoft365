@@ -22,9 +22,9 @@ interface Options extends VerboseOption {
   enabled: string;
 }
 
-class SpoTenantCdnSetCommand extends SpoCommand {
+class SpoCdnSetCommand extends SpoCommand {
   public get name(): string {
-    return commands.TENANT_CDN_SET;
+    return commands.CDN_SET;
   }
 
   public get description(): string {
@@ -149,7 +149,7 @@ class SpoTenantCdnSetCommand extends SpoCommand {
   public help(): CommandHelp {
     return function (args: CommandArgs, log: (help: string) => void): void {
       const chalk = vorpal.chalk;
-      log(vorpal.find(commands.TENANT_CDN_SET).helpInformation());
+      log(vorpal.find(commands.CDN_SET).helpInformation());
       log(
         `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online tenant admin site,
   using the ${chalk.blue(commands.CONNECT)} command.
@@ -170,10 +170,10 @@ class SpoTenantCdnSetCommand extends SpoCommand {
 
   Examples:
   
-    ${chalk.grey(config.delimiter)} ${commands.TENANT_CDN_SET} -t Public -e true
+    ${chalk.grey(config.delimiter)} ${commands.CDN_SET} -t Public -e true
       enables the Office 365 Public CDN on the current tenant
 
-    ${chalk.grey(config.delimiter)} ${commands.TENANT_CDN_SET} -t Public -e false
+    ${chalk.grey(config.delimiter)} ${commands.CDN_SET} -t Public -e false
       disables the Office 365 Public CDN on the current tenant
 
   More information:
@@ -185,4 +185,4 @@ class SpoTenantCdnSetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoTenantCdnSetCommand();
+module.exports = new SpoCdnSetCommand();

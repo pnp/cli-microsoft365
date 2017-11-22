@@ -21,13 +21,13 @@ interface Options extends VerboseOption {
   type: string;
 }
 
-class SpoTenantCdnOriginListCommand extends SpoCommand {
+class SpoCdnPolicyListCommand extends SpoCommand {
   public get name(): string {
-    return commands.TENANT_CDN_ORIGIN_LIST;
+    return commands.CDN_POLICY_LIST;
   }
 
   public get description(): string {
-    return 'List CDN origins settings for the current SharePoint Online tenant';
+    return 'Lists CDN policies settings for the current SharePoint Online tenant';
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -66,7 +66,7 @@ class SpoTenantCdnOriginListCommand extends SpoCommand {
           cmd.log('');
         }
 
-        cmd.log(`Retrieving configured origins for ${(cdnType === 1 ? 'Private' : 'Public')} CDN...`);
+        cmd.log(`Retrieving configured policies for ${(cdnType === 1 ? 'Private' : 'Public')} CDN...`);
 
         const requestOptions: any = {
           url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
@@ -74,7 +74,7 @@ class SpoTenantCdnOriginListCommand extends SpoCommand {
             authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': res.FormDigestValue
           },
-          body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="GetTenantCdnOrigins" Id="22" ObjectPathId="18"><Parameters><Parameter Type="Enum">${cdnType}</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="18" Name="${auth.site.tenantId}" /></ObjectPaths></Request>`
+          body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="GetTenantCdnPolicies" Id="7" ObjectPathId="3"><Parameters><Parameter Type="Enum">${cdnType}</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="3" Name="${auth.site.tenantId}" /></ObjectPaths></Request>`
         };
 
         if (this.verbose) {
@@ -87,7 +87,7 @@ class SpoTenantCdnOriginListCommand extends SpoCommand {
       })
       .then((res: string): void => {
         if (this.verbose) {
-          cmd.log('Response:');
+          cmd.log('Response:')
           cmd.log(res);
           cmd.log('');
         }
@@ -99,9 +99,10 @@ class SpoTenantCdnOriginListCommand extends SpoCommand {
         }
         else {
           const result: string[] = json[json.length - 1];
-          cmd.log('Configured origins:');
-          result.forEach((o: string): void => {
-            cmd.log(o);
+          cmd.log('Configured policies:');
+          result.forEach(o => {
+            const kv: string[] = o.split(';');
+            cmd.log(`${kv[0]}: ${kv[1]}`);
           });
         }
         cb();
@@ -143,14 +144,14 @@ class SpoTenantCdnOriginListCommand extends SpoCommand {
   public help(): CommandHelp {
     return function (args: CommandArgs, log: (help: string) => void): void {
       const chalk = vorpal.chalk;
-      log(vorpal.find(commands.TENANT_CDN_ORIGIN_LIST).helpInformation());
+      log(vorpal.find(commands.CDN_POLICY_LIST).helpInformation());
       log(
         `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online tenant admin site,
   using the ${chalk.blue(commands.CONNECT)} command.
         
   Remarks:
 
-    To list origins of a Office 365 CDN, you have to first connect to a tenant admin site using the
+    To list the policies of an Office 365 CDN, you have to first connect to a tenant admin site using the
     ${chalk.blue(commands.CONNECT)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso-admin.sharepoint.com`)}.
     If you are connected to a different site and will try to manage tenant properties,
     you will get an error.
@@ -160,11 +161,11 @@ class SpoTenantCdnOriginListCommand extends SpoCommand {
 
   Examples:
   
-    ${chalk.grey(config.delimiter)} ${commands.TENANT_CDN_ORIGIN_LIST}
-      shows the list of origins configured for the Public CDN
+    ${chalk.grey(config.delimiter)} ${commands.CDN_POLICY_LIST}
+      shows the list of policies configured for the Public CDN
 
-    ${chalk.grey(config.delimiter)} ${commands.TENANT_CDN_ORIGIN_LIST} -t Private
-      shows the list of origins configured for the Private CDN
+    ${chalk.grey(config.delimiter)} ${commands.CDN_POLICY_LIST} -t Private
+      shows the list of policies configured for the Private CDN
 
   More information:
 
@@ -175,4 +176,4 @@ class SpoTenantCdnOriginListCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoTenantCdnOriginListCommand();
+module.exports = new SpoCdnPolicyListCommand();
