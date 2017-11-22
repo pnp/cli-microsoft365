@@ -21,5 +21,6 @@ export default {
   APP_DEPLOY: `${prefix} app deploy`,
   APP_RETRACT: `${prefix} app retract`,
   APP_ADD: `${prefix} app add`,
-  APP_REMOVE: `${prefix} app remove`
+  APP_REMOVE: `${prefix} app remove`,
+  APP_UPGRADE: `${prefix} app upgrade`,
 };
