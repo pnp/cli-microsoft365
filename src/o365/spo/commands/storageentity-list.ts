@@ -4,13 +4,12 @@ import config from '../../../config';
 import * as request from 'request-promise-native';
 import commands from '../commands';
 import VerboseOption from '../../../VerboseOption';
-import Command, {
-  CommandAction,
+import {
   CommandHelp,
   CommandOption,
   CommandValidate
 } from '../../../Command';
-import appInsights from '../../../appInsights';
+import SpoCommand from '../SpoCommand';
 
 const vorpal: Vorpal = require('../../../vorpal-init');
 
@@ -28,7 +27,7 @@ interface TenantProperty {
   Value: string;
 }
 
-class SpoStorageEntityListCommand extends Command {
+class SpoStorageEntityListCommand extends SpoCommand {
   public get name(): string {
     return `${commands.STORAGEENTITY_LIST}`;
   }
@@ -37,96 +36,79 @@ class SpoStorageEntityListCommand extends Command {
     return 'Lists tenant properties stored on the specified SharePoint Online app catalog';
   }
 
-  public get action(): CommandAction {
-    return function (args: CommandArgs, cb: () => void) {
-      const verbose: boolean = args.options.verbose || false;
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    const resource: string = Auth.getResourceFromUrl(args.options.appCatalogUrl);
 
-      appInsights.trackEvent({
-        name: commands.STORAGEENTITY_LIST,
-        properties: {
-          verbose: verbose.toString()
+    if (this.verbose) {
+      cmd.log(`Retrieving access token for ${resource} using refresh token ${auth.service.refreshToken}...`);
+    }
+
+    auth
+      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.verbose)
+      .then((accessToken: string): Promise<{ storageentitiesindex: string }> => {
+        if (this.verbose) {
+          cmd.log(`Retrieved access token ${accessToken}. Loading all tenant properties...`);
         }
-      });
 
-      if (!auth.site.connected) {
-        this.log('Connect to a SharePoint Online site first');
-        cb();
-        return;
-      }
+        cmd.log(`Retrieving details for all tenant properties in ${args.options.appCatalogUrl}...`);
 
-      const resource: string = Auth.getResourceFromUrl(args.options.appCatalogUrl);
+        const requestOptions: any = {
+          url: `${args.options.appCatalogUrl}/_api/web/AllProperties?$select=storageentitiesindex`,
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+            accept: 'application/json;odata=nometadata'
+          },
+          json: true
+        };
 
-      if (verbose) {
-        this.log(`Retrieving access token for ${resource} using refresh token ${auth.service.refreshToken}...`);
-      }
+        if (this.verbose) {
+          cmd.log('Executing web request...');
+          cmd.log(requestOptions);
+          cmd.log('');
+        }
 
-      auth
-        .getAccessToken(resource, auth.service.refreshToken as string, this, verbose)
-        .then((accessToken: string): Promise<{ storageentitiesindex: string }> => {
-          if (verbose) {
-            this.log(`Retrieved access token ${accessToken}. Loading all tenant properties...`);
+        return request.get(requestOptions);
+      })
+      .then((web: { storageentitiesindex?: string }): void => {
+        if (this.verbose) {
+          cmd.log('Response:');
+          cmd.log(web);
+          cmd.log('');
+        }
+
+        try {
+          if (!web.storageentitiesindex ||
+            web.storageentitiesindex.trim().length === 0) {
+            cmd.log('No tenant properties found');
+            return;
           }
 
-          this.log(`Retrieving details for all tenant properties in ${args.options.appCatalogUrl}...`);
-
-          const requestOptions: any = {
-            url: `${args.options.appCatalogUrl}/_api/web/AllProperties?$select=storageentitiesindex`,
-            headers: {
-              authorization: `Bearer ${accessToken}`,
-              accept: 'application/json;odata=nometadata'
-            },
-            json: true
-          };
-
-          if (verbose) {
-            this.log('Executing web request...');
-            this.log(requestOptions);
-            this.log('');
+          const properties: { [key: string]: TenantProperty } = JSON.parse(web.storageentitiesindex);
+          const keys: string[] = Object.keys(properties);
+          if (keys.length === 0) {
+            cmd.log('No tenant properties found');
           }
-
-          return request.get(requestOptions);
-        })
-        .then((web: { storageentitiesindex?: string }): void => {
-          if (verbose) {
-            this.log('Response:');
-            this.log(web);
-            this.log('');
+          else {
+            keys.forEach((key: string): void => {
+              const property: TenantProperty = properties[key];
+              cmd.log(`Key:         ${key}`);
+              cmd.log(`Value:       ${property.Value}`);
+              cmd.log(`Description: ${(property.Description || 'not set')}`);
+              cmd.log(`Comment:     ${(property.Comment || 'not set')}`);
+              cmd.log('');
+            });
           }
-
-          try {
-            if (!web.storageentitiesindex ||
-              web.storageentitiesindex.trim().length === 0) {
-              this.log('No tenant properties found');
-              return;
-            }
-
-            const properties: { [key: string]: TenantProperty } = JSON.parse(web.storageentitiesindex);
-            const keys: string[] = Object.keys(properties);
-            if (keys.length === 0) {
-              this.log('No tenant properties found');
-            }
-            else {
-              keys.forEach((key: string): void => {
-                const property: TenantProperty = properties[key];
-                this.log(`Key:         ${key}`);
-                this.log(`Value:       ${property.Value}`);
-                this.log(`Description: ${(property.Description || 'not set')}`);
-                this.log(`Comment:     ${(property.Comment || 'not set')}`);
-                this.log('');
-              });
-            }
-          }
-          catch (e) {
-            this.log(vorpal.chalk.red(`Error: ${e}`));
-          }
-          finally {
-            cb();
-          }
-        }, (err: any): void => {
-          this.log(vorpal.chalk.red(`Error: ${err}`));
+        }
+        catch (e) {
+          cmd.log(vorpal.chalk.red(`Error: ${e}`));
+        }
+        finally {
           cb();
-        });
-    };
+        }
+      }, (err: any): void => {
+        cmd.log(vorpal.chalk.red(`Error: ${err}`));
+        cb();
+      });
   }
 
   public options(): CommandOption[] {
@@ -135,29 +117,18 @@ class SpoStorageEntityListCommand extends Command {
       description: 'URL of the app catalog site'
     }];
 
-    const parentOptions: CommandOption[] | undefined = super.options();
-    if (parentOptions) {
-      return options.concat(parentOptions);
-    }
-    else {
-      return options;
-    }
+    const parentOptions: CommandOption[] = super.options();
+    return options.concat(parentOptions);
   }
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (args.options && args.options.appCatalogUrl) {
-        if (args.options.appCatalogUrl.indexOf('https://') !== 0 ||
-          args.options.appCatalogUrl.indexOf('.sharepoint.com') === -1 ||
-          args.options.appCatalogUrl.indexOf('/sites/') === -1) {
-          return `${args.options.appCatalogUrl} is not a valid SharePoint Online app catalog URL`;
-        }
-        else {
-          return true;
-        }
+      const result: boolean | string = SpoCommand.isValidSharePointUrl(args.options.appCatalogUrl);
+      if (result === false) {
+        return 'Missing required option appCatalogUrl';
       }
       else {
-        return 'Missing required option appCatalogUrl';
+        return result;
       }
     };
   }

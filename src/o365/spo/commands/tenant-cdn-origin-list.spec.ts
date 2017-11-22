@@ -58,7 +58,7 @@ describe(commands.TENANT_CDN_ORIGIN_LIST, () => {
   });
 
   it('calls telemetry', (done) => {
-    cmdInstance.action = tenantCdnOriginListCommand.action;
+    cmdInstance.action = tenantCdnOriginListCommand.action();
     cmdInstance.action({ options: {}, appCatalogUrl: 'https://contoso-admin.sharepoint.com' }, () => {
       try {
         assert(trackEvent.called);
@@ -71,7 +71,7 @@ describe(commands.TENANT_CDN_ORIGIN_LIST, () => {
   });
 
   it('logs correct telemetry event', (done) => {
-    cmdInstance.action = tenantCdnOriginListCommand.action;
+    cmdInstance.action = tenantCdnOriginListCommand.action();
     cmdInstance.action({ options: {}, appCatalogUrl: 'https://contoso-admin.sharepoint.com' }, () => {
       try {
         assert.equal(telemetry.name, commands.TENANT_CDN_ORIGIN_LIST);
@@ -86,11 +86,11 @@ describe(commands.TENANT_CDN_ORIGIN_LIST, () => {
   it('aborts when not connected to a SharePoint site', (done) => {
     auth.site = new Site();
     auth.site.connected = false;
-    cmdInstance.action = tenantCdnOriginListCommand.action;
+    cmdInstance.action = tenantCdnOriginListCommand.action();
     cmdInstance.action({ options: { verbose: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       let returnsCorrectValue: boolean = false;
       log.forEach(l => {
-        if (l && l.indexOf('Connect to a SharePoint Online tenant admin site first') > -1) {
+        if (l && l.indexOf('Connect to a SharePoint Online site first') > -1) {
           returnsCorrectValue = true;
         }
       });
@@ -108,7 +108,7 @@ describe(commands.TENANT_CDN_ORIGIN_LIST, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = tenantCdnOriginListCommand.action;
+    cmdInstance.action = tenantCdnOriginListCommand.action();
     cmdInstance.action({ options: { verbose: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       let returnsCorrectValue: boolean = false;
       log.forEach(l => {
@@ -154,7 +154,7 @@ describe(commands.TENANT_CDN_ORIGIN_LIST, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
-    cmdInstance.action = tenantCdnOriginListCommand.action;
+    cmdInstance.action = tenantCdnOriginListCommand.action();
     cmdInstance.action({ options: { verbose: true, type: 'Public' } }, () => {
       let correctLogStatements = 0;
       log.forEach(l => {
@@ -209,7 +209,7 @@ describe(commands.TENANT_CDN_ORIGIN_LIST, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
-    cmdInstance.action = tenantCdnOriginListCommand.action;
+    cmdInstance.action = tenantCdnOriginListCommand.action();
     cmdInstance.action({ options: { verbose: false, type: 'Private' } }, () => {
       let correctLogStatements = 0;
       log.forEach(l => {
@@ -263,7 +263,7 @@ describe(commands.TENANT_CDN_ORIGIN_LIST, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
-    cmdInstance.action = tenantCdnOriginListCommand.action;
+    cmdInstance.action = tenantCdnOriginListCommand.action();
     cmdInstance.action({ options: { verbose: true } }, () => {
       let correctLogStatements = 0;
       log.forEach(l => {
@@ -326,7 +326,7 @@ describe(commands.TENANT_CDN_ORIGIN_LIST, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
-    cmdInstance.action = tenantCdnOriginListCommand.action;
+    cmdInstance.action = tenantCdnOriginListCommand.action();
     cmdInstance.action({ options: { verbose: true } }, () => {
       let genericErrorHandled = false;
       log.forEach(l => {
@@ -433,7 +433,7 @@ describe(commands.TENANT_CDN_ORIGIN_LIST, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = tenantCdnOriginListCommand.action;
+    cmdInstance.action = tenantCdnOriginListCommand.action();
     cmdInstance.action({ options: { verbose: true }, appCatalogUrl: 'https://contoso-admin.sharepoint.com' }, () => {
       let containsError = false;
       log.forEach(l => {

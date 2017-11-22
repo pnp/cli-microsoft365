@@ -3,12 +3,11 @@ import config from '../../../config';
 import * as request from 'request-promise-native';
 import commands from '../commands';
 import VerboseOption from '../../../VerboseOption';
-import Command, {
-  CommandAction,
+import {
   CommandHelp,
   CommandOption
 } from '../../../Command';
-import appInsights from '../../../appInsights';
+import SpoCommand from '../SpoCommand';
 
 const vorpal: Vorpal = require('../../../vorpal-init');
 
@@ -27,7 +26,7 @@ interface TenantProperty {
   Value: string;
 }
 
-class SpoStorageEntityGetCommand extends Command {
+class SpoStorageEntityGetCommand extends SpoCommand {
   public get name(): string {
     return `${commands.STORAGEENTITY_GET}`;
   }
@@ -36,74 +35,57 @@ class SpoStorageEntityGetCommand extends Command {
     return 'Get details for the specified tenant property';
   }
 
-  public get action(): CommandAction {
-    return function (args: CommandArgs, cb: () => void) {
-      const verbose: boolean = args.options.verbose || false;
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    if (this.verbose) {
+      cmd.log(`Retrieving access token for ${auth.service.resource}...`);
+    }
 
-      appInsights.trackEvent({
-        name: commands.STORAGEENTITY_GET,
-        properties: {
-          verbose: verbose.toString()
+    auth
+      .ensureAccessToken(auth.service.resource, cmd, this.verbose)
+      .then((accessToken: string): Promise<TenantProperty> => {
+        if (this.verbose) {
+          cmd.log(`Retrieved access token ${accessToken}. Loading details for the ${args.options.key} tenant property...`);
         }
-      });
 
-      if (!auth.site.connected) {
-        this.log('Connect to a SharePoint Online site first');
+        const requestOptions: any = {
+          url: `${auth.site.url}/_api/web/GetStorageEntity('${encodeURIComponent(args.options.key)}')`,
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+            accept: 'application/json;odata=nometadata'
+          },
+          json: true
+        };
+
+        if (this.verbose) {
+          cmd.log('Executing web request...');
+          cmd.log(requestOptions);
+          cmd.log('');
+        }
+
+        return request.get(requestOptions);
+      })
+      .then((property: TenantProperty): void => {
+        if (this.verbose) {
+          cmd.log('Property:');
+          cmd.log(property);
+          cmd.log('');
+        }
+
+        if (property["odata.null"] === true) {
+          cmd.log(`Property with key ${args.options.key} not found`);
+        }
+        else {
+          cmd.log(`Details for tenant property ${args.options.key}:`);
+          cmd.log(`  Value:       ${property.Value}`);
+          cmd.log(`  Description: ${(property.Description || 'not set')}`);
+          cmd.log(`  Comment:    ${(property.Comment || 'not set')}`);
+        }
+        cmd.log('');
         cb();
-        return;
-      }
-
-      if (verbose) {
-        this.log(`key option set. Retrieving access token for ${auth.service.resource}...`);
-      }
-
-      auth
-        .ensureAccessToken(auth.service.resource, this, verbose)
-        .then((accessToken: string): Promise<TenantProperty> => {
-          if (verbose) {
-            this.log(`Retrieved access token ${accessToken}. Loading details for the ${args.options.key} tenant property...`);
-          }
-
-          const requestOptions: any = {
-            url: `${auth.site.url}/_api/web/GetStorageEntity('${encodeURIComponent(args.options.key)}')`,
-            headers: {
-              authorization: `Bearer ${accessToken}`,
-              accept: 'application/json;odata=nometadata'
-            },
-            json: true
-          };
-
-          if (verbose) {
-            this.log('Executing web request...');
-            this.log(requestOptions);
-            this.log('');
-          }
-
-          return request.get(requestOptions);
-        })
-        .then((property: TenantProperty): void => {
-          if (verbose) {
-            this.log('Property:');
-            this.log(property);
-            this.log('');
-          }
-
-          if (property["odata.null"] === true) {
-            this.log(`Property with key ${args.options.key} not found`);
-          }
-          else {
-            this.log(`Details for tenant property ${args.options.key}:`);
-            this.log(`  Value:       ${property.Value}`);
-            this.log(`  Description: ${(property.Description || 'not set')}`);
-            this.log(`  Comment:    ${(property.Comment || 'not set')}`);
-          }
-          this.log('');
-          cb();
-        }, (err: any): void => {
-          this.log(vorpal.chalk.red(`Error: ${err}`));
-          cb();
-        });
-    };
+      }, (err: any): void => {
+        cmd.log(vorpal.chalk.red(`Error: ${err}`));
+        cb();
+      });
   }
 
   public options(): CommandOption[] {
@@ -112,13 +94,8 @@ class SpoStorageEntityGetCommand extends Command {
       description: 'Name of the tenant property to retrieve'
     }];
 
-    const parentOptions: CommandOption[] | undefined = super.options();
-    if (parentOptions) {
-      return options.concat(parentOptions);
-    }
-    else {
-      return options;
-    }
+    const parentOptions: CommandOption[] = super.options();
+    return options.concat(parentOptions);
   }
 
   public help(): CommandHelp {

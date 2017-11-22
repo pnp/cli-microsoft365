@@ -89,7 +89,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
   });
 
   it('calls telemetry', (done) => {
-    cmdInstance.action = storageEntityRemoveCommand.action;
+    cmdInstance.action = storageEntityRemoveCommand.action();
     cmdInstance.action({ options: {}, url: 'https://contoso-admin.sharepoint.com' }, () => {
       try {
         assert(trackEvent.called);
@@ -102,7 +102,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
   });
 
   it('logs correct telemetry event', (done) => {
-    cmdInstance.action = storageEntityRemoveCommand.action;
+    cmdInstance.action = storageEntityRemoveCommand.action();
     cmdInstance.action({ options: {}, url: 'https://contoso-admin.sharepoint.com' }, () => {
       try {
         assert.equal(telemetry.name, commands.STORAGEENTITY_REMOVE);
@@ -117,11 +117,11 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
   it('aborts when not connected to a SharePoint site', (done) => {
     auth.site = new Site();
     auth.site.connected = false;
-    cmdInstance.action = storageEntityRemoveCommand.action;
+    cmdInstance.action = storageEntityRemoveCommand.action();
     cmdInstance.action({ options: { verbose: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       let returnsCorrectValue: boolean = false;
       log.forEach(l => {
-        if (l && l.indexOf('Connect to a SharePoint Online tenant admin site first') > -1) {
+        if (l && l.indexOf('Connect to a SharePoint Online site first') > -1) {
           returnsCorrectValue = true;
         }
       });
@@ -139,7 +139,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = storageEntityRemoveCommand.action;
+    cmdInstance.action = storageEntityRemoveCommand.action();
     cmdInstance.action({ options: { verbose: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       let returnsCorrectValue: boolean = false;
       log.forEach(l => {
@@ -161,7 +161,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = storageEntityRemoveCommand.action;
+    cmdInstance.action = storageEntityRemoveCommand.action();
     cmdInstance.action({ options: { verbose: false, key: 'existingproperty', confirm: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }}, () => {
       let deleteRequestIssued = false;
       requests.forEach(r => {
@@ -188,7 +188,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = storageEntityRemoveCommand.action;
+    cmdInstance.action = storageEntityRemoveCommand.action();
     cmdInstance.action({ options: { verbose: true, key: 'existingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }}, () => {
       let promptIssued = false;
 
@@ -210,7 +210,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = storageEntityRemoveCommand.action;
+    cmdInstance.action = storageEntityRemoveCommand.action();
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     };
@@ -229,7 +229,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = storageEntityRemoveCommand.action;
+    cmdInstance.action = storageEntityRemoveCommand.action();
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     };
@@ -291,7 +291,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = storageEntityRemoveCommand.action;
+    cmdInstance.action = storageEntityRemoveCommand.action();
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     };
@@ -370,16 +370,15 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     assert(actual);
   });
 
+  it('accepts valid SharePoint Online site URL', () => {
+    const actual = (storageEntityRemoveCommand.validate() as CommandValidate)({ options: { appCatalogUrl: 'https://contoso.sharepoint.com' }});
+    assert(actual);
+  });
+
   it('rejects invalid SharePoint Online URL', () => {
     const url = 'https://contoso.com';
     const actual = (storageEntityRemoveCommand.validate() as CommandValidate)({ options: { appCatalogUrl: url }});
-    assert.equal(actual, `${url} is not a valid SharePoint Online app catalog URL`);
-  });
-
-  it('rejects invalid SharePoint Online app catalog URL', () => {
-    const url = 'https://contoso.sharepoint.com';
-    const actual = (storageEntityRemoveCommand.validate() as CommandValidate)({ options: { appCatalogUrl: url }});
-    assert.equal(actual, `${url} is not a valid SharePoint Online app catalog URL`);
+    assert.equal(actual, `${url} is not a valid SharePoint Online site URL`);
   });
 
   it('fails validation when no SharePoint Online app catalog URL specified', () => {
@@ -422,7 +421,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = storageEntityRemoveCommand.action;
+    cmdInstance.action = storageEntityRemoveCommand.action();
     cmdInstance.action({ options: { verbose: true, confirm: true, key: 'existingproperty', appCatalogUrl: 'https://contoso-admin.sharepoint.com' }}, () => {
       let containsError = false;
       log.forEach(l => {

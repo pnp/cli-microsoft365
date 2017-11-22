@@ -50,7 +50,7 @@ describe(commands.DISCONNECT, () => {
   });
 
   it('calls telemetry', (done) => {
-    cmdInstance.action = disconnectCommand.action;
+    cmdInstance.action = disconnectCommand.action();
     cmdInstance.action({ options: {} }, () => {
       try {
         assert(trackEvent.called);
@@ -63,7 +63,7 @@ describe(commands.DISCONNECT, () => {
   });
 
   it('logs correct telemetry event', (done) => {
-    cmdInstance.action = disconnectCommand.action;
+    cmdInstance.action = disconnectCommand.action();
     cmdInstance.action({ options: {} }, () => {
       try {
         assert.equal(telemetry.name, commands.DISCONNECT);
@@ -78,7 +78,7 @@ describe(commands.DISCONNECT, () => {
   it('disconnects from SharePoint when connected', (done) => {
     auth.site = new Site();
     auth.site.connected = true;
-    cmdInstance.action = disconnectCommand.action;
+    cmdInstance.action = disconnectCommand.action();
     cmdInstance.action({ options: { verbose: true } }, () => {
       try {
         assert(!auth.site.connected);
@@ -93,7 +93,7 @@ describe(commands.DISCONNECT, () => {
   it('disconnects from SharePoint when not connected', (done) => {
     auth.site = new Site();
     auth.site.connected = false;
-    cmdInstance.action = disconnectCommand.action;
+    cmdInstance.action = disconnectCommand.action();
     cmdInstance.action({ options: { verbose: true } }, () => {
       try {
         assert(!auth.site.connected);

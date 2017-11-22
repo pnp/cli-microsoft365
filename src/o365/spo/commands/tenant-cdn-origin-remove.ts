@@ -4,13 +4,12 @@ import config from '../../../config';
 import * as request from 'request-promise-native';
 import commands from '../commands';
 import VerboseOption from '../../../VerboseOption';
-import Command, {
-  CommandAction,
+import {
   CommandHelp,
   CommandOption,
   CommandValidate
 } from '../../../Command';
-import appInsights from '../../../appInsights';
+import SpoCommand from '../SpoCommand';
 import Utils from '../../../Utils';
 
 const vorpal: Vorpal = require('../../../vorpal-init');
@@ -25,7 +24,7 @@ interface Options extends VerboseOption {
   confirm?: boolean;
 }
 
-class SpoTenantCdnOriginRemoveCommand extends Command {
+class SpoTenantCdnOriginRemoveCommand extends SpoCommand {
   public get name(): string {
     return commands.TENANT_CDN_ORIGIN_REMOVE;
   }
@@ -34,135 +33,107 @@ class SpoTenantCdnOriginRemoveCommand extends Command {
     return 'Removes CDN origin for the current SharePoint Online tenant';
   }
 
-  public get action(): CommandAction {
-    return function (args: CommandArgs, cb: () => void) {
-      const verbose: boolean = args.options.verbose || false;
-      const cdnTypeString: string = args.options.type || 'Public';
-      const cdnType: number = cdnTypeString === 'Private' ? 1 : 0;
-      const chalk: any = vorpal.chalk;
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.cdnType = args.options.type || 'Public';
+    telemetryProps.confirm = (!(!args.options.confirm)).toString();
+    return telemetryProps;
+  }
 
-      appInsights.trackEvent({
-        name: commands.TENANT_CDN_ORIGIN_REMOVE,
-        properties: {
-          cdnType: cdnTypeString,
-          verbose: verbose.toString(),
-          confirm: (!(!args.options.confirm)).toString()
-        }
-      });
+  protected requiresTenantAdmin(): boolean {
+    return true;
+  }
 
-      if (!auth.site.connected) {
-        this.log('Connect to a SharePoint Online tenant admin site first');
-        cb();
-        return;
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    const cdnTypeString: string = args.options.type || 'Public';
+    const cdnType: number = cdnTypeString === 'Private' ? 1 : 0;
+    const chalk: any = vorpal.chalk;
+
+    const removeCdnOrigin = (): void => {
+      if (this.verbose) {
+        cmd.log(`Retrieving access token for ${auth.service.resource}...`);
       }
 
-      if (!auth.site.isTenantAdminSite()) {
-        this.log(`${auth.site.url} is not a tenant admin site. Connect to your tenant admin site and try again`);
-        cb();
-        return;
-      }
+      auth
+        .ensureAccessToken(auth.service.resource, cmd, this.verbose)
+        .then((accessToken: string): Promise<ContextInfo> => {
+          if (this.verbose) {
+            cmd.log('Response:');
+            cmd.log(accessToken);
+            cmd.log('');
+          }
 
-      const removeCdnOrigin = (): void => {
-        if (verbose) {
-          this.log(`Retrieving access token for ${auth.service.resource}...`);
-        }
+          return this.getRequestDigest(cmd, this.verbose);
+        })
+        .then((res: ContextInfo): Promise<string> => {
+          if (this.verbose) {
+            cmd.log('Response:')
+            cmd.log(res);
+            cmd.log('');
+          }
 
-        auth
-          .ensureAccessToken(auth.service.resource, this, verbose)
-          .then((accessToken: string): Promise<ContextInfo> => {
-            if (verbose) {
-              this.log('Response:');
-              this.log(accessToken);
-              this.log('');
-            }
+          cmd.log(`Removing origin ${args.options.origin} from the ${(cdnType === 1 ? 'Private' : 'Public')} CDN. Please wait, this might take a moment...`);
 
-            const requestOptions: any = {
-              url: `${auth.site.url}/_api/contextinfo`,
-              headers: {
-                authorization: `Bearer ${accessToken}`,
-                accept: 'application/json;odata=nometadata'
-              },
-              json: true
-            };
+          const requestOptions: any = {
+            url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+            headers: {
+              authorization: `Bearer ${auth.service.accessToken}`,
+              'X-RequestDigest': res.FormDigestValue
+            },
+            body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="RemoveTenantCdnOrigin" Id="33" ObjectPathId="29"><Parameters><Parameter Type="Enum">${cdnType}</Parameter><Parameter Type="String">${Utils.escapeXml(args.options.origin)}</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="29" Name="${auth.site.tenantId}" /></ObjectPaths></Request>`
+          };
 
-            if (verbose) {
-              this.log('Executing web request...');
-              this.log(requestOptions);
-              this.log('');
-            }
+          if (this.verbose) {
+            cmd.log('Executing web request...');
+            cmd.log(requestOptions);
+            cmd.log('');
+          }
 
-            return request.post(requestOptions);
-          })
-          .then((res: ContextInfo): Promise<string> => {
-            if (verbose) {
-              this.log('Response:')
-              this.log(res);
-              this.log('');
-            }
+          return request.post(requestOptions);
+        })
+        .then((res: string): void => {
+          if (this.verbose) {
+            cmd.log('Response:');
+            cmd.log(res);
+            cmd.log('');
+          }
 
-            this.log(`Removing origin ${args.options.origin} from the ${(cdnType === 1 ? 'Private' : 'Public')} CDN. Please wait, this might take a moment...`);
-
-            const requestOptions: any = {
-              url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
-              headers: {
-                authorization: `Bearer ${auth.service.accessToken}`,
-                'X-RequestDigest': res.FormDigestValue
-              },
-              body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="RemoveTenantCdnOrigin" Id="33" ObjectPathId="29"><Parameters><Parameter Type="Enum">${cdnType}</Parameter><Parameter Type="String">${Utils.escapeXml(args.options.origin)}</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="29" Name="${auth.site.tenantId}" /></ObjectPaths></Request>`
-            };
-
-            if (verbose) {
-              this.log('Executing web request...');
-              this.log(requestOptions);
-              this.log('');
-            }
-
-            return request.post(requestOptions);
-          })
-          .then((res: string): void => {
-            if (verbose) {
-              this.log('Response:');
-              this.log(res);
-              this.log('');
-            }
-
-            const json: ClientSvcResponse = JSON.parse(res);
-            const response: ClientSvcResponseContents = json[0];
-            if (response.ErrorInfo) {
-              this.log(vorpal.chalk.red(`Error: ${response.ErrorInfo.ErrorMessage}`));
-            }
-            else {
-              this.log(chalk.green('DONE'));
-            }
-            cb();
-          }, (err: any): void => {
-            this.log(vorpal.chalk.red(`Error: ${err}`));
-            cb();
-          });
-      };
-
-      if (args.options.confirm) {
-        if (verbose) {
-          this.log('Confirmation suppressed through the confirm option. Removing CDN origin...');
-        }
-        removeCdnOrigin();
-      }
-      else {
-        this.prompt({
-          type: 'confirm',
-          name: 'continue',
-          default: false,
-          message: `Are you sure you want to delete the ${args.options.origin} CDN origin?`,
-        }, (result: { continue: boolean }): void => {
-          if (!result.continue) {
-            cb();
+          const json: ClientSvcResponse = JSON.parse(res);
+          const response: ClientSvcResponseContents = json[0];
+          if (response.ErrorInfo) {
+            cmd.log(vorpal.chalk.red(`Error: ${response.ErrorInfo.ErrorMessage}`));
           }
           else {
-            removeCdnOrigin();
+            cmd.log(chalk.green('DONE'));
           }
+          cb();
+        }, (err: any): void => {
+          cmd.log(vorpal.chalk.red(`Error: ${err}`));
+          cb();
         });
-      }
     };
+
+    if (args.options.confirm) {
+      if (this.verbose) {
+        cmd.log('Confirmation suppressed through the confirm option. Removing CDN origin...');
+      }
+      removeCdnOrigin();
+    }
+    else {
+      cmd.prompt({
+        type: 'confirm',
+        name: 'continue',
+        default: false,
+        message: `Are you sure you want to delete the ${args.options.origin} CDN origin?`,
+      }, (result: { continue: boolean }): void => {
+        if (!result.continue) {
+          cb();
+        }
+        else {
+          removeCdnOrigin();
+        }
+      });
+    }
   }
 
   public options(): CommandOption[] {
