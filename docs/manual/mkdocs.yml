@@ -3,20 +3,22 @@ pages:
   - Home: 'index.md'
   - Commands:
     - SharePoint Online (spo):
-      - cdn get: 'cmd/spo/cdn-get.md'
-      - cdn origin list: 'cmd/spo/cdn-origin-list.md'
-      - cdn origin remove: 'cmd/spo/cdn-origin-remove.md'
-      - cdn origin set: 'cmd/spo/cdn-origin-set.md'
-      - cdn policy list: 'cmd/spo/cdn-policy-list.md'
-      - cdn policy set: 'cmd/spo/cdn-policy-set.md'
-      - cdn set: 'cmd/spo/cdn-set.md'
       - connect: 'cmd/spo/connect.md'
       - disconnect: 'cmd/spo/disconnect.md'
       - status: 'cmd/spo/status.md'
-      - storageentity get: 'cmd/spo/storageentity-get.md'
-      - storageentity list: 'cmd/spo/storageentity-list.md'
-      - storageentity remove: 'cmd/spo/storageentity-remove.md'
-      - storageentity set: 'cmd/spo/storageentity-set.md'
+      - cdn:
+        - cdn get: 'cmd/spo/cdn/cdn-get.md'
+        - cdn set: 'cmd/spo/cdn/cdn-set.md'
+        - cdn origin list: 'cmd/spo/cdn/cdn-origin-list.md'
+        - cdn origin remove: 'cmd/spo/cdn/cdn-origin-remove.md'
+        - cdn origin set: 'cmd/spo/cdn/cdn-origin-set.md'
+        - cdn policy list: 'cmd/spo/cdn/cdn-policy-list.md'
+        - cdn policy set: 'cmd/spo/cdn/cdn-policy-set.md'
+      - storageentity:
+        - storageentity get: 'cmd/spo/storageentity/storageentity-get.md'
+        - storageentity list: 'cmd/spo/storageentity/storageentity-list.md'
+        - storageentity remove: 'cmd/spo/storageentity/storageentity-remove.md'
+        - storageentity set: 'cmd/spo/storageentity/storageentity-set.md'
   - About:
     - 'Why this CLI': 'about/why-cli.md'
     - 'Release notes': 'about/release-notes.md'
