@@ -3,6 +3,8 @@ pages:
   - Home: 'index.md'
   - Commands:
     - SharePoint Online (spo):
+      - app:
+        - app list: 'cmd/spo/app/app-list.md'
       - cdn get: 'cmd/spo/cdn-get.md'
       - cdn origin list: 'cmd/spo/cdn-origin-list.md'
       - cdn origin remove: 'cmd/spo/cdn-origin-remove.md'

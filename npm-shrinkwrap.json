@@ -10,6 +10,12 @@
       "integrity": "sha1-ox10JBprHtu5c8822XooloNKUfk=",
       "dev": true
     },
+    "@types/easy-table": {
+      "version": "0.0.31",
+      "resolved": "https://registry.npmjs.org/@types/easy-table/-/easy-table-0.0.31.tgz",
+      "integrity": "sha1-HYgWSeBE82lAP5tsZJijDWWqc/0=",
+      "dev": true
+    },
     "@types/form-data": {
       "version": "2.2.1",
       "resolved": "https://registry.npmjs.org/@types/form-data/-/form-data-2.2.1.tgz",
@@ -221,6 +227,12 @@
       "resolved": "https://registry.npmjs.org/cli-width/-/cli-width-1.1.1.tgz",
       "integrity": "sha1-pNKT72frt7iNSk1CwMzwDE0eNm0="
     },
+    "clone": {
+      "version": "1.0.3",
+      "resolved": "https://registry.npmjs.org/clone/-/clone-1.0.3.tgz",
+      "integrity": "sha1-KY1+IjFmD0DAA8LtMUDezz9TCF8=",
+      "optional": true
+    },
     "co": {
       "version": "4.6.0",
       "resolved": "https://registry.npmjs.org/co/-/co-4.6.0.tgz",
@@ -309,6 +321,15 @@
         "ms": "2.0.0"
       }
     },
+    "defaults": {
+      "version": "1.0.3",
+      "resolved": "https://registry.npmjs.org/defaults/-/defaults-1.0.3.tgz",
+      "integrity": "sha1-xlYFHpgX2f8I7YgUd/P+QBnz730=",
+      "optional": true,
+      "requires": {
+        "clone": "1.0.3"
+      }
+    },
     "delayed-stream": {
       "version": "1.0.0",
       "resolved": "https://registry.npmjs.org/delayed-stream/-/delayed-stream-1.0.0.tgz",
@@ -332,6 +353,14 @@
       "resolved": "https://registry.npmjs.org/diff/-/diff-3.3.1.tgz",
       "integrity": "sha512-MKPHZDMB0o6yHyDryUOScqZibp914ksXwAMYMTHj6KO8UeKsRYNJD3oNCKjTqZon+V488P7N/HzXF8t7ZR95ww==",
       "dev": true
+    },
+    "easy-table": {
+      "version": "1.1.0",
+      "resolved": "https://registry.npmjs.org/easy-table/-/easy-table-1.1.0.tgz",
+      "integrity": "sha1-hvmrTBAvA3G3KXuSplHVgkvIy3M=",
+      "requires": {
+        "wcwidth": "1.0.1"
+      }
     },
     "ecc-jsbn": {
       "version": "0.1.1",
@@ -2696,6 +2725,15 @@
         "node-localstorage": "0.6.0",
         "strip-ansi": "3.0.1",
         "wrap-ansi": "2.1.0"
+      }
+    },
+    "wcwidth": {
+      "version": "1.0.1",
+      "resolved": "https://registry.npmjs.org/wcwidth/-/wcwidth-1.0.1.tgz",
+      "integrity": "sha1-8LDc+RW8X/FSivrbLA4XtTLaL+g=",
+      "optional": true,
+      "requires": {
+        "defaults": "1.0.3"
       }
     },
     "wrap-ansi": {
