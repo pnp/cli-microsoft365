@@ -29,7 +29,7 @@ fs.realpath(__dirname, (err: NodeJS.ErrnoException, resolvedPath: string): void 
       file.indexOf('.spec.js') === -1 &&
       file.indexOf('.js.map') === -1) {
       const cmd: any = require(file);
-      if (cmd instanceof Command ) {
+      if (cmd instanceof Command) {
         cmd.init(vorpal);
       }
     }
