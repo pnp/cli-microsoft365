@@ -6,6 +6,8 @@ pages:
       - connect: 'cmd/spo/connect.md'
       - disconnect: 'cmd/spo/disconnect.md'
       - status: 'cmd/spo/status.md'
+      - app:
+        - app list: 'cmd/spo/app/app-list.md'
       - cdn:
         - cdn get: 'cmd/spo/cdn/cdn-get.md'
         - cdn set: 'cmd/spo/cdn/cdn-set.md'
