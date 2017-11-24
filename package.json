@@ -61,5 +61,8 @@
     "rimraf": "^2.6.2",
     "sinon": "^4.0.1",
     "typescript": "^2.6.1"
+  },
+  "nyc": {
+    "exclude": "**/*.spec.js"
   }
 }
