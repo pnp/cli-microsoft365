@@ -12,6 +12,7 @@
     "type": "git",
     "url": "git+https://github.com/SharePoint/office365-cli.git"
   },
+  "homepage": "https://sharepoint.github.io/office365-cli/",
   "bugs": {
     "url": "https://github.com/SharePoint/office365-cli/issues"
   },
