@@ -9,6 +9,7 @@ pages:
       - app:
         - app add: 'cmd/spo/app/app-add.md'
         - app get: 'cmd/spo/app/app-get.md'
+        - app install: 'cmd/spo/app/app-install.md'
         - app list: 'cmd/spo/app/app-list.md'
       - cdn:
         - cdn get: 'cmd/spo/cdn/cdn-get.md'
