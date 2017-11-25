@@ -23,7 +23,7 @@ interface Options extends VerboseOption {
   siteUrl: string;
 }
 
-class AppInstallCommand extends SpoCommand {
+class AppUninstallCommand extends SpoCommand {
   public get name(): string {
     return commands.APP_UNINSTALL;
   }
@@ -148,26 +148,21 @@ class AppInstallCommand extends SpoCommand {
   public help(): CommandHelp {
     return function (args: {}, log: (help: string) => void): void {
       const chalk = vorpal.chalk;
-      log(vorpal.find(commands.APP_INSTALL).helpInformation());
+      log(vorpal.find(commands.APP_UNINSTALL).helpInformation());
       log(
         `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online site,
       using the ${chalk.blue(commands.CONNECT)} command.
 
   Remarks:
   
-    To install an app from the tenant app catalog in a site, you have to first connect
-    to a SharePoint site using the ${chalk.blue(commands.CONNECT)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
-
-    If the app with the specified ID doesn't exist in the tenant app catalog, the command will fail
-    with an error. Before you can install app in a site, you have to add it to the tenant app catalog
-    first using the ${chalk.blue(commands.APP_ADD)} command.
+    To uninstall an app from the site, you have to first connect to a SharePoint site using
+    the ${chalk.blue(commands.CONNECT)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
    
   Examples:
   
-    ${chalk.grey(config.delimiter)} ${commands.APP_INSTALL} -i b2307a39-e878-458b-bc90-03bc578531d6 -s https://contoso.sharepoint.com
-      Installs the app with ID ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
-      in the ${chalk.grey('https://contoso.sharepoint.com')} site.
+    ${chalk.grey(config.delimiter)} ${commands.APP_UNINSTALL} -i b2307a39-e878-458b-bc90-03bc578531d6 -s https://contoso.sharepoint.com
+      Uninstalls the app with ID ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
+      from the ${chalk.grey('https://contoso.sharepoint.com')} site.
 
   More information:
   
@@ -178,4 +173,4 @@ class AppInstallCommand extends SpoCommand {
   }
 }
 
-module.exports = new AppInstallCommand();
+module.exports = new AppUninstallCommand();
