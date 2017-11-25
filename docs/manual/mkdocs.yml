@@ -11,6 +11,7 @@ pages:
         - app get: 'cmd/spo/app/app-get.md'
         - app install: 'cmd/spo/app/app-install.md'
         - app list: 'cmd/spo/app/app-list.md'
+        - app uninstall: 'cmd/spo/app/app-uninstall.md'
       - cdn:
         - cdn get: 'cmd/spo/cdn/cdn-get.md'
         - cdn set: 'cmd/spo/cdn/cdn-set.md'

@@ -5,6 +5,7 @@ export default {
   APP_GET: `${prefix} app get`,
   APP_INSTALL: `${prefix} app install`,
   APP_LIST: `${prefix} app list`,
+  APP_UNINSTALL: `${prefix} app uninstall`,
   CONNECT: `${prefix} connect`,
   DISCONNECT: `${prefix} disconnect`,
   STATUS: `${prefix} status`,
