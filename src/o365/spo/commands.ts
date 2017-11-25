@@ -22,5 +22,6 @@ export default {
   CDN_ORIGIN_SET: `${prefix} cdn origin set`,
   CDN_ORIGIN_REMOVE: `${prefix} cdn origin remove`,
   CDN_POLICY_LIST: `${prefix} cdn policy list`,
-  CDN_POLICY_SET: `${prefix} cdn policy set`
+  CDN_POLICY_SET: `${prefix} cdn policy set`,
+  CUSTOMACTION_GET: `${prefix} customaction get`,
 };

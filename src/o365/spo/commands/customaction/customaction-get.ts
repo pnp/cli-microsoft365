@@ -11,6 +11,7 @@ import {
 import SpoCommand from '../../SpoCommand';
 import { ContextInfo } from '../../spo';
 import Utils from '../../../../Utils';
+import { CustomAction } from './customaction';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -43,13 +44,37 @@ class SpoCustomActionGetCommand extends SpoCommand {
       .ensureAccessToken(auth.service.resource, cmd, this.verbose)
       .then((accessToken: string): Promise<ContextInfo> => {
         if (this.verbose) {
-          cmd.log(`Retrieved access token ${accessToken}. Loading details for the ${args.options.id} custom action...`);
+          cmd.log(`Retrieved access token ${accessToken}.`);
+        }
+
+        const requestOptions: any = {
+          url: `${args.options.url}/_api/contextinfo`,
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+            accept: 'application/json;odata=nometadata'
+          },
+          json: true
+        }
+
+        if (this.verbose) {
+          cmd.log('Executing web request...');
+          cmd.log(requestOptions);
+          cmd.log('');
+        }
+
+        return request.post(requestOptions);
+      })
+      .then((contextResponse: ContextInfo): Promise<CustomAction> => {
+        if (this.verbose) {
+          cmd.log('Response:');
+          cmd.log(contextResponse);
+          cmd.log('');
         }
 
         const requestOptions: any = {
           url: `${auth.site.url}/_api/web/usercustomactions('${encodeURIComponent(args.options.id)}')`,
           headers: {
-            authorization: `Bearer ${accessToken}`,
+            authorization: `Bearer ${auth.service.accessToken}`,
             accept: 'application/json;odata=nometadata'
           },
           json: true
@@ -63,21 +88,24 @@ class SpoCustomActionGetCommand extends SpoCommand {
 
         return request.get(requestOptions);
       })
-      .then((res: any): void => {  // ContextInfo
+      .then((customAction: CustomAction): void => {
         if (this.verbose) {
           cmd.log('Response:');
-          cmd.log(res);
+          cmd.log(customAction);
           cmd.log('');
         }
 
-        cmd.log(`Retrieving custom action...`);
-
-        const json: any = JSON.parse(res); // RestResponse<AppMetadata>
-        cmd.log(json);
-
-        const apps = json.d.results;   
-
-        cmd.log(apps.toString());
+        if (customAction["odata.null"] === true) {
+          cmd.log(`Custom action with id ${args.options.id} not found`);
+        }
+        else {
+          cmd.log(`Details for custom action ${args.options.id}:`);
+          cmd.log(`  Name:     ${customAction.Name}`);
+          cmd.log(`  Location: ${customAction.Location}`);
+          cmd.log(`  Scope:    ${customAction.Scope}`);
+          cmd.log(`  ClientSideComponentId:    ${customAction.ClientSideComponentId}`);
+          cmd.log(`  ClientSideComponentProperties:    ${customAction.ClientSideComponentProperties}`);
+        }
         cb();
       }, (err: any): void => {
         cmd.log(vorpal.chalk.red(`Error: ${err}`));
@@ -100,7 +128,7 @@ class SpoCustomActionGetCommand extends SpoCommand {
         description: 'Scope of the custom action. Allowed values Site|Web|All. Default All',
         autocomplete: ['Site', 'Web', 'All']
       }
-  ];
+    ];
 
     const parentOptions: CommandOption[] = super.options();
     return options.concat(parentOptions);
@@ -110,7 +138,7 @@ class SpoCustomActionGetCommand extends SpoCommand {
     return (args: CommandArgs): boolean | string => {
 
       if (Utils.isValidGuid(args.options.id) === false) {
-          return `${args.options.id} is not valid. Custom action id (Guid) expected.`;
+        return `${args.options.id} is not valid. Custom action id (Guid) expected.`;
       }
 
       if (SpoCommand.isValidSharePointUrl(args.options.url) === false) {
@@ -124,7 +152,7 @@ class SpoCustomActionGetCommand extends SpoCommand {
           return `${args.options.scope} is not a valid custom action scope. Allowed values are Site|Web|All`;
         }
       }
-      
+
       return true;
     };
   }
@@ -146,7 +174,7 @@ class SpoCustomActionGetCommand extends SpoCommand {
         
           ${chalk.grey(config.delimiter)} ${commands.CUSTOMACTION_GET} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 -u https://contoso.sharepoint.com/sites/test
       
-          ${chalk.grey(config.delimiter)} ${commands.CUSTOMACTION_GET} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 -u https://contoso.sharepoint.com/sites/test -s "Site"
+          ${chalk.grey(config.delimiter)} ${commands.CUSTOMACTION_GET} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 -u https://contoso.sharepoint.com/sites/test -s Site
       
         More information:
       
