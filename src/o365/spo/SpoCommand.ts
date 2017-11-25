@@ -39,10 +39,14 @@ export default abstract class SpoCommand extends Command {
   }
 
   protected getRequestDigest(cmd: CommandInstance, verbose: boolean = false): Promise<ContextInfo> {
+    return this.getRequestDigestForSite(auth.site.url, auth.site.accessToken, cmd, verbose);
+  }
+
+  protected getRequestDigestForSite(siteUrl: string, accessToken: string, cmd: CommandInstance, verbose: boolean = false): Promise<ContextInfo> {
     const requestOptions: any = {
-      url: `${auth.site.url}/_api/contextinfo`,
+      url: `${siteUrl}/_api/contextinfo`,
       headers: {
-        authorization: `Bearer ${auth.site.accessToken}`,
+        authorization: `Bearer ${accessToken}`,
         accept: 'application/json;odata=nometadata'
       },
       json: true
