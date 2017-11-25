@@ -1,0 +1,48 @@
+# spo app add
+
+Adds an app to the specified SharePoint Online app catalog
+
+## Usage
+
+```sh
+spo app add [options]
+```
+
+## Options
+
+Option|Description
+------|-----------
+`--help`|output usage information
+`-p, --filePath <filePath>`|Absolute or relative path to the solution package file to add to the app catalog
+`--overwrite`|Set to overwrite the existing package file
+`--verbose`|Runs command with verbose logging
+
+!!! important
+    Before using this command, connect to a SharePoint Online site, using the [spo connect](../connect.md) command.
+
+## Remarks
+
+To add an app to the tenant app catalog, you have to first connect to a SharePoint site using the
+[spo connect](../connect.md) command, eg. `spo connect https://contoso.sharepoint.com`.
+
+When specifying the path to the app package file you can use both relative and absolute paths. Note, that `~` in the path, will not be resolved and will most likely result in an error.
+
+If you try to upload a package that already exists in the tenant app catalog without specifying the `--overwrite` option, the command will fail with an error stating that the specified package already exists.
+
+## Examples
+
+```sh
+spo app add -p /Users/pnp/spfx/sharepoint/solution/spfx.sppkg
+```
+
+Adds package spfx.sppkg to the tenant app catalog
+
+```sh
+spo app add -p sharepoint/solution/spfx.sppkg --overwrite
+```
+
+Overwrites the package spfx.sppkg in the tenant app catalog with the newer version
+
+## More information
+
+- Application Lifecycle Management (ALM) APIs: [https://docs.microsoft.com/en-us/sharepoint/dev/apis/alm-api-for-spfx-add-ins](https://docs.microsoft.com/en-us/sharepoint/dev/apis/alm-api-for-spfx-add-ins)

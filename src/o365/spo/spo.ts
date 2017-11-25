@@ -17,3 +17,13 @@ export interface ClientSvcResponseContents {
   };
   TraceCorrelationId: string;
 }
+
+export interface ODataError {
+  "odata.error": {
+    code: string;
+    message: {
+      lang: string;
+      value: string;
+    }
+  }
+}

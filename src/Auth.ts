@@ -35,13 +35,17 @@ interface DeviceCode {
   message: string;
 }
 
+interface Logger {
+  log: (msg: any) => void
+}
+
 export default class Auth {
   public interval: NodeJS.Timer;
 
   constructor(public service: Service, private appId?: string) {
   }
 
-  public ensureAccessToken(resource: string, stdout: any, verbose: boolean = false): Promise<string> {
+  public ensureAccessToken(resource: string, stdout: Logger, verbose: boolean = false): Promise<string> {
     if (verbose) {
       stdout.log(`Starting Auth.ensureAccessToken. resource: ${resource}, verbose: ${verbose}`);
     }
@@ -196,7 +200,7 @@ export default class Auth {
     });
   }
 
-  public getAccessToken(resource: string, refreshToken: string, stdout: any, verbose: boolean = false): Promise<string> {
+  public getAccessToken(resource: string, refreshToken: string, stdout: Logger, verbose: boolean = false): Promise<string> {
     if (verbose) {
       stdout.log(`Starting Auth.getAccessToken. resource: ${resource}, refreshToken: ${refreshToken}, verbose: ${verbose}`);
     }
