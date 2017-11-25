@@ -60,7 +60,8 @@ class AppInstallCommand extends SpoCommand {
           url: `${args.options.siteUrl}/_api/web/tenantappcatalog/AvailableApps/GetById('${encodeURIComponent(args.options.id)}')/install`,
           headers: {
             authorization: `Bearer ${auth.site.accessToken}`,
-            accept: 'application/json;odata=nometadata'
+            accept: 'application/json;odata=nometadata',
+            'X-RequestDigest': res.FormDigestValue
           }
         };
 
