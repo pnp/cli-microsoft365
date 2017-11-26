@@ -2,6 +2,7 @@ const prefix: string = 'spo';
 
 export default {
   APP_LIST: `${prefix} app list`,
+  APP_RETRACT: `${prefix} app retract`,
   CONNECT: `${prefix} connect`,
   DISCONNECT: `${prefix} disconnect`,
   STATUS: `${prefix} status`,

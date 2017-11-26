@@ -8,6 +8,7 @@ pages:
       - status: 'cmd/spo/status.md'
       - app:
         - app list: 'cmd/spo/app/app-list.md'
+        - app retract: 'cmd/spo/app/app-retract.md'
       - cdn:
         - cdn get: 'cmd/spo/cdn/cdn-get.md'
         - cdn set: 'cmd/spo/cdn/cdn-set.md'
