@@ -12,6 +12,7 @@ pages:
         - app get: 'cmd/spo/app/app-get.md'
         - app install: 'cmd/spo/app/app-install.md'
         - app list: 'cmd/spo/app/app-list.md'
+        - app retract: 'cmd/spo/app/app-retract.md'
         - app uninstall: 'cmd/spo/app/app-uninstall.md'
         - app upgrade: 'cmd/spo/app/app-upgrade.md'
       - cdn:
