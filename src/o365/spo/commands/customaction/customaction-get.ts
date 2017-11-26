@@ -69,24 +69,17 @@ class SpoCustomActionGetCommand extends SpoCommand {
           cmd.log('Response:');
           cmd.log(contextResponse);
           cmd.log('');
-        }
 
-        const requestOptions: any = {
-          url: `${auth.site.url}/_api/web/usercustomactions('${encodeURIComponent(args.options.id)}')`,
-          headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
-            accept: 'application/json;odata=nometadata'
-          },
-          json: true
-        };
-
-        if (this.verbose) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
+          cmd.log(`Attempt to get custom action with scope: ${args.options.scope}`);
           cmd.log('');
         }
 
-        return request.get(requestOptions);
+        if(args.options.scope && args.options.scope.toLowerCase() !== "all") {
+
+          return this.getCustomAction(args.options, cmd);
+        }
+
+        return this.searchAllScopes(args.options, cmd);
       })
       .then((customAction: CustomAction): void => {
         if (this.verbose) {
@@ -102,7 +95,7 @@ class SpoCustomActionGetCommand extends SpoCommand {
           cmd.log(`Details for custom action ${args.options.id}:`);
           cmd.log(`  Name:     ${customAction.Name}`);
           cmd.log(`  Location: ${customAction.Location}`);
-          cmd.log(`  Scope:    ${customAction.Scope}`);
+          cmd.log(`  Scope:    ${this.humanizeScope(customAction.Scope)}`);
           cmd.log(`  ClientSideComponentId:    ${customAction.ClientSideComponentId}`);
           cmd.log(`  ClientSideComponentProperties:    ${customAction.ClientSideComponentProperties}`);
         }
@@ -111,6 +104,79 @@ class SpoCustomActionGetCommand extends SpoCommand {
         cmd.log(vorpal.chalk.red(`Error: ${err}`));
         cb();
       });
+  }
+
+  protected getCustomAction(options: Options, cmd: CommandInstance): Promise<CustomAction> {
+      
+      const requestOptions: any = {
+        url: `${options.url}/_api/${options.scope}/UserCustomActions('${encodeURIComponent(options.id)}')`,
+        headers: {
+          authorization: `Bearer ${auth.service.accessToken}`,
+          accept: 'application/json;odata=nometadata'
+        },
+        json: true
+      };
+
+      if (this.verbose) {
+        cmd.log('Executing web request...');
+        cmd.log(requestOptions);
+        cmd.log('');
+      }
+
+      return request.get(requestOptions);
+  }
+
+  /**
+   * Get request with `web` scope is send first. 
+   * If custom action not found then 
+   * another get request is send with `site` scope.
+   */
+  protected searchAllScopes(options: Options, cmd: CommandInstance): Promise<CustomAction> {
+    return new Promise<CustomAction>((resolve, reject) => {
+
+      options.scope = "Web";
+      this.getCustomAction(options, cmd).then((webResult: CustomAction): void => {
+        
+        if (this.verbose) {
+          cmd.log('getCustomAction with scope of web result...');
+          cmd.log(webResult);
+          cmd.log('');
+        }
+
+        if(webResult["odata.null"] !== true){
+          return resolve(webResult);
+        }
+
+        options.scope = "Site";
+        this.getCustomAction(options, cmd).then((siteResult: CustomAction): void => {
+
+          if (this.verbose) {
+            cmd.log('getCustomAction with scope of site result...');
+            cmd.log(siteResult);
+            cmd.log('');
+          }
+
+          return resolve(siteResult);
+
+        }, (err: any): void => {
+          reject(err);
+        });
+      }, (err: any): void => {
+        reject(err);
+      });
+    });
+  }
+
+  protected humanizeScope(scope: number): string {
+    
+    switch(scope) {
+      case 2:
+        return "Site";
+      case 3:
+        return "Web";
+    }
+
+    return `${scope}`;
   }
 
   public options(): CommandOption[] {
