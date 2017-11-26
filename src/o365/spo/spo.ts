@@ -17,3 +17,30 @@ export interface ClientSvcResponseContents {
   };
   TraceCorrelationId: string;
 }
+
+export interface ODataError {
+  "odata.error": {
+    code: string;
+    message: {
+      lang: string;
+      value: string;
+    }
+  }
+}
+
+export interface SearchResponse {
+  PrimaryQueryResult: {
+    RelevantResults: {
+      RowCount: number;
+      Table: {
+        Rows: {
+          Cells: {
+            Key: string;
+            Value: string;
+            ValueType: string;
+          }[];
+        }[];
+      };
+    }
+  }
+}
