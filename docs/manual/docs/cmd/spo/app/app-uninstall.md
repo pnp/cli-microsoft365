@@ -15,6 +15,7 @@ Option|Description
 `--help`|output usage information
 `-i, --id <id>`|ID of the app to retrieve information for
 `-s, --siteUrl <siteUrl>`|Absolute URL of the site to uninstall the app from
+`--confirm`|Don't prompt for confirming uninstalling the app
 `--verbose`|Runs command with verbose logging
 
 !!! important
@@ -31,6 +32,12 @@ spo app uninstall -i b2307a39-e878-458b-bc90-03bc578531d6 -s https://contoso.sha
 ```
 
 Uninstalls the app with ID _b2307a39-e878-458b-bc90-03bc578531d6_ from the _https://contoso.sharepoint.com_ site.
+
+```sh
+spo app uninstall -i b2307a39-e878-458b-bc90-03bc578531d6 -s https://contoso.sharepoint.com
+```
+
+Uninstalls the app with ID _b2307a39-e878-458b-bc90-03bc578531d6_ from the _https://contoso.sharepoint.com_ site without prompting for confirmation.
 
 ## More information
 

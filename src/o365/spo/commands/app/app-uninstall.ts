@@ -21,6 +21,7 @@ interface CommandArgs {
 interface Options extends VerboseOption {
   id: string;
   siteUrl: string;
+  confirm?: boolean;
 }
 
 class AppUninstallCommand extends SpoCommand {
@@ -32,82 +33,109 @@ class AppUninstallCommand extends SpoCommand {
     return 'Uninstalls an app from the site';
   }
 
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.confirm = (!(!args.options.confirm)).toString();
+    return telemetryProps;
+  }
+
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.siteUrl);
-    let siteAccessToken: string = '';
-
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.verbose)
-      .then((accessToken: string): Promise<ContextInfo> => {
-        siteAccessToken = accessToken;
-
-        if (this.verbose) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
-
-        return this.getRequestDigestForSite(args.options.siteUrl, siteAccessToken, cmd, this.verbose);
-      })
-      .then((res: ContextInfo): Promise<string> => {
-        if (this.verbose) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
-        cmd.log(`Uninstalling app '${args.options.id}' from the site '${args.options.siteUrl}'...`);
-
-        const requestOptions: any = {
-          url: `${args.options.siteUrl}/_api/web/tenantappcatalog/AvailableApps/GetById('${encodeURIComponent(args.options.id)}')/uninstall`,
-          headers: {
-            authorization: `Bearer ${auth.site.accessToken}`,
-            accept: 'application/json;odata=nometadata',
-            'X-RequestDigest': res.FormDigestValue
+    const uninstallApp: () => void = (): void => {
+      const resource: string = Auth.getResourceFromUrl(args.options.siteUrl);
+      let siteAccessToken: string = '';
+  
+      auth
+        .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.verbose)
+        .then((accessToken: string): Promise<ContextInfo> => {
+          siteAccessToken = accessToken;
+  
+          if (this.verbose) {
+            cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
           }
-        };
-
-        if (this.verbose) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
-        return request.post(requestOptions);
-      })
-      .then((res: string): void => {
-        if (this.verbose) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
-        cb();
-      }, (rawRes: any): void => {
-        try {
-          const res: any = JSON.parse(JSON.stringify(rawRes));
-          if (res.error) {
-            const err: ODataError = JSON.parse(res.error);
-            if (err['odata.error']) {
-              if (err['odata.error'].code === '-1, Microsoft.SharePoint.Client.ResourceNotFoundException') {
-                cmd.log(vorpal.chalk.red(`Error: App with id ${args.options.id} not found`));
+  
+          return this.getRequestDigestForSite(args.options.siteUrl, siteAccessToken, cmd, this.verbose);
+        })
+        .then((res: ContextInfo): Promise<string> => {
+          if (this.verbose) {
+            cmd.log('Response:');
+            cmd.log(res);
+            cmd.log('');
+          }
+  
+          cmd.log(`Uninstalling app '${args.options.id}' from the site '${args.options.siteUrl}'...`);
+  
+          const requestOptions: any = {
+            url: `${args.options.siteUrl}/_api/web/tenantappcatalog/AvailableApps/GetById('${encodeURIComponent(args.options.id)}')/uninstall`,
+            headers: {
+              authorization: `Bearer ${auth.site.accessToken}`,
+              accept: 'application/json;odata=nometadata',
+              'X-RequestDigest': res.FormDigestValue
+            }
+          };
+  
+          if (this.verbose) {
+            cmd.log('Executing web request...');
+            cmd.log(requestOptions);
+            cmd.log('');
+          }
+  
+          return request.post(requestOptions);
+        })
+        .then((res: string): void => {
+          if (this.verbose) {
+            cmd.log('Response:');
+            cmd.log(res);
+            cmd.log('');
+          }
+  
+          cb();
+        }, (rawRes: any): void => {
+          try {
+            const res: any = JSON.parse(JSON.stringify(rawRes));
+            if (res.error) {
+              const err: ODataError = JSON.parse(res.error);
+              if (err['odata.error']) {
+                if (err['odata.error'].code === '-1, Microsoft.SharePoint.Client.ResourceNotFoundException') {
+                  cmd.log(vorpal.chalk.red(`Error: App with id ${args.options.id} not found`));
+                }
+                else {
+                  cmd.log(vorpal.chalk.red(`Error: ${err['odata.error'].message.value}`));
+                }
               }
               else {
-                cmd.log(vorpal.chalk.red(`Error: ${err['odata.error'].message.value}`));
+                cmd.log(vorpal.chalk.red(`Error: ${res.message}`));
               }
             }
             else {
-              cmd.log(vorpal.chalk.red(`Error: ${res.message}`));
+              cmd.log(vorpal.chalk.red(`Error: ${rawRes}`));
             }
           }
-          else {
+          catch (e) {
             cmd.log(vorpal.chalk.red(`Error: ${rawRes}`));
           }
-        }
-        catch (e) {
-          cmd.log(vorpal.chalk.red(`Error: ${rawRes}`));
-        }
+  
+          cb();
+        });
+    };
 
-        cb();
+    if (args.options.confirm) {
+      uninstallApp();
+    }
+    else {
+      cmd.prompt({
+        type: 'confirm',
+        name: 'continue',
+        default: false,
+        message: `Are you sure you want to uninstall the app ${args.options.id} from site ${args.options.siteUrl}?`,
+      }, (result: { continue: boolean }): void => {
+        if (!result.continue) {
+          cb();
+        }
+        else {
+          uninstallApp();
+        }
       });
+    }
   }
 
   public options(): CommandOption[] {
@@ -119,6 +147,10 @@ class AppUninstallCommand extends SpoCommand {
       {
         option: '-s, --siteUrl <siteUrl>',
         description: 'Absolute URL of the site to install the app in'
+      },
+      {
+        option: '--confirm',
+        description: 'Don\'t prompt for confirming uninstalling the app'
       }
     ];
 
@@ -163,6 +195,10 @@ class AppUninstallCommand extends SpoCommand {
     ${chalk.grey(config.delimiter)} ${commands.APP_UNINSTALL} -i b2307a39-e878-458b-bc90-03bc578531d6 -s https://contoso.sharepoint.com
       Uninstalls the app with ID ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
       from the ${chalk.grey('https://contoso.sharepoint.com')} site.
+
+    ${chalk.grey(config.delimiter)} ${commands.APP_UNINSTALL} -i b2307a39-e878-458b-bc90-03bc578531d6 -s https://contoso.sharepoint.com --confirm
+      Uninstalls the app with ID ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
+      from the ${chalk.grey('https://contoso.sharepoint.com')} site without prompting for confirmation.
 
   More information:
   
