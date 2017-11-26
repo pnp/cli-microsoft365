@@ -2,6 +2,7 @@ const prefix: string = 'spo';
 
 export default {
   APP_ADD: `${prefix} app add`,
+  APP_DEPLOY: `${prefix} app deploy`,
   APP_GET: `${prefix} app get`,
   APP_INSTALL: `${prefix} app install`,
   APP_LIST: `${prefix} app list`,

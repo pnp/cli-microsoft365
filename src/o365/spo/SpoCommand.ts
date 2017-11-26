@@ -1,7 +1,7 @@
 import Command, { CommandAction } from '../../Command';
 import appInsights from '../../appInsights';
 import auth from './SpoAuth';
-import { ContextInfo } from './spo';
+import { ContextInfo, SearchResponse } from './spo';
 import * as request from 'request-promise-native';
 
 export default abstract class SpoCommand extends Command {
@@ -38,11 +38,11 @@ export default abstract class SpoCommand extends Command {
     }
   }
 
-  protected getRequestDigest(cmd: CommandInstance, verbose: boolean = false): Promise<ContextInfo> {
+  protected getRequestDigest(cmd: CommandInstance, verbose: boolean): Promise<ContextInfo> {
     return this.getRequestDigestForSite(auth.site.url, auth.site.accessToken, cmd, verbose);
   }
 
-  protected getRequestDigestForSite(siteUrl: string, accessToken: string, cmd: CommandInstance, verbose: boolean = false): Promise<ContextInfo> {
+  protected getRequestDigestForSite(siteUrl: string, accessToken: string, cmd: CommandInstance, verbose: boolean): Promise<ContextInfo> {
     const requestOptions: any = {
       url: `${siteUrl}/_api/contextinfo`,
       headers: {
@@ -73,5 +73,56 @@ export default abstract class SpoCommand extends Command {
     else {
       return true;
     }
+  }
+
+  protected getTenantAppCatalogUrl(cmd: CommandInstance, verbose: boolean): Promise<string> {
+    return new Promise<string>((resolve: (appCatalogUrl: string) => void, reject: (error: any) => void): void => {
+      const requestOptions: any = {
+        url: `${auth.site.url}/_api/search/query?querytext='contentclass:STS_Site%20AND%20SiteTemplate:APPCATALOG'&SelectProperties='SPWebUrl'`,
+        headers: {
+          authorization: `Bearer ${auth.site.accessToken}`,
+          accept: 'application/json;odata=nometadata'
+        },
+        json: true
+      };
+  
+      if (verbose) {
+        cmd.log('Executing web request...');
+        cmd.log(requestOptions);
+        cmd.log('');
+      }
+  
+      request
+        .get(requestOptions)
+        .then((res: SearchResponse): void => {
+          if (verbose) {
+            cmd.log('Response');
+            cmd.log(res);
+            cmd.log('');
+          }
+
+          if (res.PrimaryQueryResult.RelevantResults.RowCount < 1) {
+            reject('Tenant app catalog not found');
+            return;
+          }
+
+          for (let i: number = 0; i < res.PrimaryQueryResult.RelevantResults.Table.Rows[0].Cells.length; i++) {
+            if (res.PrimaryQueryResult.RelevantResults.Table.Rows[0].Cells[i].Key === 'SPWebUrl') {
+              resolve(res.PrimaryQueryResult.RelevantResults.Table.Rows[0].Cells[i].Value);
+              return;
+            }
+          }
+          
+          reject('Tenant app catalog URL not found');
+        }, (error: any): void => {
+          if (verbose) {
+            cmd.log('Error');
+            cmd.log(error);
+            cmd.log('');
+          }
+
+          reject(error);
+        });
+    });
   }
 }
