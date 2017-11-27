@@ -581,6 +581,13 @@ describe(commands.APP_RETRACT, () => {
   });
 
   it('fails when no URL provided in the prompt for tenant app catalog URL', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf(`search/query?querytext='contentclass:STS_Site%20AND%20SiteTemplate:APPCATALOG'`) > -1) {
+        return Promise.reject('Error while executing search query');
+      }
+
+      return Promise.reject('Invalid request');
+    });
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
@@ -596,10 +603,20 @@ describe(commands.APP_RETRACT, () => {
       catch (e) {
         done(e);
       }
+      finally {
+        Utils.restore(request.get);
+      }
     });
   });
 
   it('fails when invalid URL provided in the prompt for tenant app catalog URL', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf(`search/query?querytext='contentclass:STS_Site%20AND%20SiteTemplate:APPCATALOG'`) > -1) {
+        return Promise.reject('Error while executing search query');
+      }
+
+      return Promise.reject('Invalid request');
+    });
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
@@ -615,10 +632,20 @@ describe(commands.APP_RETRACT, () => {
       catch (e) {
         done(e);
       }
+      finally {
+        Utils.restore(request.get);
+      }
     });
   });
 
   it('correctly retracts the app with valid URL provided in the prompt for tenant app catalog URL', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf(`search/query?querytext='contentclass:STS_Site%20AND%20SiteTemplate:APPCATALOG'`) > -1) {
+        return Promise.reject('Error while executing search query');
+      }
+
+      return Promise.reject('Invalid request');
+    });
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -667,7 +694,8 @@ describe(commands.APP_RETRACT, () => {
       }
       finally {
         Utils.restore([
-          request.post
+          request.post,
+          request.get
         ]);
       }
     });
