@@ -1,5 +1,20 @@
 # Release notes
 
+## v0.2.0
+
+New commands:
+
+**SharePoint Online:**
+
+- [spo app add](../cmd/spo/app/app-add.md) - add an app to the specified SharePoint Online app catalog
+- [spo app deploy](../cmd/spo/app/app-deploy.md) - deploy the specified app in the tenant app catalog
+- [spo app get](../cmd/spo/app/app-get.md) - get information about the specific app from the tenant app catalog
+- [spo app install](../cmd/spo/app/app-install.md) - install an app from the tenant app catalog in the site
+- [spo app list](../cmd/spo/app/app-list.md) - list apps from the tenant app catalog
+- [spo app retract](../cmd/spo/app/app-retract.md) - retract the specified app from the tenant app catalog
+- [spo app uninstall](../cmd/spo/app/app-uninstall.md) - uninstall an app from the site
+- [spo app upgrade](../cmd/spo/app/app-upgrade.md) - upgrade app in the specified site
+
 ## v0.1.1
 
 - Fixed bug in resolving command paths on Windows
