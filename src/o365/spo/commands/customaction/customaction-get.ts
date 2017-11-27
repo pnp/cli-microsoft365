@@ -44,25 +44,10 @@ class SpoCustomActionGetCommand extends SpoCommand {
       .ensureAccessToken(auth.service.resource, cmd, this.verbose)
       .then((accessToken: string): Promise<ContextInfo> => {
         if (this.verbose) {
-          cmd.log(`Retrieved access token ${accessToken}.`);
+          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
         }
 
-        const requestOptions: any = {
-          url: `${args.options.url}/_api/contextinfo`,
-          headers: {
-            authorization: `Bearer ${accessToken}`,
-            accept: 'application/json;odata=nometadata'
-          },
-          json: true
-        }
-
-        if (this.verbose) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
-        return request.post(requestOptions);
+        return this.getRequestDigestForSite(args.options.url, accessToken, cmd, this.verbose);
       })
       .then((contextResponse: ContextInfo): Promise<CustomAction> => {
         if (this.verbose) {
@@ -74,7 +59,7 @@ class SpoCustomActionGetCommand extends SpoCommand {
           cmd.log('');
         }
 
-        if(args.options.scope && args.options.scope.toLowerCase() !== "all") {
+        if (args.options.scope && args.options.scope.toLowerCase() !== "all") {
 
           return this.getCustomAction(args.options, cmd);
         }
@@ -107,23 +92,23 @@ class SpoCustomActionGetCommand extends SpoCommand {
   }
 
   protected getCustomAction(options: Options, cmd: CommandInstance): Promise<CustomAction> {
-      
-      const requestOptions: any = {
-        url: `${options.url}/_api/${options.scope}/UserCustomActions('${encodeURIComponent(options.id)}')`,
-        headers: {
-          authorization: `Bearer ${auth.service.accessToken}`,
-          accept: 'application/json;odata=nometadata'
-        },
-        json: true
-      };
 
-      if (this.verbose) {
-        cmd.log('Executing web request...');
-        cmd.log(requestOptions);
-        cmd.log('');
-      }
+    const requestOptions: any = {
+      url: `${options.url}/_api/${options.scope}/UserCustomActions('${encodeURIComponent(options.id)}')`,
+      headers: {
+        authorization: `Bearer ${auth.service.accessToken}`,
+        accept: 'application/json;odata=nometadata'
+      },
+      json: true
+    };
 
-      return request.get(requestOptions);
+    if (this.verbose) {
+      cmd.log('Executing web request...');
+      cmd.log(requestOptions);
+      cmd.log('');
+    }
+
+    return request.get(requestOptions);
   }
 
   /**
@@ -136,14 +121,14 @@ class SpoCustomActionGetCommand extends SpoCommand {
 
       options.scope = "Web";
       this.getCustomAction(options, cmd).then((webResult: CustomAction): void => {
-        
+
         if (this.verbose) {
           cmd.log('getCustomAction with scope of web result...');
           cmd.log(webResult);
           cmd.log('');
         }
 
-        if(webResult["odata.null"] !== true){
+        if (webResult["odata.null"] !== true) {
           return resolve(webResult);
         }
 
@@ -167,9 +152,37 @@ class SpoCustomActionGetCommand extends SpoCommand {
     });
   }
 
+  /**
+   * This method to be removed when 
+   * https://github.com/waldekmastykarz/office365-cli/commit/c14d6336fa002bd882f2c0d0d220b89ecaeb8bb8 
+   * merged.
+   * @param siteUrl 
+   * @param accessToken 
+   * @param cmd 
+   * @param verbose 
+   */
+  protected getRequestDigestForSite(siteUrl: string, accessToken: string, cmd: CommandInstance, verbose: boolean = false): Promise<ContextInfo> {
+    const requestOptions: any = {
+      url: `${siteUrl}/_api/contextinfo`,
+      headers: {
+        authorization: `Bearer ${accessToken}`,
+        accept: 'application/json;odata=nometadata'
+      },
+      json: true
+    };
+
+    if (verbose) {
+      cmd.log('Executing web request...');
+      cmd.log(requestOptions);
+      cmd.log('');
+    }
+
+    return request.post(requestOptions);
+  }
+
   protected humanizeScope(scope: number): string {
-    
-    switch(scope) {
+
+    switch (scope) {
       case 2:
         return "Site";
       case 3:
@@ -207,7 +220,7 @@ class SpoCustomActionGetCommand extends SpoCommand {
         return `${args.options.id} is not valid. Custom action id (Guid) expected.`;
       }
 
-      if (SpoCommand.isValidSharePointUrl(args.options.url) === false) {
+      if (SpoCommand.isValidSharePointUrl(args.options.url) !== true) {
         return 'Missing required option url';
       }
 
