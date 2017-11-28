@@ -74,7 +74,7 @@ describe(commands.CUSTOMACTION_GET, () => {
 
   it('logs correct telemetry event', (done) => {
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: {}, appCatalogUrl: 'https://contoso-admin.sharepoint.com' }, () => {
+    cmdInstance.action({ options: { verbose: false, url: 'https://contoso.sharepoint.com/sites/appcatalog', id: "abc" }}, () => {
       try {
         assert.equal(telemetry.name, commands.CUSTOMACTION_GET);
         done();
@@ -89,7 +89,7 @@ describe(commands.CUSTOMACTION_GET, () => {
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
+    cmdInstance.action({ options: { verbose: false, url: 'https://contoso.sharepoint.com/sites/appcatalog', id: "abc" }}, () => {
       let returnsCorrectValue: boolean = false;
       log.forEach(l => {
         if (l && l.indexOf('Connect to a SharePoint Online site first') > -1) {
@@ -123,15 +123,13 @@ describe(commands.CUSTOMACTION_GET, () => {
     });
 
     let getRequestSpy = sinon.stub(request, 'get').callsFake((opts) => {
-      
+
       if (opts.url.indexOf('/_api/Web/UserCustomActions(') > -1) {
         return Promise.resolve('abc');
       }
 
       if (opts.url.indexOf('/_api/Site/UserCustomActions(') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
+        return Promise.resolve('abc');
       }
 
       return Promise.reject('Invalid request');
@@ -143,18 +141,24 @@ describe(commands.CUSTOMACTION_GET, () => {
     cmdInstance.action = command.action();
 
     const getCustomActionSpy = sinon.spy((command as any), 'getCustomAction');
+    const options: Object = {
+      verbose: false,
+      id: 'b2307a39-e878-458b-bc90-03bc578531d6',
+      url: 'https://contoso.sharepoint.com',
+      scope: 'Web'
+    }
 
-    cmdInstance.action({
-      options: {
-        verbose: true,
-        id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-        url: 'https://contoso.sharepoint.com', 
-        scope: 'Web'
-      }
-    }, () => {
+    cmdInstance.action({ options: options }, () => {
 
       try {
         assert(getRequestSpy.calledOnce == true);
+        assert(getCustomActionSpy.calledWith(sinon.match(
+          {
+            id: 'b2307a39-e878-458b-bc90-03bc578531d6',
+            url: 'https://contoso.sharepoint.com',
+            scope: 'Web'
+          }
+        ), cmdInstance));
         assert(getCustomActionSpy.calledOnce == true);
         done();
       }
@@ -186,15 +190,13 @@ describe(commands.CUSTOMACTION_GET, () => {
     });
 
     let getRequestSpy = sinon.stub(request, 'get').callsFake((opts) => {
-      
+
       if (opts.url.indexOf('/_api/Web/UserCustomActions(') > -1) {
         return Promise.resolve('abc');
       }
 
       if (opts.url.indexOf('/_api/Site/UserCustomActions(') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
+        return Promise.resolve('abc');
       }
 
       return Promise.reject('Invalid request');
@@ -206,18 +208,24 @@ describe(commands.CUSTOMACTION_GET, () => {
     cmdInstance.action = command.action();
 
     const getCustomActionSpy = sinon.spy((command as any), 'getCustomAction');
+    const options: Object = {
+      verbose: false,
+      id: 'b2307a39-e878-458b-bc90-03bc578531d6',
+      url: 'https://contoso.sharepoint.com',
+      scope: 'Site'
+    }
 
-    cmdInstance.action({
-      options: {
-        verbose: true,
-        id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-        url: 'https://contoso.sharepoint.com', 
-        scope: 'Site'
-      }
-    }, () => {
+    cmdInstance.action({ options: options }, () => {
 
       try {
         assert(getRequestSpy.calledOnce == true);
+        assert(getCustomActionSpy.calledWith(sinon.match(
+          {
+            id: 'b2307a39-e878-458b-bc90-03bc578531d6',
+            url: 'https://contoso.sharepoint.com',
+            scope: 'Site'
+          }
+        ), cmdInstance));
         assert(getCustomActionSpy.calledOnce == true);
         done();
       }
@@ -255,9 +263,7 @@ describe(commands.CUSTOMACTION_GET, () => {
       }
 
       if (opts.url.indexOf('/_api/Site/UserCustomActions(') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
+        return Promise.resolve('abc');
       }
 
       return Promise.reject('Invalid request');
@@ -272,9 +278,9 @@ describe(commands.CUSTOMACTION_GET, () => {
 
     cmdInstance.action({
       options: {
-        verbose: true,
+        verbose: false,
         id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-        url: 'https://contoso.sharepoint.com', 
+        url: 'https://contoso.sharepoint.com',
         scope: 'All'
       }
     }, () => {
@@ -313,13 +319,11 @@ describe(commands.CUSTOMACTION_GET, () => {
 
     let getRequestSpy = sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf('/_api/Web/UserCustomActions(') > -1) {
-        return Promise.resolve({"odata.null": true});
+        return Promise.resolve({ "odata.null": true });
       }
 
       if (opts.url.indexOf('/_api/Site/UserCustomActions(') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
+        return Promise.resolve('abc');
       }
 
       return Promise.reject('Invalid request');
@@ -356,11 +360,11 @@ describe(commands.CUSTOMACTION_GET, () => {
     });
   });
 
-  it('searchAllScopes called once when scope is All', (done) => {
+  it('searchAllScopes called when scope is All', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
 
       if (opts.url.indexOf('/common/oauth2/token') > -1) {
-        return Promise.resolve({'odata.null': true});
+        return Promise.resolve({ 'odata.null': true });
       }
 
       if (opts.url.indexOf('/_api/contextinfo') > -1) {
@@ -379,9 +383,7 @@ describe(commands.CUSTOMACTION_GET, () => {
       }
 
       if (opts.url.indexOf('/_api/Site/UserCustomActions(') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
+        return Promise.resolve('abc');
       }
 
       return Promise.reject('Invalid request');
@@ -393,16 +395,21 @@ describe(commands.CUSTOMACTION_GET, () => {
     cmdInstance.action = command.action();
 
     const searchAllScopesSpy = sinon.spy((command as any), 'searchAllScopes');
+    const options: Object = {
+      verbose: false,
+      id: 'b2307a39-e878-458b-bc90-03bc578531d6',
+      url: 'https://contoso.sharepoint.com',
+      scope: "All"
+    }
 
-    cmdInstance.action({
-      options: {
-        verbose: true,
-        id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-        url: 'https://contoso.sharepoint.com'
-      }
-    }, () => {
+    cmdInstance.action({ options: options }, () => {
 
       try {
+        assert(searchAllScopesSpy.calledWith(sinon.match(
+          {
+            id: 'b2307a39-e878-458b-bc90-03bc578531d6',
+            url: 'https://contoso.sharepoint.com'
+          }), cmdInstance));
         assert(searchAllScopesSpy.calledOnce == true);
         done();
       }
@@ -413,6 +420,187 @@ describe(commands.CUSTOMACTION_GET, () => {
         Utils.restore(request.post);
         Utils.restore(request.get);
         Utils.restore((command as any)['searchAllScopes']);
+      }
+    });
+  });
+
+  it('searchAllScopes correctly handles custom action odata.null when All scope specified', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+
+      if (opts.url.indexOf('/common/oauth2/token') > -1) {
+        return Promise.resolve('abc');
+      }
+
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        return Promise.resolve({
+          FormDigestValue: 'abc'
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+
+      if (opts.url.indexOf('/_api/Web/UserCustomActions(') > -1) {
+        return Promise.resolve({ "odata.null": true });
+      }
+
+      if (opts.url.indexOf('/_api/Site/UserCustomActions(') > -1) {
+        return Promise.resolve({ "odata.null": true });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    const commandLogSpy: any = sinon.spy(cmdInstance, 'log');
+    const actionId: string = 'b2307a39-e878-458b-bc90-03bc578531d6';
+
+    cmdInstance.action({
+      options: {
+        verbose: false,
+        id: actionId,
+        url: 'https://contoso.sharepoint.com',
+        scope: 'All'
+      }
+    }, () => {
+
+      try {
+        assert(commandLogSpy.calledWith(`Custom action with id ${actionId} not found`));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+        Utils.restore(request.get);
+        Utils.restore(cmdInstance.log);
+      }
+    });
+  });
+
+  it('searchAllScopes correctly handles web custom action reject request', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+
+      if (opts.url.indexOf('/common/oauth2/token') > -1) {
+        return Promise.resolve('abc');
+      }
+
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        return Promise.resolve({
+          FormDigestValue: 'abc'
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    const err = 'Invalid request';
+    sinon.stub(request, 'get').callsFake((opts) => {
+
+      if (opts.url.indexOf('/_api/Web/UserCustomActions(') > -1) {
+        return Promise.reject(err);
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    const commandLogSpy: any = sinon.spy(cmdInstance, 'log');
+    const actionId: string = 'b2307a39-e878-458b-bc90-03bc578531d6';
+
+    cmdInstance.action({
+      options: {
+        verbose: false,
+        id: actionId,
+        url: 'https://contoso.sharepoint.com',
+        scope: 'All'
+      }
+    }, () => {
+
+      try {
+        assert(commandLogSpy.calledWith(sinon.match(err)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+        Utils.restore(request.get);
+        Utils.restore(cmdInstance.log);
+      }
+    });
+  });
+
+  it('searchAllScopes correctly handles site custom action reject request', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+
+      if (opts.url.indexOf('/common/oauth2/token') > -1) {
+        return Promise.resolve('abc');
+      }
+
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        return Promise.resolve({
+          FormDigestValue: 'abc'
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    const err = 'Invalid request';
+    sinon.stub(request, 'get').callsFake((opts) => {
+
+      if (opts.url.indexOf('/_api/Web/UserCustomActions(') > -1) {
+        return Promise.resolve({ "odata.null": true });
+      }
+
+      if (opts.url.indexOf('/_api/Site/UserCustomActions(') > -1) {
+        return Promise.reject(err);
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    const commandLogSpy: any = sinon.spy(cmdInstance, 'log');
+    const actionId: string = 'b2307a39-e878-458b-bc90-03bc578531d6';
+
+    cmdInstance.action({
+      options: {
+        verbose: false,
+        id: actionId,
+        url: 'https://contoso.sharepoint.com',
+        scope: 'All'
+      }
+    }, () => {
+
+      try {
+        assert(commandLogSpy.calledWith(sinon.match(err)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+        Utils.restore(request.get);
+        Utils.restore(cmdInstance.log);
       }
     });
   });
@@ -639,7 +827,7 @@ describe(commands.CUSTOMACTION_GET, () => {
       options: {
         id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
         url: "https://contoso.sharepoint.com",
-        verbose: true
+        verbose: false
       }
     }, () => {
       let containsError = false;
