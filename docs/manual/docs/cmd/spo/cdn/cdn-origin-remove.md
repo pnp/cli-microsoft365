@@ -17,6 +17,7 @@ Option|Description
 `-o, --origin <origin>`|Origin to remove from the current CDN configuration
 `--confirm`|Don't prompt for confirming removal of a tenant property
 `--verbose`|Runs command with verbose logging
+`--debug`|Runs command with debug logging
 
 !!! important
     Before using this command, connect to a SharePoint Online tenant admin site, using the [spo connect](../connect.md) command.

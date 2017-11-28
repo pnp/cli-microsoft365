@@ -3,7 +3,7 @@ import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../..
 import config from '../../../../config';
 import * as request from 'request-promise-native';
 import commands from '../../commands';
-import VerboseOption from '../../../../VerboseOption';
+import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandHelp,
   CommandOption,
@@ -18,7 +18,7 @@ interface CommandArgs {
   options: Options;
 }
 
-interface Options extends VerboseOption {
+interface Options extends GlobalOptions {
   type: string;
   origin: string;
   confirm?: boolean;
@@ -50,29 +50,31 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
     const chalk: any = vorpal.chalk;
 
     const removeCdnOrigin = (): void => {
-      if (this.verbose) {
+      if (this.debug) {
         cmd.log(`Retrieving access token for ${auth.service.resource}...`);
       }
 
       auth
-        .ensureAccessToken(auth.service.resource, cmd, this.verbose)
+        .ensureAccessToken(auth.service.resource, cmd, this.debug)
         .then((accessToken: string): Promise<ContextInfo> => {
-          if (this.verbose) {
+          if (this.debug) {
             cmd.log('Response:');
             cmd.log(accessToken);
             cmd.log('');
           }
 
-          return this.getRequestDigest(cmd, this.verbose);
+          return this.getRequestDigest(cmd, this.debug);
         })
         .then((res: ContextInfo): Promise<string> => {
-          if (this.verbose) {
+          if (this.debug) {
             cmd.log('Response:')
             cmd.log(res);
             cmd.log('');
           }
 
-          cmd.log(`Removing origin ${args.options.origin} from the ${(cdnType === 1 ? 'Private' : 'Public')} CDN. Please wait, this might take a moment...`);
+          if (this.verbose) {
+            cmd.log(`Removing origin ${args.options.origin} from the ${(cdnType === 1 ? 'Private' : 'Public')} CDN. Please wait, this might take a moment...`);
+          }
 
           const requestOptions: any = {
             url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
@@ -83,7 +85,7 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
             body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="RemoveTenantCdnOrigin" Id="33" ObjectPathId="29"><Parameters><Parameter Type="Enum">${cdnType}</Parameter><Parameter Type="String">${Utils.escapeXml(args.options.origin)}</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="29" Name="${auth.site.tenantId}" /></ObjectPaths></Request>`
           };
 
-          if (this.verbose) {
+          if (this.debug) {
             cmd.log('Executing web request...');
             cmd.log(requestOptions);
             cmd.log('');
@@ -92,7 +94,7 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
           return request.post(requestOptions);
         })
         .then((res: string): void => {
-          if (this.verbose) {
+          if (this.debug) {
             cmd.log('Response:');
             cmd.log(res);
             cmd.log('');
@@ -104,7 +106,9 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
             cmd.log(vorpal.chalk.red(`Error: ${response.ErrorInfo.ErrorMessage}`));
           }
           else {
-            cmd.log(chalk.green('DONE'));
+            if (this.verbose) {
+              cmd.log(chalk.green('DONE'));
+            }
           }
           cb();
         }, (err: any): void => {
@@ -114,7 +118,7 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
     };
 
     if (args.options.confirm) {
-      if (this.verbose) {
+      if (this.debug) {
         cmd.log('Confirmation suppressed through the confirm option. Removing CDN origin...');
       }
       removeCdnOrigin();

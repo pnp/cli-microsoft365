@@ -3,7 +3,7 @@ import Auth from '../../../../Auth';
 import config from '../../../../config';
 import * as request from 'request-promise-native';
 import commands from '../../commands';
-import VerboseOption from '../../../../VerboseOption';
+import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandHelp,
   CommandOption,
@@ -17,7 +17,7 @@ interface CommandArgs {
   options: Options;
 }
 
-interface Options extends VerboseOption {
+interface Options extends GlobalOptions {
   appCatalogUrl: string;
 }
 
@@ -39,18 +39,20 @@ class SpoStorageEntityListCommand extends SpoCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const resource: string = Auth.getResourceFromUrl(args.options.appCatalogUrl);
 
-    if (this.verbose) {
+    if (this.debug) {
       cmd.log(`Retrieving access token for ${resource} using refresh token ${auth.service.refreshToken}...`);
     }
 
     auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.verbose)
+      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
       .then((accessToken: string): Promise<{ storageentitiesindex: string }> => {
-        if (this.verbose) {
+        if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}. Loading all tenant properties...`);
         }
 
-        cmd.log(`Retrieving details for all tenant properties in ${args.options.appCatalogUrl}...`);
+        if (this.verbose) {
+          cmd.log(`Retrieving details for all tenant properties in ${args.options.appCatalogUrl}...`);
+        }
 
         const requestOptions: any = {
           url: `${args.options.appCatalogUrl}/_api/web/AllProperties?$select=storageentitiesindex`,
@@ -61,7 +63,7 @@ class SpoStorageEntityListCommand extends SpoCommand {
           json: true
         };
 
-        if (this.verbose) {
+        if (this.debug) {
           cmd.log('Executing web request...');
           cmd.log(requestOptions);
           cmd.log('');
@@ -70,7 +72,7 @@ class SpoStorageEntityListCommand extends SpoCommand {
         return request.get(requestOptions);
       })
       .then((web: { storageentitiesindex?: string }): void => {
-        if (this.verbose) {
+        if (this.debug) {
           cmd.log('Response:');
           cmd.log(web);
           cmd.log('');
@@ -79,14 +81,18 @@ class SpoStorageEntityListCommand extends SpoCommand {
         try {
           if (!web.storageentitiesindex ||
             web.storageentitiesindex.trim().length === 0) {
-            cmd.log('No tenant properties found');
+            if (this.verbose) {
+              cmd.log('No tenant properties found');
+            }
             return;
           }
 
           const properties: { [key: string]: TenantProperty } = JSON.parse(web.storageentitiesindex);
           const keys: string[] = Object.keys(properties);
           if (keys.length === 0) {
-            cmd.log('No tenant properties found');
+            if (this.verbose) {
+              cmd.log('No tenant properties found');
+            }
           }
           else {
             keys.forEach((key: string): void => {

@@ -86,7 +86,7 @@ Depending on your command and the service for which you're building the command,
 
 ### Tracking command usage
 
-The Office 365 CLI tracks usage of the different commands using Azure Application Insights. By default, for each command the CLI tracks its name and whether it's been executed in verbose mode or not. If your command has additional properties that should be included in the telemetry, you can define them by overriding the **getTelemetryProperties** property and adding your properties to the **telemetryProps** object:
+The Office 365 CLI tracks usage of the different commands using Azure Application Insights. By default, for each command the CLI tracks its name and whether it's been executed in debug/verbose mode or not. If your command has additional properties that should be included in the telemetry, you can define them by overriding the **getTelemetryProperties** property and adding your properties to the **telemetryProps** object:
 
 ```ts
 class SpoMyCommand extends Command {

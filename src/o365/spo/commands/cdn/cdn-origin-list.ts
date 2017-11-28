@@ -3,7 +3,7 @@ import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../..
 import config from '../../../../config';
 import * as request from 'request-promise-native';
 import commands from '../../commands';
-import VerboseOption from '../../../../VerboseOption';
+import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandHelp,
   CommandOption,
@@ -17,7 +17,7 @@ interface CommandArgs {
   options: Options;
 }
 
-interface Options extends VerboseOption {
+interface Options extends GlobalOptions {
   type: string;
 }
 
@@ -44,29 +44,31 @@ class SpoCdnOriginListCommand extends SpoCommand {
     const cdnTypeString: string = args.options.type || 'Public';
     const cdnType: number = cdnTypeString === 'Private' ? 1 : 0;
 
-    if (this.verbose) {
+    if (this.debug) {
       cmd.log(`Retrieving access token for ${auth.service.resource}...`);
     }
 
     auth
-      .ensureAccessToken(auth.service.resource, cmd, this.verbose)
+      .ensureAccessToken(auth.service.resource, cmd, this.debug)
       .then((accessToken: string): Promise<ContextInfo> => {
-        if (this.verbose) {
+        if (this.debug) {
           cmd.log('Response:');
           cmd.log(accessToken);
           cmd.log('');
         }
 
-        return this.getRequestDigest(cmd, this.verbose);
+        return this.getRequestDigest(cmd, this.debug);
       })
       .then((res: ContextInfo): Promise<string> => {
-        if (this.verbose) {
+        if (this.debug) {
           cmd.log('Response:')
           cmd.log(res);
           cmd.log('');
         }
 
-        cmd.log(`Retrieving configured origins for ${(cdnType === 1 ? 'Private' : 'Public')} CDN...`);
+        if (this.verbose) {
+          cmd.log(`Retrieving configured origins for ${(cdnType === 1 ? 'Private' : 'Public')} CDN...`);
+        }
 
         const requestOptions: any = {
           url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
@@ -77,7 +79,7 @@ class SpoCdnOriginListCommand extends SpoCommand {
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="GetTenantCdnOrigins" Id="22" ObjectPathId="18"><Parameters><Parameter Type="Enum">${cdnType}</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="18" Name="${auth.site.tenantId}" /></ObjectPaths></Request>`
         };
 
-        if (this.verbose) {
+        if (this.debug) {
           cmd.log('Executing web request...');
           cmd.log(requestOptions);
           cmd.log('');
@@ -86,7 +88,7 @@ class SpoCdnOriginListCommand extends SpoCommand {
         return request.post(requestOptions);
       })
       .then((res: string): void => {
-        if (this.verbose) {
+        if (this.debug) {
           cmd.log('Response:');
           cmd.log(res);
           cmd.log('');

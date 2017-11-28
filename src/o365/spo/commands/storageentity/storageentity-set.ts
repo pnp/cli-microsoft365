@@ -3,7 +3,7 @@ import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../..
 import config from '../../../../config';
 import * as request from 'request-promise-native';
 import commands from '../../commands';
-import VerboseOption from '../../../../VerboseOption';
+import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandHelp,
   CommandOption,
@@ -18,7 +18,7 @@ interface CommandArgs {
   options: Options;
 }
 
-interface Options extends VerboseOption {
+interface Options extends GlobalOptions {
   appCatalogUrl: string;
   key: string;
   value: string;
@@ -40,14 +40,14 @@ class SpoStorageEntitySetCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    if (this.verbose) {
+    if (this.debug) {
       cmd.log(`key option set. Retrieving access token for ${auth.service.resource}...`);
     }
 
     auth
-      .ensureAccessToken(auth.service.resource, cmd, this.verbose)
+      .ensureAccessToken(auth.service.resource, cmd, this.debug)
       .then((accessToken: string): Promise<ContextInfo> => {
-        if (this.verbose) {
+        if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
         }
 
@@ -60,7 +60,7 @@ class SpoStorageEntitySetCommand extends SpoCommand {
           json: true
         };
 
-        if (this.verbose) {
+        if (this.debug) {
           cmd.log('Executing web request...');
           cmd.log(requestOptions);
           cmd.log('');
@@ -69,13 +69,15 @@ class SpoStorageEntitySetCommand extends SpoCommand {
         return request.post(requestOptions);
       })
       .then((res: ContextInfo): Promise<string> => {
-        if (this.verbose) {
+        if (this.debug) {
           cmd.log('Response:');
           cmd.log(res);
           cmd.log('');
         }
 
-        cmd.log(`Setting tenant property ${args.options.key} in ${args.options.appCatalogUrl}...`);
+        if (this.verbose) {
+          cmd.log(`Setting tenant property ${args.options.key} in ${args.options.appCatalogUrl}...`);
+        }
 
         const requestOptions: any = {
           url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
@@ -86,7 +88,7 @@ class SpoStorageEntitySetCommand extends SpoCommand {
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="24" ObjectPathId="23" /><ObjectPath Id="26" ObjectPathId="25" /><ObjectPath Id="28" ObjectPathId="27" /><Method Name="SetStorageEntity" Id="29" ObjectPathId="27"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.key)}</Parameter><Parameter Type="String">${Utils.escapeXml(args.options.value)}</Parameter><Parameter Type="String">${Utils.escapeXml(args.options.description || '')}</Parameter><Parameter Type="String">${Utils.escapeXml(args.options.comment || '')}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="23" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="25" ParentId="23" Name="GetSiteByUrl"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.appCatalogUrl)}</Parameter></Parameters></Method><Property Id="27" ParentId="25" Name="RootWeb" /></ObjectPaths></Request>`
         };
 
-        if (this.verbose) {
+        if (this.debug) {
           cmd.log('Executing web request...');
           cmd.log(requestOptions);
           cmd.log('');
@@ -95,7 +97,7 @@ class SpoStorageEntitySetCommand extends SpoCommand {
         return request.post(requestOptions);
       })
       .then((res: string): void => {
-        if (this.verbose) {
+        if (this.debug) {
           cmd.log('Response:');
           cmd.log(res);
           cmd.log('');
@@ -113,7 +115,9 @@ class SpoStorageEntitySetCommand extends SpoCommand {
           }
         }
         else {
-          cmd.log(vorpal.chalk.green('DONE'));
+          if (this.verbose) {
+            cmd.log(vorpal.chalk.green('DONE'));
+          }
         }
         cb();
       }, (err: any): void => {

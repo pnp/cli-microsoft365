@@ -86,7 +86,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = storageEntityListCommand.action();
-    cmdInstance.action({ options: { verbose: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
+    cmdInstance.action({ options: { debug: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       let returnsCorrectValue: boolean = false;
       log.forEach(l => {
         if (l && l.indexOf('Connect to a SharePoint Online site first') > -1) {
@@ -132,7 +132,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     cmdInstance.action = storageEntityListCommand.action();
-    cmdInstance.action({ options: { verbose: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }}, () => {
+    cmdInstance.action({ options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }}, () => {
       let correctKey1: boolean = false;
       let correctValue1: boolean = false;
       let correctDescription1: boolean = false;
@@ -214,19 +214,9 @@ describe(commands.STORAGEENTITY_LIST, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     cmdInstance.action = storageEntityListCommand.action();
-    cmdInstance.action({ options: { verbose: false, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }}, () => {
-      let correctResponse: boolean = false;
-      log.forEach(l => {
-        if (!l || typeof l !== 'string') {
-          return;
-        }
-
-        if (l.indexOf('No tenant properties found') > -1) {
-          correctResponse = true;
-        }
-      });
+    cmdInstance.action({ options: { debug: false, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }}, () => {
       try {
-        assert(correctResponse);
+        assert.equal(log.length, 0);
         done();
       }
       catch (e) {
@@ -253,7 +243,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     cmdInstance.action = storageEntityListCommand.action();
-    cmdInstance.action({ options: { verbose: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }}, () => {
+    cmdInstance.action({ options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }}, () => {
       let correctResponse: boolean = false;
       log.forEach(l => {
         if (!l || typeof l !== 'string') {
@@ -292,7 +282,36 @@ describe(commands.STORAGEENTITY_LIST, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     cmdInstance.action = storageEntityListCommand.action();
-    cmdInstance.action({ options: { verbose: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }}, () => {
+    cmdInstance.action({ options: { debug: false, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }}, () => {
+      try {
+        assert.equal(log.length, 0);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('doesn\'t fail if tenant properties web property value is empty JSON object (debug)', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/AllProperties?$select=storageentitiesindex`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+            return Promise.resolve({ storageentitiesindex: JSON.stringify({}) });
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    cmdInstance.action = storageEntityListCommand.action();
+    cmdInstance.action({ options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }}, () => {
       let correctResponse: boolean = false;
       log.forEach(l => {
         if (!l || typeof l !== 'string') {
@@ -331,7 +350,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     cmdInstance.action = storageEntityListCommand.action();
-    cmdInstance.action({ options: { verbose: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }}, () => {
+    cmdInstance.action({ options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }}, () => {
       let correctResponse: boolean = false;
       log.forEach(l => {
         if (!l || typeof l !== 'string') {
@@ -352,15 +371,15 @@ describe(commands.STORAGEENTITY_LIST, () => {
     });
   });
 
-  it('supports verbose mode', () => {
+  it('supports debug mode', () => {
     const options = (storageEntityListCommand.options() as CommandOption[]);
-    let containsVerboseOption = false;
+    let containsdebugOption = false;
     options.forEach(o => {
-      if (o.option === '--verbose') {
-        containsVerboseOption = true;
+      if (o.option === '--debug') {
+        containsdebugOption = true;
       }
     });
-    assert(containsVerboseOption);
+    assert(containsdebugOption);
   });
 
   it('requires app catalog URL', () => {
@@ -438,7 +457,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     cmdInstance.action = storageEntityListCommand.action();
-    cmdInstance.action({ options: { verbose: true, appCatalogUrl: 'https://contoso-admin.sharepoint.com' }}, () => {
+    cmdInstance.action({ options: { debug: true, appCatalogUrl: 'https://contoso-admin.sharepoint.com' }}, () => {
       let containsError = false;
       log.forEach(l => {
         if (l &&

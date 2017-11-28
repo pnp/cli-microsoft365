@@ -13,7 +13,8 @@ export default abstract class SpoCommand extends Command {
     const cmd: SpoCommand = this;
 
     return function (this: CommandInstance, args: any, cb: () => void) {
-      cmd._verbose = args.options.verbose || false;
+      cmd._debug = args.options.debug || false;
+      cmd._verbose = cmd._debug || args.options.verbose || false;
 
       appInsights.trackEvent({
         name: cmd.getCommandName(),
@@ -38,11 +39,11 @@ export default abstract class SpoCommand extends Command {
     }
   }
 
-  protected getRequestDigest(cmd: CommandInstance, verbose: boolean): Promise<ContextInfo> {
-    return this.getRequestDigestForSite(auth.site.url, auth.site.accessToken, cmd, verbose);
+  protected getRequestDigest(cmd: CommandInstance, debug: boolean): Promise<ContextInfo> {
+    return this.getRequestDigestForSite(auth.site.url, auth.site.accessToken, cmd, debug);
   }
 
-  protected getRequestDigestForSite(siteUrl: string, accessToken: string, cmd: CommandInstance, verbose: boolean): Promise<ContextInfo> {
+  protected getRequestDigestForSite(siteUrl: string, accessToken: string, cmd: CommandInstance, debug: boolean): Promise<ContextInfo> {
     const requestOptions: any = {
       url: `${siteUrl}/_api/contextinfo`,
       headers: {
@@ -52,7 +53,7 @@ export default abstract class SpoCommand extends Command {
       json: true
     };
 
-    if (verbose) {
+    if (debug) {
       cmd.log('Executing web request...');
       cmd.log(requestOptions);
       cmd.log('');
@@ -75,7 +76,7 @@ export default abstract class SpoCommand extends Command {
     }
   }
 
-  protected getTenantAppCatalogUrl(cmd: CommandInstance, verbose: boolean): Promise<string> {
+  protected getTenantAppCatalogUrl(cmd: CommandInstance, debug: boolean): Promise<string> {
     return new Promise<string>((resolve: (appCatalogUrl: string) => void, reject: (error: any) => void): void => {
       const requestOptions: any = {
         url: `${auth.site.url}/_api/search/query?querytext='contentclass:STS_Site%20AND%20SiteTemplate:APPCATALOG'&SelectProperties='SPWebUrl'`,
@@ -86,7 +87,7 @@ export default abstract class SpoCommand extends Command {
         json: true
       };
   
-      if (verbose) {
+      if (debug) {
         cmd.log('Executing web request...');
         cmd.log(requestOptions);
         cmd.log('');
@@ -95,7 +96,7 @@ export default abstract class SpoCommand extends Command {
       request
         .get(requestOptions)
         .then((res: SearchResponse): void => {
-          if (verbose) {
+          if (debug) {
             cmd.log('Response');
             cmd.log(res);
             cmd.log('');
@@ -115,7 +116,7 @@ export default abstract class SpoCommand extends Command {
           
           reject('Tenant app catalog URL not found');
         }, (error: any): void => {
-          if (verbose) {
+          if (debug) {
             cmd.log('Error');
             cmd.log(error);
             cmd.log('');

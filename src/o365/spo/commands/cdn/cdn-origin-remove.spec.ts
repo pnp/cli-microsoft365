@@ -118,7 +118,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
+    cmdInstance.action({ options: { debug: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       let returnsCorrectValue: boolean = false;
       log.forEach(l => {
         if (l && l.indexOf('Connect to a SharePoint Online site first') > -1) {
@@ -140,7 +140,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
+    cmdInstance.action({ options: { debug: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       let returnsCorrectValue: boolean = false;
       log.forEach(l => {
         if (l && l.indexOf(`${auth.site.url} is not a tenant admin site`) > -1) {
@@ -163,7 +163,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: false, origin: '*/cdn', confirm: true, type: 'Public' } }, () => {
+    cmdInstance.action({ options: { debug: false, origin: '*/cdn', confirm: true, type: 'Public' } }, () => {
       let deleteRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -191,7 +191,35 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: false, origin: '*/cdn', confirm: true, type: 'Private' } }, () => {
+    cmdInstance.action({ options: { debug: false, origin: '*/cdn', confirm: true, type: 'Private' } }, () => {
+      let deleteRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.headers['X-RequestDigest'] &&
+          r.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="RemoveTenantCdnOrigin" Id="33" ObjectPathId="29"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="String">*/cdn</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="29" Name="abc" /></ObjectPaths></Request>`) {
+          deleteRequestIssued = true;
+        }
+      });
+
+      try {
+        assert(deleteRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('removes existing CDN origin from the private CDN when Private type specified without prompting with confirmation argument (debug)', (done) => {
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: true, origin: '*/cdn', confirm: true, type: 'Private' } }, () => {
       let deleteRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -219,7 +247,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: false, origin: '*/cdn', confirm: true } }, () => {
+    cmdInstance.action({ options: { debug: false, origin: '*/cdn', confirm: true } }, () => {
       let deleteRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -246,7 +274,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: true, origin: '*/cdn' } }, () => {
+    cmdInstance.action({ options: { debug: true, origin: '*/cdn' } }, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -271,7 +299,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     };
-    cmdInstance.action({ options: { verbose: true, origin: '*/cdn' } }, () => {
+    cmdInstance.action({ options: { debug: true, origin: '*/cdn' } }, () => {
       try {
         assert(requests.length === 0);
         done();
@@ -291,7 +319,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     };
-    cmdInstance.action({ options: { verbose: true, origin: '*/cdn' } }, () => {
+    cmdInstance.action({ options: { debug: true, origin: '*/cdn' } }, () => {
       let doneResponse = false;
       log.forEach(l => {
         if (l &&
@@ -351,7 +379,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     };
-    cmdInstance.action({ options: { verbose: true, origin: '*/cdn' } }, () => {
+    cmdInstance.action({ options: { debug: true, origin: '*/cdn' } }, () => {
       let genericErrorHandled = false;
       log.forEach(l => {
         if (l && typeof l === 'string' && l.indexOf('An error has occurred') > -1) {
@@ -372,15 +400,15 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
     });
   });
 
-  it('supports verbose mode', () => {
+  it('supports debug mode', () => {
     const options = (command.options() as CommandOption[]);
-    let containsVerboseOption = false;
+    let containsdebugOption = false;
     options.forEach(o => {
-      if (o.option === '--verbose') {
-        containsVerboseOption = true;
+      if (o.option === '--debug') {
+        containsdebugOption = true;
       }
     });
-    assert(containsVerboseOption);
+    assert(containsdebugOption);
   });
 
   it('supports suppressing confirmation prompt', () => {
@@ -469,7 +497,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: true, confirm: true, key: 'existingproperty' }, appCatalogUrl: 'https://contoso-admin.sharepoint.com' }, () => {
+    cmdInstance.action({ options: { debug: true, confirm: true, key: 'existingproperty' }, appCatalogUrl: 'https://contoso-admin.sharepoint.com' }, () => {
       let containsError = false;
       log.forEach(l => {
         if (typeof l === 'string' &&

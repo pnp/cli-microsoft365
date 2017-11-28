@@ -17,6 +17,7 @@ Option|Description
 `-p, --policy <policy>`|CDN policy to configure. `IncludeFileExtensions|ExcludeRestrictedSiteClassifications`
 `-v, --value <value>`|Value for the policy to configure
 `--verbose`|Runs command with verbose logging
+`--debug`|Runs command with debug logging
 
 !!! important
     Before using this command, connect to a SharePoint Online tenant admin site, using the [spo connect](../connect.md) command.

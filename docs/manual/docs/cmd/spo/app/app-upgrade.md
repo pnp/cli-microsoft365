@@ -16,6 +16,7 @@ Option|Description
 `-i, --id <id>`|ID of the app to retrieve information for
 `-s, --siteUrl <siteUrl>`|Absolute URL of the site to install the app in
 `--verbose`|Runs command with verbose logging
+`--debug`|Runs command with debug logging
 
 !!! important
     Before using this command, connect to a SharePoint Online site, using the [spo connect](../connect.md) command.

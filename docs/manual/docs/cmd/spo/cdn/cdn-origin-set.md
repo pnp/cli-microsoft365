@@ -16,6 +16,7 @@ Option|Description
 `-t, --type [type]`|Type of CDN to manage. `Public|Private`. Default `Public`
 `-o, --origin <origin>`|Origin to add to the current CDN configuration
 `--verbose`|Runs command with verbose logging
+`--debug`|Runs command with debug logging
 
 !!! important
     Before using this command, connect to a SharePoint Online tenant admin site, using the [spo connect](../connect.md) command.
