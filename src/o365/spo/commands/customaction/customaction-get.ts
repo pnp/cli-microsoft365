@@ -174,7 +174,7 @@ class SpoCustomActionGetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--id <id>',
+        option: '-i, --id <id>',
         description: 'Id (Guid) of the custom action to retrieve'
       },
       {
@@ -230,9 +230,15 @@ class SpoCustomActionGetCommand extends SpoCommand {
       
         Examples:
         
-          ${chalk.grey(config.delimiter)} ${commands.CUSTOMACTION_GET} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 -u https://contoso.sharepoint.com/sites/test
+          ${chalk.grey(config.delimiter)} ${commands.CUSTOMACTION_GET} -i 058140e3-0e37-44fc-a1d3-79c487d371a3 -u https://contoso.sharepoint.com/sites/test
       
-          ${chalk.grey(config.delimiter)} ${commands.CUSTOMACTION_GET} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 -u https://contoso.sharepoint.com/sites/test -s Site
+          ${chalk.grey(config.delimiter)} ${commands.CUSTOMACTION_GET} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --url https://contoso.sharepoint.com/sites/test
+
+          ${chalk.grey(config.delimiter)} ${commands.CUSTOMACTION_GET} -i 058140e3-0e37-44fc-a1d3-79c487d371a3 -u https://contoso.sharepoint.com/sites/test -s Site
+
+          ${chalk.grey(config.delimiter)} ${commands.CUSTOMACTION_GET} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --url https://contoso.sharepoint.com/sites/test --scope Web
+            Returns details about the user custom action with ID '058140e3-0e37-44fc-a1d3-79c487d371a3'
+            available in the site or site collection.
       
         More information:
       
