@@ -12,6 +12,7 @@ import SpoCommand from '../../SpoCommand';
 import { ContextInfo } from '../../spo';
 import Utils from '../../../../Utils';
 import { CustomAction } from './customaction';
+import Table = require('easy-table');
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -77,12 +78,19 @@ class SpoCustomActionGetCommand extends SpoCommand {
           cmd.log(`Custom action with id ${args.options.id} not found`);
         }
         else {
-          cmd.log(`Details for custom action ${args.options.id}:`);
-          cmd.log(`  Name:     ${customAction.Name}`);
-          cmd.log(`  Location: ${customAction.Location}`);
-          cmd.log(`  Scope:    ${this.humanizeScope(customAction.Scope)}`);
-          cmd.log(`  ClientSideComponentId:    ${customAction.ClientSideComponentId}`);
-          cmd.log(`  ClientSideComponentProperties:    ${customAction.ClientSideComponentProperties}`);
+          const t: Table = new Table();
+          t.cell('Name', customAction.Name);
+          t.cell('Id', customAction.Id);
+          t.cell('Location', customAction.Location);
+          t.cell('Scope', this.humanizeScope(customAction.Scope));
+          t.cell('ClientSideComponentId', customAction.ClientSideComponentId);
+          t.cell('ClientSideComponentProperties', customAction.ClientSideComponentProperties);
+          t.newRow();
+  
+          cmd.log('');
+          cmd.log(t.printTransposed({
+            separator: ': '
+          }));
         }
         cb();
       }, (err: any): void => {
