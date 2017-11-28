@@ -1,4 +1,5 @@
 import appInsights from './appInsights';
+import GlobalOptions from './GlobalOptions';
 
 export interface CommandOption {
   option: string;
@@ -27,8 +28,17 @@ export interface CommandTypes {
   boolean?: string[];
 }
 
+interface CommandArgs {
+  options: GlobalOptions;
+}
+
 export default abstract class Command {
+  protected _debug: boolean = false;
   protected _verbose: boolean = false;
+
+  protected get debug(): boolean {
+    return this._debug;
+  }
 
   protected get verbose(): boolean {
     return this._verbose;
@@ -41,8 +51,9 @@ export default abstract class Command {
 
   public action(): CommandAction {
     const cmd: Command = this;
-    return function (this: CommandInstance, args: any, cb: () => void) {
-      cmd._verbose = args.options.verbose || false;
+    return function (this: CommandInstance, args: CommandArgs, cb: () => void) {
+      cmd._debug = args.options.debug || false;
+      cmd._verbose = cmd._debug || args.options.verbose || false;
 
       appInsights.trackEvent({
         name: cmd.getCommandName(),
@@ -54,10 +65,9 @@ export default abstract class Command {
   }
 
   public getTelemetryProperties(args: any): any {
-    const verbose: boolean = args.options.verbose || false;
-
     return {
-      verbose: verbose.toString()
+      debug: this.debug.toString(),
+      verbose: this.verbose.toString()
     };
   }
 
@@ -66,10 +76,16 @@ export default abstract class Command {
   }
 
   public options(): CommandOption[] {
-    return [{
-      option: '--verbose',
-      description: 'Runs command with verbose logging'
-    }];
+    return [
+      {
+        option: '--verbose',
+        description: 'Runs command with verbose logging'
+      },
+      {
+        option: '--debug',
+        description: 'Runs command with debug logging'
+      }
+    ];
   }
 
   public help(): CommandHelp | undefined {

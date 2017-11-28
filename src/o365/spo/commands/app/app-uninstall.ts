@@ -3,7 +3,7 @@ import auth from '../../SpoAuth';
 import Auth from '../../../../Auth';
 import config from '../../../../config';
 import commands from '../../commands';
-import VerboseOption from '../../../../VerboseOption';
+import GlobalOptions from '../../../../GlobalOptions';
 import * as request from 'request-promise-native';
 import {
   CommandHelp,
@@ -18,7 +18,7 @@ interface CommandArgs {
   options: Options;
 }
 
-interface Options extends VerboseOption {
+interface Options extends GlobalOptions {
   id: string;
   siteUrl: string;
   confirm?: boolean;
@@ -43,27 +43,29 @@ class AppUninstallCommand extends SpoCommand {
     const uninstallApp: () => void = (): void => {
       const resource: string = Auth.getResourceFromUrl(args.options.siteUrl);
       let siteAccessToken: string = '';
-  
+
       auth
-        .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.verbose)
+        .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
         .then((accessToken: string): Promise<ContextInfo> => {
           siteAccessToken = accessToken;
-  
-          if (this.verbose) {
+
+          if (this.debug) {
             cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
           }
-  
-          return this.getRequestDigestForSite(args.options.siteUrl, siteAccessToken, cmd, this.verbose);
+
+          return this.getRequestDigestForSite(args.options.siteUrl, siteAccessToken, cmd, this.debug);
         })
         .then((res: ContextInfo): Promise<string> => {
-          if (this.verbose) {
+          if (this.debug) {
             cmd.log('Response:');
             cmd.log(res);
             cmd.log('');
           }
-  
-          cmd.log(`Uninstalling app '${args.options.id}' from the site '${args.options.siteUrl}'...`);
-  
+
+          if (this.verbose) {
+            cmd.log(`Uninstalling app '${args.options.id}' from the site '${args.options.siteUrl}'...`);
+          }
+
           const requestOptions: any = {
             url: `${args.options.siteUrl}/_api/web/tenantappcatalog/AvailableApps/GetById('${encodeURIComponent(args.options.id)}')/uninstall`,
             headers: {
@@ -72,22 +74,22 @@ class AppUninstallCommand extends SpoCommand {
               'X-RequestDigest': res.FormDigestValue
             }
           };
-  
-          if (this.verbose) {
+
+          if (this.debug) {
             cmd.log('Executing web request...');
             cmd.log(requestOptions);
             cmd.log('');
           }
-  
+
           return request.post(requestOptions);
         })
         .then((res: string): void => {
-          if (this.verbose) {
+          if (this.debug) {
             cmd.log('Response:');
             cmd.log(res);
             cmd.log('');
           }
-  
+
           cb();
         }, (rawRes: any): void => {
           try {
@@ -113,7 +115,7 @@ class AppUninstallCommand extends SpoCommand {
           catch (e) {
             cmd.log(vorpal.chalk.red(`Error: ${rawRes}`));
           }
-  
+
           cb();
         });
     };

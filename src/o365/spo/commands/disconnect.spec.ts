@@ -79,7 +79,7 @@ describe(commands.DISCONNECT, () => {
     auth.site = new Site();
     auth.site.connected = true;
     cmdInstance.action = disconnectCommand.action();
-    cmdInstance.action({ options: { verbose: true } }, () => {
+    cmdInstance.action({ options: { debug: true } }, () => {
       try {
         assert(!auth.site.connected);
         done();
@@ -94,7 +94,7 @@ describe(commands.DISCONNECT, () => {
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = disconnectCommand.action();
-    cmdInstance.action({ options: { verbose: true } }, () => {
+    cmdInstance.action({ options: { debug: true } }, () => {
       try {
         assert(!auth.site.connected);
         done();

@@ -15,6 +15,7 @@ Option|Description
 `--help`|output usage information
 `-t, --type [type]`|Type of CDN to manage. `Public|Private`. Default `Public`
 `--verbose`|Runs command with verbose logging
+`--debug`|Runs command with debug logging
 
 !!! important
     Before using this command, connect to a SharePoint Online tenant admin site, using the [spo connect](../connect.md) command.

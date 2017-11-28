@@ -87,7 +87,7 @@ describe(commands.APP_ADD, () => {
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: true } }, () => {
+    cmdInstance.action({ options: { debug: true } }, () => {
       let returnsCorrectValue: boolean = false;
       log.forEach(l => {
         if (l && l.indexOf('Connect to a SharePoint Online site first') > -1) {
@@ -134,7 +134,7 @@ describe(commands.APP_ADD, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: false, filePath: 'spfx.sppkg' } }, () => {
+    cmdInstance.action({ options: { debug: false, filePath: 'spfx.sppkg' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/web/tenantappcatalog/Add(overwrite=false, url='spfx.sppkg')`) > -1 &&
@@ -165,7 +165,7 @@ describe(commands.APP_ADD, () => {
     });
   });
 
-  it('adds new app to the tenant app catalog (verbose)', (done) => {
+  it('adds new app to the tenant app catalog (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -195,7 +195,7 @@ describe(commands.APP_ADD, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: true, filePath: 'spfx.sppkg' } }, () => {
+    cmdInstance.action({ options: { debug: true, filePath: 'spfx.sppkg' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/web/tenantappcatalog/Add(overwrite=false, url='spfx.sppkg')`) > -1 &&
@@ -258,7 +258,7 @@ describe(commands.APP_ADD, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: true, filePath: 'spfx.sppkg' } }, () => {
+    cmdInstance.action({ options: { debug: true, filePath: 'spfx.sppkg' } }, () => {
       let correctErrorLogged = false;
       log.forEach(l => {
         if (!l ||
@@ -317,7 +317,7 @@ describe(commands.APP_ADD, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: true, filePath: 'spfx.sppkg' } }, () => {
+    cmdInstance.action({ options: { debug: true, filePath: 'spfx.sppkg' } }, () => {
       let correctErrorLogged = false;
       log.forEach(l => {
         if (!l ||
@@ -376,7 +376,7 @@ describe(commands.APP_ADD, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: true, filePath: 'spfx.sppkg' } }, () => {
+    cmdInstance.action({ options: { debug: true, filePath: 'spfx.sppkg' } }, () => {
       let correctErrorLogged = false;
       log.forEach(l => {
         if (!l ||
@@ -405,15 +405,15 @@ describe(commands.APP_ADD, () => {
     });
   });
 
-  it('supports verbose mode', () => {
+  it('supports debug mode', () => {
     const options = (command.options() as CommandOption[]);
-    let containsVerboseOption = false;
+    let containsdebugOption = false;
     options.forEach(o => {
-      if (o.option === '--verbose') {
-        containsVerboseOption = true;
+      if (o.option === '--debug') {
+        containsdebugOption = true;
       }
     });
-    assert(containsVerboseOption);
+    assert(containsdebugOption);
   });
 
   it('fails validation if file path not specified', () => {
@@ -490,7 +490,7 @@ describe(commands.APP_ADD, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: true } }, () => {
+    cmdInstance.action({ options: { debug: true } }, () => {
       let containsError = false;
       log.forEach(l => {
         if (typeof l === 'string' &&

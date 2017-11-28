@@ -16,6 +16,7 @@ Option|Description
 `-p, --filePath <filePath>`|Absolute or relative path to the solution package file to add to the app catalog
 `--overwrite`|Set to overwrite the existing package file
 `--verbose`|Runs command with verbose logging
+`--debug`|Runs command with debug logging
 
 !!! important
     Before using this command, connect to a SharePoint Online site, using the [spo connect](../connect.md) command.

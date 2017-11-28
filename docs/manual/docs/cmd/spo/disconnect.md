@@ -14,6 +14,7 @@ Option|Description
 ------|-----------
 `--help`|output usage information
 `--verbose`|Runs command with verbose logging
+`--debug`|Runs command with debug logging
 
 ## Remarks
 
@@ -28,7 +29,7 @@ spo disconnect
 disconnects from a previously connected SharePoint Online site
 
 ```sh
-spo disconnect --verbose
+spo disconnect --debug
 ```
 
-disconnects from a previously connected SharePoint Online site in verbose mode including detailed debug information in the console output
+disconnects from a previously connected SharePoint Online site in debug mode including detailed debug information in the console output

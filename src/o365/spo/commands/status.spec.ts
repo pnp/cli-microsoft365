@@ -81,7 +81,28 @@ describe(commands.STATUS, () => {
     cmdInstance.action({ options: {} }, () => {
       let reportsDisconnected: boolean = false;
       log.forEach(l => {
-        if (l && l.indexOf('Not connected to SharePoint Online') > -1) {
+        if (l && l.indexOf('Not connected') === 0) {
+          reportsDisconnected = true;
+        }
+      });
+      try {
+        assert(reportsDisconnected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('shows disconnected status when not connected (verbose)', (done) => {
+    auth.site = new Site();
+    auth.site.connected = false;
+    cmdInstance.action = statusCommand.action();
+    cmdInstance.action({ options: { verbose: true } }, () => {
+      let reportsDisconnected: boolean = false;
+      log.forEach(l => {
+        if (l && l.indexOf('Not connected to SharePoint Online') === 0) {
           reportsDisconnected = true;
         }
       });
@@ -103,7 +124,7 @@ describe(commands.STATUS, () => {
     cmdInstance.action({ options: {} }, () => {
       let reportsCorrectValue: boolean = false;
       log.forEach(l => {
-        if (l && l.indexOf(`Connected to ${auth.site.url}`) > -1) {
+        if (l && l.indexOf(auth.site.url) === 0) {
           reportsCorrectValue = true;
         }
       });
@@ -122,7 +143,7 @@ describe(commands.STATUS, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     cmdInstance.action = statusCommand.action();
-    cmdInstance.action({ options: {} }, () => {
+    cmdInstance.action({ options: { debug: true } }, () => {
       let reportsCorrectValue: boolean = false;
       log.forEach(l => {
         if (l && l.indexOf('Is tenant admin:') > -1 && l.indexOf('true') > -1) {
@@ -144,7 +165,7 @@ describe(commands.STATUS, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = statusCommand.action();
-    cmdInstance.action({ options: {} }, () => {
+    cmdInstance.action({ options: { debug: true } }, () => {
       let reportsCorrectValue: boolean = false;
       log.forEach(l => {
         if (l && l.indexOf('Is tenant admin:') > -1 && l.indexOf('false') > -1) {
@@ -167,7 +188,7 @@ describe(commands.STATUS, () => {
     auth.site.url = 'https://contoso.sharepoint.com/sites/team';
     auth.service.resource = 'https://contoso.sharepoint.com';
     cmdInstance.action = statusCommand.action();
-    cmdInstance.action({ options: {} }, () => {
+    cmdInstance.action({ options: { debug: true } }, () => {
       let reportsCorrectValue: boolean = false;
       log.forEach(l => {
         if (l && l.indexOf('AAD resource:') > -1 && l.indexOf(auth.service.resource) > -1) {
@@ -190,7 +211,7 @@ describe(commands.STATUS, () => {
     auth.site.url = 'https://contoso.sharepoint.com/sites/team';
     auth.service.accessToken = 'abc';
     cmdInstance.action = statusCommand.action();
-    cmdInstance.action({ options: {} }, () => {
+    cmdInstance.action({ options: { debug: true } }, () => {
       let reportsCorrectValue: boolean = false;
       log.forEach(l => {
         if (l && l.indexOf('Access token:') > -1 && l.indexOf('abc') > -1) {
@@ -213,7 +234,7 @@ describe(commands.STATUS, () => {
     auth.site.url = 'https://contoso.sharepoint.com/sites/team';
     auth.service.refreshToken = 'abc';
     cmdInstance.action = statusCommand.action();
-    cmdInstance.action({ options: {} }, () => {
+    cmdInstance.action({ options: { debug: true } }, () => {
       let reportsCorrectValue: boolean = false;
       log.forEach(l => {
         if (l && l.indexOf('Refresh token:') > -1 && l.indexOf('abc') > -1) {
@@ -240,7 +261,7 @@ describe(commands.STATUS, () => {
     auth.site.url = 'https://contoso.sharepoint.com/sites/team';
     auth.service.expiresAt = date.getUTCSeconds();
     cmdInstance.action = statusCommand.action();
-    cmdInstance.action({ options: {} }, () => {
+    cmdInstance.action({ options: { debug: true } }, () => {
       let reportsCorrectValue: boolean = false;
       log.forEach(l => {
         if (l && l.indexOf('Expires at:') > -1 && l.indexOf(expiresAtDate.toString()) > -1) {

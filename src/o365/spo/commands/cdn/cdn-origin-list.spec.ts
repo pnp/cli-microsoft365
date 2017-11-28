@@ -87,7 +87,7 @@ describe(commands.CDN_ORIGIN_LIST, () => {
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
+    cmdInstance.action({ options: { debug: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       let returnsCorrectValue: boolean = false;
       log.forEach(l => {
         if (l && l.indexOf('Connect to a SharePoint Online site first') > -1) {
@@ -109,7 +109,7 @@ describe(commands.CDN_ORIGIN_LIST, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
+    cmdInstance.action({ options: { debug: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       let returnsCorrectValue: boolean = false;
       log.forEach(l => {
         if (l && l.indexOf(`${auth.site.url} is not a tenant admin site`) > -1) {
@@ -155,7 +155,7 @@ describe(commands.CDN_ORIGIN_LIST, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: true, type: 'Public' } }, () => {
+    cmdInstance.action({ options: { debug: true, type: 'Public' } }, () => {
       let correctLogStatements = 0;
       log.forEach(l => {
         if (!l || typeof l !== 'string') {
@@ -210,7 +210,7 @@ describe(commands.CDN_ORIGIN_LIST, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: false, type: 'Private' } }, () => {
+    cmdInstance.action({ options: { debug: false, type: 'Private' } }, () => {
       let correctLogStatements = 0;
       log.forEach(l => {
         if (!l || typeof l !== 'string') {
@@ -219,6 +219,60 @@ describe(commands.CDN_ORIGIN_LIST, () => {
 
         if (l.indexOf('Configured origins:') > -1 ||
           l.indexOf('/master') > -1) {
+          correctLogStatements++;
+        }
+      });
+      try {
+        assert.equal(correctLogStatements, 2);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('retrieves the settings of the private CDN when type set to Private (debug)', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve({ FormDigestValue: 'abc' });
+        }
+      }
+
+      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers['X-RequestDigest'] &&
+          opts.headers['X-RequestDigest'] === 'abc' &&
+          opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="GetTenantCdnOrigins" Id="22" ObjectPathId="18"><Parameters><Parameter Type="Enum">1</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="18" Name="abc" /></ObjectPaths></Request>`) {
+          return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "8992299e-a003-4000-7686-fda36e26a53c" }, 22, ['/master']]));
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: true, type: 'Private' } }, () => {
+      let correctLogStatements = 0;
+      log.forEach(l => {
+        if (!l || typeof l !== 'string') {
+          return;
+        }
+
+        if (l.indexOf('Configured origins:') === 0 ||
+          l.indexOf('/master') === 0) {
           correctLogStatements++;
         }
       });
@@ -264,7 +318,7 @@ describe(commands.CDN_ORIGIN_LIST, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: true } }, () => {
+    cmdInstance.action({ options: { debug: true } }, () => {
       let correctLogStatements = 0;
       log.forEach(l => {
         if (!l || typeof l !== 'string') {
@@ -327,7 +381,7 @@ describe(commands.CDN_ORIGIN_LIST, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: true } }, () => {
+    cmdInstance.action({ options: { debug: true } }, () => {
       let genericErrorHandled = false;
       log.forEach(l => {
         if (l && typeof l === 'string' && l.indexOf('An error has occurred') > -1) {
@@ -348,15 +402,15 @@ describe(commands.CDN_ORIGIN_LIST, () => {
     });
   });
 
-  it('supports verbose mode', () => {
+  it('supports debug mode', () => {
     const options = (command.options() as CommandOption[]);
-    let containsVerboseOption = false;
+    let containsdebugOption = false;
     options.forEach(o => {
-      if (o.option === '--verbose') {
-        containsVerboseOption = true;
+      if (o.option === '--debug') {
+        containsdebugOption = true;
       }
     });
-    assert(containsVerboseOption);
+    assert(containsdebugOption);
   });
 
   it('supports specifying CDN type', () => {
@@ -434,7 +488,7 @@ describe(commands.CDN_ORIGIN_LIST, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: true }, appCatalogUrl: 'https://contoso-admin.sharepoint.com' }, () => {
+    cmdInstance.action({ options: { debug: true }, appCatalogUrl: 'https://contoso-admin.sharepoint.com' }, () => {
       let containsError = false;
       log.forEach(l => {
         if (l &&

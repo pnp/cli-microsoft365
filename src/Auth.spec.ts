@@ -80,7 +80,7 @@ describe('Auth', () => {
     });
   });
 
-  it('returns existing access token if still valid (verbose)', (done) => {
+  it('returns existing access token if still valid (debug)', (done) => {
     const now = new Date().getTime() / 1000;
     service.accessToken = 'abc';
     service.expiresAt = now + 1000;
@@ -112,7 +112,7 @@ describe('Auth', () => {
     });
   });
 
-  it('retrieves new access token using existing refresh token (verbose)', (done) => {
+  it('retrieves new access token using existing refresh token (debug)', (done) => {
     service.refreshToken = refreshToken;
     auth.ensureAccessToken(resource, stdout, true).then((accessToken) => {
       try {
@@ -159,7 +159,7 @@ describe('Auth', () => {
       });
   });
 
-  it('handles error when retrieving new access token using existing refresh token (verbose)', (done) => {
+  it('handles error when retrieving new access token using existing refresh token (debug)', (done) => {
     Utils.restore(request.post);
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://login.microsoftonline.com/common/oauth2/token' &&
@@ -267,7 +267,7 @@ describe('Auth', () => {
     auth.ensureAccessToken(resource, stdout);
   });
 
-  it('waits if device code auth is still pending (verbose)', (done) => {
+  it('waits if device code auth is still pending (debug)', (done) => {
     Utils.restore(request.post);
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://login.microsoftonline.com/common/oauth2/token' &&
@@ -358,7 +358,7 @@ describe('Auth', () => {
       });
   });
 
-  it('correctly handles device code auth error (verbose)', (done) => {
+  it('correctly handles device code auth error (debug)', (done) => {
     Utils.restore([
       request.post,
       setInterval
@@ -436,7 +436,7 @@ describe('Auth', () => {
       });
   });
 
-  it('retrieves access token after device code auth completed (verbose)', (done) => {
+  it('retrieves access token after device code auth completed (debug)', (done) => {
     Utils.restore([
       request.post,
       setInterval
@@ -501,7 +501,7 @@ describe('Auth', () => {
     });
   });
 
-  it('retrieves access token using refresh token (verbose)', (done) => {
+  it('retrieves access token using refresh token (debug)', (done) => {
     Utils.restore(request.post);
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://login.microsoftonline.com/common/oauth2/token' &&

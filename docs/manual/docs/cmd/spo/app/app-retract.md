@@ -17,6 +17,7 @@ Option|Description
 `-u, --appCatalogUrl [appCatalogUrl]`|(optional) URL of the tenant app catalog site. If not specified, the CLI will try to resolve it automatically
 `--confirm`|Don't prompt for confirming retracting the app from the tenant app catalog
 `--verbose`|Runs command with verbose logging
+`--debug`|Runs command with debug logging
 
 !!! important
     Before using this command, connect to a SharePoint Online site, using the [spo connect](../connect.md) command.

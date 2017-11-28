@@ -45,9 +45,9 @@ export default class Auth {
   constructor(public service: Service, private appId?: string) {
   }
 
-  public ensureAccessToken(resource: string, stdout: Logger, verbose: boolean = false): Promise<string> {
-    if (verbose) {
-      stdout.log(`Starting Auth.ensureAccessToken. resource: ${resource}, verbose: ${verbose}`);
+  public ensureAccessToken(resource: string, stdout: Logger, debug: boolean = false): Promise<string> {
+    if (debug) {
+      stdout.log(`Starting Auth.ensureAccessToken. resource: ${resource}, debug: ${debug}`);
     }
 
     return new Promise<string>((resolve: (accessToken: string) => void, reject: (err: any) => void) => {
@@ -55,20 +55,20 @@ export default class Auth {
 
       if (this.service.expiresAt > now &&
         this.service.accessToken !== undefined) {
-        if (verbose) {
+        if (debug) {
           stdout.log(`Existing access token ${this.service.accessToken} still valid. Returning...`);
         }
         resolve(this.service.accessToken);
         return;
       }
       else {
-        if (verbose) {
+        if (debug) {
           stdout.log(`No existing access token or expired. Token: ${this.service.accessToken}, ExpiresAt: ${this.service.expiresAt}`);
         }
       }
 
       if (this.service.refreshToken) {
-        if (verbose) {
+        if (debug) {
           stdout.log(`Retrieving new access token using existing refresh token ${this.service.refreshToken}`);
         }
 
@@ -82,7 +82,7 @@ export default class Auth {
           json: true
         };
 
-        if (verbose) {
+        if (debug) {
           stdout.log('Executing web request...');
           stdout.log(requestOptions);
           stdout.log('');
@@ -90,7 +90,7 @@ export default class Auth {
 
         request.post(requestOptions)
           .then((json: Token): void => {
-            if (verbose) {
+            if (debug) {
               stdout.log('Response:');
               stdout.log(json);
               stdout.log('');
@@ -102,7 +102,7 @@ export default class Auth {
             resolve(json.access_token);
             return;
           }, (json: Error): void => {
-            if (verbose) {
+            if (debug) {
               stdout.log('Response:');
               stdout.log(json);
               stdout.log('');
@@ -113,7 +113,7 @@ export default class Auth {
           });
       }
       else {
-        if (verbose) {
+        if (debug) {
           stdout.log('No existing refresh token. Starting new device code flow...');
         }
 
@@ -125,7 +125,7 @@ export default class Auth {
           json: true
         };
 
-        if (verbose) {
+        if (debug) {
           stdout.log('Executing web request...');
           stdout.log(requestOptions);
           stdout.log('');
@@ -133,7 +133,7 @@ export default class Auth {
 
         request.get(requestOptions)
           .then((json: DeviceCode): void => {
-            if (verbose) {
+            if (debug) {
               stdout.log('Response:');
               stdout.log(json);
               stdout.log('');
@@ -154,7 +154,7 @@ export default class Auth {
                 json: true
               };
 
-              if (verbose) {
+              if (debug) {
                 stdout.log('Executing web request:');
                 stdout.log(authCheckRequestOptions);
                 stdout.log('');
@@ -162,7 +162,7 @@ export default class Auth {
 
               request.post(authCheckRequestOptions)
                 .then((json: Token): void => {
-                  if (verbose) {
+                  if (debug) {
                     stdout.log('Response:');
                     stdout.log(json);
                     stdout.log('');
@@ -176,7 +176,7 @@ export default class Auth {
                   return;
                 }, (rej2: Error): void => {
                   if (rej2.error.error !== 'authorization_pending') {
-                    if (verbose) {
+                    if (debug) {
                       stdout.log('Response:');
                       stdout.log(rej2);
                       stdout.log('');
@@ -187,7 +187,7 @@ export default class Auth {
                     return;
                   }
                   else {
-                    if (verbose) {
+                    if (debug) {
                       stdout.log('Authorization pending...');
                     }
                   }
@@ -200,13 +200,13 @@ export default class Auth {
     });
   }
 
-  public getAccessToken(resource: string, refreshToken: string, stdout: Logger, verbose: boolean = false): Promise<string> {
-    if (verbose) {
-      stdout.log(`Starting Auth.getAccessToken. resource: ${resource}, refreshToken: ${refreshToken}, verbose: ${verbose}`);
+  public getAccessToken(resource: string, refreshToken: string, stdout: Logger, debug: boolean = false): Promise<string> {
+    if (debug) {
+      stdout.log(`Starting Auth.getAccessToken. resource: ${resource}, refreshToken: ${refreshToken}, debug: ${debug}`);
     }
 
     return new Promise<string>((resolve: (accessToken: string) => void, reject: (err: any) => void): void => {
-      if (verbose) {
+      if (debug) {
         stdout.log(`Retrieving access token for ${resource} using refresh token ${refreshToken}`);
       }
 
@@ -220,7 +220,7 @@ export default class Auth {
         json: true
       };
 
-      if (verbose) {
+      if (debug) {
         stdout.log('Executing web request...');
         stdout.log(requestOptions);
         stdout.log('');
@@ -228,7 +228,7 @@ export default class Auth {
 
       request.post(requestOptions)
         .then((json: Token): void => {
-          if (verbose) {
+          if (debug) {
             stdout.log('Response:');
             stdout.log(json);
             stdout.log('');

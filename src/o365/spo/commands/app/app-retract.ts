@@ -2,7 +2,7 @@ import auth from '../../SpoAuth';
 import Auth from '../../../../Auth';
 import config from '../../../../config';
 import commands from '../../commands';
-import VerboseOption from '../../../../VerboseOption';
+import GlobalOptions from '../../../../GlobalOptions';
 import * as request from 'request-promise-native';
 import {
   CommandHelp,
@@ -18,7 +18,7 @@ interface CommandArgs {
   options: Options;
 }
 
-interface Options extends VerboseOption {
+interface Options extends GlobalOptions {
   id: string;
   appCatalogUrl?: string;
   confirm?: boolean;
@@ -46,7 +46,7 @@ class AppDeployCommand extends SpoCommand {
 
     const retractApp: () => void = (): void => {
       auth
-        .ensureAccessToken(auth.service.resource, cmd, this.verbose)
+        .ensureAccessToken(auth.service.resource, cmd, this.debug)
         .then((accessToken: string): Promise<string> => {
           return new Promise<string>((resolve: (appCatalogUrl: string) => void, reject: (error: any) => void): void => {
             if (args.options.appCatalogUrl) {
@@ -54,11 +54,11 @@ class AppDeployCommand extends SpoCommand {
             }
             else {
               this
-                .getTenantAppCatalogUrl(cmd, this.verbose)
+                .getTenantAppCatalogUrl(cmd, this.debug)
                 .then((appCatalogUrl: string): void => {
                   resolve(appCatalogUrl);
                 }, (error: any): void => {
-                  if (this.verbose) {
+                  if (this.debug) {
                     cmd.log('Error');
                     cmd.log(error);
                     cmd.log('');
@@ -89,28 +89,30 @@ class AppDeployCommand extends SpoCommand {
           });
         })
         .then((appCatalog: string): Promise<string> => {
-          if (this.verbose) {
+          if (this.debug) {
             cmd.log(`Retrieved tenant app catalog URL ${appCatalog}`);
           }
 
           appCatalogUrl = appCatalog;
 
           let appCatalogResource: string = Auth.getResourceFromUrl(appCatalog);
-          return auth.getAccessToken(appCatalogResource, auth.service.refreshToken as string, cmd, this.verbose);
+          return auth.getAccessToken(appCatalogResource, auth.service.refreshToken as string, cmd, this.debug);
         })
         .then((token: string): Promise<ContextInfo> => {
           accessToken = token;
 
-          return this.getRequestDigestForSite(appCatalogUrl, accessToken, cmd, this.verbose);
+          return this.getRequestDigestForSite(appCatalogUrl, accessToken, cmd, this.debug);
         })
         .then((res: ContextInfo): Promise<string> => {
-          if (this.verbose) {
+          if (this.debug) {
             cmd.log('Response:');
             cmd.log(res);
             cmd.log('');
           }
 
-          cmd.log(`Retracting app...`);
+          if (this.verbose) {
+            cmd.log(`Retracting app...`);
+          }
 
           const requestOptions: any = {
             url: `${appCatalogUrl}/_api/web/tenantappcatalog/AvailableApps/GetById('${args.options.id}')/retract`,
@@ -121,7 +123,7 @@ class AppDeployCommand extends SpoCommand {
             }
           };
 
-          if (this.verbose) {
+          if (this.debug) {
             cmd.log('Executing web request...');
             cmd.log(requestOptions);
             cmd.log('');
@@ -130,13 +132,15 @@ class AppDeployCommand extends SpoCommand {
           return request.post(requestOptions);
         })
         .then((res: string): void => {
-          if (this.verbose) {
+          if (this.debug) {
             cmd.log('Response:');
             cmd.log(res);
             cmd.log('');
           }
 
-          cmd.log(vorpal.chalk.green('DONE'));
+          if (this.verbose) {
+            cmd.log(vorpal.chalk.green('DONE'));
+          }
 
           cb();
         }, (rawRes: any): void => {

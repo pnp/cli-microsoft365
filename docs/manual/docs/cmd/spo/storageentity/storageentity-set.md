@@ -19,6 +19,7 @@ Option|Description
 `-d, --description [description]`|Description to set for the property (optional)
 `-c, --comment [comment]`|Comment to set for the property (optional)
 `--verbose`|Runs command with verbose logging
+`--debug`|Runs command with debug logging
 
 !!! important
     Before using this command, connect to a SharePoint Online tenant admin site, using the [spo connect](../connect.md) command.
