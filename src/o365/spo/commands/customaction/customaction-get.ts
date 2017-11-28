@@ -60,10 +60,11 @@ class SpoCustomActionGetCommand extends SpoCommand {
         }
 
         if (args.options.scope && args.options.scope.toLowerCase() !== "all") {
-
+          
           return this.getCustomAction(args.options, cmd);
         }
-
+        
+        
         return this.searchAllScopes(args.options, cmd);
       })
       .then((customAction: CustomAction): void => {
@@ -117,8 +118,8 @@ class SpoCustomActionGetCommand extends SpoCommand {
    * another get request is send with `site` scope.
    */
   protected searchAllScopes(options: Options, cmd: CommandInstance): Promise<CustomAction> {
-    return new Promise<CustomAction>((resolve, reject) => {
 
+    return new Promise<CustomAction>((resolve, reject) => {
       options.scope = "Web";
       this.getCustomAction(options, cmd).then((webResult: CustomAction): void => {
 
@@ -150,34 +151,6 @@ class SpoCustomActionGetCommand extends SpoCommand {
         reject(err);
       });
     });
-  }
-
-  /**
-   * This method to be removed when 
-   * https://github.com/waldekmastykarz/office365-cli/commit/c14d6336fa002bd882f2c0d0d220b89ecaeb8bb8 
-   * merged.
-   * @param siteUrl 
-   * @param accessToken 
-   * @param cmd 
-   * @param verbose 
-   */
-  protected getRequestDigestForSite(siteUrl: string, accessToken: string, cmd: CommandInstance, verbose: boolean = false): Promise<ContextInfo> {
-    const requestOptions: any = {
-      url: `${siteUrl}/_api/contextinfo`,
-      headers: {
-        authorization: `Bearer ${accessToken}`,
-        accept: 'application/json;odata=nometadata'
-      },
-      json: true
-    };
-
-    if (verbose) {
-      cmd.log('Executing web request...');
-      cmd.log(requestOptions);
-      cmd.log('');
-    }
-
-    return request.post(requestOptions);
   }
 
   protected humanizeScope(scope: number): string {
