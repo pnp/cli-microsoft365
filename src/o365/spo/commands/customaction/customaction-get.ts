@@ -64,7 +64,6 @@ class SpoCustomActionGetCommand extends SpoCommand {
           return this.getCustomAction(args.options, cmd);
         }
         
-        
         return this.searchAllScopes(args.options, cmd);
       })
       .then((customAction: CustomAction): void => {
@@ -118,7 +117,6 @@ class SpoCustomActionGetCommand extends SpoCommand {
    * another get request is send with `site` scope.
    */
   protected searchAllScopes(options: Options, cmd: CommandInstance): Promise<CustomAction> {
-
     return new Promise<CustomAction>((resolve, reject) => {
       options.scope = "Web";
       this.getCustomAction(options, cmd).then((webResult: CustomAction): void => {

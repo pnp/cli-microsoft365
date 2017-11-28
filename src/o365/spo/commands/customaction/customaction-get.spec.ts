@@ -7,7 +7,6 @@ const command: Command = require('./customaction-get');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import Utils from '../../../../Utils';
-// import config from '../../../../config';
 
 describe(commands.CUSTOMACTION_GET, () => {
   let vorpal: Vorpal;
@@ -123,7 +122,6 @@ describe(commands.CUSTOMACTION_GET, () => {
     });
 
     let getRequestSpy = sinon.stub(request, 'get').callsFake((opts) => {
-
       if (opts.url.indexOf('/_api/Web/UserCustomActions(') > -1) {
         return Promise.resolve('abc');
       }
@@ -190,7 +188,6 @@ describe(commands.CUSTOMACTION_GET, () => {
     });
 
     let getRequestSpy = sinon.stub(request, 'get').callsFake((opts) => {
-
       if (opts.url.indexOf('/_api/Web/UserCustomActions(') > -1) {
         return Promise.resolve('abc');
       }
