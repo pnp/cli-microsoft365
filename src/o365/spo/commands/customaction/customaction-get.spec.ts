@@ -14,7 +14,36 @@ describe(commands.CUSTOMACTION_GET, () => {
   let cmdInstance: any;
   let trackEvent: any;
   let telemetry: any;
-  let requests: any[];
+
+  let fakeContextCalls = (): sinon.SinonStub => {
+    return sinon.stub(request, 'post').callsFake((opts) => {
+      
+      if (opts.url.indexOf('/common/oauth2/token') > -1) {
+        return Promise.resolve('abc');
+      }
+
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        return Promise.resolve({
+          FormDigestValue: 'abc'
+        });
+      }
+      return Promise.reject('Invalid request');
+    });
+  }
+
+  let fakeCustomActionRestCalls = (): sinon.SinonStub => {
+    return sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('/_api/Web/UserCustomActions(') > -1) {
+        return Promise.resolve('abc');
+      }
+
+      if (opts.url.indexOf('/_api/Site/UserCustomActions(') > -1) {
+        return Promise.resolve('abc');
+      }
+
+      return Promise.reject('Invalid request');
+    });
+  }
 
   before(() => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
@@ -106,32 +135,8 @@ describe(commands.CUSTOMACTION_GET, () => {
   });
 
   it('getCustomAction called once when scope is Web', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-
-      if (opts.url.indexOf('/common/oauth2/token') > -1) {
-        return Promise.resolve('abc');
-      }
-
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    let getRequestSpy = sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/Web/UserCustomActions(') > -1) {
-        return Promise.resolve('abc');
-      }
-
-      if (opts.url.indexOf('/_api/Site/UserCustomActions(') > -1) {
-        return Promise.resolve('abc');
-      }
-
-      return Promise.reject('Invalid request');
-    });
+    fakeContextCalls();
+    let getRequestSpy = fakeCustomActionRestCalls();
 
     auth.site = new Site();
     auth.site.connected = true;
@@ -172,32 +177,8 @@ describe(commands.CUSTOMACTION_GET, () => {
   });
 
   it('getCustomAction called once when scope is Site', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-
-      if (opts.url.indexOf('/common/oauth2/token') > -1) {
-        return Promise.resolve('abc');
-      }
-
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    let getRequestSpy = sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/Web/UserCustomActions(') > -1) {
-        return Promise.resolve('abc');
-      }
-
-      if (opts.url.indexOf('/_api/Site/UserCustomActions(') > -1) {
-        return Promise.resolve('abc');
-      }
-
-      return Promise.reject('Invalid request');
-    });
+    fakeContextCalls();
+    let getRequestSpy = fakeCustomActionRestCalls();
 
     auth.site = new Site();
     auth.site.connected = true;
@@ -238,33 +219,8 @@ describe(commands.CUSTOMACTION_GET, () => {
   });
 
   it('getCustomAction called once when scope is All, but item found on web level', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-
-      if (opts.url.indexOf('/common/oauth2/token') > -1) {
-        return Promise.resolve('abc');
-      }
-
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    let getRequestSpy = sinon.stub(request, 'get').callsFake((opts) => {
-
-      if (opts.url.indexOf('/_api/Web/UserCustomActions(') > -1) {
-        return Promise.resolve('abc');
-      }
-
-      if (opts.url.indexOf('/_api/Site/UserCustomActions(') > -1) {
-        return Promise.resolve('abc');
-      }
-
-      return Promise.reject('Invalid request');
-    });
+    fakeContextCalls();
+    let getRequestSpy = fakeCustomActionRestCalls();
 
     auth.site = new Site();
     auth.site.connected = true;
@@ -299,20 +255,7 @@ describe(commands.CUSTOMACTION_GET, () => {
   });
 
   it('getCustomAction called twice when scope is All, but item not found on web level', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-
-      if (opts.url.indexOf('/common/oauth2/token') > -1) {
-        return Promise.resolve('abc');
-      }
-
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
+    fakeContextCalls();
 
     let getRequestSpy = sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf('/_api/Web/UserCustomActions(') > -1) {
@@ -358,33 +301,8 @@ describe(commands.CUSTOMACTION_GET, () => {
   });
 
   it('searchAllScopes called when scope is All', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-
-      if (opts.url.indexOf('/common/oauth2/token') > -1) {
-        return Promise.resolve({ 'odata.null': true });
-      }
-
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    sinon.stub(request, 'get').callsFake((opts) => {
-      requests.push(opts);
-      if (opts.url.indexOf('/_api/Web/UserCustomActions(') > -1) {
-        return Promise.resolve('abc');
-      }
-
-      if (opts.url.indexOf('/_api/Site/UserCustomActions(') > -1) {
-        return Promise.resolve('abc');
-      }
-
-      return Promise.reject('Invalid request');
-    });
+    fakeContextCalls();
+    fakeCustomActionRestCalls();
 
     auth.site = new Site();
     auth.site.connected = true;
@@ -422,20 +340,7 @@ describe(commands.CUSTOMACTION_GET, () => {
   });
 
   it('searchAllScopes correctly handles custom action odata.null when All scope specified', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-
-      if (opts.url.indexOf('/common/oauth2/token') > -1) {
-        return Promise.resolve('abc');
-      }
-
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
+    fakeContextCalls();
 
     sinon.stub(request, 'get').callsFake((opts) => {
 
@@ -483,20 +388,7 @@ describe(commands.CUSTOMACTION_GET, () => {
   });
 
   it('searchAllScopes correctly handles web custom action reject request', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-
-      if (opts.url.indexOf('/common/oauth2/token') > -1) {
-        return Promise.resolve('abc');
-      }
-
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
+    fakeContextCalls();
 
     const err = 'Invalid request';
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -541,20 +433,7 @@ describe(commands.CUSTOMACTION_GET, () => {
   });
 
   it('searchAllScopes correctly handles site custom action reject request', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-
-      if (opts.url.indexOf('/common/oauth2/token') > -1) {
-        return Promise.resolve('abc');
-      }
-
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
+    fakeContextCalls();
 
     const err = 'Invalid request';
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -611,6 +490,64 @@ describe(commands.CUSTOMACTION_GET, () => {
       }
     });
     assert(containsVerboseOption);
+  });
+  
+  it('output printed correctly', (done) => {
+    const actionId: string = "7b115268-c431-458b-9eac-0b22419a1486";
+    const customAction = {
+      ClientSideComponentId: "7b115268-c431-458b-9eac-0b22419a1488",
+      ClientSideComponentProperties: {"prop":1},
+      Id: actionId,
+      Location: "Microsoft.SharePoint.StandardMenu",
+      Name: "abc",
+      Scope: 3
+    }
+    
+    fakeContextCalls();
+    
+    sinon.stub(request, 'get').callsFake((opts) => {
+
+      if (opts.url.indexOf('/_api/Web/UserCustomActions(') > -1) {
+        return Promise.resolve(customAction);
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    const logSpy: any = sinon.spy(cmdInstance, 'log');
+
+    cmdInstance.action({
+      options: {
+        verbose: false,
+        id: actionId,
+        url: 'https://contoso.sharepoint.com',
+        scope: 'All'
+      }
+    }, () => {
+
+      try {
+        assert(logSpy.calledWith(sinon.match(customAction.Name)));
+        assert(logSpy.calledWith(sinon.match(customAction.Id)));
+        assert(logSpy.calledWith(sinon.match(customAction.Location)));
+        assert(logSpy.calledWith(sinon.match("Web")));
+        assert(logSpy.calledWith(sinon.match(customAction.ClientSideComponentId)));
+        assert(logSpy.calledWith(sinon.match(JSON.stringify(customAction.ClientSideComponentProperties))));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+        Utils.restore(request.get);
+        Utils.restore(logSpy);
+      }
+    });
   });
 
   it('supports specifying scope', () => {
@@ -844,4 +781,4 @@ describe(commands.CUSTOMACTION_GET, () => {
       }
     });
   });
-});
+}); 

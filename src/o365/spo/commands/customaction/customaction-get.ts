@@ -84,7 +84,7 @@ class SpoCustomActionGetCommand extends SpoCommand {
           t.cell('Location', customAction.Location);
           t.cell('Scope', this.humanizeScope(customAction.Scope));
           t.cell('ClientSideComponentId', customAction.ClientSideComponentId);
-          t.cell('ClientSideComponentProperties', customAction.ClientSideComponentProperties);
+          t.cell('ClientSideComponentProperties', JSON.stringify(customAction.ClientSideComponentProperties));
           t.newRow();
   
           cmd.log('');
