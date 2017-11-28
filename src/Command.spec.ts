@@ -57,8 +57,8 @@ class MockCommand1 extends Command {
 
   public options(): CommandOption[] {
     return [{
-      option: '--verbose',
-      description: 'Runs command with verbose logging'
+      option: '--debug',
+      description: 'Runs command with debug logging'
     }];
   }
 }

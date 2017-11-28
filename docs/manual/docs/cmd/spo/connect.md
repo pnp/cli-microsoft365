@@ -14,6 +14,7 @@ Option|Description
 ------|-----------
 `--help`|output usage information
 `--verbose`|Runs command with verbose logging
+`--debug`|Runs command with debug logging
 
 ## Arguments
 
@@ -45,10 +46,10 @@ spo connect https://contoso-admin.sharepoint.com
 connects to a SharePoint Online tenant admin site
 
 ```sh
-spo connect --verbose https://contoso-admin.sharepoint.com
+spo connect --debug https://contoso-admin.sharepoint.com
 ```
 
-connects to a SharePoint Online tenant admin site in verbose mode including detailed debug information in the console output
+connects to a SharePoint Online tenant admin site in debug mode including detailed debug information in the console output
 
 ```sh
 spo connect https://contoso.sharepoint.com/sites/team

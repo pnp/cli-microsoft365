@@ -26,13 +26,15 @@ class AppListCommand extends SpoCommand {
 
   public commandAction(cmd: CommandInstance, args: {}, cb: () => void): void {
     auth
-      .ensureAccessToken(auth.service.resource, cmd, this.verbose)
+      .ensureAccessToken(auth.service.resource, cmd, this.debug)
       .then((accessToken: string): Promise<string> => {
-        if (this.verbose) {
+        if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}. Loading apps from tenant app catalog...`);
         }
 
-        cmd.log(`Retrieving apps...`);
+        if (this.verbose) {
+          cmd.log(`Retrieving apps...`);
+        }
 
         const requestOptions: any = {
           url: `${auth.site.url}/_api/web/tenantappcatalog/AvailableApps`,
@@ -42,7 +44,7 @@ class AppListCommand extends SpoCommand {
           }
         };
 
-        if (this.verbose) {
+        if (this.debug) {
           cmd.log('Executing web request...');
           cmd.log(requestOptions);
           cmd.log('');
@@ -51,7 +53,7 @@ class AppListCommand extends SpoCommand {
         return request.get(requestOptions);
       })
       .then((res: string): void => {
-        if (this.verbose) {
+        if (this.debug) {
           cmd.log('Response:');
           cmd.log(res);
           cmd.log('');
@@ -74,7 +76,9 @@ class AppListCommand extends SpoCommand {
           cmd.log(t.toString());
         }
         else {
-          cmd.log('No apps found');
+          if (this.verbose) {
+            cmd.log('No apps found');
+          }
         }
         cb();
       }, (err: any): void => {

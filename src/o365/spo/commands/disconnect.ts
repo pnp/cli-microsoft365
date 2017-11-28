@@ -22,9 +22,13 @@ class SpoDisconnectCommand extends Command {
     appInsights.trackEvent({
       name: commands.DISCONNECT
     });
-    cmd.log('Disconnecting from SharePoint Online...');
+    if (this.verbose) {
+      cmd.log('Disconnecting from SharePoint Online...');
+    }
     auth.site.disconnect();
-    cmd.log(chalk.green('DONE'));
+    if (this.verbose) {
+      cmd.log(chalk.green('DONE'));
+    }
     cb();
   }
 
@@ -43,9 +47,9 @@ class SpoDisconnectCommand extends Command {
     ${chalk.grey(config.delimiter)} ${commands.DISCONNECT}
       disconnects from a previously connected SharePoint Online site
 
-    ${chalk.grey(config.delimiter)} ${commands.DISCONNECT} --verbose
+    ${chalk.grey(config.delimiter)} ${commands.DISCONNECT} --debug
       disconnects from a previously connected SharePoint Online site in
-      verbose mode including detailed debug information in the console output
+      debug mode including detailed debug information in the console output
 `);
     };
   }

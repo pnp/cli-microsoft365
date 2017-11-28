@@ -17,6 +17,7 @@ Option|Description
 `-s, --siteUrl <siteUrl>`|Absolute URL of the site to uninstall the app from
 `--confirm`|Don't prompt for confirming uninstalling the app
 `--verbose`|Runs command with verbose logging
+`--debug`|Runs command with debug logging
 
 !!! important
     Before using this command, connect to a SharePoint Online site, using the [spo connect](../connect.md) command.

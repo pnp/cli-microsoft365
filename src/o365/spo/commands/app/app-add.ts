@@ -4,7 +4,7 @@ import { ContextInfo } from '../../spo';
 import config from '../../../../config';
 import * as request from 'request-promise-native';
 import commands from '../../commands';
-import VerboseOption from '../../../../VerboseOption';
+import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandHelp,
   CommandOption,
@@ -20,7 +20,7 @@ interface CommandArgs {
   options: Options;
 }
 
-interface Options extends VerboseOption {
+interface Options extends GlobalOptions {
   filePath: string;
   overwrite?: boolean;
 }
@@ -43,28 +43,30 @@ class SpoAppAddCommand extends SpoCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const overwrite: boolean = args.options.overwrite || false;
 
-    if (this.verbose) {
+    if (this.debug) {
       cmd.log(`Retrieving access token for ${auth.service.resource}...`);
     }
 
     auth
-      .ensureAccessToken(auth.service.resource, cmd, this.verbose)
+      .ensureAccessToken(auth.service.resource, cmd, this.debug)
       .then((accessToken: string): Promise<ContextInfo> => {
-        if (this.verbose) {
+        if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
         }
 
-        return this.getRequestDigest(cmd, this.verbose);
+        return this.getRequestDigest(cmd, this.debug);
       })
       .then((res: ContextInfo): Promise<string> => {
-        if (this.verbose) {
+        if (this.debug) {
           cmd.log('Response:');
           cmd.log(res);
           cmd.log('');
         }
 
         const fullPath: string = path.resolve(args.options.filePath);
-        cmd.log(`Adding app '${fullPath}' to app catalog...`);
+        if (this.verbose) {
+          cmd.log(`Adding app '${fullPath}' to app catalog...`);
+        }
 
         const fileName: string = path.basename(fullPath);
         const requestOptions: any = {
@@ -78,7 +80,7 @@ class SpoAppAddCommand extends SpoCommand {
           body: fs.readFileSync(fullPath)
         };
 
-        if (this.verbose) {
+        if (this.debug) {
           cmd.log('Executing web request...');
           cmd.log(requestOptions);
           cmd.log('');
@@ -87,13 +89,15 @@ class SpoAppAddCommand extends SpoCommand {
         return request.post(requestOptions);
       })
       .then((res: string): void => {
-        if (this.verbose) {
+        if (this.debug) {
           cmd.log('Response:');
           cmd.log(res);
           cmd.log('');
         }
 
-        cmd.log(vorpal.chalk.green('DONE'));
+        if (this.verbose) {
+          cmd.log(vorpal.chalk.green('DONE'));
+        }
 
         cb();
       }, (rawRes: any): void => {

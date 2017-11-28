@@ -84,7 +84,7 @@ describe(commands.APP_LIST, () => {
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: true } }, () => {
+    cmdInstance.action({ options: { debug: true } }, () => {
       let returnsCorrectValue: boolean = false;
       log.forEach(l => {
         if (l && l.indexOf('Connect to a SharePoint Online site first') > -1) {
@@ -133,7 +133,7 @@ describe(commands.APP_LIST, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: true } }, () => {
+    cmdInstance.action({ options: { debug: true } }, () => {
       let correctLogStatements = 0;
       log.forEach(l => {
         if (!l || typeof l !== 'string') {
@@ -177,17 +177,50 @@ describe(commands.APP_LIST, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: false } }, () => {
+    cmdInstance.action({ options: { debug: false } }, () => {
+      try {
+        assert.equal(log.length, 0);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+      }
+    });
+  });
+
+  it('correctly handles no apps in the tenant app catalog (verbose)', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('/_api/web/tenantappcatalog/AvailableApps') > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve(JSON.stringify({ value: []}));
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, verbose: true } }, () => {
       let correctLogStatement = false;
       log.forEach(l => {
         if (!l || typeof l !== 'string') {
           return;
         }
 
-        if (l.indexOf('No apps found')) {
+        if (l.indexOf('No apps found') > -1) {
           correctLogStatement = true;
         }
-      });
+      })
       try {
         assert(correctLogStatement);
         done();
@@ -201,15 +234,15 @@ describe(commands.APP_LIST, () => {
     });
   });
 
-  it('supports verbose mode', () => {
+  it('supports debug mode', () => {
     const options = (command.options() as CommandOption[]);
-    let containsVerboseOption = false;
+    let containsdebugOption = false;
     options.forEach(o => {
-      if (o.option === '--verbose') {
-        containsVerboseOption = true;
+      if (o.option === '--debug') {
+        containsdebugOption = true;
       }
     });
-    assert(containsVerboseOption);
+    assert(containsdebugOption);
   });
 
   it('has help referring to the right command', () => {
@@ -248,7 +281,7 @@ describe(commands.APP_LIST, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: true } }, () => {
+    cmdInstance.action({ options: { debug: true } }, () => {
       let containsError = false;
       log.forEach(l => {
         if (typeof l === 'string' &&

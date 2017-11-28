@@ -111,7 +111,7 @@ describe(commands.CONNECT, () => {
   it('connects to a tenant admin site', (done) => {
     auth.site = new Site();
     cmdInstance.action = connectCommand.action();
-    cmdInstance.action({ options: { verbose: false }, url: 'https://contoso-admin.sharepoint.com' }, () => {
+    cmdInstance.action({ options: { debug: false }, url: 'https://contoso-admin.sharepoint.com' }, () => {
       try {
         assert(auth.site.connected);
         done();
@@ -122,10 +122,10 @@ describe(commands.CONNECT, () => {
     });
   });
 
-  it('connects to a tenant admin site (verbose)', (done) => {
+  it('connects to a tenant admin site (debug)', (done) => {
     auth.site = new Site();
     cmdInstance.action = connectCommand.action();
-    cmdInstance.action({ options: { verbose: true }, url: 'https://contoso-admin.sharepoint.com' }, () => {
+    cmdInstance.action({ options: { debug: true }, url: 'https://contoso-admin.sharepoint.com' }, () => {
       try {
         assert(auth.site.connected);
         done();
@@ -139,7 +139,7 @@ describe(commands.CONNECT, () => {
   it('connects to a regular SharePoint site', (done) => {
     auth.site = new Site();
     cmdInstance.action = connectCommand.action();
-    cmdInstance.action({ options: { verbose: false }, url: 'https://contoso.sharepoint.com' }, () => {
+    cmdInstance.action({ options: { debug: false }, url: 'https://contoso.sharepoint.com' }, () => {
       try {
         assert(auth.site.connected);
         done();
@@ -150,10 +150,10 @@ describe(commands.CONNECT, () => {
     });
   });
 
-  it('connects to a regular SharePoint site (verbose)', (done) => {
+  it('connects to a regular SharePoint site (debug)', (done) => {
     auth.site = new Site();
     cmdInstance.action = connectCommand.action();
-    cmdInstance.action({ options: { verbose: true }, url: 'https://contoso.sharepoint.com' }, () => {
+    cmdInstance.action({ options: { debug: true }, url: 'https://contoso.sharepoint.com' }, () => {
       try {
         assert(auth.site.connected);
         done();
@@ -229,7 +229,7 @@ describe(commands.CONNECT, () => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
     auth.site = new Site();
     cmdInstance.action = connectCommand.action();
-    cmdInstance.action({ options: { verbose: false }, url: 'https://contoso-admin.sharepoint.com' }, () => {
+    cmdInstance.action({ options: { debug: false }, url: 'https://contoso-admin.sharepoint.com' }, () => {
       let containsError = false;
       log.forEach(l => {
         if (typeof l === 'string' &&
@@ -247,12 +247,12 @@ describe(commands.CONNECT, () => {
     });
   });
 
-  it('correctly handles lack of valid access token (verbose)', (done) => {
+  it('correctly handles lack of valid access token (debug)', (done) => {
     Utils.restore(auth.ensureAccessToken);
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
     auth.site = new Site();
     cmdInstance.action = connectCommand.action();
-    cmdInstance.action({ options: { verbose: true }, url: 'https://contoso-admin.sharepoint.com' }, () => {
+    cmdInstance.action({ options: { debug: true }, url: 'https://contoso-admin.sharepoint.com' }, () => {
       let containsError = false;
       log.forEach(l => {
         if (typeof l === 'string' &&

@@ -92,7 +92,7 @@ describe(commands.APP_UNINSTALL, () => {
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: true } }, () => {
+    cmdInstance.action({ options: { debug: true } }, () => {
       let returnsCorrectValue: boolean = false;
       log.forEach(l => {
         if (l && l.indexOf('Connect to a SharePoint Online site first') > -1) {
@@ -109,7 +109,7 @@ describe(commands.APP_UNINSTALL, () => {
     });
   });
 
-  it('uninstalls app from the specified site without prompting with confirmation argument (verbose)', (done) => {
+  it('uninstalls app from the specified site without prompting with confirmation argument (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -139,7 +139,7 @@ describe(commands.APP_UNINSTALL, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: true, id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com', confirm: true } }, () => {
+    cmdInstance.action({ options: { debug: true, id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com', confirm: true } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/uninstall`) > -1 &&
@@ -193,7 +193,7 @@ describe(commands.APP_UNINSTALL, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com', confirm: true } }, () => {
+    cmdInstance.action({ options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com', confirm: true } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/uninstall`) > -1 &&
@@ -222,7 +222,7 @@ describe(commands.APP_UNINSTALL, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com' } }, () => {
+    cmdInstance.action({ options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com' } }, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -247,7 +247,7 @@ describe(commands.APP_UNINSTALL, () => {
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     };
-    cmdInstance.action({ options: { verbose: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com' } }, () => {
+    cmdInstance.action({ options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com' } }, () => {
       try {
         assert(requests.length === 0);
         done();
@@ -291,7 +291,7 @@ describe(commands.APP_UNINSTALL, () => {
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     };
-    cmdInstance.action({ options: { verbose: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com' } }, () => {
+    cmdInstance.action({ options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/uninstall`) > -1 &&
@@ -351,14 +351,14 @@ describe(commands.APP_UNINSTALL, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com', confirm: true } }, () => {
+    cmdInstance.action({ options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com', confirm: true } }, () => {
       let correctLogStatement = false;
       log.forEach(l => {
         if (!l || typeof l !== 'string') {
           return;
         }
 
-        if (l.indexOf('Error: App with id b2307a39-e878-458b-bc90-03bc578531d6 not found')) {
+        if (l.indexOf('Error: App with id b2307a39-e878-458b-bc90-03bc578531d6 not found') > -1) {
           correctLogStatement = true;
         }
       })
@@ -414,14 +414,14 @@ describe(commands.APP_UNINSTALL, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com', confirm: true } }, () => {
+    cmdInstance.action({ options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com', confirm: true } }, () => {
       let correctLogStatement = false;
       log.forEach(l => {
         if (!l || typeof l !== 'string') {
           return;
         }
 
-        if (l.indexOf('Error: Another job exists for this app instance. Please retry after that job is done.')) {
+        if (l.indexOf('Error: Another job exists for this app instance. Please retry after that job is done.') > -1) {
           correctLogStatement = true;
         }
       })
@@ -467,7 +467,7 @@ describe(commands.APP_UNINSTALL, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com', confirm: true } }, () => {
+    cmdInstance.action({ options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com', confirm: true } }, () => {
       let correctLogStatement = false;
       log.forEach(l => {
         if (!l || typeof l !== 'string') {
@@ -520,7 +520,7 @@ describe(commands.APP_UNINSTALL, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com', confirm: true } }, () => {
+    cmdInstance.action({ options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com', confirm: true } }, () => {
       let correctLogStatement = false;
       log.forEach(l => {
         if (!l || typeof l !== 'string') {
@@ -582,14 +582,14 @@ describe(commands.APP_UNINSTALL, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com', confirm: true } }, () => {
+    cmdInstance.action({ options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com', confirm: true } }, () => {
       let correctLogStatement = false;
       log.forEach(l => {
         if (!l || typeof l !== 'string') {
           return;
         }
 
-        if (l.indexOf(`Error: An error has occurred`)) {
+        if (l.indexOf(`Error: An error has occurred`) > -1) {
           correctLogStatement = true;
         }
       });
@@ -626,15 +626,15 @@ describe(commands.APP_UNINSTALL, () => {
     assert(actual);
   });
 
-  it('supports verbose mode', () => {
+  it('supports debug mode', () => {
     const options = (command.options() as CommandOption[]);
-    let containsVerboseOption = false;
+    let containsdebugOption = false;
     options.forEach(o => {
-      if (o.option === '--verbose') {
-        containsVerboseOption = true;
+      if (o.option === '--debug') {
+        containsdebugOption = true;
       }
     });
-    assert(containsVerboseOption);
+    assert(containsdebugOption);
   });
 
   it('has help referring to the right command', () => {
@@ -673,7 +673,7 @@ describe(commands.APP_UNINSTALL, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: true, id: '123', siteUrl: 'https://contoso.sharepoint.com', confirm: true } }, () => {
+    cmdInstance.action({ options: { debug: true, id: '123', siteUrl: 'https://contoso.sharepoint.com', confirm: true } }, () => {
       let containsError = false;
       log.forEach(l => {
         if (typeof l === 'string' &&

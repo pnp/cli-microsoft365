@@ -4,7 +4,7 @@ import Auth from '../../../Auth';
 import config from '../../../config';
 import * as request from 'request-promise-native';
 import commands from '../commands';
-import VerboseOption from '../../../VerboseOption';
+import GlobalOptions from '../../../GlobalOptions';
 import Command, {
   CommandCancel,
   CommandHelp,
@@ -16,7 +16,7 @@ const vorpal: Vorpal = require('../../../vorpal-init');
 
 interface CommandArgs {
   url: string;
-  options: VerboseOption;
+  options: GlobalOptions;
 }
 
 const CONNECTION_SUCCEEDED: string = 'connection_succeeded';
@@ -34,27 +34,31 @@ class SpoConnectCommand extends Command {
     const chalk: any = vorpal.chalk;
 
     // disconnect before re-connecting
-    if (this.verbose) {
+    if (this.debug) {
       cmd.log(`
 Disconnecting from SPO...
 `);
     }
     auth.site.disconnect();
 
-    cmd.log(`
+    if (this.verbose) {
+      cmd.log(`
 Authenticating with SharePoint Online at ${args.url}...
 `);
+    }
 
     const resource = Auth.getResourceFromUrl(args.url);
 
     auth
-      .ensureAccessToken(resource, cmd, args.options.verbose)
+      .ensureAccessToken(resource, cmd, args.options.debug)
       .then((accessToken: string): Promise<ContextInfo> => {
         auth.service.resource = resource;
         auth.site.url = args.url;
-        cmd.log(chalk.green('DONE'));
-
         if (this.verbose) {
+          cmd.log(chalk.green('DONE'));
+        }
+
+        if (this.debug) {
           cmd.log(`Checking if ${auth.site.url} is a tenant admin site...`);
         }
         if (auth.site.isTenantAdminSite()) {
@@ -67,7 +71,7 @@ Authenticating with SharePoint Online at ${args.url}...
             json: true
           };
 
-          if (this.verbose) {
+          if (this.debug) {
             cmd.log(`${auth.site.url} is a tenant admin site. Get tenant information...`);
             cmd.log('');
             cmd.log('Executing web request:');
@@ -78,19 +82,21 @@ Authenticating with SharePoint Online at ${args.url}...
           return request.post(requestDigestRequestOptions);
         }
         else {
-          if (this.verbose) {
+          if (this.debug) {
             cmd.log(`${auth.site.url} is not a tenant admin site`);
             cmd.log('');
           }
 
           auth.site.connected = true;
-          cmd.log(`Successfully connected to ${args.url}`);
+          if (this.verbose) {
+            cmd.log(`Successfully connected to ${args.url}`);
+          }
           cb();
           throw CONNECTION_SUCCEEDED;
         }
       })
       .then((res: ContextInfo): Promise<string> => {
-        if (this.verbose) {
+        if (this.debug) {
           cmd.log('Response:');
           cmd.log(res);
           cmd.log('');
@@ -106,9 +112,11 @@ Authenticating with SharePoint Online at ${args.url}...
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
         };
 
-        cmd.log('Retrieving tenant admin site information...');
-
         if (this.verbose) {
+          cmd.log('Retrieving tenant admin site information...');
+        }
+
+        if (this.debug) {
           cmd.log('Executing web request:');
           cmd.log(tenantInfoRequestOptions);
           cmd.log('');
@@ -117,7 +125,7 @@ Authenticating with SharePoint Online at ${args.url}...
         return request.post(tenantInfoRequestOptions);
       })
       .then((res: string): void => {
-        if (this.verbose) {
+        if (this.debug) {
           cmd.log('Response:');
           cmd.log(res);
           cmd.log('');
@@ -127,13 +135,15 @@ Authenticating with SharePoint Online at ${args.url}...
 
         auth.site.tenantId = (json[json.length - 1] as any)._ObjectIdentity_.replace('\n', '&#xA;');
         auth.site.connected = true;
-        cmd.log(chalk.green('DONE'));
-        cmd.log(`Successfully connected to ${args.url}
+        if (this.verbose) {
+          cmd.log(chalk.green('DONE'));
+          cmd.log(`Successfully connected to ${args.url}
 `);
+        }
         cb();
       }, (rej: Error | string): void => {
         if (rej instanceof Error) {
-          if (this.verbose) {
+          if (this.debug) {
             cmd.log('Error:');
             cmd.log(rej);
             cmd.log('');
@@ -145,7 +155,7 @@ Authenticating with SharePoint Online at ${args.url}...
           return;
         }
         else {
-          if (this.verbose) {
+          if (this.debug) {
             cmd.log('Early exit of a promise chain');
           }
         }
@@ -195,8 +205,8 @@ Authenticating with SharePoint Online at ${args.url}...
     ${chalk.grey(config.delimiter)} ${commands.CONNECT} https://contoso-admin.sharepoint.com
       connects to a SharePoint Online tenant admin site
 
-    ${chalk.grey(config.delimiter)} ${commands.CONNECT} --verbose https://contoso-admin.sharepoint.com
-      connects to a SharePoint Online tenant admin site in verbose mode including
+    ${chalk.grey(config.delimiter)} ${commands.CONNECT} --debug https://contoso-admin.sharepoint.com
+      connects to a SharePoint Online tenant admin site in debug mode including
       detailed debug information in the console output
       
     ${chalk.grey(config.delimiter)} ${commands.CONNECT} https://contoso.sharepoint.com/sites/team

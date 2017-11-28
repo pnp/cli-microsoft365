@@ -14,6 +14,7 @@ Option|Description
 ------|-----------
 `--help`|output usage information
 `--verbose`|Runs command with verbose logging
+`--debug`|Runs command with debug logging
 
 !!! important
     Before using this command, connect to a SharePoint Online site, using the [spo connect](../connect.md) command.

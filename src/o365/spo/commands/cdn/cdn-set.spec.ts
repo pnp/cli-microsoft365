@@ -112,7 +112,7 @@ describe(commands.CDN_SET, () => {
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
+    cmdInstance.action({ options: { debug: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       let returnsCorrectValue: boolean = false;
       log.forEach(l => {
         if (l && l.indexOf('Connect to a SharePoint Online site first') > -1) {
@@ -134,7 +134,7 @@ describe(commands.CDN_SET, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
+    cmdInstance.action({ options: { debug: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       let returnsCorrectValue: boolean = false;
       log.forEach(l => {
         if (l && l.indexOf(`${auth.site.url} is not a tenant admin site`) > -1) {
@@ -157,7 +157,7 @@ describe(commands.CDN_SET, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: true, enabled: 'true', type: 'Public' } }, () => {
+    cmdInstance.action({ options: { debug: true, enabled: 'true', type: 'Public' } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -185,7 +185,7 @@ describe(commands.CDN_SET, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: true, enabled: 'false', type: 'Public' } }, () => {
+    cmdInstance.action({ options: { debug: true, enabled: 'false', type: 'Public' } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -213,7 +213,7 @@ describe(commands.CDN_SET, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: true, enabled: 'true', type: 'Private' } }, () => {
+    cmdInstance.action({ options: { debug: true, enabled: 'true', type: 'Private' } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -241,7 +241,7 @@ describe(commands.CDN_SET, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: false, enabled: 'true' } }, () => {
+    cmdInstance.action({ options: { debug: false, enabled: 'true' } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -300,7 +300,7 @@ describe(commands.CDN_SET, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: false, enabled: 'true' } }, () => {
+    cmdInstance.action({ options: { debug: false, enabled: 'true' } }, () => {
       let genericErrorHandled = false;
       log.forEach(l => {
         if (l && typeof l === 'string' && l.indexOf('An error has occurred') > -1) {
@@ -321,15 +321,15 @@ describe(commands.CDN_SET, () => {
     });
   });
 
-  it('supports verbose mode', () => {
+  it('supports debug mode', () => {
     const options = (command.options() as CommandOption[]);
-    let containsVerboseOption = false;
+    let containsdebugOption = false;
     options.forEach(o => {
-      if (o.option === '--verbose') {
-        containsVerboseOption = true;
+      if (o.option === '--debug') {
+        containsdebugOption = true;
       }
     });
-    assert(containsVerboseOption);
+    assert(containsdebugOption);
   });
 
   it('requires tenant enabled state', () => {
@@ -448,7 +448,7 @@ describe(commands.CDN_SET, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: true, confirm: true, key: 'existingproperty' }, appCatalogUrl: 'https://contoso-admin.sharepoint.com' }, () => {
+    cmdInstance.action({ options: { debug: true, confirm: true, key: 'existingproperty' }, appCatalogUrl: 'https://contoso-admin.sharepoint.com' }, () => {
       let containsError = false;
       log.forEach(l => {
         if (typeof l === 'string' &&

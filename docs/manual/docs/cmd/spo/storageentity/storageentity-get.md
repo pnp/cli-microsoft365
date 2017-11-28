@@ -15,6 +15,7 @@ Option|Description
 `--help`|output usage information
 `-k, --key <key>`|Name of the tenant property to retrieve
 `--verbose`|Runs command with verbose logging
+`--debug`|Runs command with debug logging
 
 !!! important
     Before using this command, connect to a SharePoint Online site, using the [spo connect](../connect.md) command.

@@ -2,7 +2,7 @@ import { ODataError } from './../../spo';
 import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
-import VerboseOption from '../../../../VerboseOption';
+import GlobalOptions from '../../../../GlobalOptions';
 import * as request from 'request-promise-native';
 import {
   CommandHelp,
@@ -19,7 +19,7 @@ interface CommandArgs {
   options: Options;
 }
 
-interface Options extends VerboseOption {
+interface Options extends GlobalOptions {
   id: string;
 }
 
@@ -38,13 +38,15 @@ class AppGetCommand extends SpoCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     auth
-      .ensureAccessToken(auth.service.resource, cmd, this.verbose)
+      .ensureAccessToken(auth.service.resource, cmd, this.debug)
       .then((accessToken: string): Promise<string> => {
-        if (this.verbose) {
+        if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}. Loading apps from tenant app catalog...`);
         }
 
-        cmd.log(`Retrieving app information...`);
+        if (this.verbose) {
+          cmd.log(`Retrieving app information...`);
+        }
 
         const requestOptions: any = {
           url: `${auth.site.url}/_api/web/tenantappcatalog/AvailableApps/GetById('${encodeURIComponent(args.options.id)}')`,
@@ -54,7 +56,7 @@ class AppGetCommand extends SpoCommand {
           }
         };
 
-        if (this.verbose) {
+        if (this.debug) {
           cmd.log('Executing web request...');
           cmd.log(requestOptions);
           cmd.log('');
@@ -63,7 +65,7 @@ class AppGetCommand extends SpoCommand {
         return request.get(requestOptions);
       })
       .then((res: string): void => {
-        if (this.verbose) {
+        if (this.debug) {
           cmd.log('Response:');
           cmd.log(res);
           cmd.log('');
@@ -93,7 +95,7 @@ class AppGetCommand extends SpoCommand {
           if (res.error) {
             const err: ODataError = JSON.parse(res.error);
             if (err['odata.error'] &&
-                err['odata.error'].code === '-1, Microsoft.SharePoint.Client.ResourceNotFoundException') {
+              err['odata.error'].code === '-1, Microsoft.SharePoint.Client.ResourceNotFoundException') {
               cmd.log(`App with id ${args.options.id} not found`);
             }
             else {
@@ -139,18 +141,18 @@ class AppGetCommand extends SpoCommand {
       log(
         `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online site,
       using the ${chalk.blue(commands.CONNECT)} command.
-   
-  Examples:
-  
-    ${chalk.grey(config.delimiter)} ${commands.APP_GET} -i b2307a39-e878-458b-bc90-03bc578531d6
-      Returns details about the app with ID 'b2307a39-e878-458b-bc90-03bc578531d6'
-      available in the tenant app catalog.
 
   Remarks:
   
     To get information about the specified app available in the tenant app catalog,
     you have to first connect to a SharePoint site using the ${chalk.blue(commands.CONNECT)} command,
     eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
+   
+  Examples:
+  
+    ${chalk.grey(config.delimiter)} ${commands.APP_GET} -i b2307a39-e878-458b-bc90-03bc578531d6
+      Returns details about the app with ID 'b2307a39-e878-458b-bc90-03bc578531d6'
+      available in the tenant app catalog.
 
   More information:
   

@@ -3,7 +3,7 @@ import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../..
 import config from '../../../../config';
 import * as request from 'request-promise-native';
 import commands from '../../commands';
-import VerboseOption from '../../../../VerboseOption';
+import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandHelp,
   CommandOption,
@@ -17,7 +17,7 @@ interface CommandArgs {
   options: Options;
 }
 
-interface Options extends VerboseOption {
+interface Options extends GlobalOptions {
   type: string;
 }
 
@@ -45,9 +45,9 @@ class SpoCdnGetCommand extends SpoCommand {
     const cdnType: number = cdnTypeString === 'Private' ? 1 : 0;
 
     auth
-      .ensureAccessToken(auth.service.resource, cmd, this.verbose)
+      .ensureAccessToken(auth.service.resource, cmd, this.debug)
       .then((accessToken: string): Promise<ContextInfo> => {
-        if (this.verbose) {
+        if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}. Loading CDN settings for the ${auth.site.url} tenant...`);
         }
 
@@ -60,7 +60,7 @@ class SpoCdnGetCommand extends SpoCommand {
           json: true
         }
 
-        if (this.verbose) {
+        if (this.debug) {
           cmd.log('Executing web request...');
           cmd.log(requestOptions);
           cmd.log('');
@@ -69,13 +69,15 @@ class SpoCdnGetCommand extends SpoCommand {
         return request.post(requestOptions);
       })
       .then((res: ContextInfo): Promise<string> => {
-        if (this.verbose) {
+        if (this.debug) {
           cmd.log('Response:');
           cmd.log(res);
           cmd.log('');
         }
 
-        cmd.log(`Retrieving status of ${(cdnType === 1 ? 'Private' : 'Public')} CDN...`);
+        if (this.verbose) {
+          cmd.log(`Retrieving status of ${(cdnType === 1 ? 'Private' : 'Public')} CDN...`);
+        }
 
         const requestOptions: any = {
           url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
@@ -86,7 +88,7 @@ class SpoCdnGetCommand extends SpoCommand {
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="GetTenantCdnEnabled" Id="12" ObjectPathId="8"><Parameters><Parameter Type="Enum">${cdnType}</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="8" Name="${auth.site.tenantId}" /></ObjectPaths></Request>`
         };
 
-        if (this.verbose) {
+        if (this.debug) {
           cmd.log('Executing web request...');
           cmd.log(requestOptions);
           cmd.log('');
@@ -95,7 +97,7 @@ class SpoCdnGetCommand extends SpoCommand {
         return request.post(requestOptions);
       })
       .then((res: string): void => {
-        if (this.verbose) {
+        if (this.debug) {
           cmd.log('Response:');
           cmd.log(res);
           cmd.log('');
@@ -108,7 +110,12 @@ class SpoCdnGetCommand extends SpoCommand {
         }
         else {
           const result: boolean = json[json.length - 1];
-          cmd.log(`${(cdnType === 0 ? 'Public' : 'Private')} CDN at ${auth.site.url} is ${(result === true ? 'enabled' : 'disabled')}`);
+          if (this.verbose) {
+            cmd.log(`${(cdnType === 0 ? 'Public' : 'Private')} CDN at ${auth.site.url} is ${(result === true ? 'enabled' : 'disabled')}`);
+          }
+          else {
+            cmd.log(result);
+          }
         }
         cb();
       }, (err: any): void => {

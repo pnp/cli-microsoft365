@@ -2,7 +2,7 @@ import auth from '../../SpoAuth';
 import config from '../../../../config';
 import * as request from 'request-promise-native';
 import commands from '../../commands';
-import VerboseOption from '../../../../VerboseOption';
+import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandHelp,
   CommandOption
@@ -15,7 +15,7 @@ interface CommandArgs {
   options: Options;
 }
 
-interface Options extends VerboseOption {
+interface Options extends GlobalOptions {
   key: string;
 }
 
@@ -36,14 +36,14 @@ class SpoStorageEntityGetCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    if (this.verbose) {
+    if (this.debug) {
       cmd.log(`Retrieving access token for ${auth.service.resource}...`);
     }
 
     auth
-      .ensureAccessToken(auth.service.resource, cmd, this.verbose)
+      .ensureAccessToken(auth.service.resource, cmd, this.debug)
       .then((accessToken: string): Promise<TenantProperty> => {
-        if (this.verbose) {
+        if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}. Loading details for the ${args.options.key} tenant property...`);
         }
 
@@ -56,7 +56,7 @@ class SpoStorageEntityGetCommand extends SpoCommand {
           json: true
         };
 
-        if (this.verbose) {
+        if (this.debug) {
           cmd.log('Executing web request...');
           cmd.log(requestOptions);
           cmd.log('');
@@ -65,14 +65,16 @@ class SpoStorageEntityGetCommand extends SpoCommand {
         return request.get(requestOptions);
       })
       .then((property: TenantProperty): void => {
-        if (this.verbose) {
+        if (this.debug) {
           cmd.log('Property:');
           cmd.log(property);
           cmd.log('');
         }
 
         if (property["odata.null"] === true) {
-          cmd.log(`Property with key ${args.options.key} not found`);
+          if (this.verbose) {
+            cmd.log(`Property with key ${args.options.key} not found`);
+          }
         }
         else {
           cmd.log(`Details for tenant property ${args.options.key}:`);
@@ -80,7 +82,6 @@ class SpoStorageEntityGetCommand extends SpoCommand {
           cmd.log(`  Description: ${(property.Description || 'not set')}`);
           cmd.log(`  Comment:    ${(property.Comment || 'not set')}`);
         }
-        cmd.log('');
         cb();
       }, (err: any): void => {
         cmd.log(vorpal.chalk.red(`Error: ${err}`));

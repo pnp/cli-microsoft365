@@ -3,7 +3,7 @@ import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../..
 import config from '../../../../config';
 import * as request from 'request-promise-native';
 import commands from '../../commands';
-import VerboseOption from '../../../../VerboseOption';
+import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandHelp,
   CommandOption,
@@ -18,7 +18,7 @@ interface CommandArgs {
   options: Options;
 }
 
-interface Options extends VerboseOption {
+interface Options extends GlobalOptions {
   appCatalogUrl: string;
   key: string;
   confirm?: boolean;
@@ -48,16 +48,16 @@ class SpoStorageEntityRemoveCommand extends SpoCommand {
       cmd.log(`Removing tenant property ${args.options.key} from ${args.options.appCatalogUrl}...`);
 
       auth
-        .ensureAccessToken(auth.service.resource, cmd, this.verbose)
+        .ensureAccessToken(auth.service.resource, cmd, this.debug)
         .then((accessToken: string): Promise<ContextInfo> => {
-          if (this.verbose) {
+          if (this.debug) {
             cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
           }
 
-          return this.getRequestDigest(cmd, this.verbose);
+          return this.getRequestDigest(cmd, this.debug);
         })
         .then((res: ContextInfo): Promise<string> => {
-          if (this.verbose) {
+          if (this.debug) {
             cmd.log('Response:');
             cmd.log(res);
             cmd.log('');
@@ -72,7 +72,7 @@ class SpoStorageEntityRemoveCommand extends SpoCommand {
             body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="31" ObjectPathId="30" /><ObjectPath Id="33" ObjectPathId="32" /><ObjectPath Id="35" ObjectPathId="34" /><Method Name="RemoveStorageEntity" Id="36" ObjectPathId="34"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.key)}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="30" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="32" ParentId="30" Name="GetSiteByUrl"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.appCatalogUrl)}</Parameter></Parameters></Method><Property Id="34" ParentId="32" Name="RootWeb" /></ObjectPaths></Request>`
           };
 
-          if (this.verbose) {
+          if (this.debug) {
             cmd.log('Executing web request...');
             cmd.log(requestOptions);
             cmd.log('');
@@ -81,7 +81,7 @@ class SpoStorageEntityRemoveCommand extends SpoCommand {
           return request.post(requestOptions);
         })
         .then((res: string): void => {
-          if (this.verbose) {
+          if (this.debug) {
             cmd.log('Response:');
             cmd.log(res);
             cmd.log('');
@@ -93,7 +93,9 @@ class SpoStorageEntityRemoveCommand extends SpoCommand {
             cmd.log(vorpal.chalk.red(`Error: ${response.ErrorInfo.ErrorMessage}`));
           }
           else {
-            cmd.log(vorpal.chalk.green('DONE'));
+            if (this.verbose) {
+              cmd.log(vorpal.chalk.green('DONE'));
+            }
           }
           cb();
         }, (err: any): void => {

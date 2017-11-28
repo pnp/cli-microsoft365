@@ -15,7 +15,7 @@ class SpoStatusCommand extends Command {
   public get description(): string {
     return 'Shows SharePoint Online site connection status';
   }
-  
+
   public commandAction(cmd: CommandInstance, args: {}, cb: () => void): void {
     const chalk: any = vorpal.chalk;
 
@@ -23,20 +23,30 @@ class SpoStatusCommand extends Command {
       const expiresAtDate: Date = new Date(0);
       expiresAtDate.setUTCSeconds(auth.service.expiresAt);
 
-      cmd.log(`
-Connected to ${auth.site.url}
+      if (this.verbose) {
+        cmd.log(`Connected to ${auth.site.url}`);
+      }
+      else {
+        cmd.log(auth.site.url);
+      }
 
+      if (this.debug) {
+        cmd.log(`
 ${chalk.grey('Is tenant admin:')}  ${auth.site.isTenantAdminSite()}
 ${chalk.grey('AAD resource:')}     ${auth.service.resource}
 ${chalk.grey('Access token:')}     ${auth.service.accessToken}
 ${chalk.grey('Refresh token:')}    ${auth.service.refreshToken}
 ${chalk.grey('Expires at:')}       ${expiresAtDate}
 `);
+      }
     }
     else {
-      cmd.log(`
-Not connected to SharePoint Online
-`);
+      if (this.verbose) {
+        cmd.log('Not connected to SharePoint Online');        
+      }
+      else {
+        cmd.log('Not connected');
+      }
     }
     cb();
   }

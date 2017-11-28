@@ -118,7 +118,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = storageEntityRemoveCommand.action();
-    cmdInstance.action({ options: { verbose: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
+    cmdInstance.action({ options: { debug: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       let returnsCorrectValue: boolean = false;
       log.forEach(l => {
         if (l && l.indexOf('Connect to a SharePoint Online site first') > -1) {
@@ -140,7 +140,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = storageEntityRemoveCommand.action();
-    cmdInstance.action({ options: { verbose: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
+    cmdInstance.action({ options: { debug: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       let returnsCorrectValue: boolean = false;
       log.forEach(l => {
         if (l && l.indexOf(`${auth.site.url} is not a tenant admin site`) > -1) {
@@ -162,7 +162,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     cmdInstance.action = storageEntityRemoveCommand.action();
-    cmdInstance.action({ options: { verbose: false, key: 'existingproperty', confirm: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }}, () => {
+    cmdInstance.action({ options: { debug: false, key: 'existingproperty', confirm: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }}, () => {
       let deleteRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -189,7 +189,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     cmdInstance.action = storageEntityRemoveCommand.action();
-    cmdInstance.action({ options: { verbose: true, key: 'existingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }}, () => {
+    cmdInstance.action({ options: { debug: true, key: 'existingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }}, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -214,7 +214,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     };
-    cmdInstance.action({ options: { verbose: true, key: 'existingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }}, () => {
+    cmdInstance.action({ options: { debug: true, key: 'existingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }}, () => {
       try {
         assert(requests.length === 0);
         done();
@@ -233,7 +233,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     };
-    cmdInstance.action({ options: { verbose: true, key: 'existingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }}, () => {
+    cmdInstance.action({ options: { debug: true, key: 'existingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }}, () => {
       let deleteRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -295,7 +295,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     };
-    cmdInstance.action({ options: { verbose: true, key: 'nonexistentproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }}, () => {
+    cmdInstance.action({ options: { debug: true, key: 'nonexistentproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }}, () => {
       let errorCorrectlyReported = false;
       log.forEach(l => {
         if (l && typeof l === 'string' &&
@@ -314,15 +314,15 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     });
   });
 
-  it('supports verbose mode', () => {
+  it('supports debug mode', () => {
     const options = (storageEntityRemoveCommand.options() as CommandOption[]);
-    let containsVerboseOption = false;
+    let containsdebugOption = false;
     options.forEach(o => {
-      if (o.option === '--verbose') {
-        containsVerboseOption = true;
+      if (o.option === '--debug') {
+        containsdebugOption = true;
       }
     });
-    assert(containsVerboseOption);
+    assert(containsdebugOption);
   });
 
   it('requires app catalog URL', () => {
@@ -422,7 +422,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     cmdInstance.action = storageEntityRemoveCommand.action();
-    cmdInstance.action({ options: { verbose: true, confirm: true, key: 'existingproperty', appCatalogUrl: 'https://contoso-admin.sharepoint.com' }}, () => {
+    cmdInstance.action({ options: { debug: true, confirm: true, key: 'existingproperty', appCatalogUrl: 'https://contoso-admin.sharepoint.com' }}, () => {
       let containsError = false;
       log.forEach(l => {
         if (typeof l === 'string' &&
