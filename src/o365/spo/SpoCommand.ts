@@ -1,7 +1,7 @@
 import Command, { CommandAction } from '../../Command';
 import appInsights from '../../appInsights';
 import auth from './SpoAuth';
-import { ContextInfo, SearchResponse } from './spo';
+import { ContextInfo, SearchResponse, ODataError } from './spo';
 import * as request from 'request-promise-native';
 import Utils from '../../Utils';
 
@@ -126,5 +126,23 @@ export default abstract class SpoCommand extends Command {
           reject(error);
         });
     });
+  }
+
+  protected handleRejectedODataPromise(rawResponse: any, cmd: CommandInstance, vorpal: Vorpal, callback: () => void): void {
+    const res: any = JSON.parse(JSON.stringify(rawResponse));
+    if (res.error) {
+      try {
+        const err: ODataError = JSON.parse(res.error);
+        cmd.log(vorpal.chalk.red(`Error: ${err['odata.error'].message.value}`));
+      }
+      catch {
+        cmd.log(vorpal.chalk.red(`Error: ${res.error}`));
+      }
+    }
+    else {
+      cmd.log(vorpal.chalk.red(`Error: ${rawResponse}`));
+    }
+
+    callback();
   }
 }

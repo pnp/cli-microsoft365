@@ -1,4 +1,4 @@
-import { ODataError, ContextInfo } from './../../spo';
+import { ContextInfo } from './../../spo';
 import auth from '../../SpoAuth';
 import Auth from '../../../../Auth';
 import config from '../../../../config';
@@ -92,33 +92,7 @@ class AppUninstallCommand extends SpoCommand {
           }
 
           cb();
-        }, (rawRes: any): void => {
-          try {
-            const res: any = JSON.parse(JSON.stringify(rawRes));
-            if (res.error) {
-              const err: ODataError = JSON.parse(res.error);
-              if (err['odata.error']) {
-                if (err['odata.error'].code === '-1, Microsoft.SharePoint.Client.ResourceNotFoundException') {
-                  cmd.log(vorpal.chalk.red(`Error: App with id ${args.options.id} not found`));
-                }
-                else {
-                  cmd.log(vorpal.chalk.red(`Error: ${err['odata.error'].message.value}`));
-                }
-              }
-              else {
-                cmd.log(vorpal.chalk.red(`Error: ${res.message}`));
-              }
-            }
-            else {
-              cmd.log(vorpal.chalk.red(`Error: ${rawRes}`));
-            }
-          }
-          catch (e) {
-            cmd.log(vorpal.chalk.red(`Error: ${rawRes}`));
-          }
-
-          cb();
-        });
+        }, (rawRes: any): void => this.handleRejectedODataPromise(rawRes, cmd, vorpal, cb));
     };
 
     if (args.options.confirm) {

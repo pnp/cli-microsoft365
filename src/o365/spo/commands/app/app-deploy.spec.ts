@@ -724,7 +724,11 @@ describe(commands.APP_DEPLOY, () => {
           return Promise.reject({
             error: JSON.stringify({
               'odata.error': {
-                code: '-1, Microsoft.SharePoint.Client.ResourceNotFoundException'
+                code: '-1, Microsoft.SharePoint.Client.ResourceNotFoundException',
+                message: {
+                  lang: "en-US",
+                  value: "Exception of type 'Microsoft.SharePoint.Client.ResourceNotFoundException' was thrown."
+                }
               }
             })
           });
@@ -745,7 +749,7 @@ describe(commands.APP_DEPLOY, () => {
           return;
         }
 
-        if (l.indexOf('Error: App with id b2307a39-e878-458b-bc90-03bc578531d6 not found') > -1) {
+        if (l.indexOf('ResourceNotFoundException') > -1) {
           correctLogStatement = true;
         }
       })

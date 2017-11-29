@@ -1,4 +1,3 @@
-import { ODataError } from './../../spo';
 import auth from '../../SpoAuth';
 import { ContextInfo } from '../../spo';
 import config from '../../../../config';
@@ -101,23 +100,7 @@ class SpoAppAddCommand extends SpoCommand {
         }
 
         cb();
-      }, (rawRes: any): void => {
-        const res: any = JSON.parse(JSON.stringify(rawRes));
-        if (res.error) {
-          try {
-            const err: ODataError = JSON.parse(res.error);
-            cmd.log(vorpal.chalk.red(`Error: ${err['odata.error'].message.value}`));
-          }
-          catch {
-            cmd.log(vorpal.chalk.red(`Error: ${res.error}`));
-          }
-        }
-        else {
-          cmd.log(vorpal.chalk.red(`Error: ${rawRes}`));
-        }
-
-        cb();
-      });
+      }, (rawRes: any): void => this.handleRejectedODataPromise(rawRes, cmd, vorpal, cb));
   }
 
   public options(): CommandOption[] {

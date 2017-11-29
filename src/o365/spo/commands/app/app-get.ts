@@ -1,4 +1,3 @@
-import { ODataError } from './../../spo';
 import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
@@ -90,29 +89,7 @@ class AppGetCommand extends SpoCommand {
           separator: ': '
         }));
         cb();
-      }, (rawRes: any): void => {
-        try {
-          const res: any = JSON.parse(JSON.stringify(rawRes));
-          if (res.error) {
-            const err: ODataError = JSON.parse(res.error);
-            if (err['odata.error'] &&
-              err['odata.error'].code === '-1, Microsoft.SharePoint.Client.ResourceNotFoundException') {
-              cmd.log(`App with id ${args.options.id} not found`);
-            }
-            else {
-              cmd.log(vorpal.chalk.red(`Error: ${res.message}`));
-            }
-          }
-          else {
-            cmd.log(vorpal.chalk.red(`Error: ${rawRes}`));
-          }
-        }
-        catch (e) {
-          cmd.log(vorpal.chalk.red(`Error: ${rawRes}`));
-        }
-
-        cb();
-      });
+      }, (rawRes: any): void => this.handleRejectedODataPromise(rawRes, cmd, vorpal, cb));
   }
 
   public options(): CommandOption[] {
