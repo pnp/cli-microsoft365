@@ -52,22 +52,7 @@ class SpoCdnGetCommand extends SpoCommand {
           cmd.log(`Retrieved access token ${accessToken}. Loading CDN settings for the ${auth.site.url} tenant...`);
         }
 
-        const requestOptions: any = {
-          url: `${auth.site.url}/_api/contextinfo`,
-          headers: Utils.getRequestHeaders({
-            authorization: `Bearer ${accessToken}`,
-            accept: 'application/json;odata=nometadata'
-          }),
-          json: true
-        }
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
-        return request.post(requestOptions);
+        return this.getRequestDigest(cmd, this.debug);
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.debug) {
