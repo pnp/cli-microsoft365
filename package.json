@@ -1,6 +1,6 @@
 {
   "name": "@pnp/office365-cli",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "CLI for managing Office 365 configuration",
   "license": "MIT",
   "main": "./dist/index.js",
@@ -37,6 +37,7 @@
   ],
   "contributors": [
     "Connell, Andrew <me@andrewconnell.com>",
+    "Georgiev, Velin <velin.georgiev@gmail.com>",
     "Mastykarz, Waldek <waldek@mastykarz.nl>",
     "Wilen, Wictor <wictor@wictorwilen.se>",
     "van Hunen, Erwin <erwin.van.hunen@outlook.com>"

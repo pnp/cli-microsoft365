@@ -1,21 +1,35 @@
 # Release notes
 
-## v0.2.0
+## v0.3.0
 
-New commands:
+### New commands
 
 **SharePoint Online:**
 
-- [spo app add](../cmd/spo/app/app-add.md) - add an app to the specified SharePoint Online app catalog
-- [spo app deploy](../cmd/spo/app/app-deploy.md) - deploy the specified app in the tenant app catalog
-- [spo app get](../cmd/spo/app/app-get.md) - get information about the specific app from the tenant app catalog
-- [spo app install](../cmd/spo/app/app-install.md) - install an app from the tenant app catalog in the site
-- [spo app list](../cmd/spo/app/app-list.md) - list apps from the tenant app catalog
-- [spo app retract](../cmd/spo/app/app-retract.md) - retract the specified app from the tenant app catalog
-- [spo app uninstall](../cmd/spo/app/app-uninstall.md) - uninstall an app from the site
-- [spo app upgrade](../cmd/spo/app/app-upgrade.md) - upgrade app in the specified site
+- [spo customaction get](../cmd/spo/customaction/customaction-get.md) - gets information about the specific user custom action [#20](https://github.com/SharePoint/office365-cli/issues/20)
+
+### Changes
+
+- changed command output to silent [#47](https://github.com/SharePoint/office365-cli/issues/47)
+
+## v0.2.0
+
+### New commands
+
+**SharePoint Online:**
+
+- [spo app add](../cmd/spo/app/app-add.md) - add an app to the specified SharePoint Online app catalog [#3](https://github.com/SharePoint/office365-cli/issues/3)
+- [spo app deploy](../cmd/spo/app/app-deploy.md) - deploy the specified app in the tenant app catalog [#7](https://github.com/SharePoint/office365-cli/issues/7)
+- [spo app get](../cmd/spo/app/app-get.md) - get information about the specific app from the tenant app catalog [#2](https://github.com/SharePoint/office365-cli/issues/2)
+- [spo app install](../cmd/spo/app/app-install.md) - install an app from the tenant app catalog in the site [#4](https://github.com/SharePoint/office365-cli/issues/4)
+- [spo app list](../cmd/spo/app/app-list.md) - list apps from the tenant app catalog [#1](https://github.com/SharePoint/office365-cli/issues/1)
+- [spo app retract](../cmd/spo/app/app-retract.md) - retract the specified app from the tenant app catalog [#8](https://github.com/SharePoint/office365-cli/issues/8)
+- [spo app uninstall](../cmd/spo/app/app-uninstall.md) - uninstall an app from the site [#5](https://github.com/SharePoint/office365-cli/issues/5)
+- [spo app upgrade](../cmd/spo/app/app-upgrade.md) - upgrade app in the specified site [#6](https://github.com/SharePoint/office365-cli/issues/6)
 
 ## v0.1.1
+
+### Changes
 
 - Fixed bug in resolving command paths on Windows
 
@@ -23,7 +37,7 @@ New commands:
 
 Initial release.
 
-New commands:
+### New commands
 
 **SharePoint Online:**
 
