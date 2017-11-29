@@ -10,6 +10,7 @@ import {
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
+import Utils from '../../../../Utils';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -53,10 +54,10 @@ class SpoCdnGetCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${auth.site.url}/_api/contextinfo`,
-          headers: {
+          headers: Utils.getRequestHeaders({
             authorization: `Bearer ${accessToken}`,
             accept: 'application/json;odata=nometadata'
-          },
+          }),
           json: true
         }
 
@@ -81,10 +82,10 @@ class SpoCdnGetCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
-          headers: {
+          headers: Utils.getRequestHeaders({
             authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': res.FormDigestValue
-          },
+          }),
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="GetTenantCdnEnabled" Id="12" ObjectPathId="8"><Parameters><Parameter Type="Enum">${cdnType}</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="8" Name="${auth.site.tenantId}" /></ObjectPaths></Request>`
         };
 

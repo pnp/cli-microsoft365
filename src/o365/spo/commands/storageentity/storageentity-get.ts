@@ -8,6 +8,7 @@ import {
   CommandOption
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
+import Utils from '../../../../Utils';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -49,10 +50,10 @@ class SpoStorageEntityGetCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${auth.site.url}/_api/web/GetStorageEntity('${encodeURIComponent(args.options.key)}')`,
-          headers: {
+          headers: Utils.getRequestHeaders({
             authorization: `Bearer ${accessToken}`,
             accept: 'application/json;odata=nometadata'
-          },
+          }),
           json: true
         };
 

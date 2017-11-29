@@ -1,4 +1,5 @@
 import * as request from 'request-promise-native';
+import Utils from './Utils';
 
 export abstract class Service {
   connected: boolean;
@@ -74,10 +75,10 @@ export default class Auth {
 
         const requestOptions: any = {
           url: 'https://login.microsoftonline.com/common/oauth2/token',
-          headers: {
+          headers: Utils.getRequestHeaders({
             'Content-Type': 'application/x-www-form-urlencoded',
             accept: 'application/json'
-          },
+          }),
           body: `resource=${encodeURIComponent(resource)}&client_id=${this.appId}&grant_type=refresh_token&refresh_token=${this.service.refreshToken}`,
           json: true
         };
@@ -119,9 +120,9 @@ export default class Auth {
 
         const requestOptions: any = {
           url: `https://login.microsoftonline.com/common/oauth2/devicecode?resource=${resource}&client_id=${this.appId}`,
-          headers: {
+          headers: Utils.getRequestHeaders({
             accept: 'application/json'
-          },
+          }),
           json: true
         };
 
@@ -146,10 +147,10 @@ export default class Auth {
             this.interval = setInterval((): void => {
               const authCheckRequestOptions: any = {
                 url: 'https://login.microsoftonline.com/common/oauth2/token',
-                headers: {
+                headers: Utils.getRequestHeaders({
                   'Content-Type': 'application/x-www-form-urlencoded',
                   accept: 'application/json'
-                },
+                }),
                 body: `resource=${encodeURIComponent(resource)}&client_id=${this.appId}&grant_type=device_code&code=${deviceCode}`,
                 json: true
               };
@@ -212,10 +213,10 @@ export default class Auth {
 
       const requestOptions: any = {
         url: 'https://login.microsoftonline.com/common/oauth2/token',
-        headers: {
+        headers: Utils.getRequestHeaders({
           'Content-Type': 'application/x-www-form-urlencoded',
           accept: 'application/json'
-        },
+        }),
         body: `resource=${encodeURIComponent(resource)}&client_id=${this.appId}&grant_type=refresh_token&refresh_token=${refreshToken}`,
         json: true
       };

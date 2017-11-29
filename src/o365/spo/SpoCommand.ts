@@ -3,6 +3,7 @@ import appInsights from '../../appInsights';
 import auth from './SpoAuth';
 import { ContextInfo, SearchResponse } from './spo';
 import * as request from 'request-promise-native';
+import Utils from '../../Utils';
 
 export default abstract class SpoCommand extends Command {
   protected requiresTenantAdmin(): boolean {
@@ -46,10 +47,10 @@ export default abstract class SpoCommand extends Command {
   protected getRequestDigestForSite(siteUrl: string, accessToken: string, cmd: CommandInstance, debug: boolean): Promise<ContextInfo> {
     const requestOptions: any = {
       url: `${siteUrl}/_api/contextinfo`,
-      headers: {
+      headers: Utils.getRequestHeaders({
         authorization: `Bearer ${accessToken}`,
         accept: 'application/json;odata=nometadata'
-      },
+      }),
       json: true
     };
 
@@ -80,10 +81,10 @@ export default abstract class SpoCommand extends Command {
     return new Promise<string>((resolve: (appCatalogUrl: string) => void, reject: (error: any) => void): void => {
       const requestOptions: any = {
         url: `${auth.site.url}/_api/search/query?querytext='contentclass:STS_Site%20AND%20SiteTemplate:APPCATALOG'&SelectProperties='SPWebUrl'`,
-        headers: {
+        headers: Utils.getRequestHeaders({
           authorization: `Bearer ${auth.site.accessToken}`,
           accept: 'application/json;odata=nometadata'
-        },
+        }),
         json: true
       };
   

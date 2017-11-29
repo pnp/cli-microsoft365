@@ -11,6 +11,7 @@ import {
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
+import Utils from '../../../../Utils';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -60,11 +61,11 @@ class AppInstallCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${args.options.siteUrl}/_api/web/tenantappcatalog/AvailableApps/GetById('${encodeURIComponent(args.options.id)}')/install`,
-          headers: {
+          headers: Utils.getRequestHeaders({
             authorization: `Bearer ${auth.site.accessToken}`,
             accept: 'application/json;odata=nometadata',
             'X-RequestDigest': res.FormDigestValue
-          }
+          })
         };
 
         if (this.debug) {

@@ -12,6 +12,7 @@ import {
 import SpoCommand from '../../SpoCommand';
 import { AppMetadata } from './AppMetadata';
 import Table = require('easy-table');
+import Utils from '../../../../Utils';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -50,10 +51,10 @@ class AppGetCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${auth.site.url}/_api/web/tenantappcatalog/AvailableApps/GetById('${encodeURIComponent(args.options.id)}')`,
-          headers: {
+          headers: Utils.getRequestHeaders({
             authorization: `Bearer ${accessToken}`,
             accept: 'application/json;odata=nometadata'
-          }
+          })
         };
 
         if (this.debug) {

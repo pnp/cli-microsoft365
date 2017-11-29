@@ -8,6 +8,7 @@ import {
 import SpoCommand from '../../SpoCommand';
 import { AppMetadata } from './AppMetadata';
 import Table = require('easy-table');
+import Utils from '../../../../Utils';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -38,10 +39,10 @@ class AppListCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${auth.site.url}/_api/web/tenantappcatalog/AvailableApps`,
-          headers: {
+          headers: Utils.getRequestHeaders({
             authorization: `Bearer ${accessToken}`,
             accept: 'application/json;odata=nometadata'
-          }
+          })
         };
 
         if (this.debug) {

@@ -10,6 +10,7 @@ import {
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
+import Utils from '../../../../Utils';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -56,10 +57,10 @@ class SpoStorageEntityListCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${args.options.appCatalogUrl}/_api/web/AllProperties?$select=storageentitiesindex`,
-          headers: {
+          headers: Utils.getRequestHeaders({
             authorization: `Bearer ${accessToken}`,
             accept: 'application/json;odata=nometadata'
-          },
+          }),
           json: true
         };
 

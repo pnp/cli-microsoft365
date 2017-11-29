@@ -102,10 +102,10 @@ class SpoCustomActionGetCommand extends SpoCommand {
   private getCustomAction(options: Options, cmd: CommandInstance): Promise<CustomAction> {
     const requestOptions: any = {
       url: `${options.url}/_api/${options.scope}/UserCustomActions('${encodeURIComponent(options.id)}')`,
-      headers: {
+      headers: Utils.getRequestHeaders({
         authorization: `Bearer ${auth.service.accessToken}`,
         accept: 'application/json;odata=nometadata'
-      },
+      }),
       json: true
     };
 

@@ -13,6 +13,7 @@ import {
 import SpoCommand from '../../SpoCommand';
 import * as fs from 'fs';
 import * as path from 'path';
+import Utils from '../../../../Utils';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -71,12 +72,12 @@ class SpoAppAddCommand extends SpoCommand {
         const fileName: string = path.basename(fullPath);
         const requestOptions: any = {
           url: `${auth.site.url}/_api/web/tenantappcatalog/Add(overwrite=${(overwrite.toString().toLowerCase())}, url='${fileName}')`,
-          headers: {
+          headers: Utils.getRequestHeaders({
             authorization: `Bearer ${auth.service.accessToken}`,
             accept: 'application/json;odata=nometadata',
             'X-RequestDigest': res.FormDigestValue,
             binaryStringRequestBody: 'true'
-          },
+          }),
           body: fs.readFileSync(fullPath)
         };
 

@@ -11,6 +11,7 @@ import {
 } from '../../../../Command';
 import { ContextInfo, ODataError } from '../../spo';
 import SpoCommand from '../../SpoCommand';
+import Utils from '../../../../Utils';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -116,11 +117,11 @@ class AppDeployCommand extends SpoCommand {
 
           const requestOptions: any = {
             url: `${appCatalogUrl}/_api/web/tenantappcatalog/AvailableApps/GetById('${args.options.id}')/retract`,
-            headers: {
+            headers: Utils.getRequestHeaders({
               authorization: `Bearer ${accessToken}`,
               accept: 'application/json;odata=nometadata',
               'X-RequestDigest': res.FormDigestValue
-            }
+            })
           };
 
           if (this.debug) {

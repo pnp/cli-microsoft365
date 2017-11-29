@@ -1,3 +1,5 @@
+const packageJSON = require('../package.json');
+
 export default class Utils {
   public static escapeXml(s: string | undefined) {
     if (!s) {
@@ -5,15 +7,27 @@ export default class Utils {
     }
 
     return s.replace(/[<>&'"]/g, (c: string): string => {
+      let char: string = c;
+
       switch (c) {
-        case '<': return '&lt;';
-        case '>': return '&gt;';
-        case '&': return '&amp;';
-        case '\'': return '&apos;';
-        case '"': return '&quot;';
+        case '<':
+          char = '&lt;';
+          break;
+        case '>':
+          char = '&gt;';
+          break;
+        case '&':
+          char = '&amp;';
+          break;
+        case '\'':
+          char = '&apos;';
+          break;
+        case '"':
+          char = '&quot;';
+          break;
       }
 
-      return c;
+      return char;
     });
   }
 
@@ -31,6 +45,16 @@ export default class Utils {
         m.restore();
       }
     });
+  }
+
+  public static getRequestHeaders(headers: any): any {
+    if (!headers) {
+      headers = {};
+    }
+
+    headers['User-Agent'] = `NONISV|SharePointPnP|Office365CLI/${packageJSON.version}`;
+
+    return headers;
   }
 
   public static isValidGuid(guid: string): boolean {
