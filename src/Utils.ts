@@ -32,4 +32,11 @@ export default class Utils {
       }
     });
   }
+
+  public static isValidGuid(guid: string): boolean {
+    
+    let guidRegEx = new RegExp(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+
+    return guidRegEx.test(guid);
+  }
 }
