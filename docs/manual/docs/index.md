@@ -42,7 +42,7 @@ Start managing the settings of your Office 365 tenant by connecting to it, using
 o365$ spo connect https://contoso-admin.sharepoint.com
 ```
 
-> Depending on which settings you want to manage you might need to connect either to your tenant admin site (URL with `-admin`) in it, or to a regular SharePoint site. For more information refer to the help of the command you want to use.
+> Depending on which settings you want to manage you might need to connect either to your tenant admin site (URL with `-admin` in it), or to a regular SharePoint site. For more information refer to the help of the command you want to use.
 
 To list all available commands, type in the Office 365 CLI prompt `help`:
 

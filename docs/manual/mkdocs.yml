@@ -41,6 +41,9 @@ theme:
   logo: 'images/office.png'
   feature:
     tabs: true
+google_analytics:
+  - 'UA-110480857-1'
+  - 'auto'
 markdown_extensions:
   - admonition
   - codehilite:
