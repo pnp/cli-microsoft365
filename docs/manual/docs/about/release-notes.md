@@ -11,6 +11,10 @@
 ### Changes
 
 - changed command output to silent [#47](https://github.com/SharePoint/office365-cli/issues/47)
+- added user-agent string to all requests [#52](https://github.com/SharePoint/office365-cli/issues/52)
+- refactored `spo cdn get` and `spo storageentity set` to use the `getRequestDigest` helper [#78](https://github.com/SharePoint/office365-cli/issues/78) and [#80](https://github.com/SharePoint/office365-cli/issues/80)
+- added common handler for rejected OData promises [#59](https://github.com/SharePoint/office365-cli/issues/59)
+- added Google Analytics code to documentation [#84](https://github.com/SharePoint/office365-cli/issues/84)
 
 ## v0.2.0
 
