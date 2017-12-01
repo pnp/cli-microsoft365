@@ -12,7 +12,6 @@ import SpoCommand from '../../SpoCommand';
 import { ContextInfo } from '../../spo';
 import Utils from '../../../../Utils';
 import { CustomAction } from './customaction';
-import Table = require('easy-table');
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -78,25 +77,17 @@ class SpoCustomActionGetCommand extends SpoCommand {
           }
         }
         else {
-          const t: Table = new Table();
-          t.cell('Name', customAction.Name);
-          t.cell('Id', customAction.Id);
-          t.cell('Location', customAction.Location);
-          t.cell('Scope', this.humanizeScope(customAction.Scope));
-          t.cell('ClientSideComponentId', customAction.ClientSideComponentId);
-          t.cell('ClientSideComponentProperties', JSON.stringify(customAction.ClientSideComponentProperties));
-          t.newRow();
-
-          cmd.log('');
-          cmd.log(t.printTransposed({
-            separator: ': '
-          }));
+          cmd.log({
+            Name: customAction.Name,
+            Id: customAction.Id,
+            Location: customAction.Location,
+            Scope: this.humanizeScope(customAction.Scope),
+            ClientSideComponentId: customAction.ClientSideComponentId,
+            ClientSideComponentProperties: customAction.ClientSideComponentProperties
+          });
         }
         cb();
-      }, (err: any): void => {
-        cmd.log(vorpal.chalk.red(`Error: ${err}`));
-        cb();
-      });
+      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
   }
 
   private getCustomAction(options: Options, cmd: CommandInstance): Promise<CustomAction> {

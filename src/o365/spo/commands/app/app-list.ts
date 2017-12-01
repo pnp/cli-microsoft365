@@ -7,7 +7,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import { AppMetadata } from './AppMetadata';
-import Table = require('easy-table');
 import Utils from '../../../../Utils';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -63,18 +62,14 @@ class AppListCommand extends SpoCommand {
         const apps: { value: AppMetadata[] } = JSON.parse(res);
 
         if (apps.value && apps.value.length > 0) {
-          const t: Table = new Table();
-          apps.value.map((app: AppMetadata): void => {
-            t.cell('Title', app.Title);
-            t.cell('ID', app.ID);
-            t.cell('Deployed', app.Deployed);
-            t.cell('AppCatalogVersion', app.AppCatalogVersion);
-            t.cell('InstalledVersion', app.InstalledVersion);
-            t.newRow();
-          });
-
-          cmd.log('');
-          cmd.log(t.toString());
+          cmd.log(apps.value.map(a => {
+            return {
+              Title: a.Title,
+              ID: a.ID,
+              Deployed: a.Deployed,
+              AppCatalogVersion: a.AppCatalogVersion
+            };
+          }));
         }
         else {
           if (this.verbose) {
@@ -82,10 +77,7 @@ class AppListCommand extends SpoCommand {
           }
         }
         cb();
-      }, (err: any): void => {
-        cmd.log(vorpal.chalk.red(`Error: ${err}`));
-        cb();
-      });
+      }, (rawRes: any): void => this.handleRejectedODataPromise(rawRes, cmd, cb));
   }
 
   public help(): CommandHelp {

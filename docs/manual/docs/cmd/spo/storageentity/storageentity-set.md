@@ -18,6 +18,7 @@ Option|Description
 `-v, --value <value>`|Value to set for the property
 `-d, --description [description]`|Description to set for the property (optional)
 `-c, --comment [comment]`|Comment to set for the property (optional)
+`-o, --output <output>`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 

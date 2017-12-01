@@ -1,5 +1,5 @@
 import commands from '../../commands';
-import Command, { CommandHelp, CommandOption } from '../../../../Command';
+import Command, { CommandHelp, CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
@@ -12,6 +12,7 @@ describe(commands.STORAGEENTITY_GET, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
+  let cmdInstanceLogSpy: sinon.SinonSpy;
   let trackEvent: any;
   let telemetry: any;
 
@@ -78,6 +79,7 @@ describe(commands.STORAGEENTITY_GET, () => {
         log.push(msg);
       }
     };
+    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
     auth.site = new Site();
     telemetry = null;
   });
@@ -133,14 +135,8 @@ describe(commands.STORAGEENTITY_GET, () => {
     auth.site.connected = false;
     cmdInstance.action = storageEntityGetCommand.action();
     cmdInstance.action({ options: { debug: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
-      let returnsCorrectValue: boolean = false;
-      log.forEach(l => {
-        if (l && l.indexOf('Connect to a SharePoint Online site first') > -1) {
-          returnsCorrectValue = true;
-        }
-      });
       try {
-        assert(returnsCorrectValue);
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('Connect to a SharePoint Online site first')));
         done();
       }
       catch (e) {
@@ -155,30 +151,13 @@ describe(commands.STORAGEENTITY_GET, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     cmdInstance.action = storageEntityGetCommand.action();
     cmdInstance.action({ options: { debug: true, key: 'existingproperty' }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
-      let correctComments: boolean = false;
-      let correctDescription: boolean = false;
-      let correctValue: boolean = false;
-      log.forEach(l => {
-        if (!l || typeof l !== 'string') {
-          return;
-        }
-
-        if (l.indexOf('Value:') > -1 && l.indexOf('dolor') > -1) {
-          correctValue = true;
-        }
-
-        if (l.indexOf('Description:') > -1 && l.indexOf('ipsum') > -1) {
-          correctDescription = true;
-        }
-
-        if (l.indexOf('Comment:') > -1 && l.indexOf('Lorem') > -1) {
-          correctComments = true;
-        }
-      });
       try {
-        assert(correctValue, 'Incorrect property value');
-        assert(correctDescription, 'Incorrect property description');
-        assert(correctComments, 'Incorrect property comments');
+        assert(cmdInstanceLogSpy.calledWith({
+          Key: 'existingproperty',
+          Value: 'dolor',
+          Description: 'ipsum',
+          Comment: 'Lorem'
+        }));
         done();
       }
       catch (e) {
@@ -193,17 +172,13 @@ describe(commands.STORAGEENTITY_GET, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     cmdInstance.action = storageEntityGetCommand.action();
     cmdInstance.action({ options: { debug: true, key: 'propertywithoutdescription' }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
-      let correctDescription: boolean = false;
-      log.forEach(l => {
-        if (l &&
-          typeof l === 'string' &&
-          l.indexOf('Description:') > -1 &&
-          l.indexOf('not set') > -1) {
-          correctDescription = true;
-        }
-      });
       try {
-        assert(correctDescription);
+        assert(cmdInstanceLogSpy.calledWith({
+          Key: 'propertywithoutdescription',
+          Value: 'dolor',
+          Description: undefined,
+          Comment: 'Lorem'
+        }));
         done();
       }
       catch (e) {
@@ -218,17 +193,13 @@ describe(commands.STORAGEENTITY_GET, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     cmdInstance.action = storageEntityGetCommand.action();
     cmdInstance.action({ options: { debug: false, key: 'propertywithoutcomments' }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
-      let correctComments: boolean = false;
-      log.forEach(l => {
-        if (l &&
-          typeof l === 'string' &&
-          l.indexOf('Comment:') > -1 &&
-          l.indexOf('not set') > -1) {
-          correctComments = true;
-        }
-      });
       try {
-        assert(correctComments);
+        assert(cmdInstanceLogSpy.calledWith({
+          Key: 'propertywithoutcomments',
+          Value: 'dolor',
+          Description: 'ipsum',
+          Comment: undefined
+        }));
         done();
       }
       catch (e) {
@@ -283,17 +254,13 @@ describe(commands.STORAGEENTITY_GET, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     cmdInstance.action = storageEntityGetCommand.action();
     cmdInstance.action({ options: { debug: true, key: '#myprop' }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
-      let correctValue: boolean = false;
-      log.forEach(l => {
-        if (l &&
-          typeof l === 'string' &&
-          l.indexOf('Comment:') > -1 &&
-          l.indexOf('not set') > -1) {
-          correctValue = true;
-        }
-      });
       try {
-        assert(correctValue);
+        assert(cmdInstanceLogSpy.calledWith({
+          Key: '#myprop',
+          Value: 'dolor',
+          Description: 'ipsum',
+          Comment: undefined
+        }));
         done();
       }
       catch (e) {
@@ -368,16 +335,8 @@ describe(commands.STORAGEENTITY_GET, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     cmdInstance.action = storageEntityGetCommand.action();
     cmdInstance.action({ options: { debug: true }, appCatalogUrl: 'https://contoso-admin.sharepoint.com' }, () => {
-      let containsError = false;
-      log.forEach(l => {
-        if (l &&
-          typeof l === 'string' &&
-          l.indexOf('Error getting access token') > -1) {
-          containsError = true;
-        }
-      });
       try {
-        assert(containsError);
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
         done();
       }
       catch (e) {

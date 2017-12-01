@@ -1,5 +1,5 @@
 import commands from '../../commands';
-import Command, { CommandHelp, CommandValidate, CommandOption } from '../../../../Command';
+import Command, { CommandHelp, CommandValidate, CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
@@ -13,6 +13,7 @@ describe(commands.CDN_ORIGIN_LIST, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
+  let cmdInstanceLogSpy: sinon.SinonSpy;
   let trackEvent: any;
   let telemetry: any;
 
@@ -31,6 +32,7 @@ describe(commands.CDN_ORIGIN_LIST, () => {
         log.push(msg);
       }
     };
+    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
     auth.site = new Site();
     telemetry = null;
   });
@@ -88,14 +90,8 @@ describe(commands.CDN_ORIGIN_LIST, () => {
     auth.site.connected = false;
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
-      let returnsCorrectValue: boolean = false;
-      log.forEach(l => {
-        if (l && l.indexOf('Connect to a SharePoint Online site first') > -1) {
-          returnsCorrectValue = true;
-        }
-      });
       try {
-        assert(returnsCorrectValue);
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('Connect to a SharePoint Online site first')));
         done();
       }
       catch (e) {
@@ -110,14 +106,8 @@ describe(commands.CDN_ORIGIN_LIST, () => {
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
-      let returnsCorrectValue: boolean = false;
-      log.forEach(l => {
-        if (l && l.indexOf(`${auth.site.url} is not a tenant admin site`) > -1) {
-          returnsCorrectValue = true;
-        }
-      });
       try {
-        assert(returnsCorrectValue);
+        assert(cmdInstanceLogSpy.calledWith(new CommandError(`https://contoso.sharepoint.com is not a tenant admin site. Connect to your tenant admin site and try again`)));
         done();
       }
       catch (e) {
@@ -156,20 +146,8 @@ describe(commands.CDN_ORIGIN_LIST, () => {
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, type: 'Public' } }, () => {
-      let correctLogStatements = 0;
-      log.forEach(l => {
-        if (!l || typeof l !== 'string') {
-          return;
-        }
-
-        if (l.indexOf('Configured origins:') > -1 ||
-          l.indexOf('/master') > -1 ||
-          l.indexOf('*/cdn') > -1) {
-          correctLogStatements++;
-        }
-      });
       try {
-        assert.equal(correctLogStatements, 4);
+        assert(cmdInstanceLogSpy.calledWith(['/master','*/cdn']));
         done();
       }
       catch (e) {
@@ -211,19 +189,8 @@ describe(commands.CDN_ORIGIN_LIST, () => {
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, type: 'Private' } }, () => {
-      let correctLogStatements = 0;
-      log.forEach(l => {
-        if (!l || typeof l !== 'string') {
-          return;
-        }
-
-        if (l.indexOf('Configured origins:') > -1 ||
-          l.indexOf('/master') > -1) {
-          correctLogStatements++;
-        }
-      });
       try {
-        assert.equal(correctLogStatements, 2);
+        assert(cmdInstanceLogSpy.calledWith(['/master']));
         done();
       }
       catch (e) {
@@ -265,19 +232,8 @@ describe(commands.CDN_ORIGIN_LIST, () => {
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, type: 'Private' } }, () => {
-      let correctLogStatements = 0;
-      log.forEach(l => {
-        if (!l || typeof l !== 'string') {
-          return;
-        }
-
-        if (l.indexOf('Configured origins:') === 0 ||
-          l.indexOf('/master') === 0) {
-          correctLogStatements++;
-        }
-      });
       try {
-        assert.equal(correctLogStatements, 2);
+        assert(cmdInstanceLogSpy.calledWith(['/master']));
         done();
       }
       catch (e) {
@@ -319,20 +275,8 @@ describe(commands.CDN_ORIGIN_LIST, () => {
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
-      let correctLogStatements = 0;
-      log.forEach(l => {
-        if (!l || typeof l !== 'string') {
-          return;
-        }
-
-        if (l.indexOf('Configured origins:') > -1 ||
-          l.indexOf('/master') > -1 ||
-          l.indexOf('*/cdn') > -1) {
-          correctLogStatements++;
-        }
-      });
       try {
-        assert.equal(correctLogStatements, 4);
+        assert(cmdInstanceLogSpy.calledWith(['/master', '*/cdn']));
         done();
       }
       catch (e) {
@@ -489,16 +433,8 @@ describe(commands.CDN_ORIGIN_LIST, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true }, appCatalogUrl: 'https://contoso-admin.sharepoint.com' }, () => {
-      let containsError = false;
-      log.forEach(l => {
-        if (l &&
-          typeof l === 'string' &&
-          l.indexOf('Error getting access token') > -1) {
-          containsError = true;
-        }
-      });
       try {
-        assert(containsError);
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
         done();
       }
       catch (e) {

@@ -1,5 +1,5 @@
 import commands from '../../commands';
-import Command, { CommandHelp, CommandOption, CommandValidate } from '../../../../Command';
+import Command, { CommandHelp, CommandOption, CommandValidate, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
@@ -13,6 +13,7 @@ describe(commands.APP_ADD, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
+  let cmdInstanceLogSpy: sinon.SinonSpy;
   let trackEvent: any;
   let telemetry: any;
   let requests: any[];
@@ -32,6 +33,7 @@ describe(commands.APP_ADD, () => {
         log.push(msg);
       }
     };
+    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
     auth.site = new Site();
     telemetry = null;
     requests = [];
@@ -88,14 +90,8 @@ describe(commands.APP_ADD, () => {
     auth.site.connected = false;
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
-      let returnsCorrectValue: boolean = false;
-      log.forEach(l => {
-        if (l && l.indexOf('Connect to a SharePoint Online site first') > -1) {
-          returnsCorrectValue = true;
-        }
-      });
       try {
-        assert(returnsCorrectValue);
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('Connect to a SharePoint Online site first')));
         done();
       }
       catch (e) {
@@ -259,20 +255,8 @@ describe(commands.APP_ADD, () => {
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, filePath: 'spfx.sppkg' } }, () => {
-      let correctErrorLogged = false;
-      log.forEach(l => {
-        if (!l ||
-          typeof l !== 'string') {
-          return;
-        }
-
-        if (l.indexOf('Error: A file with the name AppCatalog/spfx.sppkg already exists.') > -1) {
-          correctErrorLogged = true;
-        }
-      })
-
       try {
-        assert(correctErrorLogged);
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('A file with the name AppCatalog/spfx.sppkg already exists. It was last modified by i:0#.f|membership|admin@contoso.onmi on 24 Nov 2017 12:50:43 -0800.')));
         done();
       }
       catch (e) {
@@ -318,20 +302,8 @@ describe(commands.APP_ADD, () => {
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, filePath: 'spfx.sppkg' } }, () => {
-      let correctErrorLogged = false;
-      log.forEach(l => {
-        if (!l ||
-          typeof l !== 'string') {
-          return;
-        }
-
-        if (l.indexOf('Error: An error has occurred') > -1) {
-          correctErrorLogged = true;
-        }
-      })
-
       try {
-        assert(correctErrorLogged);
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -377,20 +349,8 @@ describe(commands.APP_ADD, () => {
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, filePath: 'spfx.sppkg' } }, () => {
-      let correctErrorLogged = false;
-      log.forEach(l => {
-        if (!l ||
-          typeof l !== 'string') {
-          return;
-        }
-
-        if (l.indexOf('Error: An error has occurred') > -1) {
-          correctErrorLogged = true;
-        }
-      })
-
       try {
-        assert(correctErrorLogged);
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -491,15 +451,8 @@ describe(commands.APP_ADD, () => {
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
-      let containsError = false;
-      log.forEach(l => {
-        if (typeof l === 'string' &&
-          l.indexOf('Error getting access token') > -1) {
-          containsError = true;
-        }
-      });
       try {
-        assert(containsError);
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
         done();
       }
       catch (e) {

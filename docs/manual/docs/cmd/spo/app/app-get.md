@@ -14,6 +14,7 @@ Option|Description
 ------|-----------
 `--help`|output usage information
 `-i, --id <id>`|ID of the app to retrieve information for
+`-o, --output <output>`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 

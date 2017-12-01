@@ -9,6 +9,7 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
+import { TenantProperty } from './TenantProperty';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -18,13 +19,6 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   key: string;
-}
-
-interface TenantProperty {
-  "odata.null": boolean,
-  Comment?: string;
-  Description?: string;
-  Value: string;
 }
 
 class SpoStorageEntityGetCommand extends SpoCommand {
@@ -78,16 +72,15 @@ class SpoStorageEntityGetCommand extends SpoCommand {
           }
         }
         else {
-          cmd.log(`Details for tenant property ${args.options.key}:`);
-          cmd.log(`  Value:       ${property.Value}`);
-          cmd.log(`  Description: ${(property.Description || 'not set')}`);
-          cmd.log(`  Comment:    ${(property.Comment || 'not set')}`);
+          cmd.log({
+            Key: args.options.key,
+            Value: property.Value,
+            Description: property.Description,
+            Comment: property.Comment
+          });
         }
         cb();
-      }, (err: any): void => {
-        cmd.log(vorpal.chalk.red(`Error: ${err}`));
-        cb();
-      });
+      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
   }
 
   public options(): CommandOption[] {

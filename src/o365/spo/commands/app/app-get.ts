@@ -10,7 +10,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import { AppMetadata } from './AppMetadata';
-import Table = require('easy-table');
 import Utils from '../../../../Utils';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -72,24 +71,10 @@ class AppGetCommand extends SpoCommand {
         }
 
         const app: AppMetadata = JSON.parse(res);
+        cmd.log(app);
 
-        const t: Table = new Table();
-        t.cell('Title', app.Title);
-        t.cell('ID', app.ID);
-        t.cell('Deployed', app.Deployed);
-        t.cell('AppCatalogVersion', app.AppCatalogVersion);
-        t.cell('InstalledVersion', app.InstalledVersion);
-        t.cell('CanUpgrade', app.CanUpgrade);
-        t.cell('CurrentVersionDeployed', app.CurrentVersionDeployed);
-        t.cell('IsClientSideSolution', app.IsClientSideSolution);
-        t.newRow();
-
-        cmd.log('');
-        cmd.log(t.printTransposed({
-          separator: ': '
-        }));
         cb();
-      }, (rawRes: any): void => this.handleRejectedODataPromise(rawRes, cmd, vorpal, cb));
+      }, (rawRes: any): void => this.handleRejectedODataPromise(rawRes, cmd, cb));
   }
 
   public options(): CommandOption[] {

@@ -1,5 +1,5 @@
 import commands from '../../commands';
-import Command, { CommandHelp, CommandOption, CommandValidate } from '../../../../Command';
+import Command, { CommandHelp, CommandOption, CommandValidate, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
@@ -12,6 +12,7 @@ describe(commands.APP_GET, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
+  let cmdInstanceLogSpy: sinon.SinonSpy;
   let trackEvent: any;
   let telemetry: any;
 
@@ -30,6 +31,7 @@ describe(commands.APP_GET, () => {
         log.push(msg);
       }
     };
+    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
     auth.site = new Site();
     telemetry = null;
   });
@@ -85,14 +87,8 @@ describe(commands.APP_GET, () => {
     auth.site.connected = false;
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
-      let returnsCorrectValue: boolean = false;
-      log.forEach(l => {
-        if (l && l.indexOf('Connect to a SharePoint Online site first') > -1) {
-          returnsCorrectValue = true;
-        }
-      });
       try {
-        assert(returnsCorrectValue);
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('Connect to a SharePoint Online site first')));
         done();
       }
       catch (e) {
@@ -126,18 +122,13 @@ describe(commands.APP_GET, () => {
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
-      let correctLogStatement = false;
-      log.forEach(l => {
-        if (!l || typeof l !== 'string') {
-          return;
-        }
-
-        if (l.indexOf('b2307a39-e878-458b-bc90-03bc578531d6') > -1) {
-          correctLogStatement = true;
-        }
-      });
       try {
-        assert(correctLogStatement);
+        assert(cmdInstanceLogSpy.calledWith({
+          ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
+          Title: 'online-client-side-solution',
+          Deployed: true,
+          AppCatalogVersion: '1.0.0.0'
+        }));
         done();
       }
       catch (e) {
@@ -174,18 +165,13 @@ describe(commands.APP_GET, () => {
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
-      let correctLogStatement = false;
-      log.forEach(l => {
-        if (!l || typeof l !== 'string') {
-          return;
-        }
-
-        if (l.indexOf('b2307a39-e878-458b-bc90-03bc578531d6') > -1) {
-          correctLogStatement = true;
-        }
-      });
       try {
-        assert(correctLogStatement);
+        assert(cmdInstanceLogSpy.calledWith({
+          ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
+          Title: 'online-client-side-solution',
+          Deployed: true,
+          AppCatalogVersion: '1.0.0.0'
+        }));
         done();
       }
       catch (e) {
@@ -225,18 +211,8 @@ describe(commands.APP_GET, () => {
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
-      let correctLogStatement = false;
-      log.forEach(l => {
-        if (!l || typeof l !== 'string') {
-          return;
-        }
-
-        if (l.indexOf(`ResourceNotFoundException`) > -1) {
-          correctLogStatement = true;
-        }
-      });
       try {
-        assert(correctLogStatement);
+        assert(cmdInstanceLogSpy.calledWith(new CommandError("Exception of type 'Microsoft.SharePoint.Client.ResourceNotFoundException' was thrown.")));
         done();
       }
       catch (e) {
@@ -268,18 +244,8 @@ describe(commands.APP_GET, () => {
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
-      let correctLogStatement = false;
-      log.forEach(l => {
-        if (!l || typeof l !== 'string') {
-          return;
-        }
-
-        if (l.indexOf(`App with id b2307a39-e878-458b-bc90-03bc578531d6 not found`)) {
-          correctLogStatement = true;
-        }
-      });
       try {
-        assert(correctLogStatement);
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -300,7 +266,10 @@ describe(commands.APP_GET, () => {
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.reject({ error: JSON.stringify({
             'odata.error': {
-              code: '-1, Microsoft.SharePoint.Client.InvalidOperationException'
+              code: '-1, Microsoft.SharePoint.Client.InvalidOperationException',
+              message: {
+                value: 'An error has occurred'
+              }
             }
           }) });
         }
@@ -315,18 +284,8 @@ describe(commands.APP_GET, () => {
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
-      let correctLogStatement = false;
-      log.forEach(l => {
-        if (!l || typeof l !== 'string') {
-          return;
-        }
-
-        if (l.indexOf(`App with id b2307a39-e878-458b-bc90-03bc578531d6 not found`)) {
-          correctLogStatement = true;
-        }
-      });
       try {
-        assert(correctLogStatement);
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -396,15 +355,8 @@ describe(commands.APP_GET, () => {
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
-      let containsError = false;
-      log.forEach(l => {
-        if (typeof l === 'string' &&
-          l.indexOf('Error getting access token') > -1) {
-          containsError = true;
-        }
-      });
       try {
-        assert(containsError);
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
         done();
       }
       catch (e) {

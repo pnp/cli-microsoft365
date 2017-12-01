@@ -100,7 +100,7 @@ class SpoAppAddCommand extends SpoCommand {
         }
 
         cb();
-      }, (rawRes: any): void => this.handleRejectedODataPromise(rawRes, cmd, vorpal, cb));
+      }, (rawRes: any): void => this.handleRejectedODataPromise(rawRes, cmd, cb));
   }
 
   public options(): CommandOption[] {

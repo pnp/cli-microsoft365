@@ -14,6 +14,7 @@ Option|Description
 ------|-----------
 `--help`|output usage information
 `-u, --appCatalogUrl <appCatalogUrl>`|URL of the app catalog site
+`-o, --output <output>`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 

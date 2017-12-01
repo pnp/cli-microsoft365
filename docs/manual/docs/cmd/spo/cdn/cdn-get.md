@@ -14,6 +14,7 @@ Option|Description
 ------|-----------
 `--help`|output usage information
 `-t, --type [type]`|Type of CDN to manage. `Public|Private`. Default `Public`
+`-o, --output <output>`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 

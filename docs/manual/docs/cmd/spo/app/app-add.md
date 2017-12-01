@@ -15,6 +15,7 @@ Option|Description
 `--help`|output usage information
 `-p, --filePath <filePath>`|Absolute or relative path to the solution package file to add to the app catalog
 `--overwrite`|Set to overwrite the existing package file
+`-o, --output <output>`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 

@@ -1,5 +1,5 @@
 import commands from '../commands';
-import Command, { CommandHelp, CommandValidate, CommandCancel } from '../../../Command';
+import Command, { CommandHelp, CommandValidate, CommandCancel, CommandError } from '../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
 import auth, { Site } from '../SpoAuth';
@@ -13,6 +13,7 @@ describe(commands.CONNECT, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
+  let cmdInstanceLogSpy: sinon.SinonSpy;
   let trackEvent: any;
   let telemetry: any;
 
@@ -57,6 +58,7 @@ describe(commands.CONNECT, () => {
         log.push(msg);
       }
     };
+    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
     auth.site = new Site();
     sinon.stub(auth.site, 'disconnect').callsFake(() => { });
     telemetry = null;
@@ -99,7 +101,7 @@ describe(commands.CONNECT, () => {
     cmdInstance.action = connectCommand.action();
     cmdInstance.action({ options: {}, url: 'https://contoso-admin.sharepoint.com' }, () => {
       try {
-        assert.equal(telemetry.name, commands.CONNECT);
+        assert.equal(telemetry.name, connectCommand.name);
         done();
       }
       catch (e) {
@@ -230,15 +232,8 @@ describe(commands.CONNECT, () => {
     auth.site = new Site();
     cmdInstance.action = connectCommand.action();
     cmdInstance.action({ options: { debug: false }, url: 'https://contoso-admin.sharepoint.com' }, () => {
-      let containsError = false;
-      log.forEach(l => {
-        if (typeof l === 'string' &&
-          l.indexOf('Connecting to SharePoint Online failed') > -1) {
-          containsError = true;
-        }
-      });
       try {
-        assert(containsError);
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
         done();
       }
       catch (e) {
@@ -253,15 +248,8 @@ describe(commands.CONNECT, () => {
     auth.site = new Site();
     cmdInstance.action = connectCommand.action();
     cmdInstance.action({ options: { debug: true }, url: 'https://contoso-admin.sharepoint.com' }, () => {
-      let containsError = false;
-      log.forEach(l => {
-        if (typeof l === 'string' &&
-          l.indexOf('Connecting to SharePoint Online failed') > -1) {
-          containsError = true;
-        }
-      });
       try {
-        assert(containsError);
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
         done();
       }
       catch (e) {

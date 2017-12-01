@@ -14,6 +14,7 @@ Option|Description
 ------|-----------
 `--help`|output usage information
 `-k, --key <key>`|Name of the tenant property to retrieve
+`-o, --output <output>`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 

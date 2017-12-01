@@ -92,7 +92,7 @@ class AppUninstallCommand extends SpoCommand {
           }
 
           cb();
-        }, (rawRes: any): void => this.handleRejectedODataPromise(rawRes, cmd, vorpal, cb));
+        }, (rawRes: any): void => this.handleRejectedODataPromise(rawRes, cmd, cb));
     };
 
     if (args.options.confirm) {

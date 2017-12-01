@@ -8,10 +8,12 @@ import GlobalOptions from '../../../GlobalOptions';
 import Command, {
   CommandCancel,
   CommandHelp,
-  CommandValidate
+  CommandValidate,
+  CommandError
 } from '../../../Command';
 import SpoCommand from '../SpoCommand';
 import Utils from '../../../Utils';
+import appInsights from '../../../appInsights';
 
 const vorpal: Vorpal = require('../../../vorpal-init');
 
@@ -33,6 +35,10 @@ class SpoConnectCommand extends Command {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const chalk: any = vorpal.chalk;
+
+    appInsights.trackEvent({
+      name: this.name
+    });
 
     // disconnect before re-connecting
     if (this.debug) {
@@ -150,8 +156,7 @@ Authenticating with SharePoint Online at ${args.url}...
             cmd.log('');
           }
 
-          cmd.log(chalk.red('Connecting to SharePoint Online failed'));
-          cmd.log(`The following error occurred: ${rej.message}`);
+          cmd.log(new CommandError(rej.message));
           cb();
           return;
         }

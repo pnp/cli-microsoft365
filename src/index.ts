@@ -5,6 +5,7 @@ import * as path from 'path';
 import config from './config';
 import Command from './Command';
 import appInsights from './appInsights';
+import Utils from './Utils';
 
 const packageJSON = require('../package.json');
 const vorpal: Vorpal = require('./vorpal-init'),
@@ -46,5 +47,8 @@ fs.realpath(__dirname, (err: NodeJS.ErrnoException, resolvedPath: string): void 
 
   vorpal
     .delimiter(chalk.red(config.delimiter))
+    .pipe((stdout: any): any => {
+      return Utils.logOutput(stdout);
+    })
     .show();
 });

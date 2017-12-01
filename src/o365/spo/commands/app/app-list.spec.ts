@@ -1,5 +1,5 @@
 import commands from '../../commands';
-import Command, { CommandHelp, CommandOption } from '../../../../Command';
+import Command, { CommandHelp, CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
@@ -12,6 +12,7 @@ describe(commands.APP_LIST, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
+  let cmdInstanceLogSpy: sinon.SinonSpy;
   let trackEvent: any;
   let telemetry: any;
 
@@ -30,6 +31,7 @@ describe(commands.APP_LIST, () => {
         log.push(msg);
       }
     };
+    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
     auth.site = new Site();
     telemetry = null;
   });
@@ -85,14 +87,8 @@ describe(commands.APP_LIST, () => {
     auth.site.connected = false;
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
-      let returnsCorrectValue: boolean = false;
-      log.forEach(l => {
-        if (l && l.indexOf('Connect to a SharePoint Online site first') > -1) {
-          returnsCorrectValue = true;
-        }
-      });
       try {
-        assert(returnsCorrectValue);
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('Connect to a SharePoint Online site first')));
         done();
       }
       catch (e) {
@@ -134,19 +130,21 @@ describe(commands.APP_LIST, () => {
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
-      let correctLogStatements = 0;
-      log.forEach(l => {
-        if (!l || typeof l !== 'string') {
-          return;
-        }
-
-        if (l.indexOf('b2307a39-e878-458b-bc90-03bc578531d6') > -1 ||
-          l.indexOf('e5f65aef-68fe-45b0-801e-92733dd57e2c') > -1) {
-          correctLogStatements++;
-        }
-      });
       try {
-        assert.equal(correctLogStatements, 2);
+        assert(cmdInstanceLogSpy.calledWith([
+          {
+            ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
+            Title: 'online-client-side-solution',
+            Deployed: true,
+            AppCatalogVersion: '1.0.0.0'
+          },
+          {
+            ID: 'e5f65aef-68fe-45b0-801e-92733dd57e2c',
+            Title: 'onprem-client-side-solution',
+            Deployed: true,
+            AppCatalogVersion: '1.0.0.0'
+          }
+        ]))
         done();
       }
       catch (e) {
@@ -282,15 +280,8 @@ describe(commands.APP_LIST, () => {
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
-      let containsError = false;
-      log.forEach(l => {
-        if (typeof l === 'string' &&
-          l.indexOf('Error getting access token') > -1) {
-          containsError = true;
-        }
-      });
       try {
-        assert(containsError);
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
         done();
       }
       catch (e) {

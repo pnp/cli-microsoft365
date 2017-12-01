@@ -1,10 +1,12 @@
 interface Vorpal {
   command: (command: string, description: string, autocomplete?: string[]) => VorpalCommand;
+  _command: CurrentCommand;
   delimiter: (delimiter: string) => Vorpal;
   exec: (command: string, callback?: () => void) => Promise<void>;
   find: (command: string) => VorpalCommand;
   on: (event: string, handler: (data?: any) => void) => Vorpal;
   parse: (argv: string[], options?: { use: string }) => string[];
+  pipe: (onStdout: (stdout: any) => any) => Vorpal;
   show: () => Vorpal;
   use: (extension: any) => Vorpal;
   chalk: any;
@@ -23,4 +25,9 @@ interface VorpalCommand {
 interface CommandInstance {
   log: (message: any) => void;
   prompt: (object: any, callback: (result: any) => void) => void;
+}
+
+interface CurrentCommand {
+  command: string;
+  args: any;
 }

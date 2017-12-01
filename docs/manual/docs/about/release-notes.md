@@ -15,6 +15,7 @@
 - refactored `spo cdn get` and `spo storageentity set` to use the `getRequestDigest` helper [#78](https://github.com/SharePoint/office365-cli/issues/78) and [#80](https://github.com/SharePoint/office365-cli/issues/80)
 - added common handler for rejected OData promises [#59](https://github.com/SharePoint/office365-cli/issues/59)
 - added Google Analytics code to documentation [#84](https://github.com/SharePoint/office365-cli/issues/84)
+- added support for formatting command output as JSON [#48](https://github.com/SharePoint/office365-cli/issues/48)
 
 ## v0.2.0
 

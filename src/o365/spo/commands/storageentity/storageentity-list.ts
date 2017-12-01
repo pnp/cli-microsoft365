@@ -11,6 +11,7 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
+import { TenantProperty } from './TenantProperty';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -20,12 +21,6 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   appCatalogUrl: string;
-}
-
-interface TenantProperty {
-  Comment?: string;
-  Description?: string;
-  Value: string;
 }
 
 class SpoStorageEntityListCommand extends SpoCommand {
@@ -96,26 +91,24 @@ class SpoStorageEntityListCommand extends SpoCommand {
             }
           }
           else {
-            keys.forEach((key: string): void => {
+            cmd.log(keys.map((key: string): any => {
               const property: TenantProperty = properties[key];
-              cmd.log(`Key:         ${key}`);
-              cmd.log(`Value:       ${property.Value}`);
-              cmd.log(`Description: ${(property.Description || 'not set')}`);
-              cmd.log(`Comment:     ${(property.Comment || 'not set')}`);
-              cmd.log('');
-            });
+              return {
+                Key: key,
+                Value: property.Value,
+                Description: property.Description,
+                Comment: property.Comment
+              }
+            }));
           }
         }
         catch (e) {
-          cmd.log(vorpal.chalk.red(`Error: ${e}`));
+          this.handleError(e, cmd);
         }
         finally {
           cb();
         }
-      }, (err: any): void => {
-        cmd.log(vorpal.chalk.red(`Error: ${err}`));
-        cb();
-      });
+      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
   }
 
   public options(): CommandOption[] {
