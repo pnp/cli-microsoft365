@@ -15,6 +15,7 @@ Option|Description
 `--help`|output usage information
 `-e, --enabled <enabled>`|Set to true to enable CDN or to false to disable it. Valid values are true|false
 `-t, --type [type]`|Type of CDN to manage. `Public|Private`. Default `Public`
+`-o, --output <output>`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 

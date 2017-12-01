@@ -1,5 +1,5 @@
 import commands from '../../commands';
-import Command, { CommandHelp, CommandValidate, CommandOption } from '../../../../Command';
+import Command, { CommandHelp, CommandValidate, CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
@@ -12,6 +12,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
+  let cmdInstanceLogSpy: sinon.SinonSpy;
   let trackEvent: any;
   let telemetry: any;
 
@@ -30,6 +31,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
         log.push(msg);
       }
     };
+    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
     auth.site = new Site();
     telemetry = null;
   });
@@ -87,14 +89,8 @@ describe(commands.STORAGEENTITY_LIST, () => {
     auth.site.connected = false;
     cmdInstance.action = storageEntityListCommand.action();
     cmdInstance.action({ options: { debug: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
-      let returnsCorrectValue: boolean = false;
-      log.forEach(l => {
-        if (l && l.indexOf('Connect to a SharePoint Online site first') > -1) {
-          returnsCorrectValue = true;
-        }
-      });
       try {
-        assert(returnsCorrectValue);
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('Connect to a SharePoint Online site first')));
         done();
       }
       catch (e) {
@@ -133,61 +129,21 @@ describe(commands.STORAGEENTITY_LIST, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     cmdInstance.action = storageEntityListCommand.action();
     cmdInstance.action({ options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }}, () => {
-      let correctKey1: boolean = false;
-      let correctValue1: boolean = false;
-      let correctDescription1: boolean = false;
-      let correctComment1: boolean = false;
-      let correctKey2: boolean = false;
-      let correctValue2: boolean = false;
-      let correctDescription2: boolean = false;
-      let correctComment2: boolean = false;
-
-      log.forEach(l => {
-        if (!l || typeof l !== 'string') {
-          return;
-        }
-
-        if (l.indexOf('Key:') > -1 && l.indexOf('Property1') > -1) {
-          correctKey1 = true;
-        }
-
-        if (l.indexOf('Description:') > -1 && l.indexOf('not set') > -1) {
-          correctDescription1 = true;
-        }
-
-        if (l.indexOf('Comment:') > -1 && l.indexOf('not set') > -1) {
-          correctComment1 = true;
-        }
-
-        if (l.indexOf('Value:') > -1 && l.indexOf('dolor1') > -1) {
-          correctValue1 = true;
-        }
-
-        if (l.indexOf('Key:') > -1 && l.indexOf('Property2') > -1) {
-          correctKey2 = true;
-        }
-
-        if (l.indexOf('Description:') > -1 && l.indexOf('ipsum2') > -1) {
-          correctDescription2 = true;
-        }
-
-        if (l.indexOf('Comment:') > -1 && l.indexOf('Lorem2') > -1) {
-          correctComment2 = true;
-        }
-
-        if (l.indexOf('Value:') > -1 && l.indexOf('dolor2') > -1) {
-          correctValue2 = true;
-        }
-      });
       try {
-        assert(correctKey1, 'Incorrect property1 name');
-        assert(correctValue1, 'Incorrect property1 value');
-        assert(correctDescription1, 'Incorrect property1 description');
-        assert(correctComment1, 'Incorrect property1 comment');
-        assert(correctKey2, 'Incorrect property2 name');
-        assert(correctValue2, 'Incorrect property2 value');
-        assert(correctDescription2, 'Incorrect property2 description');
-        assert(correctComment2, 'Incorrect property2 comment');
+        assert(cmdInstanceLogSpy.calledWith([
+          {
+            Key: 'Property1',
+            Description: undefined,
+            Comment: undefined,
+            Value: 'dolor1'
+          },
+          {
+            Key: 'Property2',
+            Description: 'ipsum2',
+            Comment: 'Lorem2',
+            Value: 'dolor2'
+          }
+        ]));
         done();
       }
       catch (e) {
@@ -351,18 +307,8 @@ describe(commands.STORAGEENTITY_LIST, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     cmdInstance.action = storageEntityListCommand.action();
     cmdInstance.action({ options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }}, () => {
-      let correctResponse: boolean = false;
-      log.forEach(l => {
-        if (!l || typeof l !== 'string') {
-          return;
-        }
-
-        if (l.indexOf('Error:') > -1) {
-          correctResponse = true;
-        }
-      });
       try {
-        assert(correctResponse, 'Incorrect response');
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('Unexpected token a in JSON at position 0')));
         done();
       }
       catch (e) {
@@ -458,16 +404,8 @@ describe(commands.STORAGEENTITY_LIST, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     cmdInstance.action = storageEntityListCommand.action();
     cmdInstance.action({ options: { debug: true, appCatalogUrl: 'https://contoso-admin.sharepoint.com' }}, () => {
-      let containsError = false;
-      log.forEach(l => {
-        if (l &&
-          typeof l === 'string' &&
-          l.indexOf('Error getting access token') > -1) {
-          containsError = true;
-        }
-      });
       try {
-        assert(containsError);
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
         done();
       }
       catch (e) {

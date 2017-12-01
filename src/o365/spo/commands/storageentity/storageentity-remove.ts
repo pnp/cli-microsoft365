@@ -7,7 +7,8 @@ import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandHelp,
   CommandOption,
-  CommandValidate
+  CommandValidate,
+  CommandError
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
@@ -45,7 +46,9 @@ class SpoStorageEntityRemoveCommand extends SpoCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const removeTenantProperty = (): void => {
-      cmd.log(`Removing tenant property ${args.options.key} from ${args.options.appCatalogUrl}...`);
+      if (this.verbose) {
+        cmd.log(`Removing tenant property ${args.options.key} from ${args.options.appCatalogUrl}...`);
+      }
 
       auth
         .ensureAccessToken(auth.service.resource, cmd, this.debug)
@@ -90,7 +93,7 @@ class SpoStorageEntityRemoveCommand extends SpoCommand {
           const json: ClientSvcResponse = JSON.parse(res);
           const response: ClientSvcResponseContents = json[0];
           if (response.ErrorInfo) {
-            cmd.log(vorpal.chalk.red(`Error: ${response.ErrorInfo.ErrorMessage}`));
+            cmd.log(new CommandError(response.ErrorInfo.ErrorMessage));
           }
           else {
             if (this.verbose) {
@@ -98,10 +101,7 @@ class SpoStorageEntityRemoveCommand extends SpoCommand {
             }
           }
           cb();
-        }, (err: any): void => {
-          cmd.log(vorpal.chalk.red(`Error: ${err}`));
-          cb();
-        });
+        }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
     }
 
     if (args.options.confirm) {

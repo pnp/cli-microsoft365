@@ -1,5 +1,5 @@
 import commands from '../../commands';
-import Command, { CommandHelp, CommandOption, CommandValidate } from '../../../../Command';
+import Command, { CommandHelp, CommandOption, CommandValidate, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
@@ -13,6 +13,7 @@ describe(commands.APP_RETRACT, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
+  let cmdInstanceLogSpy: sinon.SinonSpy;
   let trackEvent: any;
   let telemetry: any;
   let requests: any[];
@@ -38,6 +39,7 @@ describe(commands.APP_RETRACT, () => {
         cb({ continue: false });
       }
     };
+    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
     auth.site = new Site();
     telemetry = null;
     requests = [];
@@ -97,14 +99,8 @@ describe(commands.APP_RETRACT, () => {
     auth.site.connected = false;
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
-      let returnsCorrectValue: boolean = false;
-      log.forEach(l => {
-        if (l && l.indexOf('Connect to a SharePoint Online site first') > -1) {
-          returnsCorrectValue = true;
-        }
-      });
       try {
-        assert(returnsCorrectValue);
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('Connect to a SharePoint Online site first')));
         done();
       }
       catch (e) {
@@ -345,26 +341,6 @@ describe(commands.APP_RETRACT, () => {
 
       return Promise.reject('Invalid request');
     });
-    sinon.stub(request, 'post').callsFake((opts) => {
-      requests.push(opts);
-
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
-      if (opts.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/retract`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve();
-        }
-      }
-
-      return Promise.reject('Invalid request');
-    });
 
     auth.site = new Site();
     auth.site.connected = true;
@@ -416,26 +392,6 @@ describe(commands.APP_RETRACT, () => {
 
       return Promise.reject('Invalid request');
     });
-    sinon.stub(request, 'post').callsFake((opts) => {
-      requests.push(opts);
-
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
-      if (opts.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/retract`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve();
-        }
-      }
-
-      return Promise.reject('Invalid request');
-    });
 
     auth.site = new Site();
     auth.site.connected = true;
@@ -472,30 +428,6 @@ describe(commands.APP_RETRACT, () => {
 
       return Promise.reject('Invalid request');
     });
-    sinon.stub(request, 'post').callsFake((opts) => {
-      requests.push(opts);
-
-      if (opts.url.indexOf('/common/oauth2/token') > -1) {
-        return Promise.resolve('abc');
-      }
-
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
-      if (opts.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/retract`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve();
-        }
-      }
-
-      return Promise.reject('Invalid request');
-    });
 
     auth.site = new Site();
     auth.site.connected = true;
@@ -528,26 +460,6 @@ describe(commands.APP_RETRACT, () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`search/query?querytext='contentclass:STS_Site%20AND%20SiteTemplate:APPCATALOG'`) > -1) {
         return Promise.reject('Error while executing search query');
-      }
-
-      return Promise.reject('Invalid request');
-    });
-    sinon.stub(request, 'post').callsFake((opts) => {
-      requests.push(opts);
-
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
-      if (opts.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/retract`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve();
-        }
       }
 
       return Promise.reject('Invalid request');
@@ -832,18 +744,8 @@ describe(commands.APP_RETRACT, () => {
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com', confirm: true } }, () => {
-      let correctLogStatement = false;
-      log.forEach(l => {
-        if (!l || typeof l !== 'string') {
-          return;
-        }
-
-        if (l.indexOf('ResourceNotFoundException') > -1) {
-          correctLogStatement = true;
-        }
-      })
       try {
-        assert(correctLogStatement);
+        assert(cmdInstanceLogSpy.calledWith(new CommandError("Exception of type 'Microsoft.SharePoint.Client.ResourceNotFoundException' was thrown.")));
         done();
       }
       catch (e) {
@@ -881,18 +783,8 @@ describe(commands.APP_RETRACT, () => {
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com', confirm: true } }, () => {
-      let correctLogStatement = false;
-      log.forEach(l => {
-        if (!l || typeof l !== 'string') {
-          return;
-        }
-
-        if (l.indexOf(`An error has occurred`)) {
-          correctLogStatement = true;
-        }
-      });
       try {
-        assert(correctLogStatement);
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -930,18 +822,8 @@ describe(commands.APP_RETRACT, () => {
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com', confirm: true } }, () => {
-      let correctLogStatement = false;
-      log.forEach(l => {
-        if (!l || typeof l !== 'string') {
-          return;
-        }
-
-        if (l.indexOf(`An error has occurred`)) {
-          correctLogStatement = true;
-        }
-      });
       try {
-        assert(correctLogStatement);
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('{"message":"An error has occurred"}')));
         done();
       }
       catch (e) {
@@ -988,18 +870,8 @@ describe(commands.APP_RETRACT, () => {
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com', confirm: true } }, () => {
-      let correctLogStatement = false;
-      log.forEach(l => {
-        if (!l || typeof l !== 'string') {
-          return;
-        }
-
-        if (l.indexOf(`Error: An error has occurred`) > -1) {
-          correctLogStatement = true;
-        }
-      });
       try {
-        assert(correctLogStatement);
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -1079,15 +951,8 @@ describe(commands.APP_RETRACT, () => {
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, id: '123', confirm: true } }, () => {
-      let containsError = false;
-      log.forEach(l => {
-        if (typeof l === 'string' &&
-          l.indexOf('Error getting access token') > -1) {
-          containsError = true;
-        }
-      });
       try {
-        assert(containsError);
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
         done();
       }
       catch (e) {

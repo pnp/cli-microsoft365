@@ -14,8 +14,9 @@ Option|Description
 ------|-----------
 `--help`|output usage information
 `-t, --type [type]`|Type of CDN to manage. `Public|Private`. Default `Public`
-`-o, --origin <origin>`|Origin to remove from the current CDN configuration
+`-r, --origin <origin>`|Origin to remove from the current CDN configuration
 `--confirm`|Don't prompt for confirming removal of a tenant property
+`-o, --output <output>`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
@@ -35,7 +36,7 @@ the Public (default) or Private CDN. If you don't use the option, the command wi
 ## Examples
 
 ```sh
-spo cdn origin remove -t Public -o */CDN
+spo cdn origin remove -t Public -r */CDN
 ```
 
 removes */CDN from the list of origins of the Public CDN

@@ -7,7 +7,8 @@ import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandHelp,
   CommandOption,
-  CommandValidate
+  CommandValidate,
+  CommandError
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
@@ -91,9 +92,9 @@ class SpoStorageEntitySetCommand extends SpoCommand {
         const json: ClientSvcResponse = JSON.parse(res);
         const response: ClientSvcResponseContents = json[0];
         if (response.ErrorInfo) {
-          cmd.log(vorpal.chalk.red(`Error: ${response.ErrorInfo.ErrorMessage}`));
+          cmd.log(new CommandError(response.ErrorInfo.ErrorMessage));
 
-          if (response.ErrorInfo.ErrorMessage.indexOf('Access denied.') > -1) {
+          if (this.verbose && response.ErrorInfo.ErrorMessage.indexOf('Access denied.') > -1) {
             cmd.log('');
             cmd.log(`This error is often caused by invalid URL of the app catalog site. Verify, that the URL you specified as an argument of the ${commands.STORAGEENTITY_SET} command is a valid app catalog URL and try again.`);
             cmd.log('');
@@ -105,10 +106,7 @@ class SpoStorageEntitySetCommand extends SpoCommand {
           }
         }
         cb();
-      }, (err: any): void => {
-        cmd.log(vorpal.chalk.red(`Error: ${err}`));
-        cb();
-      });
+      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
   }
 
   public options(): CommandOption[] {
@@ -135,13 +133,8 @@ class SpoStorageEntitySetCommand extends SpoCommand {
       }
     ];
 
-    const parentOptions: CommandOption[] | undefined = super.options();
-    if (parentOptions) {
-      return options.concat(parentOptions);
-    }
-    else {
-      return options;
-    }
+    const parentOptions: CommandOption[] = super.options();
+    return options.concat(parentOptions);
   }
 
   public validate(): CommandValidate {

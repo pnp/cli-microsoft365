@@ -7,7 +7,8 @@ import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandHelp,
   CommandOption,
-  CommandValidate
+  CommandValidate,
+  CommandError
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
@@ -98,23 +99,23 @@ class SpoCdnPolicyListCommand extends SpoCommand {
         const json: ClientSvcResponse = JSON.parse(res);
         const response: ClientSvcResponseContents = json[0];
         if (response.ErrorInfo) {
-          cmd.log(vorpal.chalk.red(`Error: ${response.ErrorInfo.ErrorMessage}`));
+          cmd.log(new CommandError(response.ErrorInfo.ErrorMessage));
         }
         else {
           const result: string[] = json[json.length - 1];
           if (this.verbose) {
             cmd.log('Configured policies:');
           }
-          result.forEach(o => {
+          cmd.log(result.map(o => {
             const kv: string[] = o.split(';');
-            cmd.log(`${kv[0]}: ${kv[1]}`);
-          });
+            return {
+              Policy: kv[0],
+              Value: kv[1]
+            }
+          }));
         }
         cb();
-      }, (err: any): void => {
-        cmd.log(vorpal.chalk.red(`Error: ${err}`));
-        cb();
-      });
+      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
   }
 
   public options(): CommandOption[] {
@@ -124,13 +125,8 @@ class SpoCdnPolicyListCommand extends SpoCommand {
       autocomplete: ['Public', 'Private']
     }];
 
-    const parentOptions: CommandOption[] | undefined = super.options();
-    if (parentOptions) {
-      return options.concat(parentOptions);
-    }
-    else {
-      return options;
-    }
+    const parentOptions: CommandOption[] = super.options();
+    return options.concat(parentOptions);
   }
 
   public validate(): CommandValidate {

@@ -28,6 +28,21 @@ export interface CommandTypes {
   boolean?: string[];
 }
 
+export class CommandError {
+  constructor(public message: string) {
+  }
+}
+
+export interface ODataError {
+  "odata.error": {
+    code: string;
+    message: {
+      lang: string;
+      value: string;
+    }
+  }
+}
+
 interface CommandArgs {
   options: GlobalOptions;
 }
@@ -77,6 +92,11 @@ export default abstract class Command {
 
   public options(): CommandOption[] {
     return [
+      {
+        option: '-o, --output <output>',
+        description: 'Output type. json|text. Default text',
+        autocomplete: ['json', 'text']
+      },
       {
         option: '--verbose',
         description: 'Runs command with verbose logging'
@@ -143,5 +163,44 @@ export default abstract class Command {
     }
 
     return commandName;
+  }
+
+  protected handleRejectedODataPromise(rawResponse: any, cmd: CommandInstance, callback: () => void): void {
+    if (rawResponse instanceof Error) {
+      cmd.log(new CommandError(rawResponse.message));
+      callback();
+      return;
+    }
+
+    const res: any = JSON.parse(JSON.stringify(rawResponse));
+    if (res.error) {
+      try {
+        const err: ODataError = JSON.parse(res.error);
+        cmd.log(new CommandError(err['odata.error'].message.value));
+      }
+      catch {
+        cmd.log(new CommandError(res.error));
+      }
+    }
+    else {
+      cmd.log(new CommandError(rawResponse));
+    }
+
+    callback();
+  }
+
+  protected handleError(rawResponse: any, cmd: CommandInstance): void {
+    if (rawResponse instanceof Error) {
+      cmd.log(new CommandError(rawResponse.message));
+    }
+    else {
+      cmd.log(new CommandError(rawResponse));          
+    }
+  }
+
+  protected handleRejectedPromise(rawResponse: any, cmd: CommandInstance, callback: () => void): void {
+    this.handleError(rawResponse, cmd);
+
+    callback();
   }
 }

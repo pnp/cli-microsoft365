@@ -15,6 +15,7 @@ Option|Description
 `--help`|output usage information
 `-i, --id <id>`|ID of the app to deploy. Needs to be available in the tenant app catalog.
 `-u, --appCatalogUrl [appCatalogUrl]`|(optional) URL of the tenant app catalog site. If not specified, the CLI will try to resolve it automatically
+`-o, --output <output>`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 

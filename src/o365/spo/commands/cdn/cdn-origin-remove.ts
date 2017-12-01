@@ -7,7 +7,8 @@ import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandHelp,
   CommandOption,
-  CommandValidate
+  CommandValidate,
+  CommandError
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
@@ -103,7 +104,7 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
           const json: ClientSvcResponse = JSON.parse(res);
           const response: ClientSvcResponseContents = json[0];
           if (response.ErrorInfo) {
-            cmd.log(vorpal.chalk.red(`Error: ${response.ErrorInfo.ErrorMessage}`));
+            cmd.log(new CommandError(response.ErrorInfo.ErrorMessage));
           }
           else {
             if (this.verbose) {
@@ -111,10 +112,7 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
             }
           }
           cb();
-        }, (err: any): void => {
-          cmd.log(vorpal.chalk.red(`Error: ${err}`));
-          cb();
-        });
+        }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
     };
 
     if (args.options.confirm) {
@@ -148,7 +146,7 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
         autocomplete: ['Public', 'Private']
       },
       {
-        option: '-o, --origin <origin>',
+        option: '-r, --origin <origin>',
         description: 'Origin to remove from the current CDN configuration'
       },
       {
@@ -157,13 +155,8 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
       }
     ];
 
-    const parentOptions: CommandOption[] | undefined = super.options();
-    if (parentOptions) {
-      return options.concat(parentOptions);
-    }
-    else {
-      return options;
-    }
+    const parentOptions: CommandOption[] = super.options();
+    return options.concat(parentOptions);
   }
 
   public validate(): CommandValidate {
@@ -199,7 +192,7 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
 
   Examples:
   
-    ${chalk.grey(config.delimiter)} ${commands.CDN_ORIGIN_REMOVE} -t Public -o */CDN
+    ${chalk.grey(config.delimiter)} ${commands.CDN_ORIGIN_REMOVE} -t Public -r */CDN
       removes ${chalk.grey('*/CDN')} from the list of origins of the Public CDN
 
   More information:

@@ -7,7 +7,8 @@ import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandHelp,
   CommandOption,
-  CommandValidate
+  CommandValidate,
+  CommandError
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
@@ -98,20 +99,14 @@ class SpoCdnOriginListCommand extends SpoCommand {
         const json: ClientSvcResponse = JSON.parse(res);
         const response: ClientSvcResponseContents = json[0];
         if (response.ErrorInfo) {
-          cmd.log(vorpal.chalk.red(`Error: ${response.ErrorInfo.ErrorMessage}`));
+          cmd.log(new CommandError(response.ErrorInfo.ErrorMessage));
         }
         else {
           const result: string[] = json[json.length - 1];
-          cmd.log('Configured origins:');
-          result.forEach((o: string): void => {
-            cmd.log(o);
-          });
+          cmd.log(result);
         }
         cb();
-      }, (err: any): void => {
-        cmd.log(vorpal.chalk.red(`Error: ${err}`));
-        cb();
-      });
+      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
   }
 
   public options(): CommandOption[] {
@@ -121,13 +116,8 @@ class SpoCdnOriginListCommand extends SpoCommand {
       autocomplete: ['Public', 'Private']
     }];
 
-    const parentOptions: CommandOption[] | undefined = super.options();
-    if (parentOptions) {
-      return options.concat(parentOptions);
-    }
-    else {
-      return options;
-    }
+    const parentOptions: CommandOption[] = super.options();
+    return options.concat(parentOptions);
   }
 
   public validate(): CommandValidate {
