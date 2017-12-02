@@ -330,6 +330,14 @@ describe(commands.CUSTOMACTION_GET, () => {
       return Promise.reject('Invalid request');
     });
 
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('/_api/Web/UserCustomActions(') > -1) {
+        return Promise.resolve('abc');
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
