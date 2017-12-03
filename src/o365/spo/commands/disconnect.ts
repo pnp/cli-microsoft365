@@ -44,12 +44,12 @@ class SpoDisconnectCommand extends Command {
 
   Examples:
   
-    ${chalk.grey(config.delimiter)} ${commands.DISCONNECT}
-      disconnects from a previously connected SharePoint Online site
+    Disconnect from a previously connected SharePoint Online site
+      ${chalk.grey(config.delimiter)} ${commands.DISCONNECT}
 
-    ${chalk.grey(config.delimiter)} ${commands.DISCONNECT} --debug
-      disconnects from a previously connected SharePoint Online site in
-      debug mode including detailed debug information in the console output
+    Disconnect from a previously connected SharePoint Online site in
+    debug mode including detailed debug information in the console output
+      ${chalk.grey(config.delimiter)} ${commands.DISCONNECT} --debug
 `);
     };
   }

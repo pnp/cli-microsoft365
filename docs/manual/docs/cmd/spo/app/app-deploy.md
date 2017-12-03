@@ -33,17 +33,17 @@ If the app with the specified ID doesn't exist in the tenant app catalog, the co
 
 ## Examples
 
+Deploy the specified app in the tenant app catalog. Try to resolve the URL of the tenant app catalog automatically.
+
 ```sh
 spo app deploy -i 058140e3-0e37-44fc-a1d3-79c487d371a3
 ```
 
-Deploys the specified app in the tenant app catalog. Will try to resolve the URL of the tenant app catalog automatically.
+Deploy the specified app in the tenant app catalog located at _https://contoso.sharepoint.com/sites/apps_
 
 ```sh
 spo app deploy -i 058140e3-0e37-44fc-a1d3-79c487d371a3 -u https://contoso.sharepoint.com/sites/apps
 ```
-
-Deploys the specified app in the tenant app catalog located at _https://contoso.sharepoint.com/sites/apps_
 
 ## More information
 

@@ -33,17 +33,17 @@ the Public (default) or Private CDN. If you don't use the option, the command wi
 
 ## Examples
 
+Show if the Public CDN is currently enabled or not
+
 ```sh
 spo cdn get
 ```
 
-shows if the Public CDN is currently enabled or not
+Show if the Private CDN is currently enabled or not
 
 ```sh
 spo cdn get -t Private
 ```
-
-shows if the Private CDN is currently enabled or not
 
 ## More information
 

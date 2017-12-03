@@ -27,11 +27,11 @@ To list the apps available in the tenant app catalog, you have to first connect 
 
 ## Examples
 
+List all apps available in the tenant app catalog
+
 ```sh
 spo app list
 ```
-
-lists all apps available in the tenant app catalog
 
 ## More information
 

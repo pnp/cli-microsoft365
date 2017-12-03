@@ -224,20 +224,20 @@ class AppDeployCommand extends SpoCommand {
    
   Examples:
   
-    ${chalk.grey(config.delimiter)} ${commands.APP_RETRACT} -i 058140e3-0e37-44fc-a1d3-79c487d371a3
-      Retracts the specified app from the tenant app catalog. Will try to resolve the URL
-      of the tenant app catalog automatically. Additionally, will prompt for confirmation before
-      actually retracting the app.
+    Retract the specified app from the tenant app catalog. Try to resolve the URL
+    of the tenant app catalog automatically. Additionally, will prompt for confirmation before
+    actually retracting the app.
+      ${chalk.grey(config.delimiter)} ${commands.APP_RETRACT} -i 058140e3-0e37-44fc-a1d3-79c487d371a3
 
-    ${chalk.grey(config.delimiter)} ${commands.APP_RETRACT} -i 058140e3-0e37-44fc-a1d3-79c487d371a3 -u https://contoso.sharepoint.com/sites/apps
-      Retracts the specified app from the tenant app catalog located at
-      ${chalk.grey('https://contoso.sharepoint.com/sites/apps')}. Additionally, will prompt for confirmation before
-      actually retracting the app.
+    Retract the specified app from the tenant app catalog located at
+    ${chalk.grey('https://contoso.sharepoint.com/sites/apps')}. Additionally, will prompt for confirmation before
+    actually retracting the app.
+      ${chalk.grey(config.delimiter)} ${commands.APP_RETRACT} -i 058140e3-0e37-44fc-a1d3-79c487d371a3 -u https://contoso.sharepoint.com/sites/apps
 
-    ${chalk.grey(config.delimiter)} ${commands.APP_RETRACT} -i 058140e3-0e37-44fc-a1d3-79c487d371a3 --confirm
-      Retracts the specified app from the tenant app catalog. Will try to resolve the URL
-      of the tenant app catalog automatically. Will not prompt for confirmation before retracting
-      the app.
+    Retract the specified app from the tenant app catalog. Try to resolve the URL
+    of the tenant app catalog automatically. Will not prompt for confirmation before retracting
+    the app.
+      ${chalk.grey(config.delimiter)} ${commands.APP_RETRACT} -i 058140e3-0e37-44fc-a1d3-79c487d371a3 --confirm
     
   More information:
   

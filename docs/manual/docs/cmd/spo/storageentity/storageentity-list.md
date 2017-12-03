@@ -30,11 +30,11 @@ Tenant properties are stored in the app catalog site. To list all tenant propert
 
 ## Examples
 
+List all tenant properties stored in the _https://contoso.sharepoint.com/sites/appcatalog_ app catalog site
+
 ```sh
 spo storageentity list -u https://contoso.sharepoint.com/sites/appcatalog
 ```
-
-list all tenant properties stored in the https://contoso.sharepoint.com/sites/appcatalog app catalog site
 
 ## More information
 

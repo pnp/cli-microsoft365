@@ -38,11 +38,11 @@ If you specify the URL of a site different than the app catalog, you will get an
 
 ## Examples
 
+Set _123_ as the value of the _AnalyticsId_ tenant property. Also include a description and a comment for additional clarification of the usage of the property.
+
 ```sh
 spo storageentity set -k AnalyticsId -v 123 -d 'Web analytics ID' -c 'Use on all sites' -u https://contoso.sharepoint.com/sites/appcatalog
 ```
-
-set _123_ as the value of the _AnalyticsId_ tenant property. Also include a description and a comment for additional clarification of the usage of the property.
 
 ## More information
 

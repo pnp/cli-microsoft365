@@ -162,11 +162,11 @@ class SpoCdnPolicyListCommand extends SpoCommand {
 
   Examples:
   
-    ${chalk.grey(config.delimiter)} ${commands.CDN_POLICY_LIST}
-      shows the list of policies configured for the Public CDN
+    Show the list of policies configured for the Public CDN
+      ${chalk.grey(config.delimiter)} ${commands.CDN_POLICY_LIST}
 
-    ${chalk.grey(config.delimiter)} ${commands.CDN_POLICY_LIST} -t Private
-      shows the list of policies configured for the Private CDN
+    Show the list of policies configured for the Private CDN
+      ${chalk.grey(config.delimiter)} ${commands.CDN_POLICY_LIST} -t Private
 
   More information:
 

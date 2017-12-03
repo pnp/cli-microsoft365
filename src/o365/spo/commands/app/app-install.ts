@@ -142,9 +142,9 @@ class AppInstallCommand extends SpoCommand {
    
   Examples:
   
-    ${chalk.grey(config.delimiter)} ${commands.APP_INSTALL} -i b2307a39-e878-458b-bc90-03bc578531d6 -s https://contoso.sharepoint.com
-      Installs the app with ID ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
-      in the ${chalk.grey('https://contoso.sharepoint.com')} site.
+    Install the app with ID ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
+    in the ${chalk.grey('https://contoso.sharepoint.com')} site.
+      ${chalk.grey(config.delimiter)} ${commands.APP_INSTALL} -i b2307a39-e878-458b-bc90-03bc578531d6 -s https://contoso.sharepoint.com
 
   More information:
   

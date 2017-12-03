@@ -177,12 +177,12 @@ class SpoStorageEntityRemoveCommand extends SpoCommand {
 
   Examples:
   
-    ${chalk.grey(config.delimiter)} ${commands.STORAGEENTITY_REMOVE} -k AnalyticsId -u https://contoso.sharepoint.com/sites/appcatalog
-      remove the ${chalk.grey('AnalyticsId')} tenant property. Yields a confirmation prompt before actually
-      removing the property
+    Remove the ${chalk.grey('AnalyticsId')} tenant property. Yields a confirmation prompt before actually
+    removing the property
+      ${chalk.grey(config.delimiter)} ${commands.STORAGEENTITY_REMOVE} -k AnalyticsId -u https://contoso.sharepoint.com/sites/appcatalog
 
-    ${chalk.grey(config.delimiter)} ${commands.STORAGEENTITY_REMOVE} -k AnalyticsId --confirm -u https://contoso.sharepoint.com/sites/appcatalog
-      remove the ${chalk.grey('AnalyticsId')} tenant property. Suppresses the confirmation prompt
+    Remove the ${chalk.grey('AnalyticsId')} tenant property. Suppresses the confirmation prompt
+      ${chalk.grey(config.delimiter)} ${commands.STORAGEENTITY_REMOVE} -k AnalyticsId --confirm -u https://contoso.sharepoint.com/sites/appcatalog
 
   More information:
 

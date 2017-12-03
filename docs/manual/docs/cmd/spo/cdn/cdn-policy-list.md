@@ -33,17 +33,17 @@ the Public (default) or Private CDN. If you don't use the option, the command wi
 
 ## Examples
 
+Show the list of policies configured for the Public CDN
+
 ```sh
 spo cdn policy list
 ```
 
-shows the list of policies configured for the Public CDN
+Show the list of policies configured for the Private CDN
 
 ```sh
 spo cdn policy list -t Private
 ```
-
-shows the list of policies configured for the Private CDN
 
 ## More information
 

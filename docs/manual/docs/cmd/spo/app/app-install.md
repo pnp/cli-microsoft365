@@ -30,11 +30,11 @@ If the app with the specified ID doesn't exist in the tenant app catalog, the co
 
 ## Examples
 
+Install the app with ID _b2307a39-e878-458b-bc90-03bc578531d6_ in the _https://contoso.sharepoint.com_ site.
+
 ```sh
 spo app install -i b2307a39-e878-458b-bc90-03bc578531d6 -s https://contoso.sharepoint.com
 ```
-
-Installs the app with ID _b2307a39-e878-458b-bc90-03bc578531d6_ in the _https://contoso.sharepoint.com_ site.
 
 ## More information
 

@@ -170,10 +170,10 @@ class SpoStorageEntitySetCommand extends SpoCommand {
 
   Examples:
   
-    ${chalk.grey(config.delimiter)} ${commands.STORAGEENTITY_SET} -k AnalyticsId -v 123 -d 'Web analytics ID' -c 'Use on all sites'
-    -u https://contoso.sharepoint.com/sites/appcatalog
-      set ${chalk.grey('123')} as the value of the ${chalk.grey('AnalyticsId')} tenant property. Also include a description
-      and a comment for additional clarification of the usage of the property.
+    Set ${chalk.grey('123')} as the value of the ${chalk.grey('AnalyticsId')} tenant property. Also include a description
+    and a comment for additional clarification of the usage of the property.
+      ${chalk.grey(config.delimiter)} ${commands.STORAGEENTITY_SET} -k AnalyticsId -v 123 -d 'Web analytics ID' -c 'Use on all sites'
+      -u https://contoso.sharepoint.com/sites/appcatalog
 
   More information:
 

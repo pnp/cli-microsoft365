@@ -152,8 +152,8 @@ class SpoStorageEntityListCommand extends SpoCommand {
 
   Examples:
   
-    ${chalk.grey(config.delimiter)} ${commands.STORAGEENTITY_LIST} -u https://contoso.sharepoint.com/sites/appcatalog
-      list all tenant properties stored in the https://contoso.sharepoint.com/sites/appcatalog app catalog site
+    List all tenant properties stored in the ${chalk.grey('https://contoso.sharepoint.com/sites/appcatalog')} app catalog site
+      ${chalk.grey(config.delimiter)} ${commands.STORAGEENTITY_LIST} -u https://contoso.sharepoint.com/sites/appcatalog
 
   More information:
 

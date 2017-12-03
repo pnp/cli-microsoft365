@@ -23,14 +23,14 @@ The spo disconnect command disconnects from the previously connected SharePoint 
 
 ## Examples
 
+Disconnect from a previously connected SharePoint Online site
+
 ```sh
 spo disconnect
 ```
 
-disconnects from a previously connected SharePoint Online site
+Disconnects from a previously connected SharePoint Online site in debug mode including detailed debug information in the console output
 
 ```sh
 spo disconnect --debug
 ```
-
-disconnects from a previously connected SharePoint Online site in debug mode including detailed debug information in the console output

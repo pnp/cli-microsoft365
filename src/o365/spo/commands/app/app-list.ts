@@ -89,8 +89,8 @@ class AppListCommand extends SpoCommand {
    
   Examples:
   
-    ${chalk.grey(config.delimiter)} ${commands.APP_LIST}
-      Returns the list of available apps from the tenant app catalog. Shows the installed version in the site if applicable.
+    Return the list of available apps from the tenant app catalog. Show the installed version in the site if applicable.
+      ${chalk.grey(config.delimiter)} ${commands.APP_LIST}
 
   More information:
   

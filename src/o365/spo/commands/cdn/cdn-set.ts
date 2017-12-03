@@ -168,11 +168,11 @@ class SpoCdnSetCommand extends SpoCommand {
 
   Examples:
   
-    ${chalk.grey(config.delimiter)} ${commands.CDN_SET} -t Public -e true
-      enables the Office 365 Public CDN on the current tenant
+    Enable the Office 365 Public CDN on the current tenant
+      ${chalk.grey(config.delimiter)} ${commands.CDN_SET} -t Public -e true
 
-    ${chalk.grey(config.delimiter)} ${commands.CDN_SET} -t Public -e false
-      disables the Office 365 Public CDN on the current tenant
+    Disable the Office 365 Public CDN on the current tenant
+      ${chalk.grey(config.delimiter)} ${commands.CDN_SET} -t Public -e false
 
   More information:
 

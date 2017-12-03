@@ -33,17 +33,17 @@ If you try to upload a package that already exists in the tenant app catalog wit
 
 ## Examples
 
+Add the _spfx.sppkg_ package to the tenant app catalog
+
 ```sh
 spo app add -p /Users/pnp/spfx/sharepoint/solution/spfx.sppkg
 ```
 
-Adds package spfx.sppkg to the tenant app catalog
+Overwrite the _spfx.sppkg_ package in the tenant app catalog with the newer version
 
 ```sh
 spo app add -p sharepoint/solution/spfx.sppkg --overwrite
 ```
-
-Overwrites the package spfx.sppkg in the tenant app catalog with the newer version
 
 ## More information
 

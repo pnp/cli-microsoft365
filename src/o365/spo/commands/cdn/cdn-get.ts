@@ -152,11 +152,11 @@ class SpoCdnGetCommand extends SpoCommand {
 
   Examples:
   
-    ${chalk.grey(config.delimiter)} ${commands.CDN_GET}
-      shows if the Public CDN is currently enabled or not
+    Show if the Public CDN is currently enabled or not
+      ${chalk.grey(config.delimiter)} ${commands.CDN_GET}
 
-    ${chalk.grey(config.delimiter)} ${commands.CDN_GET} -t Private
-      shows if the Private CDN is currently enabled or not
+    Show if the Private CDN is currently enabled or not
+      ${chalk.grey(config.delimiter)} ${commands.CDN_GET} -t Private
 
   More information:
 

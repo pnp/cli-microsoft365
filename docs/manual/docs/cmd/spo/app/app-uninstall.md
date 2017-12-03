@@ -29,17 +29,17 @@ To uninstall an app from the site, you have to first connect to a SharePoint sit
 
 ## Examples
 
-```sh
-spo app uninstall -i b2307a39-e878-458b-bc90-03bc578531d6 -s https://contoso.sharepoint.com
-```
-
-Uninstalls the app with ID _b2307a39-e878-458b-bc90-03bc578531d6_ from the _https://contoso.sharepoint.com_ site.
+Uninstall the app with ID _b2307a39-e878-458b-bc90-03bc578531d6_ from the _https://contoso.sharepoint.com_ site.
 
 ```sh
 spo app uninstall -i b2307a39-e878-458b-bc90-03bc578531d6 -s https://contoso.sharepoint.com
 ```
 
-Uninstalls the app with ID _b2307a39-e878-458b-bc90-03bc578531d6_ from the _https://contoso.sharepoint.com_ site without prompting for confirmation.
+Uninstall the app with ID _b2307a39-e878-458b-bc90-03bc578531d6_ from the _https://contoso.sharepoint.com_ site without prompting for confirmation.
+
+```sh
+spo app uninstall -i b2307a39-e878-458b-bc90-03bc578531d6 -s https://contoso.sharepoint.com
+```
 
 ## More information
 

@@ -35,11 +35,11 @@ the Public (default) or Private CDN. If you don't use the option, the command wi
 
 ## Examples
 
+Remove _*/CDN_ from the list of origins of the Public CDN
+
 ```sh
 spo cdn origin remove -t Public -r */CDN
 ```
-
-removes */CDN from the list of origins of the Public CDN
 
 ## More information
 

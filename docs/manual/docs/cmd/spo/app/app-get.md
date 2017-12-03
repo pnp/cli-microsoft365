@@ -28,11 +28,11 @@ To get information about the specified app available in the tenant app catalog, 
 
 ## Examples
 
+Return details about the app with ID _b2307a39-e878-458b-bc90-03bc578531d6_ available in the tenant app catalog.
+
 ```sh
 spo app get -i b2307a39-e878-458b-bc90-03bc578531d6
 ```
-
-Returns details about the app with ID 'b2307a39-e878-458b-bc90-03bc578531d6' available in the tenant app catalog.
 
 ## More information
 

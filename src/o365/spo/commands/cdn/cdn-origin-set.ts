@@ -161,8 +161,8 @@ class SpoCdnOriginAddCommand extends SpoCommand {
 
   Examples:
   
-    ${chalk.grey(config.delimiter)} ${commands.CDN_ORIGIN_SET} -t Public -o */CDN
-      adds ${chalk.grey('*/CDN')} to the list of origins of the Public CDN
+    Add ${chalk.grey('*/CDN')} to the list of origins of the Public CDN
+      ${chalk.grey(config.delimiter)} ${commands.CDN_ORIGIN_SET} -t Public -o */CDN
 
   More information:
 

@@ -25,8 +25,8 @@ refresh and access token and the expiration date and time of the access token.
 
 ## Examples
 
+Show the information about the current connection to SharePoint Online
+
 ```sh
 spo status
 ```
-
-shows the information about the current connection to SharePoint Online

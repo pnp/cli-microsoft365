@@ -35,11 +35,11 @@ the Public (default) or Private CDN. If you don't use the option, the command wi
 
 ## Examples
 
+Set the list of extensions supported by the Public CDN
+
 ```sh
 spo cdn policy set -t Public -p IncludeFileExtensions -v CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON
 ```
-
-sets the list of extensions supported by the Public CDN
 
 ## More information
 

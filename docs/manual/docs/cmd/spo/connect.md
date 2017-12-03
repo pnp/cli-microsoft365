@@ -40,20 +40,20 @@ after exiting the CLI or by calling the [spo disconnect](connect.md) command.
 
 ## Examples
 
+Connects to a SharePoint Online tenant admin site
+
 ```sh
 spo connect https://contoso-admin.sharepoint.com
 ```
 
-connects to a SharePoint Online tenant admin site
+Connect to a SharePoint Online tenant admin site in debug mode including detailed debug information in the console output
 
 ```sh
 spo connect --debug https://contoso-admin.sharepoint.com
 ```
 
-connects to a SharePoint Online tenant admin site in debug mode including detailed debug information in the console output
+Connect to a regular SharePoint Online site
 
 ```sh
 spo connect https://contoso.sharepoint.com/sites/team
 ```
-
-connects to a regular SharePoint Online site

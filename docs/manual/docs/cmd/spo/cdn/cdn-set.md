@@ -38,17 +38,17 @@ disable it.
 
 ## Examples
 
+Enable the Office 365 Public CDN on the current tenant
+
 ```sh
 spo cdn set -t Public -e true
 ```
 
-enables the Office 365 Public CDN on the current tenant
+Disable the Office 365 Public CDN on the current tenant
 
 ```sh
 spo cdn set -t Public -e false
 ```
-
-disables the Office 365 Public CDN on the current tenant
 
 ## More information
 

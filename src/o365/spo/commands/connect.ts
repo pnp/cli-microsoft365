@@ -208,15 +208,15 @@ Authenticating with SharePoint Online at ${args.url}...
 
   Examples:
   
-    ${chalk.grey(config.delimiter)} ${commands.CONNECT} https://contoso-admin.sharepoint.com
-      connects to a SharePoint Online tenant admin site
+    Connect to a SharePoint Online tenant admin site
+      ${chalk.grey(config.delimiter)} ${commands.CONNECT} https://contoso-admin.sharepoint.com
 
-    ${chalk.grey(config.delimiter)} ${commands.CONNECT} --debug https://contoso-admin.sharepoint.com
-      connects to a SharePoint Online tenant admin site in debug mode including
-      detailed debug information in the console output
+    Connect to a SharePoint Online tenant admin site in debug mode including
+    detailed debug information in the console output
+      ${chalk.grey(config.delimiter)} ${commands.CONNECT} --debug https://contoso-admin.sharepoint.com
       
-    ${chalk.grey(config.delimiter)} ${commands.CONNECT} https://contoso.sharepoint.com/sites/team
-      connects to a regular SharePoint Online site
+    Connect to a regular SharePoint Online site
+      ${chalk.grey(config.delimiter)} ${commands.CONNECT} https://contoso.sharepoint.com/sites/team
 `);
     }
   }

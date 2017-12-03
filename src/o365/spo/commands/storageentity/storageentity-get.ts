@@ -112,8 +112,8 @@ class SpoStorageEntityGetCommand extends SpoCommand {
 
   Examples:
   
-    ${chalk.grey(config.delimiter)} ${commands.STORAGEENTITY_GET} -k AnalyticsId
-      show the value, description and comment of the ${chalk.grey('AnalyticsId')} tenant property
+    Show the value, description and comment of the ${chalk.grey('AnalyticsId')} tenant property
+      ${chalk.grey(config.delimiter)} ${commands.STORAGEENTITY_GET} -k AnalyticsId
 
   More information:
 

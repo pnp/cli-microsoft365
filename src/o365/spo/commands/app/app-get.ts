@@ -113,9 +113,9 @@ class AppGetCommand extends SpoCommand {
    
   Examples:
   
-    ${chalk.grey(config.delimiter)} ${commands.APP_GET} -i b2307a39-e878-458b-bc90-03bc578531d6
-      Returns details about the app with ID 'b2307a39-e878-458b-bc90-03bc578531d6'
-      available in the tenant app catalog.
+    Return details about the app with ID ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
+    available in the tenant app catalog.
+      ${chalk.grey(config.delimiter)} ${commands.APP_GET} -i b2307a39-e878-458b-bc90-03bc578531d6
 
   More information:
   

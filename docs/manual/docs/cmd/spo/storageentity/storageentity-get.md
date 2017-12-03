@@ -30,11 +30,11 @@ Tenant properties are stored in the app catalog site associated with the site to
 
 ## Examples
 
+Show the value, description and comment of the _AnalyticsId_ tenant property
+
 ```sh
 spo storageentity get -k AnalyticsId
 ```
-
-show the value, description and comment of the _AnalyticsId_ tenant property
 
 ## More information
 

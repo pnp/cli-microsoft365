@@ -36,18 +36,17 @@ If you specify the URL of a site different than the app catalog, you will get an
 
 ## Examples
 
+Remove the _AnalyticsId_ tenant property. Yields a confirmation prompt before actually removing the property
+
 ```sh
 spo storageentity remove -k AnalyticsId -u https://contoso.sharepoint.com/sites/appcatalog
 ```
 
-remove the AnalyticsId tenant property. Yields a confirmation prompt before actually
-removing the property
+Remove the _AnalyticsId_ tenant property. Suppresses the confirmation prompt
 
 ```sh
 spo storageentity remove -k AnalyticsId --confirm -u https://contoso.sharepoint.com/sites/appcatalog
 ```
-
-remove the AnalyticsId tenant property. Suppresses the confirmation prompt
 
 ## More information
 

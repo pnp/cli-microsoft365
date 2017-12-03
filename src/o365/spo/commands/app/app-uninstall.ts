@@ -169,13 +169,13 @@ class AppUninstallCommand extends SpoCommand {
    
   Examples:
   
-    ${chalk.grey(config.delimiter)} ${commands.APP_UNINSTALL} -i b2307a39-e878-458b-bc90-03bc578531d6 -s https://contoso.sharepoint.com
-      Uninstalls the app with ID ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
-      from the ${chalk.grey('https://contoso.sharepoint.com')} site.
+    Uninstall the app with ID ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
+    from the ${chalk.grey('https://contoso.sharepoint.com')} site.
+      ${chalk.grey(config.delimiter)} ${commands.APP_UNINSTALL} -i b2307a39-e878-458b-bc90-03bc578531d6 -s https://contoso.sharepoint.com
 
-    ${chalk.grey(config.delimiter)} ${commands.APP_UNINSTALL} -i b2307a39-e878-458b-bc90-03bc578531d6 -s https://contoso.sharepoint.com --confirm
-      Uninstalls the app with ID ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
-      from the ${chalk.grey('https://contoso.sharepoint.com')} site without prompting for confirmation.
+    Uninstall the app with ID ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
+    from the ${chalk.grey('https://contoso.sharepoint.com')} site without prompting for confirmation.
+      ${chalk.grey(config.delimiter)} ${commands.APP_UNINSTALL} -i b2307a39-e878-458b-bc90-03bc578531d6 -s https://contoso.sharepoint.com --confirm
 
   More information:
   

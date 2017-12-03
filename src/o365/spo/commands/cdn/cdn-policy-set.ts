@@ -184,8 +184,8 @@ class SpoCdnPolicySetCommand extends SpoCommand {
 
   Examples:
   
-    ${chalk.grey(config.delimiter)} ${commands.CDN_POLICY_SET} -t Public -p IncludeFileExtensions -v CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON
-      sets the list of extensions supported by the Public CDN
+    Set the list of extensions supported by the Public CDN
+      ${chalk.grey(config.delimiter)} ${commands.CDN_POLICY_SET} -t Public -p IncludeFileExtensions -v CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON
 
   More information:
 

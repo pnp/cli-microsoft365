@@ -153,11 +153,11 @@ class SpoCdnOriginListCommand extends SpoCommand {
 
   Examples:
   
-    ${chalk.grey(config.delimiter)} ${commands.CDN_ORIGIN_LIST}
-      shows the list of origins configured for the Public CDN
+    Show the list of origins configured for the Public CDN
+      ${chalk.grey(config.delimiter)} ${commands.CDN_ORIGIN_LIST}
 
-    ${chalk.grey(config.delimiter)} ${commands.CDN_ORIGIN_LIST} -t Private
-      shows the list of origins configured for the Private CDN
+    Show the list of origins configured for the Private CDN
+      ${chalk.grey(config.delimiter)} ${commands.CDN_ORIGIN_LIST} -t Private
 
   More information:
 

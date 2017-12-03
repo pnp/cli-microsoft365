@@ -33,17 +33,17 @@ the Public (default) or Private CDN. If you don't use the option, the command wi
 
 ## Examples
 
+Show the list of origins configured for the Public CDN
+
 ```sh
 spo cdn origin list
 ```
 
-shows the list of origins configured for the Public CDN
+Show the list of origins configured for the Private CDN
 
 ```sh
 spo cdn origin list -t Private
 ```
-
-shows the list of origins configured for the Private CDN
 
 ## More information
 

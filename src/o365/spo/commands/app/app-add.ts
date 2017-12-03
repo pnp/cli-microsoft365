@@ -161,11 +161,11 @@ class SpoAppAddCommand extends SpoCommand {
 
   Examples:
   
-    ${chalk.grey(config.delimiter)} ${commands.APP_ADD} -p /Users/pnp/spfx/sharepoint/solution/spfx.sppkg
-      Adds package ${chalk.grey('spfx.sppkg')} to the tenant app catalog
+    Add the ${chalk.grey('spfx.sppkg')} package to the tenant app catalog
+      ${chalk.grey(config.delimiter)} ${commands.APP_ADD} -p /Users/pnp/spfx/sharepoint/solution/spfx.sppkg
 
-    ${chalk.grey(config.delimiter)} ${commands.APP_ADD} -p sharepoint/solution/spfx.sppkg --overwrite
-      Overwrites the package ${chalk.grey('spfx.sppkg')} in the tenant app catalog with the newer version
+    Overwrite the ${chalk.grey('spfx.sppkg')} package in the tenant app catalog with the newer version
+      ${chalk.grey(config.delimiter)} ${commands.APP_ADD} -p sharepoint/solution/spfx.sppkg --overwrite
 
   More information:
 

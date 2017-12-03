@@ -28,11 +28,11 @@ To upgrade an app in the site, you have to first connect to a SharePoint site us
 
 ## Examples
 
+Upgrade the app with ID _b2307a39-e878-458b-bc90-03bc578531d6_ in the _https://contoso.sharepoint.com_ site.
+
 ```sh
 spo app upgrade -i b2307a39-e878-458b-bc90-03bc578531d6 -s https://contoso.sharepoint.com
 ```
-
-Upgrades the app with ID _b2307a39-e878-458b-bc90-03bc578531d6_ in the _https://contoso.sharepoint.com_ site.
 
 ## More information
 

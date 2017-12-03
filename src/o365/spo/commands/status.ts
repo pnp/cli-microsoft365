@@ -64,8 +64,8 @@ ${chalk.grey('Expires at:')}       ${expiresAtDate}
 
   Examples:
   
-    ${chalk.grey(config.delimiter)} ${commands.STATUS}
-      shows the information about the current connection to SharePoint Online
+    Show the information about the current connection to SharePoint Online
+      ${chalk.grey(config.delimiter)} ${commands.STATUS}
 `);
     };
   }
