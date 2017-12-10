@@ -25,6 +25,7 @@ pages:
         - cdn policy set: 'cmd/spo/cdn/cdn-policy-set.md'
       - customaction:
         - customaction get: 'cmd/spo/customaction/customaction-get.md'
+        - customaction list: 'cmd/spo/customaction/customaction-list.md'
       - storageentity:
         - storageentity get: 'cmd/spo/storageentity/storageentity-get.md'
         - storageentity list: 'cmd/spo/storageentity/storageentity-list.md'
