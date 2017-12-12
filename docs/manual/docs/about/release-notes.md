@@ -1,5 +1,11 @@
 # Release notes
 
+## v0.4.0
+
+### Changes
+
+- added support for persisting connection [#46](https://github.com/SharePoint/office365-cli/issues/46)
+
 ## v0.3.0
 
 ### New commands
