@@ -13,8 +13,10 @@ describe(commands.DISCONNECT, () => {
   let cmdInstance: any;
   let trackEvent: any;
   let telemetry: any;
+  let authClearSiteConnectionInfoStub: sinon.SinonStub;
 
   before(() => {
+    authClearSiteConnectionInfoStub = sinon.stub(auth, 'clearSiteConnectionInfo').callsFake(() => Promise.resolve());
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
       telemetry = t;
     });
@@ -105,6 +107,21 @@ describe(commands.DISCONNECT, () => {
     });
   });
 
+  it('clears persisted connection info when disconnecting', (done) => {
+    auth.site = new Site();
+    auth.site.connected = true;
+    cmdInstance.action = disconnectCommand.action();
+    cmdInstance.action({ options: { debug: true } }, () => {
+      try {
+        assert(authClearSiteConnectionInfoStub.called);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('has help referring to the right command', () => {
     const _helpLog: string[] = [];
     const helpLog = (msg: string) => { _helpLog.push(msg); }
@@ -132,5 +149,46 @@ describe(commands.DISCONNECT, () => {
     });
     assert(containsExamples);
     Utils.restore(vorpal.find);
+  });
+
+  it('correctly handles error while clearing persisted connection info', (done) => {
+    Utils.restore(auth.clearSiteConnectionInfo);
+    sinon.stub(auth, 'clearSiteConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
+    auth.site = new Site();
+    const disconnectSpy = sinon.spy(auth.site, 'disconnect');
+    auth.site.connected = true;
+    cmdInstance.action = disconnectCommand.action();
+    cmdInstance.action({ options: { debug: false } }, () => {
+      try {
+        assert(disconnectSpy.called);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(auth.clearSiteConnectionInfo);
+      }
+    });
+  });
+
+  it('correctly handles error while clearing persisted connection info (debug)', (done) => {
+    sinon.stub(auth, 'clearSiteConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
+    auth.site = new Site();
+    const disconnectSpy = sinon.spy(auth.site, 'disconnect');
+    auth.site.connected = true;
+    cmdInstance.action = disconnectCommand.action();
+    cmdInstance.action({ options: { debug: true } }, () => {
+      try {
+        assert(disconnectSpy.called);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(auth.clearSiteConnectionInfo);
+      }
+    });
   });
 });

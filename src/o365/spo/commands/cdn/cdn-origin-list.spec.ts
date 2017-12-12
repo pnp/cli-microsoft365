@@ -18,6 +18,7 @@ describe(commands.CDN_ORIGIN_LIST, () => {
   let telemetry: any;
 
   before(() => {
+    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
       telemetry = t;
@@ -47,7 +48,8 @@ describe(commands.CDN_ORIGIN_LIST, () => {
   after(() => {
     Utils.restore([
       appInsights.trackEvent,
-      auth.ensureAccessToken
+      auth.ensureAccessToken,
+      auth.restoreAuth
     ]);
   });
 

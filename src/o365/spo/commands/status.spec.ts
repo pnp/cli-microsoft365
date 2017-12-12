@@ -1,5 +1,5 @@
 import commands from '../commands';
-import Command, { CommandHelp } from '../../../Command';
+import Command, { CommandHelp, CommandError } from '../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
 import auth, { Site } from '../SpoAuth';
@@ -15,6 +15,7 @@ describe(commands.STATUS, () => {
   let telemetry: any;
 
   before(() => {
+    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
       telemetry = t;
     });
@@ -37,7 +38,10 @@ describe(commands.STATUS, () => {
   });
 
   after(() => {
-    Utils.restore(appInsights.trackEvent);
+    Utils.restore([
+      appInsights.trackEvent,
+      auth.restoreAuth
+    ]);
   });
 
   it('has correct name', () => {
@@ -270,6 +274,22 @@ describe(commands.STATUS, () => {
       });
       try {
         assert(reportsCorrectValue);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly handles error when restoring auth', (done) => {
+    Utils.restore(auth.restoreAuth);
+    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
+    const cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    cmdInstance.action = statusCommand.action();
+    cmdInstance.action({options:{}}, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {

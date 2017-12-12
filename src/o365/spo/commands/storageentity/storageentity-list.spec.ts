@@ -17,6 +17,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
   let telemetry: any;
 
   before(() => {
+    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
       telemetry = t;
@@ -46,6 +47,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
   after(() => {
     Utils.restore([
       appInsights.trackEvent,
+      auth.restoreAuth,
       auth.getAccessToken
     ]);
   });

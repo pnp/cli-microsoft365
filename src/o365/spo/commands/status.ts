@@ -2,7 +2,7 @@ import auth from '../SpoAuth';
 import config from '../../../config';
 import commands from '../commands';
 import Command, {
-  CommandHelp
+  CommandHelp, CommandError
 } from '../../../Command';
 
 const vorpal: Vorpal = require('../../../vorpal-init');
@@ -19,36 +19,43 @@ class SpoStatusCommand extends Command {
   public commandAction(cmd: CommandInstance, args: {}, cb: () => void): void {
     const chalk: any = vorpal.chalk;
 
-    if (auth.site.connected) {
-      const expiresAtDate: Date = new Date(0);
-      expiresAtDate.setUTCSeconds(auth.service.expiresAt);
+    auth
+      .restoreAuth()
+      .then((): void => {
+        if (auth.site.connected) {
+          const expiresAtDate: Date = new Date(0);
+          expiresAtDate.setUTCSeconds(auth.service.expiresAt);
 
-      if (this.verbose) {
-        cmd.log(`Connected to ${auth.site.url}`);
-      }
-      else {
-        cmd.log(auth.site.url);
-      }
+          if (this.verbose) {
+            cmd.log(`Connected to ${auth.site.url}`);
+          }
+          else {
+            cmd.log(auth.site.url);
+          }
 
-      if (this.debug) {
-        cmd.log(`
-${chalk.grey('Is tenant admin:')}  ${auth.site.isTenantAdminSite()}
-${chalk.grey('AAD resource:')}     ${auth.service.resource}
-${chalk.grey('Access token:')}     ${auth.service.accessToken}
-${chalk.grey('Refresh token:')}    ${auth.service.refreshToken}
-${chalk.grey('Expires at:')}       ${expiresAtDate}
-`);
-      }
-    }
-    else {
-      if (this.verbose) {
-        cmd.log('Not connected to SharePoint Online');        
-      }
-      else {
-        cmd.log('Not connected');
-      }
-    }
-    cb();
+          if (this.debug) {
+            cmd.log(`
+  ${chalk.grey('Is tenant admin:')}  ${auth.site.isTenantAdminSite()}
+  ${chalk.grey('AAD resource:')}     ${auth.service.resource}
+  ${chalk.grey('Access token:')}     ${auth.service.accessToken}
+  ${chalk.grey('Refresh token:')}    ${auth.service.refreshToken}
+  ${chalk.grey('Expires at:')}       ${expiresAtDate}
+  `);
+          }
+        }
+        else {
+          if (this.verbose) {
+            cmd.log('Not connected to SharePoint Online');
+          }
+          else {
+            cmd.log('Not connected');
+          }
+        }
+        cb();
+      }, (error: any): void => {
+        cmd.log(new CommandError(error));
+        cb();
+      });
   }
 
   public help(): CommandHelp {

@@ -22,8 +22,6 @@ interface CommandArgs {
   options: GlobalOptions;
 }
 
-const CONNECTION_SUCCEEDED: string = 'connection_succeeded';
-
 class SpoConnectCommand extends Command {
   public get name(): string {
     return `${commands.CONNECT} <url>`;
@@ -42,129 +40,152 @@ class SpoConnectCommand extends Command {
 
     // disconnect before re-connecting
     if (this.debug) {
-      cmd.log(`
-Disconnecting from SPO...
-`);
-    }
-    auth.site.disconnect();
-
-    if (this.verbose) {
-      cmd.log(`
-Authenticating with SharePoint Online at ${args.url}...
-`);
+      cmd.log(`Disconnecting from SPO...`);
     }
 
-    const resource = Auth.getResourceFromUrl(args.url);
+    const disconnect: () => void = (): void => {
+      auth.site.disconnect();
+      if (this.verbose) {
+        cmd.log(chalk.green('DONE'));
+      }
+    }
+
+    const connect: () => void = (): void => {
+      if (this.verbose) {
+        cmd.log(`Authenticating with SharePoint Online at ${args.url}...`);
+      }
+
+      const resource = Auth.getResourceFromUrl(args.url);
+      auth.site.url = args.url;
+
+      if (auth.site.isTenantAdminSite()) {
+        auth
+          .ensureAccessToken(resource, cmd, args.options.debug)
+          .then((accessToken: string): Promise<ContextInfo> => {
+            auth.service.resource = resource;
+            auth.site.url = args.url;
+            if (this.verbose) {
+              cmd.log(chalk.green('DONE'));
+            }
+
+            const requestDigestRequestOptions: any = {
+              url: `${auth.site.url}/_api/contextinfo`,
+              headers: Utils.getRequestHeaders({
+                authorization: `Bearer ${accessToken}`,
+                accept: 'application/json;odata=nometadata'
+              }),
+              json: true
+            };
+
+            if (this.debug) {
+              cmd.log(`${auth.site.url} is a tenant admin site. Get tenant information...`);
+              cmd.log('');
+              cmd.log('Executing web request:');
+              cmd.log(requestDigestRequestOptions);
+              cmd.log('');
+            }
+
+            return request.post(requestDigestRequestOptions);
+          })
+          .then((res: ContextInfo): Promise<string> => {
+            if (this.debug) {
+              cmd.log('Response:');
+              cmd.log(res);
+              cmd.log('');
+            }
+
+            const tenantInfoRequestOptions = {
+              url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+              headers: Utils.getRequestHeaders({
+                authorization: `Bearer ${auth.site.accessToken}`,
+                'X-RequestDigest': res.FormDigestValue,
+                accept: 'application/json;odata=nometadata'
+              }),
+              body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
+            };
+
+            if (this.verbose) {
+              cmd.log('Retrieving tenant admin site information...');
+            }
+
+            if (this.debug) {
+              cmd.log('Executing web request:');
+              cmd.log(tenantInfoRequestOptions);
+              cmd.log('');
+            }
+
+            return request.post(tenantInfoRequestOptions);
+          })
+          .then((res: string): Promise<void> => {
+            if (this.debug) {
+              cmd.log('Response:');
+              cmd.log(res);
+              cmd.log('');
+            }
+
+            const json: string[] = JSON.parse(res);
+
+            auth.site.tenantId = (json[json.length - 1] as any)._ObjectIdentity_.replace('\n', '&#xA;');
+            auth.site.connected = true;
+            return auth.storeSiteConnectionInfo();
+          })
+          .then((): void => {
+            if (this.verbose) {
+              cmd.log(chalk.green('DONE'));
+              cmd.log(`Successfully connected to ${args.url}`);
+            }
+            cb();
+          }, (rej: Error): void => {
+            if (this.debug) {
+              cmd.log('Error:');
+              cmd.log(rej);
+              cmd.log('');
+            }
+
+            cmd.log(new CommandError(rej.message));
+            cb();
+            return;
+          });
+      }
+      else {
+        auth
+          .ensureAccessToken(resource, cmd, args.options.debug)
+          .then((accessToken: string): Promise<void> => {
+            auth.service.resource = resource;
+            if (this.verbose) {
+              cmd.log(chalk.green('DONE'));
+            }
+
+            auth.site.connected = true;
+            return auth.storeSiteConnectionInfo();
+          })
+          .then((): void => {
+            cb();
+          }, (rej: Error): void => {
+            if (this.debug) {
+              cmd.log('Error:');
+              cmd.log(rej);
+              cmd.log('');
+            }
+
+            cmd.log(new CommandError(rej.message));
+            cb();
+          });
+      }
+    }
 
     auth
-      .ensureAccessToken(resource, cmd, args.options.debug)
-      .then((accessToken: string): Promise<ContextInfo> => {
-        auth.service.resource = resource;
-        auth.site.url = args.url;
-        if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
-        }
-
+      .clearSiteConnectionInfo()
+      .then((): void => {
+        disconnect();
+        connect();
+      }, (error: any): void => {
         if (this.debug) {
-          cmd.log(`Checking if ${auth.site.url} is a tenant admin site...`);
-        }
-        if (auth.site.isTenantAdminSite()) {
-          const requestDigestRequestOptions: any = {
-            url: `${auth.site.url}/_api/contextinfo`,
-            headers: Utils.getRequestHeaders({
-              authorization: `Bearer ${accessToken}`,
-              accept: 'application/json;odata=nometadata'
-            }),
-            json: true
-          };
-
-          if (this.debug) {
-            cmd.log(`${auth.site.url} is a tenant admin site. Get tenant information...`);
-            cmd.log('');
-            cmd.log('Executing web request:');
-            cmd.log(requestDigestRequestOptions);
-            cmd.log('');
-          }
-
-          return request.post(requestDigestRequestOptions);
-        }
-        else {
-          if (this.debug) {
-            cmd.log(`${auth.site.url} is not a tenant admin site`);
-            cmd.log('');
-          }
-
-          auth.site.connected = true;
-          if (this.verbose) {
-            cmd.log(`Successfully connected to ${args.url}`);
-          }
-          cb();
-          throw CONNECTION_SUCCEEDED;
-        }
-      })
-      .then((res: ContextInfo): Promise<string> => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
+          cmd.log(new CommandError(error));
         }
 
-        const tenantInfoRequestOptions = {
-          url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
-          headers: Utils.getRequestHeaders({
-            authorization: `Bearer ${auth.site.accessToken}`,
-            'X-RequestDigest': res.FormDigestValue,
-            accept: 'application/json;odata=nometadata'
-          }),
-          body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
-        };
-
-        if (this.verbose) {
-          cmd.log('Retrieving tenant admin site information...');
-        }
-
-        if (this.debug) {
-          cmd.log('Executing web request:');
-          cmd.log(tenantInfoRequestOptions);
-          cmd.log('');
-        }
-
-        return request.post(tenantInfoRequestOptions);
-      })
-      .then((res: string): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
-        const json: string[] = JSON.parse(res);
-
-        auth.site.tenantId = (json[json.length - 1] as any)._ObjectIdentity_.replace('\n', '&#xA;');
-        auth.site.connected = true;
-        if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
-          cmd.log(`Successfully connected to ${args.url}
-`);
-        }
-        cb();
-      }, (rej: Error | string): void => {
-        if (rej instanceof Error) {
-          if (this.debug) {
-            cmd.log('Error:');
-            cmd.log(rej);
-            cmd.log('');
-          }
-
-          cmd.log(new CommandError(rej.message));
-          cb();
-          return;
-        }
-        else {
-          if (this.debug) {
-            cmd.log('Early exit of a promise chain');
-          }
-        }
+        disconnect();
+        connect();
       });
   }
 

@@ -74,6 +74,7 @@ export default abstract class Command {
         name: cmd.getCommandName(),
         properties: cmd.getTelemetryProperties(args)
       });
+      appInsights.flush();
 
       cmd.commandAction(this, args, cb);
     }
@@ -194,7 +195,7 @@ export default abstract class Command {
       cmd.log(new CommandError(rawResponse.message));
     }
     else {
-      cmd.log(new CommandError(rawResponse));          
+      cmd.log(new CommandError(rawResponse));
     }
   }
 
