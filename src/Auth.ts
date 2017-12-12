@@ -1,5 +1,10 @@
 import * as request from 'request-promise-native';
 import Utils from './Utils';
+import * as os from 'os';
+import { TokenStorage } from './auth/TokenStorage';
+import { KeychainTokenStorage } from './auth/KeychainTokenStorage';
+import { WindowsTokenStorage } from './auth/WindowsTokenStorage';
+import { FileTokenStorage } from './auth/FileTokenStorage';
 
 export abstract class Service {
   connected: boolean;
@@ -36,7 +41,7 @@ interface DeviceCode {
   message: string;
 }
 
-interface Logger {
+export interface Logger {
   log: (msg: any) => void
 }
 
@@ -44,6 +49,10 @@ export default class Auth {
   public interval: NodeJS.Timer;
 
   constructor(public service: Service, private appId?: string) {
+  }
+
+  public restoreAuth(): Promise<void> {
+    return Promise.resolve();
   }
 
   public ensureAccessToken(resource: string, stdout: Logger, debug: boolean = false): Promise<string> {
@@ -101,7 +110,6 @@ export default class Auth {
             this.service.refreshToken = json.refresh_token;
             this.service.expiresAt = json.expires_on;
             resolve(json.access_token);
-            return;
           }, (json: Error): void => {
             if (debug) {
               stdout.log('Response:');
@@ -250,5 +258,46 @@ export default class Auth {
     }
 
     return resource;
+  }
+
+  protected getServiceConnectionInfo<TConn>(service: string): Promise<TConn> {
+    return new Promise<TConn>((resolve: (connectionInfo: TConn) => void, reject: (error: any) => void): void => {
+      const tokenStorage = this.getTokenStorage();
+      tokenStorage
+        .get(service)
+        .then((json: string): void => {
+          resolve(JSON.parse(json));
+        }, (error: any): void => {
+          reject(error);
+        })
+    });
+  }
+
+  protected setServiceConnectionInfo<TConn>(service: string, connectionInfo: TConn): Promise<void> {
+    const tokenStorage = this.getTokenStorage();
+    return tokenStorage.set(service, JSON.stringify(connectionInfo));
+  }
+
+  protected clearServiceConnectionInfo(service: string): Promise<void> {
+    const tokenStorage = this.getTokenStorage();
+    return tokenStorage.remove(service);
+  }
+
+  public getTokenStorage(): TokenStorage {
+    const platform: NodeJS.Platform = os.platform();
+    let tokenStorage: TokenStorage;
+    switch (platform) {
+      case 'darwin':
+        tokenStorage = new KeychainTokenStorage();
+        break;
+      case 'win32':
+        tokenStorage = new WindowsTokenStorage();
+        break;
+      default:
+        tokenStorage = new FileTokenStorage();
+        break;
+    }
+
+    return tokenStorage;
   }
 }

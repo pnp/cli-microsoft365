@@ -2,7 +2,7 @@ import auth from '../SpoAuth';
 import commands from '../commands';
 import config from '../../../config';
 import Command, {
-  CommandHelp,
+  CommandHelp, CommandError,
 } from '../../../Command';
 import appInsights from '../../../appInsights';
 
@@ -25,11 +25,26 @@ class SpoDisconnectCommand extends Command {
     if (this.verbose) {
       cmd.log('Disconnecting from SharePoint Online...');
     }
-    auth.site.disconnect();
-    if (this.verbose) {
-      cmd.log(chalk.green('DONE'));
+
+    const disconnect: () => void = (): void => {
+      auth.site.disconnect();
+      if (this.verbose) {
+        cmd.log(chalk.green('DONE'));
+      }
+      cb();
     }
-    cb();
+
+    auth
+      .clearSiteConnectionInfo()
+      .then((): void => {
+        disconnect();
+      }, (error: any): void => {
+        if (this.debug) {
+          cmd.log(new CommandError(error));
+        }
+
+        disconnect();
+      });
   }
 
   public help(): CommandHelp {

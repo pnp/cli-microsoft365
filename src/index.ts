@@ -43,12 +43,16 @@ fs.realpath(__dirname, (err: NodeJS.ErrnoException, resolvedPath: string): void 
       cb();
     });
 
-  vorpal.parse(process.argv);
+  vorpal.pipe((stdout: any): any => {
+    return Utils.logOutput(stdout);
+  });
 
+  const v: Vorpal = vorpal.parse(process.argv);
+
+  // if no command has been passed/match, run immersive mode
+  if (!v._command) {
   vorpal
     .delimiter(chalk.red(config.delimiter))
-    .pipe((stdout: any): any => {
-      return Utils.logOutput(stdout);
-    })
     .show();
+  }
 });

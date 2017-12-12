@@ -3,8 +3,42 @@ import * as assert from 'assert';
 import Utils from './Utils';
 import * as request from 'request-promise-native';
 import Auth, { Service } from './Auth';
+import * as os from 'os';
+import { KeychainTokenStorage } from './auth/KeychainTokenStorage';
+import { WindowsTokenStorage } from './auth/WindowsTokenStorage';
+import { FileTokenStorage } from './auth/FileTokenStorage';
+import { TokenStorage } from './auth/TokenStorage';
+import { fail } from 'assert';
 
 class MockService extends Service {
+}
+
+class MockAuth extends Auth {
+  public getConnectionInfo(): Promise<MockService> {
+    return this.getServiceConnectionInfo('mock');
+  }
+
+  public setConnectionInfo(): Promise<void> {
+    return this.setServiceConnectionInfo('mock', {});
+  }
+
+  public clearConnectionInfo(): Promise<void> {
+    return this.clearServiceConnectionInfo('mock');    
+  }
+}
+
+class MockTokenStorage implements TokenStorage {
+  public get(service: string): Promise<string> {
+    return Promise.resolve('ABC');
+  }
+
+  public set(service: string): Promise<void> {
+    return Promise.resolve();
+  }
+
+  public remove(service: string): Promise<void> {
+    return Promise.resolve();
+  }
 }
 
 describe('Auth', () => {
@@ -573,6 +607,143 @@ describe('Auth', () => {
         }
         else {
           done(err);
+        }
+      });
+  });
+
+  it('configures KeychainTokenStorage as token storage when OS is macOS', (done) => {
+    sinon.stub(os, 'platform').callsFake(() => 'darwin');
+    const actual = auth.getTokenStorage();
+    try {
+      assert(actual instanceof KeychainTokenStorage);
+      done();
+    }
+    catch (e) {
+      done(e);
+    }
+    finally {
+      Utils.restore(os.platform);
+    }
+  });
+
+  it('configures WindowsTokenStorage as token storage when OS is Windows', (done) => {
+    sinon.stub(os, 'platform').callsFake(() => 'win32');
+    const actual = auth.getTokenStorage();
+    try {
+      assert(actual instanceof WindowsTokenStorage);
+      done();
+    }
+    catch (e) {
+      done(e);
+    }
+    finally {
+      Utils.restore(os.platform);
+    }
+  });
+
+  it('configures FileTokenStorage as token storage when OS is Linux', (done) => {
+    sinon.stub(os, 'platform').callsFake(() => 'linux');
+    const actual = auth.getTokenStorage();
+    try {
+      assert(actual instanceof FileTokenStorage);
+      done();
+    }
+    catch (e) {
+      done(e);
+    }
+    finally {
+      Utils.restore(os.platform);
+    }
+  });
+
+  it('restores authentication', (done) => {
+    auth
+      .restoreAuth()
+      .then(() => {
+        done();
+      }, (err) => {
+        done(err);
+      });
+  });
+
+  it('retrieves connection information from the configured token storage', (done) => {
+    const mockStorage = new MockTokenStorage();
+    sinon.stub(mockStorage, 'get').callsFake(() => Promise.resolve(JSON.stringify({
+      connected: true,
+      resource: 'https://contoso.sharepoint.com'
+    })));
+    const mockAuth = new MockAuth(new MockService());
+    sinon.stub(mockAuth, 'getTokenStorage').callsFake(() => mockStorage);
+
+    mockAuth
+      .getConnectionInfo()
+      .then((service: MockService) => {
+        try {
+          assert.equal(service.connected, true);
+          assert.equal(service.resource, 'https://contoso.sharepoint.com');
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
+  });
+
+  it('correctly handles error when retrieving connection information from the configured token storage', (done) => {
+    const mockStorage = new MockTokenStorage();
+    sinon.stub(mockStorage, 'get').callsFake(() => Promise.reject('An error has occurred'));
+    const mockAuth = new MockAuth(new MockService());
+    sinon.stub(mockAuth, 'getTokenStorage').callsFake(() => mockStorage);
+
+    mockAuth
+      .getConnectionInfo()
+      .then((service: MockService) => {
+        fail('Expected failure but passed');
+      }, (error: any) => {
+        try {
+          assert.equal(error, 'An error has occurred');
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
+  });
+
+  it('stores connection information in the configured token storage', (done) => {
+    const mockStorage = new MockTokenStorage();
+    const mockStorageGetStub = sinon.stub(mockStorage, 'set').callsFake(() => Promise.resolve());
+    const mockAuth = new MockAuth(new MockService());
+    sinon.stub(mockAuth, 'getTokenStorage').callsFake(() => mockStorage);
+
+    mockAuth
+      .setConnectionInfo()
+      .then(() => {
+        try {
+          assert(mockStorageGetStub.called);
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
+  });
+
+  it('clears connection information in the configured token storage', (done) => {
+    const mockStorage = new MockTokenStorage();
+    const mockStorageRemoveStub = sinon.stub(mockStorage, 'remove').callsFake(() => Promise.resolve());
+    const mockAuth = new MockAuth(new MockService());
+    sinon.stub(mockAuth, 'getTokenStorage').callsFake(() => mockStorage);
+
+    mockAuth
+      .clearConnectionInfo()
+      .then(() => {
+        try {
+          assert(mockStorageRemoveStub.called);
+          done();
+        }
+        catch (e) {
+          done(e);
         }
       });
   });

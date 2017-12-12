@@ -18,7 +18,10 @@ describe(commands.CONNECT, () => {
   let telemetry: any;
 
   before(() => {
+    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
+    sinon.stub(auth, 'clearSiteConnectionInfo').callsFake(() => Promise.resolve());
+    sinon.stub(auth, 'storeSiteConnectionInfo').callsFake(() => Promise.resolve());
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
       telemetry = t;
     });
@@ -72,6 +75,9 @@ describe(commands.CONNECT, () => {
     Utils.restore([
       appInsights.trackEvent,
       auth.ensureAccessToken,
+      auth.restoreAuth,
+      auth.clearSiteConnectionInfo,
+      auth.storeSiteConnectionInfo,
       request.post
     ]);
   });
@@ -226,7 +232,7 @@ describe(commands.CONNECT, () => {
     Utils.restore(vorpal.find);
   });
 
-  it('correctly handles lack of valid access token', (done) => {
+  it('correctly handles lack of valid access token when connecting to a tenant-admin site', (done) => {
     Utils.restore(auth.ensureAccessToken);
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
     auth.site = new Site();
@@ -242,7 +248,7 @@ describe(commands.CONNECT, () => {
     });
   });
 
-  it('correctly handles lack of valid access token (debug)', (done) => {
+  it('correctly handles lack of valid access token when connecting to a tenant-admin site (debug)', (done) => {
     Utils.restore(auth.ensureAccessToken);
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
     auth.site = new Site();
@@ -254,6 +260,88 @@ describe(commands.CONNECT, () => {
       }
       catch (e) {
         done(e);
+      }
+      finally {
+        Utils.restore(auth.ensureAccessToken);
+      }
+    });
+  });
+
+  it('correctly handles lack of valid access token when connecting to a regular site', (done) => {
+    Utils.restore(auth.ensureAccessToken);
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
+    auth.site = new Site();
+    cmdInstance.action = connectCommand.action();
+    cmdInstance.action({ options: { debug: false }, url: 'https://contoso.sharepoint.com' }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly handles lack of valid access token when connecting to a regular site (debug)', (done) => {
+    Utils.restore(auth.ensureAccessToken);
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
+    auth.site = new Site();
+    cmdInstance.action = connectCommand.action();
+    cmdInstance.action({ options: { debug: true }, url: 'https://contoso.sharepoint.com' }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(auth.ensureAccessToken);
+      }
+    });
+  });
+
+  it('correctly handles error when clearing persisted auth information', (done) => {
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve('ABC'));
+    Utils.restore(auth.clearSiteConnectionInfo);
+    sinon.stub(auth, 'clearSiteConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
+    cmdInstance.action = connectCommand.action();
+    cmdInstance.action({ options: {}, url: 'https://contoso-admin.sharepoint.com' }, () => {
+      try {
+        
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore([
+          auth.clearSiteConnectionInfo,
+          auth.ensureAccessToken
+        ]);
+      }
+    });
+  });
+
+  it('correctly handles error when clearing persisted auth information (debug)', (done) => {
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve('ABC'));
+    Utils.restore(auth.clearSiteConnectionInfo);
+    sinon.stub(auth, 'clearSiteConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
+    cmdInstance.action = connectCommand.action();
+    cmdInstance.action({ options: { debug: true }, url: 'https://contoso-admin.sharepoint.com' }, () => {
+      try {
+        
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore([
+          auth.clearSiteConnectionInfo,
+          auth.ensureAccessToken
+        ]);
       }
     });
   });

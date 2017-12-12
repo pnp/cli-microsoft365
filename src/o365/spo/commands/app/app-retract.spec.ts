@@ -20,6 +20,7 @@ describe(commands.APP_RETRACT, () => {
   let promptOptions: any;
 
   before(() => {
+    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
     sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
@@ -55,6 +56,7 @@ describe(commands.APP_RETRACT, () => {
       appInsights.trackEvent,
       auth.ensureAccessToken,
       auth.getAccessToken,
+      auth.restoreAuth,
       request.get,
       request.post
     ]);

@@ -19,6 +19,7 @@ describe(commands.APP_ADD, () => {
   let requests: any[];
 
   before(() => {
+    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
       telemetry = t;
@@ -47,6 +48,7 @@ describe(commands.APP_ADD, () => {
     Utils.restore([
       appInsights.trackEvent,
       auth.ensureAccessToken,
+      auth.restoreAuth,
       request.get
     ]);
   });
