@@ -16,6 +16,9 @@ class MockCommand extends SpoCommand {
 
   public commandAction(cmd: CommandInstance, args: {}, cb: () => void): void {
   }
+
+  public commandHelp(args: any, log: (message: string) => void): void {
+  }
 }
 
 describe('SpoCommand', () => {

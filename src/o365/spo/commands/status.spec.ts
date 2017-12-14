@@ -1,9 +1,9 @@
 import commands from '../commands';
-import Command, { CommandHelp, CommandError } from '../../../Command';
+import Command, { CommandError } from '../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
 import auth, { Site } from '../SpoAuth';
-const statusCommand: Command = require('./status');
+const command: Command = require('./status');
 import * as assert from 'assert';
 import Utils from '../../../Utils';
 
@@ -45,15 +45,15 @@ describe(commands.STATUS, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(statusCommand.name.startsWith(commands.STATUS), true);
+    assert.equal(command.name.startsWith(commands.STATUS), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(statusCommand.description, null);
+    assert.notEqual(command.description, null);
   });
 
   it('calls telemetry', (done) => {
-    cmdInstance.action = statusCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, () => {
       try {
         assert(trackEvent.called);
@@ -66,7 +66,7 @@ describe(commands.STATUS, () => {
   });
 
   it('logs correct telemetry event', (done) => {
-    cmdInstance.action = statusCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, () => {
       try {
         assert.equal(telemetry.name, commands.STATUS);
@@ -81,7 +81,7 @@ describe(commands.STATUS, () => {
   it('shows disconnected status when not connected', (done) => {
     auth.site = new Site();
     auth.site.connected = false;
-    cmdInstance.action = statusCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, () => {
       let reportsDisconnected: boolean = false;
       log.forEach(l => {
@@ -102,7 +102,7 @@ describe(commands.STATUS, () => {
   it('shows disconnected status when not connected (verbose)', (done) => {
     auth.site = new Site();
     auth.site.connected = false;
-    cmdInstance.action = statusCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { verbose: true } }, () => {
       let reportsDisconnected: boolean = false;
       log.forEach(l => {
@@ -124,7 +124,7 @@ describe(commands.STATUS, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = statusCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, () => {
       let reportsCorrectValue: boolean = false;
       log.forEach(l => {
@@ -146,7 +146,7 @@ describe(commands.STATUS, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = statusCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
       let reportsCorrectValue: boolean = false;
       log.forEach(l => {
@@ -168,7 +168,7 @@ describe(commands.STATUS, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = statusCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
       let reportsCorrectValue: boolean = false;
       log.forEach(l => {
@@ -191,7 +191,7 @@ describe(commands.STATUS, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com/sites/team';
     auth.service.resource = 'https://contoso.sharepoint.com';
-    cmdInstance.action = statusCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
       let reportsCorrectValue: boolean = false;
       log.forEach(l => {
@@ -214,7 +214,7 @@ describe(commands.STATUS, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com/sites/team';
     auth.service.accessToken = 'abc';
-    cmdInstance.action = statusCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
       let reportsCorrectValue: boolean = false;
       log.forEach(l => {
@@ -237,7 +237,7 @@ describe(commands.STATUS, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com/sites/team';
     auth.service.refreshToken = 'abc';
-    cmdInstance.action = statusCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
       let reportsCorrectValue: boolean = false;
       log.forEach(l => {
@@ -264,7 +264,7 @@ describe(commands.STATUS, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com/sites/team';
     auth.service.expiresAt = date.getUTCSeconds();
-    cmdInstance.action = statusCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
       let reportsCorrectValue: boolean = false;
       log.forEach(l => {
@@ -286,7 +286,7 @@ describe(commands.STATUS, () => {
     Utils.restore(auth.restoreAuth);
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
     const cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    cmdInstance.action = statusCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({options:{}}, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(new CommandError('An error has occurred')));
@@ -299,24 +299,29 @@ describe(commands.STATUS, () => {
   });
 
   it('has help referring to the right command', () => {
-    const _helpLog: string[] = [];
-    const helpLog = (msg: string) => { _helpLog.push(msg); }
     const cmd: any = {
-      helpInformation: () => { }
+      log: (msg: string) => {},
+      prompt: () => {},
+      helpInformation: () => {}
     };
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    (statusCommand.help() as CommandHelp)({}, helpLog);
+    cmd.help = command.help();
+    cmd.help({}, () => {});
     assert(find.calledWith(commands.STATUS));
   });
 
   it('has help with examples', () => {
     const _log: string[] = [];
-    const log = (msg: string) => { _log.push(msg); }
     const cmd: any = {
-      helpInformation: () => { }
+      log: (msg: string) => {
+        _log.push(msg);
+      },
+      prompt: () => {},
+      helpInformation: () => {}
     };
     sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    (statusCommand.help() as CommandHelp)({}, log);
+    cmd.help = command.help();
+    cmd.help({}, () => {});
     let containsExamples: boolean = false;
     _log.forEach(l => {
       if (l && l.indexOf('Examples:') > -1) {

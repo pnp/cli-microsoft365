@@ -1,9 +1,9 @@
 import commands from '../commands';
-import Command, { CommandHelp, CommandValidate, CommandCancel, CommandError } from '../../../Command';
+import Command, { CommandValidate, CommandCancel, CommandError } from '../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
 import auth, { Site } from '../SpoAuth';
-const connectCommand: Command = require('./connect');
+const command: Command = require('./connect');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import config from '../../../config';
@@ -83,15 +83,15 @@ describe(commands.CONNECT, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(connectCommand.name.startsWith(commands.CONNECT), true);
+    assert.equal(command.name.startsWith(commands.CONNECT), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(connectCommand.description, null);
+    assert.notEqual(command.description, null);
   });
 
   it('calls telemetry', (done) => {
-    cmdInstance.action = connectCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: {}, url: 'https://contoso-admin.sharepoint.com' }, () => {
       try {
         assert(trackEvent.called);
@@ -104,10 +104,10 @@ describe(commands.CONNECT, () => {
   });
 
   it('logs correct telemetry event', (done) => {
-    cmdInstance.action = connectCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: {}, url: 'https://contoso-admin.sharepoint.com' }, () => {
       try {
-        assert.equal(telemetry.name, connectCommand.name);
+        assert.equal(telemetry.name, command.name);
         done();
       }
       catch (e) {
@@ -118,7 +118,7 @@ describe(commands.CONNECT, () => {
 
   it('connects to a tenant admin site', (done) => {
     auth.site = new Site();
-    cmdInstance.action = connectCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false }, url: 'https://contoso-admin.sharepoint.com' }, () => {
       try {
         assert(auth.site.connected);
@@ -132,7 +132,7 @@ describe(commands.CONNECT, () => {
 
   it('connects to a tenant admin site (debug)', (done) => {
     auth.site = new Site();
-    cmdInstance.action = connectCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true }, url: 'https://contoso-admin.sharepoint.com' }, () => {
       try {
         assert(auth.site.connected);
@@ -146,7 +146,7 @@ describe(commands.CONNECT, () => {
 
   it('connects to a regular SharePoint site', (done) => {
     auth.site = new Site();
-    cmdInstance.action = connectCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false }, url: 'https://contoso.sharepoint.com' }, () => {
       try {
         assert(auth.site.connected);
@@ -160,7 +160,7 @@ describe(commands.CONNECT, () => {
 
   it('connects to a regular SharePoint site (debug)', (done) => {
     auth.site = new Site();
-    cmdInstance.action = connectCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true }, url: 'https://contoso.sharepoint.com' }, () => {
       try {
         assert(auth.site.connected);
@@ -173,25 +173,25 @@ describe(commands.CONNECT, () => {
   });
 
   it('accepts valid SharePoint Online URL', () => {
-    const actual = (connectCommand.validate() as CommandValidate)({ url: 'https://contoso.sharepoint.com' });
+    const actual = (command.validate() as CommandValidate)({ url: 'https://contoso.sharepoint.com' });
     assert(actual);
   });
 
   it('rejects invalid SharePoint Online URL', () => {
     const url = 'https://contoso.com';
-    const actual = (connectCommand.validate() as CommandValidate)({ url: url });
+    const actual = (command.validate() as CommandValidate)({ url: url });
     assert.equal(actual, `${url} is not a valid SharePoint Online site URL`);
   });
 
   it('can be cancelled', () => {
-    assert(connectCommand.cancel());
+    assert(command.cancel());
   });
 
   it('clears pending connection on cancel', () => {
     auth.interval = {} as any;
     Utils.restore(global.clearInterval);
     const clearIntervalSpy = sinon.spy(global, 'clearInterval');
-    (connectCommand.cancel() as CommandCancel)();
+    (command.cancel() as CommandCancel)();
     assert(clearIntervalSpy.called);
   });
 
@@ -199,44 +199,49 @@ describe(commands.CONNECT, () => {
     auth.interval = undefined as any;
     Utils.restore(global.clearInterval);
     const clearIntervalSpy = sinon.spy(global, 'clearInterval');
-    (connectCommand.cancel() as CommandCancel)();
+    (command.cancel() as CommandCancel)();
     assert.equal(clearIntervalSpy.called, false);
   });
 
   it('has help referring to the right command', () => {
-    const _helpLog: string[] = [];
-    const helpLog = (msg: string) => { _helpLog.push(msg); }
     const cmd: any = {
-      helpInformation: () => { }
+      log: (msg: string) => {},
+      prompt: () => {},
+      helpInformation: () => {}
     };
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    (connectCommand.help() as CommandHelp)({}, helpLog);
+    cmd.help = command.help();
+    cmd.help({}, () => {});
     assert(find.calledWith(commands.CONNECT));
   });
 
   it('has help with examples', () => {
     const _log: string[] = [];
-    const log = (msg: string) => { _log.push(msg); }
     const cmd: any = {
-      helpInformation: () => { }
+      log: (msg: string) => {
+        _log.push(msg);
+      },
+      prompt: () => {},
+      helpInformation: () => {}
     };
     sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    (connectCommand.help() as CommandHelp)({}, log);
+    cmd.help = command.help();
+    cmd.help({}, () => {});
     let containsExamples: boolean = false;
     _log.forEach(l => {
       if (l && l.indexOf('Examples:') > -1) {
         containsExamples = true;
       }
     });
-    assert(containsExamples);
     Utils.restore(vorpal.find);
+    assert(containsExamples);
   });
 
   it('correctly handles lack of valid access token when connecting to a tenant-admin site', (done) => {
     Utils.restore(auth.ensureAccessToken);
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
     auth.site = new Site();
-    cmdInstance.action = connectCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false }, url: 'https://contoso-admin.sharepoint.com' }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
@@ -252,7 +257,7 @@ describe(commands.CONNECT, () => {
     Utils.restore(auth.ensureAccessToken);
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
     auth.site = new Site();
-    cmdInstance.action = connectCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true }, url: 'https://contoso-admin.sharepoint.com' }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
@@ -271,7 +276,7 @@ describe(commands.CONNECT, () => {
     Utils.restore(auth.ensureAccessToken);
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
     auth.site = new Site();
-    cmdInstance.action = connectCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false }, url: 'https://contoso.sharepoint.com' }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
@@ -287,7 +292,7 @@ describe(commands.CONNECT, () => {
     Utils.restore(auth.ensureAccessToken);
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
     auth.site = new Site();
-    cmdInstance.action = connectCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true }, url: 'https://contoso.sharepoint.com' }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
@@ -306,7 +311,7 @@ describe(commands.CONNECT, () => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve('ABC'));
     Utils.restore(auth.clearSiteConnectionInfo);
     sinon.stub(auth, 'clearSiteConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
-    cmdInstance.action = connectCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: {}, url: 'https://contoso-admin.sharepoint.com' }, () => {
       try {
         
@@ -328,7 +333,7 @@ describe(commands.CONNECT, () => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve('ABC'));
     Utils.restore(auth.clearSiteConnectionInfo);
     sinon.stub(auth, 'clearSiteConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
-    cmdInstance.action = connectCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true }, url: 'https://contoso-admin.sharepoint.com' }, () => {
       try {
         

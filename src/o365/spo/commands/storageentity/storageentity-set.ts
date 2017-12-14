@@ -5,7 +5,6 @@ import * as request from 'request-promise-native';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
-  CommandHelp,
   CommandOption,
   CommandValidate,
   CommandError
@@ -149,12 +148,11 @@ class SpoStorageEntitySetCommand extends SpoCommand {
     };
   }
 
-  public help(): CommandHelp {
-    return function (args: CommandArgs, log: (help: string) => void): void {
-      const chalk = vorpal.chalk;
-      log(vorpal.find(commands.STORAGEENTITY_SET).helpInformation());
-      log(
-        `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online tenant admin site,
+  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
+    const chalk = vorpal.chalk;
+    log(vorpal.find(commands.STORAGEENTITY_SET).helpInformation());
+    log(
+      `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online tenant admin site,
   using the ${chalk.blue(commands.CONNECT)} command.
                 
   Remarks:
@@ -180,7 +178,6 @@ class SpoStorageEntitySetCommand extends SpoCommand {
     SharePoint Framework Tenant Properties
       https://docs.microsoft.com/en-us/sharepoint/dev/spfx/tenant-properties
 `);
-    };
   }
 }
 

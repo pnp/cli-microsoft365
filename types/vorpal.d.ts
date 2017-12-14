@@ -15,7 +15,7 @@ interface Vorpal {
 interface VorpalCommand {
   action: (action: (this: CommandInstance, args: any, callback: () => void) => void) => VorpalCommand;
   cancel: (handler: () => void) => VorpalCommand;
-  help: (help: (args: any, log: (help: string) => void) => void) => VorpalCommand;
+  help: (help: (args: any, cbOrLog: (message?: string) => void) => void) => VorpalCommand;
   helpInformation: () => string;
   option: (name: string, description?: string, autocomplete?: string[]) => VorpalCommand;
   types: (types: { string?: string[], boolean?: string[] }) => VorpalCommand;

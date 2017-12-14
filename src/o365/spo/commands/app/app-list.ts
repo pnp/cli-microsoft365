@@ -2,9 +2,6 @@ import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import * as request from 'request-promise-native';
-import {
-  CommandHelp
-} from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import { AppMetadata } from './AppMetadata';
 import Utils from '../../../../Utils';
@@ -80,12 +77,11 @@ class AppListCommand extends SpoCommand {
       }, (rawRes: any): void => this.handleRejectedODataPromise(rawRes, cmd, cb));
   }
 
-  public help(): CommandHelp {
-    return function (args: {}, log: (help: string) => void): void {
-      const chalk = vorpal.chalk;
-      log(vorpal.find(commands.APP_LIST).helpInformation());
-      log(
-        `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online site, using the ${chalk.blue(commands.CONNECT)} command.
+  public commandHelp(args: {}, log: (help: string) => void): void {
+    const chalk = vorpal.chalk;
+    log(vorpal.find(commands.APP_LIST).helpInformation());
+    log(
+      `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online site, using the ${chalk.blue(commands.CONNECT)} command.
    
   Examples:
   
@@ -97,7 +93,6 @@ class AppListCommand extends SpoCommand {
     Application Lifecycle Management (ALM) APIs
       https://docs.microsoft.com/en-us/sharepoint/dev/apis/alm-api-for-spfx-add-ins
 `);
-    };
   }
 }
 
