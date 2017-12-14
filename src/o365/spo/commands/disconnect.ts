@@ -2,7 +2,7 @@ import auth from '../SpoAuth';
 import commands from '../commands';
 import config from '../../../config';
 import Command, {
-  CommandHelp, CommandError,
+  CommandError,
 } from '../../../Command';
 import appInsights from '../../../appInsights';
 
@@ -47,12 +47,11 @@ class SpoDisconnectCommand extends Command {
       });
   }
 
-  public help(): CommandHelp {
-    return function (args: any, log: (help: string) => void): void {
-      const chalk = vorpal.chalk;
-      log(vorpal.find(commands.DISCONNECT).helpInformation());
-      log(
-        `  Remarks:
+  public commandHelp(args: any, log: (help: string) => void): void {
+    const chalk = vorpal.chalk;
+    log(vorpal.find(commands.DISCONNECT).helpInformation());
+    log(
+      `  Remarks:
 
     The ${chalk.blue(commands.DISCONNECT)} command disconnects from the previously connected
     SharePoint Online site and removes any access and refresh tokens from memory.
@@ -66,7 +65,6 @@ class SpoDisconnectCommand extends Command {
     debug mode including detailed debug information in the console output
       ${chalk.grey(config.delimiter)} ${commands.DISCONNECT} --debug
 `);
-    };
   }
 }
 

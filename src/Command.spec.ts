@@ -3,7 +3,6 @@ import * as assert from 'assert';
 import Command, {
   CommandValidate,
   CommandCancel,
-  CommandHelp,
   CommandOption,
   CommandTypes
 } from './Command';
@@ -34,9 +33,7 @@ class MockCommand1 extends Command {
   public commandAction(): void {
   }
 
-  public help(): CommandHelp | undefined {
-    return (args: any, log: (help: string) => void) => {
-    };
+  public commandHelp(args: any, log: (message: string) => void): void {
   }
 
   public validate(): CommandValidate | undefined {
@@ -46,7 +43,7 @@ class MockCommand1 extends Command {
   }
 
   public cancel(): CommandCancel | undefined {
-    return () => {};
+    return () => { };
   }
 
   public types(): CommandTypes | undefined {
@@ -73,6 +70,10 @@ class MockCommand2 extends Command {
   }
 
   public commandAction(): void {
+  }
+
+  public commandHelp(args: any, log: (message: string) => void): void {
+    log('MockCommand2 help');
   }
 }
 
@@ -220,14 +221,6 @@ describe('Command', () => {
     assert(helpSpy.calledOnce);
   });
 
-  it('doesn\'t configure help when unavailable', () => {
-    const cmd = new MockCommand2();
-    sinon.stub(vorpal, 'command').callsFake(() => vcmd);
-    cmd.init(vorpal);
-    Utils.restore(vorpal.command);
-    assert(helpSpy.notCalled);
-  });
-
   it('configures types when available', () => {
     const cmd = new MockCommand1();
     sinon.stub(vorpal, 'command').callsFake(() => vcmd);
@@ -248,4 +241,20 @@ describe('Command', () => {
     const cmd = new MockCommand2();
     assert.equal(cmd.getCommandName(), 'Mock command 2');
   });
+
+  it('prints help using the log argument when called from the help command', () => {
+    const sandbox = sinon.createSandbox();
+    sandbox.stub(vorpal, '_command').value({
+      command: 'help mock2'
+    });
+    const log = (msg?: string) => { console.log(msg); };
+    const logSpy = sinon.spy(log);
+    const mock = new MockCommand2();
+    const cmd = {
+      help: mock.help()
+    };
+    cmd.help({}, logSpy);
+    sandbox.restore();
+    assert(logSpy.called);
+  })
 });

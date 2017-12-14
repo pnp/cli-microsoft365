@@ -7,7 +7,6 @@ import commands from '../commands';
 import GlobalOptions from '../../../GlobalOptions';
 import Command, {
   CommandCancel,
-  CommandHelp,
   CommandValidate,
   CommandError
 } from '../../../Command';
@@ -203,12 +202,11 @@ class SpoConnectCommand extends Command {
     }
   }
 
-  public help(): CommandHelp {
-    return function (args: CommandArgs, log: (help: string) => void): void {
-      const chalk = vorpal.chalk;
-      log(vorpal.find(commands.CONNECT).helpInformation());
-      log(
-        `  Arguments:
+  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
+    const chalk = vorpal.chalk;
+    log(vorpal.find(commands.CONNECT).helpInformation());
+    log(
+      `  Arguments:
     
     url  absolute URL of the SharePoint Online site to connect to
         
@@ -239,7 +237,6 @@ class SpoConnectCommand extends Command {
     Connect to a regular SharePoint Online site
       ${chalk.grey(config.delimiter)} ${commands.CONNECT} https://contoso.sharepoint.com/sites/team
 `);
-    }
   }
 }
 

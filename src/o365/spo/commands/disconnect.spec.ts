@@ -1,9 +1,9 @@
 import commands from '../commands';
-import Command, { CommandHelp } from '../../../Command';
+import Command from '../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
 import auth, { Site } from '../SpoAuth';
-const disconnectCommand: Command = require('./disconnect');
+const command: Command = require('./disconnect');
 import * as assert from 'assert';
 import Utils from '../../../Utils';
 
@@ -44,15 +44,15 @@ describe(commands.DISCONNECT, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(disconnectCommand.name.startsWith(commands.DISCONNECT), true);
+    assert.equal(command.name.startsWith(commands.DISCONNECT), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(disconnectCommand.description, null);
+    assert.notEqual(command.description, null);
   });
 
   it('calls telemetry', (done) => {
-    cmdInstance.action = disconnectCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, () => {
       try {
         assert(trackEvent.called);
@@ -65,7 +65,7 @@ describe(commands.DISCONNECT, () => {
   });
 
   it('logs correct telemetry event', (done) => {
-    cmdInstance.action = disconnectCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, () => {
       try {
         assert.equal(telemetry.name, commands.DISCONNECT);
@@ -80,7 +80,7 @@ describe(commands.DISCONNECT, () => {
   it('disconnects from SharePoint when connected', (done) => {
     auth.site = new Site();
     auth.site.connected = true;
-    cmdInstance.action = disconnectCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
       try {
         assert(!auth.site.connected);
@@ -95,7 +95,7 @@ describe(commands.DISCONNECT, () => {
   it('disconnects from SharePoint when not connected', (done) => {
     auth.site = new Site();
     auth.site.connected = false;
-    cmdInstance.action = disconnectCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
       try {
         assert(!auth.site.connected);
@@ -110,7 +110,7 @@ describe(commands.DISCONNECT, () => {
   it('clears persisted connection info when disconnecting', (done) => {
     auth.site = new Site();
     auth.site.connected = true;
-    cmdInstance.action = disconnectCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
       try {
         assert(authClearSiteConnectionInfoStub.called);
@@ -123,32 +123,37 @@ describe(commands.DISCONNECT, () => {
   });
 
   it('has help referring to the right command', () => {
-    const _helpLog: string[] = [];
-    const helpLog = (msg: string) => { _helpLog.push(msg); }
     const cmd: any = {
-      helpInformation: () => { }
+      log: (msg: string) => {},
+      prompt: () => {},
+      helpInformation: () => {}
     };
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    (disconnectCommand.help() as CommandHelp)({}, helpLog);
+    cmd.help = command.help();
+    cmd.help({}, () => {});
     assert(find.calledWith(commands.DISCONNECT));
   });
 
   it('has help with examples', () => {
     const _log: string[] = [];
-    const log = (msg: string) => { _log.push(msg); }
     const cmd: any = {
-      helpInformation: () => { }
+      log: (msg: string) => {
+        _log.push(msg);
+      },
+      prompt: () => {},
+      helpInformation: () => {}
     };
     sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    (disconnectCommand.help() as CommandHelp)({}, log);
+    cmd.help = command.help();
+    cmd.help({}, () => {});
     let containsExamples: boolean = false;
     _log.forEach(l => {
       if (l && l.indexOf('Examples:') > -1) {
         containsExamples = true;
       }
     });
-    assert(containsExamples);
     Utils.restore(vorpal.find);
+    assert(containsExamples);
   });
 
   it('correctly handles error while clearing persisted connection info', (done) => {
@@ -157,7 +162,7 @@ describe(commands.DISCONNECT, () => {
     auth.site = new Site();
     const disconnectSpy = sinon.spy(auth.site, 'disconnect');
     auth.site.connected = true;
-    cmdInstance.action = disconnectCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false } }, () => {
       try {
         assert(disconnectSpy.called);
@@ -177,7 +182,7 @@ describe(commands.DISCONNECT, () => {
     auth.site = new Site();
     const disconnectSpy = sinon.spy(auth.site, 'disconnect');
     auth.site.connected = true;
-    cmdInstance.action = disconnectCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
       try {
         assert(disconnectSpy.called);

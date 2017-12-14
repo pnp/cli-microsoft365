@@ -1,6 +1,8 @@
 import appInsights from './appInsights';
 import GlobalOptions from './GlobalOptions';
 
+const vorpal: Vorpal = require('./vorpal-init');
+
 export interface CommandOption {
   option: string;
   description: string;
@@ -16,7 +18,7 @@ export interface CommandValidate {
 }
 
 export interface CommandHelp {
-  (args: any, log: (help: string) => void): void
+  (args: any, cbOrLog: (msg?: string) => void): void
 }
 
 export interface CommandCancel {
@@ -63,6 +65,7 @@ export default abstract class Command {
   public abstract get description(): string;
 
   public abstract commandAction(cmd: CommandInstance, args: any, cb: () => void): void;
+  public abstract commandHelp(args: any, log: (message: string) => void): void;
 
   public action(): CommandAction {
     const cmd: Command = this;
@@ -109,8 +112,22 @@ export default abstract class Command {
     ];
   }
 
-  public help(): CommandHelp | undefined {
-    return;
+  public help(): CommandHelp {
+    const cmd: Command = this;
+    return function (this: CommandInstance, args: CommandArgs, cbOrLog: () => void) {
+      const ranFromHelpCommand: boolean =
+        typeof vorpal._command !== 'undefined' &&
+        typeof vorpal._command.command !== 'undefined' &&
+        vorpal._command.command.indexOf('help ') === 0;
+      
+      const log = ranFromHelpCommand ? cbOrLog : this.log.bind(this);
+
+      cmd.commandHelp(args, log);
+
+      if (!ranFromHelpCommand) {
+        cbOrLog();
+      }
+    }
   }
 
   public validate(): CommandValidate | undefined {
@@ -141,10 +158,7 @@ export default abstract class Command {
     if (cancel) {
       cmd.cancel(cancel);
     }
-    const help: CommandHelp | undefined = this.help();
-    if (help) {
-      cmd.help(help);
-    }
+    cmd.help(this.help());
     const types: CommandTypes | undefined = this.types();
     if (types) {
       cmd.types(types);

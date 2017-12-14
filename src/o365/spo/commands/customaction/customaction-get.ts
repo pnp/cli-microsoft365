@@ -4,7 +4,6 @@ import * as request from 'request-promise-native';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
-  CommandHelp,
   CommandOption,
   CommandValidate
 } from '../../../../Command';
@@ -205,12 +204,11 @@ class SpoCustomActionGetCommand extends SpoCommand {
     };
   }
 
-  public help(): CommandHelp {
-    return function (args: CommandArgs, log: (help: string) => void): void {
-      const chalk = vorpal.chalk;
-      log(vorpal.find(commands.CUSTOMACTION_GET).helpInformation());
-      log(
-        `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online site,
+  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
+    const chalk = vorpal.chalk;
+    log(vorpal.find(commands.CUSTOMACTION_GET).helpInformation());
+    log(
+      `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online site,
         using the ${chalk.blue(commands.CONNECT)} command.
                       
   Remarks:
@@ -241,7 +239,6 @@ class SpoCustomActionGetCommand extends SpoCommand {
     UserCustomAction REST API resources:
       https://msdn.microsoft.com/en-us/library/office/dn531432.aspx#bk_UserCustomAction
       `);
-    };
   }
 }
 

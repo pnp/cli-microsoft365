@@ -5,7 +5,6 @@ import * as request from 'request-promise-native';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
-  CommandHelp,
   CommandOption,
   CommandValidate,
   CommandError
@@ -133,12 +132,11 @@ class SpoCdnOriginListCommand extends SpoCommand {
     };
   }
 
-  public help(): CommandHelp {
-    return function (args: CommandArgs, log: (help: string) => void): void {
-      const chalk = vorpal.chalk;
-      log(vorpal.find(commands.CDN_ORIGIN_LIST).helpInformation());
-      log(
-        `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online tenant admin site,
+  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
+    const chalk = vorpal.chalk;
+    log(vorpal.find(commands.CDN_ORIGIN_LIST).helpInformation());
+    log(
+      `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online tenant admin site,
   using the ${chalk.blue(commands.CONNECT)} command.
         
   Remarks:
@@ -164,7 +162,6 @@ class SpoCdnOriginListCommand extends SpoCommand {
     General availability of Office 365 CDN
       https://dev.office.com/blogs/general-availability-of-office-365-cdn
 `);
-    };
   }
 }
 

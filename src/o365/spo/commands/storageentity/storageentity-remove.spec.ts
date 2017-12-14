@@ -1,9 +1,9 @@
 import commands from '../../commands';
-import Command, { CommandHelp, CommandValidate, CommandOption, CommandError } from '../../../../Command';
+import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
-const storageEntityRemoveCommand: Command = require('./storageentity-remove');
+const command: Command = require('./storageentity-remove');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import config from '../../../../config';
@@ -85,15 +85,15 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(storageEntityRemoveCommand.name.startsWith(commands.STORAGEENTITY_REMOVE), true);
+    assert.equal(command.name.startsWith(commands.STORAGEENTITY_REMOVE), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(storageEntityRemoveCommand.description, null);
+    assert.notEqual(command.description, null);
   });
 
   it('calls telemetry', (done) => {
-    cmdInstance.action = storageEntityRemoveCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: {}, url: 'https://contoso-admin.sharepoint.com' }, () => {
       try {
         assert(trackEvent.called);
@@ -106,7 +106,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
   });
 
   it('logs correct telemetry event', (done) => {
-    cmdInstance.action = storageEntityRemoveCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: {}, url: 'https://contoso-admin.sharepoint.com' }, () => {
       try {
         assert.equal(telemetry.name, commands.STORAGEENTITY_REMOVE);
@@ -121,7 +121,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
   it('aborts when not connected to a SharePoint site', (done) => {
     auth.site = new Site();
     auth.site.connected = false;
-    cmdInstance.action = storageEntityRemoveCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(new CommandError('Connect to a SharePoint Online site first')));
@@ -137,7 +137,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = storageEntityRemoveCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(new CommandError(`${auth.site.url} is not a tenant admin site. Connect to your tenant admin site and try again`)));
@@ -153,7 +153,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = storageEntityRemoveCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, key: 'existingproperty', confirm: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }}, () => {
       let deleteRequestIssued = false;
       requests.forEach(r => {
@@ -180,7 +180,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = storageEntityRemoveCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, key: 'existingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }}, () => {
       let promptIssued = false;
 
@@ -202,7 +202,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = storageEntityRemoveCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     };
@@ -221,7 +221,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = storageEntityRemoveCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     };
@@ -283,7 +283,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = storageEntityRemoveCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     };
@@ -307,7 +307,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (storageEntityRemoveCommand.options() as CommandOption[]);
+    const options = (command.options() as CommandOption[]);
     let containsdebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -318,7 +318,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
   });
 
   it('requires app catalog URL', () => {
-    const options = (storageEntityRemoveCommand.options() as CommandOption[]);
+    const options = (command.options() as CommandOption[]);
     let requiresAppCatalogUrl = false;
     options.forEach(o => {
       if (o.option.indexOf('<appCatalogUrl>') > -1) {
@@ -329,7 +329,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
   });
 
   it('supports suppressing confirmation prompt', () => {
-    const options = (storageEntityRemoveCommand.options() as CommandOption[]);
+    const options = (command.options() as CommandOption[]);
     let containsConfirmOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--confirm') > -1) {
@@ -340,7 +340,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
   });
 
   it('requires tenant property name', () => {
-    const options = (storageEntityRemoveCommand.options() as CommandOption[]);
+    const options = (command.options() as CommandOption[]);
     let requiresTenantPropertyName = false;
     options.forEach(o => {
       if (o.option.indexOf('<key>') > -1) {
@@ -352,51 +352,56 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
 
   it('doesn\'t fail if the parent doesn\'t define options', () => {
     sinon.stub(Command.prototype, 'options').callsFake(() => { return undefined; });
-    const options = (storageEntityRemoveCommand.options() as CommandOption[]);
+    const options = (command.options() as CommandOption[]);
     Utils.restore(Command.prototype.options);
     assert(options.length > 0);
   });
 
   it('accepts valid SharePoint Online app catalog URL', () => {
-    const actual = (storageEntityRemoveCommand.validate() as CommandValidate)({ options: { appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }});
+    const actual = (command.validate() as CommandValidate)({ options: { appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }});
     assert(actual);
   });
 
   it('accepts valid SharePoint Online site URL', () => {
-    const actual = (storageEntityRemoveCommand.validate() as CommandValidate)({ options: { appCatalogUrl: 'https://contoso.sharepoint.com' }});
+    const actual = (command.validate() as CommandValidate)({ options: { appCatalogUrl: 'https://contoso.sharepoint.com' }});
     assert(actual);
   });
 
   it('rejects invalid SharePoint Online URL', () => {
     const url = 'https://contoso.com';
-    const actual = (storageEntityRemoveCommand.validate() as CommandValidate)({ options: { appCatalogUrl: url }});
+    const actual = (command.validate() as CommandValidate)({ options: { appCatalogUrl: url }});
     assert.equal(actual, `${url} is not a valid SharePoint Online site URL`);
   });
 
   it('fails validation when no SharePoint Online app catalog URL specified', () => {
-    const actual = (storageEntityRemoveCommand.validate() as CommandValidate)({ options: { }});
+    const actual = (command.validate() as CommandValidate)({ options: { }});
     assert.equal(actual, 'Missing required option appCatalogUrl');
   });
 
   it('has help referring to the right command', () => {
-    const _helpLog: string[] = [];
-    const helpLog = (msg: string) => { _helpLog.push(msg); }
     const cmd: any = {
-      helpInformation: () => { }
+      log: (msg: string) => {},
+      prompt: () => {},
+      helpInformation: () => {}
     };
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    (storageEntityRemoveCommand.help() as CommandHelp)({}, helpLog);
+    cmd.help = command.help();
+    cmd.help({}, () => {});
     assert(find.calledWith(commands.STORAGEENTITY_REMOVE));
   });
 
   it('has help with examples', () => {
     const _log: string[] = [];
-    const log = (msg: string) => { _log.push(msg); }
     const cmd: any = {
-      helpInformation: () => { }
+      log: (msg: string) => {
+        _log.push(msg);
+      },
+      prompt: () => {},
+      helpInformation: () => {}
     };
     sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    (storageEntityRemoveCommand.help() as CommandHelp)({}, log);
+    cmd.help = command.help();
+    cmd.help({}, () => {});
     let containsExamples: boolean = false;
     _log.forEach(l => {
       if (l && l.indexOf('Examples:') > -1) {
@@ -413,7 +418,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = storageEntityRemoveCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, confirm: true, key: 'existingproperty', appCatalogUrl: 'https://contoso-admin.sharepoint.com' }}, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));

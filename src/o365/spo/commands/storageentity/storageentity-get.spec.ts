@@ -1,9 +1,9 @@
 import commands from '../../commands';
-import Command, { CommandHelp, CommandOption, CommandError } from '../../../../Command';
+import Command, { CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
-const storageEntityGetCommand: Command = require('./storageentity-get');
+const command: Command = require('./storageentity-get');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import Utils from '../../../../Utils';
@@ -99,15 +99,15 @@ describe(commands.STORAGEENTITY_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(storageEntityGetCommand.name.startsWith(commands.STORAGEENTITY_GET), true);
+    assert.equal(command.name.startsWith(commands.STORAGEENTITY_GET), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(storageEntityGetCommand.description, null);
+    assert.notEqual(command.description, null);
   });
 
   it('calls telemetry', (done) => {
-    cmdInstance.action = storageEntityGetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: {}, appCatalogUrl: 'https://contoso-admin.sharepoint.com' }, () => {
       try {
         assert(trackEvent.called);
@@ -120,7 +120,7 @@ describe(commands.STORAGEENTITY_GET, () => {
   });
 
   it('logs correct telemetry event', (done) => {
-    cmdInstance.action = storageEntityGetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: {}, appCatalogUrl: 'https://contoso-admin.sharepoint.com' }, () => {
       try {
         assert.equal(telemetry.name, commands.STORAGEENTITY_GET);
@@ -135,7 +135,7 @@ describe(commands.STORAGEENTITY_GET, () => {
   it('aborts when not connected to a SharePoint site', (done) => {
     auth.site = new Site();
     auth.site.connected = false;
-    cmdInstance.action = storageEntityGetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(new CommandError('Connect to a SharePoint Online site first')));
@@ -151,7 +151,7 @@ describe(commands.STORAGEENTITY_GET, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = storageEntityGetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, key: 'existingproperty' }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({
@@ -172,7 +172,7 @@ describe(commands.STORAGEENTITY_GET, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = storageEntityGetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, key: 'propertywithoutdescription' }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({
@@ -193,7 +193,7 @@ describe(commands.STORAGEENTITY_GET, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = storageEntityGetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, key: 'propertywithoutcomments' }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({
@@ -214,7 +214,7 @@ describe(commands.STORAGEENTITY_GET, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = storageEntityGetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, key: 'nonexistingproperty' }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       try {
         assert.equal(log.length, 0);
@@ -230,7 +230,7 @@ describe(commands.STORAGEENTITY_GET, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = storageEntityGetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, key: 'nonexistingproperty' }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       let correctValue: boolean = false;
       log.forEach(l => {
@@ -254,7 +254,7 @@ describe(commands.STORAGEENTITY_GET, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = storageEntityGetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, key: '#myprop' }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({
@@ -272,7 +272,7 @@ describe(commands.STORAGEENTITY_GET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (storageEntityGetCommand.options() as CommandOption[]);
+    const options = (command.options() as CommandOption[]);
     let containsdebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -283,7 +283,7 @@ describe(commands.STORAGEENTITY_GET, () => {
   });
 
   it('requires tenant property name', () => {
-    const options = (storageEntityGetCommand.options() as CommandOption[]);
+    const options = (command.options() as CommandOption[]);
     let requiresTenantPropertyName = false;
     options.forEach(o => {
       if (o.option.indexOf('<key>') > -1) {
@@ -295,30 +295,35 @@ describe(commands.STORAGEENTITY_GET, () => {
 
   it('doesn\'t fail if the parent doesn\'t define options', () => {
     sinon.stub(Command.prototype, 'options').callsFake(() => { return undefined; });
-    const options = (storageEntityGetCommand.options() as CommandOption[]);
+    const options = (command.options() as CommandOption[]);
     Utils.restore(Command.prototype.options);
     assert(options.length > 0);
   });
 
   it('has help referring to the right command', () => {
-    const _helpLog: string[] = [];
-    const helpLog = (msg: string) => { _helpLog.push(msg); }
     const cmd: any = {
-      helpInformation: () => { }
+      log: (msg: string) => {},
+      prompt: () => {},
+      helpInformation: () => {}
     };
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    (storageEntityGetCommand.help() as CommandHelp)({}, helpLog);
+    cmd.help = command.help();
+    cmd.help({}, () => {});
     assert(find.calledWith(commands.STORAGEENTITY_GET));
   });
 
   it('has help with examples', () => {
     const _log: string[] = [];
-    const log = (msg: string) => { _log.push(msg); }
     const cmd: any = {
-      helpInformation: () => { }
+      log: (msg: string) => {
+        _log.push(msg);
+      },
+      prompt: () => {},
+      helpInformation: () => {}
     };
     sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    (storageEntityGetCommand.help() as CommandHelp)({}, log);
+    cmd.help = command.help();
+    cmd.help({}, () => {});
     let containsExamples: boolean = false;
     _log.forEach(l => {
       if (l && l.indexOf('Examples:') > -1) {
@@ -335,7 +340,7 @@ describe(commands.STORAGEENTITY_GET, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = storageEntityGetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true }, appCatalogUrl: 'https://contoso-admin.sharepoint.com' }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));

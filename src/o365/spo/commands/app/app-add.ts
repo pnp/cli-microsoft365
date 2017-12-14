@@ -5,7 +5,6 @@ import * as request from 'request-promise-native';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
-  CommandHelp,
   CommandOption,
   CommandValidate
 } from '../../../../Command';
@@ -139,12 +138,11 @@ class SpoAppAddCommand extends SpoCommand {
     };
   }
 
-  public help(): CommandHelp {
-    return function (args: CommandArgs, log: (help: string) => void): void {
-      const chalk = vorpal.chalk;
-      log(vorpal.find(commands.APP_ADD).helpInformation());
-      log(
-        `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online site,
+  public commandHelp(args: CommandArgs, log: (message: string) => void): void {
+    const chalk = vorpal.chalk;
+    log(vorpal.find(commands.APP_ADD).helpInformation());
+    log(
+      `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online site,
   using the ${chalk.blue(commands.CONNECT)} command.
                 
   Remarks:
@@ -172,7 +170,6 @@ class SpoAppAddCommand extends SpoCommand {
     Application Lifecycle Management (ALM) APIs
       https://docs.microsoft.com/en-us/sharepoint/dev/apis/alm-api-for-spfx-add-ins
 `);
-    };
   }
 }
 

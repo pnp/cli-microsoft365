@@ -35,7 +35,7 @@ In the **./docs/manual/docs/cmd/[service]** folder, create new file for your com
 
 ## Implement command
 
-Each command in the Office 365 CLI is defined as a class extending the [Command](../../src/Command.ts) base class. At minimum a command must define `name`, `description`, `commandAction` and `help`:
+Each command in the Office 365 CLI is defined as a class extending the [Command](../../src/Command.ts) base class. At minimum a command must define `name`, `description`, `commandAction` and `commandHelp`:
 
 ```ts
 import config from '../../../config';
@@ -61,12 +61,11 @@ class MyCommand extends Command {
     cb(); // notify that the command completed
   }
 
-  public help(): CommandHelp {
-    return function (args: any, log: (help: string) => void): void {
-      const chalk = vorpal.chalk;
-      log(vorpal.find(commands.MYCOMMAND).helpInformation());
-      log(
-        `  Remarks:
+  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
+    const chalk = vorpal.chalk;
+    log(vorpal.find(commands.MYCOMMAND).helpInformation());
+    log(
+      `  Remarks:
 
     Here are some additional considerations when using this command.
 
@@ -75,7 +74,6 @@ class MyCommand extends Command {
     ${chalk.grey(config.delimiter)} ${commands.MYCOMMAND}
       example one of using the command
 `);
-    };
   }
 }
 
@@ -133,11 +131,10 @@ When building command help, you can get the standard help from Vorpal by calling
 ```ts
 class SpoMyCommand extends Command {
   // ...
-  public help(): CommandHelp {
-    return function (args: any, log: (help: string) => void): void {
-      const chalk = vorpal.chalk;
-      log(vorpal.find(commands.MYCOMMAND).helpInformation());
-      log(
+  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
+    const chalk = vorpal.chalk;
+    log(vorpal.find(commands.MYCOMMAND).helpInformation());
+    log(
         `  Remarks:
 
     Here are some additional considerations when using this command.
@@ -147,7 +144,6 @@ class SpoMyCommand extends Command {
     ${chalk.grey(config.delimiter)} ${commands.MYCOMMAND}
       example one of using the command
 `);
-    };
   }
 }
 ```

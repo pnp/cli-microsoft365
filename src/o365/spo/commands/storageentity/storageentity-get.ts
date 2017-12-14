@@ -4,7 +4,6 @@ import * as request from 'request-promise-native';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
-  CommandHelp,
   CommandOption
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
@@ -93,12 +92,11 @@ class SpoStorageEntityGetCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public help(): CommandHelp {
-    return function (args: CommandArgs, log: (help: string) => void): void {
-      const chalk = vorpal.chalk;
-      log(vorpal.find(commands.STORAGEENTITY_GET).helpInformation());
-      log(
-        `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online site using the
+  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
+    const chalk = vorpal.chalk;
+    log(vorpal.find(commands.STORAGEENTITY_GET).helpInformation());
+    log(
+      `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online site using the
         ${chalk.blue(commands.CONNECT)} command.
         
   Remarks:
@@ -120,7 +118,6 @@ class SpoStorageEntityGetCommand extends SpoCommand {
     SharePoint Framework Tenant Properties
       https://docs.microsoft.com/en-us/sharepoint/dev/spfx/tenant-properties
 `);
-    };
   }
 }
 

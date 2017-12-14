@@ -1,9 +1,9 @@
 import commands from '../../commands';
-import Command, { CommandHelp, CommandValidate, CommandOption, CommandError } from '../../../../Command';
+import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
-const storageEntitySetCommand: Command = require('./storageentity-set');
+const command: Command = require('./storageentity-set');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import config from '../../../../config';
@@ -79,15 +79,15 @@ describe(commands.STORAGEENTITY_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(storageEntitySetCommand.name.startsWith(commands.STORAGEENTITY_SET), true);
+    assert.equal(command.name.startsWith(commands.STORAGEENTITY_SET), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(storageEntitySetCommand.description, null);
+    assert.notEqual(command.description, null);
   });
 
   it('calls telemetry', (done) => {
-    cmdInstance.action = storageEntitySetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: {}, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       try {
         assert(trackEvent.called);
@@ -100,7 +100,7 @@ describe(commands.STORAGEENTITY_SET, () => {
   });
 
   it('logs correct telemetry event', (done) => {
-    cmdInstance.action = storageEntitySetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: {}, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       try {
         assert.equal(telemetry.name, commands.STORAGEENTITY_SET);
@@ -115,7 +115,7 @@ describe(commands.STORAGEENTITY_SET, () => {
   it('aborts when not connected to a SharePoint site', (done) => {
     auth.site = new Site();
     auth.site.connected = false;
-    cmdInstance.action = storageEntitySetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(new CommandError('Connect to a SharePoint Online site first')));
@@ -131,7 +131,7 @@ describe(commands.STORAGEENTITY_SET, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = storageEntitySetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(new CommandError(`${auth.site.url} is not a tenant admin site. Connect to your tenant admin site and try again`)));
@@ -147,7 +147,7 @@ describe(commands.STORAGEENTITY_SET, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = storageEntitySetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, key: 'Property1', value: 'Lorem', description: 'ipsum', comment: 'dolor', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
@@ -201,7 +201,7 @@ describe(commands.STORAGEENTITY_SET, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = storageEntitySetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, key: 'Property1', value: 'Lorem', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       try {
         assert.equal(log.length, 0);
@@ -244,7 +244,7 @@ describe(commands.STORAGEENTITY_SET, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = storageEntitySetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, key: 'Property1', value: 'Lorem', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       let isDone = false;
       log.forEach(l => {
@@ -294,7 +294,7 @@ describe(commands.STORAGEENTITY_SET, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = storageEntitySetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, key: '<Property1>', value: '\'Lorem\'', description: '"ipsum"', comment: '<dolor & samet>', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       let isDone = false;
       log.forEach(l => {
@@ -350,7 +350,7 @@ describe(commands.STORAGEENTITY_SET, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = storageEntitySetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, key: 'Property1', value: 'Lorem', description: 'ipsum', comment: 'dolor', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(new CommandError('An error has occurred')));
@@ -401,7 +401,7 @@ describe(commands.STORAGEENTITY_SET, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = storageEntitySetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, key: 'Property1', value: 'Lorem', description: 'ipsum', comment: 'dolor', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       let accessDeniedErrorHandled = false;
       log.forEach(l => {
@@ -424,7 +424,7 @@ describe(commands.STORAGEENTITY_SET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (storageEntitySetCommand.options() as CommandOption[]);
+    const options = (command.options() as CommandOption[]);
     let containsdebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -435,7 +435,7 @@ describe(commands.STORAGEENTITY_SET, () => {
   });
 
   it('requires app catalog URL', () => {
-    const options = (storageEntitySetCommand.options() as CommandOption[]);
+    const options = (command.options() as CommandOption[]);
     let requiresAppCatalogUrl = false;
     options.forEach(o => {
       if (o.option.indexOf('<appCatalogUrl>') > -1) {
@@ -446,7 +446,7 @@ describe(commands.STORAGEENTITY_SET, () => {
   });
 
   it('requires tenant property name', () => {
-    const options = (storageEntitySetCommand.options() as CommandOption[]);
+    const options = (command.options() as CommandOption[]);
     let requiresTenantPropertyName = false;
     options.forEach(o => {
       if (o.option.indexOf('<key>') > -1) {
@@ -457,7 +457,7 @@ describe(commands.STORAGEENTITY_SET, () => {
   });
 
   it('requires tenant property value', () => {
-    const options = (storageEntitySetCommand.options() as CommandOption[]);
+    const options = (command.options() as CommandOption[]);
     let requiresTenantPropertyValue = false;
     options.forEach(o => {
       if (o.option.indexOf('<value>') > -1) {
@@ -468,7 +468,7 @@ describe(commands.STORAGEENTITY_SET, () => {
   });
 
   it('supports setting tenant property description', () => {
-    const options = (storageEntitySetCommand.options() as CommandOption[]);
+    const options = (command.options() as CommandOption[]);
     let supportsTenantPropertyDescription = false;
     options.forEach(o => {
       if (o.option.indexOf('[description]') > -1) {
@@ -479,7 +479,7 @@ describe(commands.STORAGEENTITY_SET, () => {
   });
 
   it('supports setting tenant property comment', () => {
-    const options = (storageEntitySetCommand.options() as CommandOption[]);
+    const options = (command.options() as CommandOption[]);
     let supportsTenantPropertyComment = false;
     options.forEach(o => {
       if (o.option.indexOf('[comment]') > -1) {
@@ -491,51 +491,56 @@ describe(commands.STORAGEENTITY_SET, () => {
 
   it('doesn\'t fail if the parent doesn\'t define options', () => {
     sinon.stub(Command.prototype, 'options').callsFake(() => { return undefined; });
-    const options = (storageEntitySetCommand.options() as CommandOption[]);
+    const options = (command.options() as CommandOption[]);
     Utils.restore(Command.prototype.options);
     assert(options.length > 0);
   });
 
   it('accepts valid SharePoint Online app catalog URL', () => {
-    const actual = (storageEntitySetCommand.validate() as CommandValidate)({ options: { appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+    const actual = (command.validate() as CommandValidate)({ options: { appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
     assert(actual);
   });
 
   it('accepts valid SharePoint Online site URL', () => {
-    const actual = (storageEntitySetCommand.validate() as CommandValidate)({ options: { appCatalogUrl: 'https://contoso.sharepoint.com' } });
+    const actual = (command.validate() as CommandValidate)({ options: { appCatalogUrl: 'https://contoso.sharepoint.com' } });
     assert(actual);
   });
 
   it('rejects invalid SharePoint Online URL', () => {
     const url = 'https://contoso.com';
-    const actual = (storageEntitySetCommand.validate() as CommandValidate)({ options: { appCatalogUrl: url } });
+    const actual = (command.validate() as CommandValidate)({ options: { appCatalogUrl: url } });
     assert.equal(actual, `${url} is not a valid SharePoint Online site URL`);
   });
 
   it('fails validation when no SharePoint Online app catalog URL specified', () => {
-    const actual = (storageEntitySetCommand.validate() as CommandValidate)({ options: {} });
+    const actual = (command.validate() as CommandValidate)({ options: {} });
     assert.equal(actual, 'Missing required option appCatalogUrl');
   });
 
   it('has help referring to the right command', () => {
-    const _helpLog: string[] = [];
-    const helpLog = (msg: string) => { _helpLog.push(msg); }
     const cmd: any = {
-      helpInformation: () => { }
+      log: (msg: string) => {},
+      prompt: () => {},
+      helpInformation: () => {}
     };
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    (storageEntitySetCommand.help() as CommandHelp)({}, helpLog);
+    cmd.help = command.help();
+    cmd.help({}, () => {});
     assert(find.calledWith(commands.STORAGEENTITY_SET));
   });
 
   it('has help with examples', () => {
     const _log: string[] = [];
-    const log = (msg: string) => { _log.push(msg); }
     const cmd: any = {
-      helpInformation: () => { }
+      log: (msg: string) => {
+        _log.push(msg);
+      },
+      prompt: () => {},
+      helpInformation: () => {}
     };
     sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    (storageEntitySetCommand.help() as CommandHelp)({}, log);
+    cmd.help = command.help();
+    cmd.help({}, () => {});
     let containsExamples: boolean = false;
     _log.forEach(l => {
       if (l && l.indexOf('Examples:') > -1) {
@@ -552,7 +557,7 @@ describe(commands.STORAGEENTITY_SET, () => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = storageEntitySetCommand.action();
+    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, confirm: true, key: 'existingproperty', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } }, () => {
       let containsError = false;
       log.forEach(l => {

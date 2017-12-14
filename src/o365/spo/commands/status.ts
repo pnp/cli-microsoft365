@@ -2,7 +2,7 @@ import auth from '../SpoAuth';
 import config from '../../../config';
 import commands from '../commands';
 import Command, {
-  CommandHelp, CommandError
+  CommandError
 } from '../../../Command';
 
 const vorpal: Vorpal = require('../../../vorpal-init');
@@ -58,12 +58,11 @@ class SpoStatusCommand extends Command {
       });
   }
 
-  public help(): CommandHelp {
-    return function (args: any, log: (help: string) => void): void {
-      const chalk = vorpal.chalk;
-      log(vorpal.find(commands.STATUS).helpInformation());
-      log(
-        `  Remarks:
+  public commandHelp(args: any, log: (help: string) => void): void {
+    const chalk = vorpal.chalk;
+    log(vorpal.find(commands.STATUS).helpInformation());
+    log(
+      `  Remarks:
 
     If you are connected to a SharePoint Online, the ${chalk.blue(commands.STATUS)} command
     will show you information about the site to which you are connected, the currently stored
@@ -74,7 +73,6 @@ class SpoStatusCommand extends Command {
     Show the information about the current connection to SharePoint Online
       ${chalk.grey(config.delimiter)} ${commands.STATUS}
 `);
-    };
   }
 }
 
