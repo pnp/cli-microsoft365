@@ -243,6 +243,7 @@ export default class Auth {
             stdout.log('');
           }
 
+          this.service.accessToken = json.access_token;
           resolve(json.access_token);
         }, (err: any): void => {
           reject(err);

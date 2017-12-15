@@ -90,7 +90,10 @@ class SpoAuth extends Auth {
       const now: number = new Date().getTime() / 1000;
       const token: Token | undefined = this.site.accessTokens[resource];
       if (token && token.expiresAt > now) {
-        resolve(this.site.accessTokens[resource].accessToken);
+
+        const token = this.site.accessTokens[resource].accessToken
+        this.site.accessToken = token;
+        resolve(token);
         return;
       }
 
@@ -104,11 +107,13 @@ class SpoAuth extends Auth {
           this
             .setServiceConnectionInfo(this.SERVICE, this.site)
             .then((): void => {
+              this.site.accessToken = accessToken;
               resolve(accessToken);
             }, (error: any): void => {
               if (debug) {
                 stdout.log(new CommandError(error));
               }
+              this.site.accessToken = accessToken;
               resolve(accessToken);
             });
         }, (error: any): void => {
