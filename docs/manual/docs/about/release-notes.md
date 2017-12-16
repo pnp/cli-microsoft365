@@ -2,9 +2,17 @@
 
 ## v0.4.0
 
+### New commands
+
+**SharePoint Online:**
+
+- [spo customaction list](../cmd/spo/customaction/customaction-list.md) - lists user custom actions for site or site collection [#19](https://github.com/SharePoint/office365-cli/issues/19)
+
 ### Changes
 
 - added support for persisting connection [#46](https://github.com/SharePoint/office365-cli/issues/46)
+- fixed authentication bug in `spo app install`, `spo app uninstall` and `spo app upgrade` commands when connected to the tenant admin site [#118](https://github.com/SharePoint/office365-cli/issues/118)
+- fixed bug in rendering help for commands when using the `--help` option [#104](https://github.com/SharePoint/office365-cli/issues/104)
 
 ## v0.3.0
 
