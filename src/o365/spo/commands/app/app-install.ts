@@ -61,7 +61,7 @@ class AppInstallCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${args.options.siteUrl}/_api/web/tenantappcatalog/AvailableApps/GetById('${encodeURIComponent(args.options.id)}')/install`,
           headers: Utils.getRequestHeaders({
-            authorization: `Bearer ${auth.site.accessToken}`,
+            authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata',
             'X-RequestDigest': res.FormDigestValue
           })
