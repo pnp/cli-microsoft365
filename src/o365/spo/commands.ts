@@ -24,4 +24,5 @@ export default {
   CDN_POLICY_LIST: `${prefix} cdn policy list`,
   CDN_POLICY_SET: `${prefix} cdn policy set`,
   CUSTOMACTION_GET: `${prefix} customaction get`,
+  CUSTOMACTION_LIST: `${prefix} customaction list`
 };
