@@ -1,6 +1,6 @@
 # spo customaction get
 
-Gets information about the specific user custom action for site or site collection
+Gets information about a user custom action for site or site collection
 
 ## Usage
 
@@ -13,7 +13,7 @@ spo customaction get [options]
 Option|Description
 ------|-----------
 `--help`|output usage information
-`-i, --id <id>`|ID of the app to retrieve information for
+`-i, --id <id>`|ID of the user custom action to retrieve information for
 `-u, --url <url>`|Url of the site or site collection to retrieve the custom action from
 `-s, --scope [scope]`|Scope of the custom action. Allowed values `Site|Web|All`. Default `All`
 `-o, --output <output>`|Output type. `json|text`. Default `text`

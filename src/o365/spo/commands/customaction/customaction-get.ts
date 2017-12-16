@@ -11,6 +11,7 @@ import SpoCommand from '../../SpoCommand';
 import { ContextInfo } from '../../spo';
 import Utils from '../../../../Utils';
 import { CustomAction } from './customaction';
+import Auth from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -34,23 +35,28 @@ class SpoCustomActionGetCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    const resource: string = Auth.getResourceFromUrl(args.options.url);
+    let siteAccessToken: string = '';
+
     if (this.debug) {
-      cmd.log(`Retrieving access token for ${auth.service.resource}...`);
+      cmd.log(`Retrieving access token for ${resource}...`);
     }
 
     auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
+      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
       .then((accessToken: string): Promise<ContextInfo> => {
+        siteAccessToken = accessToken;
+
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
         }
 
-        return this.getRequestDigestForSite(args.options.url, accessToken, cmd, this.debug);
+        return this.getRequestDigestForSite(args.options.url, siteAccessToken, cmd, this.debug);
       })
       .then((contextResponse: ContextInfo): Promise<CustomAction> => {
         if (this.debug) {
           cmd.log('Response:');
-          cmd.log(contextResponse);
+          cmd.log(JSON.stringify(contextResponse));
           cmd.log('');
 
           cmd.log(`Attempt to get custom action with scope: ${args.options.scope}`);
@@ -58,15 +64,15 @@ class SpoCustomActionGetCommand extends SpoCommand {
         }
 
         if (args.options.scope && args.options.scope.toLowerCase() !== "all") {
-          return this.getCustomAction(args.options, cmd);
+          return this.getCustomAction(args.options, siteAccessToken, cmd);
         }
 
-        return this.searchAllScopes(args.options, cmd);
+        return this.searchAllScopes(args.options, siteAccessToken, cmd);
       })
       .then((customAction: CustomAction): void => {
         if (this.debug) {
           cmd.log('Response:');
-          cmd.log(customAction);
+          cmd.log(JSON.stringify(customAction));
           cmd.log('');
         }
 
@@ -77,23 +83,36 @@ class SpoCustomActionGetCommand extends SpoCommand {
         }
         else {
           cmd.log({
-            Name: customAction.Name,
-            Id: customAction.Id,
-            Location: customAction.Location,
-            Scope: this.humanizeScope(customAction.Scope),
             ClientSideComponentId: customAction.ClientSideComponentId,
-            ClientSideComponentProperties: customAction.ClientSideComponentProperties
+            ClientSideComponentProperties: customAction.ClientSideComponentProperties,
+            CommandUIExtension: customAction.CommandUIExtension,
+            Description: customAction.Description,
+            Group: customAction.Group,
+            Id: customAction.Id,
+            ImageUrl: customAction.ImageUrl,
+            Location: customAction.Location,
+            Name: customAction.Name,
+            RegistrationId: customAction.RegistrationId,
+            RegistrationType: customAction.RegistrationType,
+            Rights: JSON.stringify(customAction.Rights),
+            Scope: this.humanizeScope(customAction.Scope),
+            ScriptBlock: customAction.ScriptBlock,
+            ScriptSrc: customAction.ScriptSrc,
+            Sequence: customAction.Sequence,
+            Title: customAction.Title,
+            Url: customAction.Url,
+            VersionOfUserCustomAction: customAction.VersionOfUserCustomAction
           });
         }
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
   }
 
-  private getCustomAction(options: Options, cmd: CommandInstance): Promise<CustomAction> {
+  private getCustomAction(options: Options, siteAccessToken: string, cmd: CommandInstance): Promise<CustomAction> {
     const requestOptions: any = {
       url: `${options.url}/_api/${options.scope}/UserCustomActions('${encodeURIComponent(options.id)}')`,
       headers: Utils.getRequestHeaders({
-        authorization: `Bearer ${auth.service.accessToken}`,
+        authorization: `Bearer ${siteAccessToken}`,
         accept: 'application/json;odata=nometadata'
       }),
       json: true
@@ -101,7 +120,7 @@ class SpoCustomActionGetCommand extends SpoCommand {
 
     if (this.debug) {
       cmd.log('Executing web request...');
-      cmd.log(requestOptions);
+      cmd.log(JSON.stringify(requestOptions));
       cmd.log('');
     }
 
@@ -113,16 +132,16 @@ class SpoCustomActionGetCommand extends SpoCommand {
    * If custom action not found then 
    * another get request is send with `site` scope.
    */
-  private searchAllScopes(options: Options, cmd: CommandInstance): Promise<CustomAction> {
+  private searchAllScopes(options: Options, siteAccessToken: string, cmd: CommandInstance): Promise<CustomAction> {
     return new Promise<CustomAction>((resolve: (customAction: CustomAction) => void, reject: (error: any) => void): void => {
       options.scope = "Web";
 
       this
-        .getCustomAction(options, cmd)
+        .getCustomAction(options, siteAccessToken, cmd)
         .then((webResult: CustomAction): void => {
           if (this.debug) {
             cmd.log('getCustomAction with scope of web result...');
-            cmd.log(webResult);
+            cmd.log(JSON.stringify(webResult));
             cmd.log('');
           }
 
@@ -132,11 +151,11 @@ class SpoCustomActionGetCommand extends SpoCommand {
 
           options.scope = "Site";
           this
-            .getCustomAction(options, cmd)
+            .getCustomAction(options, siteAccessToken, cmd)
             .then((siteResult: CustomAction): void => {
               if (this.debug) {
                 cmd.log('getCustomAction with scope of site result...');
-                cmd.log(siteResult);
+                cmd.log(JSON.stringify(siteResult));
                 cmd.log('');
               }
 
