@@ -22,7 +22,7 @@ interface Options extends GlobalOptions {
   url: string;
 }
 
-class AppGetCommand extends SpoCommand {
+class SiteGetCommand extends SpoCommand {
   public get name(): string {
     return commands.SITE_GET;
   }
@@ -145,4 +145,4 @@ class AppGetCommand extends SpoCommand {
   }
 }
 
-module.exports = new AppGetCommand();
+module.exports = new SiteGetCommand();
