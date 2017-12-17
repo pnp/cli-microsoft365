@@ -10,7 +10,7 @@ export default class Utils {
       return s;
     }
 
-    return s.replace(/[<>&'"]/g, (c: string): string => {
+    return s.replace(/[<>&"]/g, (c: string): string => {
       let char: string = c;
 
       switch (c) {
@@ -22,9 +22,6 @@ export default class Utils {
           break;
         case '&':
           char = '&amp;';
-          break;
-        case '\'':
-          char = '&apos;';
           break;
         case '"':
           char = '&quot;';

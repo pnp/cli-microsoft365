@@ -28,6 +28,7 @@ pages:
         - customaction list: 'cmd/spo/customaction/customaction-list.md'
       - site:
         - site get: 'cmd/spo/site/site-get.md'
+        - site list: 'cmd/spo/site/site-list.md'
       - storageentity:
         - storageentity get: 'cmd/spo/storageentity/storageentity-get.md'
         - storageentity list: 'cmd/spo/storageentity/storageentity-list.md'
