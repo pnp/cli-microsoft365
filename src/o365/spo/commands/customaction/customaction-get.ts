@@ -34,6 +34,12 @@ class SpoCustomActionGetCommand extends SpoCommand {
     return 'Gets details for the specified custom action';
   }
 
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.scope = args.options.scope || 'All';
+    return telemetryProps;
+  }
+
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const resource: string = Auth.getResourceFromUrl(args.options.url);
     let siteAccessToken: string = '';
