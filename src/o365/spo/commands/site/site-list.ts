@@ -36,7 +36,7 @@ class SiteListCommand extends SpoCommand {
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.siteType = args.options.type || 'TeamSite';
-    telemetryProps.filter = args.options.filter || '(not set)';
+    telemetryProps.filter = (!(!args.options.filter)).toString();
     return telemetryProps;
   }
 
