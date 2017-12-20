@@ -247,7 +247,7 @@ describe('Command', () => {
     sandbox.stub(vorpal, '_command').value({
       command: 'help mock2'
     });
-    const log = (msg?: string) => { console.log(msg); };
+    const log = (msg?: string) => { };
     const logSpy = sinon.spy(log);
     const mock = new MockCommand2();
     const cmd = {

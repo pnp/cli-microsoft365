@@ -119,7 +119,7 @@ export default abstract class Command {
         typeof vorpal._command !== 'undefined' &&
         typeof vorpal._command.command !== 'undefined' &&
         vorpal._command.command.indexOf('help ') === 0;
-      
+
       const log = ranFromHelpCommand ? cbOrLog : this.log.bind(this);
 
       cmd.commandHelp(args, log);
@@ -201,6 +201,24 @@ export default abstract class Command {
       cmd.log(new CommandError(rawResponse));
     }
 
+    callback();
+  }
+
+  protected handleRejectedODataJsonPromise(response: any, cmd: CommandInstance, callback: () => void): void {
+    if (response.error &&
+      response.error['odata.error'] &&
+      response.error['odata.error'].message) {
+      cmd.log(new CommandError(response.error['odata.error'].message.value));
+    }
+    else {
+      if (response instanceof Error) {
+        cmd.log(new CommandError(response.message));
+      }
+      else {
+        cmd.log(new CommandError(response));
+      }
+    }
+    
     callback();
   }
 
