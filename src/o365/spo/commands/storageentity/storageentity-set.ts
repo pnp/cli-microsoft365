@@ -39,6 +39,13 @@ class SpoStorageEntitySetCommand extends SpoCommand {
     return true;
   }
 
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.description = (!(!args.options.description)).toString();
+    telemetryProps.comment = (!(!args.options.comment)).toString();
+    return telemetryProps;
+  }
+
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     if (this.debug) {
       cmd.log(`key option set. Retrieving access token for ${auth.service.resource}...`);
