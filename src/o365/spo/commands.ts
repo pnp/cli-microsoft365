@@ -6,6 +6,7 @@ export default {
   APP_GET: `${prefix} app get`,
   APP_INSTALL: `${prefix} app install`,
   APP_LIST: `${prefix} app list`,
+  APP_REMOVE: `${prefix} app remove`,
   APP_RETRACT: `${prefix} app retract`,
   APP_UNINSTALL: `${prefix} app uninstall`,
   APP_UPGRADE: `${prefix} app upgrade`,

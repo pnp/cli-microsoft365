@@ -181,12 +181,6 @@ export default abstract class Command {
   }
 
   protected handleRejectedODataPromise(rawResponse: any, cmd: CommandInstance, callback: () => void): void {
-    if (rawResponse instanceof Error) {
-      cmd.log(new CommandError(rawResponse.message));
-      callback();
-      return;
-    }
-
     const res: any = JSON.parse(JSON.stringify(rawResponse));
     if (res.error) {
       try {
@@ -198,7 +192,12 @@ export default abstract class Command {
       }
     }
     else {
-      cmd.log(new CommandError(rawResponse));
+      if (rawResponse instanceof Error) {
+        cmd.log(new CommandError(rawResponse.message));
+      }
+      else {
+        cmd.log(new CommandError(rawResponse));
+      }
     }
 
     callback();
