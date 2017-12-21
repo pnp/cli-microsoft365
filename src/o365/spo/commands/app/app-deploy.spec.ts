@@ -275,6 +275,172 @@ describe(commands.APP_DEPLOY, () => {
     });
   });
 
+  it('deploys app in the tenant app catalog skipping feature deployment when the skipFeatureDeployment flag provided', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf(`search/query?querytext='contentclass:STS_Site%20AND%20SiteTemplate:APPCATALOG'`) > -1) {
+        return Promise.resolve({
+          PrimaryQueryResult: {
+            RelevantResults: {
+              RowCount: 1,
+              Table: {
+                Rows: [{
+                  Cells: [
+                    {
+                      Key: 'ID',
+                      Value: '1',
+                      ValueType: 'Number'
+                    },
+                    {
+                      Key: 'SPWebUrl',
+                      Value: 'https://contoso.sharepoint.com/sites/apps',
+                      ValueType: 'String'
+                    }
+                  ]
+                }]
+              }
+            }
+          }
+        } as SearchResponse);
+      }
+
+      return Promise.reject('Invalid request');
+    });
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        return Promise.resolve({
+          FormDigestValue: 'abc'
+        });
+      }
+
+      if (opts.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve();
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', skipFeatureDeployment: true } }, () => {
+      let correctRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.headers.accept &&
+          r.headers.accept.indexOf('application/json') === 0 &&
+          r.body === JSON.stringify({'skipFeatureDeployment': true})) {
+          correctRequestIssued = true;
+        }
+      });
+      try {
+        assert(correctRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore([
+          request.post,
+          request.get
+        ]);
+      }
+    });
+  });
+
+  it('deploys app in the tenant app catalog not skipping feature deployment when the skipFeatureDeployment flag not provided', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf(`search/query?querytext='contentclass:STS_Site%20AND%20SiteTemplate:APPCATALOG'`) > -1) {
+        return Promise.resolve({
+          PrimaryQueryResult: {
+            RelevantResults: {
+              RowCount: 1,
+              Table: {
+                Rows: [{
+                  Cells: [
+                    {
+                      Key: 'ID',
+                      Value: '1',
+                      ValueType: 'Number'
+                    },
+                    {
+                      Key: 'SPWebUrl',
+                      Value: 'https://contoso.sharepoint.com/sites/apps',
+                      ValueType: 'String'
+                    }
+                  ]
+                }]
+              }
+            }
+          }
+        } as SearchResponse);
+      }
+
+      return Promise.reject('Invalid request');
+    });
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        return Promise.resolve({
+          FormDigestValue: 'abc'
+        });
+      }
+
+      if (opts.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve();
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
+      let correctRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.headers.accept &&
+          r.headers.accept.indexOf('application/json') === 0 &&
+          r.body === JSON.stringify({'skipFeatureDeployment': false})) {
+          correctRequestIssued = true;
+        }
+      });
+      try {
+        assert(correctRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore([
+          request.post,
+          request.get
+        ]);
+      }
+    });
+  });
+
   it('deploys app in the specified tenant app catalog', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
