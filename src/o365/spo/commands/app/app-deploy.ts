@@ -21,6 +21,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   id: string;
   appCatalogUrl?: string;
+  skipFeatureDeployment?: boolean;
 }
 
 class AppDeployCommand extends SpoCommand {
@@ -35,6 +36,7 @@ class AppDeployCommand extends SpoCommand {
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.appCatalogUrl = (!(!args.options.appCatalogUrl)).toString();
+    telemetryProps.skipFeatureDeployment = args.options.skipFeatureDeployment || false;
     return telemetryProps;
   }
 
@@ -116,8 +118,10 @@ class AppDeployCommand extends SpoCommand {
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${accessToken}`,
             accept: 'application/json;odata=nometadata',
+            'content-type': 'application/json;odata=nometadata;charset=utf-8',
             'X-RequestDigest': res.FormDigestValue
-          })
+          }),
+          body: JSON.stringify({ 'skipFeatureDeployment': args.options.skipFeatureDeployment || false })
         };
 
         if (this.debug) {
@@ -152,6 +156,10 @@ class AppDeployCommand extends SpoCommand {
       {
         option: '-u, --appCatalogUrl [appCatalogUrl]',
         description: '(optional) URL of the tenant app catalog site. If not specified, the CLI will try to resolve it automatically'
+      },
+      {
+        option: '--skipFeatureDeployment',
+        description: 'If the app supports tenant-wide deployment, deploy it to the whole tenant'
       }
     ];
 
