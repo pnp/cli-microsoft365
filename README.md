@@ -1,5 +1,7 @@
 ![SharePoint Patterns and Practices](https://devofficecdn.azureedge.net/media/Default/PnP/sppnp.png)
 
+[![Join the chat at https://gitter.im/office365-cli/cli](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/office365-cli/cli?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 # Office 365 CLI
 
 The Office 365 CLI allows you to manage different settings of your Microsoft Office 365 tenant on any platform.
