@@ -9,6 +9,7 @@
 - [spo customaction list](../cmd/spo/customaction/customaction-list.md) - lists user custom actions for site or site collection [#19](https://github.com/SharePoint/office365-cli/issues/19)
 - [spo site get](../cmd/spo/site/site-get.md) - gets information about the specific site collection [#114](https://github.com/SharePoint/office365-cli/issues/114)
 - [spo site list](../cmd/spo/site/site-list.md) - lists modern sites of the given type [#115](https://github.com/SharePoint/office365-cli/issues/115)
+- [spo site add](../cmd/spo/site/site-add.md) - creates new modern site [#116](https://github.com/SharePoint/office365-cli/issues/116)
 
 ### Changes
 
@@ -17,6 +18,8 @@
 - fixed authentication bug in the `spo customaction get` command when connected to the tenant admin site [#113](https://github.com/SharePoint/office365-cli/issues/113)
 - fixed bug in rendering help for commands when using the `--help` option [#104](https://github.com/SharePoint/office365-cli/issues/104)
 - added detailed output to the `spo customaction get` command [#93](https://github.com/SharePoint/office365-cli/issues/93)
+- improved collecting telemetry [#130](https://github.com/SharePoint/office365-cli/issues/130), [#131](https://github.com/SharePoint/office365-cli/issues/131), [#132](https://github.com/SharePoint/office365-cli/issues/132), [#133](https://github.com/SharePoint/office365-cli/issues/133)
+- added support for the `skipFeatureDeployment` flag to the [spo app deploy](../cmd/spo/app/app-deploy.md) command [#134](https://github.com/SharePoint/office365-cli/issues/134)
 
 ## v0.3.0
 
