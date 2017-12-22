@@ -1,6 +1,9 @@
 ![SharePoint Patterns and Practices](https://devofficecdn.azureedge.net/media/Default/PnP/sppnp.png)
 
+[![CircleCI](https://circleci.com/gh/SharePoint/office365-cli/tree/dev.svg?style=shield&circle-token=ce99e8046a231e1959248a61e7e32f9ae1abc8cf)](https://circleci.com/gh/SharePoint/office365-cli/tree/dev)
+[![Coverage Status](https://coveralls.io/repos/github/SharePoint/office365-cli/badge.svg?branch=dev)](https://coveralls.io/github/SharePoint/office365-cli?branch=dev)
 [![Join the chat at https://gitter.im/office365-cli/cli](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/office365-cli/cli?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![bitHound Dependencies](https://www.bithound.io/github/SharePoint/office365-cli/badges/dependencies.svg)](https://www.bithound.io/github/SharePoint/office365-cli/master/dependencies/npm)
 
 # Office 365 CLI
 
