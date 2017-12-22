@@ -28,5 +28,6 @@ export default {
   CUSTOMACTION_LIST: `${prefix} customaction list`,
   SITE_ADD: `${prefix} site add`,
   SITE_GET: `${prefix} site get`,
-  SITE_LIST: `${prefix} site list`
+  SITE_LIST: `${prefix} site list`,
+  SITE_APPCATALOG_REMOVE: `${prefix} site appcatalog remove`
 };
