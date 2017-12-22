@@ -1,0 +1,149 @@
+import auth from '../../SpoAuth';
+import config from '../../../../config';
+import commands from '../../commands';
+import * as request from 'request-promise-native';
+import SpoCommand from '../../SpoCommand';
+import Utils from '../../../../Utils';
+import { CommandOption, CommandError, CommandValidate } from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
+
+const vorpal: Vorpal = require('../../../../vorpal-init');
+
+interface CommandArgs {
+  options: Options;
+}
+
+interface Options extends GlobalOptions {
+  url: string;
+}
+
+class SiteAppCatalogAddCommand extends SpoCommand {
+  public get name(): string {
+    return commands.SITE_APPCATALOG_ADD;
+  }
+
+  public get description(): string {
+    return 'Creates a site collection app catalog in the specified site';
+  }
+
+  protected requiresTenantAdmin(): boolean {
+    return true;
+  }
+
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.url = (!(!args.options.url)).toString();
+    return telemetryProps;
+  }
+
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    const url: string = args.options.url;
+
+    auth
+      .ensureAccessToken(auth.service.resource, cmd, this.debug)
+      .then((accessToken: string): Promise<ContextInfo> => {
+        if (this.debug) {
+          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest for tenant admin at ${auth.site.url}...`);
+        }
+
+        return this.getRequestDigest(cmd, this.debug);
+      })
+      .then((res: ContextInfo): Promise<string> => {
+        if (this.debug) {
+          cmd.log('Response:');
+          cmd.log(res);
+          cmd.log('');
+        }
+
+        if (this.verbose) {
+          cmd.log(`Adding site collection app catalog...`);
+        }
+
+        const requestOptions: any = {
+          url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+          headers: Utils.getRequestHeaders({
+            authorization: `Bearer ${auth.service.accessToken}`,
+            'X-RequestDigest': res.FormDigestValue
+          }),
+          body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="38" ObjectPathId="37" /><ObjectPath Id="40" ObjectPathId="39" /><ObjectPath Id="42" ObjectPathId="41" /><ObjectPath Id="44" ObjectPathId="43" /><ObjectPath Id="46" ObjectPathId="45" /><ObjectPath Id="48" ObjectPathId="47" /></Actions><ObjectPaths><Constructor Id="37" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="39" ParentId="37" Name="GetSiteByUrl"><Parameters><Parameter Type="String">${Utils.escapeXml(url)}</Parameter></Parameters></Method><Property Id="41" ParentId="39" Name="RootWeb" /><Property Id="43" ParentId="41" Name="TenantAppCatalog" /><Property Id="45" ParentId="43" Name="SiteCollectionAppCatalogsSites" /><Method Id="47" ParentId="45" Name="Add"><Parameters><Parameter Type="String">${Utils.escapeXml(url)}</Parameter></Parameters></Method></ObjectPaths></Request>`
+        };
+
+        if (this.debug) {
+          cmd.log('Executing web request...');
+          cmd.log(JSON.stringify(requestOptions));
+          cmd.log('');
+        }
+
+        return request.post(requestOptions);
+      })
+      .then((res: string): void => {
+        if (this.debug) {
+          cmd.log('Response:');
+          cmd.log(res);
+          cmd.log('');
+        }
+
+        const json: ClientSvcResponse = JSON.parse(res);
+        const response: ClientSvcResponseContents = json[0];
+        if (response.ErrorInfo) {
+          cmd.log(new CommandError(response.ErrorInfo.ErrorMessage));
+        }
+        else {
+          if (this.verbose) {
+            cmd.log('Site collection app catalog created');
+          }
+        }
+        cb();
+      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+  }
+
+  public options(): CommandOption[] {
+    const options: CommandOption[] = [
+      {
+        option: '-u, --url <url>',
+        description: 'URL of the site collection where the app catalog should be added'
+      }
+    ];
+
+    const parentOptions: CommandOption[] = super.options();
+    return options.concat(parentOptions);
+  }
+
+  public validate(): CommandValidate {
+    return (args: CommandArgs): boolean | string => {
+      if (!args.options.url) {
+        return 'Required option url missing';
+      }
+
+      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.url);
+
+      if (isValidSharePointUrl !== true) {
+        return isValidSharePointUrl;
+      }
+
+      return true;
+    };
+  }
+
+  public commandHelp(args: {}, log: (help: string) => void): void {
+    const chalk = vorpal.chalk;
+    log(vorpal.find(this.name).helpInformation());
+    log(
+      `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online tenant admin site,
+      using the ${chalk.blue(commands.CONNECT)} command.
+   
+  Remarks:
+
+  To create a site collection app catalog, you have to first connect to a tenant admin site using the
+    ${chalk.blue(commands.CONNECT)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso-admin.sharepoint.com`)}.
+
+  Examples:
+  
+    Add a site collection app catalog to the specified site
+      ${chalk.grey(config.delimiter)} ${commands.SITE_APPCATALOG_ADD} --url https://contoso.sharepoint.com/sites/site
+    `);
+  }
+}
+
+module.exports = new SiteAppCatalogAddCommand();

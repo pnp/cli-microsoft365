@@ -29,5 +29,6 @@ export default {
   SITE_ADD: `${prefix} site add`,
   SITE_GET: `${prefix} site get`,
   SITE_LIST: `${prefix} site list`,
+  SITE_APPCATALOG_ADD: `${prefix} site appcatalog add`,
   SITE_APPCATALOG_REMOVE: `${prefix} site appcatalog remove`
 };

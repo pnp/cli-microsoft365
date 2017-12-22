@@ -31,6 +31,7 @@ pages:
         - site add: 'cmd/spo/site/site-add.md'
         - site get: 'cmd/spo/site/site-get.md'
         - site list: 'cmd/spo/site/site-list.md'
+        - site appcatalog add: 'cmd/spo/site/site-appcatalog-add.md'
         - site appcatalog remove: 'cmd/spo/site/site-appcatalog-remove.md'
       - storageentity:
         - storageentity get: 'cmd/spo/storageentity/storageentity-get.md'
