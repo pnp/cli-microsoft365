@@ -10,6 +10,9 @@
 - [spo site get](../cmd/spo/site/site-get.md) - gets information about the specific site collection [#114](https://github.com/SharePoint/office365-cli/issues/114)
 - [spo site list](../cmd/spo/site/site-list.md) - lists modern sites of the given type [#115](https://github.com/SharePoint/office365-cli/issues/115)
 - [spo site add](../cmd/spo/site/site-add.md) - creates new modern site [#116](https://github.com/SharePoint/office365-cli/issues/116)
+- [spo app remove](../cmd/spo/app/app-remove.md) - removes the specified app from the tenant app catalog [#9](https://github.com/SharePoint/office365-cli/issues/9)
+- [spo site appcatalog add](../cmd/spo/site/site-appcatalog-add.md) - creates a site collection app catalog in the specified site [#63](https://github.com/SharePoint/office365-cli/issues/63)
+- [spo site appcatalog remove](../cmd/spo/site/site-appcatalog-remove.md) - removes site collection scoped app catalog from site [#64](https://github.com/SharePoint/office365-cli/issues/64)
 
 ### Changes
 
