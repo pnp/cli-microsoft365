@@ -6,12 +6,16 @@ import { KeychainTokenStorage } from './auth/KeychainTokenStorage';
 import { WindowsTokenStorage } from './auth/WindowsTokenStorage';
 import { FileTokenStorage } from './auth/FileTokenStorage';
 
-export abstract class Service {
+export class Service {
   connected: boolean;
   resource: string;
   accessToken: string;
   refreshToken?: string;
   expiresAt: number;
+
+  constructor(resource: string = '') {
+    this.resource = resource;
+  }
 
   public disconnect(): void {
     this.connected = false;

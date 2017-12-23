@@ -38,6 +38,8 @@ pages:
         - storageentity list: 'cmd/spo/storageentity/storageentity-list.md'
         - storageentity remove: 'cmd/spo/storageentity/storageentity-remove.md'
         - storageentity set: 'cmd/spo/storageentity/storageentity-set.md'
+    - Azure Active Directory Graph (aad):
+      - connect: 'cmd/aad/connect.md'
   - Concepts:
     - 'Persisting connection': 'concepts/persisting-connection.md'
   - About:
