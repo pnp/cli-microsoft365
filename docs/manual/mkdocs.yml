@@ -40,6 +40,10 @@ pages:
         - storageentity set: 'cmd/spo/storageentity/storageentity-set.md'
     - Azure Active Directory Graph (aad):
       - connect: 'cmd/aad/connect.md'
+      - disconnect: 'cmd/aad/disconnect.md'
+      - status: 'cmd/aad/status.md'
+      - service principal (sp):
+        - sp get: 'cmd/aad/sp/sp-get.md'
   - Concepts:
     - 'Persisting connection': 'concepts/persisting-connection.md'
   - About:
