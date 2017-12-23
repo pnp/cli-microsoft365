@@ -1,6 +1,6 @@
 # Release notes
 
-## v0.4.0
+## [v0.4.0](https://github.com/SharePoint/office365-cli/releases/tag/v0.4.0)
 
 ### New commands
 
@@ -21,7 +21,7 @@
 - improved collecting telemetry [#130](https://github.com/SharePoint/office365-cli/issues/130), [#131](https://github.com/SharePoint/office365-cli/issues/131), [#132](https://github.com/SharePoint/office365-cli/issues/132), [#133](https://github.com/SharePoint/office365-cli/issues/133)
 - added support for the `skipFeatureDeployment` flag to the [spo app deploy](../cmd/spo/app/app-deploy.md) command [#134](https://github.com/SharePoint/office365-cli/issues/134)
 
-## v0.3.0
+## [v0.3.0](https://github.com/SharePoint/office365-cli/releases/tag/v0.3.0)
 
 ### New commands
 
@@ -38,7 +38,7 @@
 - added Google Analytics code to documentation [#84](https://github.com/SharePoint/office365-cli/issues/84)
 - added support for formatting command output as JSON [#48](https://github.com/SharePoint/office365-cli/issues/48)
 
-## v0.2.0
+## [v0.2.0](https://github.com/SharePoint/office365-cli/releases/tag/v0.2.0)
 
 ### New commands
 
