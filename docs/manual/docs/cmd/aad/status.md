@@ -1,6 +1,6 @@
 # aad status
 
-Shows Azure Active Directory Graph site connection status
+Shows Azure Active Directory Graph connection status
 
 ## Usage
 

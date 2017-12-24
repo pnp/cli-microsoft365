@@ -13,7 +13,7 @@ class AadStatusCommand extends Command {
   }
 
   public get description(): string {
-    return 'Shows Azure Active Directory Graph site connection status';
+    return 'Shows Azure Active Directory Graph connection status';
   }
 
   public commandAction(cmd: CommandInstance, args: {}, cb: () => void): void {

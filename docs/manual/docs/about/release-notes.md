@@ -14,6 +14,13 @@
 - [spo site appcatalog add](../cmd/spo/site/site-appcatalog-add.md) - creates a site collection app catalog in the specified site [#63](https://github.com/SharePoint/office365-cli/issues/63)
 - [spo site appcatalog remove](../cmd/spo/site/site-appcatalog-remove.md) - removes site collection scoped app catalog from site [#64](https://github.com/SharePoint/office365-cli/issues/64)
 
+**Azure Active Directory Graph:**
+
+- [aad connect](../cmd/aad/connect.md) - connects to the Azure Active Directory Graph [#160](https://github.com/SharePoint/office365-cli/issues/160)
+- [aad disconnect](../cmd/aad/disconnect.md) - disconnects from Azure Active Directory Graph [#161](https://github.com/SharePoint/office365-cli/issues/161)
+- [aad status](../cmd/aad/status.md) - shows Azure Active Directory Graph connection status [#162](https://github.com/SharePoint/office365-cli/issues/162)
+- [aad sp get](../cmd/aad/sp/sp-get.md) - gets information about the specific service principal [#158](https://github.com/SharePoint/office365-cli/issues/158)
+
 ### Changes
 
 - added support for persisting connection [#46](https://github.com/SharePoint/office365-cli/issues/46)
