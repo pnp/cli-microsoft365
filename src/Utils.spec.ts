@@ -108,6 +108,38 @@ describe('Utils', () => {
     }
   });
 
+  it('formats object output as transposed table', (done) => {
+    const o = { prop1: 'value1 ', prop12: 'value12' };
+    const actual = Utils.logOutput([o]);
+    const t = new Table();
+    t.cell('prop1', 'value1');
+    t.cell('prop12', 'value12');
+    t.newRow();
+    const expected = t.printTransposed({
+      separator: ': '
+    });
+    try {
+      assert.equal(actual, expected);
+      done();
+    }
+    catch (e) {
+      done(e);
+    }
+  });
+
+  it('formats array values as JSON', (done) => {
+    const o = { prop1: ['value1', 'value2'] };
+    const actual = Utils.logOutput([o]);
+    const expected = 'prop1: ["value1","value2"]' + os.EOL;
+    try {
+      assert.equal(actual, expected);
+      done();
+    }
+    catch (e) {
+      done(e);
+    }
+  });
+
   it('formats array output as table', (done) => {
     const o = [
       { prop1: 'value1', prop2: 'value2' },
