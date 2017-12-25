@@ -45,6 +45,7 @@ pages:
       - oauth2grant:
         - oauth2grant add: 'cmd/aad/oauth2grant/oauth2grant-add.md'
         - oauth2grant list: 'cmd/aad/oauth2grant/oauth2grant-list.md'
+        - oauth2grant set: 'cmd/aad/oauth2grant/oauth2grant-set.md'
       - service principal (sp):
         - sp get: 'cmd/aad/sp/sp-get.md'
   - Concepts:
