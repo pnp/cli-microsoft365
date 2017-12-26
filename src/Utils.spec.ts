@@ -130,7 +130,7 @@ describe('Utils', () => {
   it('formats array values as JSON', (done) => {
     const o = { prop1: ['value1', 'value2'] };
     const actual = Utils.logOutput([o]);
-    const expected = 'prop1: ["value1","value2"]' + os.EOL;
+    const expected = 'prop1: ["value1","value2"]' + '\n';
     try {
       assert.equal(actual, expected);
       done();

@@ -149,7 +149,7 @@ export default class Utils {
         output.push(`${p.length < longestPropertyLength ? p + new Array(longestPropertyLength - p.length + 1).join(' ') : p}: ${Array.isArray(obj[p]) ? JSON.stringify(obj[p]) : obj[p]}`);
       });
 
-      return output.join(os.EOL) + os.EOL;
+      return output.join('\n') + '\n';
     }
     else {
       const t: Table = new Table();
