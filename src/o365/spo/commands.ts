@@ -18,6 +18,7 @@ export default {
   CDN_POLICY_SET: `${prefix} cdn policy set`,
   CDN_SET: `${prefix} cdn set`,
   CONNECT: `${prefix} connect`,
+  CUSTOMACTION_ADD: `${prefix} customaction add`,
   CUSTOMACTION_GET: `${prefix} customaction get`,
   CUSTOMACTION_LIST: `${prefix} customaction list`,
   DISCONNECT: `${prefix} disconnect`,

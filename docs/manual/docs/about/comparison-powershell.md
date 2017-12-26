@@ -134,7 +134,7 @@ Add-PnPClientSideWebPart|SharePointPnPPowerShellOnline|
 Add-PnPContentType|SharePointPnPPowerShellOnline|
 Add-PnPContentTypeToDocumentSet|SharePointPnPPowerShellOnline|
 Add-PnPContentTypeToList|SharePointPnPPowerShellOnline|
-Add-PnPCustomAction|SharePointPnPPowerShellOnline|
+Add-PnPCustomAction|SharePointPnPPowerShellOnline|[spo customaction add](../cmd/spo/customaction/customaction-add.md)
 Add-PnPDataRowsToProvisioningTemplate|SharePointPnPPowerShellOnline|
 Add-PnPDocumentSet|SharePointPnPPowerShellOnline|
 Add-PnPEventReceiver|SharePointPnPPowerShellOnline|
