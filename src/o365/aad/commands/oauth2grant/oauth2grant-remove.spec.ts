@@ -3,13 +3,13 @@ import Command, { CommandOption, CommandValidate, CommandError } from '../../../
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../AadAuth';
-const command: Command = require('./oauth2grant-set');
+const command: Command = require('./oauth2grant-remove');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import Utils from '../../../../Utils';
 import { Service } from '../../../../Auth';
 
-describe(commands.OAUTH2GRANT_SET, () => {
+describe(commands.OAUTH2GRANT_REMOVE, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
@@ -41,7 +41,7 @@ describe(commands.OAUTH2GRANT_SET, () => {
   afterEach(() => {
     Utils.restore([
       vorpal.find,
-      request.patch
+      request.delete
     ]);
   });
 
@@ -54,7 +54,7 @@ describe(commands.OAUTH2GRANT_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.OAUTH2GRANT_SET), true);
+    assert.equal(command.name.startsWith(commands.OAUTH2GRANT_REMOVE), true);
   });
 
   it('has a description', () => {
@@ -78,7 +78,7 @@ describe(commands.OAUTH2GRANT_SET, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, () => {
       try {
-        assert.equal(telemetry.name, commands.OAUTH2GRANT_SET);
+        assert.equal(telemetry.name, commands.OAUTH2GRANT_REMOVE);
         done();
       }
       catch (e) {
@@ -102,14 +102,11 @@ describe(commands.OAUTH2GRANT_SET, () => {
     });
   });
 
-  it('updates OAuth2 permission grant (debug)', (done) => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
+  it('removes OAuth2 permission grant (debug)', (done) => {
+    sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url.indexOf(`/myorganization/oauth2PermissionGrants/YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek?api-version=1.6`) > -1) {
         if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers['content-type'] &&
-          opts.headers['content-type'].indexOf('application/json') === 0 &&
-          opts.body.scope === 'user_impersonation') {
+          opts.headers.authorization.indexOf('Bearer ') === 0) {
           return Promise.resolve();
         }
       }
@@ -120,7 +117,7 @@ describe(commands.OAUTH2GRANT_SET, () => {
     auth.service = new Service('https://graph.windows.net');
     auth.service.connected = true;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek', scope: 'user_impersonation' } }, () => {
+    cmdInstance.action({ options: { debug: true, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
         done();
@@ -131,14 +128,11 @@ describe(commands.OAUTH2GRANT_SET, () => {
     });
   });
 
-  it('updates OAuth2 permission grant', (done) => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
+  it('removes OAuth2 permission grant', (done) => {
+    sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url.indexOf(`/myorganization/oauth2PermissionGrants/YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek?api-version=1.6`) > -1) {
         if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers['content-type'] &&
-          opts.headers['content-type'].indexOf('application/json') === 0 &&
-          opts.body.scope === 'user_impersonation') {
+          opts.headers.authorization.indexOf('Bearer ') === 0) {
           return Promise.resolve();
         }
       }
@@ -149,7 +143,7 @@ describe(commands.OAUTH2GRANT_SET, () => {
     auth.service = new Service('https://graph.windows.net');
     auth.service.connected = true;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek', scope: 'user_impersonation' } }, () => {
+    cmdInstance.action({ options: { debug: false, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
         done();
@@ -161,7 +155,7 @@ describe(commands.OAUTH2GRANT_SET, () => {
   });
   
   it('correctly handles API OData error', (done) => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'delete').callsFake((opts) => {
       return Promise.reject({
         error: {
           'odata.error': {
@@ -177,7 +171,7 @@ describe(commands.OAUTH2GRANT_SET, () => {
     auth.service = new Service('https://graph.windows.net');
     auth.service.connected = true;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320', resourceId: '6a7b1395-d313-4682-8ed4-65a6265a6320', scope: 'user_impersonation' } }, () => {
+    cmdInstance.action({ options: { debug: false, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(new CommandError('An error has occurred')));
         done();
@@ -193,13 +187,8 @@ describe(commands.OAUTH2GRANT_SET, () => {
     assert.notEqual(actual, true);
   });
 
-  it('fails validation if the scope is not specified', () => {
+  it('passes validation when grantId is specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } });
-    assert.notEqual(actual, true);
-  });
-
-  it('passes validation when grantId and scope are specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek', scope: 'user_impersonation' } });
     assert(actual);
   });
 
@@ -225,17 +214,6 @@ describe(commands.OAUTH2GRANT_SET, () => {
     assert(containsOption);
   });
 
-  it('supports specifying scope', () => {
-    const options = (command.options() as CommandOption[]);
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--scope') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('has help referring to the right command', () => {
     const cmd: any = {
       log: (msg: string) => { },
@@ -245,7 +223,7 @@ describe(commands.OAUTH2GRANT_SET, () => {
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
     cmd.help({}, () => { });
-    assert(find.calledWith(commands.OAUTH2GRANT_SET));
+    assert(find.calledWith(commands.OAUTH2GRANT_REMOVE));
   });
 
   it('has help with examples', () => {
