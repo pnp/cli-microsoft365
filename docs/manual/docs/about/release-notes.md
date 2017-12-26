@@ -20,6 +20,10 @@
 - [aad disconnect](../cmd/aad/disconnect.md) - disconnects from Azure Active Directory Graph [#161](https://github.com/SharePoint/office365-cli/issues/161)
 - [aad status](../cmd/aad/status.md) - shows Azure Active Directory Graph connection status [#162](https://github.com/SharePoint/office365-cli/issues/162)
 - [aad sp get](../cmd/aad/sp/sp-get.md) - gets information about the specific service principal [#158](https://github.com/SharePoint/office365-cli/issues/158)
+- [aad oauth2grant list](../cmd/aad/oauth2grant/oauth2grant-list.md) - lists OAuth2 permission grants for the specified service principal [#159](https://github.com/SharePoint/office365-cli/issues/159)
+- [aad oauth2grant add](../cmd/aad/oauth2grant/oauth2grant-add.md) - grant the specified service principal OAuth2 permissions to the specified resource [#164](https://github.com/SharePoint/office365-cli/issues/164)
+- [aad oauth2grant set](../cmd/aad/oauth2grant/oauth2grant-set.md) - update OAuth2 permissions for the service principal [#163](https://github.com/SharePoint/office365-cli/issues/163)
+- [aad oauth2grant remove](../cmd/aad/oauth2grant/oauth2grant-remove.md) - remove specified service principal OAuth2 permissions [#165](https://github.com/SharePoint/office365-cli/issues/165)
 
 ### Changes
 
