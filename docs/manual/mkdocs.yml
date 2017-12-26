@@ -28,6 +28,7 @@ pages:
         - customaction get: 'cmd/spo/customaction/customaction-get.md'
         - customaction list: 'cmd/spo/customaction/customaction-list.md'
       - serviceprincipal:
+        - serviceprincipal permissionrequest approve: 'cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-approve.md'
         - serviceprincipal permissionrequest list: 'cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-list.md'
       - site:
         - site add: 'cmd/spo/site/site-add.md'
