@@ -93,7 +93,7 @@ describe(commands.SP_GET, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Connect to Azure Active Directory Graph site first')));
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('Connect to Azure Active Directory Graph first')));
         done();
       }
       catch (e) {

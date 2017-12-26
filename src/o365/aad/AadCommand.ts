@@ -20,7 +20,7 @@ export default abstract class AadCommand extends Command {
           appInsights.flush();
 
           if (!auth.service.connected) {
-            this.log(new CommandError('Connect to Azure Active Directory Graph site first'));
+            this.log(new CommandError('Connect to Azure Active Directory Graph first'));
             cb();
             return;
           }
