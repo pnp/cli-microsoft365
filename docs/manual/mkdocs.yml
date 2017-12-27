@@ -29,6 +29,7 @@ pages:
         - customaction list: 'cmd/spo/customaction/customaction-list.md'
       - serviceprincipal:
         - serviceprincipal grant list: 'cmd/spo/serviceprincipal/serviceprincipal-grant-list.md'
+        - serviceprincipal grant revoke: 'cmd/spo/serviceprincipal/serviceprincipal-grant-revoke.md'
         - serviceprincipal permissionrequest approve: 'cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-approve.md'
         - serviceprincipal permissionrequest deny: 'cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-deny.md'
         - serviceprincipal permissionrequest list: 'cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-list.md'
