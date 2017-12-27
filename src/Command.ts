@@ -90,6 +90,10 @@ export default abstract class Command {
     };
   }
 
+  public alias(): string[] | undefined {
+    return;
+  }
+
   public autocomplete(): string[] | undefined {
     return;
   }
@@ -150,6 +154,10 @@ export default abstract class Command {
     options.forEach((o: CommandOption): void => {
       cmd.option(o.option, o.description, o.autocomplete);
     });
+    const alias: string[] | undefined = this.alias();
+    if (alias) {
+      cmd.alias(alias);
+    }
     const validate: CommandValidate | undefined = this.validate();
     if (validate) {
       cmd.validate(validate);

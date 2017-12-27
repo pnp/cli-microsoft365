@@ -14,6 +14,7 @@ interface Vorpal {
 
 interface VorpalCommand {
   action: (action: (this: CommandInstance, args: any, callback: () => void) => void) => VorpalCommand;
+  alias: (alias: string[]) => VorpalCommand;
   cancel: (handler: () => void) => VorpalCommand;
   help: (help: (args: any, cbOrLog: (message?: string) => void) => void) => VorpalCommand;
   helpInformation: () => string;
