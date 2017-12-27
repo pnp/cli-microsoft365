@@ -33,6 +33,7 @@ pages:
         - serviceprincipal permissionrequest approve: 'cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-approve.md'
         - serviceprincipal permissionrequest deny: 'cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-deny.md'
         - serviceprincipal permissionrequest list: 'cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-list.md'
+        - serviceprincipal set: 'cmd/spo/serviceprincipal/serviceprincipal-set.md'
       - site:
         - site add: 'cmd/spo/site/site-add.md'
         - site get: 'cmd/spo/site/site-get.md'
