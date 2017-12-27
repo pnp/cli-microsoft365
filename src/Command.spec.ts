@@ -18,6 +18,10 @@ class MockCommand1 extends Command {
     return 'Mock command description';
   }
 
+  public alias(): string[] | undefined {
+    return ['mc1'];
+  }
+
   public autocomplete(): string[] | undefined {
     const autocomplete = ['param1', 'param2'];
 
@@ -80,6 +84,7 @@ class MockCommand2 extends Command {
 describe('Command', () => {
   const vcmd = {
     action: () => vcmd,
+    alias: () => vcmd,
     option: () => vcmd,
     validate: () => vcmd,
     cancel: () => vcmd,
@@ -87,6 +92,7 @@ describe('Command', () => {
     types: () => vcmd
   };
   let actionSpy: sinon.SinonSpy;
+  let aliasSpy: sinon.SinonSpy;
   let optionSpy: sinon.SinonSpy;
   let validateSpy: sinon.SinonSpy;
   let cancelSpy: sinon.SinonSpy;
@@ -95,6 +101,7 @@ describe('Command', () => {
 
   beforeEach(() => {
     actionSpy = sinon.spy(vcmd, 'action');
+    aliasSpy = sinon.spy(vcmd, 'alias');
     optionSpy = sinon.spy(vcmd, 'option');
     validateSpy = sinon.spy(vcmd, 'validate');
     cancelSpy = sinon.spy(vcmd, 'cancel');
@@ -105,6 +112,7 @@ describe('Command', () => {
   afterEach(() => {
     Utils.restore([
       vcmd.action,
+      vcmd.alias,
       vcmd.option,
       vcmd.validate,
       vcmd.cancel,
@@ -179,6 +187,14 @@ describe('Command', () => {
     cmd.init(vorpal);
     Utils.restore(vorpal.command);
     assert(optionSpy.calledOnce);
+  });
+
+  it('configures alias when available', () => {
+    const cmd = new MockCommand1();
+    sinon.stub(vorpal, 'command').callsFake(() => vcmd);
+    cmd.init(vorpal);
+    Utils.restore(vorpal.command);
+    assert(aliasSpy.calledOnce);
   });
 
   it('configures validation when available', () => {

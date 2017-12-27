@@ -26,6 +26,8 @@ export default {
   CDN_POLICY_SET: `${prefix} cdn policy set`,
   CUSTOMACTION_GET: `${prefix} customaction get`,
   CUSTOMACTION_LIST: `${prefix} customaction list`,
+  SERVICEPRINCIPAL_SET: `${prefix} serviceprincipal set`,
+  SP_SET: `${prefix} sp set`,
   SITE_ADD: `${prefix} site add`,
   SITE_GET: `${prefix} site get`,
   SITE_LIST: `${prefix} site list`,
