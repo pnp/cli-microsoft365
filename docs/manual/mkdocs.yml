@@ -58,6 +58,7 @@ pages:
         - sp get: 'cmd/aad/sp/sp-get.md'
   - Concepts:
     - 'Persisting connection': 'concepts/persisting-connection.md'
+    - 'Authorization and access tokens': 'concepts/authorization-tokens.md'
   - About:
     - 'Why this CLI': 'about/why-cli.md'
     - 'Release notes': 'about/release-notes.md'
