@@ -61,6 +61,7 @@ pages:
     - 'Authorization and access tokens': 'concepts/authorization-tokens.md'
   - About:
     - 'Why this CLI': 'about/why-cli.md'
+    - 'Comparison to SharePoint PowerShell': 'about/comparison-powershell.md'
     - 'Release notes': 'about/release-notes.md'
     - License: 'about/license.md'
 theme:
