@@ -47,12 +47,22 @@ fs.realpath(__dirname, (err: NodeJS.ErrnoException, resolvedPath: string): void 
     return Utils.logOutput(stdout);
   });
 
-  const v: Vorpal = vorpal.parse(process.argv);
+  let v: Vorpal | null = null;
+  try {
+    v = vorpal.parse(process.argv);
 
-  // if no command has been passed/match, run immersive mode
-  if (!v._command) {
-  vorpal
-    .delimiter(chalk.red(config.delimiter))
-    .show();
+    // if no command has been passed/match, run immersive mode
+    if (!v._command) {
+      vorpal
+        .delimiter(chalk.red(config.delimiter))
+        .show();
+    }
+  }
+  catch (e) {
+    appInsights.trackException({
+      exception: e
+    });
+    appInsights.flush();
+    process.exit(0);
   }
 });
