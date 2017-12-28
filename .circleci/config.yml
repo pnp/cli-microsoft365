@@ -105,6 +105,18 @@ workflows:
           filters:
             branches:
               ignore: /^(dev|master)/
+  check_master:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: master
+      - test:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
   release_next:
     jobs:
       - build:
