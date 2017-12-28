@@ -146,7 +146,7 @@ export default class Utils {
 
       const output: string[] = [];
       propertyNames.sort().forEach(p => {
-        output.push(`${p.length < longestPropertyLength ? p + new Array(longestPropertyLength - p.length + 1).join(' ') : p}: ${Array.isArray(obj[p]) ? JSON.stringify(obj[p]) : obj[p]}`);
+        output.push(`${p.length < longestPropertyLength ? p + new Array(longestPropertyLength - p.length + 1).join(' ') : p}: ${Array.isArray(obj[p]) || typeof obj[p] === 'object' ? JSON.stringify(obj[p]) : obj[p]}`);
       });
 
       return output.join('\n') + '\n';
