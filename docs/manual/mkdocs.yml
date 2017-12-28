@@ -60,6 +60,7 @@ pages:
     - 'Persisting connection': 'concepts/persisting-connection.md'
   - About:
     - 'Why this CLI': 'about/why-cli.md'
+    - 'Comparison to SharePoint PowerShell': 'about/comparison-powershell.md'
     - 'Release notes': 'about/release-notes.md'
     - License: 'about/license.md'
 theme:
