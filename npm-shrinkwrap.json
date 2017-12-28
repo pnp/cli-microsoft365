@@ -4,15 +4,6 @@
   "lockfileVersion": 1,
   "requires": true,
   "dependencies": {
-    "@types/chalk": {
-      "version": "2.2.0",
-      "resolved": "https://registry.npmjs.org/@types/chalk/-/chalk-2.2.0.tgz",
-      "integrity": "sha512-1zzPV9FDe1I/WHhRkf9SNgqtRJWZqrBWgu7JGveuHmmyR9CnAPCie2N/x+iHrgnpYBIcCJWHBoMRv2TRWktsvw==",
-      "dev": true,
-      "requires": {
-        "chalk": "1.1.3"
-      }
-    },
     "@types/easy-table": {
       "version": "0.0.31",
       "resolved": "https://registry.npmjs.org/@types/easy-table/-/easy-table-0.0.31.tgz",
