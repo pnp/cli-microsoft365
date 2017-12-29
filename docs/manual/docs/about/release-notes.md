@@ -2,6 +2,10 @@
 
 ## [v0.4.0](https://github.com/SharePoint/office365-cli/releases/tag/v0.4.0)
 
+### Breaking changes
+
+- renamed the `spo cdn origin set` command to [spo cdn origin add](../cmd/spo/cdn/cdn-origin-add.md) [#184](https://github.com/SharePoint/office365-cli/issues/184)
+
 ### New commands
 
 **SharePoint Online:**
@@ -40,6 +44,8 @@
 - added detailed output to the `spo customaction get` command [#93](https://github.com/SharePoint/office365-cli/issues/93)
 - improved collecting telemetry [#130](https://github.com/SharePoint/office365-cli/issues/130), [#131](https://github.com/SharePoint/office365-cli/issues/131), [#132](https://github.com/SharePoint/office365-cli/issues/132), [#133](https://github.com/SharePoint/office365-cli/issues/133)
 - added support for the `skipFeatureDeployment` flag to the [spo app deploy](../cmd/spo/app/app-deploy.md) command [#134](https://github.com/SharePoint/office365-cli/issues/134)
+- wrapped executing commands in `try..catch` [#109](https://github.com/SharePoint/office365-cli/issues/109)
+- added serializing objects in log [#108](https://github.com/SharePoint/office365-cli/issues/108)
 
 ## [v0.3.0](https://github.com/SharePoint/office365-cli/releases/tag/v0.3.0)
 
