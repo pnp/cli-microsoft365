@@ -1,11 +1,11 @@
-# spo cdn origin set
+# spo cdn origin add
 
 Adds CDN origin to the current SharePoint Online tenant
 
 ## Usage
 
 ```sh
-spo cdn origin set [options]
+spo cdn origin add [options]
 ```
 
 ## Options
@@ -37,7 +37,7 @@ the Public (default) or Private CDN. If you don't use the option, the command wi
 Add _*/CDN_ to the list of origins of the Public CDN
 
 ```sh
-spo cdn origin set -t Public -r */CDN
+spo cdn origin add -t Public -r */CDN
 ```
 
 ## More information

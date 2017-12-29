@@ -19,9 +19,9 @@ pages:
       - cdn:
         - cdn get: 'cmd/spo/cdn/cdn-get.md'
         - cdn set: 'cmd/spo/cdn/cdn-set.md'
+        - cdn origin add: 'cmd/spo/cdn/cdn-origin-add.md'
         - cdn origin list: 'cmd/spo/cdn/cdn-origin-list.md'
         - cdn origin remove: 'cmd/spo/cdn/cdn-origin-remove.md'
-        - cdn origin set: 'cmd/spo/cdn/cdn-origin-set.md'
         - cdn policy list: 'cmd/spo/cdn/cdn-policy-list.md'
         - cdn policy set: 'cmd/spo/cdn/cdn-policy-set.md'
       - customaction:
