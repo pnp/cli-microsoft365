@@ -8,7 +8,7 @@ Add-SPOGeoAdministrator|Microsoft.Online.SharePoint.PowerShell|
 Add-SPOSiteCollectionAppCatalog|Microsoft.Online.SharePoint.PowerShell|[spo site appcatalog add](../cmd/spo/site/site-appcatalog-add.md)
 Add-SPOSiteDesign|Microsoft.Online.SharePoint.PowerShell|
 Add-SPOSiteScript|Microsoft.Online.SharePoint.PowerShell|
-Add-SPOTenantCdnOrigin|Microsoft.Online.SharePoint.PowerShell|[spo cdn origin set](../cmd/spo/cdn/cdn-origin-set.md)
+Add-SPOTenantCdnOrigin|Microsoft.Online.SharePoint.PowerShell|[spo cdn origin add](../cmd/spo/cdn/cdn-origin-add.md)
 Add-SPOTheme|Microsoft.Online.SharePoint.PowerShell|
 Add-SPOUser|Microsoft.Online.SharePoint.PowerShell|
 Approve-SPOTenantServicePrincipalPermissionRequest|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal permissionrequest approve](../cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-approve.md)

@@ -3,13 +3,13 @@ import Command, { CommandValidate, CommandOption, CommandError } from '../../../
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
-const command: Command = require('./cdn-origin-set');
+const command: Command = require('./cdn-origin-add');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import config from '../../../../config';
 import Utils from '../../../../Utils';
 
-describe(commands.CDN_ORIGIN_SET, () => {
+describe(commands.CDN_ORIGIN_ADD, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
@@ -85,7 +85,7 @@ describe(commands.CDN_ORIGIN_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.CDN_ORIGIN_SET), true);
+    assert.equal(command.name.startsWith(commands.CDN_ORIGIN_ADD), true);
   });
 
   it('has a description', () => {
@@ -109,7 +109,7 @@ describe(commands.CDN_ORIGIN_SET, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {}, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       try {
-        assert.equal(telemetry.name, commands.CDN_ORIGIN_SET);
+        assert.equal(telemetry.name, commands.CDN_ORIGIN_ADD);
         done();
       }
       catch (e) {
@@ -406,7 +406,7 @@ describe(commands.CDN_ORIGIN_SET, () => {
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
     cmd.help({}, () => {});
-    assert(find.calledWith(commands.CDN_ORIGIN_SET));
+    assert(find.calledWith(commands.CDN_ORIGIN_ADD));
   });
 
   it('has help with examples', () => {

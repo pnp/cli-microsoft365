@@ -25,7 +25,7 @@ interface Options extends GlobalOptions {
 
 class SpoCdnOriginAddCommand extends SpoCommand {
   public get name(): string {
-    return commands.CDN_ORIGIN_SET;
+    return commands.CDN_ORIGIN_ADD;
   }
 
   public get description(): string {
@@ -142,7 +142,7 @@ class SpoCdnOriginAddCommand extends SpoCommand {
 
   public commandHelp(args: CommandArgs, log: (help: string) => void): void {
     const chalk = vorpal.chalk;
-    log(vorpal.find(commands.CDN_ORIGIN_SET).helpInformation());
+    log(vorpal.find(commands.CDN_ORIGIN_ADD).helpInformation());
     log(
       `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online tenant admin site,
   using the ${chalk.blue(commands.CONNECT)} command.
@@ -160,7 +160,7 @@ class SpoCdnOriginAddCommand extends SpoCommand {
   Examples:
   
     Add ${chalk.grey('*/CDN')} to the list of origins of the Public CDN
-      ${chalk.grey(config.delimiter)} ${commands.CDN_ORIGIN_SET} -t Public -o */CDN
+      ${chalk.grey(config.delimiter)} ${commands.CDN_ORIGIN_ADD} -t Public -o */CDN
 
   More information:
 
