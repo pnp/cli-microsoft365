@@ -90,7 +90,7 @@ Initial release.
 - [spo cdn get](../cmd/spo/cdn/cdn-get.md) - get Office 365 CDN status
 - [spo cdn origin list](../cmd/spo/cdn/cdn-origin-list.md) - list Office 365 CDN origins
 - [spo cdn origin remove](../cmd/spo/cdn/cdn-origin-remove.md) - remove Office 365 CDN origin
-- [spo cdn origin set](../cmd/spo/cdn/cdn-origin-set.md) - set Office 365 CDN origin
+- [spo cdn origin add](../cmd/spo/cdn/cdn-origin-add.md) - add Office 365 CDN origin
 - [spo cdn policy list](../cmd/spo/cdn/cdn-policy-list.md) - list Office 365 CDN policies
 - [spo cdn policy set](../cmd/spo/cdn/cdn-policy-set.md) - set Office 365 CDN policy
 - [spo cdn set](../cmd/spo/cdn/cdn-set.md) - enable/disable Office 365 CDN
