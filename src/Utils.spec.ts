@@ -9,7 +9,7 @@ import * as os from 'os';
 describe('Utils', () => {
   it('isValidGuid returns true if valid guid', () => {
     const result = Utils.isValidGuid('b2307a39-e878-458b-bc90-03bc578531d6');
-    assert(result);
+    assert.equal(result, true);
   });
 
   it('isValidGuid returns false if invalid guid', () => {

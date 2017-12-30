@@ -219,7 +219,7 @@ describe(commands.OAUTH2GRANT_ADD, () => {
 
   it('passes validation when clientId, resourceId and scope are specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320', resourceId: '6a7b1395-d313-4682-8ed4-65a6265a6320', scope: 'user_impersonation' } });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('supports debug mode', () => {

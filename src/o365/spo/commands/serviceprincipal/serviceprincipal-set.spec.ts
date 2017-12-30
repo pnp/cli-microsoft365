@@ -420,12 +420,12 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
 
   it('passes validation when the enabled option is true', () => {
     const actual = (command.validate() as CommandValidate)({ options: { enabled: 'true' } });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('passes validation when the enabled option is false', () => {
     const actual = (command.validate() as CommandValidate)({ options: { enabled: 'false' } });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('has help referring to the right command', () => {

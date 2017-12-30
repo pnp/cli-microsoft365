@@ -897,12 +897,12 @@ describe(commands.APP_RETRACT, () => {
 
   it('passes validation when the id is specified and the appCatalogUrl is not', () => {
     const actual = (command.validate() as CommandValidate)({ options: { id: '123' } });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('passes validation when the id and appCatalogUrl options are specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { id: '123', appCatalogUrl: 'https://contoso.sharepoint.com' } });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('supports debug mode', () => {

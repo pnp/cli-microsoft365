@@ -261,7 +261,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_REVOKE, () => {
 
   it('passes validation when the grantId is specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { grantId: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg' } });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('has help referring to the right command', () => {

@@ -260,7 +260,7 @@ describe(commands.SITE_APPCATALOG_REMOVE, () => {
         url: 'https://contoso.sharepoint.com/sites/site'
       }
     });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('fails validation when the url option not specified', () => {

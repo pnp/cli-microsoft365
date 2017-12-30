@@ -174,7 +174,7 @@ describe(commands.CONNECT, () => {
 
   it('accepts valid SharePoint Online URL', () => {
     const actual = (command.validate() as CommandValidate)({ url: 'https://contoso.sharepoint.com' });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('rejects invalid SharePoint Online URL', () => {

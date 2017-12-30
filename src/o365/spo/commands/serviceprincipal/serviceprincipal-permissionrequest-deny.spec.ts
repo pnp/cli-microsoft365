@@ -253,7 +253,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_DENY, () => {
 
   it('passes validation when the requestId is a valid GUID', () => {
     const actual = (command.validate() as CommandValidate)({ options: { requestId: '4dc4c043-25ee-40f2-81d3-b3bf63da7538' } });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('defines alias', () => {

@@ -337,12 +337,12 @@ describe(commands.CDN_SET, () => {
 
   it('accepts Public SharePoint Online CDN type', () => {
     const actual = (command.validate() as CommandValidate)({ options: { type: 'Public', enabled: 'true' } });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('accepts Private SharePoint Online CDN type', () => {
     const actual = (command.validate() as CommandValidate)({ options: { type: 'Private', enabled: 'true' } });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('rejects invalid SharePoint Online CDN type', () => {
@@ -353,37 +353,37 @@ describe(commands.CDN_SET, () => {
 
   it('doesn\'t fail validation if the optional type option not specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { enabled: 'true' } });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('accepts true SharePoint Online CDN enabled state', () => {
     const actual = (command.validate() as CommandValidate)({ options: { enabled: 'true' } });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('accepts True SharePoint Online CDN enabled state', () => {
     const actual = (command.validate() as CommandValidate)({ options: { enabled: 'True' } });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('accepts TRUE SharePoint Online CDN enabled state', () => {
     const actual = (command.validate() as CommandValidate)({ options: { enabled: 'TRUE' } });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('accepts false SharePoint Online CDN enabled state', () => {
     const actual = (command.validate() as CommandValidate)({ options: { enabled: 'false' } });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('accepts False SharePoint Online CDN enabled state', () => {
     const actual = (command.validate() as CommandValidate)({ options: { enabled: 'False' } });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('accepts FALSE SharePoint Online CDN enabled state', () => {
     const actual = (command.validate() as CommandValidate)({ options: { enabled: 'FALSE' } });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('rejects invalid SharePoint Online CDN enabled state', () => {

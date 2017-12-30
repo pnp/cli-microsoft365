@@ -413,7 +413,7 @@ describe(commands.APP_ADD, () => {
       fs.existsSync,
       fs.lstatSync
     ]);
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('has help referring to the right command', () => {

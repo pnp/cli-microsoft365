@@ -849,12 +849,12 @@ describe(commands.APP_REMOVE, () => {
 
   it('passes validation when the id is specified and the appCatalogUrl is not', () => {
     const actual = (command.validate() as CommandValidate)({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4' } });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('passes validation when the id and appCatalogUrl options are specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', appCatalogUrl: 'https://contoso.sharepoint.com' } });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('supports debug mode', () => {

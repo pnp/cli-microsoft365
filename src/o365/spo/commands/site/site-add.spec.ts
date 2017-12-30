@@ -914,7 +914,7 @@ describe(commands.SITE_ADD, () => {
         alias: 'team1'
       }
     });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('passes validation when the TeamSite type option specified', () => {
@@ -925,7 +925,7 @@ describe(commands.SITE_ADD, () => {
         alias: 'team1'
       }
     });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('passes validation when the CommunicationSite type option specified', () => {
@@ -936,7 +936,7 @@ describe(commands.SITE_ADD, () => {
         url: 'https://contoso.sharepoint.com/sites/marketing'
       }
     });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('fails validation if an invalid type option specified', () => {
@@ -997,7 +997,7 @@ describe(commands.SITE_ADD, () => {
         url: 'https://contoso.sharepoint.com/sites/marketing'
       }
     });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('passes validation when the type is CommunicationSite and siteDesign is Topic', () => {
@@ -1009,7 +1009,7 @@ describe(commands.SITE_ADD, () => {
         siteDesign: 'Topic'
       }
     });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('passes validation when the type is CommunicationSite and siteDesign is Showcase', () => {
@@ -1021,7 +1021,7 @@ describe(commands.SITE_ADD, () => {
         siteDesign: 'Showcase'
       }
     });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('passes validation when the type is CommunicationSite and siteDesign is Blank', () => {
@@ -1033,7 +1033,7 @@ describe(commands.SITE_ADD, () => {
         siteDesign: 'Blank'
       }
     });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('fails validation when the type is CommunicationSite and siteDesign is invalid', () => {
@@ -1057,7 +1057,7 @@ describe(commands.SITE_ADD, () => {
         siteDesignId: '92398ab7-45c7-486b-81fa-54da2ee0738a'
       }
     });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('fails validation when the type is CommunicationSite and siteDesignId is not a valid GUID', () => {
@@ -1069,7 +1069,7 @@ describe(commands.SITE_ADD, () => {
         siteDesignId: 'abc'
       }
     });
-    assert(actual);
+    assert.notEqual(actual, true);
   });
 
   it('fails validation when the type is CommunicationSite and both siteDesign and siteDesignId are specified', () => {
@@ -1082,7 +1082,7 @@ describe(commands.SITE_ADD, () => {
         siteDesignId: '92398ab7-45c7-486b-81fa-54da2ee0738a'
       }
     });
-    assert(actual);
+    assert.notEqual(actual, true);
   });
 
   it('has help referring to the right command', () => {

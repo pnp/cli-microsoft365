@@ -200,7 +200,7 @@ describe(commands.OAUTH2GRANT_SET, () => {
 
   it('passes validation when grantId and scope are specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek', scope: 'user_impersonation' } });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('supports debug mode', () => {
