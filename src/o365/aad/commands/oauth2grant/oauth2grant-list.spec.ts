@@ -292,7 +292,7 @@ describe(commands.OAUTH2GRANT_LIST, () => {
 
   it('passes validation when the clientId option specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320' } });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('supports debug mode', () => {

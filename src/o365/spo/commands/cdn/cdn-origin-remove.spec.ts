@@ -434,12 +434,12 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
 
   it('accepts Public SharePoint Online CDN type', () => {
     const actual = (command.validate() as CommandValidate)({ options: { type: 'Public' } });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('accepts Private SharePoint Online CDN type', () => {
     const actual = (command.validate() as CommandValidate)({ options: { type: 'Private' } });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('rejects invalid SharePoint Online CDN type', () => {
@@ -450,7 +450,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
 
   it('doesn\'t fail validation if the optional type option not specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('has help referring to the right command', () => {

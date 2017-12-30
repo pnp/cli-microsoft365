@@ -672,12 +672,12 @@ describe(commands.SITE_LIST, () => {
 
   it('accepts TeamSite site type', () => {
     const actual = (command.validate() as CommandValidate)({ options: { type: 'TeamSite' } });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('accepts CommunicationSite site type', () => {
     const actual = (command.validate() as CommandValidate)({ options: { type: 'CommunicationSite' } });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('rejects invalid site type', () => {
@@ -688,7 +688,7 @@ describe(commands.SITE_LIST, () => {
 
   it('doesn\'t fail validation if the optional type option not specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('has help referring to the right command', () => {

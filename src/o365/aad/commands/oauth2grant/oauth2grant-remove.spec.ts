@@ -189,7 +189,7 @@ describe(commands.OAUTH2GRANT_REMOVE, () => {
 
   it('passes validation when grantId is specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('supports debug mode', () => {
