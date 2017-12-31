@@ -29,7 +29,7 @@ Get-SPOCrossGeoMoveReport|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOCrossGeoUsers|Microsoft.Online.SharePoint.PowerShell|
 Get-SPODataEncryptionPolicy|Microsoft.Online.SharePoint.PowerShell|
 Get-SPODeletedSite|Microsoft.Online.SharePoint.PowerShell|
-Get-SPOExternalUser|Microsoft.Online.SharePoint.PowerShell|
+Get-SPOExternalUser|Microsoft.Online.SharePoint.PowerShell|[spo externaluser list](../cmd/spo/externaluser/externaluser-list.md)
 Get-SPOGeoAdministrator|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOGeoMoveCompatibilityStatus|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOGeoMoveCrossCompatibilityStatus|Microsoft.Online.SharePoint.PowerShell|
