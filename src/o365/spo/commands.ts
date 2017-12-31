@@ -20,6 +20,7 @@ export default {
   CONNECT: `${prefix} connect`,
   CUSTOMACTION_GET: `${prefix} customaction get`,
   CUSTOMACTION_LIST: `${prefix} customaction list`,
+  CUSTOMACTION_ADD: `${prefix} customaction add`,
   DISCONNECT: `${prefix} disconnect`,
   SERVICEPRINCIPAL_GRANT_LIST: `${prefix} serviceprincipal grant list`,
   SERVICEPRINCIPAL_GRANT_REVOKE: `${prefix} serviceprincipal grant revoke`,
