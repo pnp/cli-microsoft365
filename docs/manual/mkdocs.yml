@@ -62,6 +62,7 @@ pages:
   - Concepts:
     - 'Persisting connection': 'concepts/persisting-connection.md'
     - 'Authorization and access tokens': 'concepts/authorization-tokens.md'
+    - 'Command completion': 'concepts/completion.md'
   - About:
     - 'Why this CLI': 'about/why-cli.md'
     - 'Comparison to SharePoint PowerShell': 'about/comparison-powershell.md'

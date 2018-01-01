@@ -9,6 +9,7 @@ src
 types
 .gitignore
 CONTRIBUTING.md
+commands.json
 tsconfig.json
 *.map
 *.spec.js
