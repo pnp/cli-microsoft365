@@ -23,6 +23,8 @@
 - [spo serviceprincipal grant list](../cmd/spo/serviceprincipal/serviceprincipal-grant-list.md) - lists permissions granted to the service principal [#155](https://github.com/SharePoint/office365-cli/issues/155)
 - [spo serviceprincipal grant revoke](../cmd/spo/serviceprincipal/serviceprincipal-grant-revoke.md) - revokes the specified set of permissions granted to the service principal [#155](https://github.com/SharePoint/office365-cli/issues/156)
 - [spo serviceprincipal set](../cmd/spo/serviceprincipal/serviceprincipal-set.md) - enable or disable the service principal [#157](https://github.com/SharePoint/office365-cli/issues/157)
+- [spo customaction add](../cmd/spo/customaction/customaction-add.md) - adds a user custom action for site or site collection [#18](https://github.com/SharePoint/office365-cli/issues/18)
+- [spo externaluser list](../cmd/spo/externaluser/externaluser-list.md) - lists external users in the tenant [#27](https://github.com/SharePoint/office365-cli/issues/27)
 
 **Azure Active Directory Graph:**
 
