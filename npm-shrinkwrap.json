@@ -2443,6 +2443,11 @@
       "resolved": "https://registry.npmjs.org/object-assign/-/object-assign-4.1.1.tgz",
       "integrity": "sha1-IQmtx5ZYh8/AXLvUQsrIv7s2CGM="
     },
+    "omelette": {
+      "version": "0.4.5",
+      "resolved": "https://registry.npmjs.org/omelette/-/omelette-0.4.5.tgz",
+      "integrity": "sha512-b0k9uqwF60u15KmVkneVw96VYRtZu2QCbXUQ26SgdyVUgMBzctzIfhNPKAWl4oqJEKpe52CzBYSS+HIKtiK8sw=="
+    },
     "once": {
       "version": "1.4.0",
       "resolved": "https://registry.npmjs.org/once/-/once-1.4.0.tgz",

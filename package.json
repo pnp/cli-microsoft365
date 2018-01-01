@@ -45,6 +45,7 @@
   "dependencies": {
     "applicationinsights": "^1.0.1",
     "easy-table": "^1.1.0",
+    "omelette": "^0.4.5",
     "request-promise-native": "^1.0.5",
     "vorpal": "^1.12.0"
   },
