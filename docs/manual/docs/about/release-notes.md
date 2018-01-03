@@ -48,6 +48,7 @@
 - added support for the `skipFeatureDeployment` flag to the [spo app deploy](../cmd/spo/app/app-deploy.md) command [#134](https://github.com/SharePoint/office365-cli/issues/134)
 - wrapped executing commands in `try..catch` [#109](https://github.com/SharePoint/office365-cli/issues/109)
 - added serializing objects in log [#108](https://github.com/SharePoint/office365-cli/issues/108)
+- added support for autocomplete in Zsh, Bash and Fish and Clink (cmder) on Windows [#141](https://github.com/SharePoint/office365-cli/issues/141), [#190](https://github.com/SharePoint/office365-cli/issues/190)
 
 ## [v0.3.0](https://github.com/SharePoint/office365-cli/releases/tag/v0.3.0)
 
