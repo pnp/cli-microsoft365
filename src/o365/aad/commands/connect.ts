@@ -37,6 +37,7 @@ class AadConnectCommand extends Command {
 
     const disconnect: () => void = (): void => {
       auth.service.disconnect();
+      auth.service.resource = 'https://graph.windows.net';
       if (this.verbose) {
         cmd.log(chalk.green('DONE'));
       }
@@ -47,12 +48,9 @@ class AadConnectCommand extends Command {
         cmd.log(`Authenticating with AAD Graph...`);
       }
 
-      const resource = 'https://graph.windows.net';
-
       auth
-        .ensureAccessToken(resource, cmd, args.options.debug)
+        .ensureAccessToken('', cmd, args.options.debug)
         .then((accessToken: string): Promise<void> => {
-          auth.service.resource = resource;
           if (this.verbose) {
             cmd.log(chalk.green('DONE'));
           }
