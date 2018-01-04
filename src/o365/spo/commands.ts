@@ -21,6 +21,7 @@ export default {
   CUSTOMACTION_GET: `${prefix} customaction get`,
   CUSTOMACTION_LIST: `${prefix} customaction list`,
   DISCONNECT: `${prefix} disconnect`,
+  LIST_GET: `${prefix} list get`,
   SERVICEPRINCIPAL_GRANT_LIST: `${prefix} serviceprincipal grant list`,
   SERVICEPRINCIPAL_GRANT_REVOKE: `${prefix} serviceprincipal grant revoke`,
   SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE: `${prefix} serviceprincipal permissionrequest approve`,
