@@ -223,7 +223,7 @@ Get-PnPHealthScore|SharePointPnPPowerShellOnline|
 Get-PnPHomePage|SharePointPnPPowerShellOnline|
 Get-PnPIndexedPropertyKeys|SharePointPnPPowerShellOnline|
 Get-PnPJavaScriptLink|SharePointPnPPowerShellOnline|
-Get-PnPList|SharePointPnPPowerShellOnline|
+Get-PnPList|SharePointPnPPowerShellOnline|[spo list get](../cmd/spo/list/list-get.md)
 Get-PnPListItem|SharePointPnPPowerShellOnline|
 Get-PnPMasterPage|SharePointPnPPowerShellOnline|
 Get-PnPProperty|SharePointPnPPowerShellOnline|

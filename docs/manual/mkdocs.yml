@@ -30,6 +30,8 @@ pages:
         - customaction list: 'cmd/spo/customaction/customaction-list.md'
       - externaluser:
         - externaluser list: 'cmd/spo/externaluser/externaluser-list.md'
+      - list:
+        - list get: 'cmd/spo/list/list-get.md'
       - serviceprincipal:
         - serviceprincipal grant list: 'cmd/spo/serviceprincipal/serviceprincipal-grant-list.md'
         - serviceprincipal grant revoke: 'cmd/spo/serviceprincipal/serviceprincipal-grant-revoke.md'
