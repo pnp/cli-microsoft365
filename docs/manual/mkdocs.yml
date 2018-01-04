@@ -63,6 +63,7 @@ pages:
     - 'Persisting connection': 'concepts/persisting-connection.md'
     - 'Authorization and access tokens': 'concepts/authorization-tokens.md'
     - 'Command completion': 'concepts/completion.md'
+    - 'Communication with Office 365': 'concepts/communicating-o365.md'
   - About:
     - 'Why this CLI': 'about/why-cli.md'
     - 'Comparison to SharePoint PowerShell': 'about/comparison-powershell.md'
