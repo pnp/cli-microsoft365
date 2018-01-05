@@ -30,7 +30,7 @@ To create a site collection app catalog, you have to first connect to a SharePoi
 Add a site collection app catalog to the specified site
 
 ```sh
-spo site add appcatalog add --url https://contoso.sharepoint/sites/site
+spo site appcatalog add --url https://contoso.sharepoint/sites/site
 ```
 
 ## More information
