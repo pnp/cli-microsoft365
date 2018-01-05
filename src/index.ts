@@ -64,12 +64,15 @@ fs.realpath(__dirname, (err: NodeJS.ErrnoException, resolvedPath: string): void 
 
   let v: Vorpal | null = null;
   try {
+    if (process.argv.length > 2) {
+      vorpal.delimiter('');
+    }
     v = vorpal.parse(process.argv);
 
     // if no command has been passed/match, run immersive mode
     if (!v._command) {
       vorpal
-        .delimiter(chalk.red(config.delimiter))
+        .delimiter(chalk.red(config.delimiter + ' '))
         .show();
     }
   }
