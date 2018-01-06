@@ -1,14 +1,14 @@
 import commands from '../../commands';
-import Command, { CommandOption, CommandError } from '../../../../Command';
+import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
-const command: Command = require('./sitescript-list');
+const command: Command = require('./sitescript-get');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import Utils from '../../../../Utils';
 
-describe(commands.SITESCRIPT_LIST, () => {
+describe(commands.SITESCRIPT_GET, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
@@ -55,7 +55,7 @@ describe(commands.SITESCRIPT_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.SITESCRIPT_LIST), true);
+    assert.equal(command.name.startsWith(commands.SITESCRIPT_GET), true);
   });
 
   it('has a description', () => {
@@ -79,7 +79,7 @@ describe(commands.SITESCRIPT_LIST, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, () => {
       try {
-        assert.equal(telemetry.name, commands.SITESCRIPT_LIST);
+        assert.equal(telemetry.name, commands.SITESCRIPT_GET);
         done();
       }
       catch (e) {
@@ -103,26 +103,28 @@ describe(commands.SITESCRIPT_LIST, () => {
     });
   });
 
-  it('lists available site scripts', (done) => {
+  it('gets information about the specified site script', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteScripts`) > -1) {
+      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteScriptMetadata`) > -1 &&
+        JSON.stringify(opts.body) === JSON.stringify({
+          id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b'
+        })) {
         return Promise.resolve({
-          value: [
-            {
-              Content: null,
-              Description: "description",
-              Id: "19b0e1b2-e3d1-473f-9394-f08c198ef43e",
-              Title: "script1",
-              Version: 1
-            },
-            {
-              Content: null,
-              Description: "Contoso theme script description",
-              Id: "449c0c6d-5380-4df2-b84b-622e0ac8ec24",
-              Title: "Contoso theme script",
-              Version: 1
-            }
-          ]
+          "Content": JSON.stringify({
+            "$schema": "schema.json",
+            "actions": [
+              {
+                "verb": "applyTheme",
+                "themeName": "Contoso Theme"
+              }
+            ],
+            "bindata": { },
+            "version": 1
+          }),
+          "Description": "My contoso script",
+          "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
+          "Title": "Contoso",
+          "Version": 1
         });
       }
 
@@ -133,24 +135,25 @@ describe(commands.SITESCRIPT_LIST, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false } }, () => {
+    cmdInstance.action({ options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
-          {
-            Content: null,
-            Description: "description",
-            Id: "19b0e1b2-e3d1-473f-9394-f08c198ef43e",
-            Title: "script1",
-            Version: 1
-          },
-          {
-            Content: null,
-            Description: "Contoso theme script description",
-            Id: "449c0c6d-5380-4df2-b84b-622e0ac8ec24",
-            Title: "Contoso theme script",
-            Version: 1
-          }
-        ]));
+        assert(cmdInstanceLogSpy.calledWith({
+          "Content": JSON.stringify({
+            "$schema": "schema.json",
+            "actions": [
+              {
+                "verb": "applyTheme",
+                "themeName": "Contoso Theme"
+              }
+            ],
+            "bindata": { },
+            "version": 1
+          }),
+          "Description": "My contoso script",
+          "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
+          "Title": "Contoso",
+          "Version": 1
+        }));
         done();
       }
       catch (e) {
@@ -159,26 +162,28 @@ describe(commands.SITESCRIPT_LIST, () => {
     });
   });
 
-  it('lists available site scripts (debug)', (done) => {
+  it('gets information about the specified site script (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteScripts`) > -1) {
+      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteScriptMetadata`) > -1 &&
+        JSON.stringify(opts.body) === JSON.stringify({
+          id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b'
+        })) {
         return Promise.resolve({
-          value: [
-            {
-              Content: null,
-              Description: "description",
-              Id: "19b0e1b2-e3d1-473f-9394-f08c198ef43e",
-              Title: "script1",
-              Version: 1
-            },
-            {
-              Content: null,
-              Description: "Contoso theme script description",
-              Id: "449c0c6d-5380-4df2-b84b-622e0ac8ec24",
-              Title: "Contoso theme script",
-              Version: 1
-            }
-          ]
+          "Content": JSON.stringify({
+            "$schema": "schema.json",
+            "actions": [
+              {
+                "verb": "applyTheme",
+                "themeName": "Contoso Theme"
+              }
+            ],
+            "bindata": { },
+            "version": 1
+          }),
+          "Description": "My contoso script",
+          "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
+          "Title": "Contoso",
+          "Version": 1
         });
       }
 
@@ -189,24 +194,25 @@ describe(commands.SITESCRIPT_LIST, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, () => {
+    cmdInstance.action({ options: { debug: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
-          {
-            Content: null,
-            Description: "description",
-            Id: "19b0e1b2-e3d1-473f-9394-f08c198ef43e",
-            Title: "script1",
-            Version: 1
-          },
-          {
-            Content: null,
-            Description: "Contoso theme script description",
-            Id: "449c0c6d-5380-4df2-b84b-622e0ac8ec24",
-            Title: "Contoso theme script",
-            Version: 1
-          }
-        ]));
+        assert(cmdInstanceLogSpy.calledWith({
+          "Content": JSON.stringify({
+            "$schema": "schema.json",
+            "actions": [
+              {
+                "verb": "applyTheme",
+                "themeName": "Contoso Theme"
+              }
+            ],
+            "bindata": { },
+            "version": 1
+          }),
+          "Description": "My contoso script",
+          "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
+          "Title": "Contoso",
+          "Version": 1
+        }));
         done();
       }
       catch (e) {
@@ -215,42 +221,18 @@ describe(commands.SITESCRIPT_LIST, () => {
     });
   });
 
-  it('correctly handles no available site scripts', (done) => {
+  it('correctly handles error when site script not found', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteScripts`) > -1) {
-        return Promise.resolve({ value: [] });
-      }
-
-      return Promise.reject('Invalid request');
+      return Promise.reject({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
     });
 
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false } }, () => {
+    cmdInstance.action({ options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('correctly handles OData error when creating site script', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
-    });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false } }, () => {
-      try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('An error has occurred')));
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('File Not Found.')));
         done();
       }
       catch (e) {
@@ -270,6 +252,32 @@ describe(commands.SITESCRIPT_LIST, () => {
     assert(containsOption);
   });
 
+  it('supports specifying id', () => {
+    const options = (command.options() as CommandOption[]);
+    let containsOption = false;
+    options.forEach(o => {
+      if (o.option.indexOf('--id') > -1) {
+        containsOption = true;
+      }
+    });
+    assert(containsOption);
+  });
+
+  it('fails validation if id not specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: {} });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation if the id is not a valid GUID', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { id: 'abc' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('passes validation when the id is a valid GUID', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a' } });
+    assert.equal(actual, true);
+  });
+
   it('has help referring to the right command', () => {
     const cmd: any = {
       log: (msg: string) => { },
@@ -279,7 +287,7 @@ describe(commands.SITESCRIPT_LIST, () => {
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
     cmd.help({}, () => { });
-    assert(find.calledWith(commands.SITESCRIPT_LIST));
+    assert(find.calledWith(commands.SITESCRIPT_GET));
   });
 
   it('has help with examples', () => {
