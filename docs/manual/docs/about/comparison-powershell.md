@@ -46,7 +46,7 @@ Get-SPOSiteDataEncryptionPolicy|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOSiteDesign|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOSiteDesignRights|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOSiteGroup|Microsoft.Online.SharePoint.PowerShell|
-Get-SPOSiteScript|Microsoft.Online.SharePoint.PowerShell|
+Get-SPOSiteScript|Microsoft.Online.SharePoint.PowerShell|[spo sitescript list](../cmd/spo/sitescript/sitescript-list.md)
 Get-SPOStorageEntity|Microsoft.Online.SharePoint.PowerShell|[spo storageentity get](../cmd/spo/storageentity/storageentity-get.md), [spo storageentity list](../cmd/spo/storageentity/storageentity-list.md)
 Get-SPOTenant|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOTenantCdnEnabled|Microsoft.Online.SharePoint.PowerShell|[spo cdn get](../cmd/spo/cdn/cdn-get.md)
@@ -242,7 +242,7 @@ Get-PnPSiteCollectionTermStore|SharePointPnPPowerShellOnline|
 Get-PnPSiteDesign|SharePointPnPPowerShellOnline|
 Get-PnPSiteDesignRights|SharePointPnPPowerShellOnline|
 Get-PnPSitePolicy|SharePointPnPPowerShellOnline|
-Get-PnPSiteScript|SharePointPnPPowerShellOnline|
+Get-PnPSiteScript|SharePointPnPPowerShellOnline|[spo sitescript list](../cmd/spo/sitescript/sitescript-list.md)
 Get-PnPSiteSearchQueryResults|SharePointPnPPowerShellOnline|
 Get-PnPStorageEntity|SharePointPnPPowerShellOnline|[spo storageentity get](../cmd/spo/storageentity/storageentity-get.md), [spo storageentity list](../cmd/spo/storageentity/storageentity-list.md)
 Get-PnPStoredCredential|SharePointPnPPowerShellOnline|
