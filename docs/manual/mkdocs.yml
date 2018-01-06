@@ -45,6 +45,7 @@ pages:
         - site appcatalog remove: 'cmd/spo/site/site-appcatalog-remove.md'
       - sitescript:
         - sitescript add: 'cmd/spo/sitescript/sitescript-add.md'
+        - sitescript list: 'cmd/spo/sitescript/sitescript-list.md'
       - storageentity:
         - storageentity get: 'cmd/spo/storageentity/storageentity-get.md'
         - storageentity list: 'cmd/spo/storageentity/storageentity-list.md'

@@ -35,6 +35,7 @@ export default {
   SITE_GET: `${prefix} site get`,
   SITE_LIST: `${prefix} site list`,
   SITESCRIPT_ADD: `${prefix} sitescript add`,
+  SITESCRIPT_LIST: `${prefix} sitescript list`,
   SP_GRANT_LIST: `${prefix} sp grant list`,
   SP_GRANT_REVOKE: `${prefix} sp grant revoke`,
   SP_PERMISSIONREQUEST_APPROVE: `${prefix} sp permissionrequest approve`,
