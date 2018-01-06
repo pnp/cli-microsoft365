@@ -31,6 +31,12 @@ class SpoSiteScriptAddCommand extends SpoCommand {
     return 'Adds site script for use with site designs';
   }
 
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.description = (!(!args.options.description)).toString();
+    return telemetryProps;
+  }
+
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
