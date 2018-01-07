@@ -15,7 +15,7 @@ Option|Description
 `--help`|output usage information
 `-e, --enabled <enabled>`|Set to true to enable CDN or to false to disable it. Valid values are true|false
 `-t, --type [type]`|Type of CDN to manage. `Public|Private`. Default `Public`
-`-o, --output <output>`|Output type. `json|text`. Default `text`
+`-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
@@ -24,17 +24,11 @@ Option|Description
 
 ## Remarks
 
-To enable or disable an Office 365 CDN, you have to first connect to a tenant admin site using the
-[spo connect](../connect.md) command, eg. `spo connect https://contoso-admin.sharepoint.com`.
-If you are connected to a different site and will try to manage tenant properties,
-you will get an error.
+To enable or disable an Office 365 CDN, you have to first connect to a tenant admin site using the [spo connect](../connect.md) command, eg. `spo connect https://contoso-admin.sharepoint.com`. If you are connected to a different site and will try to manage tenant properties, you will get an error.
 
-Using the `-t, --type` option you can choose whether you want to manage the settings of
-the Public (default) or Private CDN. If you don't use the option, the command will use the Public CDN.
+Using the `-t, --type` option you can choose whether you want to manage the settings of the Public (default) or Private CDN. If you don't use the option, the command will use the Public CDN.
 
-Using the `-e, --enabled` option you can specify whether the given CDN type should be
-enabled or disabled. Use true to enable the specified CDN and false to
-disable it.
+Using the `-e, --enabled` option you can specify whether the given CDN type should be enabled or disabled. Use true to enable the specified CDN and false to disable it.
 
 ## Examples
 

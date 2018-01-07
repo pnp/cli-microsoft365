@@ -15,7 +15,7 @@ Option|Description
 `--help`|output usage information
 `-i, --grantId <grantId>`|`objectId` of OAuth2 permission grant to update
 `-s, --scope <scope>`|Permissions to grant
-`-o, --output <output>`|Output type. `json|text`. Default `text`
+`-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 

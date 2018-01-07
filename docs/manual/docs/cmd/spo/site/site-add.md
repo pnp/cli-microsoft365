@@ -23,7 +23,7 @@ Option|Description
 `--allowFileSharingForGuestUsers`|Determines whether it's allowed to share file with guests (applies only to communication sites)
 `--siteDesign [siteDesign]`|Type of communication site to create. Allowed values `Topic|Showcase|Blank`, default `Topic`. When creating a communication site, specify either `siteDesign` or `siteDesignId` (applies only to communication sites)
 `--siteDesignId [siteDesignId]`|Id of the custom site design to use to create the site. When creating a communication site, specify either `siteDesign` or `siteDesignId` (applies only to communication sites)
-`-o, --output <output>`|Output type. `json|text`. Default `text`
+`-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 

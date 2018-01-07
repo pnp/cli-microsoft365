@@ -14,7 +14,7 @@ Option|Description
 ------|-----------
 `--help`|output usage information
 `-i, --id <id>`|ID of the app to retrieve information for
-`-o, --output <output>`|Output type. `json|text`. Default `text`
+`-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
@@ -23,8 +23,7 @@ Option|Description
 
 ## Remarks
 
-To get information about the specified app available in the tenant app catalog, you have to first connect to a SharePoint site using the
-[spo connect](../connect.md) command, eg. `spo connect https://contoso.sharepoint.com`.
+To get information about the specified app available in the tenant app catalog, you have to first connect to a SharePoint site using the [spo connect](../connect.md) command, eg. `spo connect https://contoso.sharepoint.com`.
 
 ## Examples
 

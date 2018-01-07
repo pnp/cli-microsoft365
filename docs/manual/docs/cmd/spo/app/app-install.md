@@ -15,7 +15,7 @@ Option|Description
 `--help`|output usage information
 `-i, --id <id>`|ID of the app to retrieve information for
 `-s, --siteUrl <siteUrl>`|Absolute URL of the site to install the app in
-`-o, --output <output>`|Output type. `json|text`. Default `text`
+`-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 

@@ -14,7 +14,7 @@ Option|Description
 ------|-----------
 `--help`|output usage information
 `-u, --appCatalogUrl <appCatalogUrl>`|URL of the app catalog site
-`-o, --output <output>`|Output type. `json|text`. Default `text`
+`-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
@@ -23,8 +23,7 @@ Option|Description
 
 ## Remarks
 
-To list tenant properties, you have to first connect to a SharePoint site using the
-[spo connect](../connect.md) command, eg. `spo connect https://contoso.sharepoint.com`.
+To list tenant properties, you have to first connect to a SharePoint site using the [spo connect](../connect.md) command, eg. `spo connect https://contoso.sharepoint.com`.
 
 Tenant properties are stored in the app catalog site. To list all tenant properties, you have to specify the absolute URL of the app catalog site. If you specify an incorrect URL, or the site at the given URL is not an app catalog site, no properties will be retrieved.
 

@@ -16,7 +16,7 @@ Option|Description
 `-i, --id <id>`|ID of the app to remove. Needs to be available in the tenant app catalog.
 `-u, --appCatalogUrl [appCatalogUrl]`|(optional) URL of the tenant app catalog site. If not specified, the CLI will try to resolve it automatically
 `--confirm`|Don't prompt for confirming removing the app from the tenant app catalog
-`-o, --output <output>`|Output type. `json|text`. Default `text`
+`-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 

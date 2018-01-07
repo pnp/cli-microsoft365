@@ -20,7 +20,7 @@ Option|Description
 ------|-----------
 `--help`|output usage information
 `-i, --requestId <requestId>`|ID of the permission request to approve
-`-o, --output <output>`|Output type. `json|text`. Default `text`
+`-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 

@@ -16,7 +16,7 @@ Option|Description
 `-i, --id <id>`|ID of the app to deploy. Needs to be available in the tenant app catalog.
 `-u, --appCatalogUrl [appCatalogUrl]`|(optional) URL of the tenant app catalog site. If not specified, the CLI will try to resolve it automatically
 `--skipFeatureDeployment`|If the app supports tenant-wide deployment, deploy it to the whole tenant
-`-o, --output <output>`|Output type. `json|text`. Default `text`
+`-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
@@ -25,8 +25,7 @@ Option|Description
 
 ## Remarks
 
-To deploy an app in the tenant app catalog, you have to first connect to a SharePoint site using the
-[spo connect](../connect.md) command, eg. `spo connect https://contoso.sharepoint.com`.
+To deploy an app in the tenant app catalog, you have to first connect to a SharePoint site using the [spo connect](../connect.md) command, eg. `spo connect https://contoso.sharepoint.com`.
 
 If you don't specify the URL of the tenant app catalog site using the **appCatalogUrl** option, the CLI will try to determine its URL automatically. This will be done using SharePoint Search. If the tenant app catalog site hasn't been crawled yet, the CLI will not find it and will prompt you to provide the URL yourself.
 

@@ -21,7 +21,7 @@ Option|Description
 `--help`|output usage information
 `-e, --enabled <enabled>`|Set to `true` to enable the service principal or to `false` to disable it. Valid values are `true|false`
 `--confirm`|Don't prompt for confirming enabling/disabling the service principal
-`-o, --output <output>`|Output type. `json|text`. Default `text`
+`-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
