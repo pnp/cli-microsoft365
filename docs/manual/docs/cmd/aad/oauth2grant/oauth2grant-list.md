@@ -14,7 +14,7 @@ Option|Description
 ------|-----------
 `--help`|output usage information
 `-i, --clientId <clientId>`|objectId of the service principal for which the configured OAuth2 permission grants should be retrieved
-`-o, --output <output>`|Output type. `json|text`. Default `text`
+`-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 

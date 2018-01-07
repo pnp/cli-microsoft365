@@ -15,7 +15,7 @@ Option|Description
 `--help`|output usage information
 `--type [type]`|type of modern sites to list. Allowed values `TeamSite|CommunicationSite`, default `TeamSite`
 `-f, --filter [filter]`|filter to apply when retrieving sites
-`-o, --output <output>`|Output type. `json|text`. Default `text`
+`-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 

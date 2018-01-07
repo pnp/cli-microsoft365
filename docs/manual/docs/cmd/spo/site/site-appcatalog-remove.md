@@ -14,7 +14,7 @@ Option|Description
 ------|-----------
 `--help`|output usage information
 `-u, --url <url>`|URL of the site collection containing the app catalog to disable
-`-o, --output <output>`|Output type. `json|text`. Default `text`
+`-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 

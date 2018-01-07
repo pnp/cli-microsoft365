@@ -15,7 +15,7 @@ Option|Description
 `--help`|output usage information
 `-p, --filePath <filePath>`|Absolute or relative path to the solution package file to add to the app catalog
 `--overwrite`|Set to overwrite the existing package file
-`-o, --output <output>`|Output type. `json|text`. Default `text`
+`-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
@@ -24,8 +24,7 @@ Option|Description
 
 ## Remarks
 
-To add an app to the tenant app catalog, you have to first connect to a SharePoint site using the
-[spo connect](../connect.md) command, eg. `spo connect https://contoso.sharepoint.com`.
+To add an app to the tenant app catalog, you have to first connect to a SharePoint site using the [spo connect](../connect.md) command, eg. `spo connect https://contoso.sharepoint.com`.
 
 When specifying the path to the app package file you can use both relative and absolute paths. Note, that `~` in the path, will not be resolved and will most likely result in an error.
 

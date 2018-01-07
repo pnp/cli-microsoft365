@@ -31,7 +31,7 @@ Option|Description
 `--scriptSrc [scriptSrc]`|Specifies a file that contains script to be executed. This attribute is only applicable when the Location attribute is set to ScriptLink
 `-c, --clientSideComponentId [clientSideComponentId]`|The Client Side Component Id (GUID) of the custom action
 `-p, --clientSideComponentProperties [clientSideComponentProperties]`|The Client Side Component Properties of the custom action. Specify values as a JSON string : `'{"testMessage":"Test message"}'`
-`-o, --output <output>`|Output type. `json|text`. Default `text`
+`-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 

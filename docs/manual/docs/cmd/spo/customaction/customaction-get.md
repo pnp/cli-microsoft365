@@ -16,7 +16,7 @@ Option|Description
 `-i, --id <id>`|ID of the user custom action to retrieve information for
 `-u, --url <url>`|Url of the site or site collection to retrieve the custom action from
 `-s, --scope [scope]`|Scope of the custom action. Allowed values `Site|Web|All`. Default `All`
-`-o, --output <output>`|Output type. `json|text`. Default `text`
+`-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
@@ -25,8 +25,7 @@ Option|Description
 
 ## Remarks
 
-To retrieve custom action, you have to first connect to a SharePoint Online site using the
-[spo connect](../connect.md) command, eg. `spo connect https://contoso.sharepoint.com`.
+To retrieve custom action, you have to first connect to a SharePoint Online site using the [spo connect](../connect.md) command, eg. `spo connect https://contoso.sharepoint.com`.
 
 ## Examples
 

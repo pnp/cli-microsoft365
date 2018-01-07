@@ -18,7 +18,7 @@ Option|Description
 `-i, --position [position]`|Use to specify the zero-based index of the position in the sorted collection of the first result to be returned
 `-s, --sortOrder [sortOrder]`|Specifies the sort results in Ascending or Descending order on the `SPOUser.Email` property should occur. Allowed values `asc|desc`. Default `asc`
 `-u, --siteUrl [siteUrl]`|Specifies the site to retrieve external users for. If no site is specified, the external users for all sites are returned
-`-o, --output <output>`|Output type. `json|text`. Default `text`
+`-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 

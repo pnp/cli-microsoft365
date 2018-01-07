@@ -13,7 +13,7 @@ spo app list [options]
 Option|Description
 ------|-----------
 `--help`|output usage information
-`-o, --output <output>`|Output type. `json|text`. Default `text`
+`-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
@@ -22,8 +22,7 @@ Option|Description
 
 ## Remarks
 
-To list the apps available in the tenant app catalog, you have to first connect to a SharePoint site using the
-[spo connect](../connect.md) command, eg. `spo connect https://contoso.sharepoint.com`.
+To list the apps available in the tenant app catalog, you have to first connect to a SharePoint site using the [spo connect](../connect.md) command, eg. `spo connect https://contoso.sharepoint.com`.
 
 ## Examples
 

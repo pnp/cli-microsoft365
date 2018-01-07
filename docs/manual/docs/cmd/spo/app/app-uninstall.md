@@ -16,7 +16,7 @@ Option|Description
 `-i, --id <id>`|ID of the app to retrieve information for
 `-s, --siteUrl <siteUrl>`|Absolute URL of the site to uninstall the app from
 `--confirm`|Don't prompt for confirming uninstalling the app
-`-o, --output <output>`|Output type. `json|text`. Default `text`
+`-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
