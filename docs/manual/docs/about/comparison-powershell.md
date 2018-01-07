@@ -86,7 +86,7 @@ Remove-SPOSiteCollectionAppCatalog|Microsoft.Online.SharePoint.PowerShell|[spo s
 Remove-SPOSiteCollectionAppCatalogById|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOSiteDesign|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOSiteGroup|Microsoft.Online.SharePoint.PowerShell|
-Remove-SPOSiteScript|Microsoft.Online.SharePoint.PowerShell|
+Remove-SPOSiteScript|Microsoft.Online.SharePoint.PowerShell|[spo sitescript remove](../cmd/spo/sitescript/sitescript-remove.md)
 Remove-SPOStorageEntity|Microsoft.Online.SharePoint.PowerShell|[spo storageentity remove](../cmd/spo/storageentity/storageentity-remove.md)
 Remove-SPOTenantCdnOrigin|Microsoft.Online.SharePoint.PowerShell|[spo cdn origin remove](../cmd/spo/cdn/cdn-origin-remove.md)
 Remove-SPOTenantSyncClientRestriction|Microsoft.Online.SharePoint.PowerShell|
@@ -326,7 +326,7 @@ Remove-PnPPublishingImageRendition|SharePointPnPPowerShellOnline|
 Remove-PnPSiteClassification|SharePointPnPPowerShellOnline|
 Remove-PnPSiteCollectionAdmin|SharePointPnPPowerShellOnline|
 Remove-PnPSiteDesign|SharePointPnPPowerShellOnline|
-Remove-PnPSiteScript|SharePointPnPPowerShellOnline|
+Remove-PnPSiteScript|SharePointPnPPowerShellOnline|[spo sitescript remove](../cmd/spo/sitescript/sitescript-remove.md)
 Remove-PnPStorageEntity|SharePointPnPPowerShellOnline|[spo storageentity remove](../cmd/spo/storageentity/storageentity-remove.md)
 Remove-PnPTaxonomyItem|SharePointPnPPowerShellOnline|
 Remove-PnPTenantSite|SharePointPnPPowerShellOnline|
