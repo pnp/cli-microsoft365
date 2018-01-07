@@ -6,7 +6,7 @@ PowerShell Cmdlet|Source|Office 365 CLI command
 -----------------|------|----------------------
 Add-SPOGeoAdministrator|Microsoft.Online.SharePoint.PowerShell|
 Add-SPOSiteCollectionAppCatalog|Microsoft.Online.SharePoint.PowerShell|[spo site appcatalog add](../cmd/spo/site/site-appcatalog-add.md)
-Add-SPOSiteDesign|Microsoft.Online.SharePoint.PowerShell|
+Add-SPOSiteDesign|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign add](../cmd/spo/sitedesign/sitedesign-add.md)
 Add-SPOSiteScript|Microsoft.Online.SharePoint.PowerShell|[spo sitescript add](../cmd/spo/sitescript/sitescript-add.md)
 Add-SPOTenantCdnOrigin|Microsoft.Online.SharePoint.PowerShell|[spo cdn origin add](../cmd/spo/cdn/cdn-origin-add.md)
 Add-SPOTheme|Microsoft.Online.SharePoint.PowerShell|
@@ -158,7 +158,7 @@ Add-PnPPublishingPage|SharePointPnPPowerShellOnline|
 Add-PnPPublishingPageLayout|SharePointPnPPowerShellOnline|
 Add-PnPSiteClassification|SharePointPnPPowerShellOnline|
 Add-PnPSiteCollectionAdmin|SharePointPnPPowerShellOnline|
-Add-PnPSiteDesign|SharePointPnPPowerShellOnline|
+Add-PnPSiteDesign|SharePointPnPPowerShellOnline|[spo sitedesign add](../cmd/spo/sitedesign/sitedesign-add.md)
 Add-PnPSiteScript|SharePointPnPPowerShellOnline|[spo sitescript add](../cmd/spo/sitescript/sitescript-add.md)
 Add-PnPTaxonomyField|SharePointPnPPowerShellOnline|
 Add-PnPUserToGroup|SharePointPnPPowerShellOnline|
