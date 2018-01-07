@@ -10,7 +10,7 @@ import { Service } from '../../../Auth';
 
 describe(commands.STATUS, () => {
   let vorpal: Vorpal;
-  let log: string[];
+  let log: any[];
   let cmdInstance: any;
   let trackEvent: any;
   let telemetry: any;
@@ -27,7 +27,7 @@ describe(commands.STATUS, () => {
     vorpal = require('../../../vorpal-init');
     log = [];
     cmdInstance = {
-      log: (msg: string) => {
+      log: (msg: any) => {
         log.push(msg);
       }
     };
@@ -113,26 +113,15 @@ describe(commands.STATUS, () => {
 
   it('shows connected status when connected', (done) => {
     auth.service = new Service('https://graph.windows.net');
+    auth.service.accessToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Ing0NTh4eU9wbHNNMkg3TlhrMlN4MTd4MXVwYyIsImtpZCI6Ing0NTh4eU9wbHNNMkg3TlhrN1N4MTd4MXVwYyJ9.eyJhdWQiOiJodHRwczovL2dyYXBoLndpbmRvd3MubmV0IiwiaXNzIjoiaHR0cHM6Ly9zdHMud2luZG93cy5uZXQvY2FlZTMyZTYtNDA1ZC00MjRhLTljZjEtMjA3MWQwNDdmMjk4LyIsImlhdCI6MTUxNTAwNDc4NCwibmJmIjoxNTE1MDA0Nzg0LCJleHAiOjE1MTUwMDg2ODQsImFjciI6IjEiLCJhaW8iOiJBQVdIMi84R0FBQUFPN3c0TDBXaHZLZ1kvTXAxTGJMWFdhd2NpOEpXUUpITmpKUGNiT2RBM1BvPSIsImFtciI6WyJwd2QiXSwiYXBwaWQiOiIwNGIwNzc5NS04ZGRiLTQ2MWEtYmJlZS0wMmY5ZTFiZjdiNDYiLCJhcHBpZGFjciI6IjAiLCJmYW1pbHlfbmFtZSI6IkRvZSIsImdpdmVuX25hbWUiOiJKb2huIiwiaXBhZGRyIjoiOC44LjguOCIsIm5hbWUiOiJKb2huIERvZSIsIm9pZCI6ImYzZTU5NDkxLWZjMWEtNDdjYy1hMWYwLTk1ZWQ0NTk4MzcxNyIsInB1aWQiOiIxMDk0N0ZGRUE2OEJDQ0NFIiwic2NwIjoiNjJlOTAzOTQtNjlmNS00MjM3LTkxOTAtMDEyMTc3MTQ1ZTEwIiwic3ViIjoiemZicmtUV1VQdEdWUUg1aGZRckpvVGp3TTBrUDRsY3NnLTJqeUFJb0JuOCIsInRlbmFudF9yZWdpb25fc2NvcGUiOiJOQSIsInRpZCI6ImNhZWUzM2U2LTQwNWQtNDU0YS05Y2YxLTMwNzFkMjQxYTI5OCIsInVuaXF1ZV9uYW1lIjoiYWRtaW5AY29udG9zby5vbm1pY3Jvc29mdC5jb20iLCJ1cG4iOiJhZG1pbkBjb250b3NvLm9ubWljcm9zb2Z0LmNvbSIsInV0aSI6ImFUZVdpelVmUTBheFBLMVRUVXhsQUEiLCJ2ZXIiOiIxLjAifQ==.abc';
     auth.service.connected = true;
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith('https://graph.windows.net'));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('shows connected status when connected (verbose)', (done) => {
-    auth.service = new Service('https://graph.windows.net');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: true } }, () => {
-      try {
-        assert(cmdInstanceLogSpy.calledWith('Connected to https://graph.windows.net'));
+        assert(cmdInstanceLogSpy.calledWith({ 
+          connectedTo: 'https://graph.windows.net',
+          connectedAs: 'admin@contoso.onmicrosoft.com'
+        }));
         done();
       }
       catch (e) {
@@ -149,7 +138,7 @@ describe(commands.STATUS, () => {
     cmdInstance.action({ options: { debug: true } }, () => {
       let reportsCorrectValue: boolean = false;
       log.forEach(l => {
-        if (l && l.indexOf('AAD resource:') > -1 && l.indexOf(auth.service.resource) > -1) {
+        if (l && l.aadResource === 'https://graph.windows.net') {
           reportsCorrectValue = true;
         }
       });
@@ -171,7 +160,7 @@ describe(commands.STATUS, () => {
     cmdInstance.action({ options: { debug: true } }, () => {
       let reportsCorrectValue: boolean = false;
       log.forEach(l => {
-        if (l && l.indexOf('Access token:') > -1 && l.indexOf('abc') > -1) {
+        if (l && l.accessToken === 'abc') {
           reportsCorrectValue = true;
         }
       });
@@ -193,7 +182,7 @@ describe(commands.STATUS, () => {
     cmdInstance.action({ options: { debug: true } }, () => {
       let reportsCorrectValue: boolean = false;
       log.forEach(l => {
-        if (l && l.indexOf('Refresh token:') > -1 && l.indexOf('abc') > -1) {
+        if (l && l.refreshToken === 'abc') {
           reportsCorrectValue = true;
         }
       });
@@ -219,7 +208,9 @@ describe(commands.STATUS, () => {
     cmdInstance.action({ options: { debug: true } }, () => {
       let reportsCorrectValue: boolean = false;
       log.forEach(l => {
-        if (l && l.indexOf('Expires at:') > -1 && l.indexOf(expiresAtDate.toString()) > -1) {
+        if (l &&
+          l.expiresAt &&
+          l.expiresAt.toString() === expiresAtDate.toString()) {
           reportsCorrectValue = true;
         }
       });
