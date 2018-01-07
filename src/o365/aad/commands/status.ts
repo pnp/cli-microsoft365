@@ -4,6 +4,7 @@ import commands from '../commands';
 import Command, {
   CommandError
 } from '../../../Command';
+import Utils from '../../../Utils';
 
 const vorpal: Vorpal = require('../../../vorpal-init');
 
@@ -17,29 +18,27 @@ class AadStatusCommand extends Command {
   }
 
   public commandAction(cmd: CommandInstance, args: {}, cb: () => void): void {
-    const chalk: any = vorpal.chalk;
-
     auth
       .restoreAuth()
       .then((): void => {
         if (auth.service.connected) {
-          const expiresAtDate: Date = new Date(0);
-          expiresAtDate.setUTCSeconds(auth.service.expiresAt);
+          if (this.debug) {
+            const expiresAtDate: Date = new Date(0);
+            expiresAtDate.setUTCSeconds(auth.service.expiresAt);
 
-          if (this.verbose) {
-            cmd.log(`Connected to ${auth.service.resource}`);
+            cmd.log({
+              connectedAs: Utils.getUserNameFromAccessToken(auth.service.accessToken),
+              aadResource: auth.service.resource,
+              accessToken: auth.service.accessToken,
+              refreshToken: auth.service.refreshToken,
+              expiresAt: expiresAtDate
+            });
           }
           else {
-            cmd.log(auth.service.resource);
-          }
-
-          if (this.debug) {
-            cmd.log(`
-  ${chalk.grey('AAD resource:')}     ${auth.service.resource}
-  ${chalk.grey('Access token:')}     ${auth.service.accessToken}
-  ${chalk.grey('Refresh token:')}    ${auth.service.refreshToken}
-  ${chalk.grey('Expires at:')}       ${expiresAtDate}
-  `);
+            cmd.log({
+              connectedTo: auth.service.resource,
+              connectedAs: Utils.getUserNameFromAccessToken(auth.service.accessToken)
+            });
           }
         }
         else {

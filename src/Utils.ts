@@ -167,4 +167,27 @@ export default class Utils {
       return t.toString();
     }
   }
+
+  public static getUserNameFromAccessToken(accessToken: string): string {
+    let userName: string = '';
+
+    if (!accessToken || accessToken.length === 0) {
+      return userName;
+    }
+
+    const chunks = accessToken.split('.');
+    if (chunks.length !== 3) {
+      return userName;
+    }
+
+    const tokenString: string = Buffer.from(chunks[1], 'base64').toString();
+    try {
+      const token: any = JSON.parse(tokenString);
+      userName = token.upn;
+    }
+    catch {
+    }
+
+    return userName;
+  }
 }
