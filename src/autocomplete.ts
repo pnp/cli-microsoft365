@@ -21,61 +21,63 @@ class Autocomplete {
       catch { }
     }
 
-    const _this = this;
+    this.omelette = omelette('o365|office365');
+    this.omelette.on('complete', this.handleAutocomplete.bind(this));
+    this.omelette.init();
+  }
 
-    function handleAutocomplete(this: any, fragment: string, data: any): void {
-      let replies: Object | string[] = {};
-      let allWords: string[] = [];
+  public handleAutocomplete(fragment: string, data: EventData): void {
+    let replies: Object | string[] = {};
+    let allWords: string[] = [];
 
-      if (data.fragment === 1) {
-        replies = Object.keys(_this.commands);
-      }
-      else {
-        allWords = data.line.split(/\s+/).slice(1, -1);
-        // build array of words to use as a path to retrieve completion
-        // options from the commands tree
-        const words: string[] = allWords
-          .filter((e: string, i: number): boolean => {
-            if (e.indexOf('-') !== 0) {
-              // if the word is not an option check if it's not
-              // option's value, eg. --output json, in which case
-              // the suggestion should be command options
-              return i === 0 || allWords[i - 1].indexOf('-') !== 0;
-            }
-            else {
-              // remove all options but last one
-              return i === allWords.length - 1;
-            }
-          });
-        let accessor: Function = new Function('_', "return _['" + (words.join("']['")) + "']");
+    if (data.fragment === 1) {
+      replies = Object.keys(this.commands);
+    }
+    else {
+      allWords = data.line.split(/\s+/).slice(1, -1);
+      // build array of words to use as a path to retrieve completion
+      // options from the commands tree
+      const words: string[] = allWords
+        .filter((e: string, i: number): boolean => {
+          if (e.indexOf('-') !== 0) {
+            // if the word is not an option check if it's not
+            // option's value, eg. --output json, in which case
+            // the suggestion should be command options
+            return i === 0 || allWords[i - 1].indexOf('-') !== 0;
+          }
+          else {
+            // remove all options but last one
+            return i === allWords.length - 1;
+          }
+        });
+      let accessor: Function = new Function('_', "return _['" + (words.join("']['")) + "']");
 
-        replies = accessor(_this.commands);
+      try {
+        replies = accessor(this.commands);
         // if the last word is an option without autocomplete
         // suggest other options from the same command
         if (words[words.length - 1].indexOf('-') === 0 &&
           !Array.isArray(replies)) {
           accessor = new Function('_', "return _['" + (words.filter(w => w.indexOf('-') !== 0).join("']['")) + "']");
-          replies = accessor(_this.commands);
-
-          if (!Array.isArray(replies)) {
-            replies = Object.keys(replies);
-          }
+          replies = accessor(this.commands);
+          replies = Object.keys(replies);
         }
       }
-
-      if (!Array.isArray(replies)) {
-        replies = Object.keys(replies);
-      }
-
-      // remove options that already have been used
-      replies = (replies as string[]).filter(r => r.indexOf('-') !== 0 || allWords.indexOf(r) === -1);
-
-      this.reply(replies);
+      catch { }
     }
 
-    this.omelette = omelette('o365|office365');
-    this.omelette.on('complete', handleAutocomplete);
-    this.omelette.init();
+    if (!replies) {
+      replies = [];
+    }
+
+    if (!Array.isArray(replies)) {
+      replies = Object.keys(replies);
+    }
+
+    // remove options that already have been used
+    replies = (replies as string[]).filter(r => r.indexOf('-') !== 0 || allWords.indexOf(r) === -1);
+
+    data.reply(replies);
   }
 
   public generateShCompletion(vorpal: Vorpal): void {
@@ -106,13 +108,11 @@ class Autocomplete {
     if (!Array.isArray(branch)) {
       const keys: string[] = Object.keys(branch);
 
-      if (keys.length > 0) {
-        keys.forEach(k => {
-          if (Object.keys(branch[k]).length > 0) {
-            this.buildClinkForBranch(branch[k], lua, this.getLuaFunctionName(`${luaFunctionName}_${k}`));
-          }
-        });
-      }
+      keys.forEach(k => {
+        if (Object.keys(branch[k]).length > 0) {
+          this.buildClinkForBranch(branch[k], lua, this.getLuaFunctionName(`${luaFunctionName}_${k}`));
+        }
+      });
     }
 
     lua.push(
@@ -123,16 +123,10 @@ class Autocomplete {
     let printingArgs: boolean = false;
 
     if (Array.isArray(branch)) {
-      if (branch.find(c => c.indexOf('-') === 0)) {
-        printingArgs = true;
-        lua.push(`},${branch.map(c => `"${c}"`).join(',')}`);
-      }
-      else {
-        branch.sort().forEach((c, i) => {
-          const separator = i < branch.length - 1 ? ',' : '';
-          lua.push(`  "${c}"${separator}`);
-        });
-      }
+      branch.sort().forEach((c, i) => {
+        const separator = i < branch.length - 1 ? ',' : '';
+        lua.push(`  "${c}"${separator}`);
+      });
     }
     else {
       const keys = Object.keys(branch);
@@ -153,12 +147,7 @@ class Autocomplete {
       else {
         keys.sort().forEach((k, i) => {
           const separator = i < keys.length - 1 ? ',' : '';
-          if (Object.keys(branch[k]).length > 0) {
-            lua.push(`  "${k}"..${this.getLuaFunctionName(`${luaFunctionName}_${k}_parser`)}${separator}`);
-          }
-          else {
-            lua.push(`  "${k}"${separator}`);
-          }
+          lua.push(`  "${k}"..${this.getLuaFunctionName(`${luaFunctionName}_${k}_parser`)}${separator}`);
         });
       }
     }
