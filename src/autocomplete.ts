@@ -49,18 +49,26 @@ class Autocomplete {
           });
         let accessor: Function = new Function('_', "return _['" + (words.join("']['")) + "']");
 
-        replies = accessor(_this.commands);
-        // if the last word is an option without autocomplete
-        // suggest other options from the same command
-        if (words[words.length - 1].indexOf('-') === 0 &&
-          !Array.isArray(replies)) {
-          accessor = new Function('_', "return _['" + (words.filter(w => w.indexOf('-') !== 0).join("']['")) + "']");
+        try {
           replies = accessor(_this.commands);
 
-          if (!Array.isArray(replies)) {
-            replies = Object.keys(replies);
+          // if the last word is an option without autocomplete
+          // suggest other options from the same command
+          if (words[words.length - 1].indexOf('-') === 0 &&
+            !Array.isArray(replies)) {
+            accessor = new Function('_', "return _['" + (words.filter(w => w.indexOf('-') !== 0).join("']['")) + "']");
+            replies = accessor(_this.commands);
+
+            if (!Array.isArray(replies)) {
+              replies = Object.keys(replies);
+            }
           }
         }
+        catch { }
+      }
+
+      if (!replies) {
+        replies = [];
       }
 
       if (!Array.isArray(replies)) {
