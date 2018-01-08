@@ -28,6 +28,7 @@ pages:
         - customaction add: 'cmd/spo/customaction/customaction-add.md'
         - customaction get: 'cmd/spo/customaction/customaction-get.md'
         - customaction list: 'cmd/spo/customaction/customaction-list.md'
+        - customaction remove: 'cmd/spo/customaction/customaction-remove.md'
       - externaluser:
         - externaluser list: 'cmd/spo/externaluser/externaluser-list.md'
       - list:

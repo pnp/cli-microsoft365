@@ -308,7 +308,7 @@ Remove-PnPClientSidePage|SharePointPnPPowerShellOnline|
 Remove-PnPContentType|SharePointPnPPowerShellOnline|
 Remove-PnPContentTypeFromDocumentSet|SharePointPnPPowerShellOnline|
 Remove-PnPContentTypeFromList|SharePointPnPPowerShellOnline|
-Remove-PnPCustomAction|SharePointPnPPowerShellOnline|
+Remove-PnPCustomAction|SharePointPnPPowerShellOnline|[spo customaction remove](../cmd/spo/customaction/customaction-remove.md)
 Remove-PnPEventReceiver|SharePointPnPPowerShellOnline|
 Remove-PnPField|SharePointPnPPowerShellOnline|
 Remove-PnPFieldFromContentType|SharePointPnPPowerShellOnline|
