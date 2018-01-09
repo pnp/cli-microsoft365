@@ -284,7 +284,7 @@ describe(commands.SITE_GET, () => {
 
   it('passes validation if the url option is a valid SharePoint site URL', () => {
     const actual = (command.validate() as CommandValidate)({ options: { url: 'https://contoso.sharepoint.com' } });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('has help referring to the right command', () => {

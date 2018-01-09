@@ -260,12 +260,12 @@ describe(commands.SP_GET, () => {
 
   it('passes validation when the appId option specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { appId: '6a7b1395-d313-4682-8ed4-65a6265a6320' } });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('passes validation when the displayName option specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { displayName: 'Microsoft Graph' } });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('fails validation when both the appId and displayName are specified', () => {

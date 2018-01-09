@@ -698,7 +698,7 @@ describe(commands.CUSTOMACTION_GET, () => {
           url: "https://contoso.sharepoint.com"
         }
     });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('passes validation when the id, url and scope options specified', () => {
@@ -710,7 +710,7 @@ describe(commands.CUSTOMACTION_GET, () => {
           scope: "Site"
         }
     });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('passes validation when the id and url option specified', () => {
@@ -721,7 +721,7 @@ describe(commands.CUSTOMACTION_GET, () => {
           url: "https://contoso.sharepoint.com"
         }
     });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('humanize scope shows correct value when scope odata is 2', () => {
@@ -748,7 +748,7 @@ describe(commands.CUSTOMACTION_GET, () => {
           scope: 'All'
         }
     });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('accepts scope to be Site', () => {
@@ -760,7 +760,7 @@ describe(commands.CUSTOMACTION_GET, () => {
           scope: 'Site'
         }
     });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('accepts scope to be Web', () => {
@@ -772,7 +772,7 @@ describe(commands.CUSTOMACTION_GET, () => {
           scope: 'Web'
         }
     });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('rejects invalid string scope', () => {
@@ -808,7 +808,7 @@ describe(commands.CUSTOMACTION_GET, () => {
             url: "https://contoso.sharepoint.com"
           }
       });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('has help referring to the right command', () => {

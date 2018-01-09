@@ -350,12 +350,12 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
   it('accepts valid SharePoint Online app catalog URL', () => {
     const actual = (command.validate() as CommandValidate)({ options: { appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }});
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('accepts valid SharePoint Online site URL', () => {
     const actual = (command.validate() as CommandValidate)({ options: { appCatalogUrl: 'https://contoso.sharepoint.com' }});
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('rejects invalid SharePoint Online URL', () => {

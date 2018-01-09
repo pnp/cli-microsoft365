@@ -306,7 +306,7 @@ describe(commands.APP_GET, () => {
 
   it('passes validation when the id option specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { id: '123' } });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('supports debug mode', () => {

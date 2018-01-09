@@ -25,8 +25,11 @@ pages:
         - cdn policy set: 'cmd/spo/cdn/cdn-policy-set.md'
         - cdn set: 'cmd/spo/cdn/cdn-set.md'
       - customaction:
+        - customaction add: 'cmd/spo/customaction/customaction-add.md'
         - customaction get: 'cmd/spo/customaction/customaction-get.md'
         - customaction list: 'cmd/spo/customaction/customaction-list.md'
+      - externaluser:
+        - externaluser list: 'cmd/spo/externaluser/externaluser-list.md'
       - serviceprincipal:
         - serviceprincipal grant list: 'cmd/spo/serviceprincipal/serviceprincipal-grant-list.md'
         - serviceprincipal grant revoke: 'cmd/spo/serviceprincipal/serviceprincipal-grant-revoke.md'
@@ -59,6 +62,8 @@ pages:
   - Concepts:
     - 'Persisting connection': 'concepts/persisting-connection.md'
     - 'Authorization and access tokens': 'concepts/authorization-tokens.md'
+    - 'Command completion': 'concepts/completion.md'
+    - 'Communication with Office 365': 'concepts/communicating-o365.md'
   - About:
     - 'Why this CLI': 'about/why-cli.md'
     - 'Comparison to SharePoint PowerShell': 'about/comparison-powershell.md'

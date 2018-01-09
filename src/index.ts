@@ -6,6 +6,7 @@ import config from './config';
 import Command from './Command';
 import appInsights from './appInsights';
 import Utils from './Utils';
+import { autocomplete } from './autocomplete';
 
 const packageJSON = require('../package.json');
 const vorpal: Vorpal = require('./vorpal-init'),
@@ -35,6 +36,20 @@ fs.realpath(__dirname, (err: NodeJS.ErrnoException, resolvedPath: string): void 
       }
     }
   });
+
+  if (process.argv.indexOf('--completion:clink:generate') > -1) {
+    console.log(autocomplete.getClinkCompletion(vorpal));
+    process.exit();
+  }
+  if (process.argv.indexOf('--completion:sh:generate') > -1) {
+    autocomplete.generateShCompletion(vorpal);
+    process.exit();
+  }
+  if (process.argv.indexOf('--completion:sh:setup') > -1) {
+    autocomplete.generateShCompletion(vorpal);
+    autocomplete.setupShCompletion();
+    process.exit();
+  }
 
   vorpal
     .command('version', 'Shows the current version of the CLI')

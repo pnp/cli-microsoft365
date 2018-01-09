@@ -419,7 +419,7 @@ describe(commands.APP_UPGRADE, () => {
 
   it('passes validation when the id and siteUrl options are specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { id: '123', siteUrl: 'https://contoso.sharepoint.com' } });
-    assert(actual);
+    assert.equal(actual, true);
   });
 
   it('supports debug mode', () => {

@@ -339,7 +339,7 @@ describe('FileTokenStorage', () => {
       .remove('mock')
       .then(() => {
         try {
-          assert(actual, JSON.stringify(expected));
+          assert.equal(actual, JSON.stringify(expected));
           done();
         }
         catch (e) {
@@ -366,7 +366,7 @@ describe('FileTokenStorage', () => {
       .remove('mock')
       .then(() => {
         try {
-          assert(actual, JSON.stringify(expected));
+          assert.equal(actual, JSON.stringify(expected));
           done();
         }
         catch (e) {
