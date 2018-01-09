@@ -33,7 +33,7 @@ describe(commands.LIST_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
+    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
     sinon.stub(command as any, 'getRequestDigest').callsFake(() => { return { FormDigestValue: 'abc' }; });
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
       telemetry = t;
@@ -63,7 +63,7 @@ describe(commands.LIST_GET, () => {
   after(() => {
     Utils.restore([
       appInsights.trackEvent,
-      auth.ensureAccessToken,
+      auth.getAccessToken,
       auth.restoreAuth,
       request.get
     ]);
@@ -107,7 +107,7 @@ describe(commands.LIST_GET, () => {
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false } }, () => {
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com', title: 'Documents' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(new CommandError('Connect to a SharePoint Online site first')));
         done();
@@ -118,19 +118,11 @@ describe(commands.LIST_GET, () => {
     });
   });
 
-  it('retrieves and prints all details user custom actions if title option is passed', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
+  it('retrieves and prints all details of list if title option is passed', (done) => {
+    stubAuth();
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/lists/GetByTitle(') > -1) {
+      //if (opts.url.indexOf('/_api/web/lists/GetByTitle(') > -1) {
         return Promise.resolve(
           {
             "AllowContentTypes": true,
@@ -185,8 +177,8 @@ describe(commands.LIST_GET, () => {
             "Title": "Documents"
           }
         );
-      }
-      return Promise.reject('Invalid request');
+      //}
+      //return Promise.reject('Invalid request');
     });
 
     auth.site = new Site();
@@ -197,7 +189,7 @@ describe(commands.LIST_GET, () => {
     cmdInstance.action({ options: {
       debug: true,
       title: 'Documents',
-      url: 'https://contoso.sharepoint.com'
+      webUrl: 'https://contoso.sharepoint.com'
     } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({ 
@@ -295,7 +287,7 @@ describe(commands.LIST_GET, () => {
       options: {
         debug: true,
         title: actionTitle,
-        url: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com',
       }
     }, () => {
 
@@ -337,7 +329,7 @@ describe(commands.LIST_GET, () => {
       options: {
         debug: false,
         id: actionId,
-        url: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com',
       }
     }, () => {
 
@@ -450,13 +442,19 @@ describe(commands.LIST_GET, () => {
   });
 
   it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.ensureAccessToken);
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
+    Utils.restore(auth.getAccessToken);
+    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
     auth.site = new Site();
     auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, () => {
+    cmdInstance.action({
+      options: {
+        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+        webUrl: "https://contoso.sharepoint.com",
+        debug: false
+      }
+    }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
         done();

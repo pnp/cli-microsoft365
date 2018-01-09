@@ -11,6 +11,7 @@ import SpoCommand from '../../SpoCommand';
 import { ContextInfo } from '../../spo';
 import Utils from '../../../../Utils';
 import { ListInstance } from "./ListInstance";
+import Auth from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -19,7 +20,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  webUrl?: string;
+  webUrl: string;
   id?: string;
   title?: string;
 }
@@ -33,19 +34,35 @@ class ListGetCommand extends SpoCommand {
     return 'Gets information about the specific list';
   }
 
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.id = (!(!args.options.id)).toString();
+    telemetryProps.title = (!(!args.options.title)).toString();
+    return telemetryProps;
+  }
+
   protected requiresTenantAdmin(): boolean {
     return false;
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
+    let siteAccessToken: string = '';
+
+    if (this.debug) {
+      cmd.log(`Retrieving access token for ${resource}...`);
+    }
+
     auth
-    .ensureAccessToken(auth.service.resource, cmd, this.debug)
+    .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
     .then((accessToken: string): Promise<ContextInfo> => {
+      siteAccessToken = accessToken;
+
       if (this.debug) {
-        cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest for tenant admin at ${auth.site.url}...`);
+        cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
       }
 
-      return this.getRequestDigest(cmd, this.debug);
+      return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
     })
     .then((res: ContextInfo): Promise<ListInstance> => {
       if (this.debug) {
@@ -58,30 +75,25 @@ class ListGetCommand extends SpoCommand {
         cmd.log(`Retrieving information for list in site at ${args.options.webUrl}...`);
       }
 
-      let requestOptions: any = {}
+      let requestOptions: any = {};
+      let requestUrl: string = '';
 
       if (args.options.id) {
-        requestOptions = {
-          url: `${auth.site.url}/_api/web/lists(guid'${args.options.id}')`,
-          method: 'GET',
-          headers: Utils.getRequestHeaders({
-            authorization: `Bearer ${auth.service.accessToken}`,
-            'accept': 'application/json;odata=verbose'
-          }),
-          json: true
-        };
+        requestUrl = `${auth.site.url}/_api/web/lists(guid'${args.options.id}')`;
       }
       else {
-        requestOptions = {
-          url: `${auth.site.url}/_api/web/lists/GetByTitle('${args.options.title}')`,
-          method: 'GET',
-          headers: Utils.getRequestHeaders({
-            authorization: `Bearer ${auth.service.accessToken}`,
-            'accept': 'application/json;odata=verbose'
-          }),
-          json: true
-        };
+        requestUrl = `${auth.site.url}/_api/web/lists/GetByTitle('${args.options.title}')`;
       }
+
+      requestOptions = {
+        url: requestUrl,
+        method: 'GET',
+        headers: Utils.getRequestHeaders({
+          authorization: `Bearer ${siteAccessToken}`,
+          'accept': 'application/json;odata=nometadata'
+        }),
+        json: true
+      };
 
       if (this.debug) {
         cmd.log('Executing web request...');
@@ -89,80 +101,18 @@ class ListGetCommand extends SpoCommand {
         cmd.log('');
       }
 
-      return new Promise<ListInstance>((resolve: (list: ListInstance) => void, reject: (error: any) => void): void => {
-        request.get(requestOptions)
-          .then((response: { d: ListInstance }) => {
-            resolve(response.d);
-          })
-          .catch((error: any) => {
-            reject(error);
-          });
-      });
+      return request.get(requestOptions);
     })
     .then((listInstance: ListInstance): void => {
-      //if (this.debug) {
-        //cmd.log('Response:');
-        //cmd.log(JSON.stringify(listInstance));
-        //cmd.log('');
-      //}
-
-      //cmd.log(listInstance);
-      if (listInstance) {
-        cmd.log({ 
-          AllowContentTypes: listInstance.AllowContentTypes,
-          BaseTemplate: listInstance.BaseTemplate,
-          BaseType: listInstance.BaseType,
-          ContentTypesEnabled: listInstance.ContentTypesEnabled,
-          CrawlNonDefaultViews: listInstance.CrawlNonDefaultViews,
-          Created: listInstance.Created,
-          CurrentChangeToken: listInstance.CurrentChangeToken,
-          CustomActionElements: listInstance.CustomActionElements,
-          DefaultContentApprovalWorkflowId: listInstance.DefaultContentApprovalWorkflowId,
-          DefaultItemOpenUseListSetting: listInstance.DefaultItemOpenUseListSetting,
-          Description: listInstance.Description,
-          Direction: listInstance.Direction,
-          DocumentTemplateUrl: listInstance.DocumentTemplateUrl,
-          DraftVersionVisibility: listInstance.DraftVersionVisibility,
-          EnableAttachments: listInstance.EnableAttachments,
-          EnableFolderCreation: listInstance.EnableFolderCreation,
-          EnableMinorVersions: listInstance.EnableMinorVersions,
-          EnableModeration: listInstance.EnableModeration,
-          EnableVersioning: listInstance.EnableVersioning,
-          EntityTypeName: listInstance.EntityTypeName,
-          ExemptFromBlockDownloadOfNonViewableFiles: listInstance.ExemptFromBlockDownloadOfNonViewableFiles,
-          FileSavePostProcessingEnabled: listInstance.FileSavePostProcessingEnabled,
-          ForceCheckout: listInstance.ForceCheckout,
-          HasExternalDataSource: listInstance.HasExternalDataSource,
-          Hidden: listInstance.Hidden,
-          Id: listInstance.Id,
-          ImagePath: listInstance.ImagePath,
-          ImageUrl: listInstance.ImageUrl,
-          IrmEnabled: listInstance.IrmEnabled,
-          IrmExpire: listInstance.IrmExpire,
-          IrmReject: listInstance.IrmReject,
-          IsApplicationList: listInstance.IsApplicationList,
-          IsCatalog: listInstance.IsCatalog,
-          IsPrivate: listInstance.IsPrivate,
-          ItemCount: listInstance.ItemCount,
-          LastItemDeletedDate: listInstance.LastItemDeletedDate,
-          LastItemModifiedDate: listInstance.LastItemModifiedDate,
-          LastItemUserModifiedDate: listInstance.LastItemUserModifiedDate,
-          ListExperienceOptions: listInstance.ListExperienceOptions,
-          ListItemEntityTypeFullName: listInstance.ListItemEntityTypeFullName,
-          MajorVersionLimit: listInstance.MajorVersionLimit,
-          MajorWithMinorVersionsLimit: listInstance.MajorWithMinorVersionsLimit,
-          MultipleDataList: listInstance.MultipleDataList,
-          NoCrawl: listInstance.NoCrawl,
-          ParentWebPath: listInstance.ParentWebPath,
-          ParentWebUrl: listInstance.ParentWebUrl,
-          ParserDisabled: listInstance.ParserDisabled,
-          ServerTemplateCanCreateFolders: listInstance.ServerTemplateCanCreateFolders,
-          TemplateFeatureId: listInstance.TemplateFeatureId,
-          Title: listInstance.Title
-        });
+      if (this.debug) {
+        cmd.log('Response:');
+        cmd.log(JSON.stringify(listInstance));
+        cmd.log('');
       }
+
+      cmd.log(listInstance);
       cb();
-    }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+    }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
 
   public options(): CommandOption[] {
