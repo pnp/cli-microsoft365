@@ -23,6 +23,7 @@ export default {
   CUSTOMACTION_LIST: `${prefix} customaction list`,
   DISCONNECT: `${prefix} disconnect`,
   EXTERNALUSER_LIST: `${prefix} externaluser list`,
+  LIST_GET: `${prefix} list get`,
   SERVICEPRINCIPAL_GRANT_LIST: `${prefix} serviceprincipal grant list`,
   SERVICEPRINCIPAL_GRANT_REVOKE: `${prefix} serviceprincipal grant revoke`,
   SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE: `${prefix} serviceprincipal permissionrequest approve`,
