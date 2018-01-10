@@ -5,12 +5,12 @@ const vorpal: Vorpal = require('./vorpal-init');
 import { CommandError } from './Command';
 
 export default class Utils {
-  public static escapeXml(s: string | undefined) {
+  public static escapeXml(s: any | undefined) {
     if (!s) {
       return s;
     }
 
-    return s.replace(/[<>&"]/g, (c: string): string => {
+    return s.toString().replace(/[<>&"]/g, (c: string): string => {
       let char: string = c;
 
       switch (c) {
