@@ -1,5 +1,25 @@
 # Release notes
 
+## v0.5.0
+
+### New commands
+
+**SharePoint Online:**
+
+- [spo sitescript add](../cmd/spo/sitescript/sitescript-add.md) - adds site script for use with site designs [#65](https://github.com/SharePoint/office365-cli/issues/65)
+- [spo sitescript list](../cmd/spo/sitescript/sitescript-list.md) - lists site script available for use with site designs [#66](https://github.com/SharePoint/office365-cli/issues/66)
+- [spo sitescript get](../cmd/spo/sitescript/sitescript-get.md) - gets information about the specified site script [#67](https://github.com/SharePoint/office365-cli/issues/67)
+- [spo sitescript remove](../cmd/spo/sitescript/sitescript-remove.md) - removes the specified site script [#68](https://github.com/SharePoint/office365-cli/issues/68)
+- [spo sitescript set](../cmd/spo/sitescript/sitescript-set.md) - updates existing site script [#216](https://github.com/SharePoint/office365-cli/issues/216)
+- [spo sitedesign add](../cmd/spo/sitedesign/sitedesign-add.md) - adds site design for creating modern sites [#69](https://github.com/SharePoint/office365-cli/issues/69)
+- [spo list get](../cmd/spo/list/list-get.md) - gets information about the specific list [#199](https://github.com/SharePoint/office365-cli/issues/199)
+
+### Changes
+
+- fixed issue with prompts in non-interactive mode [#142](https://github.com/SharePoint/office365-cli/issues/142)
+- added information about the current user to status commands [#202](https://github.com/SharePoint/office365-cli/issues/202)
+- fixed issue with completing input that doesn't match commands [#222](https://github.com/SharePoint/office365-cli/issues/222)
+
 ## [v0.4.0](https://github.com/SharePoint/office365-cli/releases/tag/v0.4.0)
 
 ### Breaking changes
