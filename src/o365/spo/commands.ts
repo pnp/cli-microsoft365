@@ -21,6 +21,7 @@ export default {
   CUSTOMACTION_ADD: `${prefix} customaction add`,
   CUSTOMACTION_GET: `${prefix} customaction get`,
   CUSTOMACTION_LIST: `${prefix} customaction list`,
+  CUSTOMACTION_REMOVE: `${prefix} customaction remove`,
   DISCONNECT: `${prefix} disconnect`,
   EXTERNALUSER_LIST: `${prefix} externaluser list`,
   LIST_GET: `${prefix} list get`,
