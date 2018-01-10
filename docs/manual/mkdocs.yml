@@ -47,6 +47,7 @@ pages:
         - site appcatalog remove: 'cmd/spo/site/site-appcatalog-remove.md'
       - sitedesign:
         - sitedesign add: 'cmd/spo/sitedesign/sitedesign-add.md'
+        - sitedesign list: 'cmd/spo/sitedesign/sitedesign-list.md'
       - sitescript:
         - sitescript add: 'cmd/spo/sitescript/sitescript-add.md'
         - sitescript get: 'cmd/spo/sitescript/sitescript-get.md'

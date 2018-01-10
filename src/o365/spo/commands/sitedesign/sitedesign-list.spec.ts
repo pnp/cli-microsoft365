@@ -1,0 +1,404 @@
+import commands from '../../commands';
+import Command, { CommandOption, CommandError } from '../../../../Command';
+import * as sinon from 'sinon';
+import appInsights from '../../../../appInsights';
+import auth, { Site } from '../../SpoAuth';
+const command: Command = require('./sitedesign-list');
+import * as assert from 'assert';
+import * as request from 'request-promise-native';
+import Utils from '../../../../Utils';
+
+describe(commands.SITEDESIGN_LIST, () => {
+  let vorpal: Vorpal;
+  let log: string[];
+  let cmdInstance: any;
+  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let trackEvent: any;
+  let telemetry: any;
+
+  before(() => {
+    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
+    sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'ABC' }));
+    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
+      telemetry = t;
+    });
+  });
+
+  beforeEach(() => {
+    vorpal = require('../../../../vorpal-init');
+    log = [];
+    cmdInstance = {
+      log: (msg: string) => {
+        log.push(msg);
+      }
+    };
+    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    auth.site = new Site();
+    telemetry = null;
+  });
+
+  afterEach(() => {
+    Utils.restore([
+      vorpal.find,
+      request.post
+    ]);
+  });
+
+  after(() => {
+    Utils.restore([
+      appInsights.trackEvent,
+      auth.ensureAccessToken,
+      auth.restoreAuth,
+      (command as any).getRequestDigest
+    ]);
+  });
+
+  it('has correct name', () => {
+    assert.equal(command.name.startsWith(commands.SITEDESIGN_LIST), true);
+  });
+
+  it('has a description', () => {
+    assert.notEqual(command.description, null);
+  });
+
+  it('calls telemetry', (done) => {
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: {} }, () => {
+      try {
+        assert(trackEvent.called);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('logs correct telemetry event', (done) => {
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: {} }, () => {
+      try {
+        assert.equal(telemetry.name, commands.SITEDESIGN_LIST);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('aborts when not connected to a SharePoint site', (done) => {
+    auth.site = new Site();
+    auth.site.connected = false;
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: true } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('Connect to a SharePoint Online site first')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('lists available site designs', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesigns`) > -1) {
+        return Promise.resolve({
+          value: [
+            {
+              "Description": null,
+              "IsDefault": false,
+              "PreviewImageAltText": null,
+              "PreviewImageUrl": null,
+              "SiteScriptIds": [
+                "449c0c6d-5380-4df2-b84b-622e0ac8ec25"
+              ],
+              "Title": "Contoso REST",
+              "WebTemplate": "64",
+              "Id": "9b142c22-037f-4a7f-9017-e9d8c0e34b98",
+              "Version": 1
+            },
+            {
+              "Description": null,
+              "IsDefault": false,
+              "PreviewImageAltText": null,
+              "PreviewImageUrl": null,
+              "SiteScriptIds": [
+                "449c0c6d-5380-4df2-b84b-622e0ac8ec24"
+              ],
+              "Title": "REST test",
+              "WebTemplate": "64",
+              "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+              "Version": 1
+            }
+          ]
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith([
+          {
+            "Id": "9b142c22-037f-4a7f-9017-e9d8c0e34b98",
+            "IsDefault": false,
+            "Title": "Contoso REST",
+            "Version": 1,
+            "WebTemplate": "64"
+          },
+          {
+            "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+            "IsDefault": false,
+            "Title": "REST test",
+            "Version": 1,
+            "WebTemplate": "64"
+          }
+        ]));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('lists available site designs (debug)', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesigns`) > -1) {
+        return Promise.resolve({
+          value: [
+            {
+              "Description": null,
+              "IsDefault": false,
+              "PreviewImageAltText": null,
+              "PreviewImageUrl": null,
+              "SiteScriptIds": [
+                "449c0c6d-5380-4df2-b84b-622e0ac8ec25"
+              ],
+              "Title": "Contoso REST",
+              "WebTemplate": "64",
+              "Id": "9b142c22-037f-4a7f-9017-e9d8c0e34b98",
+              "Version": 1
+            },
+            {
+              "Description": null,
+              "IsDefault": false,
+              "PreviewImageAltText": null,
+              "PreviewImageUrl": null,
+              "SiteScriptIds": [
+                "449c0c6d-5380-4df2-b84b-622e0ac8ec24"
+              ],
+              "Title": "REST test",
+              "WebTemplate": "64",
+              "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+              "Version": 1
+            }
+          ]
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: true } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith([
+          {
+            "Id": "9b142c22-037f-4a7f-9017-e9d8c0e34b98",
+            "IsDefault": false,
+            "Title": "Contoso REST",
+            "Version": 1,
+            "WebTemplate": "64"
+          },
+          {
+            "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+            "IsDefault": false,
+            "Title": "REST test",
+            "Version": 1,
+            "WebTemplate": "64"
+          }
+        ]));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('lists available site designs with all properties for JSON output', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesigns`) > -1) {
+        return Promise.resolve({
+          value: [
+            {
+              "Description": null,
+              "IsDefault": false,
+              "PreviewImageAltText": null,
+              "PreviewImageUrl": null,
+              "SiteScriptIds": [
+                "449c0c6d-5380-4df2-b84b-622e0ac8ec25"
+              ],
+              "Title": "Contoso REST",
+              "WebTemplate": "64",
+              "Id": "9b142c22-037f-4a7f-9017-e9d8c0e34b98",
+              "Version": 1
+            },
+            {
+              "Description": null,
+              "IsDefault": false,
+              "PreviewImageAltText": null,
+              "PreviewImageUrl": null,
+              "SiteScriptIds": [
+                "449c0c6d-5380-4df2-b84b-622e0ac8ec24"
+              ],
+              "Title": "REST test",
+              "WebTemplate": "64",
+              "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+              "Version": 1
+            }
+          ]
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, output: 'json' } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith([
+          {
+            "Description": null,
+            "IsDefault": false,
+            "PreviewImageAltText": null,
+            "PreviewImageUrl": null,
+            "SiteScriptIds": [
+              "449c0c6d-5380-4df2-b84b-622e0ac8ec25"
+            ],
+            "Title": "Contoso REST",
+            "WebTemplate": "64",
+            "Id": "9b142c22-037f-4a7f-9017-e9d8c0e34b98",
+            "Version": 1
+          },
+          {
+            "Description": null,
+            "IsDefault": false,
+            "PreviewImageAltText": null,
+            "PreviewImageUrl": null,
+            "SiteScriptIds": [
+              "449c0c6d-5380-4df2-b84b-622e0ac8ec24"
+            ],
+            "Title": "REST test",
+            "WebTemplate": "64",
+            "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+            "Version": 1
+          }
+        ]));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly handles OData error when retrieving available site designs', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('An error has occurred')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('supports debug mode', () => {
+    const options = (command.options() as CommandOption[]);
+    let containsOption = false;
+    options.forEach(o => {
+      if (o.option === '--debug') {
+        containsOption = true;
+      }
+    });
+    assert(containsOption);
+  });
+
+  it('has help referring to the right command', () => {
+    const cmd: any = {
+      log: (msg: string) => { },
+      prompt: () => { },
+      helpInformation: () => { }
+    };
+    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
+    cmd.help = command.help();
+    cmd.help({}, () => { });
+    assert(find.calledWith(commands.SITEDESIGN_LIST));
+  });
+
+  it('has help with examples', () => {
+    const _log: string[] = [];
+    const cmd: any = {
+      log: (msg: string) => {
+        _log.push(msg);
+      },
+      prompt: () => { },
+      helpInformation: () => { }
+    };
+    sinon.stub(vorpal, 'find').callsFake(() => cmd);
+    cmd.help = command.help();
+    cmd.help({}, () => { });
+    let containsExamples: boolean = false;
+    _log.forEach(l => {
+      if (l && l.indexOf('Examples:') > -1) {
+        containsExamples = true;
+      }
+    });
+    Utils.restore(vorpal.find);
+    assert(containsExamples);
+  });
+
+  it('correctly handles lack of valid access token', (done) => {
+    Utils.restore(auth.ensureAccessToken);
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: true } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+});
