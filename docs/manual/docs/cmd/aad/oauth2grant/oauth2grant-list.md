@@ -27,6 +27,8 @@ To get information about service principal OAuth2 permission grants, you have to
 
 In order to list existing OAuth2 permissions granted to a service principal, you need its `objectId`. You can retrieve it using the [aad sp get](../sp/sp-get.md) command.
 
+When using the text output type (default), the command lists only the values of the `objectId`, `resourceId` and `scope` properties of the OAuth grant. When setting the output type to JSON, all available properties are included in the command output.
+
 ## Examples
 
 List OAuth2 permissions granted to service principal with `objectId` _b2307a39-e878-458b-bc90-03bc578531d6_.

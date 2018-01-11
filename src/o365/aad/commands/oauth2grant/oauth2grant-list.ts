@@ -62,18 +62,23 @@ class Oauth2GrantListCommand extends AadCommand {
       .then((res: { value: OAuth2PermissionGrant[] }): void => {
         if (this.debug) {
           cmd.log('Response:');
-          cmd.log(JSON.stringify(res, null, 2));
+          cmd.log(res);
           cmd.log('');
         }
 
         if (res.value && res.value.length > 0) {
-          cmd.log(res.value.map(g => {
-            return {
-              objectId: g.objectId,
-              resourceId: g.resourceId,
-              scope: g.scope
-            };
-          }));
+          if (args.options.output === 'json') {
+            cmd.log(res.value);
+          }
+          else {
+            cmd.log(res.value.map(g => {
+              return {
+                objectId: g.objectId,
+                resourceId: g.resourceId,
+                scope: g.scope
+              };
+            }));
+          }
         }
 
         cb();
@@ -120,6 +125,10 @@ class Oauth2GrantListCommand extends AadCommand {
 
     In order to list existing OAuth2 permissions granted to a service principal, you need its ${chalk.grey('objectId')}.
     You can retrieve it using the ${chalk.blue(commands.SP_GET)} command.
+
+    When using the text output type (default), the command lists only the values of the ${chalk.grey('objectId')},
+    ${chalk.grey('resourceId')} and ${chalk.grey('scope')} properties of the OAuth grant. When setting the output
+    type to JSON, all available properties are included in the command output.
    
   Examples:
   
