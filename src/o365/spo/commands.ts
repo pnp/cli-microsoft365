@@ -35,6 +35,7 @@ export default {
   SITE_APPCATALOG_REMOVE: `${prefix} site appcatalog remove`,
   SITE_GET: `${prefix} site get`,
   SITE_LIST: `${prefix} site list`,
+  SITE_LIST_CLASSIC: `${prefix} site list classic`,
   SITEDESIGN_ADD: `${prefix} sitedesign add`,
   SITESCRIPT_ADD: `${prefix} sitescript add`,
   SITESCRIPT_GET: `${prefix} sitescript get`,
