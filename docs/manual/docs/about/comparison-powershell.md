@@ -40,7 +40,7 @@ Get-SPOMigrationJobProgress|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOMigrationJobStatus|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOMultiGeoExperience|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOPublicCdnOrigins|Microsoft.Online.SharePoint.PowerShell|
-Get-SPOSite|Microsoft.Online.SharePoint.PowerShell|
+Get-SPOSite|Microsoft.Online.SharePoint.PowerShell|[spo site classic list](../cmd/spo/site/site-classic-list.md)
 Get-SPOSiteContentMoveState|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOSiteDataEncryptionPolicy|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOSiteDesign|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign get](../cmd/spo/sitedesign/sitedesign-get.md), [spo sitedesign list](../cmd/spo/sitedesign/sitedesign-list.md)
@@ -250,7 +250,7 @@ Get-PnPSubWebs|SharePointPnPPowerShellOnline|
 Get-PnPTaxonomyItem|SharePointPnPPowerShellOnline|
 Get-PnPTaxonomySession|SharePointPnPPowerShellOnline|
 Get-PnPTenantRecycleBinItem|SharePointPnPPowerShellOnline|
-Get-PnPTenantSite|SharePointPnPPowerShellOnline|
+Get-PnPTenantSite|SharePointPnPPowerShellOnline|[spo site get](../cmd/spo/site/site-get.md), [spo site classic list](../cmd/spo/site/site-classic-list.md)
 Get-PnPTerm|SharePointPnPPowerShellOnline|
 Get-PnPTermGroup|SharePointPnPPowerShellOnline|
 Get-PnPTermSet|SharePointPnPPowerShellOnline|
