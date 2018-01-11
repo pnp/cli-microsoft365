@@ -106,20 +106,22 @@ describe(commands.APP_LIST, () => {
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve(JSON.stringify({ value: [
-            {
-              ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
-              Title: 'online-client-side-solution',
-              Deployed: true,
-              AppCatalogVersion: '1.0.0.0'
-            },
-            {
-              ID: 'e5f65aef-68fe-45b0-801e-92733dd57e2c',
-              Title: 'onprem-client-side-solution',
-              Deployed: true,
-              AppCatalogVersion: '1.0.0.0'
-            }
-          ]}));
+          return Promise.resolve(JSON.stringify({
+            value: [
+              {
+                ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
+                Title: 'online-client-side-solution',
+                Deployed: true,
+                AppCatalogVersion: '1.0.0.0'
+              },
+              {
+                ID: 'e5f65aef-68fe-45b0-801e-92733dd57e2c',
+                Title: 'onprem-client-side-solution',
+                Deployed: true,
+                AppCatalogVersion: '1.0.0.0'
+              }
+            ]
+          }));
         }
       }
 
@@ -158,6 +160,83 @@ describe(commands.APP_LIST, () => {
     });
   });
 
+  it('includes all properties for output json', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('/_api/web/tenantappcatalog/AvailableApps') > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve(JSON.stringify({
+            value: [
+              {
+                "AppCatalogVersion": "1.0.0.0",
+                "CanUpgrade": false,
+                "CurrentVersionDeployed": false,
+                "Deployed": false,
+                "ID": "b2307a39-e878-458b-bc90-03bc578531d6",
+                "InstalledVersion": "",
+                "IsClientSideSolution": true,
+                "Title": "online-client-side-solution"
+              },
+              {
+                "AppCatalogVersion": "1.0.0.0",
+                "CanUpgrade": false,
+                "CurrentVersionDeployed": false,
+                "Deployed": false,
+                "ID": "e6362993-d4fd-4c5a-8254-fd095a7291ad",
+                "InstalledVersion": "",
+                "IsClientSideSolution": true,
+                "Title": "spfx-140-online-client-side-solution"
+              }
+            ]
+          }));
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: true, output: 'json' } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith([
+          {
+            "AppCatalogVersion": "1.0.0.0",
+            "CanUpgrade": false,
+            "CurrentVersionDeployed": false,
+            "Deployed": false,
+            "ID": "b2307a39-e878-458b-bc90-03bc578531d6",
+            "InstalledVersion": "",
+            "IsClientSideSolution": true,
+            "Title": "online-client-side-solution"
+          },
+          {
+            "AppCatalogVersion": "1.0.0.0",
+            "CanUpgrade": false,
+            "CurrentVersionDeployed": false,
+            "Deployed": false,
+            "ID": "e6362993-d4fd-4c5a-8254-fd095a7291ad",
+            "InstalledVersion": "",
+            "IsClientSideSolution": true,
+            "Title": "spfx-140-online-client-side-solution"
+          }
+        ]))
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+      }
+    });
+  });
+
   it('correctly handles no apps in the tenant app catalog', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf('/_api/web/tenantappcatalog/AvailableApps') > -1) {
@@ -165,7 +244,7 @@ describe(commands.APP_LIST, () => {
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve(JSON.stringify({ value: []}));
+          return Promise.resolve(JSON.stringify({ value: [] }));
         }
       }
 
@@ -198,7 +277,7 @@ describe(commands.APP_LIST, () => {
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve(JSON.stringify({ value: []}));
+          return Promise.resolve(JSON.stringify({ value: [] }));
         }
       }
 
@@ -247,13 +326,13 @@ describe(commands.APP_LIST, () => {
 
   it('has help referring to the right command', () => {
     const cmd: any = {
-      log: (msg: string) => {},
-      prompt: () => {},
-      helpInformation: () => {}
+      log: (msg: string) => { },
+      prompt: () => { },
+      helpInformation: () => { }
     };
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
-    cmd.help({}, () => {});
+    cmd.help({}, () => { });
     assert(find.calledWith(commands.APP_LIST));
   });
 
@@ -263,12 +342,12 @@ describe(commands.APP_LIST, () => {
       log: (msg: string) => {
         _log.push(msg);
       },
-      prompt: () => {},
-      helpInformation: () => {}
+      prompt: () => { },
+      helpInformation: () => { }
     };
     sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
-    cmd.help({}, () => {});
+    cmd.help({}, () => { });
     let containsExamples: boolean = false;
     _log.forEach(l => {
       if (l && l.indexOf('Examples:') > -1) {
