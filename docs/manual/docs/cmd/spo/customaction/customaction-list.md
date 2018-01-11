@@ -26,6 +26,8 @@ Option|Description
 
 To retrieve list of custom actions, you have to first connect to a SharePoint Online site using the [spo connect](../connect.md) command, eg. `spo connect https://contoso.sharepoint.com`.
 
+When using the text output type (default), the command lists only the values of the `Name`, `Location`, `Scope` and `Id` properties of the custom action. When setting the output type to JSON, all available properties are included in the command output.
+
 ## Examples
 
 Return details about all user custom actions located in site or site collection _https://contoso.sharepoint.com/sites/test_

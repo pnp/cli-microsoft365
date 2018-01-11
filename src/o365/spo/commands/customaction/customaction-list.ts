@@ -82,14 +82,19 @@ class SpoCustomActionListCommand extends SpoCommand {
           }
         }
         else {
-          cmd.log(customActions.map(a => {
-            return {
-              Name: a.Name,
-              Location: a.Location,
-              Scope: this.humanizeScope(a.Scope),
-              Id: a.Id
-            };
-          }));
+          if (args.options.output === 'json') {
+            cmd.log(customActions);
+          }
+          else {
+            cmd.log(customActions.map(a => {
+              return {
+                Name: a.Name,
+                Location: a.Location,
+                Scope: this.humanizeScope(a.Scope),
+                Id: a.Id
+              };
+            }));
+          }
         }
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
@@ -218,6 +223,10 @@ class SpoCustomActionListCommand extends SpoCommand {
 
     To retrieve list of custom actions, you have to first connect to a SharePoint Online site using the
     ${chalk.blue(commands.CONNECT)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
+
+    When using the text output type (default), the command lists only the values of the ${chalk.grey('Name')},
+    ${chalk.grey('Location')}, ${chalk.grey('Scope')} and ${chalk.grey('Id')} properties of the custom action. When setting the output
+    type to JSON, all available properties are included in the command output.
 
   Examples:
   
