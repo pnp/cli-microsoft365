@@ -96,23 +96,28 @@ class SiteListCommand extends SpoCommand {
         }
         else {
           const sites: SPOSitePropertiesEnumerable = json[json.length - 1];
-          cmd.log(sites._Child_Items_.map(s => {
-            return {
-              Title: s.Title,
-              Url: s.Url
-            };
-          }).sort((a, b) => {
-            const urlA = a.Url.toUpperCase();
-            const urlB = b.Url.toUpperCase();
-            if (urlA < urlB) {
-              return -1;
-            }
-            if (urlA > urlB) {
-              return 1;
-            }
+          if (args.options.output === 'json') {
+            cmd.log(sites._Child_Items_);
+          }
+          else {
+            cmd.log(sites._Child_Items_.map(s => {
+              return {
+                Title: s.Title,
+                Url: s.Url
+              };
+            }).sort((a, b) => {
+              const urlA = a.Url.toUpperCase();
+              const urlB = b.Url.toUpperCase();
+              if (urlA < urlB) {
+                return -1;
+              }
+              if (urlA > urlB) {
+                return 1;
+              }
 
-            return 0;
-          }));
+              return 0;
+            }));
+          }
         }
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
@@ -165,6 +170,10 @@ class SiteListCommand extends SpoCommand {
     Using the ${chalk.blue('-f, --filter')} option you can specify which sites you want to retrieve.
     For example, to get sites with ${chalk.grey('project')} in their URL, use ${chalk.grey("Url -like 'project'")}
     as the filter.
+
+    When using the text output type (default), the command lists only the values
+    of the ${chalk.grey('Title')}, and ${chalk.grey('Url')} properties of the site. When setting the output type to JSON,
+    all available properties are included in the command output.
   
   Examples:
   

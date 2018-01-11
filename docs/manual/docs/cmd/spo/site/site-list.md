@@ -28,6 +28,8 @@ To list modern sites, you have to first connect to a tenant admin site using the
 
 Using the `-f, --filter` option you can specify which sites you want to retrieve. For example, to get sites with _project_ in their URL, use `Url -like 'project'` as the filter.
 
+When using the text output type (default), the command lists only the values of the `Title`, and `Url` properties of the site. When setting the output type to JSON, all available properties are included in the command output.
+
 ## Examples
 
 List all modern team sites in the currently connected tenant
