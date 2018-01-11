@@ -49,4 +49,9 @@ export interface ListInstance {
   ServerTemplateCanCreateFolders:            boolean;
   TemplateFeatureId:                         string;
   Title:                                     string;
+  RootFolder:                                RootFolder;
+}
+
+export interface RootFolder {
+  ServerRelativeUrl: string;
 }
