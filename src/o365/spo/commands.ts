@@ -36,6 +36,7 @@ export default {
   SITE_GET: `${prefix} site get`,
   SITE_LIST: `${prefix} site list`,
   SITEDESIGN_ADD: `${prefix} sitedesign add`,
+  SITEDESIGN_REMOVE: `${prefix} sitedesign remove`,
   SITESCRIPT_ADD: `${prefix} sitescript add`,
   SITESCRIPT_GET: `${prefix} sitescript get`,
   SITESCRIPT_LIST: `${prefix} sitescript list`,
