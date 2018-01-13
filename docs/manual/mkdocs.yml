@@ -51,6 +51,7 @@ pages:
         - sitedesign get: 'cmd/spo/sitedesign/sitedesign-get.md'
         - sitedesign list: 'cmd/spo/sitedesign/sitedesign-list.md'
         - sitedesign remove: 'cmd/spo/sitedesign/sitedesign-remove.md'
+        - sitedesign rights grant: 'cmd/spo/sitedesign/sitedesign-rights-grant.md'
       - sitescript:
         - sitescript add: 'cmd/spo/sitescript/sitescript-add.md'
         - sitescript get: 'cmd/spo/sitescript/sitescript-get.md'
