@@ -69,7 +69,7 @@ class SiteListClassicCommand extends SpoCommand {
 
         if (includeOneDriveSites === false) {
           personalSite = '0';
-        } else if (includeOneDriveSites === true) {
+        } else {
           personalSite = '1';
         }
 
@@ -138,7 +138,7 @@ class SiteListClassicCommand extends SpoCommand {
         description: 'filter to apply when retrieving sites'
       },
       {
-        option: '--includeOneDriveSites',
+        option: '--includeOneDriveSites [includeOneDriveSites]',
         description: 'Set if you also want to retrieve OneDrive sites'
       }
     ];
