@@ -18,6 +18,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   type?: string;
   filter?: string;
+  includeOneDriveSites?: boolean;
 }
 
 class SiteListClassicCommand extends SpoCommand {
@@ -41,8 +42,10 @@ class SiteListClassicCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const webTemplate: string = args.options.type || 'STS#0';
+    const webTemplate: string = args.options.type || '';
+    const includeOneDriveSites: boolean = args.options.includeOneDriveSites || false;
     let startIndex: string = '0';
+    let personalSite: string = '0';
 
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
@@ -64,13 +67,19 @@ class SiteListClassicCommand extends SpoCommand {
           cmd.log(`Retrieving list of site collections...`);
         }
 
+        if (includeOneDriveSites === false) {
+          personalSite = '0';
+        } else if (includeOneDriveSites === true) {
+          personalSite = '1';
+        }
+
         const requestOptions: any = {
           url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': res.FormDigestValue
           }),
-          body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1" /><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="3" ParentId="1" Name="GetSitePropertiesFromSharePointByFilters"><Parameters><Parameter TypeId="{b92aeee2-c92c-4b67-abcc-024e471bc140}"><Property Name="Filter" Type="String">${Utils.escapeXml(args.options.filter || '')}</Property><Property Name="IncludeDetail" Type="Boolean">false</Property><Property Name="IncludePersonalSite" Type="Enum">0</Property><Property Name="StartIndex" Type="String">${startIndex}</Property><Property Name="Template" Type="String">${webTemplate}</Property></Parameter></Parameters></Method></ObjectPaths></Request>`
+          body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1" /><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="3" ParentId="1" Name="GetSitePropertiesFromSharePointByFilters"><Parameters><Parameter TypeId="{b92aeee2-c92c-4b67-abcc-024e471bc140}"><Property Name="Filter" Type="String">${Utils.escapeXml(args.options.filter || '')}</Property><Property Name="IncludeDetail" Type="Boolean">false</Property><Property Name="IncludePersonalSite" Type="Enum">${personalSite}</Property><Property Name="StartIndex" Type="String">${startIndex}</Property><Property Name="Template" Type="String">${webTemplate}</Property></Parameter></Parameters></Method></ObjectPaths></Request>`
         };
 
         if (this.debug) {
@@ -120,13 +129,17 @@ class SiteListClassicCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--type [type]',
+        option: '-t, --type [type]',
         description: 'type of classic sites to list. Allowed values are STS#0|BLOG#0|BDR#0|DEV#0|OFFILE#1|EHS#1|BICenterSite#0|SRCHCEN#0|BLANKINTERNET#0|BLANKINTERNETCONTAINER#0|ENTERWIKI#0|PROJECTSITE#0|PRODUCTCATALOG#0|COMMUNITY#0|COMMUNITYPORTAL#0|SRCHCENTERLITE#0|visprus#0|GROUP#0|SITEPAGEPUBLISHING#0.',
         autocomplete: ['STS#0','BLOG#0','BDR#0','DEV#0','OFFILE#1','EHS#1','BICenterSite#0','SRCHCEN#0','BLANKINTERNET#0','BLANKINTERNETCONTAINER#0','ENTERWIKI#0','PROJECTSITE#0','PRODUCTCATALOG#0','COMMUNITY#0','COMMUNITYPORTAL#0','SRCHCENTERLITE#0','visprus#0','GROUP#0','SITEPAGEPUBLISHING#0']
       },
       {
         option: '-f, --filter [filter]',
         description: 'filter to apply when retrieving sites'
+      },
+      {
+        option: '--includeOneDriveSites',
+        description: 'Set if you also want to retrieve OneDrive sites'
       }
     ];
 
@@ -186,11 +199,17 @@ class SiteListClassicCommand extends SpoCommand {
     Using the ${chalk.blue('-f, --filter')} option you can specify which sites you want to retrieve.
     For example, to get sites with ${chalk.grey('project')} in their URL, use ${chalk.grey("Url -like 'project'")}
     as the filter.
+
+    Using the ${chalk.blue('--includeOneDriveSites')} option you can specify whether you want to retrieve OneDrive sites or not.
+    For example, to retrieve OneDrive sites, add ${chalk.grey('--includeOneDriveSites')} as an option.
   
   Examples:
   
     List all sites in the currently connected tenant
       ${chalk.grey(config.delimiter)} ${commands.SITE_LIST_CLASSIC}
+
+      List all sites (including OneDrive sites) in the currently connected tenant
+      ${chalk.grey(config.delimiter)} ${commands.SITE_LIST_CLASSIC} --includeOneDriveSites    
 
     List all classic team sites in the currently connected tenant
       ${chalk.grey(config.delimiter)} ${commands.SITE_LIST_CLASSIC} --type STS#0
