@@ -20,6 +20,7 @@ export default {
   CONNECT: `${prefix} connect`,
   CUSTOMACTION_ADD: `${prefix} customaction add`,
   CUSTOMACTION_GET: `${prefix} customaction get`,
+  CUSTOMACTION_SET: `${prefix} customaction set`,
   CUSTOMACTION_LIST: `${prefix} customaction list`,
   CUSTOMACTION_REMOVE: `${prefix} customaction remove`,
   DISCONNECT: `${prefix} disconnect`,
