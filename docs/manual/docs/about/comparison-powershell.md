@@ -44,7 +44,7 @@ Get-SPOSite|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOSiteContentMoveState|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOSiteDataEncryptionPolicy|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOSiteDesign|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign get](../cmd/spo/sitedesign/sitedesign-get.md), [spo sitedesign list](../cmd/spo/sitedesign/sitedesign-list.md)
-Get-SPOSiteDesignRights|Microsoft.Online.SharePoint.PowerShell|
+Get-SPOSiteDesignRights|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign rights list](../cmd/spo/sitedesign/sitedesign-rights-list.md)
 Get-SPOSiteGroup|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOSiteScript|Microsoft.Online.SharePoint.PowerShell|[spo sitescript get](../cmd/spo/sitescript/sitescript-get.md), [spo sitescript list](../cmd/spo/sitescript/sitescript-list.md)
 Get-SPOStorageEntity|Microsoft.Online.SharePoint.PowerShell|[spo storageentity get](../cmd/spo/storageentity/storageentity-get.md), [spo storageentity list](../cmd/spo/storageentity/storageentity-list.md)
@@ -240,7 +240,7 @@ Get-PnPSiteClosure|SharePointPnPPowerShellOnline|
 Get-PnPSiteCollectionAdmin|SharePointPnPPowerShellOnline|
 Get-PnPSiteCollectionTermStore|SharePointPnPPowerShellOnline|
 Get-PnPSiteDesign|SharePointPnPPowerShellOnline|[spo sitedesign get](../cmd/spo/sitedesign/sitedesign-get.md), [spo sitedesign list](../cmd/spo/sitedesign/sitedesign-list.md)
-Get-PnPSiteDesignRights|SharePointPnPPowerShellOnline|
+Get-PnPSiteDesignRights|SharePointPnPPowerShellOnline|[spo sitedesign rights list](../cmd/spo/sitedesign/sitedesign-rights-list.md)
 Get-PnPSitePolicy|SharePointPnPPowerShellOnline|
 Get-PnPSiteScript|SharePointPnPPowerShellOnline|[spo sitescript get](../cmd/spo/sitescript/sitescript-get.md), [spo sitescript list](../cmd/spo/sitescript/sitescript-list.md)
 Get-PnPSiteSearchQueryResults|SharePointPnPPowerShellOnline|
