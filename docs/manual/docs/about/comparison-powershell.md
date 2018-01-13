@@ -98,7 +98,7 @@ Request-SPOUpgradeEvaluationSite|Microsoft.Online.SharePoint.PowerShell|
 Restore-SPODataEncryptionPolicy|Microsoft.Online.SharePoint.PowerShell|
 Restore-SPODeletedSite|Microsoft.Online.SharePoint.PowerShell|
 Revoke-SPOHubSiteRights|Microsoft.Online.SharePoint.PowerShell|
-Revoke-SPOSiteDesignRights|Microsoft.Online.SharePoint.PowerShell|
+Revoke-SPOSiteDesignRights|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign rights revoke](../cmd/spo/sitedesign/sitedesign-rights-revoke.md)
 Revoke-SPOTenantServicePrincipalPermission|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal grant revoke](../cmd/spo/serviceprincipal/serviceprincipal-grant-revoke.md)
 Revoke-SPOUserSession|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOBrowserIdleSignOut|Microsoft.Online.SharePoint.PowerShell|
@@ -348,7 +348,7 @@ Request-PnPReIndexWeb|SharePointPnPPowerShellOnline|
 Restore-PnPRecycleBinItem|SharePointPnPPowerShellOnline|
 Restore-PnPTenantRecycleBinItem|SharePointPnPPowerShellOnline|
 Resume-PnPWorkflowInstance|SharePointPnPPowerShellOnline|
-Revoke-PnPSiteDesignRights|SharePointPnPPowerShellOnline|
+Revoke-PnPSiteDesignRights|SharePointPnPPowerShellOnline|[spo sitedesign rights revoke](../cmd/spo/sitedesign/sitedesign-rights-revoke.md)
 Save-PnPProvisioningTemplate|SharePointPnPPowerShellOnline|
 Send-PnPMail|SharePointPnPPowerShellOnline|
 Set-PnPAppSideLoading|SharePointPnPPowerShellOnline|
