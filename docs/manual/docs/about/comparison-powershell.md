@@ -65,7 +65,7 @@ Get-SPOUserAndContentMoveState|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOUserOneDriveLocation|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOWebTemplate|Microsoft.Online.SharePoint.PowerShell|
 Grant-SPOHubSiteRights|Microsoft.Online.SharePoint.PowerShell|
-Grant-SPOSiteDesignRights|Microsoft.Online.SharePoint.PowerShell|
+Grant-SPOSiteDesignRights|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign rights grant](../cmd/spo/sitedesign/sitedesign-rights-grant.md)
 Invoke-SPOMigrationEncryptUploadSubmit|Microsoft.Online.SharePoint.PowerShell|
 New-SPOMigrationEncryptionParameters|Microsoft.Online.SharePoint.PowerShell|
 New-SPOMigrationPackage|Microsoft.Online.SharePoint.PowerShell|
@@ -269,7 +269,7 @@ Get-PnPWebTemplates|SharePointPnPPowerShellOnline|
 Get-PnPWikiPageContent|SharePointPnPPowerShellOnline|
 Get-PnPWorkflowDefinition|SharePointPnPPowerShellOnline|
 Get-PnPWorkflowSubscription|SharePointPnPPowerShellOnline|
-Grant-PnPSiteDesignRights|SharePointPnPPowerShellOnline|
+Grant-PnPSiteDesignRights|SharePointPnPPowerShellOnline|[spo sitedesign rights grant](../cmd/spo/sitedesign/sitedesign-rights-grant.md)
 Import-PnPAppPackage|SharePointPnPPowerShellOnline|
 Import-PnPTaxonomy|SharePointPnPPowerShellOnline|
 Import-PnPTermGroupFromXml|SharePointPnPPowerShellOnline|
