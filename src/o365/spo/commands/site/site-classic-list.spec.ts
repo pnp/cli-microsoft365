@@ -4,12 +4,12 @@ import * as sinon from 'sinon';
 import config from '../../../../config';
 import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
-const command: Command = require('./site-list-classic');
+const command: Command = require('./site-classic-list');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import Utils from '../../../../Utils';
 
-describe(commands.SITE_LIST_CLASSIC, () => {
+describe(commands.SITE_CLASSIC_LIST, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
@@ -57,7 +57,7 @@ describe(commands.SITE_LIST_CLASSIC, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.SITE_LIST_CLASSIC), true);
+    assert.equal(command.name.startsWith(commands.SITE_CLASSIC_LIST), true);
   });
 
   it('has a description', () => {
@@ -81,7 +81,7 @@ describe(commands.SITE_LIST_CLASSIC, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, () => {
       try {
-        assert.equal(telemetry.name, commands.SITE_LIST_CLASSIC);
+        assert.equal(telemetry.name, commands.SITE_CLASSIC_LIST);
         done();
       }
       catch (e) {
@@ -742,7 +742,7 @@ describe(commands.SITE_LIST_CLASSIC, () => {
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
     cmd.help({}, () => { });
-    assert(find.calledWith(commands.SITE_LIST_CLASSIC));
+    assert(find.calledWith(commands.SITE_CLASSIC_LIST));
   });
 
   it('has help with examples', () => {

@@ -21,9 +21,9 @@ interface Options extends GlobalOptions {
   includeOneDriveSites?: boolean;
 }
 
-class SiteListClassicCommand extends SpoCommand {
+class SiteClassicListCommand extends SpoCommand {
   public get name(): string {
-    return commands.SITE_LIST_CLASSIC;
+    return commands.SITE_CLASSIC_LIST;
   }
 
   public get description(): string {
@@ -206,18 +206,18 @@ class SiteListClassicCommand extends SpoCommand {
   Examples:
   
     List all sites in the currently connected tenant
-      ${chalk.grey(config.delimiter)} ${commands.SITE_LIST_CLASSIC}
+      ${chalk.grey(config.delimiter)} ${commands.SITE_CLASSIC_LIST}
 
       List all sites (including OneDrive sites) in the currently connected tenant
-      ${chalk.grey(config.delimiter)} ${commands.SITE_LIST_CLASSIC} --includeOneDriveSites    
+      ${chalk.grey(config.delimiter)} ${commands.SITE_CLASSIC_LIST} --includeOneDriveSites    
 
     List all classic team sites in the currently connected tenant
-      ${chalk.grey(config.delimiter)} ${commands.SITE_LIST_CLASSIC} --type STS#0
+      ${chalk.grey(config.delimiter)} ${commands.SITE_CLASSIC_LIST} --type STS#0
 
     List all classic project sites that contain 'project' in the URL
-      ${chalk.grey(config.delimiter)} ${commands.SITE_LIST_CLASSIC} --type PROJECTSITE#1 --filter "Url -like 'project'"
+      ${chalk.grey(config.delimiter)} ${commands.SITE_CLASSIC_LIST} --type PROJECTSITE#0 --filter "Url -like 'project'"
 `);
   }
 }
 
-module.exports = new SiteListClassicCommand();
+module.exports = new SiteClassicListCommand();
