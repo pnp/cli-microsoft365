@@ -92,10 +92,16 @@ class Autocomplete {
   public getClinkCompletion(vorpal: Vorpal): string {
     const cmd: any = this.getCommandsInfo(vorpal);
     const lua: string[] = ['local parser = clink.arg.new_parser'];
+    const functions: any = {};
 
-    this.buildClinkForBranch(cmd, lua, 'o365');
+    this.buildClinkForBranch(cmd, functions, 'o365');
+
+    Object.keys(functions).forEach(k => {
+      functions[k] = functions[k].replace(/#([^#]+)#/g, (m: string, p1: string): string => functions[p1]);
+    });
 
     lua.push(
+      'local o365_parser = ' + functions['o365'],
       '',
       'clink.arg.register_parser("o365", o365_parser)',
       'clink.arg.register_parser("office365", o365_parser)'
@@ -104,20 +110,21 @@ class Autocomplete {
     return lua.join(os.EOL);
   }
 
-  private buildClinkForBranch(branch: any, lua: string[], luaFunctionName: string): void {
+  private buildClinkForBranch(branch: any, functions: any, luaFunctionName: string): void {
     if (!Array.isArray(branch)) {
       const keys: string[] = Object.keys(branch);
 
       keys.forEach(k => {
         if (Object.keys(branch[k]).length > 0) {
-          this.buildClinkForBranch(branch[k], lua, this.getLuaFunctionName(`${luaFunctionName}_${k}`));
+          this.buildClinkForBranch(branch[k], functions, this.getLuaFunctionName(`${luaFunctionName}_${k}`));
         }
       });
     }
 
-    lua.push(
-      '',
-      `local ${luaFunctionName}_parser = parser({`
+    const parser: string[] = [];
+
+    parser.push(
+      `parser({`
     );
 
     let printingArgs: boolean = false;
@@ -125,7 +132,7 @@ class Autocomplete {
     if (Array.isArray(branch)) {
       branch.sort().forEach((c, i) => {
         const separator = i < branch.length - 1 ? ',' : '';
-        lua.push(`  "${c}"${separator}`);
+        parser.push(`"${c}"${separator}`);
       });
     }
     else {
@@ -135,24 +142,25 @@ class Autocomplete {
         const tmp: string[] = [];
         keys.sort().forEach((k, i) => {
           if (Object.keys(branch[k]).length > 0) {
-            tmp.push(`"${k}"..${this.getLuaFunctionName(`${luaFunctionName}_${k}_parser`)}`);
+            tmp.push(`"${k}"..#${this.getLuaFunctionName(`${luaFunctionName}_${k}`)}#`);
           }
           else {
             tmp.push(`"${k}"`);
           }
         });
 
-        lua.push(`},${tmp.join(',')}`);
+        parser.push(`},${tmp.join(', ')}`);
       }
       else {
         keys.sort().forEach((k, i) => {
           const separator = i < keys.length - 1 ? ',' : '';
-          lua.push(`  "${k}"..${this.getLuaFunctionName(`${luaFunctionName}_${k}_parser`)}${separator}`);
+          parser.push(`"${k}"..#${this.getLuaFunctionName(`${luaFunctionName}_${k}`)}#${separator}`);
         });
       }
     }
 
-    lua.push(`${printingArgs ? '' : '}'})`);
+    parser.push(`${printingArgs ? '' : '}'})`);
+    functions[luaFunctionName] = parser.join('');
   }
 
   private getLuaFunctionName(functionName: string): string {
