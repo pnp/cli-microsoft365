@@ -270,7 +270,7 @@ describe(commands.SITE_CLASSIC_LIST, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, type: 'STS#0' } }, () => {
+    cmdInstance.action({ options: { debug: true, webTemplate: 'STS#0' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith([
           {
@@ -438,7 +438,7 @@ describe(commands.SITE_CLASSIC_LIST, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, type: 'STS#0', filter: "Url -like 'ctest'" } }, () => {
+    cmdInstance.action({ options: { debug: true, webTemplate: 'STS#0', filter: "Url -like 'ctest'" } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith([
           {

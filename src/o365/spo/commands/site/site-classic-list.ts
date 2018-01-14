@@ -16,7 +16,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  type?: string;
+  webTemplate?: string;
   filter?: string;
   includeOneDriveSites?: boolean;
 }
@@ -27,7 +27,7 @@ class SiteClassicListCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Lists classic sites of the given type';
+    return 'Lists sites of the given type';
   }
 
   protected requiresTenantAdmin(): boolean {
@@ -36,14 +36,14 @@ class SiteClassicListCommand extends SpoCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.webTemplate = args.options.type;
+    telemetryProps.webTemplate = args.options.webTemplate;
     telemetryProps.filter = (!(!args.options.filter)).toString();
     telemetryProps.includeOneDriveSites = args.options.includeOneDriveSites;
     return telemetryProps;
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const webTemplate: string = args.options.type || '';
+    const webTemplate: string = args.options.webTemplate || '';
     const includeOneDriveSites: boolean = args.options.includeOneDriveSites || false;
     let startIndex: string = '0';
     let personalSite: string = '0';
@@ -73,6 +73,8 @@ class SiteClassicListCommand extends SpoCommand {
         } else {
           personalSite = '1';
         }
+
+        
 
         const requestOptions: any = {
           url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
@@ -130,7 +132,7 @@ class SiteClassicListCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-t, --webTemplate [type]',
+        option: '-t, --webTemplate [webTemplate]',
         description: 'type of classic sites to list.',
         autocomplete: ['STS#0','BLOG#0','BDR#0','DEV#0','OFFILE#1','EHS#1','BICenterSite#0','SRCHCEN#0','BLANKINTERNET#0','BLANKINTERNETCONTAINER#0','ENTERWIKI#0','PROJECTSITE#0','PRODUCTCATALOG#0','COMMUNITY#0','COMMUNITYPORTAL#0','SRCHCENTERLITE#0','visprus#0','GROUP#0','SITEPAGEPUBLISHING#0']
       },
