@@ -38,6 +38,7 @@ class SiteClassicListCommand extends SpoCommand {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.webTemplate = args.options.type;
     telemetryProps.filter = (!(!args.options.filter)).toString();
+    telemetryProps.includeOneDriveSites = args.options.includeOneDriveSites;
     return telemetryProps;
   }
 
@@ -129,8 +130,8 @@ class SiteClassicListCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-t, --type [type]',
-        description: 'type of classic sites to list. Allowed values are STS#0|BLOG#0|BDR#0|DEV#0|OFFILE#1|EHS#1|BICenterSite#0|SRCHCEN#0|BLANKINTERNET#0|BLANKINTERNETCONTAINER#0|ENTERWIKI#0|PROJECTSITE#0|PRODUCTCATALOG#0|COMMUNITY#0|COMMUNITYPORTAL#0|SRCHCENTERLITE#0|visprus#0|GROUP#0|SITEPAGEPUBLISHING#0.',
+        option: '-t, --webTemplate [type]',
+        description: 'type of classic sites to list.',
         autocomplete: ['STS#0','BLOG#0','BDR#0','DEV#0','OFFILE#1','EHS#1','BICenterSite#0','SRCHCEN#0','BLANKINTERNET#0','BLANKINTERNETCONTAINER#0','ENTERWIKI#0','PROJECTSITE#0','PRODUCTCATALOG#0','COMMUNITY#0','COMMUNITYPORTAL#0','SRCHCENTERLITE#0','visprus#0','GROUP#0','SITEPAGEPUBLISHING#0']
       },
       {
@@ -149,31 +150,6 @@ class SiteClassicListCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (args.options.type) {
-        if (args.options.type !== "STS#0" && 
-        args.options.type !== "BLOG#0" && 
-        args.options.type !== "BDR#0" && 
-        args.options.type !== "DEV#0" && 
-        args.options.type !== "OFFILE#1" && 
-        args.options.type !== "EHS#1" && 
-        args.options.type !== "BICenterSite#0" &&
-        args.options.type !== "SRCHCEN#0" && 
-        args.options.type !== "BLANKINTERNET#0" &&
-        args.options.type !== "BLANKINTERNETCONTAINER#0" && 
-        args.options.type !== "ENTERWIKI#0" && 
-        args.options.type !== "PROJECTSITE#0" && 
-        args.options.type !== "PRODUCTCATALOG#0" && 
-        args.options.type !== "COMMUNITY#0" && 
-        args.options.type !== "COMMUNITYPORTAL#0" && 
-        args.options.type !== "SRCHCENTERLITE#0" && 
-        args.options.type !== "visprus#0" &&
-        args.options.type !== "GROUP#0" &&
-        args.options.type !== "SITEPAGEPUBLISHING#0"
-        ) {
-          return `${args.options.type} is not a valid site type. Allowed types are STS#0|BLOG#0|BDR#0|DEV#0|OFFILE#1|EHS#1|BICenterSite#0|SRCHCEN#0|BLANKINTERNET#0|BLANKINTERNETCONTAINER#0|ENTERWIKI#0|PROJECTSITE#0|PRODUCTCATALOG#0|COMMUNITY#0|COMMUNITYPORTAL#0|SRCHCENTERLITE#0|visprus#0|GROUP#0|SITEPAGEPUBLISHING#0.`;
-        }
-      }
-
       return true;
     };
   }
@@ -192,9 +168,9 @@ class SiteClassicListCommand extends SpoCommand {
     If you are connected to a different site and will try to list the available sites,
     you will get an error.
 
-    Using the ${chalk.blue('-t, --type')} option you can specify which sites you want to retrieve.
-    For example, to get sites with ${chalk.grey('project')} in their URL, use ${chalk.grey("Url -like 'project'")}
-    as the filter.
+    Using the ${chalk.blue('-t, --webTemplate')} option you can specify which sites you want to retrieve.
+    For example, to get sites with the ${chalk.grey('STS#0')} as their web template, use ${chalk.grey("--webTemplate STS#0")}
+    as the option.
 
     Using the ${chalk.blue('-f, --filter')} option you can specify which sites you want to retrieve.
     For example, to get sites with ${chalk.grey('project')} in their URL, use ${chalk.grey("Url -like 'project'")}
