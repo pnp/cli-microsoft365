@@ -13,10 +13,10 @@ spo site list classic [options]
 Option|Description
 ------|-----------
 `--help`|output usage information
-`-t, --webTemplate [type]`|type of classic sites to list.`
+`-t, --webTemplate [type]`|type of classic sites to list.
 `-f, --filter [filter]`|filter to apply when retrieving sites
 `-o, --output [output]`|Output type. `json|text`. Default `text`
-`--includeOneDriveSites [includeOneDriveSites]`|option to include OneDrive sites or not.`
+`--includeOneDriveSites [includeOneDriveSites]`|option to include OneDrive sites or not.
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
