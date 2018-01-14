@@ -50,11 +50,11 @@ spo site list classic --includeOneDriveSites
 List all classic team sites in the currently connected tenant
 
 ```sh
-spo site list classic --type STS#0
+spo site list classic --webTemplate STS#0
 ```
 
 List all classic project sites that contain _project_ in the URL
 
 ```sh
-spo site list classic --type PROJECTSITE#0 --filter "Url -like 'project'"
+spo site list classic --webTemplate PROJECTSITE#0 --filter "Url -like 'project'"
 ```

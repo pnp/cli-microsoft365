@@ -188,10 +188,10 @@ class SiteClassicListCommand extends SpoCommand {
       ${chalk.grey(config.delimiter)} ${commands.SITE_CLASSIC_LIST} --includeOneDriveSites    
 
     List all classic team sites in the currently connected tenant
-      ${chalk.grey(config.delimiter)} ${commands.SITE_CLASSIC_LIST} --type STS#0
+      ${chalk.grey(config.delimiter)} ${commands.SITE_CLASSIC_LIST} --webTemplate STS#0
 
     List all classic project sites that contain 'project' in the URL
-      ${chalk.grey(config.delimiter)} ${commands.SITE_CLASSIC_LIST} --type PROJECTSITE#0 --filter "Url -like 'project'"
+      ${chalk.grey(config.delimiter)} ${commands.SITE_CLASSIC_LIST} --webTemplate PROJECTSITE#0 --filter "Url -like 'project'"
 `);
   }
 }
