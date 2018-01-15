@@ -225,6 +225,9 @@ class SpoSiteDesignAddCommand extends SpoCommand {
 
     Customize a default site design
       https://docs.microsoft.com/en-us/sharepoint/dev/declarative-customization/customize-default-site-design
+
+    Site design JSON schema
+      https://docs.microsoft.com/en-us/sharepoint/dev/declarative-customization/site-design-json-schema
 `);
   }
 }

@@ -53,3 +53,4 @@ spo sitedesign add --title "Contoso communication site" --webTemplate Communicat
 
 - SharePoint site design and site script overview: [https://docs.microsoft.com/en-us/sharepoint/dev/declarative-customization/site-design-overview](https://docs.microsoft.com/en-us/sharepoint/dev/declarative-customization/site-design-overview)
 - Customize a default site design: [https://docs.microsoft.com/en-us/sharepoint/dev/declarative-customization/customize-default-site-design](https://docs.microsoft.com/en-us/sharepoint/dev/declarative-customization/customize-default-site-design)
+- Site design JSON schema: [https://docs.microsoft.com/en-us/sharepoint/dev/declarative-customization/site-design-json-schema](https://docs.microsoft.com/en-us/sharepoint/dev/declarative-customization/site-design-json-schema)

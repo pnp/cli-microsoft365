@@ -104,5 +104,13 @@ markdown_extensions:
       guess_lang: false
   - toc:
       permalink: true
+extra:
+  social:
+    - type: 'twitter'
+      link: 'https://twitter.com/officedevpnp'
+    - type: 'youtube'
+      link: 'http://aka.ms/sppnp-videos'
+    - type: 'link'
+      link: 'https://aka.ms/sppnp'
 repo_url: http://github.com/SharePoint/office365-cli
 edit_uri: blob/master/docs/manual/docs
