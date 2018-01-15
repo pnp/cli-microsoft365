@@ -249,6 +249,7 @@ Get-PnPStoredCredential|SharePointPnPPowerShellOnline|
 Get-PnPSubWebs|SharePointPnPPowerShellOnline|
 Get-PnPTaxonomyItem|SharePointPnPPowerShellOnline|
 Get-PnPTaxonomySession|SharePointPnPPowerShellOnline|
+Get-PnPTenantAppCatalogUrl|SharePointPnPPowerShellOnline|
 Get-PnPTenantRecycleBinItem|SharePointPnPPowerShellOnline|
 Get-PnPTenantSite|SharePointPnPPowerShellOnline|[spo site get](../cmd/spo/site/site-get.md), [spo site classic list](../cmd/spo/site/site-classic-list.md)
 Get-PnPTerm|SharePointPnPPowerShellOnline|
@@ -257,6 +258,8 @@ Get-PnPTermSet|SharePointPnPPowerShellOnline|
 Get-PnPTheme|SharePointPnPPowerShellOnline|
 Get-PnPTimeZoneId|SharePointPnPPowerShellOnline|
 Get-PnPUnifiedGroup|SharePointPnPPowerShellOnline|
+Get-PnPUnifiedGroupMembers|SharePointPnPPowerShellOnline|
+Get-PnPUnifiedGroupOwners|SharePointPnPPowerShellOnline|
 Get-PnPUser|SharePointPnPPowerShellOnline|
 Get-PnPUserProfileProperty|SharePointPnPPowerShellOnline|
 Get-PnPView|SharePointPnPPowerShellOnline|
@@ -268,6 +271,7 @@ Get-PnPWebPartXml|SharePointPnPPowerShellOnline|
 Get-PnPWebTemplates|SharePointPnPPowerShellOnline|
 Get-PnPWikiPageContent|SharePointPnPPowerShellOnline|
 Get-PnPWorkflowDefinition|SharePointPnPPowerShellOnline|
+Get-PnPWorkflowInstance|SharePointPnPPowerShellOnline|
 Get-PnPWorkflowSubscription|SharePointPnPPowerShellOnline|
 Grant-PnPSiteDesignRights|SharePointPnPPowerShellOnline|[spo sitedesign rights grant](../cmd/spo/sitedesign/sitedesign-rights-grant.md)
 Import-PnPAppPackage|SharePointPnPPowerShellOnline|
@@ -397,6 +401,7 @@ Set-PnPWebhookSubscription|SharePointPnPPowerShellOnline|
 Set-PnPWebPartProperty|SharePointPnPPowerShellOnline|
 Set-PnPWebPermission|SharePointPnPPowerShellOnline|
 Set-PnPWikiPageContent|SharePointPnPPowerShellOnline|
+Start-PnPWorkflowInstance|SharePointPnPPowerShellOnline|
 Stop-PnPWorkflowInstance|SharePointPnPPowerShellOnline|
 Submit-PnPSearchQuery|SharePointPnPPowerShellOnline|
 Test-PnPListItemIsRecord|SharePointPnPPowerShellOnline|
