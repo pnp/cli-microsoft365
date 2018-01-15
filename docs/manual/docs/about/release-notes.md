@@ -12,13 +12,25 @@
 - [spo sitescript remove](../cmd/spo/sitescript/sitescript-remove.md) - removes the specified site script [#68](https://github.com/SharePoint/office365-cli/issues/68)
 - [spo sitescript set](../cmd/spo/sitescript/sitescript-set.md) - updates existing site script [#216](https://github.com/SharePoint/office365-cli/issues/216)
 - [spo sitedesign add](../cmd/spo/sitedesign/sitedesign-add.md) - adds site design for creating modern sites [#69](https://github.com/SharePoint/office365-cli/issues/69)
+- [spo sitedesign get](../cmd/spo/sitedesign/sitedesign-get.md) - gets information about the specified site design [#86](https://github.com/SharePoint/office365-cli/issues/86)
+- [spo sitedesign list](../cmd/spo/sitedesign/sitedesign-list.md) - lists available site designs for creating modern sites [#85](https://github.com/SharePoint/office365-cli/issues/85)
+- [spo sitedesign remove](../cmd/spo/sitedesign/sitedesign-remove.md) - removes the specified site design [#87](https://github.com/SharePoint/office365-cli/issues/87)
+- [spo sitedesign rights grant](../cmd/spo/sitedesign/sitedesign-rights-grant.md) - grants access to a site design for one or more principals [#88](https://github.com/SharePoint/office365-cli/issues/88)
+- [spo sitedesign rights revoke](../cmd/spo/sitedesign/sitedesign-rights-revoke.md) - revokes access from a site design for one or more principals [#89](https://github.com/SharePoint/office365-cli/issues/89)
+- [spo sitedesign rights list](../cmd/spo/sitedesign/sitedesign-rights-list.md) - gets a list of principals that have access to a site design [#90](https://github.com/SharePoint/office365-cli/issues/90)
 - [spo list get](../cmd/spo/list/list-get.md) - gets information about the specific list [#199](https://github.com/SharePoint/office365-cli/issues/199)
+- [spo customaction remove](../cmd/spo/customaction/customaction-remove.md) - removes the specified custom action [#21](https://github.com/SharePoint/office365-cli/issues/21)
+- [spo site classic list](../cmd/spo/site/site-classic-list.md) - lists sites of the given type [#122](https://github.com/SharePoint/office365-cli/issues/122)
+- [spo list list](../cmd/spo/list/list-list.md) - lists all available list in the specified site [#198](https://github.com/SharePoint/office365-cli/issues/198)
 
 ### Changes
 
 - fixed issue with prompts in non-interactive mode [#142](https://github.com/SharePoint/office365-cli/issues/142)
 - added information about the current user to status commands [#202](https://github.com/SharePoint/office365-cli/issues/202)
 - fixed issue with completing input that doesn't match commands [#222](https://github.com/SharePoint/office365-cli/issues/222)
+- fixed issue with escaping numeric input [#226](https://github.com/SharePoint/office365-cli/issues/226)
+- changed the [aad oauth2grant list](../cmd/aad/oauth2grant/oauth2grant-list.md), [spo app list](../cmd/spo/app/app-list.md), [spo customaction list](../cmd/spo/customaction/customaction-list.md), [spo site list](../cmd/spo/site/site-list.md) commands to list all properties for output type JSON [#232](https://github.com/SharePoint/office365-cli/issues/232), [#233](https://github.com/SharePoint/office365-cli/issues/233), [#234](https://github.com/SharePoint/office365-cli/issues/234), [#235](https://github.com/SharePoint/office365-cli/issues/235)
+- fixed issue with generating clink completion file [#252](https://github.com/SharePoint/office365-cli/issues/252)
 
 ## [v0.4.0](https://github.com/SharePoint/office365-cli/releases/tag/v0.4.0)
 
