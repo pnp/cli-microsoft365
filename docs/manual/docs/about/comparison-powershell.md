@@ -35,7 +35,7 @@ Get-SPOGeoMoveCompatibilityStatus|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOGeoMoveCrossCompatibilityStatus|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOGeoStorageQuota|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOHideDefaultThemes|Microsoft.Online.SharePoint.PowerShell|
-Get-SPOHubSite|Microsoft.Online.SharePoint.PowerShell|[spo hubsite list](../cmd/spo/hubsite/hubsite-list.md)
+Get-SPOHubSite|Microsoft.Online.SharePoint.PowerShell|[spo hubsite get](../cmd/spo/hubsite/hubsite-get.md), [spo hubsite list](../cmd/spo/hubsite/hubsite-list.md)
 Get-SPOMigrationJobProgress|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOMigrationJobStatus|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOMultiGeoExperience|Microsoft.Online.SharePoint.PowerShell|
