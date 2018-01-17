@@ -1,5 +1,13 @@
 # Release notes
 
+## [v0.6.0](https://github.com/SharePoint/office365-cli/releases/tag/v0.6.0)
+
+### New commands
+
+**SharePoint Online:**
+
+- [spo list add](../cmd/spo/list/list-add.md) - creates list in the specified site [#204](https://github.com/SharePoint/office365-cli/issues/204)
+
 ## [v0.5.0](https://github.com/SharePoint/office365-cli/releases/tag/v0.5.0)
 
 ### Breaking changes

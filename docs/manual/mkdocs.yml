@@ -48,6 +48,7 @@ pages:
         - hubsite set: 'cmd/spo/hubsite/hubsite-set.md'
         - hubsite unregister: 'cmd/spo/hubsite/hubsite-unregister.md'
       - list:
+        - list add: 'cmd/spo/list/list-add.md'
         - list get: 'cmd/spo/list/list-get.md'
         - list list: 'cmd/spo/list/list-list.md'
       - serviceprincipal:

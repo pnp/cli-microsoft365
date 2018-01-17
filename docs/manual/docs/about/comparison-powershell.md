@@ -297,7 +297,7 @@ Move-PnPListItemToRecycleBin|SharePointPnPPowerShellOnline|
 Move-PnPRecycleBinItem|SharePointPnPPowerShellOnline|
 New-PnPExtensbilityHandlerObject|SharePointPnPPowerShellOnline|
 New-PnPGroup|SharePointPnPPowerShellOnline|
-New-PnPList|SharePointPnPPowerShellOnline|
+New-PnPList|SharePointPnPPowerShellOnline|[spo list add](../cmd/spo/list/list-add.md)
 New-PnPPersonalSite|SharePointPnPPowerShellOnline|
 New-PnPProvisioningTemplate|SharePointPnPPowerShellOnline|
 New-PnPProvisioningTemplateFromFolder|SharePointPnPPowerShellOnline|
