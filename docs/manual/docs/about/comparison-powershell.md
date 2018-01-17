@@ -123,7 +123,7 @@ Start-SPOUserAndContentMove|Microsoft.Online.SharePoint.PowerShell|
 Stop-SPOUserAndContentMove|Microsoft.Online.SharePoint.PowerShell|
 Submit-SPOMigrationJob|Microsoft.Online.SharePoint.PowerShell|
 Test-SPOSite|Microsoft.Online.SharePoint.PowerShell|
-Unregister-SPOHubSite|Microsoft.Online.SharePoint.PowerShell|
+Unregister-SPOHubSite|Microsoft.Online.SharePoint.PowerShell|[spo hubsite unregister](../cmd/spo/hubsite/hubsite-unregister.md)
 Update-SPODataEncryptionPolicy|Microsoft.Online.SharePoint.PowerShell|
 Upgrade-SPOSite|Microsoft.Online.SharePoint.PowerShell|
 Add-PnPApp|SharePointPnPPowerShellOnline|[spo app add](../cmd/spo/app/app-add.md)
