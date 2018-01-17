@@ -24,6 +24,7 @@ export default {
   CUSTOMACTION_REMOVE: `${prefix} customaction remove`,
   DISCONNECT: `${prefix} disconnect`,
   EXTERNALUSER_LIST: `${prefix} externaluser list`,
+  HUBSITE_LIST: `${prefix} hubsite list`,
   LIST_GET: `${prefix} list get`,
   LIST_LIST: `${prefix} list list`,
   SERVICEPRINCIPAL_GRANT_LIST: `${prefix} serviceprincipal grant list`,

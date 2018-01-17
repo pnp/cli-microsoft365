@@ -31,6 +31,8 @@ pages:
         - customaction remove: 'cmd/spo/customaction/customaction-remove.md'
       - externaluser:
         - externaluser list: 'cmd/spo/externaluser/externaluser-list.md'
+      - hubsite:
+        - hubsite list: 'cmd/spo/hubsite/hubsite-list.md'
       - list:
         - list get: 'cmd/spo/list/list-get.md'
         - list list: 'cmd/spo/list/list-list.md'
