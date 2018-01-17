@@ -28,7 +28,11 @@ export default {
   HUBSITE_LIST: `${prefix} hubsite list`,
   HUBSITE_REGISTER: `${prefix} hubsite register`,
   LIST_GET: `${prefix} list get`,
+<<<<<<< HEAD
   LIST_LIST: `${prefix} list list`,
+=======
+  LIST_ADD: `${prefix} list add`,
+>>>>>>> spo list add Initial version without tests
   SERVICEPRINCIPAL_GRANT_LIST: `${prefix} serviceprincipal grant list`,
   SERVICEPRINCIPAL_GRANT_REVOKE: `${prefix} serviceprincipal grant revoke`,
   SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE: `${prefix} serviceprincipal permissionrequest approve`,
