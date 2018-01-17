@@ -34,6 +34,7 @@ pages:
       - hubsite:
         - hubsite get: 'cmd/spo/hubsite/hubsite-get.md'
         - hubsite list: 'cmd/spo/hubsite/hubsite-list.md'
+        - hubsite register: 'cmd/spo/hubsite/hubsite-register.md'
       - list:
         - list get: 'cmd/spo/list/list-get.md'
         - list list: 'cmd/spo/list/list-list.md'

@@ -26,6 +26,7 @@ export default {
   EXTERNALUSER_LIST: `${prefix} externaluser list`,
   HUBSITE_GET: `${prefix} hubsite get`,
   HUBSITE_LIST: `${prefix} hubsite list`,
+  HUBSITE_REGISTER: `${prefix} hubsite register`,
   LIST_GET: `${prefix} list get`,
   LIST_LIST: `${prefix} list list`,
   SERVICEPRINCIPAL_GRANT_LIST: `${prefix} serviceprincipal grant list`,

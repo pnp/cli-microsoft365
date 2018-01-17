@@ -74,7 +74,7 @@ New-SPOSdnProvider|Microsoft.Online.SharePoint.PowerShell|
 New-SPOSite|Microsoft.Online.SharePoint.PowerShell|[spo site add](../cmd/spo/site/site-add.md)
 New-SPOSiteGroup|Microsoft.Online.SharePoint.PowerShell|
 Register-SPODataEncryptionPolicy|Microsoft.Online.SharePoint.PowerShell|
-Register-SPOHubSite|Microsoft.Online.SharePoint.PowerShell|
+Register-SPOHubSite|Microsoft.Online.SharePoint.PowerShell|[spo hubsite register](../cmd/spo/hubsite/hubsite-register.md)
 Remove-SPODeletedSite|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOExternalUser|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOGeoAdministrator|Microsoft.Online.SharePoint.PowerShell|
