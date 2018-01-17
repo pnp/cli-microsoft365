@@ -31,6 +31,7 @@ export default {
   HUBSITE_UNREGISTER: `${prefix} hubsite unregister`,
   LIST_GET: `${prefix} list get`,
   LIST_LIST: `${prefix} list list`,
+  LIST_ADD: `${prefix} list add`,
   SERVICEPRINCIPAL_GRANT_LIST: `${prefix} serviceprincipal grant list`,
   SERVICEPRINCIPAL_GRANT_REVOKE: `${prefix} serviceprincipal grant revoke`,
   SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE: `${prefix} serviceprincipal permissionrequest approve`,
