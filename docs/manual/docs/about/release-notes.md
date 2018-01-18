@@ -22,6 +22,9 @@
 - [spo customaction remove](../cmd/spo/customaction/customaction-remove.md) - removes the specified custom action [#21](https://github.com/SharePoint/office365-cli/issues/21)
 - [spo site classic list](../cmd/spo/site/site-classic-list.md) - lists sites of the given type [#122](https://github.com/SharePoint/office365-cli/issues/122)
 - [spo list list](../cmd/spo/list/list-list.md) - lists all available list in the specified site [#198](https://github.com/SharePoint/office365-cli/issues/198)
+- [spo hubsite list](../cmd/spo/hubsite/hubsite-list.md) - lists hub sites in the current tenant [#91](https://github.com/SharePoint/office365-cli/issues/91)
+- [spo hubsite get](../cmd/spo/hubsite/hubsite-get.md) - gets information about the specified hub site [#92](https://github.com/SharePoint/office365-cli/issues/92)
+- [spo hubsite register](../cmd/spo/hubsite/hubsite-register.md) - registers the specified site collection as a hub site [#94](https://github.com/SharePoint/office365-cli/issues/94)
 
 ### Changes
 
