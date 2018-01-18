@@ -5,6 +5,7 @@ interface Vorpal {
   delimiter: (delimiter: string) => Vorpal;
   exec: (command: string, callback?: () => void) => Promise<void>;
   find: (command: string) => VorpalCommand;
+  isCommandArgKeyPairNormalized: boolean;
   on: (event: string, handler: (data?: any) => void) => Vorpal;
   parse: (argv: string[], options?: { use: string }) => Vorpal;
   pipe: (onStdout: (stdout: any) => any) => Vorpal;

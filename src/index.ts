@@ -51,6 +51,9 @@ fs.realpath(__dirname, (err: NodeJS.ErrnoException, resolvedPath: string): void 
     process.exit();
   }
 
+  // disable linux-normalizing args to support JSON and XML values
+  vorpal.isCommandArgKeyPairNormalized = false;
+
   vorpal
     .command('version', 'Shows the current version of the CLI')
     .action(function (this: CommandInstance, args: any, cb: () => void) {
