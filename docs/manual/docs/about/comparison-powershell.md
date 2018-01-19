@@ -104,7 +104,7 @@ Revoke-SPOUserSession|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOBrowserIdleSignOut|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOGeoStorageQuota|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOHideDefaultThemes|Microsoft.Online.SharePoint.PowerShell|
-Set-SPOHubSite|Microsoft.Online.SharePoint.PowerShell|
+Set-SPOHubSite|Microsoft.Online.SharePoint.PowerShell|[spo hubsite set](../cmd/spo/hubsite/hubsite-set.md)
 Set-SPOMigrationPackageAzureSource|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOMultiGeoExperience|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOSite|Microsoft.Online.SharePoint.PowerShell|
