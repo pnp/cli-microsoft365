@@ -103,7 +103,6 @@ describe('Command', () => {
   let cancelSpy: sinon.SinonSpy;
   let helpSpy: sinon.SinonSpy;
   let typesSpy: sinon.SinonSpy;
-  let allowUnknownOptionsSpy: sinon.SinonSpy;
 
   beforeEach(() => {
     actionSpy = sinon.spy(vcmd, 'action');
@@ -113,7 +112,6 @@ describe('Command', () => {
     cancelSpy = sinon.spy(vcmd, 'cancel');
     helpSpy = sinon.spy(vcmd, 'help');
     typesSpy = sinon.spy(vcmd, 'types');
-    allowUnknownOptionsSpy = sinon.spy(vcmd, 'allowUnknownOptions');
   });
 
   afterEach(() => {
