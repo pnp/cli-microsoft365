@@ -34,6 +34,10 @@ class MockCommand1 extends Command {
     }
   }
 
+  public allowUnknownOptions(): boolean {
+    return true;
+  }
+
   public commandAction(): void {
   }
 
@@ -89,7 +93,8 @@ describe('Command', () => {
     validate: () => vcmd,
     cancel: () => vcmd,
     help: () => vcmd,
-    types: () => vcmd
+    types: () => vcmd,
+    allowUnknownOptions: () => vcmd
   };
   let actionSpy: sinon.SinonSpy;
   let aliasSpy: sinon.SinonSpy;
@@ -98,6 +103,7 @@ describe('Command', () => {
   let cancelSpy: sinon.SinonSpy;
   let helpSpy: sinon.SinonSpy;
   let typesSpy: sinon.SinonSpy;
+  let allowUnknownOptionsSpy: sinon.SinonSpy;
 
   beforeEach(() => {
     actionSpy = sinon.spy(vcmd, 'action');
@@ -107,6 +113,7 @@ describe('Command', () => {
     cancelSpy = sinon.spy(vcmd, 'cancel');
     helpSpy = sinon.spy(vcmd, 'help');
     typesSpy = sinon.spy(vcmd, 'types');
+    allowUnknownOptionsSpy = sinon.spy(vcmd, 'allowUnknownOptions');
   });
 
   afterEach(() => {
@@ -117,7 +124,8 @@ describe('Command', () => {
       vcmd.validate,
       vcmd.cancel,
       vcmd.help,
-      vcmd.types
+      vcmd.types,
+      vcmd.allowUnknownOptions
     ]);
   });
 

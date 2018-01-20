@@ -98,6 +98,10 @@ export default abstract class Command {
     return;
   }
 
+  public allowUnknownOptions(): boolean | undefined {
+    return;
+  }
+
   public options(): CommandOption[] {
     return [
       {
@@ -165,6 +169,10 @@ export default abstract class Command {
     const cancel: CommandCancel | undefined = this.cancel();
     if (cancel) {
       cmd.cancel(cancel);
+    }
+    const allowUnknownOptions: boolean | undefined = this.allowUnknownOptions();
+    if (allowUnknownOptions) {
+      cmd.allowUnknownOptions();
     }
     cmd.help(this.help());
     const types: CommandTypes | undefined = this.types();
