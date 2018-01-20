@@ -16,7 +16,6 @@ describe(commands.CDN_ORIGIN_ADD, () => {
   let cmdInstanceLogSpy: sinon.SinonSpy;
   let trackEvent: any;
   let telemetry: any;
-  let requests: any[];
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -38,7 +37,6 @@ describe(commands.CDN_ORIGIN_ADD, () => {
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
     auth.site = new Site();
     telemetry = null;
-    requests = [];
   });
 
   afterEach(() => {
