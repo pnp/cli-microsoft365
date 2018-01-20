@@ -1,7 +1,7 @@
 {
   "name": "@pnp/office365-cli",
   "version": "0.5.0",
-  "description": "CLI for managing Office 365 configuration",
+  "description": "Manage Microsoft Office 365 on any platform",
   "license": "MIT",
   "main": "./dist/index.js",
   "bin": {

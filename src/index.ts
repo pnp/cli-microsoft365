@@ -55,6 +55,11 @@ fs.realpath(__dirname, (err: NodeJS.ErrnoException, resolvedPath: string): void 
   vorpal.isCommandArgKeyPairNormalized = false;
 
   vorpal
+    .title('Office 365 CLI')
+    .description(packageJSON.description)
+    .version(packageJSON.version);
+
+  vorpal
     .command('version', 'Shows the current version of the CLI')
     .action(function (this: CommandInstance, args: any, cb: () => void) {
       this.log(packageJSON.version);
