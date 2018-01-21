@@ -1,6 +1,8 @@
 site_name: Office 365 CLI
 pages:
   - Home: 'index.md'
+  - User Guide:
+    - 'CLI output mode': 'user-guide/cli-output-mode.md'
   - Commands:
     - SharePoint Online (spo):
       - connect: 'cmd/spo/connect.md'
