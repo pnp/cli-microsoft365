@@ -108,28 +108,6 @@ export default class Utils {
       return logStatement.join(os.EOL);
     }
 
-    // commented out due to formatting issue in easy-table
-    // https://github.com/eldargab/easy-table/issues/19
-    // const t: Table = new Table();
-    // logStatement.forEach((r: any) => {
-    //   if (typeof r !== 'object') {
-    //     return;
-    //   }
-
-    //   Object.getOwnPropertyNames(r).forEach(p => {
-    //     t.cell(p, r[p]);
-    //   })
-    //   t.newRow();
-    // });
-
-    // if (logStatement.length === 1) {
-    //   return t.printTransposed({
-    //     separator: ': '
-    //   });
-    // }
-    // else {
-    //   return t.toString();
-    // }
     if (logStatement.length === 1) {
       const obj: any = logStatement[0];
       const propertyNames: string[] = [];
