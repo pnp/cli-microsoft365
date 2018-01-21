@@ -25,6 +25,8 @@
 - [spo hubsite list](../cmd/spo/hubsite/hubsite-list.md) - lists hub sites in the current tenant [#91](https://github.com/SharePoint/office365-cli/issues/91)
 - [spo hubsite get](../cmd/spo/hubsite/hubsite-get.md) - gets information about the specified hub site [#92](https://github.com/SharePoint/office365-cli/issues/92)
 - [spo hubsite register](../cmd/spo/hubsite/hubsite-register.md) - registers the specified site collection as a hub site [#94](https://github.com/SharePoint/office365-cli/issues/94)
+- [spo hubsite unregister](../cmd/spo/hubsite/hubsite-unregister.md) - unregisters the specified site collection as a hub site [#95](https://github.com/SharePoint/office365-cli/issues/95)
+- [spo hubsite set](../cmd/spo/hubsite/hubsite-set.md) - updates properties of the specified hub site [#96](https://github.com/SharePoint/office365-cli/issues/96)
 
 ### Changes
 
@@ -34,6 +36,7 @@
 - fixed issue with escaping numeric input [#226](https://github.com/SharePoint/office365-cli/issues/226)
 - changed the [aad oauth2grant list](../cmd/aad/oauth2grant/oauth2grant-list.md), [spo app list](../cmd/spo/app/app-list.md), [spo customaction list](../cmd/spo/customaction/customaction-list.md), [spo site list](../cmd/spo/site/site-list.md) commands to list all properties for output type JSON [#232](https://github.com/SharePoint/office365-cli/issues/232), [#233](https://github.com/SharePoint/office365-cli/issues/233), [#234](https://github.com/SharePoint/office365-cli/issues/234), [#235](https://github.com/SharePoint/office365-cli/issues/235)
 - fixed issue with generating clink completion file [#252](https://github.com/SharePoint/office365-cli/issues/252)
+- added [user guide](../user-guide/installing-cli.md) [#236](https://github.com/SharePoint/office365-cli/issues/236), [#237](https://github.com/SharePoint/office365-cli/issues/237), [#238](https://github.com/SharePoint/office365-cli/issues/238), [#239](https://github.com/SharePoint/office365-cli/issues/239)
 
 ## [v0.4.0](https://github.com/SharePoint/office365-cli/releases/tag/v0.4.0)
 
