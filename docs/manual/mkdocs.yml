@@ -1,6 +1,8 @@
 site_name: Office 365 CLI
 pages:
   - Home: 'index.md'
+  - User Guide:
+    - 'Connecting to Office 365': 'user-guide/connecting-office-365.md'
   - Commands:
     - SharePoint Online (spo):
       - connect: 'cmd/spo/connect.md'
