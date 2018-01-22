@@ -12,7 +12,7 @@ Add-SPOTenantCdnOrigin|Microsoft.Online.SharePoint.PowerShell|[spo cdn origin ad
 Add-SPOTheme|Microsoft.Online.SharePoint.PowerShell|
 Add-SPOUser|Microsoft.Online.SharePoint.PowerShell|
 Approve-SPOTenantServicePrincipalPermissionRequest|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal permissionrequest approve](../cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-approve.md)
-Connect-SPOHubSite|Microsoft.Online.SharePoint.PowerShell|
+Connect-SPOHubSite|Microsoft.Online.SharePoint.PowerShell|[spo hubsite connect](../cmd/spo/hubsite/hubsite-connect.md)
 Connect-SPOService|Microsoft.Online.SharePoint.PowerShell|[spo connect](../cmd/spo/connect.md)
 ConvertTo-SPOMigrationEncryptedPackage|Microsoft.Online.SharePoint.PowerShell|
 ConvertTo-SPOMigrationTargetedPackage|Microsoft.Online.SharePoint.PowerShell|
