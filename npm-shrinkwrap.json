@@ -2775,7 +2775,7 @@
       }
     },
     "vorpal": {
-      "version": "github:pnp/vorpal#d0f8aebfaa18310233d97f48686c7190d2e81e57",
+      "version": "github:pnp/vorpal#9e74dcae4bb946fa9a65225d315ed83c03e1ff5b",
       "requires": {
         "babel-polyfill": "6.26.0",
         "chalk": "1.1.3",
