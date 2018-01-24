@@ -43,6 +43,7 @@ pages:
         - hubsite get: 'cmd/spo/hubsite/hubsite-get.md'
         - hubsite list: 'cmd/spo/hubsite/hubsite-list.md'
         - hubsite register: 'cmd/spo/hubsite/hubsite-register.md'
+        - hubsite rights grant: 'cmd/spo/hubsite/hubsite-rights-grant.md'
         - hubsite set: 'cmd/spo/hubsite/hubsite-set.md'
         - hubsite unregister: 'cmd/spo/hubsite/hubsite-unregister.md'
       - list:
