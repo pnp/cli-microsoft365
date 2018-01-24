@@ -271,7 +271,6 @@ describe(commands.HUBSITE_UNREGISTER, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales', confirm: true } }, () => {
       try {
-        console.log(log);
         assert(cmdInstanceLogSpy.calledWith(new CommandError("hubSiteId")));
         done();
       }
