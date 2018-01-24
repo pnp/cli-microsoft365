@@ -18,7 +18,7 @@ ConvertTo-SPOMigrationEncryptedPackage|Microsoft.Online.SharePoint.PowerShell|
 ConvertTo-SPOMigrationTargetedPackage|Microsoft.Online.SharePoint.PowerShell|
 Deny-SPOTenantServicePrincipalPermissionRequest|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal permissionrequest deny](../cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-deny.md)
 Disable-SPOTenantServicePrincipal|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal set](../cmd/spo/serviceprincipal/serviceprincipal-set.md)
-Disconnect-SPOHubSite|Microsoft.Online.SharePoint.PowerShell|
+Disconnect-SPOHubSite|Microsoft.Online.SharePoint.PowerShell|[spo hubsite disconnect](../cmd/spo/hubsite/hubsite-disconnect.md)
 Disconnect-SPOService|Microsoft.Online.SharePoint.PowerShell|[spo disconnect](../cmd/spo/disconnect.md)
 Enable-SPOTenantServicePrincipal|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal set](../cmd/spo/serviceprincipal/serviceprincipal-set.md)
 Get-SPOAppErrors|Microsoft.Online.SharePoint.PowerShell|

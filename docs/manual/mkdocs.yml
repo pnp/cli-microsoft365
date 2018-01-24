@@ -37,6 +37,7 @@ pages:
       - externaluser:
         - externaluser list: 'cmd/spo/externaluser/externaluser-list.md'
       - hubsite:
+        - hubsite disconnect: 'cmd/spo/hubsite/hubsite-disconnect.md'
         - hubsite get: 'cmd/spo/hubsite/hubsite-get.md'
         - hubsite list: 'cmd/spo/hubsite/hubsite-list.md'
         - hubsite register: 'cmd/spo/hubsite/hubsite-register.md'
