@@ -14,6 +14,36 @@ export class BasePermissions {
     return this._low;
   }
 
+  public set high(value:number) {
+    this._high = value;
+  }
+
+  public set low(value:number) {
+    this._low = value;
+  }
+
+  public has(perm: PermissionKind) : boolean {
+    var hasPermission = false;
+
+    if (perm === PermissionKind.FullMask)
+    {
+      hasPermission = (this.high & 32767) === 32767 && this.low === 65535;
+    }
+
+    var a = perm;
+    a = a - 1;
+    var b = 1;
+    if (a >= 0 && a < 32) {
+      b = b << a;
+      hasPermission = 0 !== (this.low & b);
+    } else if (a >= 32 && a < 64) {
+      b = b << a - 32;
+      hasPermission = (0 !== (this.high & b));
+    }
+    
+    return hasPermission;
+  }
+
   public set(perm: PermissionKind): void {
     if (perm == PermissionKind.FullMask) {
       this._low = 65535;

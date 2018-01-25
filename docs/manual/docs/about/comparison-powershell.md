@@ -308,7 +308,7 @@ New-PnPTermGroup|SharePointPnPPowerShellOnline|
 New-PnPTermSet|SharePointPnPPowerShellOnline|
 New-PnPUnifiedGroup|SharePointPnPPowerShellOnline|
 New-PnPUser|SharePointPnPPowerShellOnline|
-New-PnPWeb|SharePointPnPPowerShellOnline|
+New-PnPWeb|SharePointPnPPowerShellOnline|[spo web add](../cmd/spo/web/web-add.md)
 Publish-PnPApp|SharePointPnPPowerShellOnline|[spo app deploy](../cmd/spo/app/app-deploy.md)
 Remove-PnPApp|SharePointPnPPowerShellOnline|[spo app remove](../cmd/spo/app/app-remove.md)
 Remove-PnPClientSideComponent|SharePointPnPPowerShellOnline|
