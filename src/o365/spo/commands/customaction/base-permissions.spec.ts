@@ -133,4 +133,33 @@ describe('BasePermissions', () => {
     assert.equal(basePermissions.low, 0);
     assert.equal(basePermissions.high, 0);
   });
+
+  it('has correct high and low value set', () => {
+    basePermissions.high = 32767;
+    basePermissions.low = 65535;
+
+    assert.equal(basePermissions.high, 32767);
+    assert.equal(basePermissions.low, 65535);
+  });
+
+  it('checks the permission correctly for the actual FullMask', () => {
+
+    //http://aaclage.blogspot.co.uk/2014/09/it-is-sharepoint-permission-call.html    
+    // Full permission.
+    basePermissions.high = 2147483647;
+    basePermissions.low = 4294967295;
+
+    assert.equal(basePermissions.has(PermissionKind.AddAndCustomizePages), true);
+    assert.equal(basePermissions.has(PermissionKind.ManageWeb), true);
+    assert.equal(basePermissions.has(PermissionKind.EnumeratePermissions), true);
+  });
+
+  it('checks the permission correctly for the online FullMask', () => {
+    
+    // Full permission.
+    basePermissions.high = 32767;
+    basePermissions.low = 65535;
+
+    assert.equal(basePermissions.has(PermissionKind.FullMask), true);
+  });
 });
