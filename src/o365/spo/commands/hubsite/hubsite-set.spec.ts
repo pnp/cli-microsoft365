@@ -9,7 +9,7 @@ import * as request from 'request-promise-native';
 import config from '../../../../config';
 import Utils from '../../../../Utils';
 
-describe(commands.CDN_ORIGIN_ADD, () => {
+describe(commands.HUBSITE_SET, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
