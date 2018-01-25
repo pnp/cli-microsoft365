@@ -31,6 +31,7 @@ export default {
   HUBSITE_LIST: `${prefix} hubsite list`,
   HUBSITE_REGISTER: `${prefix} hubsite register`,
   HUBSITE_RIGHTS_GRANT: `${prefix} hubsite rights grant`,
+  HUBSITE_RIGHTS_REVOKE: `${prefix} hubsite rights revoke`,
   HUBSITE_SET: `${prefix} hubsite set`,
   HUBSITE_UNREGISTER: `${prefix} hubsite unregister`,
   LIST_GET: `${prefix} list get`,

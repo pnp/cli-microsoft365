@@ -97,7 +97,7 @@ Request-SPOPersonalSite|Microsoft.Online.SharePoint.PowerShell|
 Request-SPOUpgradeEvaluationSite|Microsoft.Online.SharePoint.PowerShell|
 Restore-SPODataEncryptionPolicy|Microsoft.Online.SharePoint.PowerShell|
 Restore-SPODeletedSite|Microsoft.Online.SharePoint.PowerShell|
-Revoke-SPOHubSiteRights|Microsoft.Online.SharePoint.PowerShell|
+Revoke-SPOHubSiteRights|Microsoft.Online.SharePoint.PowerShell|[spo hubsite rights revoke](../cmd/spo/hubsite/hubsite-rights-revoke.md)
 Revoke-SPOSiteDesignRights|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign rights revoke](../cmd/spo/sitedesign/sitedesign-rights-revoke.md)
 Revoke-SPOTenantServicePrincipalPermission|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal grant revoke](../cmd/spo/serviceprincipal/serviceprincipal-grant-revoke.md)
 Revoke-SPOUserSession|Microsoft.Online.SharePoint.PowerShell|
