@@ -298,4 +298,125 @@ describe(commands.WEB_ADD, () => {
     });
   });
 
+  it('creates web and does not set the inherit navigation because of Noscript enabled.', (done) => {
+    Utils.restore(auth.getAccessToken);
+    Utils.restore(sinon.stub);
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf('_api/web/webinfos/add') > -1) {
+        return Promise.resolve({ Configuration: 0,
+          Created                 : "2018-01-24T18:24:20",
+          Description             : "subsite",
+          Id                      : "08385b9a-8d5f-4ee9-ac98-bf6984c1856b",
+          Language                : 1033,
+          LastItemModifiedDate    : "2018-01-24T18:24:27Z",
+          LastItemUserModifiedDate: "2018-01-24T18:24:27Z",
+          ServerRelativeUrl       : "/subsite",
+          Title                   : "subsite",
+          WebTemplate             : "STS",
+          WebTemplateId           : 0 });
+      }
+
+      return Promise.resolve('abc');
+    });
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('_api/web/effectivebasepermissions') > -1) {
+        // PermissionKind.ManageLists, PermissionKind.AddListItems, PermissionKind.DeleteListItems
+        return Promise.resolve(
+          { High:2058,
+            Low:0
+          }
+        );
+      }
+
+      return Promise.resolve('abc');
+    });
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({  options: {
+      title: "subsite",
+      webUrl: "subsite",
+      parentWebUrl:"https://contoso.sharepoint.com",
+      inheritNavigation : true,
+      local:1033
+    } }, () => {
+
+      assert(cmdInstanceLogSpy.calledWith(`Subsite subsite created.`));
+      assert(cmdInstanceLogSpy.calledWith("No script is enabled. Skipping the InheitParentNvaigation settings."));
+      done();
+    });
+  });
+
+  it('creates web and handles the effectivebasepermission call error.', (done) => {
+    Utils.restore(auth.getAccessToken);
+    Utils.restore(sinon.stub);
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf('_api/web/webinfos/add') > -1) {
+        return Promise.resolve({ Configuration: 0,
+          Created                 : "2018-01-24T18:24:20",
+          Description             : "subsite",
+          Id                      : "08385b9a-8d5f-4ee9-ac98-bf6984c1856b",
+          Language                : 1033,
+          LastItemModifiedDate    : "2018-01-24T18:24:27Z",
+          LastItemUserModifiedDate: "2018-01-24T18:24:27Z",
+          ServerRelativeUrl       : "/subsite",
+          Title                   : "subsite",
+          WebTemplate             : "STS",
+          WebTemplateId           : 0 });
+      }
+
+      return Promise.resolve('abc');
+    });
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('_api/web/effectivebasepermissions') > -1) {
+        return Promise.reject("Failed to get the effectivebase permissions.");
+      }
+
+      return Promise.resolve('abc');
+    });
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({  options: {
+      title: "subsite",
+      webUrl: "subsite",
+      parentWebUrl:"https://contoso.sharepoint.com",
+      inheritNavigation : true,
+      local:1033,
+      debug: true
+    } }, () => {
+      assert(cmdInstanceLogSpy.calledWith(`Subsite subsite created.`));
+      assert(cmdInstanceLogSpy.calledWith("Failed to get the effectivebase permissions."));
+      done();
+    });
+  });
+
+  it('handles the createweb call error.', (done) => {
+    Utils.restore(auth.getAccessToken);
+    Utils.restore(sinon.stub);
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf('_api/web/webinfos/add') > -1) {
+        return Promise.reject({"error":{"code":"-2147024713, Microsoft.SharePoint.SPException","message":{"lang":"en-US","value":"The Web site address \"/subsite\" is already in use."}}});
+      }
+      return Promise.resolve('abc');
+    });
+    
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({  options: {
+      title: "subsite",
+      webUrl: "subsite",
+      parentWebUrl:"https://contoso.sharepoint.com",
+      inheritNavigation : true,
+      local:1033,
+      debug: true
+    } }, () => {
+      assert(cmdInstanceLogSpy.calledWith(new CommandError('Failed to create the web - subsite')));
+      done();
+    });
+  });
 });

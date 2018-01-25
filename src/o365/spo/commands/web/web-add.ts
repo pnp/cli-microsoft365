@@ -61,10 +61,6 @@ class WebAddCommand extends SpoCommand {
         return res;
       }, (err: any) =>  { 
         cmd.log(new CommandError(`Failed to create the web - ${args.options.webUrl}`)); 
-        if(debug)
-        {
-          cmd.log(err);
-        };
         return Promise.reject(err);
       });
     });
@@ -72,8 +68,8 @@ class WebAddCommand extends SpoCommand {
 
   private getEffectiveBasePermission(siteAccessToken:string, cmd: CommandInstance, args: CommandArgs, cb: () => void, debug : boolean) : Promise<BasePermissions> {
     let subsiteFullUrl = `${args.options.parentWebUrl}/${args.options.webUrl}`;
-      
-    return this.getRequestDigestForSite(subsiteFullUrl, siteAccessToken, cmd, this.debug)
+    
+    return this.getRequestDigestForSite(subsiteFullUrl, siteAccessToken, cmd, debug)
     .then((res: ContextInfo): Promise<any> => {
       let requestOptions: any = {
         url: `${subsiteFullUrl}/_api/web/effectivebasepermissions`,
@@ -90,7 +86,7 @@ class WebAddCommand extends SpoCommand {
         let webEffectivePermission : BasePermissions = new BasePermissions();
         webEffectivePermission.high = res.High as number;
         webEffectivePermission.low = res.Low as number;
-        if (this.debug) {
+        if (debug) {
           cmd.log("Response : WebEffectiveBasePermission")
           cmd.log(res);
         }
@@ -98,10 +94,6 @@ class WebAddCommand extends SpoCommand {
         return webEffectivePermission;
       }, (err: any) =>  { 
         cmd.log(new CommandError(`Failed to get the effectivebasepermission for the web - ${subsiteFullUrl}`)); 
-        if(debug)
-        {
-          cmd.log(err);
-        };
         return Promise.reject(err);
     });
   });
@@ -144,11 +136,10 @@ class WebAddCommand extends SpoCommand {
     auth
     .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
     .then((accessToken: string): Promise<ContextInfo> => {
-      siteAccessToken = accessToken;
       if (this.debug) {
         cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
       }
-      return this.createWeb(siteAccessToken, cmd, args, cb, this.debug);
+      return this.createWeb(accessToken, cmd, args, cb, this.debug);
     })
     .then((res: any) : any => {
       if(args.options.inheritNavigation)
