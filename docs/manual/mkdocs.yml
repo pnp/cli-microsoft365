@@ -38,6 +38,7 @@ pages:
       - list:
         - list get: 'cmd/spo/list/list-get.md'
         - list list: 'cmd/spo/list/list-list.md'
+        - list list: 'cmd/spo/list/list-add.md'
       - serviceprincipal:
         - serviceprincipal grant list: 'cmd/spo/serviceprincipal/serviceprincipal-grant-list.md'
         - serviceprincipal grant revoke: 'cmd/spo/serviceprincipal/serviceprincipal-grant-revoke.md'
