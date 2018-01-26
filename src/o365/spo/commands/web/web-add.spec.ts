@@ -41,6 +41,8 @@ describe(commands.WEB_ADD, () => {
   afterEach(() => {
     Utils.restore([
       vorpal.find,
+      auth.getAccessToken,
+      sinon.stub,
       request.get,
       request.post
     ]);
@@ -211,9 +213,8 @@ describe(commands.WEB_ADD, () => {
     assert.notEqual(actual, true);
   });
 
-  it('creates web and inherits the navigation', (done) => {
-    Utils.restore(auth.getAccessToken);
-    Utils.restore(sinon.stub);
+  it('Set InheritNavigation fail handled', (done) => {
+    // Create web
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf('_api/web/webinfos/add') > -1) {
         return Promise.resolve({ Configuration: 0,
@@ -228,9 +229,14 @@ describe(commands.WEB_ADD, () => {
           WebTemplate             : "STS",
           WebTemplateId           : 0 });
       }
+      else if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+        // SetInheritNavigation failed.
+        return Promise.reject(false);
+      }
 
       return Promise.resolve('abc');
     });
+    // Full permission.
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf('_api/web/effectivebasepermissions') > -1) {
         return Promise.resolve(
@@ -242,6 +248,73 @@ describe(commands.WEB_ADD, () => {
 
       return Promise.resolve('abc');
     });
+   
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({  options: {
+      title: "subsite",
+      webUrl: "subsite",
+      parentWebUrl:"https://contoso.sharepoint.com",
+      inheritNavigation : true,
+      local:1033,
+      debug: true
+    } }, () => {
+      assert(cmdInstanceLogSpy.calledWith(`Subsite subsite created.`));
+      assert(cmdInstanceLogSpy.calledWith(new CommandError(`Failed to set inheritNavigation for the web - https://contoso.sharepoint.com/subsite`)));
+      done();
+    });
+  });
+
+  it('creates web and inherits the navigation', (done) => {
+    // Create web
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf('_api/web/webinfos/add') > -1) {
+        return Promise.resolve({ Configuration: 0,
+          Created                 : "2018-01-24T18:24:20",
+          Description             : "subsite",
+          Id                      : "08385b9a-8d5f-4ee9-ac98-bf6984c1856b",
+          Language                : 1033,
+          LastItemModifiedDate    : "2018-01-24T18:24:27Z",
+          LastItemUserModifiedDate: "2018-01-24T18:24:27Z",
+          ServerRelativeUrl       : "/subsite",
+          Title                   : "subsite",
+          WebTemplate             : "STS",
+          WebTemplateId           : 0 });
+      }
+      else if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+        return Promise.resolve([
+          {
+          "SchemaVersion":"15.0.0.0","LibraryVersion":"16.0.7317.1203","ErrorInfo":null,"TraceCorrelationId":"4556449e-0067-4000-1529-39a0d88e307d"
+          },1,{
+          "IsNull":false
+          },3,{
+          "IsNull":false
+          },5,{
+          "IsNull":false
+          },7,{
+          "_ObjectType_":"SP.Navigation","UseShared":true
+          }
+          ]
+        );
+      }
+
+      return Promise.resolve('abc');
+    });
+    // Full permission.
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('_api/web/effectivebasepermissions') > -1) {
+        return Promise.resolve(
+          { High:2147483647,
+            Low:4294967295
+          }
+        );
+      }
+
+      return Promise.resolve('abc');
+    });
+   
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
@@ -256,13 +329,13 @@ describe(commands.WEB_ADD, () => {
     } }, () => {
       assert(cmdInstanceLogSpy.calledWith(`Subsite subsite created.`));
       assert(cmdInstanceLogSpy.calledWith("Setting the navigation to inherit the parent settings."));
+      assert(cmdInstanceLogSpy.calledWith("Response : SetInheritNavigation"));
       done();
     });
   });
 
   it('creates web only without inheriting the navigation', (done) => {
-    Utils.restore(auth.getAccessToken);
-    Utils.restore(sinon.stub);
+  
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf('_api/web/webinfos/add') > -1) {
         return Promise.resolve({ Configuration: 0,
@@ -293,14 +366,11 @@ describe(commands.WEB_ADD, () => {
       debug: true
     } }, () => {
       assert(cmdInstanceLogSpy.calledWith(`Subsite subsite created.`));
-      assert.equal(cmdInstanceLogSpy.calledWith("Setting the navigation to inherit the parent settings."), false, "Should not set the inheritnavigation.");
       done();
     });
   });
 
   it('creates web and does not set the inherit navigation because of Noscript enabled.', (done) => {
-    Utils.restore(auth.getAccessToken);
-    Utils.restore(sinon.stub);
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf('_api/web/webinfos/add') > -1) {
         return Promise.resolve({ Configuration: 0,
@@ -349,8 +419,6 @@ describe(commands.WEB_ADD, () => {
   });
 
   it('creates web and handles the effectivebasepermission call error.', (done) => {
-    Utils.restore(auth.getAccessToken);
-    Utils.restore(sinon.stub);
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf('_api/web/webinfos/add') > -1) {
         return Promise.resolve({ Configuration: 0,
@@ -394,9 +462,7 @@ describe(commands.WEB_ADD, () => {
   });
 
   it('handles the createweb call error.', (done) => {
-    Utils.restore(auth.getAccessToken);
-    Utils.restore(sinon.stub);
-    sinon.stub(request, 'post').callsFake((opts) => {
+     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf('_api/web/webinfos/add') > -1) {
         return Promise.reject({"error":{"code":"-2147024713, Microsoft.SharePoint.SPException","message":{"lang":"en-US","value":"The Web site address \"/subsite\" is already in use."}}});
       }

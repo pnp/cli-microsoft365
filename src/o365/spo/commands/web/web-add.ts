@@ -95,9 +95,36 @@ class WebAddCommand extends SpoCommand {
       }, (err: any) =>  { 
         cmd.log(new CommandError(`Failed to get the effectivebasepermission for the web - ${subsiteFullUrl}`)); 
         return Promise.reject(err);
+      });
     });
-  });
-}
+  }
+
+  private setInheritNavigation(siteAccessToken:string, cmd: CommandInstance, args: CommandArgs, cb: () => void, debug : boolean) : Promise<boolean> {
+    let subsiteFullUrl = `${args.options.parentWebUrl}/${args.options.webUrl}`;
+  
+    return this.getRequestDigestForSite(subsiteFullUrl, siteAccessToken, cmd, debug)
+    .then((res: ContextInfo): Promise<any> => {
+      let requestOptions: any = {
+        url: `${subsiteFullUrl}/_vti_bin/client.svc/ProcessQuery`,
+        headers: Utils.getRequestHeaders({
+          authorization: `Bearer ${siteAccessToken}`,
+          'X-RequestDigest': res.FormDigestValue
+        }),
+        body: `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="Javascript Library"><Actions><ObjectPath Id="1" ObjectPathId="0" /><ObjectPath Id="3" ObjectPathId="2" /><ObjectPath Id="5" ObjectPathId="4" /><SetProperty Id="6" ObjectPathId="4" Name="UseShared"><Parameter Type="Boolean">true</Parameter></SetProperty><Query Id="7" ObjectPathId="4"><Query SelectAllProperties="true"><Properties><Property Name="UseShared" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><StaticProperty Id="0" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /><Property Id="2" ParentId="0" Name="Web" /><Property Id="4" ParentId="2" Name="Navigation" /></ObjectPaths></Request>`
+      };
+
+      return request.post(requestOptions).then((res:any) : any => {
+        if (debug) {
+          cmd.log("Response : SetInheritNavigation");
+          cmd.log(res);
+        }
+        return res;
+      }, (err: any) =>  { 
+        cmd.log(new CommandError(`Failed to set inheritNavigation for the web - ${subsiteFullUrl}`)); 
+        return Promise.reject(err);
+      });
+    });
+  }
 
   public get name(): string {
     return commands.WEB_ADD;
@@ -159,7 +186,9 @@ class WebAddCommand extends SpoCommand {
             /// 
             if(perm.has(PermissionKind.AddAndCustomizePages)) {
               cmd.log("Setting the Navigation to inherit the parent site.")
-              cb();
+              return this.setInheritNavigation(siteAccessToken, cmd, args, cb, this.debug).then((res : any) => {
+                cb();
+              },(reason: any) =>  { cmd.log(reason); cb();})
             }
             else {
               cmd.log("No script is enabled. Skipping the InheitParentNvaigation settings.")
@@ -248,27 +277,27 @@ class WebAddCommand extends SpoCommand {
       `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online site,
       using the ${chalk.blue(commands.CONNECT)} command.
 
-  Remarks:
-  
-    To create a subsite, you have to first connect to SharePoint using the
-    ${chalk.blue(commands.CONNECT)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
-   
-  Examples:
-  
-    Create subsite
-      ${chalk.grey(config.delimiter)} ${commands.WEB_ADD} --title subsite --description subsite 1 --webUrl "subsite" --webTemplate STS#0 --parentWebUrl https://contoso.sharepoint.com --locale 1033
-
-    Create subsite with breaking permission inheritance
-    ${chalk.grey(config.delimiter)} ${commands.WEB_ADD} --title subsite --description subsite 1 --webUrl "subsite" --webTemplate STS#0 --parentWebUrl https://contoso.sharepoint.com --locale 1033 --breakInheritance
-
-    Create subsite with inheriting the navigation
-    ${chalk.grey(config.delimiter)} ${commands.WEB_ADD} --title subsite --description subsite 1 --webUrl "subsite" --webTemplate STS#0 --parentWebUrl https://contoso.sharepoint.com --locale 1033 --inheritNavigation
-
-    More information
+    Remarks:
     
-    Creating subsite using REST
-    https://docs.microsoft.com/en-us/sharepoint/dev/apis/rest/complete-basic-operations-using-sharepoint-rest-endpoints#creating-a-site-with-rest
-`);
+      To create a subsite, you have to first connect to SharePoint using the
+      ${chalk.blue(commands.CONNECT)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
+    
+    Examples:
+    
+      Create subsite
+        ${chalk.grey(config.delimiter)} ${commands.WEB_ADD} --title subsite --description subsite 1 --webUrl "subsite" --webTemplate STS#0 --parentWebUrl https://contoso.sharepoint.com --locale 1033
+
+      Create subsite with breaking permission inheritance
+      ${chalk.grey(config.delimiter)} ${commands.WEB_ADD} --title subsite --description subsite 1 --webUrl "subsite" --webTemplate STS#0 --parentWebUrl https://contoso.sharepoint.com --locale 1033 --breakInheritance
+
+      Create subsite with inheriting the navigation
+      ${chalk.grey(config.delimiter)} ${commands.WEB_ADD} --title subsite --description subsite 1 --webUrl "subsite" --webTemplate STS#0 --parentWebUrl https://contoso.sharepoint.com --locale 1033 --inheritNavigation
+
+      More information
+      
+      Creating subsite using REST
+      https://docs.microsoft.com/en-us/sharepoint/dev/apis/rest/complete-basic-operations-using-sharepoint-rest-endpoints#creating-a-site-with-rest
+  ` );
   }
 }
 
