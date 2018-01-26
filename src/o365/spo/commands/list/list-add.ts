@@ -254,9 +254,6 @@ class ListAddCommand extends SpoCommand {
           cmd.log('Executing web request...');
           cmd.log(requestOptions);
           cmd.log('');
-          if (args.options.schemaXml) {
-            cmd.log(args.options.schemaXml.replace('\\', '\\\\').replace('"', '\\"'));
-          }
         }
 
         return request.post(requestOptions);
@@ -553,18 +550,18 @@ class ListAddCommand extends SpoCommand {
       if (!args.options.webUrl) {
         return 'Required parameter webUrl missing';
       }
-      
-      if (args.options.baseTemplate) {
-        const template: ListTemplateType = ListTemplateType[(args.options.baseTemplate.trim() as keyof typeof ListTemplateType)];
-
-        if (!template) {
-          return `BaseTemplate option '${args.options.baseTemplate}' is not recognized as valid choice. Please note it is case sensitive`;
-        }
-      }
 
       const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
       if (isValidSharePointUrl !== true) {
         return isValidSharePointUrl;
+      }
+
+      if (args.options.baseTemplate) {
+        const template: ListTemplateType = ListTemplateType[(args.options.baseTemplate.trim() as keyof typeof ListTemplateType)];
+
+        if (!template) {
+          return `BaseTemplate option ${args.options.baseTemplate} is not recognized as valid choice. Please note it is case sensitive`;
+        }
       }
 
       if (args.options.templateFeatureId) {
@@ -763,7 +760,7 @@ class ListAddCommand extends SpoCommand {
     }
 
     if (options.enableSyndication) {
-      requestBody.enableSyndication = options.enableSyndication;
+      requestBody.EnableSyndication = options.enableSyndication;
     }
 
     if (options.enableThrottling) {
