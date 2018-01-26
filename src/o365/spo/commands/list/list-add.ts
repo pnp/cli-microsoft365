@@ -8,11 +8,12 @@ import {
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import { ContextInfo } from '../../spo';
 import Utils from '../../../../Utils';
 import { ListInstance } from "./ListInstance";
 import Auth from '../../../../Auth';
 import { ListTemplateType } from './ListTemplateType';
+import { DraftVisibilityType } from './DraftVisibilityType';
+import { ListExperience } from './ListExperience';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -27,16 +28,63 @@ interface Options extends GlobalOptions {
   description?: string;
   templateFeatureId?: string;
   schemaXml?: string;
-  allowDeletion?: string;
-  allowEveryoneViewItems?: string;
-  allowMultiResponses?: string;
-  contentTypesEnabled?: string;
-  crawlNonDefaultViews?: string;
+  allowDeletion?: boolean;
+  allowEveryoneViewItems?: boolean;
+  allowMultiResponses?: boolean;
+  contentTypesEnabled?: boolean;
+  crawlNonDefaultViews?: boolean;
   defaultContentApprovalWorkflowId?: string;
   defaultDisplayFormUrl?: string;
   defaultEditFormUrl?: string;
   direction?: string;
-  disableGridEditing?: string;
+  disableGridEditing?: boolean;
+  draftVersionVisibility?: string;
+  emailAlias?: string;
+  enableAssignToEmail?: boolean;
+  enableAttachments?: boolean;
+  enableDeployWithDependentList?: boolean;
+  enableFolderCreation?: boolean;
+  enableMinorVersions?: boolean;
+  enableModeration?: boolean;
+  enablePeopleSelector?: boolean;
+  enableResourceSelector?: boolean;
+  enableSchemaCaching?: boolean;
+  enableSyndication?: boolean;
+  enableThrottling?: boolean;
+  enableVersioning?: boolean;
+  enforceDataValidation?: boolean;
+  excludeFromOfflineClient?: boolean;
+  fetchPropertyBagForListView?: boolean;
+  followable?: boolean;
+  forceCheckout?: boolean;
+  forceDefaultContentType?: boolean;
+  hidden?: boolean;
+  includedInMyFilesScope?: boolean;
+  irmEnabled?: boolean;
+  irmExpire?: boolean;
+  irmReject?: boolean;
+  isApplicationList?: boolean;
+  listExperienceOptions?: string;
+  majorVersionLimit?: number;
+  majorWithMinorVersionsLimit?: number;
+  multipleDataList?: boolean;
+  navigateForFormsPages?: boolean;
+  needUpdateSiteClientTag?: boolean;
+  noCrawl?: boolean;
+  onQuickLaunch?: boolean;
+  ordered?: boolean;
+  parserDisabled?: boolean;
+  readOnlyUI?: boolean;
+  readSecurity?: number;
+  requestAccessEnabled?: boolean;
+  restrictUserUpdates?: boolean;
+  sendToLocationName?: string;
+  sendToLocationUrl?: string;
+  showUser?: boolean;
+  useFormsForDisplay?: boolean;
+  validationFormula?: string;
+  validationMessage?: string;
+  writeSecurity?: number;
 }
 
 class ListAddCommand extends SpoCommand {
@@ -63,10 +111,99 @@ class ListAddCommand extends SpoCommand {
     return result;
   }
 
+  /**
+   * Maps the base DraftVisibilityType enum to string array so it can 
+   * more easily be used in validation or descriptions.
+   */
+  protected get draftVisibilityTypeMap(): string[] {
+    const result: string[] = [];
+
+    for (let draftType in DraftVisibilityType) {
+      if (typeof DraftVisibilityType[draftType] === 'number') {
+        result.push(draftType);
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Maps the base ListExperience enum to string array so it can 
+   * more easily be used in validation or descriptions.
+   */
+  protected get listExperienceMap(): string[] {
+    const result: string[] = [];
+
+    for (let experience in ListExperience) {
+      if (typeof ListExperience[experience] === 'number') {
+        result.push(experience);
+      }
+    }
+    return result;
+  }
+
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    //telemetryProps.id = (!(!args.options.id)).toString();
-    telemetryProps.title = (!(!args.options.title)).toString();
+    telemetryProps.description = (!(!args.options.description)).toString();
+    telemetryProps.templateFeatureId = (!(!args.options.templateFeatureId)).toString();
+    telemetryProps.schemaXml = (!(!args.options.schemaXml)).toString();
+    telemetryProps.allowDeletion = args.options.allowDeletion || false;
+    telemetryProps.allowEveryoneViewItems = args.options.allowEveryoneViewItems || false;
+    telemetryProps.allowMultiResponses = args.options.allowMultiResponses || false;
+    telemetryProps.contentTypesEnabled = args.options.contentTypesEnabled || false;
+    telemetryProps.crawlNonDefaultViews = args.options.crawlNonDefaultViews || false;
+    telemetryProps.defaultContentApprovalWorkflowId = (!(!args.options.defaultContentApprovalWorkflowId)).toString();
+    telemetryProps.defaultDisplayFormUrl = (!(!args.options.defaultDisplayFormUrl)).toString();
+    telemetryProps.defaultEditFormUrl = (!(!args.options.defaultEditFormUrl)).toString();
+    telemetryProps.direction = (!(!args.options.direction)).toString();
+    telemetryProps.disableGridEditing = args.options.disableGridEditing || false;
+    telemetryProps.draftVersionVisibility = (!(!args.options.draftVersionVisibility)).toString();
+    telemetryProps.emailAlias = (!(!args.options.emailAlias)).toString();
+    telemetryProps.enableAssignToEmail = args.options.enableAssignToEmail || false;
+    telemetryProps.enableAttachments = args.options.enableAttachments || false;
+    telemetryProps.enableDeployWithDependentList = args.options.enableDeployWithDependentList || false;
+    telemetryProps.enableFolderCreation = args.options.enableFolderCreation || false;
+    telemetryProps.enableMinorVersions = args.options.enableMinorVersions || false;
+    telemetryProps.enableModeration = args.options.enableModeration || false;
+    telemetryProps.enablePeopleSelector = args.options.enablePeopleSelector || false;
+    telemetryProps.enableResourceSelector = args.options.enableResourceSelector || false;
+    telemetryProps.enableSchemaCaching = args.options.enableSchemaCaching || false;
+    telemetryProps.enableSyndication = args.options.enableSyndication || false;
+    telemetryProps.enableThrottling = args.options.enableThrottling || false;
+    telemetryProps.enableVersioning = args.options.enableVersioning || false;
+    telemetryProps.enforceDataValidation = args.options.enforceDataValidation || false;
+    telemetryProps.excludeFromOfflineClient = args.options.excludeFromOfflineClient || false;
+    telemetryProps.fetchPropertyBagForListView = args.options.fetchPropertyBagForListView || false;
+    telemetryProps.followable = args.options.followable || false;
+    telemetryProps.forceCheckout = args.options.forceCheckout || false;
+    telemetryProps.forceDefaultContentType = args.options.forceDefaultContentType || false;
+    telemetryProps.hidden = args.options.hidden || false;
+    telemetryProps.includedInMyFilesScope = args.options.includedInMyFilesScope || false;
+    telemetryProps.irmEnabled = args.options.irmEnabled || false;
+    telemetryProps.irmExpire = args.options.irmExpire || false;
+    telemetryProps.irmReject = args.options.irmReject || false;
+    telemetryProps.isApplicationList = args.options.isApplicationList || false;
+    telemetryProps.listExperienceOptions = (!(!args.options.listExperienceOptions)).toString();
+    telemetryProps.majorVersionLimit = (!(!args.options.majorVersionLimit)).toString();
+    telemetryProps.majorWithMinorVersionsLimit = (!(!args.options.majorWithMinorVersionsLimit)).toString();
+    telemetryProps.multipleDataList = args.options.multipleDataList || false;
+    telemetryProps.navigateForFormsPages = args.options.navigateForFormsPages || false;
+    telemetryProps.needUpdateSiteClientTag = args.options.needUpdateSiteClientTag || false;
+    telemetryProps.noCrawl = args.options.noCrawl || false;
+    telemetryProps.onQuickLaunch = args.options.onQuickLaunch || false;
+    telemetryProps.ordered = args.options.ordered || false;
+    telemetryProps.parserDisabled = args.options.parserDisabled || false;
+    telemetryProps.readOnlyUI = args.options.readOnlyUI || false;
+    telemetryProps.readSecurity = (!(!args.options.readSecurity)).toString();
+    telemetryProps.requestAccessEnabled = args.options.requestAccessEnabled || false;
+    telemetryProps.restrictUserUpdates = args.options.restrictUserUpdates || false;
+    telemetryProps.sendToLocationName = (!(!args.options.sendToLocationName)).toString();
+    telemetryProps.sendToLocationUrl = (!(!args.options.sendToLocationUrl)).toString();
+    telemetryProps.showUser = args.options.showUser || false;
+    telemetryProps.useFormsForDisplay = args.options.useFormsForDisplay || false;    
+    telemetryProps.validationFormula = (!(!args.options.validationFormula)).toString();
+    telemetryProps.validationMessage = (!(!args.options.validationMessage)).toString();
+    telemetryProps.writeSecurity = (!(!args.options.writeSecurity)).toString();
+
     return telemetryProps;
   }
 
@@ -80,21 +217,21 @@ class ListAddCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<ContextInfo> => {
+      .then((accessToken: string): Promise<ListInstance> => {
         siteAccessToken = accessToken;
 
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
         }
 
-        return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
-      })
-      .then((res: ContextInfo): Promise<ListInstance> => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
+        //return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
+      //})
+      //.then((res: ContextInfo): Promise<ListInstance> => {
+        // if (this.debug) {
+        //   cmd.log('Response:');
+        //   cmd.log(res);
+        //   cmd.log('');
+        // }
 
         if (this.verbose) {
           cmd.log(`Retrieving information for list in site at ${args.options.webUrl}...`);
@@ -117,7 +254,9 @@ class ListAddCommand extends SpoCommand {
           cmd.log('Executing web request...');
           cmd.log(requestOptions);
           cmd.log('');
-          cmd.log(args.options.schemaXml);
+          if (args.options.schemaXml) {
+            cmd.log(args.options.schemaXml.replace('\\', '\\\\').replace('"', '\\"'));
+          }
         }
 
         return request.post(requestOptions);
@@ -164,28 +303,23 @@ class ListAddCommand extends SpoCommand {
       },
       {
         option: '--allowDeletion [allowDeletion]',
-        description: 'Boolean value specifying whether the list can be deleted. Valid values are true|false',
-        autocomplete: ['true', 'false']
+        description: 'Boolean value specifying whether the list can be deleted'
       },   
       {
         option: '--allowEveryoneViewItems [allowEveryoneViewItems]',
-        description: 'Boolean value specifying whether everyone can view documents in the document library or attachments to items in the list. Valid values are true|false',
-        autocomplete: ['true', 'false']
+        description: 'Boolean value specifying whether everyone can view documents in the document library or attachments to items in the list'
       },
       {
         option: '--allowMultiResponses [allowMultiResponses]',
-        description: 'Boolean value specifying whether users are allowed to give multiple responses to the survey. Valid values are true|false',
-        autocomplete: ['true', 'false']
+        description: 'Boolean value specifying whether users are allowed to give multiple responses to the survey'
       },
       {
         option: '--contentTypesEnabled [contentTypesEnabled]',
-        description: 'Boolean value specifying whether content types are enabled for the list. Valid values are true|false',
-        autocomplete: ['true', 'false']
+        description: 'Boolean value specifying whether content types are enabled for the list'
       },
       {
         option: '--crawlNonDefaultViews [crawlNonDefaultViews]',
-        description: 'Boolean value specifying whether to crawl non default views. Valid values are true|false',
-        autocomplete: ['true', 'false']
+        description: 'Boolean value specifying whether to crawl non default views'
       },
       {
         option: '--defaultContentApprovalWorkflowId [defaultContentApprovalWorkflowId]',
@@ -206,16 +340,16 @@ class ListAddCommand extends SpoCommand {
       },
       {
         option: '--disableGridEditing [disableGridEditing]',
-        description: 'Property for assigning or retrieving grid editing on the list. Valid values are true|false',
-        autocomplete: ['true', 'false']
+        description: 'Property for assigning or retrieving grid editing on the list'
       },
       {
         option: '--draftVersionVisibility [draftVersionVisibility]',
-        description: 'Value that specifies the minimum permission required to view minor versions and drafts within the list'
+        description: `Value that specifies the minimum permission required to view minor versions and drafts within the list. Allowed values ${this.draftVisibilityTypeMap.join('|')}. Default ${this.draftVisibilityTypeMap[0]}`,
+        autocomplete: this.draftVisibilityTypeMap
       },
       {
         option: '--emailAlias [emailAlias]',
-        description: 'If e-mail notification is enabled, gets or sets the e-mail address to use to notify to the owner of an item when an assignment has changed or the item has been updated'
+        description: 'If e-mail notification is enabled, gets or sets the e-mail address to use to notify to the owner of an item when an assignment has changed or the item has been updated.'
       },
       {
         option: '--enableAssignToEmail [enableAssignToEmail]',
@@ -263,7 +397,7 @@ class ListAddCommand extends SpoCommand {
       },
       {
         option: '--enableVersioning [enableVersioning]',
-        description: 'Boolean value that specifies whether versioning is enabled for the document library'
+        description: 'Boolean value that specifies whether versioning is enabled for the document library.'
       },
       {
         option: '--enforceDataValidation [enforceDataValidation]',
@@ -295,115 +429,110 @@ class ListAddCommand extends SpoCommand {
       },
       {
         option: '--includedInMyFilesScope [includedInMyFilesScope]',
-        description: ''
-      },
-      {
-        option: '--indexedRootFolderPropertyKeys [indexedRootFolderPropertyKeys]',
-        description: ''
+        description: 'Specifies whether this list is accessible to an app principal that has been granted an OAuth scope that contains the string “myfiles” by a case-insensitive comparison when the current user is a site collection administrator of the personal site that contains the list'
       },
       {
         option: '--irmEnabled [irmEnabled]',
-        description: ''
+        description: 'Gets or sets a Boolean value that specifies whether Information Rights Management (IRM) is enabled for the list'
       },
       {
         option: '--irmExpire [irmExpire]',
-        description: ''
+        description: 'Gets or sets a Boolean value that specifies whether Information Rights Management (IRM) expiration is enabled for the list'
       },
       {
         option: '--irmReject [irmReject]',
-        description: ''
+        description: 'Gets or sets a Boolean value that specifies whether Information Rights Management (IRM) rejection is enabled for the list'
       },
       {
         option: '--isApplicationList [isApplicationList]',
-        description: ''
+        description: 'Indicates whether this list should be treated as a top level navigation object or not'
       },
       {
         option: '--listExperienceOptions [listExperienceOptions]',
-        description: ''
+        description: `Gets or sets the list experience for the list. Allowed values ${this.listExperienceMap.join('|')}. Default ${this.listExperienceMap[0]}`,
+        autocomplete: this.listExperienceMap
       },
       {
         option: '--majorVersionLimit [majorVersionLimit]',
-        description: ''
+        description: 'Gets or sets the maximum number of major versions allowed for an item in a document library that uses version control with major versions only.'
       },
       {
         option: '--majorWithMinorVersionsLimit [majorWithMinorVersionsLimit]',
-        description: ''
+        description: 'Gets or sets the maximum number of major versions that are allowed for an item in a document library that uses version control with both major and minor versions.'
       },
       {
         option: '--multipleDataList [multipleDataList]',
-        description: ''
+        description: 'Gets or sets a Boolean value that specifies whether the list in a Meeting Workspace site contains data for multiple meeting instances within the site'
       },
       {
         option: '--navigateForFormsPages [navigateForFormsPages]',
-        description: ''
+        description: 'Indicates whether to navigate for forms pages or use a modal dialog'
       },
       {
         option: '--needUpdateSiteClientTag [needUpdateSiteClientTag]',
-        description: ''
+        description: 'A boolean value that determines whether to editing documents in this list should increment the ClientTag for the site. The tag is used to allow clients to cache JS/CSS/resources that are retrieved from the Content DB, including custom CSR templates.'
       },
       {
         option: '--noCrawl [noCrawl]',
-        description: ''
+        description: 'Gets or sets a Boolean value specifying whether crawling is enabled for the list'
       },
       {
         option: '--onQuickLaunch [onQuickLaunch]',
-        description: ''
+        description: 'Gets or sets a Boolean value that specifies whether the list appears on the Quick Launch area of the home page'
       },
       {
         option: '--ordered [ordered]',
-        description: ''
+        description: 'Gets or sets a Boolean value that specifies whether the option to allow users to reorder items in the list is available on the Edit View page for the list'
       },
       {
         option: '-parserDisabled [parserDisabled]',
-        description: ''
+        description: 'Gets or sets a Boolean value that specifies whether the parser should be disabled'
       },
       {
         option: '--readOnlyUI [readOnlyUI]',
-        description: ''
+        description: 'A boolean value that indicates whether the UI for this list should be presented in a read-only fashion. This will not affect security nor will it actually prevent changes to the list from occurring - it only affects the way the UI is displayed'
       },
       {
         option: '--readSecurity [readSecurity]',
-        description: ''
+        description: 'Gets or sets the Read security setting for the list. Valid values are 1 (All users have Read access to all items)|2 (Users have Read access only to items that they create)',
+        autocomplete: ['1', '2']
       },
       {
         option: '--requestAccessEnabled [requestAccessEnabled]',
-        description: ''
+        description: 'Gets or sets a Boolean value that specifies whether the option to allow users to request access to the list is available'
       },
       {
         option: '--restrictUserUpdates [restrictUserUpdates]',
-        description: ''
+        description: 'A boolean value that indicates whether the this list is a restricted one or not The value can\'t be changed if there are existing items in the list'
       },
       {
         option: '--sendToLocationName [sendToLocationName]',
-        description: ''
+        description: 'Gets or sets a file name to use when copying an item in the list to another document library.'
       },
       {
         option: '--sendToLocationUrl [sendToLocationUrl]',
-        description: ''
+        description: 'Gets or sets a URL to use when copying an item in the list to another document library'
       },
       {
         option: '--showUser [showUser]',
-        description: ''
-      },
-      {
-        option: '--smsAlertTemplate [smsAlertTemplate]',
-        description: ''
+        description: 'Gets or sets a Boolean value that specifies whether names of users are shown in the results of the survey'
       },
       {
         option: '--useFormsForDisplay [useFormsForDisplay]',
-        description: ''
+        description: 'Indicates whether forms should be considered for display context or not'
       },
       {
         option: '--validationFormula [validationFormula]',
-        description: ''
+        description: 'Gets or sets a formula that is evaluated each time that a list item is added or updated.'
       },
       {
         option: '--validationMessage [validationMessage]',
-        description: ''
+        description: 'Gets or sets the message that is displayed when validation fails for a list item.'
       },
       {
         option: '--writeSecurity [writeSecurity]',
-        description: ''
+        description: 'Gets or sets the Write security setting for the list. Valid values are 1 (All users can modify all items)|2 (Users can modify only items that they create)|4 (Users cannot modify any list item)',
+        autocomplete: ['1', '2', '4']
       }
     ];
 
@@ -433,12 +562,6 @@ class ListAddCommand extends SpoCommand {
         }
       }
 
-      // if (args.options.baseTemplate) {
-      //   if (typeof args.options.baseTemplate !== 'number'){
-      //     return `${args.options.baseTemplate} is not a number`;
-      //   }
-      // }
-
       const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
       if (isValidSharePointUrl !== true) {
         return isValidSharePointUrl;
@@ -447,41 +570,6 @@ class ListAddCommand extends SpoCommand {
       if (args.options.templateFeatureId) {
         if (!Utils.isValidGuid(args.options.templateFeatureId)) {
           return `${args.options.templateFeatureId} is not a valid GUID`;
-        }
-      }
-
-      if (args.options.allowDeletion) {
-        if (args.options.allowDeletion.toLowerCase() !== 'true' &&
-          args.options.allowDeletion.toLowerCase() !== 'false') {
-          return `allowDeletion value ${args.options.allowDeletion} is not a valid boolean value. Allowed values are true|false`;
-        }
-      }
-
-      if (args.options.allowEveryoneViewItems) {
-        if (args.options.allowEveryoneViewItems.toLowerCase() !== 'true' &&
-          args.options.allowEveryoneViewItems.toLowerCase() !== 'false') {
-          return `allowEveryoneViewItems value ${args.options.allowEveryoneViewItems} is not a valid boolean value. Allowed values are true|false`;
-        }
-      }
-
-      if (args.options.allowMultiResponses) {
-        if (args.options.allowMultiResponses.toLowerCase() !== 'true' &&
-          args.options.allowMultiResponses.toLowerCase() !== 'false') {
-          return `allowMultiResponses value ${args.options.allowMultiResponses} is not a valid boolean value. Allowed values are true|false`;
-        }
-      }
-
-      if (args.options.contentTypesEnabled) {
-        if (args.options.contentTypesEnabled.toLowerCase() !== 'true' &&
-          args.options.contentTypesEnabled.toLowerCase() !== 'false') {
-          return `contentTypesEnabled value ${args.options.contentTypesEnabled} is not a valid boolean value. Allowed values are true|false`;
-        }
-      }
-
-      if (args.options.crawlNonDefaultViews) {
-        if (args.options.crawlNonDefaultViews.toLowerCase() !== 'true' &&
-          args.options.crawlNonDefaultViews.toLowerCase() !== 'false') {
-          return `crawlNonDefaultViews value ${args.options.crawlNonDefaultViews} is not a valid boolean value. Allowed values are true|false`;
         }
       }
 
@@ -495,16 +583,53 @@ class ListAddCommand extends SpoCommand {
         if (args.options.direction.toLowerCase() !== 'none' &&
           args.options.direction.toLowerCase() !== 'ltr' &&
           args.options.direction.toLowerCase() !== 'rtl') {
-          return `direction value ${args.options.direction} is not a valid boolean value. Allowed values are NONE|LTR|RTL`;
+          return `direction value ${args.options.direction} is not a valid value. Allowed values are NONE|LTR|RTL`;
         }
       }
 
-      if (args.options.disableGridEditing) {
-        if (args.options.disableGridEditing.toLowerCase() !== 'true' &&
-          args.options.disableGridEditing.toLowerCase() !== 'false') {
-          return `disableGridEditing value ${args.options.disableGridEditing} is not a valid boolean value. Allowed values are true|false`;
+      if (args.options.draftVersionVisibility) {
+        const draftType: DraftVisibilityType = DraftVisibilityType[(args.options.draftVersionVisibility.trim() as keyof typeof DraftVisibilityType)];
+
+        if (!draftType) {
+          return `draftVisibilityType option '${args.options.draftVersionVisibility}' is not recognized as valid choice. Please note it is case sensitive`;
         }
       }
+
+      if (args.options.emailAlias && !args.options.enableAssignToEmail) {
+        return `emailAlias could not be set if enableAssignToEmail is not set to true. Please set enableAssignToEmail.`;
+      }
+
+      if (args.options.listExperienceOptions) {
+        const experience: ListExperience = ListExperience[(args.options.listExperienceOptions.trim() as keyof typeof ListExperience)];
+
+        if (!experience) {
+          return `listExperienceOptions option '${args.options.listExperienceOptions}' is not recognized as valid choice. Please note it is case sensitive`;
+        }
+      }
+
+      if (args.options.majorVersionLimit && !args.options.enableVersioning) {
+          return `majorVersionLimit option is only valid in combination with enableVersioning.`;
+      }
+
+      if ((args.options.majorWithMinorVersionsLimit && !args.options.enableMinorVersions) && (args.options.majorWithMinorVersionsLimit && !args.options.enableModeration)) {
+        return `majorWithMinorVersionsLimit option is only valid in combination with enableMinorVersions or enableModeration.`;
+      }
+      
+      if (args.options.readSecurity) {
+        if (args.options.readSecurity !== 1 &&
+          args.options.readSecurity !== 2) {
+          return `readSecurity value ${args.options.readSecurity} is not a valid value. Allowed values are 1|2`;
+        }
+      }
+
+      if (args.options.writeSecurity) {
+        if (args.options.writeSecurity !== 1 &&
+          args.options.writeSecurity !== 2 &&
+          args.options.writeSecurity !== 4) {
+          return `writeSecurity value ${args.options.writeSecurity} is not a valid value. Allowed values are 1|2|4`;
+        }
+      }
+      // writeSecurity?: number;
 
       return true;
     };
@@ -550,7 +675,7 @@ class ListAddCommand extends SpoCommand {
     }
 
     if (options.schemaXml) {
-      requestBody.SchemaXml = options.schemaXml;
+      requestBody.SchemaXml = options.schemaXml.replace('\\', '\\\\').replace('"', '\\"');
     }
 
     if (options.allowDeletion) {
@@ -591,6 +716,194 @@ class ListAddCommand extends SpoCommand {
 
     if (options.disableGridEditing) {
       requestBody.DisableGridEditing = options.disableGridEditing;
+    }
+
+    if (options.draftVersionVisibility) {
+      requestBody.DraftVersionVisibility = options.draftVersionVisibility;
+    }
+
+    if (options.emailAlias) {
+      requestBody.EmailAlias = options.emailAlias;
+    }
+
+    if (options.enableAssignToEmail) {
+      requestBody.EnableAssignToEmail = options.enableAssignToEmail;
+    }
+
+    if (options.enableAttachments) {
+      requestBody.EnableAttachments = options.enableAttachments;
+    }
+
+    if (options.enableDeployWithDependentList) {
+      requestBody.EnableDeployWithDependentList = options.enableDeployWithDependentList;
+    }
+
+    if (options.enableFolderCreation) {
+      requestBody.EnableFolderCreation = options.enableFolderCreation;
+    }
+
+    if (options.enableMinorVersions) {
+      requestBody.EnableMinorVersions = options.enableMinorVersions;
+    }
+
+    if (options.enableModeration) {
+      requestBody.EnableModeration = options.enableModeration;
+    }
+
+    if (options.enablePeopleSelector) {
+      requestBody.EnablePeopleSelector = options.enablePeopleSelector;
+    }
+
+    if (options.enableResourceSelector) {
+      requestBody.EnableResourceSelector = options.enableResourceSelector;
+    }
+
+    if (options.enableSchemaCaching) {
+      requestBody.EnableSchemaCaching = options.enableSchemaCaching;
+    }
+
+    if (options.enableSyndication) {
+      requestBody.enableSyndication = options.enableSyndication;
+    }
+
+    if (options.enableThrottling) {
+      requestBody.EnableThrottling = options.enableThrottling;
+    }
+
+    if (options.enableVersioning) {
+      requestBody.EnableVersioning = options.enableVersioning;
+    }
+
+    if (options.enforceDataValidation) {
+      requestBody.EnforceDataValidation = options.enforceDataValidation;
+    }
+
+    if (options.excludeFromOfflineClient) {
+      requestBody.ExcludeFromOfflineClient = options.excludeFromOfflineClient;
+    }
+
+    if (options.fetchPropertyBagForListView) {
+      requestBody.FetchPropertyBagForListView = options.fetchPropertyBagForListView;
+    }
+
+    if (options.followable) {
+      requestBody.Followable = options.followable;
+    }
+
+    if (options.forceCheckout) {
+      requestBody.ForceCheckout = options.forceCheckout;
+    }
+
+    if (options.forceDefaultContentType) {
+      requestBody.ForceDefaultContentType = options.forceDefaultContentType;
+    }
+
+    if (options.hidden) {
+      requestBody.Hidden = options.hidden;
+    }
+
+    if (options.includedInMyFilesScope) {
+      requestBody.IncludedInMyFilesScope = options.includedInMyFilesScope;
+    }
+
+    if (options.irmEnabled) {
+      requestBody.IrmEnabled = options.irmEnabled;
+    }
+
+    if (options.irmExpire) {
+      requestBody.IrmExpire = options.irmExpire;
+    }
+
+    if (options.irmReject) {
+      requestBody.IrmReject = options.irmReject;
+    }
+
+    if (options.isApplicationList) {
+      requestBody.IsApplicationList = options.isApplicationList;
+    }
+
+    if (options.listExperienceOptions) {
+      requestBody.ListExperienceOptions = options.listExperienceOptions;
+    }
+
+    if (options.majorVersionLimit) {
+      requestBody.MajorVersionLimit = options.majorVersionLimit;
+    }
+
+    if (options.majorWithMinorVersionsLimit) {
+      requestBody.MajorWithMinorVersionsLimit = options.majorWithMinorVersionsLimit;
+    }
+
+    if (options.multipleDataList) {
+      requestBody.MultipleDataList = options.multipleDataList;
+    }
+
+    if (options.navigateForFormsPages) {
+      requestBody.NavigateForFormsPages = options.navigateForFormsPages;
+    }
+
+    if (options.needUpdateSiteClientTag) {
+      requestBody.NeedUpdateSiteClientTag = options.needUpdateSiteClientTag;
+    }
+
+    if (options.noCrawl) {
+      requestBody.NoCrawl = options.noCrawl;
+    }
+
+    if (options.onQuickLaunch) {
+      requestBody.OnQuickLaunch = options.onQuickLaunch;
+    }
+
+    if (options.ordered) {
+      requestBody.Ordered = options.ordered;
+    }
+
+    if (options.parserDisabled) {
+      requestBody.ParserDisabled = options.parserDisabled;
+    }
+
+    if (options.readOnlyUI) {
+      requestBody.ReadOnlyUI = options.readOnlyUI;
+    }
+
+    if (options.readSecurity) {
+      requestBody.ReadSecurity = options.readSecurity;
+    }
+
+    if (options.requestAccessEnabled) {
+      requestBody.RequestAccessEnabled = options.requestAccessEnabled;
+    }
+
+    if (options.restrictUserUpdates) {
+      requestBody.RestrictUserUpdates = options.restrictUserUpdates;
+    }
+
+    if (options.sendToLocationName) {
+      requestBody.SendToLocationName = options.sendToLocationName;
+    }
+
+    if (options.sendToLocationUrl) {
+      requestBody.SendToLocationUrl = options.sendToLocationUrl;
+    }
+
+    if (options.showUser) {
+      requestBody.ShowUser = options.showUser;
+    }
+
+    if (options.useFormsForDisplay) {
+      requestBody.UseFormsForDisplay = options.useFormsForDisplay;
+    }
+
+    if (options.validationFormula) {
+      requestBody.ValidationFormula = options.validationFormula;
+    }
+
+    if (options.validationMessage) {
+      requestBody.ValidationMessage = options.validationMessage;
+    }
+
+    if (options.writeSecurity) {
+      requestBody.WriteSecurity = options.writeSecurity;
     }
 
     return requestBody;
