@@ -479,6 +479,1302 @@ describe(commands.LIST_ADD, () => {
     });
   });
 
+  it('sets specified disableGridEditing for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.DisableGridEditing;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', disableGridEditing: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified draftVersionVisibility for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.DraftVersionVisibility;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', draftVersionVisibility: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified emailAlias for list', (done) => {
+    const expected = 'yourname@contoso.onmicrosoft.com';
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.EmailAlias;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', emailAlias: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified enableAssignToEmail for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.EnableAssignToEmail;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableAssignToEmail: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified enableAttachments for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.EnableAttachments;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableAttachments: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified enableDeployWithDependentList for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.EnableDeployWithDependentList;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableDeployWithDependentList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified enableFolderCreation for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.EnableFolderCreation;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableFolderCreation: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified enableMinorVersions for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.EnableMinorVersions;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableMinorVersions: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified enableModeration for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.EnableModeration;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableModeration: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified enablePeopleSelector for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.EnablePeopleSelector;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enablePeopleSelector: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified enableResourceSelector for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.EnableResourceSelector;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableResourceSelector: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified enableSchemaCaching for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.EnableSchemaCaching;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableSchemaCaching: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified enableSyndication for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.EnableSyndication;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableSyndication: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified enableThrottling for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.EnableThrottling;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableThrottling: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified enableVersioning for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.EnableVersioning;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableVersioning: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified enforceDataValidation for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.EnforceDataValidation;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enforceDataValidation: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified excludeFromOfflineClient for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.ExcludeFromOfflineClient;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', excludeFromOfflineClient: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified fetchPropertyBagForListView for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.FetchPropertyBagForListView;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', fetchPropertyBagForListView: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified followable for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.Followable;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', followable: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified forceCheckout for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.ForceCheckout;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', forceCheckout: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified forceDefaultContentType for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.ForceDefaultContentType;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', forceDefaultContentType: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified hidden for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.Hidden;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', hidden: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified includedInMyFilesScope for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.IncludedInMyFilesScope;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', includedInMyFilesScope: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified irmEnabled for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.IrmEnabled;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', irmEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified irmExpire for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.IrmExpire;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', irmExpire: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified irmReject for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.IrmReject;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', irmReject: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified isApplicationList for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.IsApplicationList;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', isApplicationList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified listExperienceOptions for list', (done) => {
+    const expected = 'NewExperience';
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.ListExperienceOptions;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', listExperienceOptions: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified majorVersionLimit for list', (done) => {
+    const expected = 34;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.MajorVersionLimit;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', majorVersionLimit: expected, enableVersioning: true, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified majorWithMinorVersionsLimit for list', (done) => {
+    const expected = 20;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.MajorWithMinorVersionsLimit;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', majorWithMinorVersionsLimit: expected, enableMinorVersions: true, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified multipleDataList for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.MultipleDataList;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', multipleDataList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified navigateForFormsPages for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.NavigateForFormsPages;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', navigateForFormsPages: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified needUpdateSiteClientTag for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.NeedUpdateSiteClientTag;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', needUpdateSiteClientTag: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified noCrawl for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.NoCrawl;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', noCrawl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified onQuickLaunch for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.OnQuickLaunch;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', onQuickLaunch: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified ordered for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.Ordered;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', ordered: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified parserDisabled for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.ParserDisabled;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', parserDisabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified readOnlyUI for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.ReadOnlyUI;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', readOnlyUI: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified readSecurity for list', (done) => {
+    const expected = 2;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.ReadSecurity;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', readSecurity: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified requestAccessEnabled for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.RequestAccessEnabled;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', requestAccessEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified restrictUserUpdates for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.RestrictUserUpdates;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', restrictUserUpdates: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified sendToLocationName for list', (done) => {
+    const expected = 'SendToLocation';
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.SendToLocationName;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', sendToLocationName: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified sendToLocationUrl for list', (done) => {
+    const expected = '/sites/project-x/SendToLocation.aspx';
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.SendToLocationUrl;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', sendToLocationUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified showUser for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.ShowUser;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', showUser: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified useFormsForDisplay for list', (done) => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.UseFormsForDisplay;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', useFormsForDisplay: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified validationFormula for list', (done) => {
+    const expected = `IF(fieldName=true);'truetest':'falsetest'`;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.ValidationFormula;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', validationFormula: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified validationMessage for list', (done) => {
+    const expected = 'Error on field x';
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.ValidationMessage;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', validationMessage: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets specified writeSecurity for list', (done) => {
+    const expected = 4;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.body.WriteSecurity;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', writeSecurity: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('supports debug mode', () => {
     const options = (command.options() as CommandOption[]);
     let containsDebugOption = false;
@@ -524,17 +1820,34 @@ describe(commands.LIST_ADD, () => {
   });
 
   it('fails validation if the url option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { } });
+    const actual = (command.validate() as CommandValidate)({ options: { title: 'List 1', baseTemplate: 'GenericList' } });
     assert.notEqual(actual, true);
   });
 
-  it('fails validation if both title and baseTemplate options are not passed', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com' } });
+  it('fails validation if title option not specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', baseTemplate: 'GenericList' } });
     assert.notEqual(actual, true);
+  });
+
+  it('fails validation if baseTemplate option not specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails if non existing baseTemplate specified', () => {
+    const baseTemplateValue = 'NonExistingBaseTemplate';
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: baseTemplateValue } });
+    assert.equal(actual, `BaseTemplate option ${baseTemplateValue} is not recognized as valid choice. Please note it is case sensitive`);
+  });
+
+  it('has correct baseTemplate specified', () => {
+    const baseTemplateValue = 'GenericList';
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: baseTemplateValue } });
+    assert(actual === true);
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'foo' } });
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'foo', title: 'List 1', baseTemplate: 'GenericList' } });
     assert.notEqual(actual, true);
   });
 
@@ -563,6 +1876,30 @@ describe(commands.LIST_ADD, () => {
     assert(actual);
   });
 
+  it('fails if non existing draftVersionVisibility specified', () => {
+    const draftVersionValue = 'NonExistingDraftVersionVisibility';
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', draftVersionVisibility: draftVersionValue } });
+    assert.equal(actual, `draftVisibilityType option '${draftVersionValue}' is not recognized as valid choice. Please note it is case sensitive`);
+  });
+
+  it('has correct draftVersionVisibility specified', () => {
+    const draftVersionValue = 'Approver';
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', draftVersionVisibility: draftVersionValue } });
+    assert(actual === true);
+  });
+
+  it('fails if emailAlias specified, but enableAssignToEmail is not true', () => {
+    const emailAliasValue = 'yourname@contoso.onmicrosoft.com';
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', emailAlias: emailAliasValue } });
+    assert.equal(actual, `emailAlias could not be set if enableAssignToEmail is not set to true. Please set enableAssignToEmail.`);
+  });
+
+  it('has correct emailAlias and enableAssignToEmail values specified', () => {
+    const emailAliasValue = 'yourname@contoso.onmicrosoft.com';
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', emailAlias: emailAliasValue, enableAssignToEmail: true } });
+    assert(actual === true);
+  });
+
   it('fails if non existing direction specified', () => {
     const directionValue = 'abc';
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', direction: directionValue } });
@@ -573,6 +1910,195 @@ describe(commands.LIST_ADD, () => {
     const directionValue = 'LTR';
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', direction: directionValue } });
     assert(actual === true);
+  });
+
+  it('fails if majorVersionLimit specified, but enableVersioning is not true', () => {
+    const majorVersionLimitValue = 20;
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', majorVersionLimit: majorVersionLimitValue } });
+    assert.equal(actual, `majorVersionLimit option is only valid in combination with enableVersioning.`);
+  });
+
+  it('has correct majorVersionLimit and enableVersioning values specified', () => {
+    const majorVersionLimitValue = 20;
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', majorVersionLimit: majorVersionLimitValue, enableVersioning: true } });
+    assert(actual === true);
+  });
+  
+  it('fails if majorWithMinorVersionsLimit specified, but enableModeration is not true', () => {
+    const majorWithMinorVersionLimitValue = 20;
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', majorWithMinorVersionsLimit: majorWithMinorVersionLimitValue } });
+    assert.equal(actual, `majorWithMinorVersionsLimit option is only valid in combination with enableMinorVersions or enableModeration.`);
+  });
+
+  it('has correct majorVersionLimit and enableVersioning values specified', () => {
+    const majorVersionLimitValue = 20;
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', majorVersionLimit: majorVersionLimitValue, enableVersioning: true } });
+    assert(actual === true);
+  });
+
+  it('fails if non existing readSecurity specified', () => {
+    const readSecurityValue = 5;
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', readSecurity: readSecurityValue } });
+    assert.equal(actual, `readSecurity value ${readSecurityValue} is not a valid value. Allowed values are 1|2`);
+  });
+
+  it('has correct readSecurity specified', () => {
+    const readSecurityValue = 2;
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', readSecurity: readSecurityValue } });
+    assert(actual === true);
+  });
+
+  it('fails if non existing listExperienceOptions specified', () => {
+    const listExperienceValue = 'NonExistingExperience';
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', listExperienceOptions: listExperienceValue } });
+    assert.equal(actual, `listExperienceOptions option '${listExperienceValue}' is not recognized as valid choice. Please note it is case sensitive`);
+  });
+
+  it('has correct listExperienceOptions specified', () => {
+    const listExperienceValue = 'NewExperience';
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', listExperienceOptions: listExperienceValue } });
+    assert(actual === true);
+  });
+
+  it('fails if non existing readSecurity specified', () => {
+    const writeSecurityValue = 5;
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', writeSecurity: writeSecurityValue } });
+    assert.equal(actual, `writeSecurity value ${writeSecurityValue} is not a valid value. Allowed values are 1|2|4`);
+  });
+
+  it('has correct direction specified', () => {
+    const writeSecurityValue = 4;
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', writeSecurity: writeSecurityValue } });
+    assert(actual === true);
+  });
+
+  it('returns listInstance object when list is added with correct values', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        return Promise.resolve(
+          {
+            "AllowContentTypes": true,
+            "BaseTemplate": 100,
+            "BaseType": 1,
+            "ContentTypesEnabled": false,
+            "CrawlNonDefaultViews": false,
+            "Created": null,
+            "CurrentChangeToken": null,
+            "CustomActionElements": null,
+            "DefaultContentApprovalWorkflowId": "00000000-0000-0000-0000-000000000000",
+            "DefaultItemOpenUseListSetting": false,
+            "Description": "",
+            "Direction": "none",
+            "DocumentTemplateUrl": null,
+            "DraftVersionVisibility": 0,
+            "EnableAttachments": false,
+            "EnableFolderCreation": true,
+            "EnableMinorVersions": false,
+            "EnableModeration": false,
+            "EnableVersioning": false,
+            "EntityTypeName": "Documents",
+            "ExemptFromBlockDownloadOfNonViewableFiles": false,
+            "FileSavePostProcessingEnabled": false,
+            "ForceCheckout": false,
+            "HasExternalDataSource": false,
+            "Hidden": false,
+            "Id": "14b2b6ed-0885-4814-bfd6-594737cc3ae3",
+            "ImagePath": null,
+            "ImageUrl": null,
+            "IrmEnabled": false,
+            "IrmExpire": false,
+            "IrmReject": false,
+            "IsApplicationList": false,
+            "IsCatalog": false,
+            "IsPrivate": false,
+            "ItemCount": 69,
+            "LastItemDeletedDate": null,
+            "LastItemModifiedDate": null,
+            "LastItemUserModifiedDate": null,
+            "ListExperienceOptions": 0,
+            "ListItemEntityTypeFullName": null,
+            "MajorVersionLimit": 0,
+            "MajorWithMinorVersionsLimit": 0,
+            "MultipleDataList": false,
+            "NoCrawl": false,
+            "ParentWebPath": null,
+            "ParentWebUrl": null,
+            "ParserDisabled": false,
+            "ServerTemplateCanCreateFolders": true,
+            "TemplateFeatureId": null,
+            "Title": "List 1"
+          }
+        );
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: true, title: 'List 1', baseTemplate: 'GenericList', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith({ 
+          AllowContentTypes: true,
+          BaseTemplate: 100,
+          BaseType: 1,
+          ContentTypesEnabled: false,
+          CrawlNonDefaultViews: false,
+          Created: null,
+          CurrentChangeToken: null,
+          CustomActionElements: null,
+          DefaultContentApprovalWorkflowId: '00000000-0000-0000-0000-000000000000',
+          DefaultItemOpenUseListSetting: false,
+          Description: '',
+          Direction: 'none',
+          DocumentTemplateUrl: null,
+          DraftVersionVisibility: 0,
+          EnableAttachments: false,
+          EnableFolderCreation: true,
+          EnableMinorVersions: false,
+          EnableModeration: false,
+          EnableVersioning: false,
+          EntityTypeName: 'Documents',
+          ExemptFromBlockDownloadOfNonViewableFiles: false,
+          FileSavePostProcessingEnabled: false,
+          ForceCheckout: false,
+          HasExternalDataSource: false,
+          Hidden: false,
+          Id: '14b2b6ed-0885-4814-bfd6-594737cc3ae3',
+          ImagePath: null,
+          ImageUrl: null,
+          IrmEnabled: false,
+          IrmExpire: false,
+          IrmReject: false,
+          IsApplicationList: false,
+          IsCatalog: false,
+          IsPrivate: false,
+          ItemCount: 69,
+          LastItemDeletedDate: null,
+          LastItemModifiedDate: null,
+          LastItemUserModifiedDate: null,
+          ListExperienceOptions: 0,
+          ListItemEntityTypeFullName: null,
+          MajorVersionLimit: 0,
+          MajorWithMinorVersionsLimit: 0,
+          MultipleDataList: false,
+          NoCrawl: false,
+          ParentWebPath: null,
+          ParentWebUrl: null,
+          ParserDisabled: false,
+          ServerTemplateCanCreateFolders: true,
+          TemplateFeatureId: null,
+          Title: 'List 1'
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+    
   });
 
   it('has help referring to the right command', () => {
