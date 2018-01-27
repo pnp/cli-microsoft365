@@ -381,7 +381,7 @@ describe(commands.WEB_ADD, () => {
     });
   });
 
-  it('creates web and inherits the navigation - debug mode', (done) => {
+  it('creates web and inherits the navigation (debug)', (done) => {
     // Create web
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf('_api/web/webinfos/add') > -1) {
