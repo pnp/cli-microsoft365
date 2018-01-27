@@ -180,7 +180,7 @@ class WebAddCommand extends SpoCommand {
       siteAccessToken = accessToken;
       return this.createWeb(accessToken, cmd, args, cb, this.debug);
     })
-    .then((res: any) : any => {
+    .then((res: boolean) : any => {
       if(args.options.inheritNavigation)
       {
         if(this.debug)
@@ -302,6 +302,9 @@ class WebAddCommand extends SpoCommand {
 
       Create subsite with inheriting the navigation
       ${chalk.grey(config.delimiter)} ${commands.WEB_ADD} --title subsite --description subsite 1 --webUrl "subsite" --webTemplate STS#0 --parentWebUrl https://contoso.sharepoint.com --locale 1033 --inheritNavigation
+
+      Create subsite with breaking permission inheritance and inheriting the navigation
+      ${chalk.grey(config.delimiter)} ${commands.WEB_ADD} --title subsite --description subsite 1 --webUrl "subsite" --webTemplate STS#0 --parentWebUrl https://contoso.sharepoint.com --locale 1033 --breakInheritance --inheritNavigation
 
       More information
       
