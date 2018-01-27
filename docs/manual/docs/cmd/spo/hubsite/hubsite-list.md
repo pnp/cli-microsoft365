@@ -2,6 +2,9 @@
 
 Lists hub sites in the current tenant
 
+!!! attention
+    This command is based on a SharePoint API that is currently in preview and is subject to change once the API reached general availability.
+
 ## Usage
 
 ```sh

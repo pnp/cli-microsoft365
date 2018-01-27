@@ -1,6 +1,6 @@
 # Office 365 CLI
 
-The Office 365 CLI allows you to manage different settings of your Microsoft Office 365 tenant on any platform.
+Using the Office 365 CLI, you can manage your Microsoft Office 365 tenant on any platform. No matter if you are on Windows, macOS or Linux, using Bash, Cmder or PowerShell, using the Office 365 CLI you can configure Office 365 and build automation scripts.
 
 <script type="text/javascript" src="https://asciinema.org/a/TJORGWjhqrbOSOQHe7fh3c11S.js" id="asciicast-TJORGWjhqrbOSOQHe7fh3c11S" async></script>
 
@@ -16,12 +16,6 @@ or using yarn:
 
 ```sh
 yarn global add @pnp/office365-cli
-```
-
-The beta version of the Office 365 CLI can be installed by using the `@next` tag:
-
-```sh
-npm i -g @pnp/office365-cli@next
 ```
 
 ## Getting started
@@ -55,6 +49,8 @@ To exit the CLI, type `exit`:
 ```sh
 o365$ exit
 ```
+
+See the [User Guide](user-guide/installing-cli.md) to learn more about the Office 365 CLI and its capabilities.
 
 ## SharePoint Patterns and Practices
 

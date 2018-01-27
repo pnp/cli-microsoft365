@@ -166,6 +166,10 @@ class SpoHubSiteDisconnectCommand extends SpoCommand {
         
   Remarks:
 
+    ${chalk.yellow('Attention:')} This command is based on a SharePoint API that is currently
+    in preview and is subject to change once the API reached general
+    availability.
+
     To disconnect a site collection from its hub site, you have to first connect
     to a tenant admin site using the ${chalk.blue(commands.CONNECT)} command,
     eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso-admin.sharepoint.com`)}.

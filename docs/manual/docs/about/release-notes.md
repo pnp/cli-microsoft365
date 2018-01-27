@@ -1,6 +1,6 @@
 # Release notes
 
-## v0.5.0
+## [v0.5.0](https://github.com/SharePoint/office365-cli/releases/tag/v0.5.0)
 
 ### New commands
 
@@ -27,6 +27,11 @@
 - [spo hubsite register](../cmd/spo/hubsite/hubsite-register.md) - registers the specified site collection as a hub site [#94](https://github.com/SharePoint/office365-cli/issues/94)
 - [spo hubsite unregister](../cmd/spo/hubsite/hubsite-unregister.md) - unregisters the specified site collection as a hub site [#95](https://github.com/SharePoint/office365-cli/issues/95)
 - [spo hubsite set](../cmd/spo/hubsite/hubsite-set.md) - updates properties of the specified hub site [#96](https://github.com/SharePoint/office365-cli/issues/96)
+- [spo hubsite connect](../cmd/spo/hubsite/hubsite-connect.md) - connects the specified site collection to the given hub site [#97](https://github.com/SharePoint/office365-cli/issues/97)
+- [spo hubsite disconnect](../cmd/spo/hubsite/hubsite-disconnect.md) - disconnects the specifies site collection from its hub site [#98](https://github.com/SharePoint/office365-cli/issues/98)
+- [spo hubsite rights grant](../cmd/spo/hubsite/hubsite-rights-grant.md) - grants permissions to join the hub site for one or more principals [#99](https://github.com/SharePoint/office365-cli/issues/99)
+- [spo hubsite rights revoke](../cmd/spo/hubsite/hubsite-rights-revoke.md) - revokes rights to join sites to the specified hub site for one or more principals [#100](https://github.com/SharePoint/office365-cli/issues/100)
+- [spo customaction set](../cmd/spo/customaction/customaction-set.md) - updates a user custom action for site or site collection [#212](https://github.com/SharePoint/office365-cli/issues/212)
 
 ### Changes
 
