@@ -1819,31 +1819,19 @@ describe(commands.LIST_ADD, () => {
     assert(false);
   });
 
-  it('fails validation if the url option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { title: 'List 1', baseTemplate: 'GenericList' } });
-    assert.notEqual(actual, true);
-  });
-
   it('fails validation if title option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', baseTemplate: 'GenericList' } });
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com' } });
     assert.notEqual(actual, true);
   });
 
   it('fails validation if baseTemplate option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1' } });
+    const actual = (command.validate() as CommandValidate)({ options: { title: 'List 1' } });
     assert.notEqual(actual, true);
   });
 
-  it('fails if non existing baseTemplate specified', () => {
-    const baseTemplateValue = 'NonExistingBaseTemplate';
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: baseTemplateValue } });
-    assert.equal(actual, `BaseTemplate option ${baseTemplateValue} is not recognized as valid choice. Please note it is case sensitive`);
-  });
-
-  it('has correct baseTemplate specified', () => {
-    const baseTemplateValue = 'GenericList';
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: baseTemplateValue } });
-    assert(actual === true);
+  it('fails validation if the url option not specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { title: 'List 1', baseTemplate: 'GenericList' } });
+    assert.notEqual(actual, true);
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
@@ -1854,6 +1842,18 @@ describe(commands.LIST_ADD, () => {
   it('passes validation if the url option is a valid SharePoint site URL', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList' } });
     assert(actual);
+  });
+
+  it('has correct baseTemplate specified', () => {
+    const baseTemplateValue = 'DocumentLibrary';
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: baseTemplateValue } });
+    assert(actual === true);
+  });
+
+  it('fails if non existing baseTemplate specified', () => {
+    const baseTemplateValue = 'foo';
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: baseTemplateValue } });
+    assert.equal(actual, `BaseTemplate option ${baseTemplateValue} is not recognized as valid choice. Please note it is case sensitive`);
   });
 
   it('fails validation if the templateFeatureId option is not a valid GUID', () => {

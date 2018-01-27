@@ -556,12 +556,9 @@ class ListAddCommand extends SpoCommand {
         return isValidSharePointUrl;
       }
 
-      if (args.options.baseTemplate) {
-        const template: ListTemplateType = ListTemplateType[(args.options.baseTemplate.trim() as keyof typeof ListTemplateType)];
-
-        if (!template) {
-          return `BaseTemplate option ${args.options.baseTemplate} is not recognized as valid choice. Please note it is case sensitive`;
-        }
+      const template: ListTemplateType = ListTemplateType[(args.options.baseTemplate.trim() as keyof typeof ListTemplateType)];
+      if (!template) {
+        return `BaseTemplate option ${args.options.baseTemplate} is not recognized as valid choice. Please note it is case sensitive`;
       }
 
       if (args.options.templateFeatureId) {
@@ -626,7 +623,6 @@ class ListAddCommand extends SpoCommand {
           return `writeSecurity value ${args.options.writeSecurity} is not a valid value. Allowed values are 1|2|4`;
         }
       }
-      // writeSecurity?: number;
 
       return true;
     };
