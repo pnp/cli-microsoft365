@@ -33,95 +33,106 @@ interface Options extends GlobalOptions {
 
 class WebAddCommand extends SpoCommand {
 
-  private createWeb(siteAccessToken:string, cmd: CommandInstance, args: CommandArgs, cb: () => void, debug : boolean) : Promise<any> {
-    return this.getRequestDigestForSite(args.options.parentWebUrl, siteAccessToken, cmd, this.debug).then((res: ContextInfo): Promise<any> => {
-    let requestOptions: any = {
-      url: `${args.options.parentWebUrl}/_api/web/webinfos/add`,
-      headers: Utils.getRequestHeaders({
-        authorization: `Bearer ${siteAccessToken}`,
-        'content-type': 'application/json;odata=nometadata',
-        accept: 'application/json;odata=nometadata',
-        "X-RequestDigest": res.FormDigestValue
-      }),
-      json: true,
-      body: {
-        'parameters': {
-          'Url': args.options.webUrl,
-          'Title': args.options.title,
-          'Description': args.options.description,
-          'Language':args.options.locale,
-          'WebTemplate':args.options.webTemplate,
-          'UseUniquePermissions':args.options.breakInheritance,
-        }
-      }};
-
-      return request.post(requestOptions).then((res:any) : any => {
-        cmd.log(`Subsite ${args.options.title} created.`)
-        cmd.log(res);
-        return res;
-      }, (err: any) =>  { 
-        cmd.log(new CommandError(`Failed to create the web - ${args.options.webUrl}`)); 
-        return Promise.reject(err);
-      });
-    });
-  }
-
-  private getEffectiveBasePermission(siteAccessToken:string, cmd: CommandInstance, args: CommandArgs, cb: () => void, debug : boolean) : Promise<BasePermissions> {
-    let subsiteFullUrl = `${args.options.parentWebUrl}/${args.options.webUrl}`;
-    
-    return this.getRequestDigestForSite(subsiteFullUrl, siteAccessToken, cmd, debug)
-    .then((res: ContextInfo): Promise<any> => {
+  private createWeb(siteAccessToken:string, cmd: CommandInstance, args: CommandArgs, cb: () => void, debug : boolean) : Promise<boolean> {
+    return new Promise<boolean>((resolve: (result: boolean) => void, reject: (error: any) => void): void => {
+     this.getRequestDigestForSite(args.options.parentWebUrl, siteAccessToken, cmd, this.debug).then((res: ContextInfo): Promise<any> => {
       let requestOptions: any = {
-        url: `${subsiteFullUrl}/_api/web/effectivebasepermissions`,
+        url: `${args.options.parentWebUrl}/_api/web/webinfos/add`,
         headers: Utils.getRequestHeaders({
           authorization: `Bearer ${siteAccessToken}`,
           'content-type': 'application/json;odata=nometadata',
           accept: 'application/json;odata=nometadata',
           "X-RequestDigest": res.FormDigestValue
         }),
-        json: true
-      };
+        json: true,
+        body: {
+          'parameters': {
+            'Url': args.options.webUrl,
+            'Title': args.options.title,
+            'Description': args.options.description,
+            'Language':args.options.locale,
+            'WebTemplate':args.options.webTemplate,
+            'UseUniquePermissions':args.options.breakInheritance,
+          }
+        }};
 
-      return request.get(requestOptions).then((res:any) : any => {
-        let webEffectivePermission : BasePermissions = new BasePermissions();
-        webEffectivePermission.high = res.High as number;
-        webEffectivePermission.low = res.Low as number;
-        if (debug) {
-          cmd.log("Response : WebEffectiveBasePermission")
+        return request.post(requestOptions).then((res:any) : any => {
+          const chalk = vorpal.chalk;
           cmd.log(res);
-        }
-  
-        return webEffectivePermission;
+          cmd.log(chalk.green(`Subsite ${args.options.title} created.`));
+          return resolve(true);
+        }, (err: any) =>  { 
+          cmd.log(new CommandError(`Failed to create the web - ${args.options.webUrl}`)); 
+          return reject(err);
+        });
       }, (err: any) =>  { 
-        cmd.log(new CommandError(`Failed to get the effectivebasepermission for the web - ${subsiteFullUrl}`)); 
-        return Promise.reject(err);
+        cmd.log(new CommandError(`Failed to get the contextinfo for the web - ${args.options.parentWebUrl}`))
+        return reject(err);
+      });
+    });
+  }
+
+  private getEffectiveBasePermission(siteAccessToken:string, cmd: CommandInstance, args: CommandArgs, cb: () => void, debug : boolean) : Promise<BasePermissions> {
+    let subsiteFullUrl = `${args.options.parentWebUrl}/${encodeURIComponent(args.options.webUrl)}`;
+    return new Promise<BasePermissions>((resolve: (result: BasePermissions) => void, reject: (error: any) => void): void => {
+      this.getRequestDigestForSite(subsiteFullUrl, siteAccessToken, cmd, debug)
+      .then((res: ContextInfo): Promise<any> => {
+        let requestOptions: any = {
+          url: `${subsiteFullUrl}/_api/web/effectivebasepermissions`,
+          headers: Utils.getRequestHeaders({
+            authorization: `Bearer ${siteAccessToken}`,
+            'content-type': 'application/json;odata=nometadata',
+            accept: 'application/json;odata=nometadata',
+            "X-RequestDigest": res.FormDigestValue
+          }),
+          json: true
+        };
+
+        return request.get(requestOptions).then((res:any) : any => {
+          let webEffectivePermission : BasePermissions = new BasePermissions();
+          webEffectivePermission.high = res.High as number;
+          webEffectivePermission.low = res.Low as number;
+          if (debug) {
+            cmd.log("Response : WebEffectiveBasePermission")
+            cmd.log(res);
+          }
+    
+          return resolve(webEffectivePermission);
+        }, (err: any) =>  { 
+          cmd.log(new CommandError(`Failed to get the effectivebasepermission for the web - ${subsiteFullUrl}`)); 
+          return reject(err);
+        });
+      }, (err: any) =>  { 
+        cmd.log(new CommandError(`Failed to get the contextinfo for the web - ${subsiteFullUrl}`))
+        return reject(err);
       });
     });
   }
 
   private setInheritNavigation(siteAccessToken:string, cmd: CommandInstance, args: CommandArgs, cb: () => void, debug : boolean) : Promise<boolean> {
-    let subsiteFullUrl = `${args.options.parentWebUrl}/${args.options.webUrl}`;
-  
-    return this.getRequestDigestForSite(subsiteFullUrl, siteAccessToken, cmd, debug)
-    .then((res: ContextInfo): Promise<any> => {
-      let requestOptions: any = {
-        url: `${subsiteFullUrl}/_vti_bin/client.svc/ProcessQuery`,
-        headers: Utils.getRequestHeaders({
-          authorization: `Bearer ${siteAccessToken}`,
-          'X-RequestDigest': res.FormDigestValue
-        }),
-        body: `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="Javascript Library"><Actions><ObjectPath Id="1" ObjectPathId="0" /><ObjectPath Id="3" ObjectPathId="2" /><ObjectPath Id="5" ObjectPathId="4" /><SetProperty Id="6" ObjectPathId="4" Name="UseShared"><Parameter Type="Boolean">true</Parameter></SetProperty><Query Id="7" ObjectPathId="4"><Query SelectAllProperties="true"><Properties><Property Name="UseShared" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><StaticProperty Id="0" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /><Property Id="2" ParentId="0" Name="Web" /><Property Id="4" ParentId="2" Name="Navigation" /></ObjectPaths></Request>`
-      };
+    return new Promise<boolean>((resolve: (result: boolean) => void, reject: (error: any) => void): void => {
+      let subsiteFullUrl = `${args.options.parentWebUrl}/${encodeURIComponent(args.options.webUrl)}`;
+      this.getRequestDigestForSite(subsiteFullUrl, siteAccessToken, cmd, debug)
+      .then((res: ContextInfo): Promise<any> => {
+        let requestOptions: any = {
+          url: `${subsiteFullUrl}/_vti_bin/client.svc/ProcessQuery`,
+          headers: Utils.getRequestHeaders({
+            authorization: `Bearer ${siteAccessToken}`,
+            'X-RequestDigest': res.FormDigestValue
+          }),
+          body: `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="Javascript Library"><Actions><ObjectPath Id="1" ObjectPathId="0" /><ObjectPath Id="3" ObjectPathId="2" /><ObjectPath Id="5" ObjectPathId="4" /><SetProperty Id="6" ObjectPathId="4" Name="UseShared"><Parameter Type="Boolean">true</Parameter></SetProperty><Query Id="7" ObjectPathId="4"><Query SelectAllProperties="true"><Properties><Property Name="UseShared" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><StaticProperty Id="0" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /><Property Id="2" ParentId="0" Name="Web" /><Property Id="4" ParentId="2" Name="Navigation" /></ObjectPaths></Request>`
+        };
 
-      return request.post(requestOptions).then((res:any) : any => {
-        if (debug) {
-          cmd.log(`Response : SetInheritNavigation`);
-          cmd.log(res);
-        }
-        return res;
-      }, (err: any) =>  { 
-        cmd.log(new CommandError(`Failed to set inheritNavigation for the web - ${subsiteFullUrl}`)); 
-        return Promise.reject(err);
+        return request.post(requestOptions).then((res:any) : any => {
+          if (debug) {
+            cmd.log(`Response : SetInheritNavigation`);
+            cmd.log(res);
+          }
+          return resolve(true);
+        }, (err: any) =>  { 
+          cmd.log(new CommandError(`Failed to set inheritNavigation for the web - ${subsiteFullUrl}`)); 
+          return reject(err);
+        });
       });
     });
   }
@@ -162,7 +173,7 @@ class WebAddCommand extends SpoCommand {
     
     auth
     .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-    .then((accessToken: string): Promise<ContextInfo> => {
+    .then((accessToken: string): Promise<boolean> => {
       if (this.debug) {
         cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
       }
@@ -187,13 +198,13 @@ class WebAddCommand extends SpoCommand {
             if(perm.has(PermissionKind.AddAndCustomizePages)) {
               return this.setInheritNavigation(siteAccessToken, cmd, args, cb, this.debug).then((res : any) => {
                 cb();
-              },(reason: any) =>  { cmd.log(reason); cb();})
+              },(err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
             }
             else {
               cmd.log("No script is enabled. Skipping the InheitParentNavigation settings.")
               cb();
             }
-          }, (reason: any) =>  { cmd.log(reason); cb();});
+          }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
       }
       else
        {
