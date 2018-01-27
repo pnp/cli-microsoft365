@@ -115,7 +115,7 @@ class WebAddCommand extends SpoCommand {
 
       return request.post(requestOptions).then((res:any) : any => {
         if (debug) {
-          cmd.log("Response : SetInheritNavigation");
+          cmd.log(`Response : SetInheritNavigation`);
           cmd.log(res);
         }
         return res;
@@ -166,6 +166,7 @@ class WebAddCommand extends SpoCommand {
       if (this.debug) {
         cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
       }
+      siteAccessToken = accessToken;
       return this.createWeb(accessToken, cmd, args, cb, this.debug);
     })
     .then((res: any) : any => {
@@ -173,9 +174,8 @@ class WebAddCommand extends SpoCommand {
       {
         if(this.debug)
         {
-          cmd.log("Setting the navigation to inherit the parent settings.");
+          cmd.log("Setting the navigation as the parent site.");
         }
-
         this.getEffectiveBasePermission(siteAccessToken, cmd, args, cb, this.debug)
         .then((perm:BasePermissions) : any => {
             /// Detects if the site in question has no script enabled or not. 
@@ -185,13 +185,12 @@ class WebAddCommand extends SpoCommand {
             /// for the effects of NoScript
             /// 
             if(perm.has(PermissionKind.AddAndCustomizePages)) {
-              cmd.log("Setting the Navigation to inherit the parent site.")
               return this.setInheritNavigation(siteAccessToken, cmd, args, cb, this.debug).then((res : any) => {
                 cb();
               },(reason: any) =>  { cmd.log(reason); cb();})
             }
             else {
-              cmd.log("No script is enabled. Skipping the InheitParentNvaigation settings.")
+              cmd.log("No script is enabled. Skipping the InheitParentNavigation settings.")
               cb();
             }
           }, (reason: any) =>  { cmd.log(reason); cb();});
@@ -215,7 +214,7 @@ class WebAddCommand extends SpoCommand {
       },
       {
         option: '--webUrl [webUrl]',
-        description: 'Subsite web relative url'
+        description: 'Subsite relative url'
       },
       {
         option: '--webTemplate [webTemplate]',
