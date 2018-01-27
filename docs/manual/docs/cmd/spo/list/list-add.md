@@ -50,12 +50,38 @@ Option|Description
 `--forceCheckout [forceCheckout]`|Boolean value that specifies whether forced checkout is enabled for the document library. Valid values are true|false
 `--forceDefaultContentType [forceDefaultContentType]`|Specifies whether we want to return the default Document root content type. Valid values are true|false
 `--hidden [hidden]`|Boolean value that specifies whether the list is hidden. Valid values are true|false
+`--includedInMyFilesScope [includedInMyFilesScope]  Specifies whether this list is accessible to an app principal that has been granted an OAuth scope that contains the string “myfiles” by a case-insensitive comparison when the current user is a site collection administrator of the personal site that contains the list
+`--irmEnabled [irmEnabled]`|Gets or sets a Boolean value that specifies whether Information Rights Management (IRM) is enabled for the list
+`--irmExpire [irmExpire]`|Gets or sets a Boolean value that specifies whether Information Rights Management (IRM) expiration is enabled for the list
+`--irmReject [irmReject]`|Gets or sets a Boolean value that specifies whether Information Rights Management (IRM) rejection is enabled for the list
+`--isApplicationList [isApplicationList]`|Indicates whether this list should be treated as a top level navigation object or not
+`--listExperienceOptions [listExperienceOptions]`|Gets or sets the list experience for the list. Allowed values Auto|NewExperience|ClassicExperience. Default Auto
+`--majorVersionLimit [majorVersionLimit]`|Gets or sets the maximum number of major versions allowed for an item in a document library that uses version control with major versions only.
+`--majorWithMinorVersionsLimit [majorWithMinorVersionsLimit]`|Gets or sets the maximum number of major versions that are allowed for an item in a document library that uses version control with both major and minor versions.
+`--multipleDataList [multipleDataList]`|Gets or sets a Boolean value that specifies whether the list in a Meeting Workspace sitecontains data for multiple meeting instances within the site
+`--navigateForFormsPages [navigateForFormsPages]`|Indicates whether to navigate for forms pages or use a modal dialog
+`--needUpdateSiteClientTag [needUpdateSiteClientTag]`|A boolean value that determines whether to editing documents in this list should increment the ClientTag for the site. The tag is used to allow clients to cache JS/CSS/resources that are retrieved from the Content DB, including custom CSR templates.
+`--noCrawl [noCrawl]`|Gets or sets a Boolean value specifying whether crawling is enabled for the list
+`--onQuickLaunch [onQuickLaunch]`|Gets or sets a Boolean value that specifies whether the list appears on the Quick Launcharea of the home page
+`--ordered [ordered]`|Gets or sets a Boolean value that specifies whether the option to allow users to reorderitems in the list is available on the Edit View page for the list
+`--parserDisabled [parserDisabled]`|Gets or sets a Boolean value that specifies whether the parser should be disabled
+`--readOnlyUI [readOnlyUI]`|A boolean value that indicates whether the UI for this list should be presented in a read-only fashion. This will not affect security nor will it actually prevent changes to the list from occurring - it only affects the way the UI is displayed
+`--readSecurity [readSecurity]`|Gets or sets the Read security setting for the list. Valid values are 1 (All users have Read access to all items)|2 (Users have Read access only to items that they create)
+`--requestAccessEnabled [requestAccessEnabled]`|Gets or sets a Boolean value that specifies whether the option to allow users to requestaccess to the list is available
+`--restrictUserUpdates [restrictUserUpdates]`|A boolean value that indicates whether the this list is a restricted one or not The value can't be changed if there are existing items in the list
+`--sendToLocationName [sendToLocationName]`|Gets or sets a file name to use when copying an item in the list to another document library.
+`--sendToLocationUrl [sendToLocationUrl]`|Gets or sets a URL to use when copying an item in the list to another document library
+`--showUser [showUser]`|Gets or sets a Boolean value that specifies whether names of users are shown in the results of the survey
+`--useFormsForDisplay [useFormsForDisplay]`|Indicates whether forms should be considered for display context or not
+`--validationFormula [validationFormula]`|Gets or sets a formula that is evaluated each time that a list item is added or updated.
+`--validationMessage [validationMessage]`|Gets or sets the message that is displayed when validation fails for a list item.
+`--writeSecurity [writeSecurity]`|Gets or sets the Write security setting for the list. Valid values are 1 (All users can modify all items)|2 (Users can modify only items that they create)|4 (Users cannot modify any list item)
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
 !!! important
-    Before using this command, connect to a SharePoint Online site, using the [spo connect](../connect.md) command.
+Before using this command, connect to a SharePoint Online site, using the [spo connect](../connect.md) command.
 
 ## Remarks
 
