@@ -556,9 +556,15 @@ class ListAddCommand extends SpoCommand {
         return isValidSharePointUrl;
       }
 
-      const template: ListTemplateType = ListTemplateType[(args.options.baseTemplate.trim() as keyof typeof ListTemplateType)];
-      if (!template) {
-        return `BaseTemplate option ${args.options.baseTemplate} is not recognized as valid choice. Please note it is case sensitive`;
+      const baseTemplateErrorMessage = `BaseTemplate option ${args.options.baseTemplate} is not recognized as valid choice. Please note it is case sensitive`;
+      if (typeof args.options.baseTemplate === 'string') {
+        const template: ListTemplateType = ListTemplateType[(args.options.baseTemplate.trim() as keyof typeof ListTemplateType)];
+        if (!template) {
+          return baseTemplateErrorMessage;
+        }
+      }
+      else {
+        return baseTemplateErrorMessage;
       }
 
       if (args.options.templateFeatureId) {
@@ -582,10 +588,16 @@ class ListAddCommand extends SpoCommand {
       }
 
       if (args.options.draftVersionVisibility) {
-        const draftType: DraftVisibilityType = DraftVisibilityType[(args.options.draftVersionVisibility.trim() as keyof typeof DraftVisibilityType)];
+        const draftVersionVisibilityErrorMessage = `draftVisibilityType option '${args.options.draftVersionVisibility}' is not recognized as valid choice. Please note it is case sensitive`;
+        if (typeof args.options.draftVersionVisibility === 'string') {
+          const draftType: DraftVisibilityType = DraftVisibilityType[(args.options.draftVersionVisibility.trim() as keyof typeof DraftVisibilityType)];
 
-        if (!draftType) {
-          return `draftVisibilityType option '${args.options.draftVersionVisibility}' is not recognized as valid choice. Please note it is case sensitive`;
+          if (!draftType) {
+            return draftVersionVisibilityErrorMessage;
+          }
+        }
+        else {
+          return draftVersionVisibilityErrorMessage;
         }
       }
 
@@ -594,10 +606,16 @@ class ListAddCommand extends SpoCommand {
       }
 
       if (args.options.listExperienceOptions) {
-        const experience: ListExperience = ListExperience[(args.options.listExperienceOptions.trim() as keyof typeof ListExperience)];
+        const listExperienceOptionsErrorMessage = `listExperienceOptions option '${args.options.listExperienceOptions}' is not recognized as valid choice. Please note it is case sensitive`;
+        if (typeof args.options.listExperienceOptions === 'string') {
+          const experience: ListExperience = ListExperience[(args.options.listExperienceOptions.trim() as keyof typeof ListExperience)];
 
-        if (!experience) {
-          return `listExperienceOptions option '${args.options.listExperienceOptions}' is not recognized as valid choice. Please note it is case sensitive`;
+          if (!experience) {
+            return listExperienceOptionsErrorMessage;
+          }
+        }
+        else {
+          return listExperienceOptionsErrorMessage;
         }
       }
 

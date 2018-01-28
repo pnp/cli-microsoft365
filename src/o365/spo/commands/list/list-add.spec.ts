@@ -1856,6 +1856,12 @@ describe(commands.LIST_ADD, () => {
     assert.equal(actual, `BaseTemplate option ${baseTemplateValue} is not recognized as valid choice. Please note it is case sensitive`);
   });
 
+  it('fails if non string value for baseTemplate specified', () => {
+    const baseTemplateValue = 107;
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: baseTemplateValue } });
+    assert.equal(actual, `BaseTemplate option ${baseTemplateValue} is not recognized as valid choice. Please note it is case sensitive`);
+  });
+
   it('fails validation if the templateFeatureId option is not a valid GUID', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', templateFeatureId: 'foo' } });
     assert.notEqual(actual, true);
@@ -1878,6 +1884,12 @@ describe(commands.LIST_ADD, () => {
 
   it('fails if non existing draftVersionVisibility specified', () => {
     const draftVersionValue = 'NonExistingDraftVersionVisibility';
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', draftVersionVisibility: draftVersionValue } });
+    assert.equal(actual, `draftVisibilityType option '${draftVersionValue}' is not recognized as valid choice. Please note it is case sensitive`);
+  });
+
+  it('fails if non string value for draftVersionVisibility specified', () => {
+    const draftVersionValue = 1;
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', draftVersionVisibility: draftVersionValue } });
     assert.equal(actual, `draftVisibilityType option '${draftVersionValue}' is not recognized as valid choice. Please note it is case sensitive`);
   });
@@ -1950,6 +1962,12 @@ describe(commands.LIST_ADD, () => {
 
   it('fails if non existing listExperienceOptions specified', () => {
     const listExperienceValue = 'NonExistingExperience';
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', listExperienceOptions: listExperienceValue } });
+    assert.equal(actual, `listExperienceOptions option '${listExperienceValue}' is not recognized as valid choice. Please note it is case sensitive`);
+  });
+
+  it('fails if non string value for listExperienceOptions specified', () => {
+    const listExperienceValue = 1;
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', listExperienceOptions: listExperienceValue } });
     assert.equal(actual, `listExperienceOptions option '${listExperienceValue}' is not recognized as valid choice. Please note it is case sensitive`);
   });
