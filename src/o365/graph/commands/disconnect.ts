@@ -1,4 +1,4 @@
-import auth from '../AadAuth';
+import auth from '../GraphAuth';
 import commands from '../commands';
 import config from '../../../config';
 import Command, {
@@ -8,13 +8,13 @@ import appInsights from '../../../appInsights';
 
 const vorpal: Vorpal = require('../../../vorpal-init');
 
-class AadDisconnectCommand extends Command {
+class GraphDisconnectCommand extends Command {
   public get name(): string {
     return commands.DISCONNECT;
   }
 
   public get description(): string {
-    return 'Disconnects from Azure Active Directory Graph';
+    return 'Disconnects from the Microsoft Graph';
   }
 
   public commandAction(cmd: CommandInstance, args: {}, cb: () => void): void {
@@ -23,7 +23,7 @@ class AadDisconnectCommand extends Command {
       name: commands.DISCONNECT
     });
     if (this.verbose) {
-      cmd.log('Disconnecting from AAD Graph...');
+      cmd.log('Disconnecting from Microsoft Graph...');
     }
 
     const disconnect: () => void = (): void => {
@@ -53,19 +53,19 @@ class AadDisconnectCommand extends Command {
     log(
       `  Remarks:
 
-    The ${chalk.blue(commands.DISCONNECT)} command disconnects from Azure Active Directory Graph
+    The ${chalk.blue(commands.DISCONNECT)} command disconnects from the Microsoft Graph
     and removes any access and refresh tokens from memory.
 
   Examples:
   
-    Disconnect from Azure Active Directory Graph
+    Disconnect from Microsoft Graph
       ${chalk.grey(config.delimiter)} ${commands.DISCONNECT}
 
-    Disconnect from Azure Active Directory Graph in debug mode including detailed debug
+    Disconnect from Microsoft Graph in debug mode including detailed debug
     information in the console output
       ${chalk.grey(config.delimiter)} ${commands.DISCONNECT} --debug
 `);
   }
 }
 
-module.exports = new AadDisconnectCommand();
+module.exports = new GraphDisconnectCommand();

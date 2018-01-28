@@ -217,13 +217,13 @@ class SpoConnectCommand extends Command {
     to a SharePoint Online tenant admin site (suffixed with ${chalk.grey('-admin')},
     eg. ${chalk.grey('https://contoso-admin.sharepoint.com')}) or a regular site.
 
-    The ${chalk.blue(commands.CONNECT)} command uses device code OAuth flow with the standard
-    Microsoft SharePoint Online Management Shell Azure AD application to connect
+    The ${chalk.blue(commands.CONNECT)} command uses device code OAuth flow to connect
     to SharePoint Online.
     
     When connecting to a SharePoint site, the ${chalk.blue(commands.CONNECT)} command stores in memory
-    the access token and the refresh token for the specified site. Both tokens are cleared from memory
-    after exiting the CLI or by calling the ${chalk.blue(commands.DISCONNECT)} command.
+    the access token and the refresh token for the specified site. Both tokens
+    are cleared from memory after exiting the CLI or by calling
+    the ${chalk.blue(commands.DISCONNECT)} command.
 
   Examples:
   

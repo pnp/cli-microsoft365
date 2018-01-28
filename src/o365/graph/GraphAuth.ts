@@ -2,8 +2,8 @@ import Auth, { Logger, Service } from "../../Auth";
 import { CommandError } from "../../Command";
 import config from "../../config";
 
-class AadAuth extends Auth {
-  private SERVICE: string = 'AAD';
+class GraphAuth extends Auth {
+  private SERVICE: string = 'Graph';
 
   public restoreAuth(): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
@@ -54,4 +54,4 @@ class AadAuth extends Auth {
   }
 }
 
-export default new AadAuth(new Service('https://graph.windows.net'), config.aadAadAppId);
+export default new GraphAuth(new Service('https://graph.microsoft.com'), config.aadGraphAppId);

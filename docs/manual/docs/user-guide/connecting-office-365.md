@@ -25,6 +25,14 @@ aad connect
 !!! tip
     If the service uses a fixed URL, such as Azure AD or Microsoft Graph, you will execute the `connect` command without any arguments, for example `aad connect`. However, when connecting to other services that require a URL, such as SharePoint, you will execute the `connect` command with the URL to which the CLI should connect to, for example: `spo connect https://contoso.sharepoint.com`. For more information on connecting to each service, refer to the help of the `connect` command for that service.
 
+After executing the `connect` command, you will be prompted to navigate to _https://aka.ms/devicelogin_ and enter the login code. After entering the code, you will see the prompt that you are about to authenticate the _PnP Office 365 Management Shell_ application to access your tenant on your behalf.
+
+[![Signing in to Azure Active Directory](../images/login.png)](../images/login.png)
+
+If you are using the Office 365 CLI for the first time, you will be also prompted to verify the permissions you are about to grant the Office 365 CLI. This is referred to as _consent_.
+
+[![Granting the Office 365 CLI the necessary permissions](../images/consent.png)](../images/consent.png)
+
 ### Check connection status
 
 To see if you're connected to the particular Office 365 service and if so, with which account, use the `<service> status` command, for example, to see if you're connected to SharePoint Online, execute:
