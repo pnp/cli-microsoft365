@@ -220,19 +220,19 @@ class WebAddCommand extends SpoCommand {
         description: 'Subsite description, optional'
       },
       {
-        option: '--webUrl [webUrl]',
+        option: '-u, --webUrl [webUrl]',
         description: 'Subsite relative url'
       },
       {
-        option: '--webTemplate [webTemplate]',
+        option: '-w, --webTemplate [webTemplate]',
         description: 'Subsite template, eg. STS#0 (Classic team site)'
       },
       {
-        option: '--parentWebUrl [parentWebUrl]',
+        option: '-p, --parentWebUrl [parentWebUrl]',
         description: 'URL of the parent site under which to create the subsite'
       },
       {
-        option: '--locale [locale]',
+        option: '-l, --locale [locale]',
         description: 'Subsite locale LCID, eg. 1033 for en-US'
       },
       {
