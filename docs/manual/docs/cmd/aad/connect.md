@@ -21,7 +21,7 @@ Option|Description
 
 Using the `aad connect` command you can connect to the Azure Active Directory Graph to manage your AAD objects.
 
-The `aad connect` command uses device code OAuth flow with the standard [Microsoft Azure Xplat-CLI](https://github.com/Azure/azure-xplat-cli) Azure AD application to connect to the AAD Graph.
+The `aad connect` command uses device code OAuth flow to connect to the AAD Graph.
 
 When connecting to the AAD Graph, the `aad connect` command stores in memory the access token and the refresh token. Both tokens are cleared from memory after exiting the CLI or by calling the [aad disconnect](disconnect.md) command.
 

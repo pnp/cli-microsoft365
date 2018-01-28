@@ -18,6 +18,36 @@ Use `Auth.getAccessToken` when:
 
 There are a number of ways in which you can authenticate and authorize with Office 365. The Office 365 CLI uses the OAuth protocol to authorize with Office 365 and its services. OAuth flows in Office 365 are facilitated by Azure Active Directory.
 
+### Azure AD application used by the Office 365 CLI
+
+Office 365 CLI gets access to Office 365 through a custom Azure AD application named _PnP Office 365 Management Shell_. If you don't want to consent this application in your tenant, you can use a different application instead.
+
+When specifying a custom Azure AD application to be used by the Office 365 CLI, you can either choose to use one application for all Office 365 services or a separate application for each service. To use one Azure AD application for all Office 365 CLI commands, set the `OFFICE365CLI_AADAPPID` environment variable to the ID of your Azure AD application. If you want to use a different Azure AD application for each Office 365 service use the following environment variables:
+
+- `OFFICE365CLI_AADAADAPPID` - for the ID of the Azure AD application to communicate with Azure AD Graph
+- `OFFICE365CLI_AADGRAPHAPPID` - for the ID of the Azure AD application to communicate with the Microsoft Graph
+- `OFFICE365CLI_AADSPOAPPID` - for the ID of the Azure AD application to communicate with SharePoint Online
+
+Office 365 CLI requires the following permissions to Office 365 services:
+
+- Office 365 SharePoint Online (Microsoft.SharePoint)
+    - Have full control of all site collections
+    - Read user profiles
+    - Read and write managed metadata
+- Microsoft Graph
+    - Invite guest users to the organization
+    - Read and write all groups
+    - Read and write directory data
+    - Access directory as the signed in user
+    - Read and write identity providers
+- Windows Azure Active Directory
+    - Access the directory as the signed-in user
+
+!!! attention
+    After changing the ID of the Azure AD application used by the Office 365 CLI refresh the existing connections to Office 365 using the corresponding `<service> connect` command. If you try to use the existing connection, Office 365 CLI will fail when trying to refresh the existing access token.
+
+### Access and refresh tokens in the Office 365 CLI
+
 After completing the OAuth flow, the CLI receives from Azure Active Directory a refresh- and an access token. Each web request to Office 365 APIs contains the access token which authorizes the Office 365 CLI to execute the particular operation. When the access token expires, the CLI uses the refresh token to obtain a new access token. When the refresh token expires, the user has to reconnect to Office 365 to obtain a new refresh token.
 
 ## Services and commands

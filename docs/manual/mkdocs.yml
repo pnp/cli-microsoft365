@@ -94,6 +94,10 @@ pages:
       - web:
         - web add: 'cmd/spo/web/web-add.md'
         - web remove: 'cmd/spo/web/web-remove.md'
+    - Microsoft Graph (graph):
+      - connect: 'cmd/graph/connect.md'
+      - disconnect: 'cmd/graph/disconnect.md'
+      - status: 'cmd/graph/status.md'
     - Azure Active Directory Graph (aad):
       - connect: 'cmd/aad/connect.md'
       - disconnect: 'cmd/aad/disconnect.md'

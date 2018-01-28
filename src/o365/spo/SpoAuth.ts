@@ -1,5 +1,6 @@
 import Auth, { Service, Logger } from '../../Auth';
 import { CommandError } from '../../Command';
+import config from '../../config';
 
 interface Hash {
   [indexer: string]: Token;
@@ -126,4 +127,4 @@ class SpoAuth extends Auth {
   }
 }
 
-export default new SpoAuth(new Site(), '9bc3ab49-b65d-410a-85ad-de819febfddc');
+export default new SpoAuth(new Site(), config.aadSpoAppId);

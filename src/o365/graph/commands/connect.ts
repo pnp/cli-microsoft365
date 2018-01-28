@@ -1,4 +1,4 @@
-import auth from '../AadAuth';
+import auth from '../GraphAuth';
 import config from '../../../config';
 import commands from '../commands';
 import GlobalOptions from '../../../GlobalOptions';
@@ -14,13 +14,13 @@ interface CommandArgs {
   options: GlobalOptions;
 }
 
-class AadConnectCommand extends Command {
+class GraphConnectCommand extends Command {
   public get name(): string {
     return `${commands.CONNECT}`;
   }
 
   public get description(): string {
-    return 'Connects to the Azure Active Directory Graph';
+    return 'Connects to the Microsoft Graph';
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
@@ -32,12 +32,12 @@ class AadConnectCommand extends Command {
 
     // disconnect before re-connecting
     if (this.debug) {
-      cmd.log(`Disconnecting from AAD Graph...`);
+      cmd.log(`Disconnecting from Microsoft Graph...`);
     }
 
     const disconnect: () => void = (): void => {
       auth.service.disconnect();
-      auth.service.resource = 'https://graph.windows.net';
+      auth.service.resource = 'https://graph.microsoft.com';
       if (this.verbose) {
         cmd.log(chalk.green('DONE'));
       }
@@ -45,7 +45,7 @@ class AadConnectCommand extends Command {
 
     const connect: () => void = (): void => {
       if (this.verbose) {
-        cmd.log(`Authenticating with AAD Graph...`);
+        cmd.log(`Authenticating with Microsoft Graph...`);
       }
 
       auth
@@ -101,26 +101,25 @@ class AadConnectCommand extends Command {
     log(
       `  Remarks:
     
-    Using the ${chalk.blue(commands.CONNECT)} command you can connect to the Azure Active
-    Directory Graph to manage your AAD objects.
+    Using the ${chalk.blue(commands.CONNECT)} command you can connect to the Microsoft Graph.
 
-    The ${chalk.blue(commands.CONNECT)} command uses device code OAuth flow
-    to connect to the AAD Graph.
+    The ${chalk.blue(commands.CONNECT)} command uses device code OAuth flow to connect
+    to the Microsoft Graph.
     
-    When connecting to the AAD Graph, the ${chalk.blue(commands.CONNECT)} command stores in memory
-    the access token and the refresh token. Both tokens are cleared from memory
-    after exiting the CLI or by calling the ${chalk.blue(commands.DISCONNECT)} command.
+    When connecting to the Microsoft Graph, the ${chalk.blue(commands.CONNECT)} command stores
+    in memory the access token and the refresh token. Both tokens are cleared
+    from memory after exiting the CLI or by calling the ${chalk.blue(commands.DISCONNECT)} command.
 
   Examples:
   
-    Connect to the AAD Graph
+    Connect to the Microsoft Graph
       ${chalk.grey(config.delimiter)} ${commands.CONNECT}
 
-    Connect to the AAD Graph in debug mode including detailed debug information in
+    Connect to the Microsoft Graph in debug mode including detailed debug information in
     the console output
       ${chalk.grey(config.delimiter)} ${commands.CONNECT} --debug
 `);
   }
 }
 
-module.exports = new AadConnectCommand();
+module.exports = new GraphConnectCommand();
