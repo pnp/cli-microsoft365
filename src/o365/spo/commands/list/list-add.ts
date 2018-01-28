@@ -224,15 +224,6 @@ class ListAddCommand extends SpoCommand {
           cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
         }
 
-        //return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
-      //})
-      //.then((res: ContextInfo): Promise<ListInstance> => {
-        // if (this.debug) {
-        //   cmd.log('Response:');
-        //   cmd.log(res);
-        //   cmd.log('');
-        // }
-
         if (this.verbose) {
           cmd.log(`Retrieving information for list in site at ${args.options.webUrl}...`);
         }
