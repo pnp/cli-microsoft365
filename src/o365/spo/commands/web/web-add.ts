@@ -34,8 +34,8 @@ interface Options extends GlobalOptions {
 class WebAddCommand extends SpoCommand {
 
   private createWeb(siteAccessToken:string, cmd: CommandInstance, args: CommandArgs, cb: () => void, debug : boolean) : Promise<boolean> {
-    return new Promise<boolean>((resolve: (result: boolean) => void, reject: (error: any) => void): void => {
-     this.getRequestDigestForSite(args.options.parentWebUrl, siteAccessToken, cmd, this.debug).then((res: ContextInfo): Promise<any> => {
+   return new Promise<boolean>((resolve: (result: boolean) => void, reject: (error: any) => void): void => {
+      this.getRequestDigestForSite(args.options.parentWebUrl, siteAccessToken, cmd, this.debug).then((res: ContextInfo): Promise<any> => {
       let requestOptions: any = {
         url: `${args.options.parentWebUrl}/_api/web/webinfos/add`,
         headers: Utils.getRequestHeaders({
@@ -69,7 +69,7 @@ class WebAddCommand extends SpoCommand {
         cmd.log(new CommandError(`Failed to get the contextinfo for the web - ${args.options.parentWebUrl}`))
         return reject(err);
       });
-    });
+   });
   }
 
   private getEffectiveBasePermission(siteAccessToken:string, cmd: CommandInstance, args: CommandArgs, cb: () => void, debug : boolean) : Promise<BasePermissions> {
@@ -166,13 +166,9 @@ class WebAddCommand extends SpoCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const resource: string = Auth.getResourceFromUrl(args.options.parentWebUrl);
     let siteAccessToken: string = '';
-
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
-    }
     
     auth
-    .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
+    .ensureAccessToken(resource, cmd, this.debug)
     .then((accessToken: string): Promise<boolean> => {
       if (this.debug) {
         cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
@@ -201,7 +197,7 @@ class WebAddCommand extends SpoCommand {
               },(err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
             }
             else {
-              cmd.log("No script is enabled. Skipping the InheitParentNavigation settings.")
+              cmd.log("No script is enabled. Skipping the InheritParentNavigation settings.")
               cb();
             }
           }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));

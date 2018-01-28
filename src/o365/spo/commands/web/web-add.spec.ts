@@ -18,8 +18,8 @@ describe(commands.WEB_ADD, () => {
  
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    sinon.stub(command as any, 'getRequestDigest').callsFake(() => { return { FormDigestValue: 'abc' }; });
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
+    sinon.stub(command as any, 'getRequestDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc' }); });
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
       telemetry = t;
     });
@@ -41,7 +41,6 @@ describe(commands.WEB_ADD, () => {
   afterEach(() => {
     Utils.restore([
       vorpal.find,
-      auth.getAccessToken,
       sinon.stub,
       request.get,
       request.post
@@ -51,6 +50,7 @@ describe(commands.WEB_ADD, () => {
   after(() => {
     Utils.restore([
       appInsights.trackEvent,
+      auth.ensureAccessToken,
       auth.getAccessToken,
       auth.restoreAuth,
       request.get,
@@ -152,31 +152,6 @@ describe(commands.WEB_ADD, () => {
     assert(containsExamples);
   });
 
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.getAccessToken);
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        title: "subsite",
-        webUrl: "subsite",
-        parentWebUrl:"https://contoso.sharepoint.com",
-        debug: false
-      }
-    }, () => {
-      try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('fails validation if the title option not specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: {  webUrl: "subsite",
     parentWebUrl:"https://contoso.sharepoint.com", webTemplate:"STS#0", locale:1033} });
@@ -214,8 +189,7 @@ describe(commands.WEB_ADD, () => {
     assert.notEqual(actual, true);
   });
 
-  it('creates web only without inheriting the navigation', (done) => {
-  
+  it('creates web without inheriting the navigation', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf('_api/web/webinfos/add') > -1) {
         return Promise.resolve({ Configuration: 0,
@@ -230,6 +204,9 @@ describe(commands.WEB_ADD, () => {
           WebTemplate             : "STS",
           WebTemplateId           : 0 });
       }
+      else if(opts.url.indexOf('_api/contextinfo') > -1){
+        return Promise.resolve({ FormDigestValue: 'abc' }); 
+      }
 
       return Promise.resolve('abc');
     });
@@ -241,8 +218,9 @@ describe(commands.WEB_ADD, () => {
       title: "subsite",
       webUrl: "subsite",
       parentWebUrl:"https://contoso.sharepoint.com",
-      inheritNavigation : false,
       local:1033,
+      breakInheritance : true,
+      inheritNavigation : false,
       debug: true
     } }, () => {
       assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green(`Subsite subsite created.`)));
@@ -250,7 +228,7 @@ describe(commands.WEB_ADD, () => {
     });
   });
 
-  it('creates web and does not set the inherit navigation because of Noscript enabled.', (done) => {
+  it('creates web and does not set the inherit navigation (Noscript enabled)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf('_api/web/webinfos/add') > -1) {
         return Promise.resolve({ Configuration: 0,
@@ -293,94 +271,12 @@ describe(commands.WEB_ADD, () => {
     } }, () => {
 
       assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green(`Subsite subsite created.`)));
-      assert(cmdInstanceLogSpy.calledWith("No script is enabled. Skipping the InheitParentNavigation settings."));
+      assert(cmdInstanceLogSpy.calledWith("No script is enabled. Skipping the InheritParentNavigation settings."));
       done();
     });
   });
 
-  it('creates web and handles the effectivebasepermission call error.', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('_api/web/webinfos/add') > -1) {
-        return Promise.resolve({ Configuration: 0,
-          Created                 : "2018-01-24T18:24:20",
-          Description             : "subsite",
-          Id                      : "08385b9a-8d5f-4ee9-ac98-bf6984c1856b",
-          Language                : 1033,
-          LastItemModifiedDate    : "2018-01-24T18:24:27Z",
-          LastItemUserModifiedDate: "2018-01-24T18:24:27Z",
-          ServerRelativeUrl       : "/subsite",
-          Title                   : "subsite",
-          WebTemplate             : "STS",
-          WebTemplateId           : 0 });
-      }
-
-      return Promise.resolve('abc');
-    });
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('_api/web/effectivebasepermissions') > -1) {
-        return Promise.reject("Failed to get the effectivebase permissions.");
-      }
-
-      return Promise.resolve('abc');
-    });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({  options: {
-      title: "subsite",
-      webUrl: "subsite",
-      parentWebUrl:"https://contoso.sharepoint.com",
-      inheritNavigation : true,
-      local:1033,
-      debug: true
-    } }, () => {
-      assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green(`Subsite subsite created.`)));
-      assert(cmdInstanceLogSpy.calledWith(new CommandError("Failed to get the effectivebase permissions.")));
-      done();
-    });
-  });
-
-  it('creates web and handles the subsite contextinfo call error while getting the effectivebasepermission.', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('_api/web/webinfos/add') > -1) {
-        return Promise.resolve({ Configuration: 0,
-          Created                 : "2018-01-24T18:24:20",
-          Description             : "subsite",
-          Id                      : "08385b9a-8d5f-4ee9-ac98-bf6984c1856b",
-          Language                : 1033,
-          LastItemModifiedDate    : "2018-01-24T18:24:27Z",
-          LastItemUserModifiedDate: "2018-01-24T18:24:27Z",
-          ServerRelativeUrl       : "/subsite",
-          Title                   : "subsite",
-          WebTemplate             : "STS",
-          WebTemplateId           : 0 });
-      }
-      else if(opts.url.indexOf('/subsite/_api/contextinfo') > -1) {
-        return Promise.reject(false);
-      }
-
-      return Promise.resolve('abc');
-    });
-    
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({  options: {
-      title: "subsite",
-      webUrl: "subsite",
-      parentWebUrl:"https://contoso.sharepoint.com",
-      inheritNavigation : true,
-      local:1033,
-      debug: true
-    } }, () => {
-      assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green(`Subsite subsite created.`)));
-      assert(cmdInstanceLogSpy.calledWith(new CommandError('Failed to get the contextinfo for the web - https://contoso.sharepoint.com/subsite')));
-      done();
-    });
-  });
-
+  
   it('creates web and inherits the navigation (debug)', (done) => {
     // Create web
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -515,58 +411,7 @@ describe(commands.WEB_ADD, () => {
     });
   });
 
-  it('correctly handles the parentweb contextinfo call error.', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if(opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.reject(false);
-      }
-      return Promise.resolve('abc');
-    });
-    
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({  options: {
-      title: "subsite",
-      webUrl: "subsite",
-      parentWebUrl:"https://contoso.sharepoint.com",
-      inheritNavigation : true,
-      local:1033,
-      debug: true
-    } }, () => {
-      assert(cmdInstanceLogSpy.calledWith(new CommandError('Failed to get the contextinfo for the web - https://contoso.sharepoint.com')));
-      done();
-    });
-  });
-
-
-  it('correctly handles the createweb call error.', (done) => {
-     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('_api/web/webinfos/add') > -1) {
-        return Promise.reject({"error":{"code":"-2147024713, Microsoft.SharePoint.SPException","message":{"lang":"en-US","value":"The Web site address \"/subsite\" is already in use."}}});
-      }
-      return Promise.resolve('abc');
-    });
-    
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({  options: {
-      title: "subsite",
-      webUrl: "subsite",
-      parentWebUrl:"https://contoso.sharepoint.com",
-      inheritNavigation : true,
-      local:1033,
-      debug: true
-    } }, () => {
-      assert(cmdInstanceLogSpy.calledWith(new CommandError('Failed to create the web - subsite')));
-      done();
-    });
-  });
-
-  it('correctly handles the set inheritNavigation error.', (done) => {
+  it('correctly handles the set inheritNavigation error', (done) => {
     // Create web
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf('_api/web/webinfos/add') > -1) {
@@ -620,5 +465,164 @@ describe(commands.WEB_ADD, () => {
     });
   });
 
+  it('creates web and handles the subsite contextinfo call error while getting the effectivebasepermission', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf('_api/web/webinfos/add') > -1) {
+        return Promise.resolve({ Configuration: 0,
+          Created                 : "2018-01-24T18:24:20",
+          Description             : "subsite",
+          Id                      : "08385b9a-8d5f-4ee9-ac98-bf6984c1856b",
+          Language                : 1033,
+          LastItemModifiedDate    : "2018-01-24T18:24:27Z",
+          LastItemUserModifiedDate: "2018-01-24T18:24:27Z",
+          ServerRelativeUrl       : "/subsite",
+          Title                   : "subsite",
+          WebTemplate             : "STS",
+          WebTemplateId           : 0 });
+      }
+      else if(opts.url.indexOf('/subsite/_api/contextinfo') > -1) {
+        return Promise.reject(false);
+      }
+
+      return Promise.resolve('abc');
+    });
+    
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({  options: {
+      title: "subsite",
+      webUrl: "subsite",
+      parentWebUrl:"https://contoso.sharepoint.com",
+      inheritNavigation : true,
+      local:1033,
+      debug: true
+    } }, () => {
+      assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green(`Subsite subsite created.`)));
+      assert(cmdInstanceLogSpy.calledWith(new CommandError('Failed to get the contextinfo for the web - https://contoso.sharepoint.com/subsite')));
+      done();
+    });
+  });
+
+  it('correctly handles the parentweb contextinfo call error', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if(opts.url.indexOf('/_api/contextinfo') > -1) {
+        return Promise.reject(false);
+      }
+      return Promise.resolve('abc');
+    });
+    
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({  options: {
+      title: "subsite",
+      webUrl: "subsite",
+      parentWebUrl:"https://contoso.sharepoint.com",
+      inheritNavigation : true,
+      local:1033,
+      debug: true
+    } }, () => {
+      assert(cmdInstanceLogSpy.calledWith(new CommandError('Failed to get the contextinfo for the web - https://contoso.sharepoint.com')));
+      done();
+    });
+  });
+
+
+  it('correctly handles the createweb call error', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf('_api/web/webinfos/add') > -1) {
+        return Promise.reject({"error":{"code":"-2147024713, Microsoft.SharePoint.SPException","message":{"lang":"en-US","value":"The Web site address \"/subsite\" is already in use."}}});
+      }
+      return Promise.resolve('abc');
+    });
+   
+    
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({  options: {
+      title: "subsite",
+      webUrl: "subsite",
+      parentWebUrl:"https://contoso.sharepoint.com",
+      inheritNavigation : true,
+      local:1033,
+      debug: true
+    } }, () => {
+      assert(cmdInstanceLogSpy.calledWith(new CommandError('Failed to create the web - subsite')));
+      done();
+    });
+  });
+
+  it('creates web and handles the effectivebasepermission call error', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf('_api/web/webinfos/add') > -1) {
+        return Promise.resolve({ Configuration: 0,
+          Created                 : "2018-01-24T18:24:20",
+          Description             : "subsite",
+          Id                      : "08385b9a-8d5f-4ee9-ac98-bf6984c1856b",
+          Language                : 1033,
+          LastItemModifiedDate    : "2018-01-24T18:24:27Z",
+          LastItemUserModifiedDate: "2018-01-24T18:24:27Z",
+          ServerRelativeUrl       : "/subsite",
+          Title                   : "subsite",
+          WebTemplate             : "STS",
+          WebTemplateId           : 0 });
+      }
+
+      return Promise.resolve('abc');
+    });
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('_api/web/effectivebasepermissions') > -1) {
+        return Promise.reject("Failed to get the effectivebase permissions.");
+      }
+
+      return Promise.resolve('abc');
+    });
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({  options: {
+      title: "subsite",
+      webUrl: "subsite",
+      parentWebUrl:"https://contoso.sharepoint.com",
+      inheritNavigation : true,
+      local:1033,
+      debug: true
+    } }, () => {
+      assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green(`Subsite subsite created.`)));
+      assert(cmdInstanceLogSpy.calledWith(new CommandError("Failed to get the effectivebase permissions.")));
+      done();
+    });
+  });
+
+  it('correctly handles the ensureAccessToken error', (done) => {
+    Utils.restore(auth.ensureAccessToken);
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        title: "subsite",
+        webUrl: "subsite",
+        parentWebUrl:"https://contoso.sharepoint.com",
+        debug: false
+      }
+    }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
 
 });
