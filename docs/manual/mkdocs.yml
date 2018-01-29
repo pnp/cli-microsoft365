@@ -63,6 +63,7 @@ pages:
         - site add: 'cmd/spo/site/site-add.md'
         - site get: 'cmd/spo/site/site-get.md'
         - site list: 'cmd/spo/site/site-list.md'
+        - site set: 'cmd/spo/site/site-set.md'
         - site appcatalog add: 'cmd/spo/site/site-appcatalog-add.md'
         - site appcatalog remove: 'cmd/spo/site/site-appcatalog-remove.md'
         - site classic list: 'cmd/spo/site/site-classic-list.md'

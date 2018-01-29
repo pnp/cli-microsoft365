@@ -389,7 +389,7 @@ Set-PnPPropertyBagValue|SharePointPnPPowerShellOnline|
 Set-PnPProvisioningTemplateMetadata|SharePointPnPPowerShellOnline|
 Set-PnPRequestAccessEmails|SharePointPnPPowerShellOnline|
 Set-PnPSearchConfiguration|SharePointPnPPowerShellOnline|
-Set-PnPSite|SharePointPnPPowerShellOnline|
+Set-PnPSite|SharePointPnPPowerShellOnline|[spo site set](../cmd/spo/site/site-set.md)
 Set-PnPSiteClosure|SharePointPnPPowerShellOnline|
 Set-PnPSitePolicy|SharePointPnPPowerShellOnline|
 Set-PnPStorageEntity|SharePointPnPPowerShellOnline|[spo storageentity set](../cmd/spo/storageentity/storageentity-set.md)

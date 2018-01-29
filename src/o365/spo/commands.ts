@@ -50,6 +50,7 @@ export default {
   SITE_CLASSIC_LIST: `${prefix} site classic list`,
   SITE_GET: `${prefix} site get`,
   SITE_LIST: `${prefix} site list`,
+  SITE_SET: `${prefix} site set`,
   SITEDESIGN_ADD: `${prefix} sitedesign add`,
   SITEDESIGN_GET: `${prefix} sitedesign get`,
   SITEDESIGN_LIST: `${prefix} sitedesign list`,
