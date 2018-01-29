@@ -104,3 +104,7 @@ spo list add --title 'List1' --baseTemplate GenericList --templateFeatureId _00b
 ## More information
 
 - List REST API resources: [https://msdn.microsoft.com/en-us/library/office/dn531433.aspx#bk_ListEndpoint](https://msdn.microsoft.com/en-us/library/office/dn531433.aspx#bk_ListEndpoint)
+- SPList Class Members information: [https://msdn.microsoft.com/en-us/library/microsoft.sharepoint.client.list_members.aspx](https://msdn.microsoft.com/en-us/library/microsoft.sharepoint.client.list_members.aspx)
+- BaseTemplate ListTemplateType enum information: [https://msdn.microsoft.com/en-us/library/microsoft.sharepoint.client.listtemplatetype.aspx](https://msdn.microsoft.com/en-us/library/microsoft.sharepoint.client.listtemplatetype.aspx)
+- DraftVersionVisibiltiy DraftVersionVisibilityType enum information: [https://msdn.microsoft.com/en-us/library/microsoft.sharepoint.client.draftvisibilitytype.aspx](https://msdn.microsoft.com/en-us/library/microsoft.sharepoint.client.draftvisibilitytype.aspx)
+- ListExperienceOptions ListExperience enum information: [https://msdn.microsoft.com/en-us/library/microsoft.sharepoint.client.listexperience.aspx](https://msdn.microsoft.com/en-us/library/microsoft.sharepoint.client.listexperience.aspx)
