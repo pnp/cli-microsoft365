@@ -84,14 +84,11 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
             cmd.log(JSON.stringify(customAction));
             cmd.log('');
           }
-
-          if (customAction && customAction["odata.null"] === true) {
-            if (this.verbose) {
+          if (this.verbose) {
+            if (customAction && customAction["odata.null"] === true) {
               cmd.log(`Custom action with id ${args.options.id} not found`);
             }
-          }
-          else {
-            if (this.verbose) {
+            else {
               cmd.log(vorpal.chalk.green('DONE'));
             }
           }
@@ -189,7 +186,7 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
       },
       {
         option: '-u, --url <url>',
-        description: 'Url of the site (collection) to remove the custom action from'
+        description: 'Url of the site or site collection to remove the custom action from'
       },
       {
         option: '-s, --scope [scope]',
