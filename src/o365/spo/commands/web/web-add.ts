@@ -13,7 +13,7 @@ import {
 import SpoCommand from '../../SpoCommand';
 import Auth from '../../../../Auth';
 import Utils from '../../../../Utils';
-import { PermissionKind, BasePermissions } from '../customaction/base-permissions';
+import { PermissionKind, BasePermissions } from './../../common/base-permissions';
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
 interface CommandArgs {

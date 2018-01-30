@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { BasePermissions, PermissionKind } from './base-permissions'
+import { BasePermissions, PermissionKind } from './../common/base-permissions'
 
 describe('BasePermissions', () => {
 

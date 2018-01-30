@@ -12,7 +12,7 @@ import { ContextInfo } from '../../spo';
 import Utils from '../../../../Utils';
 import { CustomAction } from './customaction';
 import Auth from '../../../../Auth';
-import { BasePermissions, PermissionKind } from './base-permissions';
+import { BasePermissions, PermissionKind } from './../../common/base-permissions';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
