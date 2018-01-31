@@ -2,6 +2,10 @@
 
 ## [v0.5.0](https://github.com/SharePoint/office365-cli/releases/tag/v0.5.0)
 
+### Breaking changes
+
+- changed the [spo site get](../cmd/spo/site/site-get.md) command to return SPSite properties [#293](https://github.com/SharePoint/office365-cli/issues/293)
+
 ### New commands
 
 **SharePoint Online:**
