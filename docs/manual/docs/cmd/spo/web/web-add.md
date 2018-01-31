@@ -13,12 +13,12 @@ spo web add [options]
 Option|Description
 ------|-----------
 `--help`|output usage information
-`-t, --title [title]`|Subsite title
+`-t, --title <title>`|Subsite title
 `-d, --description [description]`|Subsite description, optional
-`-u, --webUrl [webUrl]`|Subsite relative url
-`-w, --webTemplate [webTemplate]`|Subsite template, eg. STS#0 (Classic team site)
-`-p, --parentWebUrl [parentWebUrl]`|URL of the parent site under which to create the subsite
-`-l, --locale [locale]`|Subsite locale LCID, eg. 1033 for en-US
+`-u, --webUrl <webUrl>`|Subsite relative url
+`-w, --webTemplate <webTemplate>`|Subsite template, eg. STS#0 (Classic team site)
+`-p, --parentWebUrl <parentWebUrl>`|URL of the parent site under which to create the subsite
+`-l, --locale [locale]`|Subsite locale LCID, eg. 1033 for en-US.Default `1033`
 `--breakInheritance [breakInheritance]`|Set to not inherit permissions from the parent site, optional
 `--inheritNavigation [inheritNavigation]`|Set to inherit the navigation from the parent site, optional
 `-o, --output [output]`|Output type. `json|text`. Default `text`

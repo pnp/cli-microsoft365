@@ -18,7 +18,7 @@ describe(commands.WEB_ADD, () => {
  
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
+    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
     sinon.stub(command as any, 'getRequestDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc' }); });
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
       telemetry = t;
@@ -50,7 +50,6 @@ describe(commands.WEB_ADD, () => {
   after(() => {
     Utils.restore([
       appInsights.trackEvent,
-      auth.ensureAccessToken,
       auth.getAccessToken,
       auth.restoreAuth,
       request.get,
@@ -179,13 +178,6 @@ describe(commands.WEB_ADD, () => {
   it('fails validation if the webTemplate option not specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: {  title:"subsite", 
     webUrl:"subsite", parentWebUrl:"https://contoso.sharepoint.com", locale:1033} });
-    assert.notEqual(actual, true);
-  });
-
-
-  it('fails validation if the locale option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {  title:"subsite", 
-    webUrl:"subsite", parentWebUrl:"https://contoso.sharepoint.com", webTemplate:"STS#0"} });
     assert.notEqual(actual, true);
   });
 
@@ -600,9 +592,9 @@ describe(commands.WEB_ADD, () => {
     });
   });
 
-  it('correctly handles the ensureAccessToken error', (done) => {
-    Utils.restore(auth.ensureAccessToken);
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
+  it('correctly handles the getAccessToken error', (done) => {
+    Utils.restore(auth.getAccessToken);
+    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';

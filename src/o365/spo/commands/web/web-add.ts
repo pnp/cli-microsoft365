@@ -21,9 +21,9 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  title?: string;
+  title: string;
   webUrl: string;
-  webTemplate?: string;
+  webTemplate: string;
   parentWebUrl: string;
   description?: string;
   locale?: string;
@@ -145,10 +145,6 @@ class WebAddCommand extends SpoCommand {
     return 'Creates new subsite';
   }
 
-  protected requiresTenantAdmin(): boolean {
-    return false;
-  }
-
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.title = (!(!args.options.title)).toString();
@@ -156,7 +152,7 @@ class WebAddCommand extends SpoCommand {
     telemetryProps.webTemplate = (!(!args.options.webTemplate)).toString();
     telemetryProps.parentWebUrl = (!(!args.options.parentWebUrl)).toString();
     telemetryProps.description = (!(!args.options.description)).toString();
-    telemetryProps.locale = (!(!args.options.locale)).toString();
+    telemetryProps.locale = args.options.locale || '1033';
     telemetryProps.breakInheritance = args.options.breakInheritance || false;
     telemetryProps.inheritNavigation = args.options.inheritNavigation || false;
 
@@ -168,7 +164,7 @@ class WebAddCommand extends SpoCommand {
     let siteAccessToken: string = '';
     
     auth
-    .ensureAccessToken(resource, cmd, this.debug)
+    .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
     .then((accessToken: string): Promise<boolean> => {
       if (this.debug) {
         cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
@@ -220,20 +216,20 @@ class WebAddCommand extends SpoCommand {
         description: 'Subsite description, optional'
       },
       {
-        option: '-u, --webUrl [webUrl]',
+        option: '-u, --webUrl <webUrl>',
         description: 'Subsite relative url'
       },
       {
-        option: '-w, --webTemplate [webTemplate]',
+        option: '-w, --webTemplate <webTemplate>',
         description: 'Subsite template, eg. STS#0 (Classic team site)'
       },
       {
-        option: '-p, --parentWebUrl [parentWebUrl]',
+        option: '-p, --parentWebUrl <parentWebUrl>',
         description: 'URL of the parent site under which to create the subsite'
       },
       {
         option: '-l, --locale [locale]',
-        description: 'Subsite locale LCID, eg. 1033 for en-US'
+        description: 'Subsite locale LCID, eg. 1033 for en-US. Default 1033'
       },
       {
         option: '--breakInheritance [breakInheritance]',
@@ -266,10 +262,6 @@ class WebAddCommand extends SpoCommand {
 
       if (!args.options.parentWebUrl) {
         return 'Required option parentWebUrl missing';
-      }
-
-      if (!args.options.locale) {
-        return 'Required option locale missing';
       }
 
       return true;
