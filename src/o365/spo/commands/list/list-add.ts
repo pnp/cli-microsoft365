@@ -183,8 +183,8 @@ class ListAddCommand extends SpoCommand {
     telemetryProps.irmReject = typeof args.options.irmReject === 'string';
     telemetryProps.isApplicationList = typeof args.options.isApplicationList === 'string';
     telemetryProps.listExperienceOptions = typeof args.options.listExperienceOptions === 'string';
-    telemetryProps.majorVersionLimit = typeof args.options.majorVersionLimit === 'string';
-    telemetryProps.majorWithMinorVersionsLimit = typeof args.options.majorWithMinorVersionsLimit === 'string';
+    telemetryProps.majorVersionLimit = typeof args.options.majorVersionLimit === 'number';
+    telemetryProps.majorWithMinorVersionsLimit = typeof args.options.majorWithMinorVersionsLimit === 'number';
     telemetryProps.multipleDataList = typeof args.options.multipleDataList === 'string';
     telemetryProps.navigateForFormsPages = typeof args.options.navigateForFormsPages === 'string';
     telemetryProps.needUpdateSiteClientTag = typeof args.options.needUpdateSiteClientTag === 'string';
@@ -193,7 +193,7 @@ class ListAddCommand extends SpoCommand {
     telemetryProps.ordered = typeof args.options.ordered === 'string';
     telemetryProps.parserDisabled = typeof args.options.parserDisabled === 'string';
     telemetryProps.readOnlyUI = typeof args.options.readOnlyUI === 'string';
-    telemetryProps.readSecurity = typeof args.options.readSecurity === 'string';
+    telemetryProps.readSecurity = typeof args.options.readSecurity === 'number';
     telemetryProps.requestAccessEnabled = typeof args.options.requestAccessEnabled === 'string';
     telemetryProps.restrictUserUpdates = typeof args.options.readOnlyUI === 'string';
     telemetryProps.sendToLocationName = typeof args.options.sendToLocationName === 'string';
@@ -202,7 +202,7 @@ class ListAddCommand extends SpoCommand {
     telemetryProps.useFormsForDisplay = typeof args.options.useFormsForDisplay === 'string';
     telemetryProps.validationFormula = typeof args.options.validationFormula === 'string';
     telemetryProps.validationMessage = typeof args.options.validationMessage === 'string';
-    telemetryProps.writeSecurity = typeof args.options.writeSecurity === 'string';
+    telemetryProps.writeSecurity = typeof args.options.writeSecurity === 'number';
 
     return telemetryProps;
   }
