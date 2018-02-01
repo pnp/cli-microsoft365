@@ -71,5 +71,6 @@ export default {
   STORAGEENTITY_LIST: `${prefix} storageentity list`,
   STORAGEENTITY_GET: `${prefix} storageentity get`,
   STORAGEENTITY_SET: `${prefix} storageentity set`,
-  STORAGEENTITY_REMOVE: `${prefix} storageentity remove`
+  STORAGEENTITY_REMOVE: `${prefix} storageentity remove`,
+  WEB_ADD: `${prefix} web add`
 };
