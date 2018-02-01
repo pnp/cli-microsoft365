@@ -189,66 +189,51 @@ class SpoListAddCommand extends SpoCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.description = typeof args.options.description === 'string';
-    telemetryProps.templateFeatureId = typeof args.options.templateFeatureId === 'string';
-    telemetryProps.schemaXml = typeof args.options.schemaXml === 'string';
-    telemetryProps.allowDeletion = typeof args.options.allowDeletion === 'string';
-    telemetryProps.allowEveryoneViewItems = typeof args.options.allowEveryoneViewItems === 'string';
-    telemetryProps.allowMultiResponses = typeof args.options.allowMultiResponses === 'string';
-    telemetryProps.contentTypesEnabled = typeof args.options.contentTypesEnabled === 'string';
-    telemetryProps.crawlNonDefaultViews = typeof args.options.crawlNonDefaultViews === 'string';
-    telemetryProps.defaultContentApprovalWorkflowId = typeof args.options.defaultContentApprovalWorkflowId === 'string';
-    telemetryProps.defaultDisplayFormUrl = typeof args.options.defaultDisplayFormUrl === 'string';
-    telemetryProps.defaultEditFormUrl = typeof args.options.defaultEditFormUrl === 'string';
-    telemetryProps.direction = typeof args.options.direction === 'string';
-    telemetryProps.disableGridEditing = typeof args.options.disableGridEditing === 'string';
-    telemetryProps.draftVersionVisibility = typeof args.options.draftVersionVisibility === 'string';
-    telemetryProps.emailAlias = typeof args.options.emailAlias === 'string';
-    telemetryProps.enableAssignToEmail = typeof args.options.enableAssignToEmail === 'string';
-    telemetryProps.enableAttachments = typeof args.options.enableAttachments === 'string';
-    telemetryProps.enableDeployWithDependentList = typeof args.options.enableDeployWithDependentList === 'string';
-    telemetryProps.enableFolderCreation = typeof args.options.enableFolderCreation === 'string';
-    telemetryProps.enableMinorVersions = typeof args.options.enableMinorVersions === 'string';
-    telemetryProps.enableModeration = typeof args.options.enableModeration === 'string';
-    telemetryProps.enablePeopleSelector = typeof args.options.enablePeopleSelector === 'string';
-    telemetryProps.enableResourceSelector = typeof args.options.enableResourceSelector === 'string';
-    telemetryProps.enableSchemaCaching = typeof args.options.enableSchemaCaching === 'string';
-    telemetryProps.enableSyndication = typeof args.options.enableSyndication === 'string';
-    telemetryProps.enableThrottling = typeof args.options.enableThrottling === 'string';
-    telemetryProps.enableVersioning = typeof args.options.enableVersioning === 'string';
-    telemetryProps.enforceDataValidation = typeof args.options.enforceDataValidation === 'string';
-    telemetryProps.excludeFromOfflineClient = typeof args.options.excludeFromOfflineClient === 'string';
-    telemetryProps.fetchPropertyBagForListView = typeof args.options.fetchPropertyBagForListView === 'string';
-    telemetryProps.followable = typeof args.options.followable === 'string';
-    telemetryProps.forceCheckout = typeof args.options.forceCheckout === 'string';
-    telemetryProps.forceDefaultContentType = typeof args.options.forceDefaultContentType === 'string';
-    telemetryProps.hidden = typeof args.options.hidden === 'string';
-    telemetryProps.includedInMyFilesScope = typeof args.options.includedInMyFilesScope === 'string';
-    telemetryProps.irmEnabled = typeof args.options.irmEnabled === 'string';
-    telemetryProps.irmExpire = typeof args.options.irmExpire === 'string';
-    telemetryProps.irmReject = typeof args.options.irmReject === 'string';
-    telemetryProps.isApplicationList = typeof args.options.isApplicationList === 'string';
-    telemetryProps.listExperienceOptions = typeof args.options.listExperienceOptions === 'string';
-    telemetryProps.majorVersionLimit = typeof args.options.majorVersionLimit === 'number';
-    telemetryProps.majorWithMinorVersionsLimit = typeof args.options.majorWithMinorVersionsLimit === 'number';
-    telemetryProps.multipleDataList = typeof args.options.multipleDataList === 'string';
-    telemetryProps.navigateForFormsPages = typeof args.options.navigateForFormsPages === 'string';
-    telemetryProps.needUpdateSiteClientTag = typeof args.options.needUpdateSiteClientTag === 'string';
-    telemetryProps.noCrawl = typeof args.options.noCrawl === 'string';
-    telemetryProps.onQuickLaunch = typeof args.options.onQuickLaunch === 'string';
-    telemetryProps.ordered = typeof args.options.ordered === 'string';
-    telemetryProps.parserDisabled = typeof args.options.parserDisabled === 'string';
-    telemetryProps.readOnlyUI = typeof args.options.readOnlyUI === 'string';
-    telemetryProps.readSecurity = typeof args.options.readSecurity === 'number';
-    telemetryProps.requestAccessEnabled = typeof args.options.requestAccessEnabled === 'string';
-    telemetryProps.restrictUserUpdates = typeof args.options.readOnlyUI === 'string';
-    telemetryProps.sendToLocationName = typeof args.options.sendToLocationName === 'string';
-    telemetryProps.sendToLocationUrl = typeof args.options.sendToLocationUrl === 'string';
-    telemetryProps.showUser = typeof args.options.showUser === 'string';
-    telemetryProps.useFormsForDisplay = typeof args.options.useFormsForDisplay === 'string';
-    telemetryProps.validationFormula = typeof args.options.validationFormula === 'string';
-    telemetryProps.validationMessage = typeof args.options.validationMessage === 'string';
-    telemetryProps.writeSecurity = typeof args.options.writeSecurity === 'number';
+
+    // add properties with identifiable data
+    [
+      'description',
+      'templateFeatureId',
+      'schemaXml',
+      'defaultContentApprovalWorkflowId',
+      'defaultDisplayFormUrl',
+      'defaultEditFormUrl',
+      'emailAlias',
+      'sendToLocationName',
+      'sendToLocationUrl',
+      'validationFormula',
+      'validationMessage' 
+    ].forEach(o => {
+      const value: any = (args.options as any)[o];
+      if (value) {
+        telemetryProps[o] = (typeof value !== 'undefined').toString();
+      }
+    });
+    
+    // add boolean values
+    SpoListAddCommand.booleanOptions.forEach(o => {
+      const value: any = (args.options as any)[o];
+      if (value) {
+        telemetryProps[o] = (value === 'true').toString();
+      }
+    });
+
+    // add properties with non-identifiable data
+    [
+      'baseTemplate',
+      'direction',
+      'draftVersionVisibility',
+      'listExperienceOptions',
+      'majorVersionLimit',
+      'majorWithMinorVersionsLimit',
+      'readSecurity',
+      'writeSecurity'
+    ].forEach(o => {
+      const value: any = (args.options as any)[o];
+      if (value) {
+        telemetryProps[o] = value.toString();
+      }
+    });
 
     return telemetryProps;
   }
@@ -751,7 +736,7 @@ class SpoListAddCommand extends SpoCommand {
     Add a list with title ${chalk.grey('Announcements')}, baseTemplate ${chalk.grey('Announcements')}
     in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
     with content types and versioning enabled and major version limit set to ${chalk.grey('50')}
-      ${chalk.grey(config.delimiter)} ${commands.LIST_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --title Announcements --baseTemplate Announcements --contentTypesEnabled --enableVersioning --majorVersionLimit 50
+      ${chalk.grey(config.delimiter)} ${commands.LIST_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --title Announcements --baseTemplate Announcements --contentTypesEnabled true --enableVersioning true --majorVersionLimit 50
 
   More information:
 
