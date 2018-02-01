@@ -64,6 +64,14 @@ export default class Utils {
     return guidRegEx.test(guid);
   }
 
+  public static isValidBoolean(value: string): boolean {
+    if (value.toLowerCase() === 'true' || value.toLowerCase() === 'false') {
+      return true;
+    }
+
+    return false;
+  }
+
   public static logOutput(stdout: any): any {
     // what comes in, should be an array
     // if it's not, return as-is
