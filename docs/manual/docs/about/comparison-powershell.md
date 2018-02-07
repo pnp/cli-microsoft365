@@ -72,7 +72,7 @@ New-SPOMigrationEncryptionParameters|Microsoft.Online.SharePoint.PowerShell|
 New-SPOMigrationPackage|Microsoft.Online.SharePoint.PowerShell|
 New-SPOPublicCdnOrigin|Microsoft.Online.SharePoint.PowerShell|
 New-SPOSdnProvider|Microsoft.Online.SharePoint.PowerShell|
-New-SPOSite|Microsoft.Online.SharePoint.PowerShell|[spo site add](../cmd/spo/site/site-add.md)
+New-SPOSite|Microsoft.Online.SharePoint.PowerShell|[spo site classic add](../cmd/spo/site/site-classic-add.md)
 New-SPOSiteGroup|Microsoft.Online.SharePoint.PowerShell|
 Register-SPODataEncryptionPolicy|Microsoft.Online.SharePoint.PowerShell|
 Register-SPOHubSite|Microsoft.Online.SharePoint.PowerShell|[spo hubsite register](../cmd/spo/hubsite/hubsite-register.md)
@@ -302,7 +302,7 @@ New-PnPPersonalSite|SharePointPnPPowerShellOnline|
 New-PnPProvisioningTemplate|SharePointPnPPowerShellOnline|
 New-PnPProvisioningTemplateFromFolder|SharePointPnPPowerShellOnline|
 New-PnPSite|SharePointPnPPowerShellOnline|[spo site add](../cmd/spo/site/site-add.md)
-New-PnPTenantSite|SharePointPnPPowerShellOnline|
+New-PnPTenantSite|SharePointPnPPowerShellOnline|[spo site classic add](../cmd/spo/site/site-classic-add.md)
 New-PnPTerm|SharePointPnPPowerShellOnline|
 New-PnPTermGroup|SharePointPnPPowerShellOnline|
 New-PnPTermSet|SharePointPnPPowerShellOnline|

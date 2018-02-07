@@ -1,4 +1,5 @@
 export interface ContextInfo {
+  FormDigestTimeoutSeconds: number;
   FormDigestValue: string;
 }
 
