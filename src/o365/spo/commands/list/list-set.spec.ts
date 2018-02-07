@@ -118,7 +118,7 @@ describe(commands.LIST_SET, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', title: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+    cmdInstance.action({ options: { debug: true, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', title: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
         assert.equal(actual, expected);
         done();
@@ -2402,135 +2402,6 @@ describe(commands.LIST_SET, () => {
     const writeSecurityValue = 4;
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', writeSecurity: writeSecurityValue } });
     assert(actual === true);
-  });
-
-  it('returns listInstance object when list is added with correct values', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
-        return Promise.resolve(
-          {
-            "AllowContentTypes": true,
-            "BaseTemplate": 100,
-            "BaseType": 1,
-            "ContentTypesEnabled": false,
-            "CrawlNonDefaultViews": false,
-            "Created": null,
-            "CurrentChangeToken": null,
-            "CustomActionElements": null,
-            "DefaultContentApprovalWorkflowId": "00000000-0000-0000-0000-000000000000",
-            "DefaultItemOpenUseListSetting": false,
-            "Description": "",
-            "Direction": "none",
-            "DocumentTemplateUrl": null,
-            "DraftVersionVisibility": 0,
-            "EnableAttachments": false,
-            "EnableFolderCreation": true,
-            "EnableMinorVersions": false,
-            "EnableModeration": false,
-            "EnableVersioning": false,
-            "EntityTypeName": "Documents",
-            "ExemptFromBlockDownloadOfNonViewableFiles": false,
-            "FileSavePostProcessingEnabled": false,
-            "ForceCheckout": false,
-            "HasExternalDataSource": false,
-            "Hidden": false,
-            "Id": "14b2b6ed-0885-4814-bfd6-594737cc3ae3",
-            "ImagePath": null,
-            "ImageUrl": null,
-            "IrmEnabled": false,
-            "IrmExpire": false,
-            "IrmReject": false,
-            "IsApplicationList": false,
-            "IsCatalog": false,
-            "IsPrivate": false,
-            "ItemCount": 69,
-            "LastItemDeletedDate": null,
-            "LastItemModifiedDate": null,
-            "LastItemUserModifiedDate": null,
-            "ListExperienceOptions": 0,
-            "ListItemEntityTypeFullName": null,
-            "MajorVersionLimit": 0,
-            "MajorWithMinorVersionsLimit": 0,
-            "MultipleDataList": false,
-            "NoCrawl": false,
-            "ParentWebPath": null,
-            "ParentWebUrl": null,
-            "ParserDisabled": false,
-            "ServerTemplateCanCreateFolders": true,
-            "TemplateFeatureId": null,
-            "Title": "List 1"
-          }
-        );
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, title: 'List 1', baseTemplate: 'GenericList', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert(cmdInstanceLogSpy.calledWith({ 
-          AllowContentTypes: true,
-          BaseTemplate: 100,
-          BaseType: 1,
-          ContentTypesEnabled: false,
-          CrawlNonDefaultViews: false,
-          Created: null,
-          CurrentChangeToken: null,
-          CustomActionElements: null,
-          DefaultContentApprovalWorkflowId: '00000000-0000-0000-0000-000000000000',
-          DefaultItemOpenUseListSetting: false,
-          Description: '',
-          Direction: 'none',
-          DocumentTemplateUrl: null,
-          DraftVersionVisibility: 0,
-          EnableAttachments: false,
-          EnableFolderCreation: true,
-          EnableMinorVersions: false,
-          EnableModeration: false,
-          EnableVersioning: false,
-          EntityTypeName: 'Documents',
-          ExemptFromBlockDownloadOfNonViewableFiles: false,
-          FileSavePostProcessingEnabled: false,
-          ForceCheckout: false,
-          HasExternalDataSource: false,
-          Hidden: false,
-          Id: '14b2b6ed-0885-4814-bfd6-594737cc3ae3',
-          ImagePath: null,
-          ImageUrl: null,
-          IrmEnabled: false,
-          IrmExpire: false,
-          IrmReject: false,
-          IsApplicationList: false,
-          IsCatalog: false,
-          IsPrivate: false,
-          ItemCount: 69,
-          LastItemDeletedDate: null,
-          LastItemModifiedDate: null,
-          LastItemUserModifiedDate: null,
-          ListExperienceOptions: 0,
-          ListItemEntityTypeFullName: null,
-          MajorVersionLimit: 0,
-          MajorWithMinorVersionsLimit: 0,
-          MultipleDataList: false,
-          NoCrawl: false,
-          ParentWebPath: null,
-          ParentWebUrl: null,
-          ParserDisabled: false,
-          ServerTemplateCanCreateFolders: true,
-          TemplateFeatureId: null,
-          Title: 'List 1'
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-    
   });
 
   it('has help referring to the right command', () => {

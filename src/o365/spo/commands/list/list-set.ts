@@ -281,13 +281,7 @@ class SpoListAddCommand extends SpoCommand {
         return request.post(requestOptions);
       })
       .then((res: any): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
-        cmd.log(res);
+        // REST post call doesn't return anything. res is undefined.
 
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
