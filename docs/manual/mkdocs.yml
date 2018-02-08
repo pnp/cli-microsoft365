@@ -90,6 +90,7 @@ pages:
         - storageentity set: 'cmd/spo/storageentity/storageentity-set.md'
       - web:
         - web add: 'cmd/spo/web/web-add.md'
+        - web remove: 'cmd/spo/web/web-remove.md'
     - Azure Active Directory Graph (aad):
       - connect: 'cmd/aad/connect.md'
       - disconnect: 'cmd/aad/disconnect.md'

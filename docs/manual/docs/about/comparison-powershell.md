@@ -343,7 +343,7 @@ Remove-PnPUnifiedGroup|SharePointPnPPowerShellOnline|
 Remove-PnPUser|SharePointPnPPowerShellOnline|
 Remove-PnPUserFromGroup|SharePointPnPPowerShellOnline|
 Remove-PnPView|SharePointPnPPowerShellOnline|
-Remove-PnPWeb|SharePointPnPPowerShellOnline|
+Remove-PnPWeb|SharePointPnPPowerShellOnline|[spo web remove](../cmd/spo/web/web-remove.md)
 Remove-PnPWebhookSubscription|SharePointPnPPowerShellOnline|
 Remove-PnPWebPart|SharePointPnPPowerShellOnline|
 Remove-PnPWikiPage|SharePointPnPPowerShellOnline|
