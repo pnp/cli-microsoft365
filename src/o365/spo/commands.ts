@@ -41,6 +41,8 @@ export default {
   LIST_LIST: `${prefix} list list`,
   LIST_REMOVE: `${prefix} list remove`,
   LIST_SET: `${prefix} list set`,
+  PROPERTYBAG_GET: `${prefix} propertybag get`,
+  PROPERTYBAG_LIST: `${prefix} propertybag list`,
   SERVICEPRINCIPAL_GRANT_LIST: `${prefix} serviceprincipal grant list`,
   SERVICEPRINCIPAL_GRANT_REVOKE: `${prefix} serviceprincipal grant revoke`,
   SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE: `${prefix} serviceprincipal permissionrequest approve`,
