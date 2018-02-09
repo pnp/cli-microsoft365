@@ -1,5 +1,8 @@
+import auth from '../../SpoAuth';
+import * as request from 'request-promise-native';
 import config from '../../../../config';
 import commands from '../../commands';
+import Utils from '../../../../Utils';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandOption,
@@ -7,6 +10,8 @@ import {
 
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
+import { ContextInfo } from '../../spo';
+import Auth from '../../../../Auth';
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
 interface CommandArgs {
@@ -35,7 +40,89 @@ class SpoWebAddCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    
+    const removeWeb = (): void => {
+      const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
+      let siteAccessToken: string = '';
+
+      if (this.debug) {
+        cmd.log(`Retrieving access token for ${resource}...`);
+      }
+
+      auth
+        .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
+        .then((accessToken: string): Promise<ContextInfo> => {
+          siteAccessToken = accessToken;
+
+          if (this.debug) {
+            cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
+          }
+
+          return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
+        })
+        .then((contextResponse: ContextInfo): Promise<any> => {
+          if (this.debug) {
+            cmd.log('Response:');
+            cmd.log(JSON.stringify(contextResponse));
+            cmd.log('');
+
+            cmd.log(`Attempt to remove the subsite: ${args.options.webUrl}`);
+            cmd.log('');
+          }
+
+          const requestOptions: any = {
+            url: `${args.options.webUrl}/_api/web`,
+            headers: Utils.getRequestHeaders({
+              authorization: `Bearer ${siteAccessToken}`,
+              accept: 'application/json;odata=nometadata',
+              'X-HTTP-Method': 'DELETE'
+            }),
+            json: true
+          };
+  
+          if (this.debug) {
+            cmd.log('Executing web request...');
+            cmd.log(requestOptions);
+            cmd.log('');
+          }
+
+          if (this.verbose) {
+            cmd.log(`Deleting subsite ${args.options.webUrl} ...`);
+          }
+  
+          return request.post(requestOptions)
+        })
+        .then((res: any): void => {
+          if (this.debug) {
+            cmd.log('Response:')
+            cmd.log(res);
+            cmd.log('');
+          }
+          if (this.verbose) {
+            cmd.log(vorpal.chalk.green('DELETED'));
+          }
+          cb();
+        }
+        , (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+    }
+
+    if (args.options.confirm) {
+      removeWeb();
+    }
+    else {
+      cmd.prompt({
+        type: 'confirm',
+        name: 'continue',
+        default: false,
+        message: `Are you sure you want to remove the subsite ${args.options.webUrl}`,
+      }, (result: { continue: boolean }): void => {
+        if (!result.continue) {
+          cb();
+        }
+        else {
+          removeWeb();
+        }
+      });
+    }
   }
 
   public options(): CommandOption[] {

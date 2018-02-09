@@ -11,10 +11,11 @@ import Utils from '../../../../Utils';
 describe(commands.WEB_REMOVE, () => {
   let vorpal: Vorpal;
   let log: any[];
-  let cmdInstance: agit statny;
+  let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
   let trackEvent: any;
   let telemetry: any;
+  let promptOptions: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -31,11 +32,16 @@ describe(commands.WEB_REMOVE, () => {
     cmdInstance = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      prompt: (options: any, cb: (result: { continue: boolean }) => void) => {
+        promptOptions = options;
+        cb({ continue: false });
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
     auth.site = new Site();
     telemetry = null;
+    promptOptions = undefined;
   });
 
   afterEach(() => {
@@ -166,5 +172,27 @@ describe(commands.WEB_REMOVE, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
+  });
+
+  it('should prompt before deleting subsite when confirmation argument not passed', (done) => {
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { webUrl: 'https://contoso.sharepoint.com/subsite'} }, () => {
+      let promptIssued = false;
+
+      if (promptOptions && promptOptions.type === 'confirm') {
+        promptIssued = true;
+      }
+
+      try {
+        assert(promptIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 });
