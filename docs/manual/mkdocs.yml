@@ -56,6 +56,9 @@ pages:
         - list list: 'cmd/spo/list/list-list.md'
         - list remove: 'cmd/spo/list/list-remove.md'
         - list set: 'cmd/spo/list/list-set.md'
+      - propertybag:
+        - propertybag get: 'cmd/spo/propertybag/propertybag-get.md'
+        - propertybag list: 'cmd/spo/propertybag/propertybag-list.md'
       - serviceprincipal:
         - serviceprincipal grant list: 'cmd/spo/serviceprincipal/serviceprincipal-grant-list.md'
         - serviceprincipal grant revoke: 'cmd/spo/serviceprincipal/serviceprincipal-grant-revoke.md'

@@ -234,7 +234,7 @@ Get-PnPList|SharePointPnPPowerShellOnline|[spo list get](../cmd/spo/list/list-ge
 Get-PnPListItem|SharePointPnPPowerShellOnline|
 Get-PnPMasterPage|SharePointPnPPowerShellOnline|
 Get-PnPProperty|SharePointPnPPowerShellOnline|
-Get-PnPPropertyBag|SharePointPnPPowerShellOnline|
+Get-PnPPropertyBag|SharePointPnPPowerShellOnline|[spo propertybag get](../cmd/spo/propertybag/propertybag-get.md), [spo propertybag list](../cmd/spo/propertybag/propertybag-list.md)
 Get-PnPProvisioningTemplate|SharePointPnPPowerShellOnline|
 Get-PnPProvisioningTemplateFromGallery|SharePointPnPPowerShellOnline|
 Get-PnPPublishingImageRendition|SharePointPnPPowerShellOnline|
