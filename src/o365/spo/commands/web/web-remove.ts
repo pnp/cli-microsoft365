@@ -98,7 +98,7 @@ class SpoWebAddCommand extends SpoCommand {
             cmd.log('');
           }
           if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DELETED'));
+            cmd.log(vorpal.chalk.green('DONE'));
           }
           cb();
         }

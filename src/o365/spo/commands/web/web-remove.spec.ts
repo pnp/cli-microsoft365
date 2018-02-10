@@ -11,6 +11,7 @@ import Utils from '../../../../Utils';
 describe(commands.WEB_REMOVE, () => {
   let vorpal: Vorpal;
   let log: any[];
+  let requests: any[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
   let trackEvent: any;
@@ -38,6 +39,7 @@ describe(commands.WEB_REMOVE, () => {
         cb({ continue: false });
       }
     };
+    requests = [];
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
     auth.site = new Site();
     telemetry = null;
@@ -195,4 +197,47 @@ describe(commands.WEB_REMOVE, () => {
       }
     });
   });
+
+  it('deletes web successfully without prompting with confirmation argument', (done) => {
+     // Delete web
+     sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+      if (opts.url.indexOf('_api/web') > -1) {
+        return Promise.resolve(true);
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        webUrl: "https://sktechnologies.sharepoint.com/subsite",
+        confirm: true
+      }
+    }, () => {
+      let correctRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf(`/_api/web`) > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.headers.accept &&
+          r.headers.accept.indexOf('application/json') === 0) {
+            correctRequestIssued = true;
+          }
+        });
+      try {
+        assert(correctRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+
+  });
+
 });
