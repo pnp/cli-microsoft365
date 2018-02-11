@@ -257,7 +257,7 @@ describe(commands.WEB_REMOVE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
-        webUrl: "https://sktechnologies.sharepoint.com/subsite",
+        webUrl: "https://contoso.sharepoint.com/subsite",
         confirm: true
       }
     }, () => {
@@ -304,7 +304,7 @@ describe(commands.WEB_REMOVE, () => {
   };
    cmdInstance.action({
      options: {
-       webUrl: "https://sktechnologies.sharepoint.com/subsite"
+       webUrl: "https://contoso.sharepoint.com/subsite"
      }
    }, () => {
      let correctRequestIssued = false;
@@ -347,7 +347,7 @@ describe(commands.WEB_REMOVE, () => {
  cmdInstance.action({
    options: {
      verbose: true,
-     webUrl: "https://sktechnologies.sharepoint.com/subsite",
+     webUrl: "https://contoso.sharepoint.com/subsite",
      confirm: true
    }
  }, () => {
@@ -392,7 +392,7 @@ it('deletes web successfully without prompting with confirmation argument (debug
  cmdInstance.action({
    options: {
      debug: true,
-     webUrl: "https://sktechnologies.sharepoint.com/subsite",
+     webUrl: "https://contoso.sharepoint.com/subsite",
      confirm: true
    }
  }, () => {
