@@ -96,7 +96,7 @@ class SpoCustomActionSetCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<ContextInfo> => {
+      .then((accessToken: string): request.RequestPromise => {
         siteAccessToken = accessToken;
 
         if (this.debug) {
@@ -105,7 +105,7 @@ class SpoCustomActionSetCommand extends SpoCommand {
 
         return this.getRequestDigestForSite(args.options.url, siteAccessToken, cmd, this.debug);
       })
-      .then((contextResponse: ContextInfo): Promise<CustomAction | undefined> => {
+      .then((contextResponse: ContextInfo): request.RequestPromise | Promise<CustomAction | undefined> => {
         if (!args.options.scope) {
           args.options.scope = 'All';
         }
@@ -346,8 +346,7 @@ class SpoCustomActionSetCommand extends SpoCommand {
       `);
   }
 
-  private updateCustomAction(options: Options, siteAccessToken: string, cmd: CommandInstance): Promise<CustomAction | undefined> {
-
+  private updateCustomAction(options: Options, siteAccessToken: string, cmd: CommandInstance): request.RequestPromise {
     const requestBody: any = this.mapRequestBody(options);
 
     const requestOptions: any = {

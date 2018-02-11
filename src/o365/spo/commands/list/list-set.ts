@@ -10,9 +10,7 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
-import { ListInstance } from "./ListInstance";
 import Auth from '../../../../Auth';
-import { ListTemplateType } from './ListTemplateType';
 import { DraftVisibilityType } from './DraftVisibilityType';
 import { ListExperience } from './ListExperience';
 
@@ -23,12 +21,9 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  title: string;
-  baseTemplate: string;
+  title?: string;
+  id: string;
   webUrl: string;
-  description?: string;
-  templateFeatureId?: string;
-  schemaXml?: string;
   allowDeletion?: string;
   allowEveryoneViewItems?: string;
   allowMultiResponses?: string;
@@ -37,6 +32,7 @@ interface Options extends GlobalOptions {
   defaultContentApprovalWorkflowId?: string;
   defaultDisplayFormUrl?: string;
   defaultEditFormUrl?: string;
+  description?: string;
   direction?: string;
   disableGridEditing?: string;
   draftVersionVisibility?: string;
@@ -79,16 +75,18 @@ interface Options extends GlobalOptions {
   readSecurity?: number;
   requestAccessEnabled?: string;
   restrictUserUpdates?: string;
+  schemaXml?: string;
   sendToLocationName?: string;
   sendToLocationUrl?: string;
   showUser?: string;
+  templateFeatureId?: string;
   useFormsForDisplay?: string;
   validationFormula?: string;
   validationMessage?: string;
   writeSecurity?: number;
 }
 
-class SpoListAddCommand extends SpoCommand {
+class SpoListSetCommand extends SpoCommand {
   private static booleanOptions: string[] = [
     'allowDeletion',
     'allowEveryoneViewItems',
@@ -135,26 +133,11 @@ class SpoListAddCommand extends SpoCommand {
   ];
 
   public get name(): string {
-    return commands.LIST_ADD;
+    return commands.LIST_SET;
   }
 
   public get description(): string {
-    return 'Creates list in the specified site';
-  }
-
-  /**
-   * Maps the base ListTemplateType enum to string array so it can 
-   * more easily be used in validation or descriptions.
-   */
-  protected get listTemplateTypeMap(): string[] {
-    const result: string[] = [];
-
-    for (let template in ListTemplateType) {
-      if (typeof ListTemplateType[template] === 'number') {
-        result.push(template);
-      }
-    }
-    return result;
+    return 'Updates the settings of the specified list';
   }
 
   /**
@@ -192,6 +175,7 @@ class SpoListAddCommand extends SpoCommand {
 
     // add properties with identifiable data
     [
+      'title',
       'description',
       'templateFeatureId',
       'schemaXml',
@@ -211,7 +195,7 @@ class SpoListAddCommand extends SpoCommand {
     });
     
     // add boolean values
-    SpoListAddCommand.booleanOptions.forEach(o => {
+    SpoListSetCommand.booleanOptions.forEach(o => {
       const value: any = (args.options as any)[o];
       if (value) {
         telemetryProps[o] = (value === 'true').toString();
@@ -220,7 +204,6 @@ class SpoListAddCommand extends SpoCommand {
 
     // add properties with non-identifiable data
     [
-      'baseTemplate',
       'direction',
       'draftVersionVisibility',
       'listExperienceOptions',
@@ -251,21 +234,19 @@ class SpoListAddCommand extends SpoCommand {
       .then((accessToken: string): request.RequestPromise => {
         siteAccessToken = accessToken;
 
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
-
         if (this.verbose) {
-          cmd.log(`Creating list in site at ${args.options.webUrl}...`);
+          cmd.log(`Updating list in site at ${args.options.webUrl}...`);
         }
 
         const requestBody: any = this.mapRequestBody(args.options);
 
         const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/lists`,
+          url: `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.id)}')`,
           method: 'POST',
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${siteAccessToken}`,
+            'X-HTTP-Method': 'MERGE',
+            'If-Match': '*',
             'accept': 'application/json;odata=nometadata'
           }),
           body: requestBody,
@@ -280,15 +261,8 @@ class SpoListAddCommand extends SpoCommand {
 
         return request.post(requestOptions);
       })
-      .then((listInstance: ListInstance): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(listInstance);
-          cmd.log('');
-        }
-
-        cmd.log(listInstance);
-
+      .then((): void => {
+        // REST post call doesn't return anything
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
@@ -296,29 +270,16 @@ class SpoListAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-t, --title <title>',
-        description: 'The displayed title for the list'
-      },
-      {
-        option: '--baseTemplate <baseTemplate>',
-        description: `The list definition type on which the list is based. Allowed values ${this.listTemplateTypeMap.join('|')}. Default ${this.listTemplateTypeMap[0]}`,
-        autocomplete: this.listTemplateTypeMap
+        option: '-i, --id <id>',
+        description: 'The ID of the list to update'
       },
       {
         option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the list should be added'
+        description: 'URL of the site where the list to update is located'
       },
       {
-        option: '--description [description]',
-        description: 'The description for the list'
-      },
-      {
-        option: '--templateFeatureId [templateFeatureId]',
-        description: 'The globally unique identifier (GUID) of a template feature that is associated with the list'
-      },
-      {
-        option: '--schemaXml [schemaXml]',
-        description: 'The schema in Collaborative Application Markup Language (CAML) schemas that defines the list'
+        option: '-t, --title [title]',
+        description: 'The displayed title for the list'
       },
       {
         option: '--allowDeletion [allowDeletion]',
@@ -358,6 +319,10 @@ class SpoListAddCommand extends SpoCommand {
         description: 'Value that specifies the URL of the edit form to use for list items in the list'
       },
       {
+        option: '--description [description]',
+        description: 'The description for the list'
+      },
+      {
         option: '--direction [direction]',
         description: 'Value that specifies the reading order of the list. Valid values are NONE|LTR|RTL',
         autocomplete: ['NONE', 'LTR', 'RTL']
@@ -388,7 +353,7 @@ class SpoListAddCommand extends SpoCommand {
       },
       {
         option: '--enableDeployWithDependentList [enableDeployWithDependentList]',
-        description: ' Boolean value that specifies whether the list can be deployed with a dependent list',
+        description: 'Boolean value that specifies whether the list can be deployed with a dependent list',
         autocomplete: ['true', 'false']
       },
       {
@@ -565,6 +530,10 @@ class SpoListAddCommand extends SpoCommand {
         autocomplete: ['true', 'false']
       },
       {
+        option: '--schemaXml [schemaXml]',
+        description: 'The schema in Collaborative Application Markup Language (CAML) schemas that defines the list'
+      },
+      {
         option: '--sendToLocationName [sendToLocationName]',
         description: 'Gets or sets a file name to use when copying an item in the list to another document library.'
       },
@@ -576,6 +545,10 @@ class SpoListAddCommand extends SpoCommand {
         option: '--showUser [showUser]',
         description: 'Gets or sets a Boolean value that specifies whether names of users are shown in the results of the survey',
         autocomplete: ['true', 'false']
+      },
+      {
+        option: '--templateFeatureId [templateFeatureId]',
+        description: 'The globally unique identifier (GUID) of a template feature that is associated with the list'
       },
       {
         option: '--useFormsForDisplay [useFormsForDisplay]',
@@ -603,8 +576,7 @@ class SpoListAddCommand extends SpoCommand {
 
   public types(): CommandTypes {
     return {
-      string: SpoListAddCommand.booleanOptions.concat([
-        'baseTemplate',
+      string: SpoListSetCommand.booleanOptions.concat([
         'webUrl',
         'templateFeatureId',
         'defaultContentApprovalWorkflowId',
@@ -616,8 +588,8 @@ class SpoListAddCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.title) {
-        return 'Required parameter title missing';
+      if (!args.options.id) {
+        return 'Required parameter id missing';
       }
 
       if (!args.options.webUrl) {
@@ -629,18 +601,12 @@ class SpoListAddCommand extends SpoCommand {
         return isValidSharePointUrl;
       }
 
-      if (!args.options.baseTemplate) {
-        return 'Required parameter baseTemplate missing';
-      }
-      else {
-        const template: ListTemplateType = ListTemplateType[(args.options.baseTemplate.trim() as keyof typeof ListTemplateType)];
-        if (!template) {
-          return `${args.options.baseTemplate} is not a valid baseTemplate value`;
-        }
+      if (!Utils.isValidGuid(args.options.id)) {
+        return `${args.options.id} is not a valid GUID`;
       }
 
-      for (let i = 0; i < SpoListAddCommand.booleanOptions.length; i++) {
-        const option: string = SpoListAddCommand.booleanOptions[i];
+      for (let i = 0; i < SpoListSetCommand.booleanOptions.length; i++) {
+        const option: string = SpoListSetCommand.booleanOptions[i];
         const value: string | undefined = (args.options as any)[option];
         if (value && !Utils.isValidBoolean(value)) {
           return `${value} in option ${option} is not a valid boolean value`
@@ -718,25 +684,25 @@ class SpoListAddCommand extends SpoCommand {
   
   Remarks:
   
-    To add a list, you have to first connect to SharePoint using the
-    ${chalk.blue(commands.CONNECT)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
+    To update a list, you have to first connect to SharePoint using the
+    ${chalk.blue(commands.CONNECT)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
         
   Examples:
   
-    Add a list with title ${chalk.grey('Announcements')} and baseTemplate ${chalk.grey('Announcements')}
-    in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LIST_ADD} --title 'DemoList' --baseTemplate Announcements --webUrl https://contoso.sharepoint.com/sites/project-x
+    Update the ${chalk.grey('allowContentTypes')} property of the list with id
+    ${chalk.grey('3EA5A977-315E-4E25-8B0F-E4F949BF6B8F')} located in site
+    ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
+      ${chalk.grey(config.delimiter)} ${commands.LIST_SET} --webUrl https://contoso.sharepoint.com/sites/project-x --id 3EA5A977-315E-4E25-8B0F-E4F949BF6B8F --allowContentTypes true
 
-    Add a list with title ${chalk.grey('Announcements')}, baseTemplate ${chalk.grey('Announcements')}
-    in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} using a custom
-    XML schema
-      ${chalk.grey(config.delimiter)} ${commands.LIST_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --title Announcements --baseTemplate Announcements --schemaXml '<List DocTemplateUrl="" DefaultViewUrl="" MobileDefaultViewUrl="" ID="{92FF93AB-920E-4D33-AE42-58B5E245BEFF}" Title="Announcements" Description="" ImageUrl="/_layouts/15/images/itann.png?rev=44" Name="{92FF93AB-920E-4D33-AE42-58B5E245BEFF}" BaseType="0" FeatureId="{00BFEA71-D1CE-42DE-9C63-A44004CE0104}" ServerTemplate="104" Created="20161221 20:02:12" Modified="20180110 19:35:15" LastDeleted="20161221 20:02:12" Version="0" Direction="none" ThumbnailSize="0" WebImageWidth="0" WebImageHeight="0" Flags="536875008" ItemCount="1" AnonymousPermMask="0" RootFolder="/sites/project-x/Lists/Announcements"      ReadSecurity="1" WriteSecurity="1" Author="3" EventSinkAssembly="" EventSinkClass="" EventSinkData="" EmailAlias="" WebFullUrl="/sites/project-x" WebId="7694137e-7038-4831-a1bd-218b28fe5d34" SendToLocation="" ScopeId="92facaf9-8d7a-40eb-9e69-362c91513cbd" MajorVersionLimit="0" MajorWithMinorVersionsLimit="0" WorkFlowId="00000000-0000-0000-0000-000000000000" HasUniqueScopes="False" NoThrottleListOperations="False" HasRelatedLists="False" Followable="False" Acl="" Flags2="0" RootFolderId="d4d67cc1-ad6e-4293-b039-ea49263d195f" ComplianceTag="" ComplianceFlags="0" UserModified="20161221 20:03:00" ListSchemaVersion="3" AclVersion="" AllowDeletion="True" AllowMultiResponses="False" EnableAttachments="True" EnableModeration="False" EnableVersioning="False" HasExternalDataSource="False" Hidden="False" MultipleDataList="False" Ordered="False" ShowUser="True" EnablePeopleSelector="False" EnableResourceSelector="False" EnableMinorVersion="False" RequireCheckout="False" ThrottleListOperations="False" ExcludeFromOfflineClient="False" CanOpenFileAsync="True" EnableFolderCreation="False" IrmEnabled="False" IrmSyncable="False" IsApplicationList="False" PreserveEmptyValues="False" StrictTypeCoercion="False" EnforceDataValidation="False" MaxItemsPerThrottledOperation="5000"></List>'
+    Enable versioning and set the number of major versions to keep on the list
+    with id ${chalk.grey('3EA5A977-315E-4E25-8B0F-E4F949BF6B8F')} located in site
+    ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
+      ${chalk.grey(config.delimiter)} ${commands.LIST_SET} --webUrl https://contoso.sharepoint.com/sites/project-x --id 3EA5A977-315E-4E25-8B0F-E4F949BF6B8F --enableVersioning true --majorVersionLimit 50
     
-    Add a list with title ${chalk.grey('Announcements')}, baseTemplate ${chalk.grey('Announcements')}
-    in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-    with content types and versioning enabled and major version limit set to ${chalk.grey('50')}
-      ${chalk.grey(config.delimiter)} ${commands.LIST_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --title Announcements --baseTemplate Announcements --contentTypesEnabled true --enableVersioning true --majorVersionLimit 50
+    Enable content types and versioning in the list with id
+    ${chalk.grey('3EA5A977-315E-4E25-8B0F-E4F949BF6B8F')} located in site
+    ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
+      ${chalk.grey(config.delimiter)} ${commands.LIST_SET} --webUrl https://contoso.sharepoint.com/sites/project-x --id 3EA5A977-315E-4E25-8B0F-E4F949BF6B8F --contentTypesEnabled true --enableVersioning true --majorVersionLimit 50 --majorWithMinorVersionsLimit 100
 
   More information:
 
@@ -755,10 +721,11 @@ class SpoListAddCommand extends SpoCommand {
   }
 
   private mapRequestBody(options: Options): any {
-    const requestBody: any = {
-      Title: options.title,
-      BaseTemplate: ListTemplateType[(options.baseTemplate.trim() as keyof typeof ListTemplateType)].valueOf()
-    };
+    const requestBody: any = {};
+
+    if (options.title) {
+      requestBody.Title = options.title;
+    }
 
     if (options.description) {
       requestBody.Description = options.description;
@@ -1004,4 +971,4 @@ class SpoListAddCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoListAddCommand();
+module.exports = new SpoListSetCommand();

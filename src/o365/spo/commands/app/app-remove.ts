@@ -96,7 +96,7 @@ class AppRemoveCommand extends SpoCommand {
           let appCatalogResource: string = Auth.getResourceFromUrl(appCatalog);
           return auth.getAccessToken(appCatalogResource, auth.service.refreshToken as string, cmd, this.debug);
         })
-        .then((accessToken: string): Promise<void> => {
+        .then((accessToken: string): request.RequestPromise => {
           if (this.debug) {
             cmd.log(`Retrieved access token for the tenant app catalog ${accessToken}. Removing app from the app catalog...`);
           }

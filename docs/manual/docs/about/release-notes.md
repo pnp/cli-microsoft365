@@ -9,6 +9,9 @@
 - [spo list add](../cmd/spo/list/list-add.md) - creates list in the specified site [#204](https://github.com/SharePoint/office365-cli/issues/204)
 - [spo web add](../cmd/spo/web/web-add.md) - create new subsite [#189](https://github.com/SharePoint/office365-cli/issues/189)
 - [spo customaction clear](../cmd/spo/customaction/customaction-clear.md) - deletes all custom actions in the collection [#231](https://github.com/SharePoint/office365-cli/issues/231)
+- [spo site set](../cmd/spo/site/site-set.md) - updates properties of the specified site [#121](https://github.com/SharePoint/office365-cli/issues/121)
+- [spo list set](../cmd/spo/list/list-set.md) - updates the settings of the specified list [#205](https://github.com/SharePoint/office365-cli/issues/205)
+- [spo site classic add](../cmd/spo/site/site-classic-add.md) - creates new classic site [#123](https://github.com/SharePoint/office365-cli/issues/123)
 
 ## [v0.5.0](https://github.com/SharePoint/office365-cli/releases/tag/v0.5.0)
 

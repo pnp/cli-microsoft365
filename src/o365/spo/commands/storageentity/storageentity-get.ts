@@ -36,7 +36,7 @@ class SpoStorageEntityGetCommand extends SpoCommand {
 
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<TenantProperty> => {
+      .then((accessToken: string): request.RequestPromise => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}. Loading details for the ${args.options.key} tenant property...`);
         }

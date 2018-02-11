@@ -1,7 +1,7 @@
 import Command, { CommandAction, CommandError } from '../../Command';
 import appInsights from '../../appInsights';
 import auth from './SpoAuth';
-import { ContextInfo, SearchResponse } from './spo';
+import { SearchResponse } from './spo';
 import * as request from 'request-promise-native';
 import Utils from '../../Utils';
 
@@ -48,11 +48,11 @@ export default abstract class SpoCommand extends Command {
     }
   }
 
-  protected getRequestDigest(cmd: CommandInstance, debug: boolean): Promise<ContextInfo> {
+  protected getRequestDigest(cmd: CommandInstance, debug: boolean): request.RequestPromise {
     return this.getRequestDigestForSite(auth.site.url, auth.site.accessToken, cmd, debug);
   }
 
-  protected getRequestDigestForSite(siteUrl: string, accessToken: string, cmd: CommandInstance, debug: boolean): Promise<ContextInfo> {
+  protected getRequestDigestForSite(siteUrl: string, accessToken: string, cmd: CommandInstance, debug: boolean): request.RequestPromise {
     const requestOptions: any = {
       url: `${siteUrl}/_api/contextinfo`,
       headers: Utils.getRequestHeaders({

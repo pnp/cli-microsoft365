@@ -8,7 +8,6 @@ import {
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import { ContextInfo } from '../../spo';
 import Utils from '../../../../Utils';
 import Auth from '../../../../Auth';
 
@@ -51,7 +50,7 @@ class SpoCustomActionClearCommand extends SpoCommand {
 
       auth
         .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-        .then((accessToken: string): Promise<ContextInfo> => {
+        .then((accessToken: string): request.RequestPromise | Promise<void> => {
           siteAccessToken = accessToken;
 
           if (this.debug) {
@@ -98,7 +97,7 @@ class SpoCustomActionClearCommand extends SpoCommand {
     }
   }
 
-  private clearScopedCustomActions(options: Options, siteAccessToken: string, cmd: CommandInstance): Promise<any> {
+  private clearScopedCustomActions(options: Options, siteAccessToken: string, cmd: CommandInstance): request.RequestPromise {
     const requestOptions: any = {
       url: `${options.url}/_api/${options.scope}/UserCustomActions/clear`,
       headers: Utils.getRequestHeaders({
@@ -121,13 +120,13 @@ class SpoCustomActionClearCommand extends SpoCommand {
    * Clear request with `web` scope is send first. 
    * Another clear request is send with `site` scope after.
    */
-  private clearAllScopes(options: Options, siteAccessToken: string, cmd: CommandInstance): Promise<any> {
-    return new Promise<any>((resolve: () => void, reject: (error: any) => void): void => {
+  private clearAllScopes(options: Options, siteAccessToken: string, cmd: CommandInstance): Promise<void> {
+    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       options.scope = "Web";
 
       this
         .clearScopedCustomActions(options, siteAccessToken, cmd)
-        .then((webResult: any): Promise<any> => {
+        .then((webResult: any): request.RequestPromise => {
           if (this.debug) {
             cmd.log('clearScopedCustomActions with scope of web result...');
             cmd.log(JSON.stringify(webResult));

@@ -95,7 +95,7 @@ class SpoCustomActionAddCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<ContextInfo> => {
+      .then((accessToken: string): request.RequestPromise => {
         siteAccessToken = accessToken;
 
         if (this.debug) {
@@ -104,7 +104,7 @@ class SpoCustomActionAddCommand extends SpoCommand {
 
         return this.getRequestDigestForSite(args.options.url, siteAccessToken, cmd, this.debug);
       })
-      .then((contextResponse: ContextInfo): Promise<CustomAction> => {
+      .then((contextResponse: ContextInfo): request.RequestPromise => {
         if (!args.options.scope) {
           args.options.scope = 'Web';
         }

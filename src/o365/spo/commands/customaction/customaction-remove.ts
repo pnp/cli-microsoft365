@@ -53,7 +53,7 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
 
       auth
         .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-        .then((accessToken: string): Promise<ContextInfo> => {
+        .then((accessToken: string): request.RequestPromise => {
           siteAccessToken = accessToken;
 
           if (this.debug) {
@@ -62,7 +62,7 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
 
           return this.getRequestDigestForSite(args.options.url, siteAccessToken, cmd, this.debug);
         })
-        .then((contextResponse: ContextInfo): Promise<CustomAction | undefined> => {
+        .then((contextResponse: ContextInfo): request.RequestPromise | Promise<CustomAction | undefined> => {
           if (this.debug) {
             cmd.log('Response:');
             cmd.log(JSON.stringify(contextResponse));
@@ -116,7 +116,7 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
     }
   }
 
-  private removeScopedCustomAction(options: Options, siteAccessToken: string, cmd: CommandInstance): Promise<CustomAction> {
+  private removeScopedCustomAction(options: Options, siteAccessToken: string, cmd: CommandInstance): request.RequestPromise {
     const requestOptions: any = {
       url: `${options.url}/_api/${options.scope}/UserCustomActions('${encodeURIComponent(options.id)}')`,
       headers: Utils.getRequestHeaders({
