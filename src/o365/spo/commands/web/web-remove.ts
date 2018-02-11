@@ -50,16 +50,16 @@ class SpoWebAddCommand extends SpoCommand {
 
       auth
         .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-        .then((accessToken: string): Promise<ContextInfo> => {
+        .then((accessToken: string): request.RequestPromise => {
           siteAccessToken = accessToken;
 
           if (this.debug) {
             cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
           }
 
-          return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
+          return this.getRequestDigestForSite(encodeURI(args.options.webUrl), siteAccessToken, cmd, this.debug);
         })
-        .then((contextResponse: ContextInfo): Promise<any> => {
+        .then((contextResponse: ContextInfo): request.RequestPromise => {
           if (this.debug) {
             cmd.log('Response:');
             cmd.log(JSON.stringify(contextResponse));
@@ -70,7 +70,7 @@ class SpoWebAddCommand extends SpoCommand {
           }
 
           const requestOptions: any = {
-            url: `${args.options.webUrl}/_api/web`,
+            url: `${encodeURI(args.options.webUrl)}/_api/web`,
             headers: Utils.getRequestHeaders({
               authorization: `Bearer ${siteAccessToken}`,
               accept: 'application/json;odata=nometadata',
