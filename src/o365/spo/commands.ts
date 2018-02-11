@@ -57,6 +57,7 @@ export default {
   SITEDESIGN_GET: `${prefix} sitedesign get`,
   SITEDESIGN_LIST: `${prefix} sitedesign list`,
   SITEDESIGN_REMOVE: `${prefix} sitedesign remove`,
+  SITEDESIGN_SET: `${prefix} sitedesign set`,
   SITEDESIGN_RIGHTS_GRANT: `${prefix} sitedesign rights grant`,
   SITEDESIGN_RIGHTS_LIST: `${prefix} sitedesign rights list`,
   SITEDESIGN_RIGHTS_REVOKE: `${prefix} sitedesign rights revoke`,

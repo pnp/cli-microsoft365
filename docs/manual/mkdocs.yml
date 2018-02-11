@@ -74,6 +74,7 @@ pages:
         - sitedesign get: 'cmd/spo/sitedesign/sitedesign-get.md'
         - sitedesign list: 'cmd/spo/sitedesign/sitedesign-list.md'
         - sitedesign remove: 'cmd/spo/sitedesign/sitedesign-remove.md'
+        - sitedesign set: 'cmd/spo/sitedesign/sitedesign-set.md'
         - sitedesign rights grant: 'cmd/spo/sitedesign/sitedesign-rights-grant.md'
         - sitedesign rights list: 'cmd/spo/sitedesign/sitedesign-rights-list.md'
         - sitedesign rights revoke: 'cmd/spo/sitedesign/sitedesign-rights-revoke.md'
