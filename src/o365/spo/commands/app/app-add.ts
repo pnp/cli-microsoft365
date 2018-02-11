@@ -48,14 +48,14 @@ class SpoAppAddCommand extends SpoCommand {
 
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<ContextInfo> => {
+      .then((accessToken: string): request.RequestPromise => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
         }
 
         return this.getRequestDigest(cmd, this.debug);
       })
-      .then((res: ContextInfo): Promise<string> => {
+      .then((res: ContextInfo): request.RequestPromise => {
         if (this.debug) {
           cmd.log('Response:');
           cmd.log(res);

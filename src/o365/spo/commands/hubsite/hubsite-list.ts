@@ -25,7 +25,7 @@ class SpoHubSiteListCommand extends SpoCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<{ value: HubSite[] }> => {
+      .then((accessToken: string): request.RequestPromise => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
         }

@@ -231,7 +231,7 @@ class SpoListSetCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<void> => {
+      .then((accessToken: string): request.RequestPromise => {
         siteAccessToken = accessToken;
 
         if (this.verbose) {

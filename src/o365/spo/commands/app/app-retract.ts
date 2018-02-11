@@ -98,12 +98,12 @@ class AppDeployCommand extends SpoCommand {
           let appCatalogResource: string = Auth.getResourceFromUrl(appCatalog);
           return auth.getAccessToken(appCatalogResource, auth.service.refreshToken as string, cmd, this.debug);
         })
-        .then((token: string): Promise<ContextInfo> => {
+        .then((token: string): request.RequestPromise => {
           accessToken = token;
 
           return this.getRequestDigestForSite(appCatalogUrl, accessToken, cmd, this.debug);
         })
-        .then((res: ContextInfo): Promise<string> => {
+        .then((res: ContextInfo): request.RequestPromise => {
           if (this.debug) {
             cmd.log('Response:');
             cmd.log(res);

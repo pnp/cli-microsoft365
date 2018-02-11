@@ -33,11 +33,11 @@ interface Options extends GlobalOptions {
 }
 
 class SpoSiteClassicAddCommand extends SpoCommand {
-  private formDigest: string;
-  private formDigestExpiresAt: Date;
-  private accessToken: string;
-  private dots: string;
-  private timeout: NodeJS.Timer;
+  private formDigest?: string;
+  private formDigestExpiresAt?: Date;
+  private accessToken?: string;
+  private dots?: string;
+  private timeout?: NodeJS.Timer;
 
   public get name(): string {
     return commands.SITE_CLASSIC_ADD;
@@ -80,7 +80,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
       })
       .then((): Promise<boolean> => {
         if (args.options.removeDeletedSite) {
-          return this.siteExistsInTheRecycleBin(args.options.url, this.accessToken, cmd);
+          return this.siteExistsInTheRecycleBin(args.options.url, this.accessToken as string, cmd);
         }
         else {
           // assume site doesn't exist
@@ -93,7 +93,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
             cmd.log('Site exists in the recycle bin');
           }
 
-          return this.deleteSiteFromTheRecycleBin(args.options.url, args.options.wait, this.accessToken, cmd);
+          return this.deleteSiteFromTheRecycleBin(args.options.url, args.options.wait, this.accessToken as string, cmd);
         }
         else {
           if (this.verbose) {
@@ -106,7 +106,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
       .then((): Promise<void> => {
         return this.ensureFormDigest(cmd);
       })
-      .then((): Promise<string> => {
+      .then((): request.RequestPromise => {
         if (this.verbose) {
           cmd.log(`Creating site collection ${args.options.url}...`);
         }
@@ -157,7 +157,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
             }
   
             this.timeout = setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), resolve, reject, this.accessToken, cmd);
+              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), resolve, reject, this.accessToken as string, cmd);
             }, operation.PollingInterval);
           }
         });
@@ -183,7 +183,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       const now: Date = new Date();
       if (this.formDigest &&
-        now < this.formDigestExpiresAt) {
+        now < (this.formDigestExpiresAt as Date)) {
         if (this.debug) {
           cmd.log('Existing form digest still valid');
         }
@@ -216,7 +216,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
     return new Promise<boolean>((resolve: (exists: boolean) => void, reject: (error: any) => void): void => {
       this
         .ensureFormDigest(cmd)
-        .then((): Promise<string> => {
+        .then((): request.RequestPromise => {
           if (this.verbose) {
             cmd.log(`Checking if the site ${url} exists...`);
           }
@@ -265,7 +265,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
             }
           }
         })
-        .then((exists: boolean): Promise<string> => {
+        .then((exists: boolean): request.RequestPromise => {
           if (this.verbose) {
             cmd.log(`Site doesn't exist. Checking if the site ${url} exists in the recycle bin...`);
           }
@@ -328,7 +328,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       this
         .ensureFormDigest(cmd)
-        .then((): Promise<string> => {
+        .then((): request.RequestPromise => {
           if (this.verbose) {
             cmd.log(`Deleting site ${url} from the recycle bin...`);
           }
@@ -381,7 +381,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
   private waitUntilFinished(operationId: string, resolve: () => void, reject: (error: any) => void, accessToken: string, cmd: CommandInstance): void {
     this
       .ensureFormDigest(cmd)
-      .then((): Promise<string> => {
+      .then((): request.RequestPromise => {
         if (this.debug) {
           cmd.log(`Checking if operation ${operationId} completed...`);
         }
