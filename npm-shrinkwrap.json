@@ -59,9 +59,9 @@
       }
     },
     "@types/request-promise-native": {
-      "version": "1.0.10",
-      "resolved": "https://registry.npmjs.org/@types/request-promise-native/-/request-promise-native-1.0.10.tgz",
-      "integrity": "sha512-I/MMIbg2RUmABAolSjmd8FG+URrzrnwePkSB5zcBQWqzAmiPW5laNT0SQojQH1qvYPyIO9f0/Abx0iyPJhGwcA==",
+      "version": "1.0.13",
+      "resolved": "https://registry.npmjs.org/@types/request-promise-native/-/request-promise-native-1.0.13.tgz",
+      "integrity": "sha512-lVh8UmxCXxQ/Tnqq+Hcx05AfBbA7XoU9hQPLXnpq6AWl8ld1gOJxukD6nB/6Ce4ZMHh+/DiPTfWkH59bmrgfCg==",
       "dev": true,
       "requires": {
         "@types/request": "2.47.0"

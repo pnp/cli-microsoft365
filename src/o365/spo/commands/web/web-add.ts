@@ -61,7 +61,7 @@ class SpoWebAddCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<ContextInfo> => {
+      .then((accessToken: string): request.RequestPromise => {
         siteAccessToken = accessToken;
 
         if (this.debug) {
@@ -70,7 +70,7 @@ class SpoWebAddCommand extends SpoCommand {
 
         return this.getRequestDigestForSite(args.options.parentWebUrl, siteAccessToken, cmd, this.debug);
       })
-      .then((res: ContextInfo): Promise<any> => {
+      .then((res: ContextInfo): request.RequestPromise => {
         if (this.debug) {
           cmd.log('Response:')
           cmd.log(res);
@@ -110,7 +110,7 @@ class SpoWebAddCommand extends SpoCommand {
 
         return request.post(requestOptions)
       })
-      .then((res: any): Promise<any> => {
+      .then((res: any): request.RequestPromise | Promise<boolean> => {
         if (this.debug) {
           cmd.log('Response:')
           cmd.log(res);
@@ -146,7 +146,7 @@ class SpoWebAddCommand extends SpoCommand {
 
         return request.get(requestOptions);
       })
-      .then((res: any): Promise<ContextInfo> => {
+      .then((res: any): request.RequestPromise | Promise<boolean> => {
         if (this.debug) {
           cmd.log('Response:')
           cmd.log(res);
@@ -178,7 +178,7 @@ class SpoWebAddCommand extends SpoCommand {
 
         return this.getRequestDigestForSite(subsiteFullUrl, siteAccessToken, cmd, this.debug);
       })
-      .then((res: ContextInfo): Promise<any> => {
+      .then((res: ContextInfo): request.RequestPromise => {
         if (this.debug) {
           cmd.log('Response:')
           cmd.log(res);

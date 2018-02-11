@@ -37,7 +37,7 @@ class AppGetCommand extends SpoCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<string> => {
+      .then((accessToken: string): request.RequestPromise => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}. Loading apps from tenant app catalog...`);
         }

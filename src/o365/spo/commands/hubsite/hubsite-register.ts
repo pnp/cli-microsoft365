@@ -10,7 +10,6 @@ import Utils from '../../../../Utils';
 import { ContextInfo } from '../../spo';
 import GlobalOptions from '../../../../GlobalOptions';
 import Auth from '../../../../Auth';
-import { HubSite } from './HubSite';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -37,7 +36,7 @@ class SpoHubSiteRegisterCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<ContextInfo> => {
+      .then((accessToken: string): request.RequestPromise => {
         siteAccessToken = accessToken;
 
         if (this.debug) {
@@ -50,7 +49,7 @@ class SpoHubSiteRegisterCommand extends SpoCommand {
 
         return this.getRequestDigestForSite(args.options.url, siteAccessToken, cmd, this.debug);
       })
-      .then((res: ContextInfo): Promise<HubSite> => {
+      .then((res: ContextInfo): request.RequestPromise => {
         if (this.debug) {
           cmd.log('Response:')
           cmd.log(res);
