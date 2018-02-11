@@ -111,6 +111,7 @@ Set-SPOMigrationPackageAzureSource|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOMultiGeoCompanyAllowedDataLocation|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOMultiGeoExperience|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOSite|Microsoft.Online.SharePoint.PowerShell|
+Set-SPOSiteDesign|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign set](../cmd/spo/sitedesign/sitedesign-set.md)
 Set-SPOSiteGroup|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOSiteOffice365Group|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOSiteScript|Microsoft.Online.SharePoint.PowerShell|
@@ -391,6 +392,7 @@ Set-PnPRequestAccessEmails|SharePointPnPPowerShellOnline|
 Set-PnPSearchConfiguration|SharePointPnPPowerShellOnline|
 Set-PnPSite|SharePointPnPPowerShellOnline|[spo site set](../cmd/spo/site/site-set.md)
 Set-PnPSiteClosure|SharePointPnPPowerShellOnline|
+Set-PnPSiteDesign|SharePointPnPPowerShellOnline|[spo sitedesign set](../cmd/spo/sitedesign/sitedesign-set.md)
 Set-PnPSitePolicy|SharePointPnPPowerShellOnline|
 Set-PnPStorageEntity|SharePointPnPPowerShellOnline|[spo storageentity set](../cmd/spo/storageentity/storageentity-set.md)
 Set-PnPTaxonomyFieldValue|SharePointPnPPowerShellOnline|
