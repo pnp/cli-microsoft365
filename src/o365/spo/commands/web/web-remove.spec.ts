@@ -327,7 +327,7 @@ describe(commands.WEB_REMOVE, () => {
    });
  });
 
- it('deletes web successfully without prompting with confirmation argument - verbose', (done) => {
+ it('deletes web successfully without prompting with confirmation argument (verbose)', (done) => {
   // Delete web
   sinon.stub(request, 'post').callsFake((opts) => {
    requests.push(opts);
@@ -372,7 +372,7 @@ describe(commands.WEB_REMOVE, () => {
  });
 });
 
-it('deletes web successfully without prompting with confirmation argument - verbose', (done) => {
+it('deletes web successfully without prompting with confirmation argument (debug)', (done) => {
   // Delete web
   sinon.stub(request, 'post').callsFake((opts) => {
    requests.push(opts);
