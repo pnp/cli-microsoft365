@@ -402,16 +402,12 @@ it('deletes web successfully without prompting with confirmation argument - verb
        r.headers.authorization &&
        r.headers.authorization.indexOf('Bearer ') === 0 &&
        r.headers.accept &&
-       r.resolveWithFullResponse &&
-       !r.simple &&
        r.headers.accept.indexOf('application/json') === 0) {
          correctRequestIssued = true;
        }
      });
    try {
      assert(correctRequestIssued);
-
-     assert(cmdInstanceLogSpy.calledWith(sinon.match('Response')));
      done();
    }
    catch (e) {

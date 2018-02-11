@@ -76,8 +76,6 @@ class SpoWebAddCommand extends SpoCommand {
               accept: 'application/json;odata=nometadata',
               'X-HTTP-Method': 'DELETE'
             }),
-            resolveWithFullResponse: true,
-            simple:false,
             json: true
           };
   
@@ -96,7 +94,7 @@ class SpoWebAddCommand extends SpoCommand {
         .then((res: any): void => {
           if (this.debug) {
             cmd.log('Response:')
-            cmd.log(res.statusCode);
+            cmd.log(`${res.statusCode}`);
             cmd.log('');
           }
           if (this.verbose) {
