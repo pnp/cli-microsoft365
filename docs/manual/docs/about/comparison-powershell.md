@@ -394,7 +394,7 @@ Set-PnPSiteClosure|SharePointPnPPowerShellOnline|
 Set-PnPSitePolicy|SharePointPnPPowerShellOnline|
 Set-PnPStorageEntity|SharePointPnPPowerShellOnline|[spo storageentity set](../cmd/spo/storageentity/storageentity-set.md)
 Set-PnPTaxonomyFieldValue|SharePointPnPPowerShellOnline|
-Set-PnPTenantSite|SharePointPnPPowerShellOnline|
+Set-PnPTenantSite|SharePointPnPPowerShellOnline|[spo site classic set](../cmd/spo/site/site-classic-set.md)
 Set-PnPTheme|SharePointPnPPowerShellOnline|
 Set-PnPTraceLog|SharePointPnPPowerShellOnline|
 Set-PnPUnifiedGroup|SharePointPnPPowerShellOnline|
