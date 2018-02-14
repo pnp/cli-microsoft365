@@ -70,6 +70,7 @@ pages:
         - site appcatalog remove: 'cmd/spo/site/site-appcatalog-remove.md'
         - site classic add: 'cmd/spo/site/site-classic-add.md'
         - site classic list: 'cmd/spo/site/site-classic-list.md'
+        - site classic set: 'cmd/spo/site/site-classic-set.md'
       - sitedesign:
         - sitedesign add: 'cmd/spo/sitedesign/sitedesign-add.md'
         - sitedesign get: 'cmd/spo/sitedesign/sitedesign-get.md'

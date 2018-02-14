@@ -51,6 +51,7 @@ export default {
   SITE_APPCATALOG_REMOVE: `${prefix} site appcatalog remove`,
   SITE_CLASSIC_ADD: `${prefix} site classic add`,
   SITE_CLASSIC_LIST: `${prefix} site classic list`,
+  SITE_CLASSIC_SET: `${prefix} site classic set`,
   SITE_GET: `${prefix} site get`,
   SITE_LIST: `${prefix} site list`,
   SITE_SET: `${prefix} site set`,
