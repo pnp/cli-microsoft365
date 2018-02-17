@@ -7,11 +7,15 @@
 **SharePoint Online:**
 
 - [spo list add](../cmd/spo/list/list-add.md) - creates list in the specified site [#204](https://github.com/SharePoint/office365-cli/issues/204)
-- [spo web add](../cmd/spo/web/web-add.md) - create new subsite [#189](https://github.com/SharePoint/office365-cli/issues/189)
+- [spo list remove](../cmd/spo/list/list-remove.md) - removes the specified list [#206](https://github.com/SharePoint/office365-cli/issues/206)
+- [spo list set](../cmd/spo/list/list-set.md) - updates the settings of the specified list [#205](https://github.com/SharePoint/office365-cli/issues/205)
 - [spo customaction clear](../cmd/spo/customaction/customaction-clear.md) - deletes all custom actions in the collection [#231](https://github.com/SharePoint/office365-cli/issues/231)
 - [spo site set](../cmd/spo/site/site-set.md) - updates properties of the specified site [#121](https://github.com/SharePoint/office365-cli/issues/121)
-- [spo list set](../cmd/spo/list/list-set.md) - updates the settings of the specified list [#205](https://github.com/SharePoint/office365-cli/issues/205)
 - [spo site classic add](../cmd/spo/site/site-classic-add.md) - creates new classic site [#123](https://github.com/SharePoint/office365-cli/issues/123)
+- [spo site classic set](../cmd/spo/site/site-classic-set.md) - change classic site settings [#124](https://github.com/SharePoint/office365-cli/issues/124)
+- [spo sitedesign set](../cmd/spo/sitedesign/sitedesign-set.md) - updates a site design with new values [#251](https://github.com/SharePoint/office365-cli/issues/251)
+- [spo web add](../cmd/spo/web/web-add.md) - create new subsite [#189](https://github.com/SharePoint/office365-cli/issues/189)
+- [spo web remove](../cmd/spo/web/web-remove.md) - delete specified subsite [#192](https://github.com/SharePoint/office365-cli/issues/192)
 
 ## [v0.5.0](https://github.com/SharePoint/office365-cli/releases/tag/v0.5.0)
 
