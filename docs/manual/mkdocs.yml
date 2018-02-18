@@ -38,6 +38,8 @@ pages:
         - customaction set: 'cmd/spo/customaction/customaction-set.md'
       - externaluser:
         - externaluser list: 'cmd/spo/externaluser/externaluser-list.md'
+      - file:
+        - file list: 'cmd/spo/file/file-list.md'
       - hubsite:
         - hubsite connect: 'cmd/spo/hubsite/hubsite-connect.md'
         - hubsite disconnect: 'cmd/spo/hubsite/hubsite-disconnect.md'

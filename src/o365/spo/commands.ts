@@ -26,6 +26,7 @@ export default {
   CUSTOMACTION_REMOVE: `${prefix} customaction remove`,
   DISCONNECT: `${prefix} disconnect`,
   EXTERNALUSER_LIST: `${prefix} externaluser list`,
+  FILE_LIST: `${prefix} file list`,
   HUBSITE_CONNECT: `${prefix} hubsite connect`,
   HUBSITE_DISCONNECT: `${prefix} hubsite disconnect`,
   HUBSITE_GET: `${prefix} hubsite get`,
