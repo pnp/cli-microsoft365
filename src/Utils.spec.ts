@@ -99,6 +99,12 @@ describe('Utils', () => {
     }
   });
 
+  it('formats date output as text', () => {
+    const d = new Date();
+    const actual = Utils.logOutput([d]);
+    assert.equal(actual, d.toString());
+  });
+
   it('formats object output as transposed table', (done) => {
     const o = { prop1: 'value1', prop2: 'value2' };
     const actual = Utils.logOutput([o]);

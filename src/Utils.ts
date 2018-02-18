@@ -76,6 +76,11 @@ export default class Utils {
     }
 
     let logStatement: any = stdout.pop();
+
+    if (logStatement instanceof Date) {
+      return logStatement.toString();
+    }
+
     const logStatementType: string = typeof logStatement;
 
     if (logStatementType === 'undefined') {
