@@ -2,6 +2,10 @@
 
 ## [v0.6.0](https://github.com/SharePoint/office365-cli/releases/tag/v0.6.0)
 
+### Breaking changes
+
+- switched to a custom Azure AD application for communicating with Office 365. After installing this version you have to reconnect to Office 365
+
 ### New commands
 
 **SharePoint Online:**
@@ -16,6 +20,16 @@
 - [spo sitedesign set](../cmd/spo/sitedesign/sitedesign-set.md) - updates a site design with new values [#251](https://github.com/SharePoint/office365-cli/issues/251)
 - [spo web add](../cmd/spo/web/web-add.md) - create new subsite [#189](https://github.com/SharePoint/office365-cli/issues/189)
 - [spo web remove](../cmd/spo/web/web-remove.md) - delete specified subsite [#192](https://github.com/SharePoint/office365-cli/issues/192)
+
+**Microsoft Graph:**
+
+- [graph connect](../cmd/graph/connect.md) - connects to the Microsoft Graph [#10](https://github.com/SharePoint/office365-cli/issues/10)
+- [graph disconnect](../cmd/graph/disconnect.md) - disconnects from the Microsoft Graph [#10](https://github.com/SharePoint/office365-cli/issues/10)
+- [graph status](../cmd/graph/status.md) - shows Microsoft Graph connection status [#10](https://github.com/SharePoint/office365-cli/issues/10)
+
+### Changes
+
+- fixed bug in logging dates [#317](https://github.com/SharePoint/office365-cli/issues/317)
 
 ## [v0.5.0](https://github.com/SharePoint/office365-cli/releases/tag/v0.5.0)
 
