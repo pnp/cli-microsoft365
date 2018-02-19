@@ -100,6 +100,8 @@ pages:
       - connect: 'cmd/graph/connect.md'
       - disconnect: 'cmd/graph/disconnect.md'
       - status: 'cmd/graph/status.md'
+      - o365group:
+        - o365group list: 'cmd/graph/o365group/o365group-list.md'
     - Azure Active Directory Graph (aad):
       - connect: 'cmd/aad/connect.md'
       - disconnect: 'cmd/aad/disconnect.md'
