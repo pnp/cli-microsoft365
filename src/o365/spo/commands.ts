@@ -82,6 +82,7 @@ export default {
   STORAGEENTITY_GET: `${prefix} storageentity get`,
   STORAGEENTITY_SET: `${prefix} storageentity set`,
   STORAGEENTITY_REMOVE: `${prefix} storageentity remove`,
+  TENANT_APPCATALOGURL_GET: `${prefix} tenant appcatalogurl get`,
   WEB_ADD: `${prefix} web add`,
   WEB_REMOVE: `${prefix} web remove`,
   WEB_LIST: `${prefix} web list`

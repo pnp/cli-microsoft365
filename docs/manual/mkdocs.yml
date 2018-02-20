@@ -96,6 +96,8 @@ pages:
         - storageentity list: 'cmd/spo/storageentity/storageentity-list.md'
         - storageentity remove: 'cmd/spo/storageentity/storageentity-remove.md'
         - storageentity set: 'cmd/spo/storageentity/storageentity-set.md'
+      - tenant:
+        - tenant appcatalogurl get: 'cmd/spo/tenant/tenant-appcatalogurl-get.md'
       - web:
         - web add: 'cmd/spo/web/web-add.md'
         - web list: 'cmd/spo/web/web-list.md'
