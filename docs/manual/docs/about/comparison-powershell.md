@@ -262,7 +262,7 @@ Get-PnPTermGroup|SharePointPnPPowerShellOnline|
 Get-PnPTermSet|SharePointPnPPowerShellOnline|
 Get-PnPTheme|SharePointPnPPowerShellOnline|
 Get-PnPTimeZoneId|SharePointPnPPowerShellOnline|
-Get-PnPUnifiedGroup|SharePointPnPPowerShellOnline|
+Get-PnPUnifiedGroup|SharePointPnPPowerShellOnline|[graph o365group list](../cmd/graph/o365group/o365group-list.md)
 Get-PnPUnifiedGroupMembers|SharePointPnPPowerShellOnline|
 Get-PnPUnifiedGroupOwners|SharePointPnPPowerShellOnline|
 Get-PnPUser|SharePointPnPPowerShellOnline|
