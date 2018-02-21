@@ -226,14 +226,21 @@ export default abstract class Command {
       cmd.log(new CommandError(response.error['odata.error'].message.value));
     }
     else {
-      if (response instanceof Error) {
-        cmd.log(new CommandError(response.message));
+      if (response.error &&
+        response.error.error &&
+        response.error.error.message) {
+        cmd.log(new CommandError(response.error.error.message));
       }
       else {
-        cmd.log(new CommandError(response));
+        if (response instanceof Error) {
+          cmd.log(new CommandError(response.message));
+        }
+        else {
+          cmd.log(new CommandError(response));
+        }
       }
     }
-    
+
     callback();
   }
 
