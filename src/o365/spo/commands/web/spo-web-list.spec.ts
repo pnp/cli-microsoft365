@@ -1,4 +1,4 @@
- import commands from '../../commands';
+import commands from '../../commands';
 import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
@@ -124,59 +124,42 @@ describe(commands.WEB_LIST, () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf('/_api/web/webs') > -1) {
         return Promise.resolve(
-          {"value":[{
-            "AllowContentTypes": true,
-            "BaseTemplate": 109,
-            "BaseType": 1,
-            "ContentTypesEnabled": false,
-            "CrawlNonDefaultViews": false,
+          {
+            "value": [{
+              "AllowRssFeeds": false,
+            "AlternateCssUrl": null,
+            "AppInstanceId": "00000000-0000-0000-0000-000000000000",
+            "Configuration": 0,
             "Created": null,
             "CurrentChangeToken": null,
-            "CustomActionElements": null,
-            "DefaultContentApprovalWorkflowId": "00000000-0000-0000-0000-000000000000",
-            "DefaultItemOpenUseListSetting": false,
-            "Description": "",
-            "Direction": "none",
-            "DocumentTemplateUrl": null,
-            "DraftVersionVisibility": 0,
-            "EnableAttachments": false,
-            "EnableFolderCreation": true,
-            "EnableMinorVersions": false,
-            "EnableModeration": false,
-            "EnableVersioning": false,
-            "EntityTypeName": "Documents",
-            "ExemptFromBlockDownloadOfNonViewableFiles": false,
-            "FileSavePostProcessingEnabled": false,
-            "ForceCheckout": false,
-            "HasExternalDataSource": false,
-            "Hidden": false,
-            "Id": "14b2b6ed-0885-4814-bfd6-594737cc3ae3",
-            "ImagePath": null,
-            "ImageUrl": null,
-            "IrmEnabled": false,
-            "IrmExpire": false,
-            "IrmReject": false,
-            "IsApplicationList": false,
-            "IsCatalog": false,
-            "IsPrivate": false,
-            "ItemCount": 69,
-            "LastItemDeletedDate": null,
+            "CustomMasterUrl": null,
+            "Description": null,
+            "DesignPackageId": null,
+            "DocumentLibraryCalloutOfficeWebAppPreviewersDisabled": false,
+            "EnableMinimalDownload": false,
+            "HorizontalQuickLaunch": false,
+            "Id": "d8d179c7-f459-4f90-b592-14b08e84accb",
+            "IsMultilingual": false,
+            "Language": 1033,
             "LastItemModifiedDate": null,
             "LastItemUserModifiedDate": null,
-            "ListExperienceOptions": 0,
-            "ListItemEntityTypeFullName": null,
-            "MajorVersionLimit": 0,
-            "MajorWithMinorVersionsLimit": 0,
-            "MultipleDataList": false,
+            "MasterUrl": null,
             "NoCrawl": false,
-            "ParentWebPath": null,
-            "ParentWebUrl": null,
-            "ParserDisabled": false,
-            "ServerTemplateCanCreateFolders": true,
-            "TemplateFeatureId": null,
-            "Title": "Documents",
-            "RootFolder": {"ServerRelativeUrl":"Documents"}
-          }]}
+            "OverwriteTranslationsOnChange": false,
+            "ResourcePath": null,
+            "QuickLaunchEnabled": false,
+            "RecycleBinEnabled": false,
+            "ServerRelativeUrl": null,
+            "SiteLogoUrl": null,
+            "SyndicationEnabled": false,
+            "Title": "Subsite",
+            "TreeViewEnabled": false,
+            "UIVersion": 15,
+            "UIVersionConfigurationEnabled": false,
+            "Url": "https://Contoso.sharepoint.com/Subsite",
+            "WebTemplate": "STS",
+             }]
+          }
         );
       }
       return Promise.reject('Invalid request');
@@ -187,65 +170,50 @@ describe(commands.WEB_LIST, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: {
-      output: 'json',
-      debug: true,
-      webUrl: 'https://contoso.sharepoint.com'
-    } }, () => {
+    cmdInstance.action({
+      options: {
+        output: 'json',
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com'
+      }
+    }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({value: [{ 
-          AllowContentTypes: true,
-          BaseTemplate: 109,
-          BaseType: 1,
-          ContentTypesEnabled: false,
-          CrawlNonDefaultViews: false,
-          Created: null,
-          CurrentChangeToken: null,
-          CustomActionElements: null,
-          DefaultContentApprovalWorkflowId: '00000000-0000-0000-0000-000000000000',
-          DefaultItemOpenUseListSetting: false,
-          Description: '',
-          Direction: 'none',
-          DocumentTemplateUrl: null,
-          DraftVersionVisibility: 0,
-          EnableAttachments: false,
-          EnableFolderCreation: true,
-          EnableMinorVersions: false,
-          EnableModeration: false,
-          EnableVersioning: false,
-          EntityTypeName: 'Documents',
-          ExemptFromBlockDownloadOfNonViewableFiles: false,
-          FileSavePostProcessingEnabled: false,
-          ForceCheckout: false,
-          HasExternalDataSource: false,
-          Hidden: false,
-          Id: '14b2b6ed-0885-4814-bfd6-594737cc3ae3',
-          ImagePath: null,
-          ImageUrl: null,
-          IrmEnabled: false,
-          IrmExpire: false,
-          IrmReject: false,
-          IsApplicationList: false,
-          IsCatalog: false,
-          IsPrivate: false,
-          ItemCount: 69,
-          LastItemDeletedDate: null,
-          LastItemModifiedDate: null,
-          LastItemUserModifiedDate: null,
-          ListExperienceOptions: 0,
-          ListItemEntityTypeFullName: null,
-          MajorVersionLimit: 0,
-          MajorWithMinorVersionsLimit: 0,
-          MultipleDataList: false,
-          NoCrawl: false,
-          ParentWebPath: null,
-          ParentWebUrl: null,
-          ParserDisabled: false,
-          ServerTemplateCanCreateFolders: true,
-          TemplateFeatureId: null,
-          Title: 'Documents',
-          RootFolder: {ServerRelativeUrl: 'Documents'}
-        }]}));
+        assert(cmdInstanceLogSpy.calledWith({
+          value: [{
+            AllowRssFeeds: true,
+            AlternateCssUrl: null,
+            AppInstanceId: "00000000-0000-0000-0000-000000000000",
+            Configuration: 0,
+            Created: null,
+            CurrentChangeToken: null,
+            CustomMasterUrl: null,
+            Description: null,
+            DesignPackageId: null,
+            DocumentLibraryCalloutOfficeWebAppPreviewersDisabled: false,
+            EnableMinimalDownload: false,
+            HorizontalQuickLaunch: false,
+            Id: "d8d179c7-f459-4f90-b592-14b08e84accb",
+            IsMultilingual: false,
+            Language: 1033,
+            LastItemModifiedDate: null,
+            LastItemUserModifiedDate: null,
+            MasterUrl: null,
+            NoCrawl: false,
+            OverwriteTranslationsOnChange: false,
+            ResourcePath: null,
+            QuickLaunchEnabled: false,
+            RecycleBinEnabled: false,
+            ServerRelativeUrl: null,
+            SiteLogoUrl: null,
+            SyndicationEnabled: false,
+            Title: "Subsite",
+            TreeViewEnabled: false,
+            UIVersion: 15,
+            UIVersionConfigurationEnabled: false,
+            Url: "https://Contoso.sharepoint.com/Subsite",
+            WebTemplate: "STS",
+            }]
+        }));
         done();
       }
       catch (e) {
@@ -264,13 +232,15 @@ describe(commands.WEB_LIST, () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf('/_api/web/webs') > -1) {
         return Promise.resolve(
-          {"value":[
-            {
-              "Title": "Documents",
-              "RootFolder": {"ServerRelativeUrl": "Documents"},
-              "Id": "14b2b6ed-0885-4814-bfd6-594737cc3ae3"
-            }
-          ]}
+          {
+            "value": [
+              {
+                //"Title": "Subsite",
+                "Url": "https://Contoso.sharepoint.com/"
+                //"Id": "d8d179c7-f459-4f90-b592-14b08e84accb"
+              }
+            ]
+          }
         );
       }
       return Promise.reject('Invalid request');
@@ -281,17 +251,19 @@ describe(commands.WEB_LIST, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: {
-      output: 'text',
-      debug: false,
-      webUrl: 'https://contoso.sharepoint.com'
-    } }, () => {
+    cmdInstance.action({
+      options: {
+        output: 'text',
+        debug: false,
+        webUrl: 'https://contoso.sharepoint.com'
+      }
+    }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(
           [{
-            Title: 'Documents',
-            Url: 'Documents',
-            Id: '14b2b6ed-0885-4814-bfd6-594737cc3ae3'
+           // Title: 'Subsite',
+            Url: "https://Contoso.sharepoint.com/"
+            //Id: '14b2b6ed-0885-4814-bfd6-594737cc3ae3'
           }]
         ));
         done();
@@ -420,7 +392,7 @@ describe(commands.WEB_LIST, () => {
   });
 
   it('fails validation if the url option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { } });
+    const actual = (command.validate() as CommandValidate)({ options: {} });
     assert.notEqual(actual, true);
   });
 

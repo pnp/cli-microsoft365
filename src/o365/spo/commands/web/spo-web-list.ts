@@ -103,7 +103,7 @@ class ListListCommand extends SpoCommand {
           cmd.log(WebProperties.value.map(l => {
             return {
               Title: l.Title,
-              Url: l.RootFolder.ServerRelativeUrl,
+              Url: l.Url,
               Id: l.Id
             };
           }));
