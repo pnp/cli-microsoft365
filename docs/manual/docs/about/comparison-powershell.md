@@ -309,7 +309,7 @@ New-PnPTenantSite|SharePointPnPPowerShellOnline|[spo site classic add](../cmd/sp
 New-PnPTerm|SharePointPnPPowerShellOnline|
 New-PnPTermGroup|SharePointPnPPowerShellOnline|
 New-PnPTermSet|SharePointPnPPowerShellOnline|
-New-PnPUnifiedGroup|SharePointPnPPowerShellOnline|
+New-PnPUnifiedGroup|SharePointPnPPowerShellOnline|[graph o365group add](../cmd/graph/o365group/o365group-add.md)
 New-PnPUser|SharePointPnPPowerShellOnline|
 New-PnPWeb|SharePointPnPPowerShellOnline|[spo web add](../cmd/spo/web/web-add.md)
 Publish-PnPApp|SharePointPnPPowerShellOnline|[spo app deploy](../cmd/spo/app/app-deploy.md)

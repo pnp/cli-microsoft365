@@ -226,10 +226,27 @@ export default abstract class Command {
       cmd.log(new CommandError(response.error['odata.error'].message.value));
     }
     else {
-      if (response.error &&
-        response.error.error &&
-        response.error.error.message) {
-        cmd.log(new CommandError(response.error.error.message));
+      if (response.error) {
+        if (response.error.error &&
+          response.error.error.message) {
+          cmd.log(new CommandError(response.error.error.message));
+        }
+        else {
+          try {
+            const error: any = JSON.parse(response.error);
+            if (error &&
+              error.error &&
+              error.error.message) {
+              cmd.log(new CommandError(error.error.message));
+            }
+            else {
+              cmd.log(new CommandError(response.error));
+            }
+          }
+          catch {
+            cmd.log(new CommandError(response.error));
+          }
+        }
       }
       else {
         if (response instanceof Error) {
