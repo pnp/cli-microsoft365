@@ -270,7 +270,7 @@ Get-PnPUnifiedGroupOwners|SharePointPnPPowerShellOnline|
 Get-PnPUser|SharePointPnPPowerShellOnline|
 Get-PnPUserProfileProperty|SharePointPnPPowerShellOnline|
 Get-PnPView|SharePointPnPPowerShellOnline|
-Get-PnPWeb|SharePointPnPPowerShellOnline|
+Get-PnPWeb|SharePointPnPPowerShellOnline|[spo web list](../cmd/spo/web/web-list.md)
 Get-PnPWebhookSubscriptions|SharePointPnPPowerShellOnline|
 Get-PnPWebPart|SharePointPnPPowerShellOnline|
 Get-PnPWebPartProperty|SharePointPnPPowerShellOnline|

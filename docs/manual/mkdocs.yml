@@ -98,6 +98,7 @@ pages:
         - storageentity set: 'cmd/spo/storageentity/storageentity-set.md'
       - web:
         - web add: 'cmd/spo/web/web-add.md'
+        - web list: 'cmd/spo/web/web-list.md'
         - web remove: 'cmd/spo/web/web-remove.md'
     - Microsoft Graph (graph):
       - connect: 'cmd/graph/connect.md'

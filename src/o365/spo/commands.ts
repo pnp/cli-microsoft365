@@ -83,5 +83,6 @@ export default {
   STORAGEENTITY_SET: `${prefix} storageentity set`,
   STORAGEENTITY_REMOVE: `${prefix} storageentity remove`,
   WEB_ADD: `${prefix} web add`,
-  WEB_REMOVE: `${prefix} web remove`
+  WEB_REMOVE: `${prefix} web remove`,
+  WEB_LIST: `${prefix} web list`
 };
