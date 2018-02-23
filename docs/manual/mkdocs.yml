@@ -98,6 +98,10 @@ pages:
         - storageentity set: 'cmd/spo/storageentity/storageentity-set.md'
       - tenant:
         - tenant appcatalogurl get: 'cmd/spo/tenant/tenant-appcatalogurl-get.md'
+      - theme:
+        - theme list: 'cmd/spo/theme/theme-list.md'
+        - theme remove: 'cmd/spo/theme/theme-remove.md'
+        - theme set: 'cmd/spo/theme/theme-set.md'
       - web:
         - web add: 'cmd/spo/web/web-add.md'
         - web get: 'cmd/spo/web/web-get.md'

@@ -10,7 +10,7 @@ Add-SPOSiteCollectionAppCatalog|Microsoft.Online.SharePoint.PowerShell|[spo site
 Add-SPOSiteDesign|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign add](../cmd/spo/sitedesign/sitedesign-add.md)
 Add-SPOSiteScript|Microsoft.Online.SharePoint.PowerShell|[spo sitescript add](../cmd/spo/sitescript/sitescript-add.md)
 Add-SPOTenantCdnOrigin|Microsoft.Online.SharePoint.PowerShell|[spo cdn origin add](../cmd/spo/cdn/cdn-origin-add.md)
-Add-SPOTheme|Microsoft.Online.SharePoint.PowerShell|
+Add-SPOTheme|Microsoft.Online.SharePoint.PowerShell|[spo theme set](../cmd/spo/theme/theme-set.md)
 Add-SPOUser|Microsoft.Online.SharePoint.PowerShell|
 Approve-SPOTenantServicePrincipalPermissionRequest|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal permissionrequest approve](../cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-approve.md)
 Connect-SPOService|Microsoft.Online.SharePoint.PowerShell|[spo connect](../cmd/spo/connect.md)
@@ -58,7 +58,7 @@ Get-SPOTenantServicePrincipalPermissionGrants|Microsoft.Online.SharePoint.PowerS
 Get-SPOTenantServicePrincipalPermissionRequests|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal permissionrequest list](../cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-list.md)
 Get-SPOTenantSyncClientRestriction|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOTenantTaxonomyReplicationParameters|Microsoft.Online.SharePoint.PowerShell|
-Get-SPOTheme|Microsoft.Online.SharePoint.PowerShell|
+Get-SPOTheme|Microsoft.Online.SharePoint.PowerShell|[spo theme list](../cmd/spo/theme/theme-list.md)
 Get-SPOUser|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOUserAndContentMoveState|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOUserOneDriveLocation|Microsoft.Online.SharePoint.PowerShell|
@@ -92,7 +92,7 @@ Remove-SPOSiteScript|Microsoft.Online.SharePoint.PowerShell|[spo sitescript remo
 Remove-SPOStorageEntity|Microsoft.Online.SharePoint.PowerShell|[spo storageentity remove](../cmd/spo/storageentity/storageentity-remove.md)
 Remove-SPOTenantCdnOrigin|Microsoft.Online.SharePoint.PowerShell|[spo cdn origin remove](../cmd/spo/cdn/cdn-origin-remove.md)
 Remove-SPOTenantSyncClientRestriction|Microsoft.Online.SharePoint.PowerShell|
-Remove-SPOTheme|Microsoft.Online.SharePoint.PowerShell|
+Remove-SPOTheme|Microsoft.Online.SharePoint.PowerShell|[spo theme remove](../cmd/spo/theme/theme-remove.md)
 Remove-SPOUser|Microsoft.Online.SharePoint.PowerShell|
 Repair-SPOSite|Microsoft.Online.SharePoint.PowerShell|
 Request-SPOPersonalSite|Microsoft.Online.SharePoint.PowerShell|
