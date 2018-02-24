@@ -22,14 +22,14 @@ interface Options extends GlobalOptions {
   json: string;
 }
 
-class ThemeAddCommand extends SpoCommand {
+class ThemeRemoveCommand extends SpoCommand {
   
   public get name(): string {
-    return commands.THEME_ADD;
+    return commands.THEME_REMOVE;
   }
 
   public get description(): string {
-    return 'Adds new theme to tenant with the given palette';
+    return 'Removes existing theme from the tenant with the given name';
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
@@ -52,20 +52,11 @@ class ThemeAddCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          cmd.log(`Adding theme to tenant...`);
+          cmd.log(`Removing theme from tenant...`);
         }
-
-        let palette: any = {
-          "palette" : args.options.json
-        }
-
-        cmd.log('args:');
-        cmd.log(args.options.json);
-        cmd.log('pal is:');
-        cmd.log(palette);
 
         const requestOptions: any = {
-          url: `${auth.site.url}/_api/thememanager/AddTenantTheme`,
+          url: `${auth.site.url}/_api/thememanager/DeleteTenantTheme`,
           method: 'POST',
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${siteAccessToken}`,
@@ -73,7 +64,6 @@ class ThemeAddCommand extends SpoCommand {
           }),
           body: {
             "name": args.options.name,
-            "themeJson" : JSON.stringify(palette),
             },
           json: true
         };
@@ -104,10 +94,6 @@ class ThemeAddCommand extends SpoCommand {
       {
         option: '--name <name>',
         description: 'name of the theme getting added'
-      },
-      {
-        option: '--json <json>',
-        description: 'color palette in the form of JSON object'
       }
     ];
 
@@ -120,11 +106,6 @@ class ThemeAddCommand extends SpoCommand {
       if (!args.options.name) {
         return 'Required parameter name missing';
       }
-
-      if (!args.options.json) {
-        return 'Required parameter json missing';
-      }
-
       return true;
     };
   }
@@ -143,12 +124,10 @@ class ThemeAddCommand extends SpoCommand {
           
     Example:
     
-      Add new theme to the tenant
+      Removes theme from tenant
       ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-        ${chalk.grey(config.delimiter)} ${commands.THEME_ADD} --name Contoso-Blue --json <JSON object copied from URL>`);
+        ${chalk.grey(config.delimiter)} ${commands.THEME_REMOVE} --name Contoso-Blue`);
   }
-
 }
 
-module.exports = new ThemeAddCommand();
-
+module.exports = new ThemeRemoveCommand();
