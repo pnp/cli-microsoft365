@@ -233,14 +233,14 @@ export default abstract class Command {
         }
         else {
           try {
-            let error: any = JSON.parse(response.error);
+            const error: any = JSON.parse(response.error);
             if (error &&
               error.error &&
               error.error.message) {
               cmd.log(new CommandError(error.error.message));
             }
             else {
-              cmd.log(new CommandError(error));
+              cmd.log(new CommandError(response.error));
             }
           }
           catch {
