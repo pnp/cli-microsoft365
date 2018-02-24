@@ -10,7 +10,6 @@ import {
 import SpoCommand from '../../SpoCommand';
 import { ContextInfo } from '../../spo';
 import Utils from '../../../../Utils';
-import Auth from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -19,37 +18,31 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  webUrl: string;
+  name: string;
+  json: string;
 }
 
-class ThemeGetCommand extends SpoCommand {
+class ThemeAddCommand extends SpoCommand {
   
   public get name(): string {
-    return commands.THEME_GET;
+    return commands.THEME_ADD;
   }
 
   public get description(): string {
-    return 'Gets the current theme settings for the site';
+    return 'Adds new theme to the site with the given palette';
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
     let siteAccessToken: string = '';
-
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
-    }
-
     auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
+      .ensureAccessToken(auth.service.resource, cmd, this.debug)
       .then((accessToken: string): request.RequestPromise => {
         siteAccessToken = accessToken;
-
         if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
+          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest for tenant admin at ${auth.site.url}...`);
         }
 
-        return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
+        return this.getRequestDigest(cmd, this.debug);
       })
       .then((res: ContextInfo): request.RequestPromise => {
         if (this.debug) {
@@ -59,11 +52,11 @@ class ThemeGetCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          cmd.log(`Retrieving theme information in site at ${args.options.webUrl}...`);
+          cmd.log(`Adding theme to tenant...`);
         }
 
         let requestUrl: string = '';
-        requestUrl = `${args.options.webUrl}/_api/thememanager/GetTenantThemingOptions`;        
+        requestUrl = `${auth.site.url}/_api/thememanager/AddTenantTheme`;      
 
         const requestOptions: any = {
           url: requestUrl,
@@ -72,7 +65,10 @@ class ThemeGetCommand extends SpoCommand {
             authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata'
           }),
-          body: '',
+          body: {
+            "name": args.options.name,
+            "themeJson" : JSON.stringify(`{"palette":${args.options.json}}`),
+            },
           json: true
         };
 
@@ -100,9 +96,13 @@ class ThemeGetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the themes will be retreived'
+        option: '--name <name>',
+        description: 'name of the theme getting added'
       },
+      {
+        option: '--json <json>',
+        description: 'color palette in the form of JSON object'
+      }
     ];
 
     const parentOptions: CommandOption[] = super.options();
@@ -111,13 +111,12 @@ class ThemeGetCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.webUrl) {
-        return 'Required parameter webUrl missing';
+      if (!args.options.name) {
+        return 'Required parameter name missing';
       }
 
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
+      if (!args.options.json) {
+        return 'Required parameter json missing';
       }
 
       return true;
@@ -138,10 +137,11 @@ class ThemeGetCommand extends SpoCommand {
           
     Example:
     
-      Return theme settings for the site
+      Add new theme for the site
       ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-        ${chalk.grey(config.delimiter)} ${commands.THEME_GET} --webUrl https://contoso.sharepoint.com/sites/project-x`);
+        ${chalk.grey(config.delimiter)} ${commands.THEME_ADD} --name Contoso-Blue --json <JSON object copied from URL>`);
   }
+
 }
 
-module.exports = new ThemeGetCommand();
+module.exports = new ThemeAddCommand();
