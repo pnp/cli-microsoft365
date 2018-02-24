@@ -1,6 +1,6 @@
 # Release notes
 
-## [v0.6.0](https://github.com/SharePoint/office365-cli/releases/tag/v0.6.0)
+## [v1.0.0](https://github.com/SharePoint/office365-cli/releases/tag/v1.0.0)
 
 ### Breaking changes
 
@@ -10,6 +10,7 @@
 
 **SharePoint Online:**
 
+- [spo file list](../cmd/spo/file/file-list.md) - lists all available files in the specified folder and site [#281](https://github.com/SharePoint/office365-cli/issues/281)
 - [spo list add](../cmd/spo/list/list-add.md) - creates list in the specified site [#204](https://github.com/SharePoint/office365-cli/issues/204)
 - [spo list remove](../cmd/spo/list/list-remove.md) - removes the specified list [#206](https://github.com/SharePoint/office365-cli/issues/206)
 - [spo list set](../cmd/spo/list/list-set.md) - updates the settings of the specified list [#205](https://github.com/SharePoint/office365-cli/issues/205)
@@ -26,6 +27,8 @@
 - [graph connect](../cmd/graph/connect.md) - connects to the Microsoft Graph [#10](https://github.com/SharePoint/office365-cli/issues/10)
 - [graph disconnect](../cmd/graph/disconnect.md) - disconnects from the Microsoft Graph [#10](https://github.com/SharePoint/office365-cli/issues/10)
 - [graph status](../cmd/graph/status.md) - shows Microsoft Graph connection status [#10](https://github.com/SharePoint/office365-cli/issues/10)
+- [graph o365group get](../cmd/graph/o365group/o365group-get.md) - gets information about the specified Office 365 Group [#306](https://github.com/SharePoint/office365-cli/issues/306)
+- [graph o365group list](../cmd/graph/o365group/o365group-list.md) - lists Office 365 Groups in the current tenant [#305](https://github.com/SharePoint/office365-cli/issues/305)
 
 ### Changes
 
