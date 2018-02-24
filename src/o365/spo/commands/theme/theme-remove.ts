@@ -8,7 +8,9 @@ import {
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import { ContextInfo } from '../../spo';
+import {
+  ContextInfo
+} from '../../spo';
 import Utils from '../../../../Utils';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -19,11 +21,10 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   name: string;
-  json: string;
 }
 
 class ThemeRemoveCommand extends SpoCommand {
-  
+
   public get name(): string {
     return commands.THEME_REMOVE;
   }
@@ -64,7 +65,7 @@ class ThemeRemoveCommand extends SpoCommand {
           }),
           body: {
             "name": args.options.name,
-            },
+          },
           json: true
         };
 
@@ -90,12 +91,10 @@ class ThemeRemoveCommand extends SpoCommand {
   }
 
   public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '--name <name>',
-        description: 'name of the theme getting added'
-      }
-    ];
+    const options: CommandOption[] = [{
+      option: '--name <name>',
+      description: 'name of the theme getting added'
+    }];
 
     const parentOptions: CommandOption[] = super.options();
     return options.concat(parentOptions);

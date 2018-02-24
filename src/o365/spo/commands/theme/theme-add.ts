@@ -8,7 +8,8 @@ import {
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import { ContextInfo } from '../../spo';
+import * as fs from 'fs';
+import * as path from 'path';
 import Utils from '../../../../Utils';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -19,11 +20,11 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   name: string;
-  json: string;
+  filePath: string;
 }
 
 class ThemeAddCommand extends SpoCommand {
-  
+
   public get name(): string {
     return commands.THEME_ADD;
   }
@@ -33,48 +34,41 @@ class ThemeAddCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    let siteAccessToken: string = '';
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
       .then((accessToken: string): request.RequestPromise => {
-        siteAccessToken = accessToken;
+
         if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest for tenant admin at ${auth.site.url}...`);
+          cmd.log(`Retrieved access token ${accessToken}. Adding new theme to the tenant store...`);
         }
 
-        return this.getRequestDigest(cmd, this.debug);
-      })
-      .then((res: ContextInfo): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
+        const fullPath: string = path.resolve(args.options.filePath);
 
         if (this.verbose) {
-          cmd.log(`Adding theme to tenant...`);
+          cmd.log(`Adding theme from ${fullPath} to tenant...`);
         }
 
-        let palette: any = {
-          "palette" : args.options.json
+        const palette: any = {
+          "palette": JSON.parse(fs.readFileSync(fullPath, 'utf8'))
         }
 
-        cmd.log('args:');
-        cmd.log(args.options.json);
-        cmd.log('pal is:');
-        cmd.log(palette);
+        if (this.debug) {
+          cmd.log('');
+          cmd.log('Palette');
+          cmd.log(JSON.stringify(palette));
+        }
 
         const requestOptions: any = {
           url: `${auth.site.url}/_api/thememanager/AddTenantTheme`,
           method: 'POST',
           headers: Utils.getRequestHeaders({
-            authorization: `Bearer ${siteAccessToken}`,
+            authorization: `Bearer ${accessToken}`,
             'accept': 'application/json;odata=nometadata'
           }),
           body: {
             "name": args.options.name,
-            "themeJson" : JSON.stringify(palette),
-            },
+            "themeJson": JSON.stringify(palette)
+          },
           json: true
         };
 
@@ -86,28 +80,30 @@ class ThemeAddCommand extends SpoCommand {
 
         return request.post(requestOptions);
       })
-      .then((response: any): void => {
+      .then((rawRes: string): void => {
+
         if (this.debug) {
           cmd.log('Response:');
-          cmd.log(response);
+          cmd.log(rawRes);
           cmd.log('');
         }
 
-        cmd.log(response);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+        if (this.verbose) {
+          cmd.log(vorpal.chalk.green('DONE'));
+        }
 
+        cb();
+      }, (rawRes: any): void => this.handleRejectedODataPromise(rawRes, cmd, cb));
   }
 
   public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '--name <name>',
+    const options: CommandOption[] = [{
+        option: '-n, --name <name>',
         description: 'name of the theme getting added'
       },
       {
-        option: '--json <json>',
-        description: 'color palette in the form of JSON object'
+        option: '-p, --filePath <filePath>',
+        description: 'Absolute or relative path to the theme json file to add to the tenant theme store'
       }
     ];
 
@@ -121,10 +117,19 @@ class ThemeAddCommand extends SpoCommand {
         return 'Required parameter name missing';
       }
 
-      if (!args.options.json) {
-        return 'Required parameter json missing';
+      if (!args.options.filePath) {
+        return 'Required parameter file path missing';
       }
 
+      const fullPath: string = path.resolve(args.options.filePath);
+
+      if (!fs.existsSync(fullPath)) {
+        return `File '${fullPath}' not found`;
+      }
+
+      if (fs.lstatSync(fullPath).isDirectory()) {
+        return `Path '${fullPath}' points to a directory`;
+      }
       return true;
     };
   }
@@ -138,17 +143,21 @@ class ThemeAddCommand extends SpoCommand {
   
     Remarks:
     
-      To get information about a theme, you have to first connect to SharePoint using the
+      To add new them, you have to first connect to SharePoint using the
       ${chalk.blue(commands.CONNECT)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
           
-    Example:
+    Examples:
     
-      Add new theme to the tenant
-      ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-        ${chalk.grey(config.delimiter)} ${commands.THEME_ADD} --name Contoso-Blue --json <JSON object copied from URL>`);
-  }
+      Add new theme to the tenant from absolute or relative path of given theme json file
+      ${chalk.grey(config.delimiter)} ${commands.THEME_ADD} -n Contoso-Blue -p /Users/rjesh/themes/contoso-blue.json
+      
+    More information:
 
+      Create custom theme using Office Fabric theme generator tool, 
+        copy the JSON output and save as JSON file.
+      https://developer.microsoft.com/en-us/fabric#/styles/themegenerator
+      `);
+  }
 }
 
 module.exports = new ThemeAddCommand();
-
