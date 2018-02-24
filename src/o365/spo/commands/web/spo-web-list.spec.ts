@@ -180,7 +180,7 @@ describe(commands.WEB_LIST, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({
           value: [{
-            AllowRssFeeds: true,
+            AllowRssFeeds: false,
             AlternateCssUrl: null,
             AppInstanceId: "00000000-0000-0000-0000-000000000000",
             Configuration: 0,
@@ -235,9 +235,9 @@ describe(commands.WEB_LIST, () => {
           {
             "value": [
               {
-                //"Title": "Subsite",
-                "Url": "https://Contoso.sharepoint.com/"
-                //"Id": "d8d179c7-f459-4f90-b592-14b08e84accb"
+                "Title": "Subsite",
+                "Url": "https://Contoso.sharepoint.com/",
+                "Id": "d8d179c7-f459-4f90-b592-14b08e84accb"
               }
             ]
           }
@@ -261,9 +261,9 @@ describe(commands.WEB_LIST, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(
           [{
-           // Title: 'Subsite',
-            Url: "https://Contoso.sharepoint.com/"
-            //Id: '14b2b6ed-0885-4814-bfd6-594737cc3ae3'
+            Title: 'Subsite',
+            Url: "https://Contoso.sharepoint.com/",
+            Id: 'd8d179c7-f459-4f90-b592-14b08e84accb'
           }]
         ));
         done();
@@ -278,7 +278,7 @@ describe(commands.WEB_LIST, () => {
     });
   });
 
-  it('command correctly handles list list reject request', (done) => {
+  it('command correctly handles web list reject request', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf('/_api/contextinfo') > -1) {
         return Promise.resolve({
