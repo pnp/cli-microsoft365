@@ -96,6 +96,7 @@ pages:
       - web:
         - web add: 'cmd/spo/web/web-add.md'
         - web remove: 'cmd/spo/web/web-remove.md'
+        - web list: 'cmd/spo/web/web-list.md'
     - Microsoft Graph (graph):
       - connect: 'cmd/graph/connect.md'
       - disconnect: 'cmd/graph/disconnect.md'
