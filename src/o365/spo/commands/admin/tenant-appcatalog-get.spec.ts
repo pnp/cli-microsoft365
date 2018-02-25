@@ -1,5 +1,5 @@
 import commands from '../../commands';
-import Command, { CommandOption } from '../../../../Command';
+import Command, { CommandValidate, CommandError,CommandOption } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
@@ -11,9 +11,12 @@ import Utils from '../../../../Utils';
 describe(commands.TENANT_APPCATALOG_GET, () => {
   let vorpal: Vorpal;
   let log: any[];
+  let requests: any[];
   let cmdInstance: any;
   let trackEvent: any;
   let telemetry: any;
+
+  let cmdInstanceLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -27,11 +30,13 @@ describe(commands.TENANT_APPCATALOG_GET, () => {
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
+    requests = [];
     cmdInstance = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
+    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
     auth.site = new Site();
     telemetry = null;
   });
@@ -135,4 +140,161 @@ describe(commands.TENANT_APPCATALOG_GET, () => {
     assert(containsExamples);
   });
 
+  it('validation always returns true', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+      }
+    });
+    assert.equal(actual, true);
+  });
+
+  it('handles promise error while getting tenant appcatalog', (done) => {
+    // get tenant app catalog
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+        return Promise.reject('An error has occurred');
+      }
+      if (opts.url.indexOf('contextinfo') > -1) {
+        return Promise.resolve('abc');
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+       
+      }
+    }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('An error has occurred')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('handles error while getting tenant appcatalog', (done) => {
+    // get tenant app catalog
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+        return Promise.resolve(JSON.stringify([
+          {
+            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": {
+              "ErrorMessage": "An error has occurred", "ErrorValue": null, "TraceCorrelationId": "18091989-62a6-4cad-9717-29892ee711bc", "ErrorCode": -1, "ErrorTypeName": "Microsoft.SharePoint.Client.ServerException"
+            }, "TraceCorrelationId": "18091989-62a6-4cad-9717-29892ee711bc"
+          }
+        ]));
+      }
+      if (opts.url.indexOf('contextinfo') > -1) {
+        return Promise.resolve('abc');
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+       
+      }
+    }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('An error has occurred')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('gets the tenant appcatalog url (debug)', (done) => {
+    // get tenant app catalog
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+        return Promise.resolve(JSON.stringify([
+          {
+          "SchemaVersion":"15.0.0.0","LibraryVersion":"16.0.7407.1202","ErrorInfo":null,"TraceCorrelationId":"2df74b9e-c022-5000-1529-309f2cd00843"
+          },58,{
+          "IsNull":false
+          },59,{
+          "_ObjectType_":"SP.TenantSettings","CorporateCatalogUrl":"https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fapps"
+          }
+          ]));
+      }
+      if (opts.url.indexOf('contextinfo') > -1) {
+        return Promise.resolve('abc');
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+       debug:true
+      }
+    }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(sinon.match('https://contoso.sharepoint.com/sites/apps')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('handles if tenant appcatalog is null or not exist (debug)', (done) => {
+    // get tenant app catalog
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+        return Promise.resolve(JSON.stringify([
+          {
+          "SchemaVersion":"15.0.0.0","LibraryVersion":"16.0.7407.1202","ErrorInfo":null,"TraceCorrelationId":"2df74b9e-c022-5000-1529-309f2cd00843"
+          },58,{
+          "IsNull":false
+          },59,{
+          "_ObjectType_":"SP.TenantSettings","CorporateCatalogUrl":null
+          }
+          ]));
+      }
+      if (opts.url.indexOf('contextinfo') > -1) {
+        return Promise.resolve('abc');
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+       debug:true
+      }
+    }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith('Tenant appcatalog url is null.'));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
 });

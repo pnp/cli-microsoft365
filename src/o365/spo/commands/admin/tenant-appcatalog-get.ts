@@ -81,7 +81,14 @@ class SpoWebAddCommand extends SpoCommand {
         cmd.log(new CommandError(response.ErrorInfo.ErrorMessage));
       }
       else {
-        cmd.log(json);
+        var catalogUrl : string = json.pop().CorporateCatalogUrl;
+        if(catalogUrl != null)
+        {
+          cmd.log(catalogUrl);
+        }
+        else {
+          cmd.log("Tenant appcatalog url is null.");
+        }
       }
       cb();
     }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
