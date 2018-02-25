@@ -10,7 +10,7 @@ import {
   CommandValidate
 } from '../../../../Command';
 import Utils from '../../../../Utils';
-import AadCommand from '../../GraphCommand';
+import GraphCommand from '../../GraphCommand';
 import { Group } from './Group';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -29,7 +29,7 @@ interface Options extends GlobalOptions {
   logoPath?: string;
 }
 
-class GraphO365GroupAddCommand extends AadCommand {
+class GraphO365GroupAddCommand extends GraphCommand {
   private static numRepeat: number = 15;
 
   public get name(): string {
