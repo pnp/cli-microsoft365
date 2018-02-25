@@ -402,7 +402,7 @@ Set-PnPTaxonomyFieldValue|SharePointPnPPowerShellOnline|
 Set-PnPTenantSite|SharePointPnPPowerShellOnline|[spo site classic set](../cmd/spo/site/site-classic-set.md)
 Set-PnPTheme|SharePointPnPPowerShellOnline|
 Set-PnPTraceLog|SharePointPnPPowerShellOnline|
-Set-PnPUnifiedGroup|SharePointPnPPowerShellOnline|
+Set-PnPUnifiedGroup|SharePointPnPPowerShellOnline|[graph o365group set](../cmd/graph/o365group/o365group-set.md)
 Set-PnPUserProfileProperty|SharePointPnPPowerShellOnline|
 Set-PnPView|SharePointPnPPowerShellOnline|
 Set-PnPWeb|SharePointPnPPowerShellOnline|

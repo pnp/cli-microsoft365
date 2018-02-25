@@ -5,5 +5,6 @@ export default {
   DISCONNECT: `${prefix} disconnect`,
   O365GROUP_GET: `${prefix} o365group get`,
   O365GROUP_LIST: `${prefix} o365group list`,
+  O365GROUP_SET: `${prefix} o365group set`,
   STATUS: `${prefix} status`
 };
