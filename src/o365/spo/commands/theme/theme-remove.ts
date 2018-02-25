@@ -8,9 +8,6 @@ import {
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import {
-  ContextInfo
-} from '../../spo';
 import Utils from '../../../../Utils';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -30,26 +27,17 @@ class ThemeRemoveCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Removes existing theme from the tenant with the given name';
+    return 'Removes existing theme from tenant with the given name.';
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    let siteAccessToken: string = '';
+
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
       .then((accessToken: string): request.RequestPromise => {
-        siteAccessToken = accessToken;
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest for tenant admin at ${auth.site.url}...`);
-        }
 
-        return this.getRequestDigest(cmd, this.debug);
-      })
-      .then((res: ContextInfo): request.RequestPromise => {
         if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
+          cmd.log(`Retrieved access token ${accessToken}. Removing theme from tenant store...`);
         }
 
         if (this.verbose) {
@@ -60,7 +48,7 @@ class ThemeRemoveCommand extends SpoCommand {
           url: `${auth.site.url}/_api/thememanager/DeleteTenantTheme`,
           method: 'POST',
           headers: Utils.getRequestHeaders({
-            authorization: `Bearer ${siteAccessToken}`,
+            authorization: `Bearer ${accessToken}`,
             'accept': 'application/json;odata=nometadata'
           }),
           body: {
@@ -76,24 +64,29 @@ class ThemeRemoveCommand extends SpoCommand {
         }
 
         return request.post(requestOptions);
+       
       })
-      .then((response: any): void => {
+      .then((rawRes: string): void => {
+
         if (this.debug) {
           cmd.log('Response:');
-          cmd.log(response);
+          cmd.log(rawRes);
           cmd.log('');
         }
 
-        cmd.log(response);
+        if (this.verbose) {
+          cmd.log(vorpal.chalk.green('DONE'));
+        }
+
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, cmd, cb));
 
   }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [{
-      option: '--name <name>',
-      description: 'name of the theme getting added'
+        option: '-n, --name <name>',
+        description: 'name of the theme getting removed'
     }];
 
     const parentOptions: CommandOption[] = super.options();
@@ -118,14 +111,13 @@ class ThemeRemoveCommand extends SpoCommand {
   
     Remarks:
     
-      To get information about a theme, you have to first connect to SharePoint using the
+      To remove the theme, you have to first connect to SharePoint using the
       ${chalk.blue(commands.CONNECT)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
           
     Example:
     
       Removes theme from tenant
-      ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-        ${chalk.grey(config.delimiter)} ${commands.THEME_REMOVE} --name Contoso-Blue`);
+      ${chalk.grey(config.delimiter)} ${commands.THEME_REMOVE} -n Contoso-Blue`);
   }
 }
 
