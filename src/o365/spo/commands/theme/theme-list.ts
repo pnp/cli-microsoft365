@@ -12,14 +12,14 @@ interface CommandArgs {
   options: GlobalOptions;
 }
 
-class ThemeGetCommand extends SpoCommand {
+class ThemeListCommand extends SpoCommand {
 
   public get name(): string {
-    return commands.THEME_GET;
+    return commands.THEME_LIST;
   }
 
   public get description(): string {
-    return 'Gets the current theme settings for the site';
+    return 'Retreives the list of custom themes added to the tenant store.';
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
@@ -53,14 +53,33 @@ class ThemeGetCommand extends SpoCommand {
         }
         return request.get(requestOptions);
       })
-      .then((themeResponse: any): void => {
+      .then((rawRes: any): void => {
+
         if (this.debug) {
           cmd.log('Response:');
-          cmd.log(themeResponse);
+          cmd.log(rawRes);
           cmd.log('');
         }
 
-        cmd.log(themeResponse);
+        const themePreviews: any[] = rawRes.themePreviews;
+
+        if (themePreviews && themePreviews.length > 0) {
+
+          if (args.options.output === 'json') {
+            cmd.log(themePreviews);
+          }
+          else {
+            themePreviews.map(a => {
+              const themeJson = JSON.parse(a.themeJson);
+              cmd.log(`Name: ${a.name}\nPalette: ${JSON.stringify(themeJson.palette)}`);              
+            });          
+          }
+        }
+        else {
+          if (this.verbose) {
+            cmd.log('No themes found');
+          }
+        }
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
@@ -77,11 +96,15 @@ class ThemeGetCommand extends SpoCommand {
       To get information about a theme, you have to first connect to SharePoint using the
       ${chalk.blue(commands.CONNECT)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
           
-    Example:
+    Examples:
     
       Returns themes from the tenant store
-      ${commands.THEME_GET}`);
+      ${commands.THEME_LIST}
+      
+      Returns themes from the tenant store as JSON
+      ${commands.THEME_LIST} -o json     
+      `);
   }
 }
 
-module.exports = new ThemeGetCommand();
+module.exports = new ThemeListCommand();
