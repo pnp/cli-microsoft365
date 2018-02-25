@@ -80,6 +80,7 @@ export default {
   STORAGEENTITY_GET: `${prefix} storageentity get`,
   STORAGEENTITY_SET: `${prefix} storageentity set`,
   STORAGEENTITY_REMOVE: `${prefix} storageentity remove`,
+  TENANT_APPCATALOG_GET: `${prefix} tenant appcatalog get`,
   WEB_ADD: `${prefix} web add`,
   WEB_REMOVE: `${prefix} web remove`
 };
