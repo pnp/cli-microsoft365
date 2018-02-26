@@ -15,11 +15,15 @@
 - [spo list remove](../cmd/spo/list/list-remove.md) - removes the specified list [#206](https://github.com/SharePoint/office365-cli/issues/206)
 - [spo list set](../cmd/spo/list/list-set.md) - updates the settings of the specified list [#205](https://github.com/SharePoint/office365-cli/issues/205)
 - [spo customaction clear](../cmd/spo/customaction/customaction-clear.md) - deletes all custom actions in the collection [#231](https://github.com/SharePoint/office365-cli/issues/231)
+- [spo propertybag get](../cmd/spo/propertybag/propertybag-get.md) - gets the value of the specified property from the property bag [#289](https://github.com/SharePoint/office365-cli/issues/289)
+- [spo propertybag list](../cmd/spo/propertybag/propertybag-list.md) - gets property bag values [#288](https://github.com/SharePoint/office365-cli/issues/288)
 - [spo site set](../cmd/spo/site/site-set.md) - updates properties of the specified site [#121](https://github.com/SharePoint/office365-cli/issues/121)
 - [spo site classic add](../cmd/spo/site/site-classic-add.md) - creates new classic site [#123](https://github.com/SharePoint/office365-cli/issues/123)
 - [spo site classic set](../cmd/spo/site/site-classic-set.md) - change classic site settings [#124](https://github.com/SharePoint/office365-cli/issues/124)
 - [spo sitedesign set](../cmd/spo/sitedesign/sitedesign-set.md) - updates a site design with new values [#251](https://github.com/SharePoint/office365-cli/issues/251)
+- [spo tenant appcatalogurl get](../cmd/spo/tenant/tenant-appcatalogurl-get.md) - gets the URL of the tenant app catalog [#315](https://github.com/SharePoint/office365-cli/issues/315)
 - [spo web add](../cmd/spo/web/web-add.md) - create new subsite [#189](https://github.com/SharePoint/office365-cli/issues/189)
+- [spo web list](../cmd/spo/web/web-list.md) - lists subsites of the specified site [#187](https://github.com/SharePoint/office365-cli/issues/187)
 - [spo web remove](../cmd/spo/web/web-remove.md) - delete specified subsite [#192](https://github.com/SharePoint/office365-cli/issues/192)
 
 **Microsoft Graph:**
@@ -27,8 +31,10 @@
 - [graph connect](../cmd/graph/connect.md) - connects to the Microsoft Graph [#10](https://github.com/SharePoint/office365-cli/issues/10)
 - [graph disconnect](../cmd/graph/disconnect.md) - disconnects from the Microsoft Graph [#10](https://github.com/SharePoint/office365-cli/issues/10)
 - [graph status](../cmd/graph/status.md) - shows Microsoft Graph connection status [#10](https://github.com/SharePoint/office365-cli/issues/10)
+- [graph o365group add](../cmd/graph/o365group/o365group-add.md) - creates Office 365 Group [#308](https://github.com/SharePoint/office365-cli/issues/308)
 - [graph o365group get](../cmd/graph/o365group/o365group-get.md) - gets information about the specified Office 365 Group [#306](https://github.com/SharePoint/office365-cli/issues/306)
 - [graph o365group list](../cmd/graph/o365group/o365group-list.md) - lists Office 365 Groups in the current tenant [#305](https://github.com/SharePoint/office365-cli/issues/305)
+- [graph o365group set](../cmd/graph/o365group/o365group-set.md) - updates Office 365 Group properties [#307](https://github.com/SharePoint/office365-cli/issues/307)
 
 ### Changes
 
