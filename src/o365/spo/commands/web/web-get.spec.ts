@@ -118,7 +118,7 @@ describe(commands.WEB_GET, () => {
     });
   });
 
-  it('retrieves web information', (done) => {
+  it('retrieves site information', (done) => {
     stubAuth();
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -226,7 +226,7 @@ describe(commands.WEB_GET, () => {
     });
   });
 
-  it('retrieves all web information with output option text', (done) => {
+  it('retrieves all site information with output option text', (done) => {
     stubAuth();
 
     sinon.stub(request, 'get').callsFake((opts) => {

@@ -28,7 +28,7 @@ class SpoWebGetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Retrieve information of the specified subsite';
+    return 'Retrieve information of the specified site';
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
@@ -46,7 +46,7 @@ class SpoWebGetCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          cmd.log(`Retrieving web information in web at ${args.options.webUrl}...`);
+          cmd.log(`Retrieving web information in site at ${args.options.webUrl}...`);
         }
 
         let requestUrl: string = `${args.options.webUrl}/_api/web/`;
@@ -84,7 +84,7 @@ class SpoWebGetCommand extends SpoCommand {
     const options: CommandOption[] = [
       {
         option: '-u, --webUrl <webUrl>',
-        description: 'URL of the subsite for which to retrieve the information'
+        description: 'URL of the site for which to retrieve the information'
       }
     ];
 
@@ -116,12 +116,12 @@ class SpoWebGetCommand extends SpoCommand {
   
   Remarks:
   
-    To retrieve all information of subsite, you have to first connect to SharePoint using the
+    To retrieve all information of site, you have to first connect to SharePoint using the
     ${chalk.blue(commands.CONNECT)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
         
   Examples:
   
-    Retrieve all information from subsite ${chalk.grey('https://contoso.sharepoint.com/subsite')}
+    Retrieve all information from site ${chalk.grey('https://contoso.sharepoint.com/subsite')}
       ${chalk.grey(config.delimiter)} ${commands.WEB_GET} --webUrl https://contoso.sharepoint.com/subsite
       `);
   }
