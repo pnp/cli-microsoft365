@@ -85,5 +85,6 @@ export default {
   TENANT_APPCATALOGURL_GET: `${prefix} tenant appcatalogurl get`,
   WEB_ADD: `${prefix} web add`,
   WEB_REMOVE: `${prefix} web remove`,
+  WEB_GET: `${prefix} web get`,
   WEB_LIST: `${prefix} web list`
 };
