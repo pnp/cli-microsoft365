@@ -100,6 +100,7 @@ pages:
         - tenant appcatalogurl get: 'cmd/spo/tenant/tenant-appcatalogurl-get.md'
       - web:
         - web add: 'cmd/spo/web/web-add.md'
+        - web get: 'cmd/spo/web/web-get.md'
         - web list: 'cmd/spo/web/web-list.md'
         - web remove: 'cmd/spo/web/web-remove.md'
     - Microsoft Graph (graph):
