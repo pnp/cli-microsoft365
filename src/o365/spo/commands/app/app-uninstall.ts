@@ -46,7 +46,7 @@ class AppUninstallCommand extends SpoCommand {
 
       auth
         .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-        .then((accessToken: string): Promise<ContextInfo> => {
+        .then((accessToken: string): request.RequestPromise => {
           siteAccessToken = accessToken;
 
           if (this.debug) {
@@ -55,7 +55,7 @@ class AppUninstallCommand extends SpoCommand {
 
           return this.getRequestDigestForSite(args.options.siteUrl, siteAccessToken, cmd, this.debug);
         })
-        .then((res: ContextInfo): Promise<string> => {
+        .then((res: ContextInfo): request.RequestPromise => {
           if (this.debug) {
             cmd.log('Response:');
             cmd.log(res);

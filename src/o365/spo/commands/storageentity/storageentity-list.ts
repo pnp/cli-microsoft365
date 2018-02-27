@@ -40,7 +40,7 @@ class SpoStorageEntityListCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<{ storageentitiesindex: string }> => {
+      .then((accessToken: string): request.RequestPromise => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}. Loading all tenant properties...`);
         }

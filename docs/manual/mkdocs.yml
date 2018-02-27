@@ -31,12 +31,15 @@ pages:
         - cdn set: 'cmd/spo/cdn/cdn-set.md'
       - customaction:
         - customaction add: 'cmd/spo/customaction/customaction-add.md'
+        - customaction clear: 'cmd/spo/customaction/customaction-clear.md'
         - customaction get: 'cmd/spo/customaction/customaction-get.md'
         - customaction list: 'cmd/spo/customaction/customaction-list.md'
         - customaction remove: 'cmd/spo/customaction/customaction-remove.md'
         - customaction set: 'cmd/spo/customaction/customaction-set.md'
       - externaluser:
         - externaluser list: 'cmd/spo/externaluser/externaluser-list.md'
+      - file:
+        - file list: 'cmd/spo/file/file-list.md'
       - hubsite:
         - hubsite connect: 'cmd/spo/hubsite/hubsite-connect.md'
         - hubsite disconnect: 'cmd/spo/hubsite/hubsite-disconnect.md'
@@ -48,8 +51,14 @@ pages:
         - hubsite set: 'cmd/spo/hubsite/hubsite-set.md'
         - hubsite unregister: 'cmd/spo/hubsite/hubsite-unregister.md'
       - list:
+        - list add: 'cmd/spo/list/list-add.md'
         - list get: 'cmd/spo/list/list-get.md'
         - list list: 'cmd/spo/list/list-list.md'
+        - list remove: 'cmd/spo/list/list-remove.md'
+        - list set: 'cmd/spo/list/list-set.md'
+      - propertybag:
+        - propertybag get: 'cmd/spo/propertybag/propertybag-get.md'
+        - propertybag list: 'cmd/spo/propertybag/propertybag-list.md'
       - serviceprincipal:
         - serviceprincipal grant list: 'cmd/spo/serviceprincipal/serviceprincipal-grant-list.md'
         - serviceprincipal grant revoke: 'cmd/spo/serviceprincipal/serviceprincipal-grant-revoke.md'
@@ -61,14 +70,18 @@ pages:
         - site add: 'cmd/spo/site/site-add.md'
         - site get: 'cmd/spo/site/site-get.md'
         - site list: 'cmd/spo/site/site-list.md'
+        - site set: 'cmd/spo/site/site-set.md'
         - site appcatalog add: 'cmd/spo/site/site-appcatalog-add.md'
         - site appcatalog remove: 'cmd/spo/site/site-appcatalog-remove.md'
+        - site classic add: 'cmd/spo/site/site-classic-add.md'
         - site classic list: 'cmd/spo/site/site-classic-list.md'
+        - site classic set: 'cmd/spo/site/site-classic-set.md'
       - sitedesign:
         - sitedesign add: 'cmd/spo/sitedesign/sitedesign-add.md'
         - sitedesign get: 'cmd/spo/sitedesign/sitedesign-get.md'
         - sitedesign list: 'cmd/spo/sitedesign/sitedesign-list.md'
         - sitedesign remove: 'cmd/spo/sitedesign/sitedesign-remove.md'
+        - sitedesign set: 'cmd/spo/sitedesign/sitedesign-set.md'
         - sitedesign rights grant: 'cmd/spo/sitedesign/sitedesign-rights-grant.md'
         - sitedesign rights list: 'cmd/spo/sitedesign/sitedesign-rights-list.md'
         - sitedesign rights revoke: 'cmd/spo/sitedesign/sitedesign-rights-revoke.md'
@@ -83,6 +96,22 @@ pages:
         - storageentity list: 'cmd/spo/storageentity/storageentity-list.md'
         - storageentity remove: 'cmd/spo/storageentity/storageentity-remove.md'
         - storageentity set: 'cmd/spo/storageentity/storageentity-set.md'
+      - tenant:
+        - tenant appcatalogurl get: 'cmd/spo/tenant/tenant-appcatalogurl-get.md'
+      - web:
+        - web add: 'cmd/spo/web/web-add.md'
+        - web list: 'cmd/spo/web/web-list.md'
+        - web get: 'cmd/spo/web/web-get.md'
+        - web remove: 'cmd/spo/web/web-remove.md'
+    - Microsoft Graph (graph):
+      - connect: 'cmd/graph/connect.md'
+      - disconnect: 'cmd/graph/disconnect.md'
+      - status: 'cmd/graph/status.md'
+      - o365group:
+        - o365group add: 'cmd/graph/o365group/o365group-add.md'
+        - o365group get: 'cmd/graph/o365group/o365group-get.md'
+        - o365group list: 'cmd/graph/o365group/o365group-list.md'
+        - o365group set: 'cmd/graph/o365group/o365group-set.md'
     - Azure Active Directory Graph (aad):
       - connect: 'cmd/aad/connect.md'
       - disconnect: 'cmd/aad/disconnect.md'

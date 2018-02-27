@@ -1,11 +1,11 @@
-# spo site list
+# spo site classic list
 
 Lists classic sites of the given type
 
 ## Usage
 
 ```sh
-spo site list classic [options]
+spo site classic list [options]
 ```
 
 ## Options
@@ -38,23 +38,23 @@ Using the `--includeOneDriveSites`option you can specify whether you want to ret
 List all classic sites in the currently connected tenant
 
 ```sh
-spo site list classic
+spo site classic list
 ```
 
 List all classic team sites in the currently connected tenant including OneDrive sites
 
 ```sh
-spo site list classic --includeOneDriveSites
+spo site classic list --includeOneDriveSites
 ```
 
 List all classic team sites in the currently connected tenant
 
 ```sh
-spo site list classic --webTemplate STS#0
+spo site classic list --webTemplate STS#0
 ```
 
 List all classic project sites that contain _project_ in the URL
 
 ```sh
-spo site list classic --webTemplate PROJECTSITE#0 --filter "Url -like 'project'"
+spo site classic list --webTemplate PROJECTSITE#0 --filter "Url -like 'project'"
 ```

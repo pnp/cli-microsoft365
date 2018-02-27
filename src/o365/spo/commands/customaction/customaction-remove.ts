@@ -53,7 +53,7 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
 
       auth
         .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-        .then((accessToken: string): Promise<ContextInfo> => {
+        .then((accessToken: string): request.RequestPromise => {
           siteAccessToken = accessToken;
 
           if (this.debug) {
@@ -62,7 +62,7 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
 
           return this.getRequestDigestForSite(args.options.url, siteAccessToken, cmd, this.debug);
         })
-        .then((contextResponse: ContextInfo): Promise<CustomAction | undefined> => {
+        .then((contextResponse: ContextInfo): request.RequestPromise | Promise<CustomAction | undefined> => {
           if (this.debug) {
             cmd.log('Response:');
             cmd.log(JSON.stringify(contextResponse));
@@ -84,14 +84,11 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
             cmd.log(JSON.stringify(customAction));
             cmd.log('');
           }
-
-          if (customAction && customAction["odata.null"] === true) {
-            if (this.verbose) {
+          if (this.verbose) {
+            if (customAction && customAction["odata.null"] === true) {
               cmd.log(`Custom action with id ${args.options.id} not found`);
             }
-          }
-          else {
-            if (this.verbose) {
+            else {
               cmd.log(vorpal.chalk.green('DONE'));
             }
           }
@@ -119,7 +116,7 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
     }
   }
 
-  private removeScopedCustomAction(options: Options, siteAccessToken: string, cmd: CommandInstance): Promise<CustomAction> {
+  private removeScopedCustomAction(options: Options, siteAccessToken: string, cmd: CommandInstance): request.RequestPromise {
     const requestOptions: any = {
       url: `${options.url}/_api/${options.scope}/UserCustomActions('${encodeURIComponent(options.id)}')`,
       headers: Utils.getRequestHeaders({
@@ -189,7 +186,7 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
       },
       {
         option: '-u, --url <url>',
-        description: 'Url of the site (collection) to remove the custom action from'
+        description: 'Url of the site or site collection to remove the custom action from'
       },
       {
         option: '-s, --scope [scope]',

@@ -260,7 +260,6 @@ describe(commands.SITE_GET, () => {
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, url: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      console.log(log);
       try {
         assert(cmdInstanceLogSpy.calledWith(new CommandError('404 - "404 FILE NOT FOUND"')));
         done();

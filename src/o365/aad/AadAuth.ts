@@ -1,5 +1,6 @@
 import Auth, { Logger, Service } from "../../Auth";
 import { CommandError } from "../../Command";
+import config from "../../config";
 
 class AadAuth extends Auth {
   private SERVICE: string = 'AAD';
@@ -53,4 +54,4 @@ class AadAuth extends Auth {
   }
 }
 
-export default new AadAuth(new Service('https://graph.windows.net'), '04b07795-8ddb-461a-bbee-02f9e1bf7b46');
+export default new AadAuth(new Service('https://graph.windows.net'), config.aadAadAppId);

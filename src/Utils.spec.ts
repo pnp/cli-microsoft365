@@ -17,6 +17,16 @@ describe('Utils', () => {
     assert(result == false);
   });
 
+  it('isValidBoolean returns true if valid boolean', () => {
+    const result = Utils.isValidBoolean('true');
+    assert.equal(result, true);
+  });
+
+  it('isValidBoolean returns false if invalid boolean', () => {
+    const result = Utils.isValidBoolean('foo');
+    assert(result == false);
+  });
+
   it('adds User-Agent string to undefined headers', () => {
     const result = Utils.getRequestHeaders(undefined);
     assert.equal(!result['User-Agent'], false);
@@ -87,6 +97,12 @@ describe('Utils', () => {
     catch (e) {
       done(e);
     }
+  });
+
+  it('formats date output as text', () => {
+    const d = new Date();
+    const actual = Utils.logOutput([d]);
+    assert.equal(actual, d.toString());
   });
 
   it('formats object output as transposed table', (done) => {

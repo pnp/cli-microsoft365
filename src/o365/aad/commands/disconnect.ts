@@ -53,7 +53,7 @@ class AadDisconnectCommand extends Command {
     log(
       `  Remarks:
 
-    The ${chalk.blue(commands.DISCONNECT)} command disconnects from  Azure Active Directory Graph
+    The ${chalk.blue(commands.DISCONNECT)} command disconnects from Azure Active Directory Graph
     and removes any access and refresh tokens from memory.
 
   Examples:

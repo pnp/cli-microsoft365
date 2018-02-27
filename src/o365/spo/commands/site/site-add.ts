@@ -72,7 +72,7 @@ class SiteAddCommand extends SpoCommand {
 
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<CreateGroupExResponse> => {
+      .then((accessToken: string): request.RequestPromise => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}`);
         }

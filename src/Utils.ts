@@ -64,6 +64,10 @@ export default class Utils {
     return guidRegEx.test(guid);
   }
 
+  public static isValidBoolean(value: string): boolean {
+    return value.toLowerCase() === 'true' || value.toLowerCase() === 'false'
+  }
+
   public static logOutput(stdout: any): any {
     // what comes in, should be an array
     // if it's not, return as-is
@@ -72,6 +76,11 @@ export default class Utils {
     }
 
     let logStatement: any = stdout.pop();
+
+    if (logStatement instanceof Date) {
+      return logStatement.toString();
+    }
+
     const logStatementType: string = typeof logStatement;
 
     if (logStatementType === 'undefined') {

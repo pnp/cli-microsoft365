@@ -5,6 +5,7 @@ Following table lists the different Office 365 CLI commands and how they map to 
 PowerShell Cmdlet|Source|Office 365 CLI command
 -----------------|------|----------------------
 Add-SPOGeoAdministrator|Microsoft.Online.SharePoint.PowerShell|
+Add-SPOHubSiteAssociation|Microsoft.Online.SharePoint.PowerShell|[spo hubsite connect](../cmd/spo/hubsite/hubsite-connect.md)
 Add-SPOSiteCollectionAppCatalog|Microsoft.Online.SharePoint.PowerShell|[spo site appcatalog add](../cmd/spo/site/site-appcatalog-add.md)
 Add-SPOSiteDesign|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign add](../cmd/spo/sitedesign/sitedesign-add.md)
 Add-SPOSiteScript|Microsoft.Online.SharePoint.PowerShell|[spo sitescript add](../cmd/spo/sitescript/sitescript-add.md)
@@ -12,13 +13,11 @@ Add-SPOTenantCdnOrigin|Microsoft.Online.SharePoint.PowerShell|[spo cdn origin ad
 Add-SPOTheme|Microsoft.Online.SharePoint.PowerShell|
 Add-SPOUser|Microsoft.Online.SharePoint.PowerShell|
 Approve-SPOTenantServicePrincipalPermissionRequest|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal permissionrequest approve](../cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-approve.md)
-Connect-SPOHubSite|Microsoft.Online.SharePoint.PowerShell|[spo hubsite connect](../cmd/spo/hubsite/hubsite-connect.md)
 Connect-SPOService|Microsoft.Online.SharePoint.PowerShell|[spo connect](../cmd/spo/connect.md)
 ConvertTo-SPOMigrationEncryptedPackage|Microsoft.Online.SharePoint.PowerShell|
 ConvertTo-SPOMigrationTargetedPackage|Microsoft.Online.SharePoint.PowerShell|
 Deny-SPOTenantServicePrincipalPermissionRequest|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal permissionrequest deny](../cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-deny.md)
 Disable-SPOTenantServicePrincipal|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal set](../cmd/spo/serviceprincipal/serviceprincipal-set.md)
-Disconnect-SPOHubSite|Microsoft.Online.SharePoint.PowerShell|[spo hubsite disconnect](../cmd/spo/hubsite/hubsite-disconnect.md)
 Disconnect-SPOService|Microsoft.Online.SharePoint.PowerShell|[spo disconnect](../cmd/spo/disconnect.md)
 Enable-SPOTenantServicePrincipal|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal set](../cmd/spo/serviceprincipal/serviceprincipal-set.md)
 Get-SPOAppErrors|Microsoft.Online.SharePoint.PowerShell|
@@ -31,7 +30,6 @@ Get-SPODataEncryptionPolicy|Microsoft.Online.SharePoint.PowerShell|
 Get-SPODeletedSite|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOExternalUser|Microsoft.Online.SharePoint.PowerShell|[spo externaluser list](../cmd/spo/externaluser/externaluser-list.md)
 Get-SPOGeoAdministrator|Microsoft.Online.SharePoint.PowerShell|
-Get-SPOGeoMoveCompatibilityStatus|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOGeoMoveCrossCompatibilityStatus|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOGeoStorageQuota|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOHideDefaultThemes|Microsoft.Online.SharePoint.PowerShell|
@@ -68,17 +66,19 @@ Get-SPOWebTemplate|Microsoft.Online.SharePoint.PowerShell|
 Grant-SPOHubSiteRights|Microsoft.Online.SharePoint.PowerShell|[spo hubsite rights grant](../cmd/spo/hubsite/hubsite-rights-grant.md)
 Grant-SPOSiteDesignRights|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign rights grant](../cmd/spo/sitedesign/sitedesign-rights-grant.md)
 Invoke-SPOMigrationEncryptUploadSubmit|Microsoft.Online.SharePoint.PowerShell|
+Invoke-SPOSiteDesign|Microsoft.Online.SharePoint.PowerShell|
 New-SPOMigrationEncryptionParameters|Microsoft.Online.SharePoint.PowerShell|
 New-SPOMigrationPackage|Microsoft.Online.SharePoint.PowerShell|
 New-SPOPublicCdnOrigin|Microsoft.Online.SharePoint.PowerShell|
 New-SPOSdnProvider|Microsoft.Online.SharePoint.PowerShell|
-New-SPOSite|Microsoft.Online.SharePoint.PowerShell|[spo site add](../cmd/spo/site/site-add.md)
+New-SPOSite|Microsoft.Online.SharePoint.PowerShell|[spo site classic add](../cmd/spo/site/site-classic-add.md)
 New-SPOSiteGroup|Microsoft.Online.SharePoint.PowerShell|
 Register-SPODataEncryptionPolicy|Microsoft.Online.SharePoint.PowerShell|
 Register-SPOHubSite|Microsoft.Online.SharePoint.PowerShell|[spo hubsite register](../cmd/spo/hubsite/hubsite-register.md)
 Remove-SPODeletedSite|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOExternalUser|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOGeoAdministrator|Microsoft.Online.SharePoint.PowerShell|
+Remove-SPOHubSiteAssociation|Microsoft.Online.SharePoint.PowerShell|[spo hubsite disconnect](../cmd/spo/hubsite/hubsite-disconnect.md)
 Remove-SPOMigrationJob|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOMultiGeoCompanyAllowedDataLocation|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOPublicCdnOrigin|Microsoft.Online.SharePoint.PowerShell|
@@ -111,6 +111,7 @@ Set-SPOMigrationPackageAzureSource|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOMultiGeoCompanyAllowedDataLocation|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOMultiGeoExperience|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOSite|Microsoft.Online.SharePoint.PowerShell|
+Set-SPOSiteDesign|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign set](../cmd/spo/sitedesign/sitedesign-set.md)
 Set-SPOSiteGroup|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOSiteOffice365Group|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOSiteScript|Microsoft.Online.SharePoint.PowerShell|
@@ -122,6 +123,7 @@ Set-SPOTenantContentTypeReplicationParameters|Microsoft.Online.SharePoint.PowerS
 Set-SPOTenantSyncClientRestriction|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOTenantTaxonomyReplicationParameters|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOUser|Microsoft.Online.SharePoint.PowerShell|
+Set-SPOWebTheme|Microsoft.Online.SharePoint.PowerShell|
 Start-SPOSiteContentMove|Microsoft.Online.SharePoint.PowerShell|
 Start-SPOUserAndContentMove|Microsoft.Online.SharePoint.PowerShell|
 Stop-SPOUserAndContentMove|Microsoft.Online.SharePoint.PowerShell|
@@ -129,6 +131,7 @@ Submit-SPOMigrationJob|Microsoft.Online.SharePoint.PowerShell|
 Test-SPOSite|Microsoft.Online.SharePoint.PowerShell|
 Unregister-SPOHubSite|Microsoft.Online.SharePoint.PowerShell|[spo hubsite unregister](../cmd/spo/hubsite/hubsite-unregister.md)
 Update-SPODataEncryptionPolicy|Microsoft.Online.SharePoint.PowerShell|
+Update-UserType|Microsoft.Online.SharePoint.PowerShell|
 Upgrade-SPOSite|Microsoft.Online.SharePoint.PowerShell|
 Add-PnPApp|SharePointPnPPowerShellOnline|[spo app add](../cmd/spo/app/app-add.md)
 Add-PnPClientSidePage|SharePointPnPPowerShellOnline|
@@ -217,7 +220,7 @@ Get-PnPDocumentSetTemplate|SharePointPnPPowerShellOnline|
 Get-PnPEventReceiver|SharePointPnPPowerShellOnline|
 Get-PnPFeature|SharePointPnPPowerShellOnline|
 Get-PnPField|SharePointPnPPowerShellOnline|
-Get-PnPFile|SharePointPnPPowerShellOnline|
+Get-PnPFile|SharePointPnPPowerShellOnline|[spo file list](../cmd/spo/file/file-list.md)
 Get-PnPFolder|SharePointPnPPowerShellOnline|
 Get-PnPFolderItem|SharePointPnPPowerShellOnline|
 Get-PnPGroup|SharePointPnPPowerShellOnline|
@@ -231,7 +234,7 @@ Get-PnPList|SharePointPnPPowerShellOnline|[spo list get](../cmd/spo/list/list-ge
 Get-PnPListItem|SharePointPnPPowerShellOnline|
 Get-PnPMasterPage|SharePointPnPPowerShellOnline|
 Get-PnPProperty|SharePointPnPPowerShellOnline|
-Get-PnPPropertyBag|SharePointPnPPowerShellOnline|
+Get-PnPPropertyBag|SharePointPnPPowerShellOnline|[spo propertybag get](../cmd/spo/propertybag/propertybag-get.md), [spo propertybag list](../cmd/spo/propertybag/propertybag-list.md)
 Get-PnPProvisioningTemplate|SharePointPnPPowerShellOnline|
 Get-PnPProvisioningTemplateFromGallery|SharePointPnPPowerShellOnline|
 Get-PnPPublishingImageRendition|SharePointPnPPowerShellOnline|
@@ -253,7 +256,7 @@ Get-PnPStoredCredential|SharePointPnPPowerShellOnline|
 Get-PnPSubWebs|SharePointPnPPowerShellOnline|
 Get-PnPTaxonomyItem|SharePointPnPPowerShellOnline|
 Get-PnPTaxonomySession|SharePointPnPPowerShellOnline|
-Get-PnPTenantAppCatalogUrl|SharePointPnPPowerShellOnline|
+Get-PnPTenantAppCatalogUrl|SharePointPnPPowerShellOnline|[spo tenant appcatalogurl get](../cmd/spo/tenant/tenant-appcatalogurl-get.md)
 Get-PnPTenantRecycleBinItem|SharePointPnPPowerShellOnline|
 Get-PnPTenantSite|SharePointPnPPowerShellOnline|[spo site get](../cmd/spo/site/site-get.md), [spo site classic list](../cmd/spo/site/site-classic-list.md)
 Get-PnPTerm|SharePointPnPPowerShellOnline|
@@ -261,13 +264,13 @@ Get-PnPTermGroup|SharePointPnPPowerShellOnline|
 Get-PnPTermSet|SharePointPnPPowerShellOnline|
 Get-PnPTheme|SharePointPnPPowerShellOnline|
 Get-PnPTimeZoneId|SharePointPnPPowerShellOnline|
-Get-PnPUnifiedGroup|SharePointPnPPowerShellOnline|
+Get-PnPUnifiedGroup|SharePointPnPPowerShellOnline|[graph o365group get](../cmd/graph/o365group/o365group-get.md), [graph o365group list](../cmd/graph/o365group/o365group-list.md)
 Get-PnPUnifiedGroupMembers|SharePointPnPPowerShellOnline|
 Get-PnPUnifiedGroupOwners|SharePointPnPPowerShellOnline|
 Get-PnPUser|SharePointPnPPowerShellOnline|
 Get-PnPUserProfileProperty|SharePointPnPPowerShellOnline|
 Get-PnPView|SharePointPnPPowerShellOnline|
-Get-PnPWeb|SharePointPnPPowerShellOnline|
+Get-PnPWeb|SharePointPnPPowerShellOnline|[spo web list](../cmd/spo/web/web-list.md)
 Get-PnPWebhookSubscriptions|SharePointPnPPowerShellOnline|
 Get-PnPWebPart|SharePointPnPPowerShellOnline|
 Get-PnPWebPartProperty|SharePointPnPPowerShellOnline|
@@ -297,18 +300,18 @@ Move-PnPListItemToRecycleBin|SharePointPnPPowerShellOnline|
 Move-PnPRecycleBinItem|SharePointPnPPowerShellOnline|
 New-PnPExtensbilityHandlerObject|SharePointPnPPowerShellOnline|
 New-PnPGroup|SharePointPnPPowerShellOnline|
-New-PnPList|SharePointPnPPowerShellOnline|
+New-PnPList|SharePointPnPPowerShellOnline|[spo list add](../cmd/spo/list/list-add.md)
 New-PnPPersonalSite|SharePointPnPPowerShellOnline|
 New-PnPProvisioningTemplate|SharePointPnPPowerShellOnline|
 New-PnPProvisioningTemplateFromFolder|SharePointPnPPowerShellOnline|
 New-PnPSite|SharePointPnPPowerShellOnline|[spo site add](../cmd/spo/site/site-add.md)
-New-PnPTenantSite|SharePointPnPPowerShellOnline|
+New-PnPTenantSite|SharePointPnPPowerShellOnline|[spo site classic add](../cmd/spo/site/site-classic-add.md)
 New-PnPTerm|SharePointPnPPowerShellOnline|
 New-PnPTermGroup|SharePointPnPPowerShellOnline|
 New-PnPTermSet|SharePointPnPPowerShellOnline|
-New-PnPUnifiedGroup|SharePointPnPPowerShellOnline|
+New-PnPUnifiedGroup|SharePointPnPPowerShellOnline|[graph o365group add](../cmd/graph/o365group/o365group-add.md)
 New-PnPUser|SharePointPnPPowerShellOnline|
-New-PnPWeb|SharePointPnPPowerShellOnline|
+New-PnPWeb|SharePointPnPPowerShellOnline|[spo web add](../cmd/spo/web/web-add.md)
 Publish-PnPApp|SharePointPnPPowerShellOnline|[spo app deploy](../cmd/spo/app/app-deploy.md)
 Remove-PnPApp|SharePointPnPPowerShellOnline|[spo app remove](../cmd/spo/app/app-remove.md)
 Remove-PnPClientSideComponent|SharePointPnPPowerShellOnline|
@@ -326,7 +329,7 @@ Remove-PnPFolder|SharePointPnPPowerShellOnline|
 Remove-PnPGroup|SharePointPnPPowerShellOnline|
 Remove-PnPIndexedProperty|SharePointPnPPowerShellOnline|
 Remove-PnPJavaScriptLink|SharePointPnPPowerShellOnline|
-Remove-PnPList|SharePointPnPPowerShellOnline|
+Remove-PnPList|SharePointPnPPowerShellOnline|[spo list remove](../cmd/spo/list/list-remove.md)
 Remove-PnPListItem|SharePointPnPPowerShellOnline|
 Remove-PnPNavigationNode|SharePointPnPPowerShellOnline|
 Remove-PnPPropertyBagValue|SharePointPnPPowerShellOnline|
@@ -343,7 +346,7 @@ Remove-PnPUnifiedGroup|SharePointPnPPowerShellOnline|
 Remove-PnPUser|SharePointPnPPowerShellOnline|
 Remove-PnPUserFromGroup|SharePointPnPPowerShellOnline|
 Remove-PnPView|SharePointPnPPowerShellOnline|
-Remove-PnPWeb|SharePointPnPPowerShellOnline|
+Remove-PnPWeb|SharePointPnPPowerShellOnline|[spo web remove](../cmd/spo/web/web-remove.md)
 Remove-PnPWebhookSubscription|SharePointPnPPowerShellOnline|
 Remove-PnPWebPart|SharePointPnPPowerShellOnline|
 Remove-PnPWikiPage|SharePointPnPPowerShellOnline|
@@ -378,7 +381,7 @@ Set-PnPGroupPermissions|SharePointPnPPowerShellOnline|
 Set-PnPHomePage|SharePointPnPPowerShellOnline|
 Set-PnPIndexedProperties|SharePointPnPPowerShellOnline|
 Set-PnPInPlaceRecordsManagement|SharePointPnPPowerShellOnline|
-Set-PnPList|SharePointPnPPowerShellOnline|
+Set-PnPList|SharePointPnPPowerShellOnline|[spo list set](../cmd/spo/list/list-set.md)
 Set-PnPListItem|SharePointPnPPowerShellOnline|
 Set-PnPListItemAsRecord|SharePointPnPPowerShellOnline|
 Set-PnPListItemPermission|SharePointPnPPowerShellOnline|
@@ -389,15 +392,17 @@ Set-PnPPropertyBagValue|SharePointPnPPowerShellOnline|
 Set-PnPProvisioningTemplateMetadata|SharePointPnPPowerShellOnline|
 Set-PnPRequestAccessEmails|SharePointPnPPowerShellOnline|
 Set-PnPSearchConfiguration|SharePointPnPPowerShellOnline|
-Set-PnPSite|SharePointPnPPowerShellOnline|
+Set-PnPSite|SharePointPnPPowerShellOnline|[spo site set](../cmd/spo/site/site-set.md)
 Set-PnPSiteClosure|SharePointPnPPowerShellOnline|
+Set-PnPSiteDesign|SharePointPnPPowerShellOnline|[spo sitedesign set](../cmd/spo/sitedesign/sitedesign-set.md)
 Set-PnPSitePolicy|SharePointPnPPowerShellOnline|
+Set-PnPSiteScript|SharePointPnPPowerShellOnline|[spo sitescript set](../cmd/spo/sitescript/sitescript-set.md)
 Set-PnPStorageEntity|SharePointPnPPowerShellOnline|[spo storageentity set](../cmd/spo/storageentity/storageentity-set.md)
 Set-PnPTaxonomyFieldValue|SharePointPnPPowerShellOnline|
-Set-PnPTenantSite|SharePointPnPPowerShellOnline|
+Set-PnPTenantSite|SharePointPnPPowerShellOnline|[spo site classic set](../cmd/spo/site/site-classic-set.md)
 Set-PnPTheme|SharePointPnPPowerShellOnline|
 Set-PnPTraceLog|SharePointPnPPowerShellOnline|
-Set-PnPUnifiedGroup|SharePointPnPPowerShellOnline|
+Set-PnPUnifiedGroup|SharePointPnPPowerShellOnline|[graph o365group set](../cmd/graph/o365group/o365group-set.md)
 Set-PnPUserProfileProperty|SharePointPnPPowerShellOnline|
 Set-PnPView|SharePointPnPPowerShellOnline|
 Set-PnPWeb|SharePointPnPPowerShellOnline|

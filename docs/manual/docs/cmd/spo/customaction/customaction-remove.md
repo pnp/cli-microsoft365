@@ -13,8 +13,8 @@ spo customaction remove [options]
 Option|Description
 ------|-----------
 `--help`|output usage information
-`-i, --id <id>`|ID of the user custom action to retrieve information for
-`-u, --url <url>`|Url of the site or site collection to retrieve the custom action from
+`-i, --id <id>`|Id (GUID) of the custom action to remove
+`-u, --url <url>`|Url of the site or site collection to remove the custom action from
 `-s, --scope [scope]`|Scope of the custom action. Allowed values `Site|Web|All`. Default `All`
 `--confirm`|Don't prompt for confirming removal of a user custom action
 `-o, --output [output]`|Output type. `json|text`. Default `text`
