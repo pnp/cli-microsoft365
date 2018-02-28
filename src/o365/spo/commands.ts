@@ -79,7 +79,7 @@ export default {
   STORAGEENTITY_GET: `${prefix} storageentity get`,
   STORAGEENTITY_SET: `${prefix} storageentity set`,
   STORAGEENTITY_REMOVE: `${prefix} storageentity remove`,
-  THEME_ADD: `${prefix} theme add`,
+  THEME_SET: `${prefix} theme set`,
   THEME_LIST: `${prefix} theme list`,
   THEME_REMOVE: `${prefix} theme remove`,
   WEB_ADD: `${prefix} web add`,

@@ -23,14 +23,14 @@ interface Options extends GlobalOptions {
   filePath: string;
 }
 
-class ThemeAddCommand extends SpoCommand {
+class ThemeSetCommand extends SpoCommand {
 
   public get name(): string {
-    return commands.THEME_ADD;
+    return commands.THEME_SET;
   }
 
   public get description(): string {
-    return 'Adds new theme to tenant with the given palette';
+    return 'Add or update theme to tenant with the given palette';
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
@@ -72,7 +72,7 @@ class ThemeAddCommand extends SpoCommand {
           json: true
         };
 
-        if (this.debug) {
+        if (args.options.debug) {
           cmd.log('Executing web request...');
           cmd.log(requestOptions);
           cmd.log('');
@@ -82,18 +82,20 @@ class ThemeAddCommand extends SpoCommand {
       })
       .then((rawRes: string): void => {
 
-        if (this.debug) {
+        if (args.options.debug) {
           cmd.log('Response:');
           cmd.log(rawRes);
           cmd.log('');
         }
 
-        if (this.verbose) {
+        if (args.options.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
         }
 
         cb();
-      }, (rawRes: any): void => this.handleRejectedODataPromise(rawRes, cmd, cb));
+      }, (err: any): void => {
+        this.handleRejectedODataPromise(err, cmd, cb)
+      });
   }
 
   public options(): CommandOption[] {
@@ -143,21 +145,21 @@ class ThemeAddCommand extends SpoCommand {
   
     Remarks:
     
-      To add new them, you have to first connect to SharePoint using the
+      To add/update theme, you have to first connect to SharePoint using the
       ${chalk.blue(commands.CONNECT)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
           
     Examples:
     
-      Add new theme to the tenant from absolute or relative path of given theme json file
-      ${chalk.grey(config.delimiter)} ${commands.THEME_ADD} -n Contoso-Blue -p /Users/rjesh/themes/contoso-blue.json
+      To add or update theme to the tenant from absolute or relative path of given theme json file
+      ${chalk.grey(config.delimiter)} ${commands.THEME_SET} -n Contoso-Blue -p /Users/rjesh/themes/contoso-blue.json
       
     More information:
 
       Create custom theme using Office Fabric theme generator tool, 
-        copy the JSON output and save as JSON file.
+        copy the JSON output and save as JSON file.clear
       https://developer.microsoft.com/en-us/fabric#/styles/themegenerator
       `);
   }
 }
 
-module.exports = new ThemeAddCommand();
+module.exports = new ThemeSetCommand();

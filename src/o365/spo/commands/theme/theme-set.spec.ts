@@ -3,13 +3,13 @@ import Command, { CommandOption,CommandValidate,CommandError } from '../../../..
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
-const command: Command = require('./theme-add');
+const command: Command = require('./theme-set');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import Utils from '../../../../Utils';
 import * as fs from 'fs';
 
-describe(commands.THEME_ADD, () => {
+describe(commands.THEME_SET, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
@@ -49,7 +49,7 @@ describe(commands.THEME_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.THEME_ADD), true);
+    assert.equal(command.name.startsWith(commands.THEME_SET), true);
   });
 
   it('has a description', () => {
@@ -90,7 +90,7 @@ describe(commands.THEME_ADD, () => {
       options: {
         debug: false,
         name: 'Contoso',
-        fullPath: 'theme.json'
+        filePath: 'theme.json'
       }
     }, () => {
 
@@ -113,7 +113,7 @@ describe(commands.THEME_ADD, () => {
  it('uses correct API url when name option is passed (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf('/_api/thememanager/AddTenantTheme') > -1) {
-        return Promise.resolve('Correct Url')
+        return Promise.resolve('done')
       }
 
       return Promise.reject('Invalid request');
@@ -129,13 +129,13 @@ describe(commands.THEME_ADD, () => {
       options: {
         verbose: true,
         debug: true,
-        name: 'Contoso1',
-        themeJson: 'ABC'
+        name: 'Contoso-Blue',
+        filePath: 'Contoso-Blue.json'
       }
     }, () => {
 
       try {
-        assert(true);
+        assert(cmdInstanceLogSpy.calledWith("done"),'Invalid request');
         done();
       }
       catch (e) {
@@ -148,6 +148,84 @@ describe(commands.THEME_ADD, () => {
         ]);
       }
     });
+  });
+
+  it('correctly handles api error', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf('/_api/thememanager/AddTenantTheme') > -1) {
+        return Promise.reject('An error has occurred');
+      }
+
+      return Promise.reject('Invalid request');
+    });
+    sinon.stub(fs, 'readFileSync').callsFake(() => '123');
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    cmdInstance.action({
+      options: {
+        verbose: true,
+        debug: true,
+        name: 'Contoso-Blue',
+        filePath: 'Contoso-Blue.json'
+      }
+    }, () => {
+
+      try {
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('An error has occurred')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore([
+          fs.readFileSync,
+          request.post
+        ]);
+      }
+    });
+  });
+
+  it('fails validation if file path not specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: {name: 'abc'} });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation if file path doesn\'t exist', () => {
+    sinon.stub(fs, 'existsSync').callsFake(() => false);
+    const actual = (command.validate() as CommandValidate)({ options: { name: 'abc', filePath: 'abc' } });
+    Utils.restore(fs.existsSync);
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation if file path points to a directory', () => {
+    const stats: fs.Stats = new fs.Stats();
+    sinon.stub(stats, 'isDirectory').callsFake(() => true);
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    sinon.stub(fs, 'lstatSync').callsFake(() => stats);
+    const actual = (command.validate() as CommandValidate)({ options: { name: 'abc', filePath: 'abc' } });
+    Utils.restore([
+      fs.existsSync,
+      fs.lstatSync
+    ]);
+    assert.notEqual(actual, true);
+  });
+
+  it('passes validation when path points to a valid file', () => {
+    const stats: fs.Stats = new fs.Stats();
+    sinon.stub(stats, 'isDirectory').callsFake(() => false);
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    sinon.stub(fs, 'lstatSync').callsFake(() => stats);
+    const actual = (command.validate() as CommandValidate)({ options: { name: 'contoso-blue',filePath: 'contoso-blue.json' } });
+    Utils.restore([
+      fs.existsSync,
+      fs.lstatSync
+    ]);
+    assert.equal(actual, true);
   });
 
   it('supports debug mode', () => {
@@ -170,7 +248,7 @@ describe(commands.THEME_ADD, () => {
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
     cmd.help({}, () => { });
-    assert(find.calledWith(commands.THEME_ADD));
+    assert(find.calledWith(commands.THEME_SET));
   });
 
   it('fails validation if name is not passed', () => {
