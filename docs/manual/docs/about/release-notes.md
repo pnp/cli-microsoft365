@@ -39,6 +39,7 @@
 ### Changes
 
 - fixed bug in logging dates [#317](https://github.com/SharePoint/office365-cli/issues/317)
+- fixed typo in the example of the [spo cdn origin add](../cmd/spo/cdn/cdn-origin-add.md) command [#338](https://github.com/SharePoint/office365-cli/issues/338)
 
 ## [v0.5.0](https://github.com/SharePoint/office365-cli/releases/tag/v0.5.0)
 
