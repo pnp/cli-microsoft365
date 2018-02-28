@@ -55,7 +55,7 @@ class ThemeListCommand extends SpoCommand {
       })
       .then((rawRes: any): void => {
 
-        if (this.debug) {
+        if (args.options.debug) {
           cmd.log('Response:');
           cmd.log(rawRes);
           cmd.log('');
@@ -81,7 +81,10 @@ class ThemeListCommand extends SpoCommand {
           }
         }
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => {
+        this.handleRejectedODataJsonPromise(err, cmd, cb);
+      }
+      );
   }
 
   public commandHelp(args: {}, log: (help: string) => void): void {
