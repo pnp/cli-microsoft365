@@ -63,28 +63,34 @@ class ThemeListCommand extends SpoCommand {
 
         const themePreviews: any[] = rawRes.themePreviews;
 
-        if (themePreviews && themePreviews.length > 0) {
+        
+          if (themePreviews && themePreviews.length > 0) {
 
-          if (args.options.output === 'json') {
-            cmd.log(themePreviews);
+            if (args.options.output === 'json') {
+              cmd.log(themePreviews);
+            }
+            else {
+              try {
+                themePreviews.map(a => {
+                  const themeJson = JSON.parse(a.themeJson);
+                  cmd.log(`Name: ${a.name}\nPalette: ${JSON.stringify(themeJson.palette)}\n`);              
+                });   
+              }
+              catch (e) 
+              {
+                cmd.log('Not able to retreive one of the theme.');
+              }        
+            }
           }
           else {
-            themePreviews.map(a => {
-              const themeJson = JSON.parse(a.themeJson);
-              cmd.log(`Name: ${a.name}\nPalette: ${JSON.stringify(themeJson.palette)}`);              
-            });          
-          }
-        }
-        else {
-          if (this.verbose) {
-            cmd.log('No themes found');
-          }
-        }
-        cb();
+            if (this.verbose) {
+              cmd.log('No themes found');
+            }
+          }        
+        cb();     
       }, (err: any): void => {
         this.handleRejectedODataJsonPromise(err, cmd, cb);
-      }
-      );
+      });
   }
 
   public commandHelp(args: {}, log: (help: string) => void): void {
