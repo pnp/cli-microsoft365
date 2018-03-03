@@ -28,12 +28,12 @@ To list company theme(s), you have to first connect to a SharePoint admin site u
     
 Returns themes from the tenant store
 ```sh
-O365 SPO theme list
+o365$ SPO theme list
 ```
 
 Returns themes from the tenant store as JSON
 ```sh
-O365 SPO theme list -o json   
+o365$ SPO theme list -o json   
 ```
 
 ## More information:

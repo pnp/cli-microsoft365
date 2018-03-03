@@ -108,7 +108,8 @@ describe(commands.THEME_SET, () => {
       options: {
         debug: false,
         name: 'Contoso',
-        filePath: 'theme.json'
+        filePath: 'theme.json',
+        isInverted: false
       }
     }, () => {
 
@@ -156,7 +157,7 @@ describe(commands.THEME_SET, () => {
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers['X-RequestDigest'] &&
           opts.headers['X-RequestDigest'] === 'abc' &&
-          opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="SharePoint Framework CLI v0.6.0" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><Method Name="UpdateTenantTheme" Id="11" ObjectPathId="9"><Parameters><Parameter Type="String">Contoso</Parameter><Parameter Type="String">{"isInverted":false,"name":"Contoso","palette":123}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="9" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`) {
+          opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="SharePoint Framework CLI v0.6.0" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><Method Name="UpdateTenantTheme" Id="11" ObjectPathId="9"><Parameters><Parameter Type="String">Contoso</Parameter><Parameter Type="String">{"isInverted":true,"name":"Contoso","palette":123}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="9" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`) {
           return Promise.resolve(JSON.stringify([{"SchemaVersion":"15.0.0.0","LibraryVersion":"16.0.7025.1207","ErrorInfo":null,"TraceCorrelationId":"3d92299e-e019-4000-c866-de7d45aa9628"},12,true]));
         }
       }
@@ -174,75 +175,8 @@ describe(commands.THEME_SET, () => {
       options: {
         debug: true,
         name: 'Contoso',
-        filePath: 'theme.json'
-      }
-    }, () => {
-
-      let correctRequestIssued = false;
-      
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
-          r.headers.authorization &&
-          r.headers.authorization.indexOf('Bearer ') === 0 &&
-          r.headers['X-RequestDigest'] &&
-          r.body) {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        Utils.restore([
-          fs.readFileSync,
-          request.post
-        ]);
-      }
-    });
-  });
-
-  it('adds theme with inverted option', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      requests.push(opts);
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve({ FormDigestValue: 'abc' });
-        }
-      }
-
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers['X-RequestDigest'] &&
-          opts.headers['X-RequestDigest'] === 'abc' &&
-          opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="SharePoint Framework CLI v0.6.0" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><Method Name="UpdateTenantTheme" Id="11" ObjectPathId="9"><Parameters><Parameter Type="String">Contoso</Parameter><Parameter Type="String">{"isInverted":false,"name":"Contoso","palette":123}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="9" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`) {
-          return Promise.resolve(JSON.stringify([{"SchemaVersion":"15.0.0.0","LibraryVersion":"16.0.7025.1207","ErrorInfo":null,"TraceCorrelationId":"3d92299e-e019-4000-c866-de7d45aa9628"},12,true]));
-        }
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    sinon.stub(fs, 'readFileSync').callsFake(() => '123');
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
-
-    cmdInstance.action({
-      options: {
-        debug: false,
-        verbose: true,
-        name: 'Contoso',
         filePath: 'theme.json',
-        inverted: true
+        isInverted: true
       }
     }, () => {
 
@@ -308,7 +242,8 @@ describe(commands.THEME_SET, () => {
       options: {
         debug: true,
         name: 'Contoso',
-        filePath: 'theme.json'
+        filePath: 'theme.json',
+        inverted: false,
       }
     }, () => {
 
@@ -366,7 +301,8 @@ describe(commands.THEME_SET, () => {
       options: {
         debug: true,
         name: 'Contoso',
-        filePath: 'theme.json'
+        filePath: 'theme.json',
+        isInverted: false
       }
     }, () => {
       
@@ -424,7 +360,7 @@ describe(commands.THEME_SET, () => {
     sinon.stub(stats, 'isDirectory').callsFake(() => false);
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
-    const actual = (command.validate() as CommandValidate)({ options: { name: 'contoso-blue',filePath: 'contoso-blue.json' } });
+    const actual = (command.validate() as CommandValidate)({ options: { name: 'contoso-blue',filePath: 'contoso-blue.json', isInverted: false } });
     Utils.restore([
       fs.existsSync,
       fs.lstatSync
@@ -472,6 +408,36 @@ describe(commands.THEME_SET, () => {
 
   it('passes validation when path is passed', () => {
     const actual = (command.validate() as CommandValidate)({ options: { fullPath: 'theme.json' } });
+    assert(actual);
+  });
+
+  it('fails validation if file path points to a directory', () => {
+    const stats: fs.Stats = new fs.Stats();
+    sinon.stub(stats, 'isDirectory').callsFake(() => true);
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    sinon.stub(fs, 'lstatSync').callsFake(() => stats);
+    const actual = (command.validate() as CommandValidate)({ options: { filePath: 'abc' } });
+    Utils.restore([
+      fs.existsSync,
+      fs.lstatSync
+    ]);
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation if file path doesn\'t exist', () => {
+    sinon.stub(fs, 'existsSync').callsFake(() => false);
+    const actual = (command.validate() as CommandValidate)({ options: { filePath: 'abc' } });
+    Utils.restore(fs.existsSync);
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation when inverted parameter is not passed', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { isInverted: undefined } });
+    assert.notEqual(actual, true);
+  });
+
+  it('passes validation when inverted parameter is passed', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { isInverted: false } });
     assert(actual);
   });
 

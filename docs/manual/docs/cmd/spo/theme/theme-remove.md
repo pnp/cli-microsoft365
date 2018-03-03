@@ -29,7 +29,7 @@ Option|Description
 
 Remove theme without prompting for confirmation
 ```sh
-O365 SPO theme remove -n Contoso-Blue --confirm
+o365$ SPO theme remove -n Contoso-Blue --confirm
 ```
 
 ## More information:

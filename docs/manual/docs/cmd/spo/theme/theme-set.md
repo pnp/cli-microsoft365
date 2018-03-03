@@ -30,12 +30,7 @@ To set company theme, you have to first connect to a SharePoint admin site using
     
 To add or update theme to the tenant from absolute or relative path of given theme json file
 ```sh
-O365 SPO theme set -n Contoso-Blue -p /Users/rjesh/themes/contoso-blue.json
-```
-
-To add or update theme to the tenant from absolute or relative path of given theme json file with inverted option
-```sh
-O365 SPO theme set -n Contoso-Blue -p /Users/rjesh/themes/contoso-blue.json --inverted
+o365$ SPO theme set -n Contoso-Blue -p /Users/rjesh/themes/contoso-blue.json --isInverted false
 ```
 
 ## More information:

@@ -23,7 +23,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   name: string;
   filePath: string;
-  inverted?: boolean;
+  isInverted: boolean;
 }
 
 class ThemeSetCommand extends SpoCommand {
@@ -38,7 +38,7 @@ class ThemeSetCommand extends SpoCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.inverted = (!(!args.options.inverted)).toString();
+    telemetryProps.inverted = (!(!args.options.isInverted)).toString();
     return telemetryProps;
   }
 
@@ -74,7 +74,7 @@ class ThemeSetCommand extends SpoCommand {
           cmd.log(JSON.stringify(palette));
         }
 
-        const isInverted:boolean  = args.options.inverted? true : false;
+        const isInverted:boolean  = args.options.isInverted? true : false;
 
         const requestOptions: any = {
           url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
@@ -125,7 +125,7 @@ class ThemeSetCommand extends SpoCommand {
         description: 'Absolute or relative path to the theme json file to add to the tenant theme store'
       },
       {
-        option: '--inverted',
+        option: '--isInverted',
         description: 'Specify whether the theme is inverted'
       }
     ];
@@ -142,6 +142,10 @@ class ThemeSetCommand extends SpoCommand {
 
       if (!args.options.filePath) {
         return 'Required parameter file path missing';
+      }
+
+      if (typeof(args.options.isInverted) === "undefined") {
+        return 'Required parameter inverted missing';
       }
 
       const fullPath: string = path.resolve(args.options.filePath);
@@ -172,11 +176,8 @@ class ThemeSetCommand extends SpoCommand {
     Examples:
     
       To add or update theme to the tenant from absolute or relative path of given theme json file
-      ${chalk.grey(config.delimiter)} ${commands.THEME_SET} -n Contoso-Blue -p /Users/rjesh/themes/contoso-blue.json
-
-      To add or update theme to the tenant from absolute or relative path of given theme json file with inverted option
-      ${chalk.grey(config.delimiter)} ${commands.THEME_SET} -n Contoso-Blue -p /Users/rjesh/themes/contoso-blue.json --inverted
-      
+      ${chalk.grey(config.delimiter)} ${commands.THEME_SET} -n Contoso-Blue -p /Users/rjesh/themes/contoso-blue.json --isInverted false
+     
     More information:
 
       Create custom theme using Office Fabric theme generator tool, 
