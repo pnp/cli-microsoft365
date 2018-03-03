@@ -23,7 +23,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   name: string;
   filePath: string;
-  inverted: boolean;
+  inverted?: boolean;
 }
 
 class ThemeSetCommand extends SpoCommand {
@@ -35,71 +35,6 @@ class ThemeSetCommand extends SpoCommand {
   public get description(): string {
     return 'Add or update theme to tenant with the given palette';
   }
-/*
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
-
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Adding new theme to the tenant store...`);
-        }
-
-        const fullPath: string = path.resolve(args.options.filePath);
-
-        if (this.verbose) {
-          cmd.log(`Adding theme from ${fullPath} to tenant...`);
-        }
-
-        const palette: any = {
-          "palette": JSON.parse(fs.readFileSync(fullPath, 'utf8'))
-        }
-
-        if (this.debug) {
-          cmd.log('');
-          cmd.log('Palette');
-          cmd.log(JSON.stringify(palette));
-        }
-
-        const requestOptions: any = {
-          url: `${auth.site.url}/_api/thememanager/AddTenantTheme`,
-          method: 'POST',
-          headers: Utils.getRequestHeaders({
-            authorization: `Bearer ${accessToken}`,
-            'accept': 'application/json;odata=nometadata'
-          }),
-          body: {
-            "name": args.options.name,
-            "themeJson": JSON.stringify(palette)
-          },
-          json: true
-        };
-
-        if (args.options.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
-        return request.post(requestOptions);
-      })
-      .then((rawRes: string): void => {
-
-        if (args.options.debug) {
-          cmd.log('Response:');
-          cmd.log(rawRes);
-          cmd.log('');
-        }
-
-        if (args.options.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any): void => {
-        this.handleRejectedODataPromise(err, cmd, cb)
-      });
-  }*/
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
 
@@ -133,13 +68,15 @@ class ThemeSetCommand extends SpoCommand {
           cmd.log(JSON.stringify(palette));
         }
 
+        const isInverted:boolean  = args.options.inverted? true : false;
+
         const requestOptions: any = {
           url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': res.FormDigestValue
           }),
-          body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><Method Name="AddTenantTheme" Id="11" ObjectPathId="9"><Parameters><Parameter Type="String">${args.options.name}</Parameter><Parameter Type="String">{"isInverted":${args.options.inverted},"name":"${args.options.name}","palette":${JSON.stringify(palette)}}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="9" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`
+          body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><Method Name="UpdateTenantTheme" Id="11" ObjectPathId="9"><Parameters><Parameter Type="String">${args.options.name}</Parameter><Parameter Type="String">{"isInverted":${isInverted},"name":"${args.options.name}","palette":${JSON.stringify(palette)}}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="9" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`
         };
 
         if (this.debug) {
