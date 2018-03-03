@@ -331,13 +331,13 @@ describe(commands.THEME_SET, () => {
   });
 
   it('fails validation if file path not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {name: 'abc'} });
+    const actual = (command.validate() as CommandValidate)({ options: {name: 'abc', isInverted:false} });
     assert.notEqual(actual, true);
   });
 
   it('fails validation if file path doesn\'t exist', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const actual = (command.validate() as CommandValidate)({ options: { name: 'abc', filePath: 'abc' } });
+    const actual = (command.validate() as CommandValidate)({ options: { name: 'abc', filePath: 'abc', isInverted:false } });
     Utils.restore(fs.existsSync);
     assert.notEqual(actual, true);
   });
@@ -347,7 +347,7 @@ describe(commands.THEME_SET, () => {
     sinon.stub(stats, 'isDirectory').callsFake(() => true);
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
-    const actual = (command.validate() as CommandValidate)({ options: { name: 'abc', filePath: 'abc' } });
+    const actual = (command.validate() as CommandValidate)({ options: { name: 'abc', filePath: 'abc', isInverted:false } });
     Utils.restore([
       fs.existsSync,
       fs.lstatSync
@@ -411,28 +411,8 @@ describe(commands.THEME_SET, () => {
     assert(actual);
   });
 
-  it('fails validation if file path points to a directory', () => {
-    const stats: fs.Stats = new fs.Stats();
-    sinon.stub(stats, 'isDirectory').callsFake(() => true);
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'lstatSync').callsFake(() => stats);
-    const actual = (command.validate() as CommandValidate)({ options: { filePath: 'abc' } });
-    Utils.restore([
-      fs.existsSync,
-      fs.lstatSync
-    ]);
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if file path doesn\'t exist', () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const actual = (command.validate() as CommandValidate)({ options: { filePath: 'abc' } });
-    Utils.restore(fs.existsSync);
-    assert.notEqual(actual, true);
-  });
-
   it('fails validation when inverted parameter is not passed', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { isInverted: undefined } });
+    const actual = (command.validate() as CommandValidate)({ options: { name: 'abc', filePath: 'abc'} });
     assert.notEqual(actual, true);
   });
 
