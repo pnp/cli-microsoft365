@@ -89,10 +89,9 @@ describe(commands.THEME_SET, () => {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers['X-RequestDigest'] &&
-          opts.headers['X-RequestDigest'] === 'abc' &&
-          opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="SharePoint Framework CLI v0.6.0" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><Method Name="UpdateTenantTheme" Id="11" ObjectPathId="9"><Parameters><Parameter Type="String">Contoso</Parameter><Parameter Type="String">{"isInverted":false,"name":"Contoso","palette":123}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="9" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`) {
+          opts.headers['X-RequestDigest'] === 'abc') {
           return Promise.resolve(JSON.stringify([{"SchemaVersion":"15.0.0.0","LibraryVersion":"16.0.7025.1207","ErrorInfo":null,"TraceCorrelationId":"3d92299e-e019-4000-c866-de7d45aa9628"},12,true]));
-        }
+          }
       }
 
       return Promise.reject('Invalid request');
@@ -156,8 +155,7 @@ describe(commands.THEME_SET, () => {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers['X-RequestDigest'] &&
-          opts.headers['X-RequestDigest'] === 'abc' &&
-          opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="SharePoint Framework CLI v0.6.0" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><Method Name="UpdateTenantTheme" Id="11" ObjectPathId="9"><Parameters><Parameter Type="String">Contoso</Parameter><Parameter Type="String">{"isInverted":true,"name":"Contoso","palette":123}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="9" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`) {
+          opts.headers['X-RequestDigest'] === 'abc') {
           return Promise.resolve(JSON.stringify([{"SchemaVersion":"15.0.0.0","LibraryVersion":"16.0.7025.1207","ErrorInfo":null,"TraceCorrelationId":"3d92299e-e019-4000-c866-de7d45aa9628"},12,true]));
         }
       }
@@ -223,8 +221,7 @@ describe(commands.THEME_SET, () => {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers['X-RequestDigest'] &&
-          opts.headers['X-RequestDigest'] === 'abc' &&
-          opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="SharePoint Framework CLI v0.6.0" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><Method Name="UpdateTenantTheme" Id="11" ObjectPathId="9"><Parameters><Parameter Type="String">Contoso</Parameter><Parameter Type="String">{"isInverted":false,"name":"Contoso","palette":123}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="9" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`) {
+          opts.headers['X-RequestDigest'] === 'abc') {
           return Promise.resolve(JSON.stringify([{"SchemaVersion":"15.0.0.0","LibraryVersion":"16.0.7025.1207","ErrorInfo":"{ErrorMessage:error occured}","TraceCorrelationId":"3d92299e-e019-4000-c866-de7d45aa9628"},12,false]));
         }
       }
@@ -282,8 +279,7 @@ describe(commands.THEME_SET, () => {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers['X-RequestDigest'] &&
-          opts.headers['X-RequestDigest'] === 'abc' &&
-          opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="SharePoint Framework CLI v0.6.0" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><Method Name="UpdateTenantTheme" Id="11" ObjectPathId="9"><Parameters><Parameter Type="String">Contoso</Parameter><Parameter Type="String">{"isInverted":false,"name":"Contoso","palette":123}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="9" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`) {
+          opts.headers['X-RequestDigest'] === 'abc') {
           return Promise.reject('An error has occurred');
         }
       }
