@@ -18,6 +18,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   name: string;
+  confirm?: boolean;
 }
 
 class ThemeRemoveCommand extends SpoCommand {
@@ -30,64 +31,97 @@ class ThemeRemoveCommand extends SpoCommand {
     return 'Removes existing theme from tenant with the given name.';
   }
 
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.confirm = (!(!args.options.confirm)).toString();
+    return telemetryProps;
+  }
+
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
 
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+    const removeTheme = (): void => {
+      auth
+        .ensureAccessToken(auth.service.resource, cmd, this.debug)
+        .then((accessToken: string): request.RequestPromise => {
 
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Removing theme from tenant store...`);
+          if (this.debug) {
+            cmd.log(`Retrieved access token ${accessToken}. Removing theme from tenant store...`);
+          }
+
+          if (this.verbose) {
+            cmd.log(`Removing theme from tenant...`);
+          }
+
+          const requestOptions: any = {
+            url: `${auth.site.url}/_api/thememanager/DeleteTenantTheme`,
+            method: 'POST',
+            headers: Utils.getRequestHeaders({
+              authorization: `Bearer ${accessToken}`,
+              'accept': 'application/json;odata=nometadata'
+            }),
+            body: {
+              "name": args.options.name,
+            },
+            json: true
+          };
+
+          if (this.debug) {
+            cmd.log('Executing web request...');
+            cmd.log(requestOptions);
+            cmd.log('');
+          }
+
+          return request.post(requestOptions);
+        
+        })
+        .then((rawRes: string): void => {
+
+          if (this.debug) {
+            cmd.log('Response:');
+            cmd.log(rawRes);
+            cmd.log('');
+          }
+
+          if (this.verbose) {
+            cmd.log(vorpal.chalk.green('DONE'));
+          }
+
+          cb();
+        }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, cmd, cb));
+    }
+
+    if (args.options.confirm) {
+      removeTheme();
+    }
+    else {
+      cmd.prompt({
+        type: 'confirm',
+        name: 'continue',
+        default: false,
+        message: `Are you sure you want to remove the theme`,
+      }, (result: { continue: boolean }): void => {
+        if (!result.continue) {
+          cb();
         }
-
-        if (this.verbose) {
-          cmd.log(`Removing theme from tenant...`);
+        else {
+          removeTheme();
         }
-
-        const requestOptions: any = {
-          url: `${auth.site.url}/_api/thememanager/DeleteTenantTheme`,
-          method: 'POST',
-          headers: Utils.getRequestHeaders({
-            authorization: `Bearer ${accessToken}`,
-            'accept': 'application/json;odata=nometadata'
-          }),
-          body: {
-            "name": args.options.name,
-          },
-          json: true
-        };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
-        return request.post(requestOptions);
-       
-      })
-      .then((rawRes: string): void => {
-
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(rawRes);
-          cmd.log('');
-        }
-
-        if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
-        }
-
-        cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, cmd, cb));
+      });
+    }
 
   }
 
   public options(): CommandOption[] {
-    const options: CommandOption[] = [{
+    const options: CommandOption[] = [
+      {
         option: '-n, --name <name>',
         description: 'name of the theme getting removed'
-    }];
+      },
+      {
+        option: '--confirm',
+        description: 'Do not prompt for confirmation before removing theme'
+      }
+    ];
 
     const parentOptions: CommandOption[] = super.options();
     return options.concat(parentOptions);
@@ -116,8 +150,8 @@ class ThemeRemoveCommand extends SpoCommand {
           
     Example:
     
-      Removes theme from tenant
-      ${chalk.grey(config.delimiter)} ${commands.THEME_REMOVE} -n Contoso-Blue`);
+      Remove theme without prompting for confirmation
+      ${chalk.grey(config.delimiter)} ${commands.THEME_REMOVE} -n Contoso-Blue --confirm`);
   }
 }
 
