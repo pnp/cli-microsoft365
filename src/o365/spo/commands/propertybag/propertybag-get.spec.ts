@@ -1,0 +1,1329 @@
+import commands from '../../commands';
+import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
+import * as sinon from 'sinon';
+import appInsights from '../../../../appInsights';
+import auth, { Site } from '../../SpoAuth';
+const command: Command = require('./propertybag-get');
+import * as assert from 'assert';
+import * as request from 'request-promise-native';
+import Utils from '../../../../Utils';
+import { IdentityResponse } from './propertybag-base';
+import config from '../../../../config';
+
+describe(commands.PROPERTYBAG_GET, () => {
+  let vorpal: Vorpal;
+  let log: string[];
+  let cmdInstance: any;
+  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let trackEvent: any;
+  let telemetry: any;
+  let stubAllPostRequests: any = (
+    requestObjectIdentityResp = null,
+    getFolderPropertyBagResp = null,
+    getWebPropertyBagResp = null
+  ) => {
+    return sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf('/common/oauth2/token') > -1) {
+        return Promise.resolve('abc');
+      }
+
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        return Promise.resolve({
+          FormDigestValue: 'abc'
+        });
+      }
+
+      // fake requestObjectIdentity
+      if (opts.body.indexOf('3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a') > -1) {
+        if (requestObjectIdentityResp) {
+          return requestObjectIdentityResp;
+        } else {
+          return Promise.resolve(JSON.stringify([{
+            "SchemaVersion": "15.0.0.0",
+            "LibraryVersion": "16.0.7331.1206",
+            "ErrorInfo": null,
+            "TraceCorrelationId": "38e4499e-10a2-5000-ce25-77d4ccc2bd96"
+          }, 7, {
+            "_ObjectType_": "SP.Web",
+            "_ObjectIdentity_": "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
+            "ServerRelativeUrl": "\u002f"
+          }]));
+        }
+      }
+
+      // fake getFolderPropertyBag
+      if (opts.body.indexOf('GetFolderByServerRelativeUrl') > -1) {
+        if (getFolderPropertyBagResp) {
+          return getFolderPropertyBagResp;
+        } else {
+          return Promise.resolve(JSON.stringify([
+            {
+              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7331.1206", "ErrorInfo": null, "TraceCorrelationId": "93e5499e-00f1-5000-1f36-3ab12512a7e9"
+            }, 18, {
+              "IsNull": false
+            }, 19, {
+              "_ObjectIdentity_": "93e5499e-00f1-5000-1f36-3ab12512a7e9|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:f3806c23-0c9f-42d3-bc7d-3895acc06dc3:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d2c5:folder:df4291de-226f-4c39-bbcc-df21915f5fc1"
+            }, 20, {
+              "_ObjectType_": "SP.Folder", "_ObjectIdentity_": "93e5499e-00f1-5000-1f36-3ab12512a7e9|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:f3806c23-0c9f-42d3-bc7d-3895acc06dc3:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d2c5:folder:df4291de-226f-4c39-bbcc-df21915f5fc1", "Properties": {
+                "_ObjectType_": "SP.PropertyValues", "vti_folderitemcount$  Int32": 0, "vti_level$  Int32": 1, "vti_parentid": "{1C5271C8-DB93-459E-9C18-68FC33EFD856}", "vti_winfileattribs": "00000012", "vti_candeleteversion": "true", "vti_foldersubfolderitemcount$  Int32": 0, "vti_timelastmodified": "\/Date(2017,10,7,11,29,31,0)\/", "vti_dirlateststamp": "\/Date(2018,1,12,22,34,31,0)\/", "vti_isscriptable": "false", "vti_isexecutable": "false", "vti_metainfoversion$  Int32": 1, "vti_isbrowsable": "true", "vti_timecreated": "\/Date(2017,10,7,11,29,31,0)\/", "vti_etag": "\"{DF4291DE-226F-4C39-BBCC-DF21915F5FC1},256\"", "vti_hassubdirs": "true", "vti_docstoreversion$  Int32": 256, "vti_rtag": "rt:DF4291DE-226F-4C39-BBCC-DF21915F5FC1@00000000256", "vti_docstoretype$  Int32": 1, "vti_replid": "rid:{DF4291DE-226F-4C39-BBCC-DF21915F5FC1}"
+              }
+            }
+          ]));
+        }
+      }
+
+      // fake getWebPropertyBag
+      if (opts.body.indexOf('Property Name="AllProperties" SelectAll="true"') > -1) {
+        if (getWebPropertyBagResp) {
+          return getWebPropertyBagResp;
+        } else {
+          return Promise.resolve(JSON.stringify([
+            {
+              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7331.1206", "ErrorInfo": null, "TraceCorrelationId": "e7e5499e-7031-5000-ccf1-ddcbe51e534c"
+            }, 25, {
+              "_ObjectType_": "SP.Web", "_ObjectIdentity_": "e7e5499e-7031-5000-ccf1-ddcbe51e534c|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:f3806c23-0c9f-42d3-bc7d-3895acc06dc3:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d2c5", "ServerRelativeUrl": "\u002fsites\u002fVisionTestDev1\u002fen", "AllProperties": {
+                "_ObjectType_": "SP.PropertyValues", "_PnP_ProvisioningTemplateInfo": "{\"TemplateId\":\"TEMPLATE-B5D1728BA91E48E5B3FCB8CFF5CFCF66\",\"TemplateVersion\":1.0,\"TemplateSitePolicy\":null,\"ProvisioningTime\":\"2017-11-07T11:37:35.6130975+00:00\",\"Result\":true}", "vti_indexedpropertykeys": "XwBQAG4AUABfAFAAcgBvAHYAaQBzAGkAbwBuAGkAbgBnAFQAZQBtAHAAbABhAHQAZQBJAGQA|", "__InheritCurrentNavigation": "False", "_webnavigationsettings": "<?xml version=\"1.0\" encoding=\"utf-16\" standalone=\"yes\"?>\r\n<WebNavigationSettings Version=\"1.1\">\r\n  <SiteMapProviderSettings>\r\n    <SwitchableSiteMapProviderSettings Name=\"CurrentNavigationSwitchableProvider\" TargetProviderName=\"CurrentNavigation\" \u002f>\r\n    <TaxonomySiteMapProviderSettings Name=\"CurrentNavigationTaxonomyProvider\" Disabled=\"True\" \u002f>\r\n    <SwitchableSiteMapProviderSettings Name=\"GlobalNavigationSwitchableProvider\" TargetProviderName=\"GlobalNavigation\" \u002f>\r\n    <TaxonomySiteMapProviderSettings Name=\"GlobalNavigationTaxonomyProvider\" Disabled=\"True\" \u002f>\r\n  <\u002fSiteMapProviderSettings>\r\n  <NewPageSettings AddNewPagesToNavigation=\"True\" CreateFriendlyUrlsForNewPages=\"True\" \u002f>\r\n<\u002fWebNavigationSettings>\r\n", "vti_defaultlanguage": "en-us", "vti_mastercssfilecache": "corev15app.css", "_PnP_ProvisioningTemplateId": "TEMPLATE-B5D1728BA91E48E5B3FCB8CFF5CFCF66", "vti_extenderversion": "16.0.0.7025", "vti_approvallevels": "Approved Rejected Pending\\ Review", "vti_categories": "Travel Expense\\ Report Business Competition Goals\u002fObjectives Ideas Miscellaneous Waiting VIP In\\ Process Planning Schedule", "NoCrawl": "false", "$": "sdf", "__NavigationShowSiblings": "false"
+              }
+            }
+          ]));
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+  }
+
+  before(() => {
+    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
+    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
+    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
+      telemetry = t;
+    });
+  });
+
+  beforeEach(() => {
+    vorpal = require('../../../../vorpal-init');
+    log = [];
+    cmdInstance = {
+      log: (msg: string) => {
+        log.push(msg);
+      }
+    };
+    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    auth.site = new Site();
+    telemetry = null;
+  });
+
+  afterEach(() => {
+    Utils.restore([
+      vorpal.find
+    ]);
+  });
+
+  after(() => {
+    Utils.restore([
+      appInsights.trackEvent,
+      auth.getAccessToken,
+      auth.restoreAuth
+    ]);
+  });
+
+  it('has correct name', () => {
+    assert.equal(command.name.startsWith(commands.PROPERTYBAG_GET), true);
+  });
+
+  it('has a description', () => {
+    assert.notEqual(command.description, null);
+  });
+
+  it('calls telemetry', (done) => {
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: {}, appCatalogUrl: 'https://contoso-admin.sharepoint.com' }, () => {
+      try {
+        assert(trackEvent.called);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('logs correct telemetry event', (done) => {
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { webUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
+      try {
+        assert.equal(telemetry.name, commands.PROPERTYBAG_GET);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('aborts when not connected to a SharePoint site', (done) => {
+    auth.site = new Site();
+    auth.site.connected = false;
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { webUrl: 'https://contoso.sharepoint.com/sites/abc' } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('Connect to a SharePoint Online site first')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('should call getWebPropertyBag when folder is not specified and site is /', (done) => {
+    stubAllPostRequests();
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    const getWebPropertyBagSpy = sinon.spy((command as any), 'getWebPropertyBag');
+    const options: Object = {
+      webUrl: 'https://contoso.sharepoint.com',
+      debug: true
+    }
+    const objIdentity: IdentityResponse = {
+      objectIdentity: "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
+      serverRelativeUrl: "\u002f"
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert(getWebPropertyBagSpy.calledWith(objIdentity, 'https://contoso.sharepoint.com', cmdInstance));
+        assert(getWebPropertyBagSpy.calledOnce === true);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+        Utils.restore((command as any)['getWebPropertyBag']);
+      }
+    });
+  });
+
+  it('should call getWebPropertyBag when folder is not specified and site is /sites/test', (done) => {
+    stubAllPostRequests(new Promise((resolve, reject) => { return resolve(JSON.stringify([{
+      "SchemaVersion": "15.0.0.0",
+      "LibraryVersion": "16.0.7331.1206",
+      "ErrorInfo": null,
+      "TraceCorrelationId": "38e4499e-10a2-5000-ce25-77d4ccc2bd96"
+    }, 7, {
+      "_ObjectType_": "SP.Web",
+      "_ObjectIdentity_": "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
+      "ServerRelativeUrl": "\u002fsites\u002ftest"
+    }])) }));
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    const getWebPropertyBagSpy = sinon.spy((command as any), 'getWebPropertyBag');
+    const options: Object = {
+      webUrl: 'https://contoso.sharepoint.com/sites/test',
+      debug: true
+    }
+    const objIdentity: IdentityResponse = {
+      objectIdentity: "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
+      serverRelativeUrl: "\u002fsites\u002ftest"
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert(getWebPropertyBagSpy.calledWith(objIdentity, 'https://contoso.sharepoint.com/sites/test', cmdInstance));
+        assert(getWebPropertyBagSpy.calledOnce === true);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+        Utils.restore((command as any)['getWebPropertyBag']);
+      }
+    });
+  });
+
+  it('should call getFolderPropertyBag when folder is specified and site is /', (done) => {
+    stubAllPostRequests();
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    const getFolderPropertyBagSpy = sinon.spy((command as any), 'getFolderPropertyBag');
+    const options: Object = {
+      webUrl: 'https://contoso.sharepoint.com',
+      folder: '/',
+      debug: true
+    }
+    const objIdentity: IdentityResponse = {
+      objectIdentity: "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
+      serverRelativeUrl: "\u002f"
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert(getFolderPropertyBagSpy.calledWith(objIdentity, 'https://contoso.sharepoint.com', '/', cmdInstance));
+        assert(getFolderPropertyBagSpy.calledOnce === true);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+        Utils.restore((command as any)['getFolderPropertyBag']);
+      }
+    });
+  });
+
+  it('should call getFolderPropertyBag when folder is specified and site is /sites/test', (done) => {
+    stubAllPostRequests(new Promise((resolve, reject) => { return resolve(JSON.stringify([{
+      "SchemaVersion": "15.0.0.0",
+      "LibraryVersion": "16.0.7331.1206",
+      "ErrorInfo": null,
+      "TraceCorrelationId": "38e4499e-10a2-5000-ce25-77d4ccc2bd96"
+    }, 7, {
+      "_ObjectType_": "SP.Web",
+      "_ObjectIdentity_": "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
+      "ServerRelativeUrl": "\u002fsites\u002ftest"
+    }])) }));
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    const getFolderPropertyBagSpy = sinon.spy((command as any), 'getFolderPropertyBag');
+    const options: Object = {
+      webUrl: 'https://contoso.sharepoint.com/sites/test',
+      folder: '/',
+      debug: true
+    }
+    const objIdentity: IdentityResponse = {
+      objectIdentity: "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
+      serverRelativeUrl: "\u002fsites\u002ftest"
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert(getFolderPropertyBagSpy.calledWith(objIdentity, 'https://contoso.sharepoint.com/sites/test', '/', cmdInstance));
+        assert(getFolderPropertyBagSpy.calledOnce === true);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+        Utils.restore((command as any)['getFolderPropertyBag']);
+      }
+    });
+  });
+
+  it('should correctly handle getFolderPropertyBag reject promise', (done) => {
+    stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return reject('abc'); }));
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    const getFolderPropertyBagSpy = sinon.spy((command as any), 'getFolderPropertyBag');
+    const options: Object = {
+      webUrl: 'https://contoso.sharepoint.com',
+      folder: '/'
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert(getFolderPropertyBagSpy.calledOnce === true);
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('abc')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+        Utils.restore((command as any)['getFolderPropertyBag']);
+      }
+    });
+  });
+
+  it('should correctly handle getWebPropertyBag reject promise', (done) => {
+    stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return reject('abc1'); }));
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    const getWebPropertyBagSpy = sinon.spy((command as any), 'getWebPropertyBag');
+    const options: Object = {
+      webUrl: 'https://contoso.sharepoint.com',
+      debug: false
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert(getWebPropertyBagSpy.calledOnce === true);
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('abc1')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+        Utils.restore((command as any)['getWebPropertyBag']);
+      }
+    });
+  });
+
+  it('should correctly handle getFolderPropertyBag ClientSvc error response', (done) => {
+    const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "getFolderPropertyBag error" } }]);
+    stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return resolve(error); }));
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    const getFolderPropertyBagSpy = sinon.spy((command as any), 'getFolderPropertyBag');
+    const options: Object = {
+      webUrl: 'https://contoso.sharepoint.com',
+      folder: '/',
+      verbose: true
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert(getFolderPropertyBagSpy.calledOnce === true);
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('getFolderPropertyBag error')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+        Utils.restore((command as any)['getFolderPropertyBag']);
+      }
+    });
+  });
+
+  it('should correctly handle getWebPropertyBag ClientSvc error response', (done) => {
+    const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "getWebPropertyBag error" } }]);
+    stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return resolve(error); }));
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    const getWebPropertyBagSpy = sinon.spy((command as any), 'getWebPropertyBag');
+    const options: Object = {
+      webUrl: 'https://contoso.sharepoint.com'
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert(getWebPropertyBagSpy.calledOnce === true);
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('getWebPropertyBag error')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+        Utils.restore((command as any)['getWebPropertyBag']);
+      }
+    });
+  });
+
+  it('should correctly handle requestObjectIdentity error response', (done) => {
+    const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "requestObjectIdentity error" } }]);
+
+    stubAllPostRequests(new Promise<any>((resolve, reject) => { return resolve(error) }), null, null);
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    const requestObjectIdentitySpy = sinon.spy((command as any), 'requestObjectIdentity');
+    const options: Object = {
+      webUrl: 'https://contoso.sharepoint.com'
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert(requestObjectIdentitySpy.calledOnce === true);
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('requestObjectIdentity error')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+        Utils.restore((command as any)['requestObjectIdentity']);
+      }
+    });
+  });
+
+  it('should correctly handle requestObjectIdentity ErrorMessage null response', (done) => {
+    const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": undefined } }]);
+
+    stubAllPostRequests(new Promise<any>((resolve, reject) => { return resolve(error) }), null, null);
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    const requestObjectIdentitySpy = sinon.spy((command as any), 'requestObjectIdentity');
+    const options: Object = {
+      webUrl: 'https://contoso.sharepoint.com'
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert(requestObjectIdentitySpy.calledOnce === true);
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('ClientSvc unknown error')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+        Utils.restore((command as any)['requestObjectIdentity']);
+      }
+    });
+  });
+
+  it('should correctly handle getFolderPropertyBag ErrorMessage null response', (done) => {
+    const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": undefined } }]);
+
+    stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return resolve(error) }));
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    const options: Object = {
+      webUrl: 'https://contoso.sharepoint.com',
+      key: 'vti_parentid',
+      folder: '/'
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('ClientSvc unknown error')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('should correctly handle getFolderPropertyBag ErrorMessage null response', (done) => {
+    const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": undefined } }]);
+
+    stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return resolve(error) }));
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    const options: Object = {
+      webUrl: 'https://contoso.sharepoint.com',
+      key: 'vti_parentid'
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('ClientSvc unknown error')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('should correctly return string property', (done) => {
+    stubAllPostRequests();
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    const filterByKeySpy = sinon.spy((command as any), 'filterByKey');
+    const options: Object = {
+      webUrl: 'https://contoso.sharepoint.com',
+      folder: '/',
+      key: 'vti_parentid'
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert(filterByKeySpy.calledOnce === true);
+
+        const out = cmdInstanceLogSpy.lastCall.args[0];
+        assert.equal(out, '{1C5271C8-DB93-459E-9C18-68FC33EFD856}');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+        Utils.restore((command as any)['filterByKey']);
+      }
+    });
+  });
+
+  it('should correctly return date property (text)', (done) => {
+    stubAllPostRequests();
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    const filterByKeySpy = sinon.spy((command as any), 'filterByKey');
+    const options: Object = {
+      webUrl: 'https://contoso.sharepoint.com',
+      folder: '/',
+      key: 'vti_timelastmodified' //\/Date(2017,10,7,11,29,31,0)\/
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert(filterByKeySpy.calledOnce === true);
+
+        const out = cmdInstanceLogSpy.lastCall.args[0];
+        const expectedDate = new Date(2017, 10, 7, 11, 29, 31, 0);
+        assert.equal(out.getUTCMonth(), expectedDate.getUTCMonth(), 'getUTCMonth');
+        assert.equal(out.getUTCFullYear(), expectedDate.getUTCFullYear(), 'getUTCFullYear');
+        assert.equal(out.getUTCDate(), expectedDate.getUTCDate(), 'getUTCDate');
+        assert.equal(out.getUTCHours(), expectedDate.getUTCHours(), 'getUTCHours');
+        assert.equal(out.getUTCMinutes(), expectedDate.getUTCMinutes(), 'getUTCMinutes');
+        assert.equal(out.getSeconds(), expectedDate.getSeconds(), 'getSeconds');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+        Utils.restore((command as any)['filterByKey']);
+      }
+    });
+  });
+
+  it('should correctly return date property (json)', (done) => {
+    stubAllPostRequests();
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    const filterByKeySpy = sinon.spy((command as any), 'filterByKey');
+    const options: Object = {
+      webUrl: 'https://contoso.sharepoint.com',
+      folder: '/',
+      key: 'vti_timelastmodified',
+      output: 'json'
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert(filterByKeySpy.calledOnce === true);
+
+        const out = cmdInstanceLogSpy.lastCall.args[0];
+        assert.equal(Object.prototype.toString.call(out), '[object Date]');
+        const expectedDate = new Date(2017, 10, 7, 11, 29, 31, 0);
+        assert.equal(out.getUTCMonth(), expectedDate.getUTCMonth(), 'getUTCMonth');
+        assert.equal(out.getUTCFullYear(), expectedDate.getUTCFullYear(), 'getUTCFullYear');
+        assert.equal(out.getUTCDate(), expectedDate.getUTCDate(), 'getUTCDate');
+        assert.equal(out.getUTCHours(), expectedDate.getUTCHours(), 'getUTCHours');
+        assert.equal(out.getUTCMinutes(), expectedDate.getUTCMinutes(), 'getUTCMinutes');
+        assert.equal(out.getSeconds(), expectedDate.getSeconds(), 'getSeconds');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+        Utils.restore((command as any)['filterByKey']);
+      }
+    });
+  });
+
+  it('should correctly return int property', (done) => {
+    stubAllPostRequests();
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    const filterByKeySpy = sinon.spy((command as any), 'filterByKey');
+    const options: Object = {
+      webUrl: 'https://contoso.sharepoint.com',
+      folder: '/',
+      key: 'vti_level'
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert(filterByKeySpy.calledOnce === true);
+
+        const out = cmdInstanceLogSpy.lastCall.args[0];
+        assert.equal(out, 1);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+        Utils.restore((command as any)['filterByKey']);
+      }
+    });
+  });
+
+  it('should correctly return int property with value 0', (done) => {
+    stubAllPostRequests();
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    const options: Object = {
+      webUrl: 'https://contoso.sharepoint.com',
+      folder: '/',
+      key: 'vti_folderitemcount'
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert.equal(cmdInstanceLogSpy.lastCall.args[0], 0);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('should correctly return bool property', (done) => {
+    stubAllPostRequests();
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    const filterByKeySpy = sinon.spy((command as any), 'filterByKey');
+    const options: Object = {
+      webUrl: 'https://contoso.sharepoint.com',
+      folder: '/',
+      key: 'vti_candeleteversion'
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert(filterByKeySpy.calledOnce === true);
+        
+        const out = cmdInstanceLogSpy.lastCall.args[0];
+        assert.equal(out, true);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+        Utils.restore((command as any)['filterByKey']);
+      }
+    });
+  });
+
+  it('should correctly return property not found (verbose)', (done) => {
+    stubAllPostRequests();
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    const options: Object = {
+      webUrl: 'https://contoso.sharepoint.com',
+      folder: '/',
+      key: 'abc',
+      verbose: true
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        const out = cmdInstanceLogSpy.lastCall.args[0];
+        assert.equal(out, 'Property not found.');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('should correctly return empty line if not found and not verbose', (done) => {
+    stubAllPostRequests();
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    const options: Object = {
+      webUrl: 'https://contoso.sharepoint.com',
+      folder: '/',
+      key: 'abc',
+      verbose: false
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert.equal(cmdInstanceLogSpy.notCalled, true);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('should reject promise if _ObjectIdentity_ not found', (done) => {
+    stubAllPostRequests(new Promise<any>((resolve, reject) => { return resolve('[{}]') }));
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    const options: Object = {
+      webUrl: 'https://contoso.sharepoint.com',
+      folder: '/',
+      key: 'vti_parentid'
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('Cannot proceed. _ObjectIdentity_ not found')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('should reject promise if Properties not found', (done) => {
+    stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return resolve('[{}]') }));
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    const options: Object = {
+      webUrl: 'https://contoso.sharepoint.com',
+      folder: '/',
+      key: 'vti_parentid'
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('Cannot proceed. Properties not found')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('should reject promise if AllProperties not found', (done) => {
+    stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return resolve('[{}]') }));
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    const options: Object = {
+      webUrl: 'https://contoso.sharepoint.com',
+      key: 'vti_parentid'
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('Cannot proceed. AllProperties not found')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('should return error if requestObjectIdentity reqest failed', (done) => {
+    stubAllPostRequests(new Promise<any>((resolve, reject) => { return reject('error1') }));
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    const options: Object = {
+      webUrl: 'https://contoso.sharepoint.com',
+      key: 'vti_parentid'
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        const out = cmdInstanceLogSpy.lastCall.args[0];
+        assert.equal(out.message, 'error1');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('should correctly post url, headers and body when calling client.svc when requestObjectIdentity', (done) => {
+    const postRequestSpy: sinon.SinonSpy = stubAllPostRequests();
+    
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    const options: Object = {
+      webUrl: 'https://contoso.sharepoint.com',
+      key: 'vti_parentid'
+    };
+
+    cmdInstance.action({ options: options }, () => {
+      
+      try {
+        const secondCall = postRequestSpy.getCalls()[1];
+        assert(secondCall.calledWith(sinon.match({ url: 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery' })));
+        assert(secondCall.calledWith(sinon.match({ headers: { authorization: 'Bearer ABC'}})));
+        assert(secondCall.calledWith(sinon.match({ headers: { 'X-RequestDigest': 'abc'}})));
+        assert(secondCall.calledWith(sinon.match({ body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="1" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="ServerRelativeUrl" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Property Id="5" ParentId="3" Name="Web" /><StaticProperty Id="3" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /></ObjectPaths></Request>`
+        })));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('should correctly post url, headers and body when calling client.svc when getWebPropertyBag', (done) => {
+    const postRequestSpy: sinon.SinonSpy = stubAllPostRequests();
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    const options: Object = {
+      webUrl: 'https://contoso.sharepoint.com',
+      key: 'vti_parentid'
+    };
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        const lastCall = postRequestSpy.lastCall;
+        assert(lastCall.calledWith(sinon.match({ url: 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery' })));
+        assert(lastCall.calledWith(sinon.match({ headers: { authorization: 'Bearer ABC'}})));
+        assert(lastCall.calledWith(sinon.match({ headers: { 'X-RequestDigest': 'abc'}})));
+        assert(lastCall.calledWith(sinon.match({ body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="97" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="ServerRelativeUrl" ScalarProperty="true" /><Property Name="AllProperties" SelectAll="true"><Query SelectAllProperties="false"><Properties /></Query></Property></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275" /></ObjectPaths></Request>`
+        })));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('should correctly post payload when calling client.svc when getFolderPropertyBag and site is /', (done) => {
+    const postRequestSpy: sinon.SinonSpy = stubAllPostRequests();
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    const options: Object = {
+      webUrl: 'https://contoso.sharepoint.com',
+      key: 'vti_parentid',
+      folder: '/'
+    };
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        const lastCall = postRequestSpy.lastCall;
+        assert(lastCall.calledWith(sinon.match({ url: 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery' })));
+        assert(lastCall.calledWith(sinon.match({ headers: { authorization: 'Bearer ABC'}})));
+        assert(lastCall.calledWith(sinon.match({ headers: { 'X-RequestDigest': 'abc'}})));
+        assert(lastCall.calledWith(sinon.match({ body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /><Query Id="12" ObjectPathId="9"><Query SelectAllProperties="false"><Properties><Property Name="Properties" SelectAll="true"><Query SelectAllProperties="false"><Properties /></Query></Property></Properties></Query></Query></Actions><ObjectPaths><Method Id="9" ParentId="5" Name="GetFolderByServerRelativeUrl"><Parameters><Parameter Type="String">/</Parameter></Parameters></Method><Identity Id="5" Name="38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275" /></ObjectPaths></Request>`
+        })));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('should correctly post payload when calling client.svc when getFolderPropertyBag and site is /sites/test', (done) => {
+    const postRequestSpy: sinon.SinonSpy = stubAllPostRequests(new Promise((resolve, reject) => { return resolve(JSON.stringify([{
+      "SchemaVersion": "15.0.0.0",
+      "LibraryVersion": "16.0.7331.1206",
+      "ErrorInfo": null,
+      "TraceCorrelationId": "38e4499e-10a2-5000-ce25-77d4ccc2bd96"
+    }, 7, {
+      "_ObjectType_": "SP.Web",
+      "_ObjectIdentity_": "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
+      "ServerRelativeUrl": "\u002fsites\u002ftest"
+    }])) }));
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    const options: Object = {
+      webUrl: 'https://contoso.sharepoint.com/sites/test',
+      key: 'vti_parentid',
+      folder: '/'
+    };
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        const lastCall = postRequestSpy.lastCall;
+        assert(lastCall.calledWith(sinon.match({ url: 'https://contoso.sharepoint.com/sites/test/_vti_bin/client.svc/ProcessQuery' })));
+        assert(lastCall.calledWith(sinon.match({ headers: { authorization: 'Bearer ABC'}})));
+        assert(lastCall.calledWith(sinon.match({ headers: { 'X-RequestDigest': 'abc'}})));
+        assert(lastCall.calledWith(sinon.match({ body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /><Query Id="12" ObjectPathId="9"><Query SelectAllProperties="false"><Properties><Property Name="Properties" SelectAll="true"><Query SelectAllProperties="false"><Properties /></Query></Property></Properties></Query></Query></Actions><ObjectPaths><Method Id="9" ParentId="5" Name="GetFolderByServerRelativeUrl"><Parameters><Parameter Type="String">/sites/test/</Parameter></Parameters></Method><Identity Id="5" Name="38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275" /></ObjectPaths></Request>`
+        })));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('should correctly post payload when calling client.svc when getFolderPropertyBag and site is /', (done) => {
+    const postRequestSpy: sinon.SinonSpy = stubAllPostRequests();
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    const options: Object = {
+      webUrl: 'https://contoso.sharepoint.com',
+      key: 'vti_parentid',
+      folder: '/'
+    };
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        const lastCall = postRequestSpy.lastCall;
+        assert(lastCall.calledWith(sinon.match({ url: 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery' })));
+        assert(lastCall.calledWith(sinon.match({ headers: { authorization: 'Bearer ABC'}})));
+        assert(lastCall.calledWith(sinon.match({ headers: { 'X-RequestDigest': 'abc'}})));
+        assert(lastCall.calledWith(sinon.match({ body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /><Query Id="12" ObjectPathId="9"><Query SelectAllProperties="false"><Properties><Property Name="Properties" SelectAll="true"><Query SelectAllProperties="false"><Properties /></Query></Property></Properties></Query></Query></Actions><ObjectPaths><Method Id="9" ParentId="5" Name="GetFolderByServerRelativeUrl"><Parameters><Parameter Type="String">/</Parameter></Parameters></Method><Identity Id="5" Name="38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275" /></ObjectPaths></Request>`
+        })));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('should correctly post payload when calling client.svc when getFolderPropertyBag and site is /sites/test', (done) => {
+    const postRequestSpy: sinon.SinonSpy = stubAllPostRequests(new Promise((resolve, reject) => { return resolve(JSON.stringify([{
+      "SchemaVersion": "15.0.0.0",
+      "LibraryVersion": "16.0.7331.1206",
+      "ErrorInfo": null,
+      "TraceCorrelationId": "38e4499e-10a2-5000-ce25-77d4ccc2bd96"
+    }, 7, {
+      "_ObjectType_": "SP.Web",
+      "_ObjectIdentity_": "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
+      "ServerRelativeUrl": "\u002fsites\u002ftest"
+    }])) }));
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com/sites/test';
+    cmdInstance.action = command.action();
+    const options: Object = {
+      webUrl: 'https://contoso.sharepoint.com/sites/test',
+      key: 'vti_parentid',
+      folder: '/'
+    };
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        const lastCall = postRequestSpy.lastCall;
+        assert(lastCall.calledWith(sinon.match({ url: 'https://contoso.sharepoint.com/sites/test/_vti_bin/client.svc/ProcessQuery' })));
+        assert(lastCall.calledWith(sinon.match({ headers: { authorization: 'Bearer ABC'}})));
+        assert(lastCall.calledWith(sinon.match({ headers: { 'X-RequestDigest': 'abc'}})));
+        assert(lastCall.calledWith(sinon.match({ body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /><Query Id="12" ObjectPathId="9"><Query SelectAllProperties="false"><Properties><Property Name="Properties" SelectAll="true"><Query SelectAllProperties="false"><Properties /></Query></Property></Properties></Query></Query></Actions><ObjectPaths><Method Id="9" ParentId="5" Name="GetFolderByServerRelativeUrl"><Parameters><Parameter Type="String">/sites/test/</Parameter></Parameters></Method><Identity Id="5" Name="38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275" /></ObjectPaths></Request>`
+        })));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('supports debug mode', () => {
+    const options = (command.options() as CommandOption[]);
+    let containsVerboseOption = false;
+    options.forEach(o => {
+      if (o.option === '--debug') {
+        containsVerboseOption = true;
+      }
+    });
+    assert(containsVerboseOption);
+  });
+
+  it('supports specifying folder', () => {
+    const options = (command.options() as CommandOption[]);
+    let containsScopeOption = false;
+    options.forEach(o => {
+      if (o.option.indexOf('[folder]') > -1) {
+        containsScopeOption = true;
+      }
+    });
+    assert(containsScopeOption);
+  });
+
+  it('doesn\'t fail if the parent doesn\'t define options', () => {
+    sinon.stub(Command.prototype, 'options').callsFake(() => { return undefined; });
+    const options = (command.options() as CommandOption[]);
+    Utils.restore(Command.prototype.options);
+    assert(options.length > 0);
+  });
+
+  it('should properly format integer property', () => {
+    const prop = (command as any).formatProperty('vti_folderitemcount$  Int32', 0);
+    assert.equal(prop.key, 'vti_folderitemcount');
+    assert.equal(prop.value, 0);
+  });
+
+  it('should properly format date property', () => {
+    const prop = (command as any).formatProperty('vti_timecreated', '\/Date(2017,10,7,11,29,31,0)\/');
+    assert.equal(prop.key, 'vti_timecreated');
+    assert.equal(Object.prototype.toString.call(prop.value), '[object Date]');
+    assert.equal((prop.value as Date).toISOString(), new Date(2017, 10, 7, 11, 29, 31, 0).toISOString());
+  });
+
+  it('should properly format boolean property', () => {
+    const prop = (command as any).formatProperty('vti_timecreated', 'true');
+    assert.equal(prop.key, 'vti_timecreated');
+    assert.equal(prop.value, true);
+  });
+
+  it('fails validation if the url option not specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { key: 'abc' } });
+    assert.equal(actual, "Missing required option url");
+  });
+
+  it('fails validation if the url option is not a valid SharePoint site URL', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options:
+        {
+          webUrl: 'foo',
+          key: 'abc'
+        }
+    });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation if the key option is not specified', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options:
+        {
+          webUrl: 'https://contoso.sharepoint.com',
+        }
+    });
+    assert.notEqual(actual, true);
+  });
+
+  it('passes validation when the url and key options specified', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options:
+        {
+          webUrl: "https://contoso.sharepoint.com",
+          key: 'abc'
+        }
+    });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation when the url, key and folder options specified', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options:
+        {
+          webUrl: "https://contoso.sharepoint.com",
+          key: 123,
+          folder: "/"
+        }
+    });
+    assert.equal(actual, true);
+  });
+
+  it('doesn\'t fail validation if the optional folder option not specified', () => {
+    const actual = (command.validate() as CommandValidate)(
+      {
+        options:
+          {
+            webUrl: "https://contoso.sharepoint.com",
+            key: 'abc'
+          }
+      });
+    assert.equal(actual, true);
+  });
+
+  it('has help referring to the right command', () => {
+    const cmd: any = {
+      log: (msg: string) => { },
+      prompt: () => { },
+      helpInformation: () => { }
+    };
+    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
+    cmd.help = command.help();
+    cmd.help({}, () => { });
+    assert(find.calledWith(commands.PROPERTYBAG_GET));
+  });
+
+  it('has help with examples', () => {
+    const _log: string[] = [];
+    const cmd: any = {
+      log: (msg: string) => {
+        _log.push(msg);
+      },
+      prompt: () => { },
+      helpInformation: () => { }
+    };
+    sinon.stub(vorpal, 'find').callsFake(() => cmd);
+    cmd.help = command.help();
+    cmd.help({}, () => { });
+    let containsExamples: boolean = false;
+    _log.forEach(l => {
+      if (l && l.indexOf('Examples:') > -1) {
+        containsExamples = true;
+      }
+    });
+    Utils.restore(vorpal.find);
+    assert(containsExamples);
+  });
+
+  it('correctly handles lack of valid access token', (done) => {
+    Utils.restore(auth.getAccessToken);
+    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        webUrl: "https://contoso.sharepoint.com"
+      }
+    }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(auth.getAccessToken);
+      }
+    });
+  });
+});

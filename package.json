@@ -1,6 +1,6 @@
 {
   "name": "@pnp/office365-cli",
-  "version": "0.6.0",
+  "version": "1.0.0",
   "description": "Manage Microsoft Office 365 on any platform",
   "license": "MIT",
   "main": "./dist/index.js",
@@ -38,11 +38,14 @@
   "contributors": [
     "Connell, Andrew <me@andrewconnell.com>",
     "Georgiev, Velin <velin.georgiev@gmail.com>",
+    "Hvam, Allan <ahp@delegate.dk>",
     "Kailasam, Balamurugan <kshsbala@engineer.com>",
+    "Keijzers, Paul <KbWorks@users.noreply.github.com>",
     "Laskewitz, Daniel <daniel@laskewitz.nl>",
     "Mastykarz, Waldek <waldek@mastykarz.nl>",
     "Schouten, Robert <robert.schouten@wortell.nl>",
     "Sitaraman, Rajesh <rajesh.sitaraman@outlook.com",
+    "Svenson, Mikael <miksvenson@gmail.com>",
     "Wilen, Wictor <wictor@wictorwilen.se>",
     "van Hunen, Erwin <erwin.van.hunen@outlook.com>"
   ],

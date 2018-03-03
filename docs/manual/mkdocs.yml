@@ -38,6 +38,8 @@ pages:
         - customaction set: 'cmd/spo/customaction/customaction-set.md'
       - externaluser:
         - externaluser list: 'cmd/spo/externaluser/externaluser-list.md'
+      - file:
+        - file list: 'cmd/spo/file/file-list.md'
       - hubsite:
         - hubsite connect: 'cmd/spo/hubsite/hubsite-connect.md'
         - hubsite disconnect: 'cmd/spo/hubsite/hubsite-disconnect.md'
@@ -54,6 +56,9 @@ pages:
         - list list: 'cmd/spo/list/list-list.md'
         - list remove: 'cmd/spo/list/list-remove.md'
         - list set: 'cmd/spo/list/list-set.md'
+      - propertybag:
+        - propertybag get: 'cmd/spo/propertybag/propertybag-get.md'
+        - propertybag list: 'cmd/spo/propertybag/propertybag-list.md'
       - serviceprincipal:
         - serviceprincipal grant list: 'cmd/spo/serviceprincipal/serviceprincipal-grant-list.md'
         - serviceprincipal grant revoke: 'cmd/spo/serviceprincipal/serviceprincipal-grant-revoke.md'
@@ -95,13 +100,21 @@ pages:
         - theme list: 'cmd/spo/theme/theme-list.md'
         - theme remove: 'cmd/spo/theme/theme-remove.md'
         - theme set: 'cmd/spo/theme/theme-set.md'
+      - tenant:
+        - tenant appcatalogurl get: 'cmd/spo/tenant/tenant-appcatalogurl-get.md'
       - web:
         - web add: 'cmd/spo/web/web-add.md'
+        - web list: 'cmd/spo/web/web-list.md'
         - web remove: 'cmd/spo/web/web-remove.md'
     - Microsoft Graph (graph):
       - connect: 'cmd/graph/connect.md'
       - disconnect: 'cmd/graph/disconnect.md'
       - status: 'cmd/graph/status.md'
+      - o365group:
+        - o365group add: 'cmd/graph/o365group/o365group-add.md'
+        - o365group get: 'cmd/graph/o365group/o365group-get.md'
+        - o365group list: 'cmd/graph/o365group/o365group-list.md'
+        - o365group set: 'cmd/graph/o365group/o365group-set.md'
     - Azure Active Directory Graph (aad):
       - connect: 'cmd/aad/connect.md'
       - disconnect: 'cmd/aad/disconnect.md'

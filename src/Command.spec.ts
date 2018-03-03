@@ -4,7 +4,8 @@ import Command, {
   CommandValidate,
   CommandCancel,
   CommandOption,
-  CommandTypes
+  CommandTypes,
+  CommandError
 } from './Command';
 import Utils from './Utils';
 const vorpal: Vorpal = require('./vorpal-init');
@@ -82,6 +83,10 @@ class MockCommand2 extends Command {
 
   public commandHelp(args: any, log: (message: string) => void): void {
     log('MockCommand2 help');
+  }
+
+  public handlePromiseError(response: any, cmd: CommandInstance, callback: () => void): void {
+    this.handleRejectedODataJsonPromise(response, cmd, callback);
   }
 }
 
@@ -278,5 +283,62 @@ describe('Command', () => {
     cmd.help({}, logSpy);
     sandbox.restore();
     assert(logSpy.called);
-  })
+  });
+
+  it('displays error message when it\'s serialized in the error property', () => {
+    const l: any[] = [];
+    const log = (msg?: string) => { l.push(msg); };
+    const logSpy = sinon.spy(log);
+    const cmd = {
+      log: logSpy,
+      prompt: () => {}
+    };
+    const mock = new MockCommand2();
+    mock.handlePromiseError({
+      error: JSON.stringify({
+        error: {
+          message: 'An error has occurred'
+        }
+      })
+    }, cmd, () => {});
+    assert(logSpy.calledWith(new CommandError('An error has occurred')));
+  });
+
+  it('displays the raw error message when the serialized value from the error property is not an error object', () => {
+    const l: any[] = [];
+    const log = (msg?: string) => { l.push(msg); };
+    const logSpy = sinon.spy(log);
+    const cmd = {
+      log: logSpy,
+      prompt: () => {}
+    };
+    const mock = new MockCommand2();
+    mock.handlePromiseError({
+      error: JSON.stringify({
+        error: {
+          id: '123'
+        }
+      })
+    }, cmd, () => {});
+    assert(logSpy.calledWith(new CommandError(JSON.stringify({
+      error: {
+        id: '123'
+      }
+    }))));
+  });
+
+  it('displays the raw error message when the serialized value from the error property is not a JSON object', () => {
+    const l: any[] = [];
+    const log = (msg?: string) => { l.push(msg); };
+    const logSpy = sinon.spy(log);
+    const cmd = {
+      log: logSpy,
+      prompt: () => {}
+    };
+    const mock = new MockCommand2();
+    mock.handlePromiseError({
+      error: 'abc'
+    }, cmd, () => {});
+    assert(logSpy.calledWith(new CommandError('abc')));
+  });
 });
