@@ -63,7 +63,6 @@ class ThemeListCommand extends SpoCommand {
 
         const themePreviews: any[] = rawRes.themePreviews;
 
-        
           if (themePreviews && themePreviews.length > 0) {
 
             if (args.options.output === 'json') {
@@ -73,7 +72,7 @@ class ThemeListCommand extends SpoCommand {
               try {
                 themePreviews.map(a => {
                   const themeJson = JSON.parse(a.themeJson);
-                  cmd.log(`Name: ${a.name}\nPalette: ${JSON.stringify(themeJson.palette)}\n`);              
+                  cmd.log(`Name: ${a.name}\nPalette: ${JSON.stringify(themeJson.palette)}\nInverted: ${(themeJson.isInverted).toString()}\n`);              
                 });   
               }
               catch (e) 
