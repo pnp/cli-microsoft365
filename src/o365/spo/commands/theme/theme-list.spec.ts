@@ -1,7 +1,6 @@
 import commands from '../../commands';
 import Command, { CommandOption,CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
-//import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
 const command: Command = require('./theme-list');
 import * as assert from 'assert';
@@ -13,7 +12,6 @@ describe(commands.THEME_LIST, () => {
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  //let requests: any[];
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -139,7 +137,6 @@ describe(commands.THEME_LIST, () => {
       }
     });
   });
-
   
   it('retrieves available themes from the tenant store - output json', (done) => {
     let expected:any = {
@@ -155,7 +152,7 @@ describe(commands.THEME_LIST, () => {
               "themeJson": "{\"palette\":{\"themePrimary\":\"#284b68\",\"themeLighterAlt\":\"#ecf3f8\",\"themeLighter\":\"#cfe0ed\",\"themeLight\":\"#8bb3d3\",\"themeTertiary\":\"#417bab\",\"themeSecondary\":\"#2c5474\",\"themeDarkAlt\":\"#24445e\",\"themeDark\":\"#193043\",\"themeDarker\":\"#16293a\",\"neutralLighterAlt\":\"#f8f8f8\",\"neutralLighter\":\"#f4f4f4\",\"neutralLight\":\"#eaeaea\",\"neutralQuaternaryAlt\":\"#dadada\",\"neutralQuaternary\":\"#d0d0d0\",\"neutralTertiaryAlt\":\"#c8c8c8\",\"neutralTertiary\":\"#a6a6a6\",\"neutralSecondary\":\"#666666\",\"neutralPrimaryAlt\":\"#3c3c3c\",\"neutralPrimary\":\"#333\",\"neutralDark\":\"#212121\",\"black\":\"#1c1c1c\",\"white\":\"#fff\",\"primaryBackground\":\"#fff\",\"primaryText\":\"#333\",\"bodyBackground\":\"#fff\",\"bodyText\":\"#333\",\"disabledBackground\":\"#f4f4f4\",\"disabledText\":\"#c8c8c8\"}}"
           }
       ]
-  };
+    };
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf('/_api/thememanager/GetTenantThemingOptions') > -1) {
         if (opts.headers.authorization &&
@@ -166,7 +163,7 @@ describe(commands.THEME_LIST, () => {
         }
       }
       return Promise.reject('Invalid request');
-    });
+      });
 
     auth.site = new Site();
     auth.site.connected = true;
@@ -174,7 +171,6 @@ describe(commands.THEME_LIST, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({options:{ debug: true, verbose: true, output: "json"}}, () => {
       try {
-        //assert(expected, res);
         assert(cmdInstanceLogSpy.calledWith(expected),'Invalid request');
         done();
       }
@@ -201,7 +197,7 @@ describe(commands.THEME_LIST, () => {
               "themeJson": "{\"palette\":{\"themePrimary\":\"#284b68\",\"themeLighterAlt\":\"#ecf3f8\",\"themeLighter\":\"#cfe0ed\",\"themeLight\":\"#8bb3d3\",\"themeTertiary\":\"#417bab\",\"themeSecondary\":\"#2c5474\",\"themeDarkAlt\":\"#24445e\",\"themeDark\":\"#193043\",\"themeDarker\":\"#16293a\",\"neutralLighterAlt\":\"#f8f8f8\",\"neutralLighter\":\"#f4f4f4\",\"neutralLight\":\"#eaeaea\",\"neutralQuaternaryAlt\":\"#dadada\",\"neutralQuaternary\":\"#d0d0d0\",\"neutralTertiaryAlt\":\"#c8c8c8\",\"neutralTertiary\":\"#a6a6a6\",\"neutralSecondary\":\"#666666\",\"neutralPrimaryAlt\":\"#3c3c3c\",\"neutralPrimary\":\"#333\",\"neutralDark\":\"#212121\",\"black\":\"#1c1c1c\",\"white\":\"#fff\",\"primaryBackground\":\"#fff\",\"primaryText\":\"#333\",\"bodyBackground\":\"#fff\",\"bodyText\":\"#333\",\"disabledBackground\":\"#f4f4f4\",\"disabledText\":\"#c8c8c8\"}}"
           }
       ]
-  };
+    };
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf('/_api/thememanager/GetTenantThemingOptions') > -1) {
         if (opts.headers.authorization &&
@@ -238,7 +234,7 @@ describe(commands.THEME_LIST, () => {
       "odata.metadata": "https://m365x642699.sharepoint.com/sites/HBI-testsite/_api/$metadata#SP.Utilities.ThemingOptions",
       "hideDefaultThemes": false,
       "themePreviews": []
-  };
+    };
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf('/_api/thememanager/GetTenantThemingOptions') > -1) {
         if (opts.headers.authorization &&
@@ -269,7 +265,6 @@ describe(commands.THEME_LIST, () => {
       }
     });
   });
-
 
   it('supports debug mode', () => {
     const options = (command.options() as CommandOption[]);

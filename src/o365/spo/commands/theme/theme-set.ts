@@ -36,6 +36,12 @@ class ThemeSetCommand extends SpoCommand {
     return 'Add or update theme to tenant with the given palette';
   }
 
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.inverted = (!(!args.options.inverted)).toString();
+    return telemetryProps;
+  }
+
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
 
     auth
@@ -84,7 +90,6 @@ class ThemeSetCommand extends SpoCommand {
           cmd.log(requestOptions);
           cmd.log('');
         }
-
         return request.post(requestOptions);
       })
       .then((res: string): void => {
@@ -93,9 +98,10 @@ class ThemeSetCommand extends SpoCommand {
           cmd.log(res);
           cmd.log('');
         }
-
+        
         const json: ClientSvcResponse = JSON.parse(res);
         const response: ClientSvcResponseContents = json[0];
+
         if (response.ErrorInfo) {
           cmd.log(new CommandError(response.ErrorInfo.ErrorMessage));
         }
