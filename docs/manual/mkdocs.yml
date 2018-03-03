@@ -91,6 +91,10 @@ pages:
         - storageentity list: 'cmd/spo/storageentity/storageentity-list.md'
         - storageentity remove: 'cmd/spo/storageentity/storageentity-remove.md'
         - storageentity set: 'cmd/spo/storageentity/storageentity-set.md'
+      - theme:
+        - theme list: 'cmd/spo/theme/theme-list.md'
+        - theme remove: 'cmd/spo/theme/theme-remove.md'
+        - theme set: 'cmd/spo/theme/theme-set.md'
       - web:
         - web add: 'cmd/spo/web/web-add.md'
         - web remove: 'cmd/spo/web/web-remove.md'

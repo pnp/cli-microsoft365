@@ -167,7 +167,7 @@ class ThemeSetCommand extends SpoCommand {
     Remarks:
     
       To add/update theme, you have to first connect to SharePoint using the
-      ${chalk.blue(commands.CONNECT)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
+      ${chalk.blue(commands.CONNECT)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso-admin.sharepoint.com`)}.
           
     Examples:
     
@@ -180,7 +180,7 @@ class ThemeSetCommand extends SpoCommand {
     More information:
 
       Create custom theme using Office Fabric theme generator tool, 
-        copy the JSON output and save as JSON file.clear
+        copy the JSON output and save as JSON file.
       https://developer.microsoft.com/en-us/fabric#/styles/themegenerator
       `);
   }
