@@ -33,18 +33,18 @@ class GraphO365GroupListCommand extends GraphItemsListCommand<Group> {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const groupFilter = `$filter=groupTypes/any(c:c+eq+'Unified')`; 
+    const groupFilter = `?$filter=groupTypes/any(c:c+eq+'Unified')`; 
     const displayNameFilter: string = args.options.displayName ? ` and startswith(DisplayName,'${encodeURIComponent(args.options.displayName).replace(/'/g,`''`)}')` : '';
     const mailNicknameFilter: string = args.options.mailNickname ? ` and startswith(MailNickname,'${encodeURIComponent(args.options.mailNickname).replace(/'/g,`''`)}')` : '';
     const topCount = '&$top=100'
-    let endpoint = `${auth.service.resource}/v1.0/groups?${groupFilter}${displayNameFilter}${mailNicknameFilter}${topCount}`; 
+    let endpoint = `${auth.service.resource}/v1.0/groups${groupFilter}${displayNameFilter}${mailNicknameFilter}${topCount}`; 
 
     if(args.options.deleted){
       if (this.debug) {
         cmd.log(vorpal.chalk.green('switch to BETA endpoint to retrieve deleted items'));
       }
 
-      endpoint = `${auth.service.resource}/beta/directory/deletedItems/Microsoft.Graph.Group?${groupFilter}${displayNameFilter}${mailNicknameFilter}${topCount}`; 
+      endpoint = `${auth.service.resource}/beta/directory/deletedItems/Microsoft.Graph.Group${groupFilter}${displayNameFilter}${mailNicknameFilter}${topCount}`; 
     }
  
     this
@@ -54,6 +54,9 @@ class GraphO365GroupListCommand extends GraphItemsListCommand<Group> {
           return Promise.all(this.items.map(g => this.getGroupSiteUrl(g.id, cmd)));
         }
         else {
+          if(args.options.includeSiteUrl && this.verbose){
+            cmd.log(vorpal.chalk.gray('--includeSiteUrl will be ignored as it is not supported for deleted sites'));
+          }
           return Promise.resolve();
         }
       })
@@ -82,6 +85,14 @@ class GraphO365GroupListCommand extends GraphItemsListCommand<Group> {
                 displayName: g.displayName,
                 mailNickname: g.mailNickname,
                 siteUrl: g.siteUrl
+              };
+            }
+            else if (args.options.deleted){
+              return {
+                id: g.id,
+                displayName: g.displayName,
+                mailNickname: g.mailNickname,
+                deletedDateTime: g.deletedDateTime
               };
             }
             else {
