@@ -78,6 +78,7 @@ pages:
         - site classic set: 'cmd/spo/site/site-classic-set.md'
       - sitedesign:
         - sitedesign add: 'cmd/spo/sitedesign/sitedesign-add.md'
+        - sitedesign apply: 'cmd/spo/sitedesign/sitedesign-apply.md'
         - sitedesign get: 'cmd/spo/sitedesign/sitedesign-get.md'
         - sitedesign list: 'cmd/spo/sitedesign/sitedesign-list.md'
         - sitedesign remove: 'cmd/spo/sitedesign/sitedesign-remove.md'
