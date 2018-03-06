@@ -20,6 +20,7 @@ interface Options extends GlobalOptions {
   displayName?: string;
   mailNickname?: string;
   includeSiteUrl: boolean;
+  deleted?: boolean;
 }
 
 class GraphO365GroupListCommand extends GraphItemsListCommand<Group> {
@@ -32,13 +33,24 @@ class GraphO365GroupListCommand extends GraphItemsListCommand<Group> {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    const groupFilter = `$filter=groupTypes/any(c:c+eq+'Unified')`; 
     const displayNameFilter: string = args.options.displayName ? ` and startswith(DisplayName,'${encodeURIComponent(args.options.displayName).replace(/'/g,`''`)}')` : '';
     const mailNicknameFilter: string = args.options.mailNickname ? ` and startswith(MailNickname,'${encodeURIComponent(args.options.mailNickname).replace(/'/g,`''`)}')` : '';
+    const topCount = '&$top=100'
+    let endpoint = `${auth.service.resource}/v1.0/groups?${groupFilter}${displayNameFilter}${mailNicknameFilter}${topCount}`; 
 
+    if(args.options.deleted){
+      if (this.debug) {
+        cmd.log(vorpal.chalk.green('switch to BETA endpoint to retrieve deleted items'));
+      }
+
+      endpoint = `${auth.service.resource}/beta/directory/deletedItems/Microsoft.Graph.Group?${groupFilter}${displayNameFilter}${mailNicknameFilter}${topCount}`; 
+    }
+ 
     this
-      .getAllItems(`${auth.service.resource}/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified')${displayNameFilter}${mailNicknameFilter}&$top=100`, cmd)
+      .getAllItems(endpoint, cmd)
       .then((): Promise<any> => {
-        if (args.options.includeSiteUrl) {
+        if (args.options.includeSiteUrl && !args.options.deleted) {
           return Promise.all(this.items.map(g => this.getGroupSiteUrl(g.id, cmd)));
         }
         else {
@@ -136,6 +148,10 @@ class GraphO365GroupListCommand extends GraphItemsListCommand<Group> {
       {
         option: '--includeSiteUrl',
         description: 'Set to retrieve the site URL for each group'
+      },
+      {
+        option: '--deleted',
+        description: 'Set to only retrieve deleted groups'
       }
     ];
 
@@ -162,6 +178,8 @@ class GraphO365GroupListCommand extends GraphItemsListCommand<Group> {
     likely get an error as the command will get throttled, issuing too many
     requests, too frequently. If you get an error, consider narrowing down
     the result set using the ${chalk.blue('--displayName')} and ${chalk.blue('--mailNickname')} filters.
+    
+    Retrieving the site URL is not possible when retrieving the deleted groups. 
 
   Examples:
   
@@ -173,6 +191,12 @@ class GraphO365GroupListCommand extends GraphItemsListCommand<Group> {
 
     List Office 365 Groups mail nick name starting with ${chalk.grey(`team`)}
       ${chalk.grey(config.delimiter)} ${this.name} --mailNickname team
+
+    List deleted Office 365 Groups with display name starting with ${chalk.grey(`Project`)}
+      ${chalk.grey(config.delimiter)} ${this.name} --displayName Project --deleted
+
+    List deleted Office 365 Groups mail nick name starting with ${chalk.grey(`team`)}
+      ${chalk.grey(config.delimiter)} ${this.name} --mailNickname team --deleted
 
     List Office 365 Groups with display name starting with ${chalk.grey(`Project`)} including
     the URL of the corresponding SharePoint site
