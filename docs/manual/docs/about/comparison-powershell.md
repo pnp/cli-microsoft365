@@ -342,7 +342,7 @@ Remove-PnPStorageEntity|SharePointPnPPowerShellOnline|[spo storageentity remove]
 Remove-PnPTaxonomyItem|SharePointPnPPowerShellOnline|
 Remove-PnPTenantSite|SharePointPnPPowerShellOnline|
 Remove-PnPTermGroup|SharePointPnPPowerShellOnline|
-Remove-PnPUnifiedGroup|SharePointPnPPowerShellOnline|
+Remove-PnPUnifiedGroup|SharePointPnPPowerShellOnline|[graph o365group remove](../cmd/graph/o365group/o365group-remove.md)
 Remove-PnPUser|SharePointPnPPowerShellOnline|
 Remove-PnPUserFromGroup|SharePointPnPPowerShellOnline|
 Remove-PnPView|SharePointPnPPowerShellOnline|
