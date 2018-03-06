@@ -37,6 +37,10 @@ class ThemeRemoveCommand extends SpoCommand {
     return telemetryProps;
   }
 
+  protected requiresTenantAdmin(): boolean { 
+    return true; 
+  } 
+
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
 
     const removeTheme = (): void => {

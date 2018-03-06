@@ -15,11 +15,16 @@ describe(commands.THEME_SET, () => {
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
   let requests: any[];
+  let trackEvent: any;
+  let telemetry: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
     sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
+    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
+      telemetry = t;
+    });
   });
 
   beforeEach(() => {
@@ -56,6 +61,32 @@ describe(commands.THEME_SET, () => {
 
   it('has a description', () => {
     assert.notEqual(command.description, null);
+  });
+
+  it('calls telemetry', (done) => {
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: {} }, () => {
+      try {
+        assert(trackEvent.called);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('logs correct telemetry event', (done) => {
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: {} }, () => {
+      try {
+        assert.equal(telemetry.name, commands.THEME_SET);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 
   it('aborts when not connected to a SharePoint site', (done) => {
@@ -111,8 +142,6 @@ describe(commands.THEME_SET, () => {
         isInverted: false
       }
     }, () => {
-
-      let correctRequestIssued = false;
       
       requests.forEach(r => {
         if (r.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
@@ -120,11 +149,10 @@ describe(commands.THEME_SET, () => {
           r.headers.authorization.indexOf('Bearer ') === 0 &&
           r.headers['X-RequestDigest'] &&
           r.body) {
-          correctRequestIssued = true;
         }
       });
       try {
-        assert(correctRequestIssued);
+        assert(cmdInstanceLogSpy.calledWith(true));
         done();
       }
       catch (e) {

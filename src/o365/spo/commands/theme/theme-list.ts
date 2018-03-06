@@ -22,6 +22,10 @@ class ThemeListCommand extends SpoCommand {
     return 'Retreives the list of custom themes added to the tenant store.';
   }
 
+  protected requiresTenantAdmin(): boolean { 
+    return true; 
+  } 
+
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
@@ -37,12 +41,10 @@ class ThemeListCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${auth.site.url}/_api/thememanager/GetTenantThemingOptions`,
-          method: 'POST',
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${accessToken}`,
             'accept': 'application/json;odata=nometadata'
           }),
-          body: '',
           json: true
         };
 
@@ -51,7 +53,7 @@ class ThemeListCommand extends SpoCommand {
           cmd.log(requestOptions);
           cmd.log('');
         }
-        return request.get(requestOptions);
+        return request.post(requestOptions);
       })
       .then((rawRes: any): void => {
 
@@ -62,30 +64,16 @@ class ThemeListCommand extends SpoCommand {
         }
 
         const themePreviews: any[] = rawRes.themePreviews;
-
-          if (themePreviews && themePreviews.length > 0) {
-
-            if (args.options.output === 'json') {
-              cmd.log(themePreviews);
-            }
-            else {
-              try {
-                themePreviews.map(a => {
-                  const themeJson = JSON.parse(a.themeJson);
-                  cmd.log(`Name: ${a.name}\nPalette: ${JSON.stringify(themeJson.palette)}\nInverted: ${(themeJson.isInverted).toString()}\n`);              
-                });   
-              }
-              catch (e) 
-              {
-                cmd.log('Not able to retreive one of the theme.');
-              }        
-            }
+        if (themePreviews && themePreviews.length > 0) {
+          cmd.log(themePreviews.map(a => {
+            return  ({ Name: a.name });             
+          }));          
+        }
+        else {
+          if (this.verbose) {
+            cmd.log('No themes found');
           }
-          else {
-            if (this.verbose) {
-              cmd.log('No themes found');
-            }
-          }        
+        }        
         cb();     
       }, (err: any): void => {
         this.handleRejectedODataJsonPromise(err, cmd, cb);

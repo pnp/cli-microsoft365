@@ -42,6 +42,10 @@ class ThemeSetCommand extends SpoCommand {
     return telemetryProps;
   }
 
+  protected requiresTenantAdmin(): boolean { 
+    return true; 
+  } 
+
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
 
     auth
@@ -82,7 +86,7 @@ class ThemeSetCommand extends SpoCommand {
             authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': res.FormDigestValue
           }),
-          body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><Method Name="UpdateTenantTheme" Id="11" ObjectPathId="9"><Parameters><Parameter Type="String">${args.options.name}</Parameter><Parameter Type="String">{"isInverted":${isInverted},"name":"${args.options.name}","palette":${JSON.stringify(palette)}}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="9" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`
+          body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><Method Name="UpdateTenantTheme" Id="11" ObjectPathId="9"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.name)}</Parameter><Parameter Type="String">{"isInverted":${isInverted},"name":"${Utils.escapeXml(args.options.name)}","palette":${JSON.stringify(palette)}}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="9" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`
         };
 
         if (this.debug) {
@@ -107,9 +111,7 @@ class ThemeSetCommand extends SpoCommand {
         }
         else {
           const result: boolean = json[json.length - 1];
-          if (this.verbose) {            
-            cmd.log(result);
-          }
+          cmd.log(result);
         }
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
