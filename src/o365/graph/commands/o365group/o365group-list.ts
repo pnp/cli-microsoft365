@@ -38,6 +38,7 @@ class GraphO365GroupListCommand extends GraphItemsListCommand<Group> {
     this
       .getAllItems(`${auth.service.resource}/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified')${displayNameFilter}${mailNicknameFilter}&$top=100`, cmd)
       .then((): Promise<any> => {
+        this.items == [];
         if (args.options.includeSiteUrl) {
           return Promise.all(this.items.map(g => this.getGroupSiteUrl(g.id, cmd)));
         }
