@@ -535,7 +535,7 @@ describe(commands.O365GROUP_SET, () => {
     assert.notEqual(actual, true);
   });
 
-  it('fails validation if the id is not a valid GUI', () => {
+  it('fails validation if the id is not a valid GUID', () => {
     const actual = (command.validate() as CommandValidate)({ options: { id: 'invalid', description: 'My awesome group' } });
     assert.notEqual(actual, true);
   });
