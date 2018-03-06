@@ -120,6 +120,7 @@ pages:
         - o365group get: 'cmd/graph/o365group/o365group-get.md'
         - o365group list: 'cmd/graph/o365group/o365group-list.md'
         - o365group remove: 'cmd/graph/o365group/o365group-remove.md'
+        - o365group restore: 'cmd/graph/o365group/o365group-restore.md'
         - o365group set: 'cmd/graph/o365group/o365group-set.md'
     - Azure Active Directory Graph (aad):
       - connect: 'cmd/aad/connect.md'
