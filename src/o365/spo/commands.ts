@@ -59,6 +59,7 @@ export default {
   SITE_LIST: `${prefix} site list`,
   SITE_SET: `${prefix} site set`,
   SITEDESIGN_ADD: `${prefix} sitedesign add`,
+  SITEDESIGN_APPLY: `${prefix} sitedesign apply`,
   SITEDESIGN_GET: `${prefix} sitedesign get`,
   SITEDESIGN_LIST: `${prefix} sitedesign list`,
   SITEDESIGN_REMOVE: `${prefix} sitedesign remove`,
