@@ -128,9 +128,7 @@ describe(commands.SITEDESIGN_APPLY, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
-          value: []
-        }));
+        assert(cmdInstanceLogSpy.notCalled);
         done();
       }
       catch (e) {
