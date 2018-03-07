@@ -1,4 +1,5 @@
 export interface FileProperties {
+  ListItemAllFields:    Object;
   CheckInComment:       string;
   CheckOutType:         number;
   ContentTag:           string;

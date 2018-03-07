@@ -228,7 +228,7 @@ Get-PnPDocumentSetTemplate|SharePointPnPPowerShellOnline|
 Get-PnPEventReceiver|SharePointPnPPowerShellOnline|
 Get-PnPFeature|SharePointPnPPowerShellOnline|
 Get-PnPField|SharePointPnPPowerShellOnline|
-Get-PnPFile|SharePointPnPPowerShellOnline|[spo file list](../cmd/spo/file/file-list.md)
+Get-PnPFile|SharePointPnPPowerShellOnline|[spo file get](../cmd/spo/file/file-get.md), [spo file list](../cmd/spo/file/file-list.md)
 Get-PnPFolder|SharePointPnPPowerShellOnline|
 Get-PnPFolderItem|SharePointPnPPowerShellOnline|
 Get-PnPGroup|SharePointPnPPowerShellOnline|
