@@ -1,5 +1,21 @@
 # Release notes
 
+## [v1.1.0](https://github.com/SharePoint/office365-cli/releases/tag/v1.1.0)
+
+### New commands
+
+**SharePoint Online:**
+
+- [spo sitedesign apply](../cmd/spo/sitedesign/sitedesign-apply.md) - applies a site design to an existing site collection [#339](https://github.com/SharePoint/office365-cli/issues/339)
+- [spo theme get](../cmd/spo/theme/theme-get.md) - gets custom theme information [#349](https://github.com/SharePoint/office365-cli/issues/349)
+- [spo theme list](../cmd/spo/theme/theme-list.md) - retrieves the list of custom themes [#332](https://github.com/SharePoint/office365-cli/issues/332)
+- [spo theme remove](../cmd/spo/theme/theme-remove.md) - removes existing theme [#331](https://github.com/SharePoint/office365-cli/issues/331)
+- [spo theme set](../cmd/spo/theme/theme-set.md) - add or update a theme [#330](https://github.com/SharePoint/office365-cli/issues/330), [#340](https://github.com/SharePoint/office365-cli/issues/340)
+
+**Microsoft Graph:**
+
+- [graph o365group remove](../cmd/graph/o365group/o365group-remove.md) - removes an Office 365 Group [#309](https://github.com/SharePoint/office365-cli/issues/309)
+
 ## [v1.0.0](https://github.com/SharePoint/office365-cli/releases/tag/v1.0.0)
 
 ### Breaking changes
