@@ -6,6 +6,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 
 import Utils from '../../../../Utils';
 import GraphCommand from '../../GraphCommand';
+import { DirectorySettingTemplatesRsp } from './DirectorySettingTemplatesRsp';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -46,7 +47,7 @@ class GraphO365SiteClassificationGetCommand extends GraphCommand {
 
         return request.get(requestOptions);
       })
-      .then((res: any): void => {
+      .then((res: DirectorySettingTemplatesRsp): void => {
         if (this.debug) {
           cmd.log('Response:')
           cmd.log(res);
@@ -56,6 +57,9 @@ class GraphO365SiteClassificationGetCommand extends GraphCommand {
         if(res.value.length == 0) { 
           // TODO: Handle for the Group.Unified key...
           cmd.log('SiteClassification is not enabled.')
+        }
+        else{
+          cmd.log('SiteClassification is enabled.')
         }
 
         cb();
