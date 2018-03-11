@@ -338,6 +338,180 @@ describe(commands.SITECLASSIFICATION_GET, () => {
     });
   });
 
+  it('retrieves information about the Office 365 Tenant siteclassification (multi siteclassification)', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/settings`) {
+        return Promise.resolve({value :[
+          {
+            "id": "d20c475c-6f96-449a-aee8-08146be187d3",
+            "displayName": "Group.Unified",
+            "templateId": "62375ab9-6b52-47ed-826b-58e47e0e304b",
+            "values": [
+              {
+                "name": "CustomBlockedWordsList",
+                "value": ""
+              },
+              {
+                "name": "EnableMSStandardBlockedWords",
+                "value": "false"
+              },
+              {
+                "name": "ClassificationDescriptions",
+                "value": ""
+              },
+              {
+                "name": "DefaultClassification",
+                "value": "TopSecret"
+              },
+              {
+                "name": "PrefixSuffixNamingRequirement",
+                "value": ""
+              },
+              {
+                "name": "AllowGuestsToBeGroupOwner",
+                "value": "false"
+              },
+              {
+                "name": "AllowGuestsToAccessGroups",
+                "value": "true"
+              },
+              {
+                "name": "GuestUsageGuidelinesUrl",
+                "value": ""
+              },
+              {
+                "name": "GroupCreationAllowedGroupId",
+                "value": ""
+              },
+              {
+                "name": "AllowToAddGuests",
+                "value": "true"
+              },
+              {
+                "name": "UsageGuidelinesUrl",
+                "value": "https://test"
+              },
+              {
+                "name": "ClassificationList",
+                "value": "TopSecret,HBI"
+              },
+              {
+                "name": "EnableGroupCreation",
+                "value": "true"
+              }
+            ]
+          }
+        ]});
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    auth.service = new Service('https://graph.microsoft.com');
+    auth.service.connected = true;
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: true } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith({
+          "Classifications": ["TopSecret","HBI"],
+          "DefaultClassification": "TopSecret",
+          "UsageGuidelinesUrl": "https://test"
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('Handles Office 365 Tenant siteclassification DirectorySettings Key does not exist', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/settings`) {
+        return Promise.resolve({value :[
+          {
+            "id": "d20c475c-6f96-449a-aee8-08146be187d3",
+            "displayName": "Group.Unified",
+            "templateId": "62375ab9-6b52-47ed-826b-58e47e0e304b",
+            "values": [
+              {
+                "name": "CustomBlockedWordsList",
+                "value": ""
+              },
+              {
+                "name": "EnableMSStandardBlockedWords",
+                "value": "false"
+              },
+              {
+                "name": "ClassificationDescriptions",
+                "value": ""
+              },
+              {
+                "name": "DefaultClassification_not_exist",
+                "value": "TopSecret"
+              },
+              {
+                "name": "PrefixSuffixNamingRequirement",
+                "value": ""
+              },
+              {
+                "name": "AllowGuestsToBeGroupOwner",
+                "value": "false"
+              },
+              {
+                "name": "AllowGuestsToAccessGroups",
+                "value": "true"
+              },
+              {
+                "name": "GuestUsageGuidelinesUrl",
+                "value": ""
+              },
+              {
+                "name": "GroupCreationAllowedGroupId",
+                "value": ""
+              },
+              {
+                "name": "AllowToAddGuests",
+                "value": "true"
+              },
+              {
+                "name": "UsageGuidelinesUrl_not_exist",
+                "value": "https://test"
+              },
+              {
+                "name": "ClassificationList_not_exist",
+                "value": "TopSecret,HBI"
+              },
+              {
+                "name": "EnableGroupCreation",
+                "value": "true"
+              }
+            ]
+          }
+        ]});
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    auth.service = new Service('https://graph.microsoft.com');
+    auth.service.connected = true;
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: true } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith({
+          "Classifications": [],
+          "DefaultClassification": "",
+          "UsageGuidelinesUrl": ""
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('correctly handles lack of valid access token', (done) => {
     Utils.restore(auth.ensureAccessToken);
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });

@@ -78,6 +78,7 @@ class GraphO365SiteClassificationGetCommand extends GraphCommand {
               return directorySetting.name === 'ClassificationList';
             });
 
+            siteClassificationsSettings.Classifications = [];
             if (classificationList != null && classificationList.length > 0)
             {
                 siteClassificationsSettings.Classifications = classificationList[0].value.split(',');
@@ -88,6 +89,7 @@ class GraphO365SiteClassificationGetCommand extends GraphCommand {
               return directorySetting.name === 'UsageGuidelinesUrl';
             });
 
+            siteClassificationsSettings.UsageGuidelinesUrl = "";
             if (guidanceUrl != null && guidanceUrl.length > 0)
             {
                 siteClassificationsSettings.UsageGuidelinesUrl = guidanceUrl[0].value;
@@ -98,6 +100,7 @@ class GraphO365SiteClassificationGetCommand extends GraphCommand {
               return directorySetting.name === 'DefaultClassification';
             });
 
+            siteClassificationsSettings.DefaultClassification = "";
             if (defaultClassification != null && defaultClassification.length > 0)
             {
                 siteClassificationsSettings.DefaultClassification = defaultClassification[0].value;
