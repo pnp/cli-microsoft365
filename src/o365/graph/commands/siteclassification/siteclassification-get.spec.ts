@@ -10,7 +10,7 @@ import Utils from '../../../../Utils';
 import { Service } from '../../../../Auth';
 import * as fs from 'fs';
 
-describe(commands.O365GROUP_ADD, () => {
+describe(commands.SITECLASSIFICATION_GET, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
@@ -31,7 +31,7 @@ describe(commands.O365GROUP_ADD, () => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
-      log: (msg: string) => {
+      log: (msg: string) => { 
         log.push(msg);
       }
     };
@@ -143,6 +143,201 @@ describe(commands.O365GROUP_ADD, () => {
     assert(containsExamples);
   });
 
+  it('Handles Office 365 Tenant siteclassification is not enabled', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/settings`) {
+        return Promise.resolve({value :[
+        ]});
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    auth.service = new Service('https://graph.microsoft.com');
+    auth.service.connected = true;
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('SiteClassification is not enabled.')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('Handles Office 365 Tenant siteclassification missing DirectorySettingTemplate', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/settings`) {
+        return Promise.resolve({value :[
+          {
+            "id": "d20c475c-6f96-449a-aee8-08146be187d3",
+            "displayName": "Group.Unified_not_exist",
+            "templateId": "62375ab9-6b52-47ed-826b-58e47e0e304b",
+            "values": [
+              {
+                "name": "CustomBlockedWordsList",
+                "value": ""
+              },
+              {
+                "name": "EnableMSStandardBlockedWords",
+                "value": "false"
+              },
+              {
+                "name": "ClassificationDescriptions",
+                "value": ""
+              },
+              {
+                "name": "DefaultClassification",
+                "value": "TopSecret"
+              },
+              {
+                "name": "PrefixSuffixNamingRequirement",
+                "value": ""
+              },
+              {
+                "name": "AllowGuestsToBeGroupOwner",
+                "value": "false"
+              },
+              {
+                "name": "AllowGuestsToAccessGroups",
+                "value": "true"
+              },
+              {
+                "name": "GuestUsageGuidelinesUrl",
+                "value": ""
+              },
+              {
+                "name": "GroupCreationAllowedGroupId",
+                "value": ""
+              },
+              {
+                "name": "AllowToAddGuests",
+                "value": "true"
+              },
+              {
+                "name": "UsageGuidelinesUrl",
+                "value": "https://test"
+              },
+              {
+                "name": "ClassificationList",
+                "value": "TopSecret"
+              },
+              {
+                "name": "EnableGroupCreation",
+                "value": "true"
+              }
+            ]
+          }
+        ]});
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    auth.service = new Service('https://graph.microsoft.com');
+    auth.service.connected = true;
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(new CommandError("Missing DirectorySettingTemplate for \"Group.Unified\"")));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+ 
+  it('retrieves information about the Office 365 Tenant siteclassification (single siteclassification)', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/settings`) {
+        return Promise.resolve({value :[
+          {
+            "id": "d20c475c-6f96-449a-aee8-08146be187d3",
+            "displayName": "Group.Unified",
+            "templateId": "62375ab9-6b52-47ed-826b-58e47e0e304b",
+            "values": [
+              {
+                "name": "CustomBlockedWordsList",
+                "value": ""
+              },
+              {
+                "name": "EnableMSStandardBlockedWords",
+                "value": "false"
+              },
+              {
+                "name": "ClassificationDescriptions",
+                "value": ""
+              },
+              {
+                "name": "DefaultClassification",
+                "value": "TopSecret"
+              },
+              {
+                "name": "PrefixSuffixNamingRequirement",
+                "value": ""
+              },
+              {
+                "name": "AllowGuestsToBeGroupOwner",
+                "value": "false"
+              },
+              {
+                "name": "AllowGuestsToAccessGroups",
+                "value": "true"
+              },
+              {
+                "name": "GuestUsageGuidelinesUrl",
+                "value": ""
+              },
+              {
+                "name": "GroupCreationAllowedGroupId",
+                "value": ""
+              },
+              {
+                "name": "AllowToAddGuests",
+                "value": "true"
+              },
+              {
+                "name": "UsageGuidelinesUrl",
+                "value": "https://test"
+              },
+              {
+                "name": "ClassificationList",
+                "value": "TopSecret"
+              },
+              {
+                "name": "EnableGroupCreation",
+                "value": "true"
+              }
+            ]
+          }
+        ]});
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    auth.service = new Service('https://graph.microsoft.com');
+    auth.service.connected = true;
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: true } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith({
+          "Classifications": ["TopSecret"],
+          "DefaultClassification": "TopSecret",
+          "UsageGuidelinesUrl": "https://test"
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('correctly handles lack of valid access token', (done) => {
     Utils.restore(auth.ensureAccessToken);
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
@@ -159,4 +354,5 @@ describe(commands.O365GROUP_ADD, () => {
       }
     });
   });
+
 });

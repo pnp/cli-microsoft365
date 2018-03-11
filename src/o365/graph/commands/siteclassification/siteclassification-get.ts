@@ -90,7 +90,7 @@ class GraphO365SiteClassificationGetCommand extends GraphCommand {
 
             if (guidanceUrl != null && guidanceUrl.length > 0)
             {
-                siteClassificationsSettings.UsageGuidelinesUrl = guidanceUrl[0].name;
+                siteClassificationsSettings.UsageGuidelinesUrl = guidanceUrl[0].value;
             }
 
             // Get the DefaultClassification
@@ -109,7 +109,8 @@ class GraphO365SiteClassificationGetCommand extends GraphCommand {
         }
 
         cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any) => 
+      this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
 
 
@@ -122,14 +123,14 @@ class GraphO365SiteClassificationGetCommand extends GraphCommand {
         
   Remarks:
 
-    To get information about a Office 365 Group, you have to first connect to
+    To get information about a Office 365 Tenant SiteClassification, you have to first connect to
     the Microsoft Graph using the ${chalk.blue(commands.CONNECT)} command,
     eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT}`)}.
 
   Examples:
   
-    Get information about the Office 365 Group with id ${chalk.grey(`1caf7dcd-7e83-4c3a-94f7-932a1299c844`)}
-      ${chalk.grey(config.delimiter)} ${this.name} --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844
+    Get information about the Office 365 Tenant SiteClassification}
+      ${chalk.grey(config.delimiter)} ${this.name}
     `);
   }
 }
