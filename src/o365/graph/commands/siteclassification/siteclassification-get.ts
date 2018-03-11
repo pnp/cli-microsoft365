@@ -7,6 +7,10 @@ import GlobalOptions from '../../../../GlobalOptions';
 import Utils from '../../../../Utils';
 import GraphCommand from '../../GraphCommand';
 import { DirectorySettingTemplatesRsp } from './DirectorySettingTemplatesRsp';
+import { DirectorySetting } from './DirectorySetting';
+import { DirectorySettingValue } from './DirectorySettingValue';
+import { SiteClassificationSettings} from './SiteClassificationSettings'
+import { CommandError } from '../../../../Command';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -55,11 +59,53 @@ class GraphO365SiteClassificationGetCommand extends GraphCommand {
         }
 
         if(res.value.length == 0) { 
-          // TODO: Handle for the Group.Unified key...
-          cmd.log('SiteClassification is not enabled.')
+          cmd.log(new CommandError('SiteClassification is not enabled.'));
         }
         else{
-          cmd.log('SiteClassification is enabled.')
+          var unifiedGroupSetting = res.value.filter(function (directorySetting : DirectorySetting) {
+            return directorySetting.displayName === 'Group.Unified';
+          });
+          
+          if(unifiedGroupSetting == null || unifiedGroupSetting.length == 0)
+          {
+            cmd.log(new CommandError("Missing DirectorySettingTemplate for \"Group.Unified\""));
+          }
+          else {
+            var siteClassificationsSettings  = new SiteClassificationSettings();
+
+            // Get the classification list
+            var classificationList = unifiedGroupSetting[0].values.filter(function (directorySetting : DirectorySettingValue) {
+              return directorySetting.name === 'ClassificationList';
+            });
+
+            if (classificationList != null && classificationList.length > 0)
+            {
+                siteClassificationsSettings.Classifications = classificationList[0].value.split(',');
+            }
+
+            // Get the UsageGuidancelinesUrl
+            var guidanceUrl = unifiedGroupSetting[0].values.filter(function (directorySetting : DirectorySettingValue) {
+              return directorySetting.name === 'UsageGuidelinesUrl';
+            });
+
+            if (guidanceUrl != null && guidanceUrl.length > 0)
+            {
+                siteClassificationsSettings.UsageGuidelinesUrl = guidanceUrl[0].name;
+            }
+
+            // Get the DefaultClassification
+            var defaultClassification = unifiedGroupSetting[0].values.filter(function (directorySetting : DirectorySettingValue) {
+              return directorySetting.name === 'DefaultClassification';
+            });
+
+            if (defaultClassification != null && defaultClassification.length > 0)
+            {
+                siteClassificationsSettings.DefaultClassification = defaultClassification[0].value;
+            }
+
+            cmd.log(siteClassificationsSettings);
+          }
+
         }
 
         cb();
