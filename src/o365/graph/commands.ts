@@ -9,5 +9,6 @@ export default {
   O365GROUP_SET: `${prefix} o365group set`,
   O365GROUP_REMOVE: `${prefix} o365group remove`,
   O365GROUP_RESTORE: `${prefix} o365group restore`,
+  SITECLASSIFICATION_GET: `${prefix} siteclassification get`,
   STATUS: `${prefix} status`
 };

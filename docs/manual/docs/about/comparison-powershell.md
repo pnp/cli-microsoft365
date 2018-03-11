@@ -253,7 +253,7 @@ Get-PnPRequestAccessEmails|SharePointPnPPowerShellOnline|
 Get-PnPRoleDefinition|SharePointPnPPowerShellOnline|
 Get-PnPSearchConfiguration|SharePointPnPPowerShellOnline|
 Get-PnPSite|SharePointPnPPowerShellOnline|[spo site get](../cmd/spo/site/site-get.md), [spo site list](../cmd/spo/site/site-list.md)
-Get-PnPSiteClassification|SharePointPnPPowerShellOnline|
+Get-PnPSiteClassification|SharePointPnPPowerShellOnline|[graph siteclassification get](../cmd/graph/siteclassification/siteclassification-get.md)
 Get-PnPSiteClosure|SharePointPnPPowerShellOnline|
 Get-PnPSiteCollectionAdmin|SharePointPnPPowerShellOnline|
 Get-PnPSiteCollectionTermStore|SharePointPnPPowerShellOnline|
