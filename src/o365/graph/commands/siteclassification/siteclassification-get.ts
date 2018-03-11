@@ -26,7 +26,6 @@ class GraphO365SiteClassificationGetCommand extends GraphCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-   
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
       .then((): request.RequestPromise => {
@@ -52,6 +51,11 @@ class GraphO365SiteClassificationGetCommand extends GraphCommand {
           cmd.log('Response:')
           cmd.log(res);
           cmd.log('');
+        }
+
+        if(res.value.length == 0) { 
+          // TODO: Handle for the Group.Unified key...
+          cmd.log('SiteClassification is not enabled.')
         }
 
         cb();
