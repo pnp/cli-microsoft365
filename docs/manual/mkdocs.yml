@@ -61,6 +61,7 @@ pages:
         - list remove: 'cmd/spo/list/list-remove.md'
         - list set: 'cmd/spo/list/list-set.md'
       - listitem:
+        - listitem add: 'cmd/spo/listitem/listitem-add.md'
         - listitem remove: 'cmd/spo/listitem/listitem-remove.md'
       - page:
         - page add: 'cmd/spo/page/page-add.md'

@@ -157,7 +157,7 @@ Add-PnPIndexedProperty|SharePointPnPPowerShellOnline|
 Add-PnPJavaScriptBlock|SharePointPnPPowerShellOnline|
 Add-PnPJavaScriptLink|SharePointPnPPowerShellOnline|
 Add-PnPListFoldersToProvisioningTemplate|SharePointPnPPowerShellOnline|
-Add-PnPListItem|SharePointPnPPowerShellOnline|
+Add-PnPListItem|SharePointPnPPowerShellOnline|[spo listitem add](../cmd/spo/listitem/listitem-add.md)
 Add-PnPMasterPage|SharePointPnPPowerShellOnline|
 Add-PnPNavigationNode|SharePointPnPPowerShellOnline|
 Add-PnPOffice365GroupToSite|SharePointPnPPowerShellOnline|
