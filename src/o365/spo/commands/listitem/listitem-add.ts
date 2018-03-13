@@ -98,8 +98,8 @@ class SpoListItemAddCommand extends SpoCommand {
     const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
     let siteAccessToken: string = '';
     let listRestUrl: string = (args.options.listId ? 
-        `${args.options.webUrl}/_api/web/lists/(guid'${args.options.listId}')`
-      : `${args.options.webUrl}/_api/web/lists/getByTitle('${args.options.listTitle}')`);
+        `${args.options.webUrl}/_api/web/lists/(guid'${encodeURIComponent(args.options.listId || "")}')`
+      : `${args.options.webUrl}/_api/web/lists/getByTitle('${encodeURIComponent(args.options.listTitle || "")}')`);
     let contentTypeId: string = '';
     let listRootFolder: string = '';
 
@@ -430,21 +430,29 @@ class SpoListItemAddCommand extends SpoCommand {
 
     return Promise.all(checkFoldersPromise).then(() => {
 
+      let sortedFolders = createFolders.sort((cf1, cf2) => {
+        if (cf1.parentFolder > cf2.parentFolder) return 1;
+        if (cf1.parentFolder > cf2.parentFolder) return -1;
+        return 0;
+      })
+
       if (this.debug) {
         cmd.log(`Folders found:`);
         cmd.log(checkedFolders);
         cmd.log(`Folders to create:`);
+        cmd.log(createFolders);
+        cmd.log(`Folders to create (sorted):`);
         cmd.log(createFolders);
         cmd.log('');
       }
 
       let createFolderPromises: any[] = [];
 
-      for (let i = 0; i < createFolders.length; i++) {
+      for (let i = 0; i < sortedFolders.length; i++) {
 
         // Below path is used by the modern UI
         const createFolderOptions: any = {
-          url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1='${(createFolders[i].parentFolder)}'&@a2='${(createFolders[i].folderName)}'`,
+          url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1='${(encodeURIComponent(sortedFolders[i].parentFolder))}'&@a2='${encodeURIComponent((sortedFolders[i].folderName))}'`,
           method: 'POST',
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${siteAccessToken}`,
@@ -480,7 +488,7 @@ class SpoListItemAddCommand extends SpoCommand {
             if (counter < createFolderPromises.length) {
               recurse();
             } else {
-              resolve()
+              resolve();
             }
           }).catch((response: any) => {
             if (this.debug) {
