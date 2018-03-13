@@ -64,3 +64,6 @@ coverage
 docs/manual/site
 # generated commands info
 commands.json
+
+# VS env folder
+.vs/
