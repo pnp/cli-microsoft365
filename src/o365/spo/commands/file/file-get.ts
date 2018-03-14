@@ -12,6 +12,7 @@ import { ContextInfo } from '../../spo';
 import Utils from '../../../../Utils';
 import Auth from '../../../../Auth';
 import fs = require('fs');
+import * as path from 'path';
 import { FileProperties } from './FileProperties';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -37,7 +38,20 @@ class FileGetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Download or get information about the specified file';
+    return 'Get information about the specified file';
+  }
+
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.id = (!(!args.options.id)).toString();
+    telemetryProps.url = (!(!args.options.url)).toString();
+    telemetryProps.asString = args.options.asString || false;
+    telemetryProps.asListItem = args.options.asListItem || false;
+    telemetryProps.asFile = args.options.asFile || false;
+    telemetryProps.fileName = (!(!args.options.fileName)).toString();
+    telemetryProps.path = (!(!args.options.path)).toString();
+
+    return telemetryProps;
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
@@ -67,12 +81,7 @@ class FileGetCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          if (args.options.url) {
-            cmd.log(`Retrieving file ${args.options.url} from site ${args.options.webUrl}...`);
-          }
-          else {
-            cmd.log(`Retrieving file with ID ${args.options.id} from site ${args.options.webUrl}...`);
-          }
+          cmd.log(`Retrieving file from site ${args.options.webUrl}...`);
         }
 
         let requestUrl: string;
@@ -141,11 +150,8 @@ class FileGetCommand extends SpoCommand {
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
 
-  private writeFile(fileContent: string, path: string, fileName: string): void {
-    let fullPath: string = path.concat('/', fileName);
-    if (path.endsWith('/')) {
-      fullPath = path.concat(fileName);
-    }
+  private writeFile(fileContent: string, filePath: string, fileName: string): void {
+    let fullPath: string = path.join(filePath, fileName);
 
     fs.writeFileSync(fullPath, fileContent);
   }
@@ -153,7 +159,7 @@ class FileGetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
+        option: '-w, --webUrl <webUrl>',
         description: 'The URL of the site where the folder from which to retrieve files is located'
       },
       {
@@ -236,13 +242,34 @@ class FileGetCommand extends SpoCommand {
   
   Remarks:
   
-    To get all files, you have to first connect to SharePoint using the
+    To get a file, you have to first connect to SharePoint using the
     ${chalk.blue(commands.CONNECT)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
         
   Examples:
   
-    Return all files from folder ${chalk.grey('shared documents')} located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.FILE_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'share documents'
+    Return file properties for file with id ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')} located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
+      ${chalk.grey(config.delimiter)} ${commands.FILE_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6'
+
+    Return file as string for file with id ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')} located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
+      ${chalk.grey(config.delimiter)} ${commands.FILE_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6' --asString
+
+    Return list item properties for file with id ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')} located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
+      ${chalk.grey(config.delimiter)} ${commands.FILE_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6' --asListItem   
+
+    Save file at path ${chalk.grey('/Users/user/documents')} with filename ${chalk.grey('SavedAsTest1.docx')} for file with id ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')} located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
+      ${chalk.grey(config.delimiter)} ${commands.FILE_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6' --asFile --path /Users/user/documents --fileName SavedAsTest1.docx
+    
+    Return file properties for file with site relative url ${chalk.grey('/sites/project-x/documents/Test1.docx')} located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
+      ${chalk.grey(config.delimiter)} ${commands.FILE_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --url '/sites/project-x/documents/Test1.docx'
+
+    Return file as string for file with site relative url ${chalk.grey('/sites/project-x/documents/Test1.docx')} located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
+      ${chalk.grey(config.delimiter)} ${commands.FILE_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --url '/sites/project-x/documents/Test1.docx' --asString
+
+    Return list item properties for file with site relative url ${chalk.grey('/sites/project-x/documents/Test1.docx')} located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
+      ${chalk.grey(config.delimiter)} ${commands.FILE_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --url '/sites/project-x/documents/Test1.docx' --asListItem   
+
+    Save file at path ${chalk.grey('/Users/user/documents')} with filename ${chalk.grey('SavedAsTest1.docx')} for file with site relative url ${chalk.grey('/sites/project-x/documents/Test1.docx')} located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
+      ${chalk.grey(config.delimiter)} ${commands.FILE_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --url '/sites/project-x/documents/Test1.docx' --asFile --path /Users/user/documents --fileName SavedAsTest1.docx
       `);
   }
 }
