@@ -27,6 +27,14 @@ interface Options extends GlobalOptions {
   folder?: string;
 }
 
+interface FieldValue {
+  ErrorMessage: string;
+  FieldName: string;
+  FieldValue: any;
+  HasException: boolean;
+  ItemId: number;
+}
+
 class SpoListItemAddCommand extends SpoCommand {
 
   public allowUnknownOptions(): boolean | undefined {
@@ -44,53 +52,7 @@ class SpoListItemAddCommand extends SpoCommand {
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
 
-    // TODO: impleemnt getTelementryProperties
-    /*
-    // add properties with identifiable data
-    [
-      'description',
-      'templateFeatureId',
-      'schemaXml',
-      'defaultContentApprovalWorkflowId',
-      'defaultDisplayFormUrl',
-      'defaultEditFormUrl',
-      'emailAlias',
-      'sendToLocationName',
-      'sendToLocationUrl',
-      'validationFormula',
-      'validationMessage' 
-    ].forEach(o => {
-      const value: any = (args.options as any)[o];
-      if (value) {
-        telemetryProps[o] = (typeof value !== 'undefined').toString();
-      }
-    });
-    
-    // add boolean values
-    SpoListAddCommand.booleanOptions.forEach(o => {
-      const value: any = (args.options as any)[o];
-      if (value) {
-        telemetryProps[o] = (value === 'true').toString();
-      }
-    });
-
-    // add properties with non-identifiable data
-    [
-      'baseTemplate',
-      'direction',
-      'draftVersionVisibility',
-      'listExperienceOptions',
-      'majorVersionLimit',
-      'majorWithMinorVersionsLimit',
-      'readSecurity',
-      'writeSecurity'
-    ].forEach(o => {
-      const value: any = (args.options as any)[o];
-      if (value) {
-        telemetryProps[o] = value.toString();
-      }
-    });*/
-
+    // All command arguments contain potentially identifiable data
     return telemetryProps;
   }
 
@@ -245,17 +207,57 @@ class SpoListItemAddCommand extends SpoCommand {
 
         return request.post(requestOptions);
       })
-      .then((response: any): void => {
+      .then((response: any): request.RequestPromise | Promise<void> => {
         if (this.debug) {
           cmd.log('Response:');
           cmd.log(response);
           cmd.log('');
         }
 
+        // If response is from /lists/(list)/items POST call, return response['data']
         if (response["data"]) {
           cmd.log(<ListItemInstance>response["data"])
         }
 
+        // If response is from /AddValidateUpdateItemUsingPath POST call, perform get on added item to get all field values
+        if (response["value"] && response["value"].length && response["value"].length > 0) {
+          let fieldValues: FieldValue[] = response["value"];
+          let idField = fieldValues.filter((thisField, index, values) => { return (thisField.FieldName == "Id") })
+          if (this.debug) {
+            cmd.log(`field values returned:`)
+            cmd.log(fieldValues)
+            cmd.log(`Id returned by AddValidateUpdateItemUsingPath: ${idField.length > 0 ? idField[0].FieldValue: undefined}`);
+          }
+
+          if (idField.length == 0) {
+            return Promise.reject(`Item didn't add successfully`)
+          }
+
+          const requestOptions: any = {
+            url: `${listRestUrl}/items(${idField[0].FieldValue})`,
+            method: 'GET',
+            headers: Utils.getRequestHeaders({
+              authorization: `Bearer ${siteAccessToken}`,
+              'accept': 'application/json;odata=nometadata'
+            }),
+            json: true
+          };
+
+          if (this.debug) {
+            cmd.log('Executing web request...');
+            cmd.log(requestOptions);
+            cmd.log('');
+          }
+
+          return request.get(requestOptions);
+        }
+
+        return Promise.resolve()
+      })
+      .then((response: any): void => {
+        if (response) {
+          cmd.log(<ListItemInstance>response)
+        }
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
@@ -339,10 +341,30 @@ class SpoListItemAddCommand extends SpoCommand {
         
   Examples:
   
-    Add an item to a list with title ${chalk.grey('Demo Item')} and content type id ${chalk.grey('0x0101')}
+    Add an item to a list with Title ${chalk.grey('Demo Item')} and content type name ${chalk.grey('Item')}
     to list with title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_ADD} --title 'Demo Item' --contentType 0x0101 --listTitle 'Demo List' --webUrl https://contoso.sharepoint.com/sites/project-x
+      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_ADD} --contentType Item --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --title "Demo Item"
 
+    Add an item to a list with Title ${chalk.grey('Demo Multi Managed Metadata Field')} and a single-select metadata field named SingleMetadataField
+    to list with title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} (note: term GUIDs must be specified on the right-side of the pipe | character)
+      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_ADD} --contentType Item --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --title "Demo Single Managed Metadata Field" --SingleMetadataField "TermLabel1|xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx;"
+    
+    Add an item to a list with Title ${chalk.grey('Demo Multi Managed Metadata Field')} and a multi-select metadata field named MultiMetadataField
+    to list with title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} (note: term GUIDs must be specified on the right-side of the pipe | character)
+      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_ADD} --contentType Item --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --title "Demo Multi Managed Metadata Field" --MultiMetadataField "TermLabel1|xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx;TermLabel2|xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx;"
+  
+    Add an item to a list with Title ${chalk.grey('Demo Single Person Field')} and a single-select people field named SinglePeopleField
+    to list with title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
+      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_ADD} --contentType Item --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --title "Demo Single Person Field" --SinglePeopleField "[{'Key':'i:0#.f|membership|markh@conotoso.com'}]"
+      
+    Add an item to a list with Title ${chalk.grey('Demo Multi Person Field')} and a multi-select people field named MultiPeopleField
+    to list with title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
+      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_ADD} --contentType Item --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --title "Demo Multi Person Field" --MultiPeopleField "[{'Key':'i:0#.f|membership|markh@conotoso.com'},{'Key':'i:0#.f|membership|adamb@conotoso.com'}]"
+      
+    Add an item to a list with Title ${chalk.grey('Demo Hyperlink Field')} and a hyperlink field named CustomHyperlink
+    to list with title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
+      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_ADD} --contentType Item --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --title "Demo Hyperlink Field" --CustomHyperlink "https://www.bing.com, Bing"
+        
     More information:
 
     SP Client List Item Class Members information
