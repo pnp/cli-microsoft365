@@ -1216,7 +1216,7 @@ describe(commands.O365GROUP_LIST, () => {
     auth.service.connected = true;
     auth.service.resource = 'https://graph.microsoft.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: true, deleted: true } }, () => {
+    cmdInstance.action({ options: { verbose: true, includeSiteUrl: true, deleted: true } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith([
           {
