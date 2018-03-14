@@ -1,4 +1,4 @@
-# spo file list
+# spo file get
 
 Get information about the specified file
 
