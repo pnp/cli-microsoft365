@@ -79,15 +79,7 @@ class GraphO365GroupListCommand extends GraphItemsListCommand<Group> {
         }
         else {
           cmd.log(this.items.map(g => {
-            if (args.options.includeSiteUrl) {
-              return {
-                id: g.id,
-                displayName: g.displayName,
-                mailNickname: g.mailNickname,
-                siteUrl: g.siteUrl
-              };
-            }
-            else if (args.options.deleted){
+            if (args.options.deleted){
               return {
                 id: g.id,
                 displayName: g.displayName,
@@ -95,6 +87,14 @@ class GraphO365GroupListCommand extends GraphItemsListCommand<Group> {
                 deletedDateTime: g.deletedDateTime
               };
             }
+            else if (args.options.includeSiteUrl) {
+              return {
+                id: g.id,
+                displayName: g.displayName,
+                mailNickname: g.mailNickname,
+                siteUrl: g.siteUrl
+              };
+            }            
             else {
               return {
                 id: g.id,
