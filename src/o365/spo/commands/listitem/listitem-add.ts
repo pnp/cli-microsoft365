@@ -322,6 +322,11 @@ class SpoListItemAddCommand extends SpoCommand {
         return `Only specify one of listId or listTitle parameters`;
       }
 
+      if (args.options.listId &&
+        !Utils.isValidGuid(args.options.listId)) {
+        return `${args.options.listId} in option listId is not a valid GUID`;
+      }
+
       return true;
     };
   }

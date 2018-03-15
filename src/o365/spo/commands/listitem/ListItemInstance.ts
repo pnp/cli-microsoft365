@@ -4,7 +4,8 @@ export interface ListItemInstance {
   ContentTypeId: string;
   Created: Date;
   EditorId: number;
+  GUID: string;
   ID: number;
+  Modified: Date;
   Title: string;
-  FieldValues: Object;
 } 
