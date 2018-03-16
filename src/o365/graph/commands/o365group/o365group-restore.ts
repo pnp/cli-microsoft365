@@ -44,14 +44,11 @@ class GraphO365GroupRestoreCommand extends GraphCommand {
         .then((accessToken: string): request.RequestPromise | Promise<void> => {
           if (this.debug) {
             cmd.log(`Retrieved access token ${accessToken}.`);
+            cmd.log(vorpal.chalk.green('switch to BETA endpoint to restore deleted items'));
           }
 
           if (this.verbose) {
-            cmd.log(`Removing Office 365 Group: ${args.options.id}...`);
-          }
-
-          if (this.debug) {
-            cmd.log(vorpal.chalk.green('switch to BETA endpoint to restore deleted items'));
+            cmd.log(`Restoring Office 365 Group: ${args.options.id}...`);
           }
 
           const requestOptions: any = {
