@@ -143,7 +143,7 @@ describe(commands.O365GROUP_RESTORE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848'} }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(cmdInstanceLogSpy.called);
         done();
       }
       catch (e) {
