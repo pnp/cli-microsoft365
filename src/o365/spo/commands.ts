@@ -42,6 +42,7 @@ export default {
   LIST_LIST: `${prefix} list list`,
   LIST_REMOVE: `${prefix} list remove`,
   LIST_SET: `${prefix} list set`,
+  PAGE_ADD: `${prefix} page add`,
   PAGE_LIST: `${prefix} page list`,
   PROPERTYBAG_GET: `${prefix} propertybag get`,
   PROPERTYBAG_LIST: `${prefix} propertybag list`,
