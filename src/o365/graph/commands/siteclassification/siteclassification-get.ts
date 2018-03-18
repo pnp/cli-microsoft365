@@ -132,7 +132,7 @@ class GraphO365SiteClassificationGetCommand extends GraphCommand {
 
   Examples:
   
-    Get information about the Office 365 Tenant SiteClassification}
+    Gets information about the Office 365 Tenant SiteClassification
       ${chalk.grey(config.delimiter)} ${this.name}
     `);
   }

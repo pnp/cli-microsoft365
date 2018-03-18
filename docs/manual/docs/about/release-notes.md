@@ -6,6 +6,7 @@
 
 **SharePoint Online:**
 
+- [spo page list](../cmd/spo/page/page-list.md) - lists all modern pages in the given site [#359](https://github.com/SharePoint/office365-cli/issues/359)
 - [spo sitedesign apply](../cmd/spo/sitedesign/sitedesign-apply.md) - applies a site design to an existing site collection [#339](https://github.com/SharePoint/office365-cli/issues/339)
 - [spo theme get](../cmd/spo/theme/theme-get.md) - gets custom theme information [#349](https://github.com/SharePoint/office365-cli/issues/349)
 - [spo theme list](../cmd/spo/theme/theme-list.md) - retrieves the list of custom themes [#332](https://github.com/SharePoint/office365-cli/issues/332)
@@ -15,6 +16,13 @@
 **Microsoft Graph:**
 
 - [graph o365group remove](../cmd/graph/o365group/o365group-remove.md) - removes an Office 365 Group [#309](https://github.com/SharePoint/office365-cli/issues/309)
+- [graph o365group restore](../cmd/graph/o365group/o365group-restore.md) - restores a deleted Office 365 Group [#346](https://github.com/SharePoint/office365-cli/issues/346)
+
+### Updated commands
+
+**Microsoft Graph:**
+
+- [graph o365group list](../cmd/graph/o365group/o365group-list.md) - added support for listing deleted Office 365 Groups [#347](https://github.com/SharePoint/office365-cli/issues/347)
 
 ## [v1.0.0](https://github.com/SharePoint/office365-cli/releases/tag/v1.0.0)
 
