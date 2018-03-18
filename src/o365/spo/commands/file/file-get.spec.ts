@@ -444,6 +444,45 @@ describe(commands.FILE_GET, () => {
     });
   });
 
+  it('uses correct API url when url and id are both not passed', (done) => {
+    stubAuth();
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === '') {
+        return Promise.resolve('Correct Url')
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    cmdInstance.action({
+      options: {
+        debug: false,
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+      }
+    }, () => {
+
+      try {
+        assert(1===1);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore([
+          request.post,
+          request.get
+        ]);
+      }
+    });
+  });
+
   it('fails validation if path doesn\'t exist', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/project-x', id: 'b2307a39-e878-458b-bc90-03bc578531d6', asFile: true, path: 'abc', fileName: 'test.docx' } });
@@ -492,6 +531,93 @@ describe(commands.FILE_GET, () => {
         Utils.restore(request.get);
         Utils.restore((command as any)['writeFile']);
         Utils.restore(fs.writeFileSync);
+      }
+    });
+  });it('writeFile called when option --asFile is specified', (done) => {
+    stubAuth();
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('/_api/web/GetFileById(') > -1) {
+        return Promise.resolve('abc');
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    const writeFileSpy = sinon.spy((command as any), 'writeFile');
+    sinon.stub(fs, 'writeFileSync').callsFake(() => '');
+    const options: Object = {
+      debug: false,
+      id: 'b2307a39-e878-458b-bc90-03bc578531d6',
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+      asFile: true,
+      path: '/Users/user/documents',
+      fileName: 'Test1.docx'
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert(writeFileSpy.called)
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+        Utils.restore(request.get);
+        Utils.restore((command as any)['writeFile']);
+        Utils.restore(fs.writeFileSync);
+      }
+    });
+  });
+
+  it('writeFile not called when option --asFile and path is empty is specified', (done) => {
+    stubAuth();
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('/_api/web/GetFileById(') > -1) {
+        return Promise.resolve('abc');
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    const writeFileSpy = sinon.spy((command as any), 'writeFile');
+    //sinon.stub(fs, 'writeFileSync').callsFake(() => '');
+    const options: Object = {
+      debug: false,
+      id: 'b2307a39-e878-458b-bc90-03bc578531d6',
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+      asFile: true,
+      fileName: 'Test1.docx'
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert(writeFileSpy.notCalled)
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+        Utils.restore(request.get);
+        Utils.restore((command as any)['writeFile']);
+        //Utils.restore(fs.writeFileSync);
       }
     });
   });

@@ -11,7 +11,7 @@ import SpoCommand from '../../SpoCommand';
 import { ContextInfo } from '../../spo';
 import Utils from '../../../../Utils';
 import Auth from '../../../../Auth';
-import fs = require('fs');
+import * as fs from 'fs';
 import * as path from 'path';
 import { FileProperties } from './FileProperties';
 
@@ -23,16 +23,15 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   webUrl: string;
-  url: string;
-  id: string;
-  asString: boolean;
-  asListItem: boolean;
-  asFile: boolean;
-  fileName: string;
-  path: string;
+  url?: string;
+  id?: string;
+  asString?: boolean;
+  asListItem?: boolean;
+  asFile?: boolean;
+  path?: string;
 }
 
-class FileGetCommand extends SpoCommand {
+class SpoFileGetCommand extends SpoCommand {
   public get name(): string {
     return commands.FILE_GET;
   }
@@ -48,7 +47,6 @@ class FileGetCommand extends SpoCommand {
     telemetryProps.asString = args.options.asString || false;
     telemetryProps.asListItem = args.options.asListItem || false;
     telemetryProps.asFile = args.options.asFile || false;
-    telemetryProps.fileName = (!(!args.options.fileName)).toString();
     telemetryProps.path = (!(!args.options.path)).toString();
 
     return telemetryProps;
@@ -84,29 +82,25 @@ class FileGetCommand extends SpoCommand {
           cmd.log(`Retrieving file from site ${args.options.webUrl}...`);
         }
 
-        let requestUrl: string;
-        let options: string;
+        let requestUrl: string = '';
+        let options: string = '';
 
         if (args.options.id) {
           requestUrl = `${args.options.webUrl}/_api/web/GetFileById('${encodeURIComponent(args.options.id)}')`;
         }
-        else {
+        else if (args.options.url) {
           requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${encodeURIComponent(args.options.url)}')`;
         }
 
         if (args.options.asListItem) {
           options = '?$expand=ListItemAllFields';
         }
-        else if (!args.options.asListItem && !args.options.asFile && !args.options.asString) {
-          options = '';
-        }
-        else {
+        else if (args.options.asFile || args.options.asString) {
           options = '/$value';
         }
 
         const requestOptions: any = {
           url: requestUrl + options,
-          method: 'GET',
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata'
@@ -131,18 +125,20 @@ class FileGetCommand extends SpoCommand {
         }
         
         if (args.options.asString) {
-          cmd.log(file);
+          cmd.log(file.toString());
         }
         else if (args.options.asListItem) {
-          let fileProperties: FileProperties = JSON.parse(JSON.stringify(file));
+          const fileProperties: FileProperties = JSON.parse(JSON.stringify(file));
           cmd.log(fileProperties.ListItemAllFields)
         }
         else if(args.options.asFile) {
-          this.writeFile(file, args.options.path, args.options.fileName)
-          cmd.log(`File ${args.options.fileName} saved to path ${args.options.path}`);
+          if (args.options.path) {
+            this.writeFile(file, args.options.path);
+            cmd.log(`File saved to path ${args.options.path}`);
+          }
         }
         else {
-          let fileProperties: FileProperties = JSON.parse(JSON.stringify(file));
+          const fileProperties: FileProperties = JSON.parse(JSON.stringify(file));
           cmd.log(fileProperties);
         }
 
@@ -150,21 +146,19 @@ class FileGetCommand extends SpoCommand {
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
 
-  private writeFile(fileContent: string, filePath: string, fileName: string): void {
-    let fullPath: string = path.join(filePath, fileName);
-
-    fs.writeFileSync(fullPath, fileContent);
+  private writeFile(fileContent: string, filePath: string): void {
+    fs.writeFileSync(filePath, fileContent);
   }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
         option: '-w, --webUrl <webUrl>',
-        description: 'The URL of the site where the folder from which to retrieve files is located'
+        description: 'The URL of the site where the file is located'
       },
       {
         option: '-u, --url [url]',
-        description: 'server- or site-relative URL of the file. Specify either url or id but not both'
+        description: 'server-relative URL of the file. Specify either url or id but not both'
       },
       {
         option: '-i, --id [id]',
@@ -183,12 +177,8 @@ class FileGetCommand extends SpoCommand {
         description: 'save the file to the path specified in the path option'
       },
       {
-        option:'-f, --fileName [fileName]',
-        description: 'the name of the file including extension. Must be specified when the --asFile option is used'
-      },
-      {
         option: '-p, --path [path]',
-        description: 'path where to save the file. Must be specified when the --asFile option is used'
+        description: 'path including file name where to save the file. Must be specified when the --asFile option is used'
       }
     ];
 
@@ -221,12 +211,11 @@ class FileGetCommand extends SpoCommand {
         return 'Specify id or url, one is required';
       }
 
-      if (args.options.asFile && (!args.options.path || !args.options.fileName)) {
-        return 'The path and fileName should be specified when the --asFile option is used';
+      if (args.options.asFile && !args.options.path) {
+        return 'The path should be specified when the --asFile option is used';
       }
-
-      if (args.options.path && !fs.existsSync(args.options.path)) {
-        return 'Specified path does not exits';
+      if (args.options.path && !fs.existsSync(path.dirname(args.options.path))) {
+        return 'Specified path where to save the file does not exits';
       }
 
       return true;
@@ -256,8 +245,8 @@ class FileGetCommand extends SpoCommand {
     Return list item properties for file with id ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')} located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
       ${chalk.grey(config.delimiter)} ${commands.FILE_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6' --asListItem   
 
-    Save file at path ${chalk.grey('/Users/user/documents')} with filename ${chalk.grey('SavedAsTest1.docx')} for file with id ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')} located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.FILE_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6' --asFile --path /Users/user/documents --fileName SavedAsTest1.docx
+    Save file at path ${chalk.grey('/Users/user/documents/SavedAsTest1.docx')} for file with id ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')} located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
+      ${chalk.grey(config.delimiter)} ${commands.FILE_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6' --asFile --path /Users/user/documents/SavedAsTest1.docx
     
     Return file properties for file with site relative url ${chalk.grey('/sites/project-x/documents/Test1.docx')} located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
       ${chalk.grey(config.delimiter)} ${commands.FILE_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --url '/sites/project-x/documents/Test1.docx'
@@ -268,10 +257,10 @@ class FileGetCommand extends SpoCommand {
     Return list item properties for file with site relative url ${chalk.grey('/sites/project-x/documents/Test1.docx')} located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
       ${chalk.grey(config.delimiter)} ${commands.FILE_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --url '/sites/project-x/documents/Test1.docx' --asListItem   
 
-    Save file at path ${chalk.grey('/Users/user/documents')} with filename ${chalk.grey('SavedAsTest1.docx')} for file with site relative url ${chalk.grey('/sites/project-x/documents/Test1.docx')} located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.FILE_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --url '/sites/project-x/documents/Test1.docx' --asFile --path /Users/user/documents --fileName SavedAsTest1.docx
+    Save file at path ${chalk.grey('/Users/user/documentsSavedAsTest1.docx')} for file with site relative url ${chalk.grey('/sites/project-x/documents/Test1.docx')} located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
+      ${chalk.grey(config.delimiter)} ${commands.FILE_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --url '/sites/project-x/documents/Test1.docx' --asFile --path /Users/user/documents/SavedAsTest1.docx
       `);
   }
 }
 
-module.exports = new FileGetCommand();
+module.exports = new SpoFileGetCommand();
