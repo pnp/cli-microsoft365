@@ -8,7 +8,6 @@ import {
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import { ContextInfo } from '../../spo';
 import Utils from '../../../../Utils';
 import Auth from '../../../../Auth';
 import * as fs from 'fs';
@@ -66,16 +65,7 @@ class SpoFileGetCommand extends SpoCommand {
         siteAccessToken = accessToken;
 
         if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
-
-        return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
-      })
-      .then((res: ContextInfo): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
+          cmd.log(`Retrieved access token ${accessToken}.`);
         }
 
         if (this.verbose) {

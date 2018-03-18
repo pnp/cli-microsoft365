@@ -22,11 +22,11 @@ describe(commands.FILE_GET, () => {
         return Promise.resolve('abc');
       }
 
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
+      // if (opts.url.indexOf('/_api/contextinfo') > -1) {
+      //   return Promise.resolve({
+      //     FormDigestValue: 'abc'
+      //   });
+      // }
 
       return Promise.reject('Invalid request');
     });
@@ -35,7 +35,7 @@ describe(commands.FILE_GET, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    sinon.stub(command as any, 'getRequestDigest').callsFake(() => { return { FormDigestValue: 'abc' }; });
+    //sinon.stub(command as any, 'getRequestDigest').callsFake(() => { return { FormDigestValue: 'abc' }; });
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
       telemetry = t;
     });
