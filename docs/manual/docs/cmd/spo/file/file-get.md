@@ -19,8 +19,7 @@ Option|Description
 `--asString`|retrieve the contents of the specified file as string
 `--asListItem`|retrieve the underlying list item
 `--asFile`|save the file to the path specified in the path option
-`-f, --fileName [fileName]`|the name of the file including extension. Must be specified when the --asFile option is used
-`-p, --path [path]`|path where to save the file. Must be specified when the --asFile option is used
+`-p, --path [path]`|path including file name where to save the file. Must be specified when the --asFile option is used
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
@@ -52,10 +51,10 @@ Return list item properties for file with id _b2307a39-e878-458b-bc90-03bc578531
 spo file get --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6' --asListItem
 ```
 
-Save file at path _/Users/user/documents_ with filename _SavedAsTest1.docx_ for file with id _b2307a39-e878-458b-bc90-03bc578531d6_ located in site _https://contoso.sharepoint.com/sites/project-x_
+Save file at path _/Users/user/documents/SavedAsTest1.docx_ for file with id _b2307a39-e878-458b-bc90-03bc578531d6_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo file get --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6' --asFile --path /Users/user/documents --fileName SavedAsTest1.docx
+spo file get --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6' --asFile --path /Users/user/documents/SavedAsTest1.docx
 ```
 
 Return file properties for file with site relative url _/sites/project-x/documents/Test1.docx_ located in site _https://contoso.sharepoint.com/sites/project-x_
@@ -76,8 +75,8 @@ Return list item properties for file with site relative url _/sites/project-x/do
 spo file get --webUrl https://contoso.sharepoint.com/sites/project-x --url '/sites/project-x/documents/Test1.docx' --asListItem
 ```
 
-Save file at path _/Users/user/documents_ with filename _SavedAsTest1.docx_ for file with site relative url _/sites/project-x/documents/Test1.docx_ located in site _https://contoso.sharepoint.com/sites/project-x_
+Save file at path _/Users/user/documents/SavedAsTest1.docx_ for file with site relative url _/sites/project-x/documents/Test1.docx_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo file get --webUrl https://contoso.sharepoint.com/sites/project-x --url '/sites/project-x/documents/Test1.docx' --asFile --path /Users/user/documents --fileName SavedAsTest1.docx
+spo file get --webUrl https://contoso.sharepoint.com/sites/project-x --url '/sites/project-x/documents/Test1.docx' --asFile --path /Users/user/documents/SavedAsTest1.docx
 ```
