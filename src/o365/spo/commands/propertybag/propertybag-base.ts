@@ -36,12 +36,13 @@ export abstract class SpoPropertyBagBaseCommand extends SpoCommand {
   }
 
   /**
+   * Requests web object itentity for the current web.
    * This request has to be send before we can construct the property bag request.
    * The response data looks like:
    * _ObjectIdentity_=<GUID>|<GUID>:site:<GUID>:web:<GUID>
    * _ObjectType_=SP.Web
    * ServerRelativeUrl=/sites/contoso
-   * The ObjectIdentity is needed to create another request to retrieve the property bag.
+   * The ObjectIdentity is needed to create another request to retrieve the property bag or set property.
    * @param webUrl web url
    * @param cmd command cmd
    */
@@ -83,6 +84,66 @@ export abstract class SpoPropertyBagBaseCommand extends SpoCommand {
 
         reject('Cannot proceed. _ObjectIdentity_ not found'); // this is not supposed to happen
       }, (err: any): void => { reject(err); });
+    });
+  }
+
+  /**
+   * This request has to be send before we can construct the property bag request.
+   * The response data looks like:
+   * _ObjectIdentity_=<GUID>|<GUID>:site:<GUID>:web:<GUID>:folder:<GUID>
+   * _ObjectType_=SP.Folder
+   * Properties ...
+   * The ObjectIdentity is needed to create another request to retrieve the folder property bag or set property.
+   * @param webUrl web url
+   * @param cmd command cmd
+   */
+  protected requestFolderObjectIdentity(identityResp: IdentityResponse, webUrl: string, folder: string, cmd: CommandInstance): Promise<IdentityResponse> {
+    let serverRelativeUrl: string = folder;
+    if (identityResp.serverRelativeUrl !== '/') {
+      serverRelativeUrl = `${identityResp.serverRelativeUrl}${serverRelativeUrl}`
+    }
+
+    const requestOptions: any = {
+      url: `${webUrl}/_vti_bin/client.svc/ProcessQuery`,
+      headers: Utils.getRequestHeaders({
+        authorization: `Bearer ${this.siteAccessToken}`,
+        'X-RequestDigest': this.formDigestValue
+      }),
+      body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /><Query Id="12" ObjectPathId="9"><Query SelectAllProperties="false"><Properties><Property Name="Properties" SelectAll="true"><Query SelectAllProperties="false"><Properties /></Query></Property></Properties></Query></Query></Actions><ObjectPaths><Method Id="9" ParentId="5" Name="GetFolderByServerRelativeUrl"><Parameters><Parameter Type="String">${serverRelativeUrl}</Parameter></Parameters></Method><Identity Id="5" Name="${identityResp.objectIdentity}" /></ObjectPaths></Request>`
+    };
+
+    if (this.debug) {
+      cmd.log('Request:');
+      cmd.log(JSON.stringify(requestOptions));
+      cmd.log('');
+    }
+
+    return new Promise<IdentityResponse>((resolve: any, reject: any) => {
+
+      return request.post(requestOptions).then((res: any) => {
+        if (this.debug) {
+          cmd.log('Response:');
+          cmd.log(JSON.stringify(res));
+          cmd.log('');
+        }
+
+        const json: ClientSvcResponse = JSON.parse(res);
+
+        const contents: ClientSvcResponseContents = json.find(x => { return x['ErrorInfo']; });
+        if (contents && contents.ErrorInfo) {
+          return reject(contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error');
+        }
+        const objectIdentity = json.find(x => { return x['_ObjectIdentity_'] });
+        if (objectIdentity) {
+          return resolve({
+            objectIdentity: objectIdentity['_ObjectIdentity_'],
+            serverRelativeUrl: serverRelativeUrl
+          });
+        }
+
+        reject('Cannot proceed. Folder _ObjectIdentity_ not found'); // this is not suppose to happen
+
+      }, (err: any): void => { reject(err); })
     });
   }
 
