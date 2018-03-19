@@ -57,7 +57,7 @@ class GraphO365GroupListCommand extends GraphItemsListCommand<Group> {
     }
 
     this
-      .getAllItems(endpoint, cmd)
+      .getAllItems(endpoint, cmd, true)
       .then((): Promise<any> => {
         if (args.options.includeSiteUrl) {
           return Promise.all(this.items.map(g => this.getGroupSiteUrl(g.id, cmd)));
