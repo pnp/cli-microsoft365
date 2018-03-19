@@ -13,7 +13,7 @@ export abstract class GraphItemsListCommand<T> extends GraphCommand {
     this.items = [];
   }
 
-  protected getAllItems(url: string, cmd: CommandInstance): Promise<void> {
+  protected getAllItems(url: string, cmd: CommandInstance, firstRun: boolean): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       auth
         .ensureAccessToken(auth.service.resource, cmd, this.debug)
@@ -42,7 +42,7 @@ export abstract class GraphItemsListCommand<T> extends GraphCommand {
             cmd.log('');
           }
 
-          if (!res['@odata.nextLink']) {
+          if (firstRun) {
             this.items = [];
           }
 
@@ -50,7 +50,7 @@ export abstract class GraphItemsListCommand<T> extends GraphCommand {
 
           if (res['@odata.nextLink']) {
             this
-              .getAllItems(res['@odata.nextLink'] as string, cmd)
+              .getAllItems(res['@odata.nextLink'] as string, cmd, false)
               .then((): void => {
                 resolve();
               }, (err: any): void => {
