@@ -42,6 +42,10 @@ export abstract class GraphItemsListCommand<T> extends GraphCommand {
             cmd.log('');
           }
 
+          if (!res['@odata.nextLink']) {
+            this.items = [];
+          }
+
           this.items = this.items.concat(res.value);
 
           if (res['@odata.nextLink']) {
