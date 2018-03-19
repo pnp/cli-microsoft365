@@ -17,13 +17,72 @@ describe(commands.LISTITEM_ADD, () => {
   let cmdInstanceLogSpy: sinon.SinonSpy;
   let trackEvent: any;
   let telemetry: any;
+
+  const expectedTitle = `List Item 1`;
+  const expectedId = 147;
+  const expectedFolder = 'Folder1';
+  let actualId = 0;
+  let actualFolder = ''
+
+  let postFakes = (opts: any) => {
+    if (opts.url.indexOf('/common/oauth2/token') > -1) {
+      return Promise.resolve('abc');
+    }
+
+    if (opts.url.indexOf('/_api/contextinfo') > -1) {
+      return Promise.resolve({
+        FormDigestValue: 'abc'
+      });
+    }
+    if (opts.url.indexOf('AddValidateUpdateItemUsingPath') > -1) {
+      return Promise.resolve({ value: [ { FieldName: "Id", FieldValue: expectedId }] });
+    }
+    if (opts.url.indexOf('AddSubFolderUsingPath') > -1) {
+      console.log(opts.url)
+      actualFolder = opts.url.match(/@a2='([^']+)'/i)[1];
+      return Promise.resolve();
+    }
+    return Promise.reject('Invalid request');
+  }
+
+  let getFakes = (opts: any) => {
+    if (opts.url.indexOf('contenttypes') > -1) {
+      return Promise.resolve({ value: [ {Id: { StringValue: "0x01" } } ] });
+    }
+    if (opts.url.indexOf('rootFolder') > -1) {
+      return Promise.resolve({ ServerRelativeUrl: '/sites/project-xxx/Lists/Demo%20List'});
+    }
+    if (opts.url.indexOf('/items(') > -1) {
+      actualId = opts.url.match(/\/items\((\d+)\)/i)[1];
+      return Promise.resolve(
+        {
+          "Attachments": false,
+          "AuthorId": 3,
+          "ContentTypeId": "0x0100B21BD271A810EE488B570BE49963EA34",
+          "Created": "2018-03-15T10:43:10Z",
+          "EditorId": 3,
+          "GUID": "ea093c7b-8ae6-4400-8b75-e2d01154dffc",
+          "ID": actualId,
+          "Modified": "2018-03-15T10:43:10Z",
+          "Title": expectedTitle,
+        }
+      );
+    }
+    if (opts.url.indexOf('GetFolderByServerRelativePath') > -1) {
+      console.log(opts.url)
+      return Promise.reject('');
+    }
+    return Promise.reject('Invalid request');
+  }
   
+
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
       telemetry = t;
     });
+
   });
 
   beforeEach(() => {
@@ -160,48 +219,73 @@ describe(commands.LISTITEM_ADD, () => {
     assert(actual);
   });
 
-  it('returns listItemInstance object when list is added with correct values', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(/\/items\(\d*\)/i) > -1) {
-        return Promise.resolve(
-          {
-            "Attachments": false,
-            "AuthorId": 3,
-            "ContentTypeId": "0x0100B21BD271A810EE488B570BE49963EA34",
-            "Created": "2018-03-15T10:43:10Z",
-            "EditorId": 3,
-            "GUID": "ea093c7b-8ae6-4400-8b75-e2d01154dffc",
-            "ID": 147,
-            "Modified": "2018-03-15T10:43:10Z",
-            "Title": "Test Item 1",
-          }
-        );
-      }
+  it('returns listItemInstance object when list item is added with correct values', (done) => {
 
-      return Promise.reject('Invalid request');
-    });
+    sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'post').callsFake(postFakes);
 
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, listTitle: 'Demo List', webUrl: 'https://contoso.sharepoint.com/sites/project-x', Title: "Test Item" } }, () => {
+
+    let options: any = { 
+      debug: true, 
+      listTitle: 'Demo List', 
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
+      Title: expectedTitle
+    }
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: options }, () => {
+
       try {
-        assert(cmdInstanceLogSpy.calledWith({ 
-          Attachments: false,
-          AuthorId: 3,
-          ContentTypeId: "0x0100B21BD271A810EE488B570BE49963EA34",
-          Created: "2018-03-15T10:43:10Z",
-          EditorId: 3,
-          GUID: "ea093c7b-8ae6-4400-8b75-e2d01154dffc",
-          ID: 147,
-          Modified: "2018-03-15T10:43:10Z",
-          Title: "Test Item 1",
-        }));
+        assert.equal(actualId, expectedId);
         done();
       }
       catch (e) {
         done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+      }
+    });
+    
+  });
+
+  it('attempts to create a folder when list item is added with folder specified', (done) => {
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    let options: any = { 
+      debug: true, 
+      listTitle: 'Demo List', 
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
+      Title: expectedTitle,
+      folder: expectedFolder
+    }
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert.equal(actualFolder, expectedFolder);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
       }
     });
     
