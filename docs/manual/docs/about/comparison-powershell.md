@@ -393,7 +393,7 @@ Send-PnPMail|SharePointPnPPowerShellOnline|
 Set-PnPAppSideLoading|SharePointPnPPowerShellOnline|
 Set-PnPAuditing|SharePointPnPPowerShellOnline|
 Set-PnPAvailablePageLayouts|SharePointPnPPowerShellOnline|
-Set-PnPClientSidePage|SharePointPnPPowerShellOnline|
+Set-PnPClientSidePage|SharePointPnPPowerShellOnline|[spo page set](../cmd/spo/page/page-set.md)
 Set-PnPClientSideText|SharePointPnPPowerShellOnline|
 Set-PnPClientSideWebPart|SharePointPnPPowerShellOnline|
 Set-PnPContext|SharePointPnPPowerShellOnline|

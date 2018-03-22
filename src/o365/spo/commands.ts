@@ -42,6 +42,7 @@ export default {
   LIST_REMOVE: `${prefix} list remove`,
   LIST_SET: `${prefix} list set`,
   PAGE_LIST: `${prefix} page list`,
+  PAGE_SET: `${prefix} page set`,
   PROPERTYBAG_GET: `${prefix} propertybag get`,
   PROPERTYBAG_LIST: `${prefix} propertybag list`,
   SERVICEPRINCIPAL_GRANT_LIST: `${prefix} serviceprincipal grant list`,
