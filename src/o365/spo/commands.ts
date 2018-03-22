@@ -44,6 +44,7 @@ export default {
   LIST_SET: `${prefix} list set`,
   PAGE_ADD: `${prefix} page add`,
   PAGE_LIST: `${prefix} page list`,
+  PAGE_SET: `${prefix} page set`,
   PROPERTYBAG_GET: `${prefix} propertybag get`,
   PROPERTYBAG_LIST: `${prefix} propertybag list`,
   PROPERTYBAG_REMOVE: `${prefix} propertybag remove`,
