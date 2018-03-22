@@ -1,14 +1,15 @@
 import auth from '../../SpoAuth';
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
+import { ContextInfo } from '../../spo';
 import config from '../../../../config';
 import * as request from 'request-promise-native';
 import commands from '../../commands';
 import {
-  CommandOption, CommandValidate, CommandError
+  CommandOption, CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import GlobalOptions from '../../../../GlobalOptions';
+import Auth from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -36,74 +37,68 @@ class SpoHubSiteDisconnectCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  protected requiresTenantAdmin(): boolean {
-    return true;
-  }
-
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const disconnectHubSite: () => void = (): void => {
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${auth.service.resource}...`);
-    }
+      const resource: string = Auth.getResourceFromUrl(args.options.url);
+      let siteAccessToken: string = '';
 
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(accessToken);
-          cmd.log('');
-        }
+      auth
+        .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
+        .then((accessToken: string): request.RequestPromise => {
+          siteAccessToken = accessToken;
 
-        return this.getRequestDigest(cmd, this.debug);
-      })
-      .then((res: ContextInfo): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log('Response:')
-          cmd.log(res);
-          cmd.log('');
-        }
+          if (this.debug) {
+            cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
+          }
 
-        if (this.verbose) {
-          cmd.log(`Disconnecting site collection ${args.options.url} from its hubsite...`);
-        }
+          if (this.verbose) {
+            cmd.log(`Retrieving request digest...`);
+          }
 
-        const requestOptions: any = {
-          url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
-          headers: Utils.getRequestHeaders({
-            authorization: `Bearer ${auth.service.accessToken}`,
-            'X-RequestDigest': res.FormDigestValue
-          }),
-          body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="13" ObjectPathId="12" /><Method Name="DisconnectSiteFromHubSite" Id="14" ObjectPathId="12"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.url)}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="12" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
-        };
+          return this.getRequestDigestForSite(args.options.url, siteAccessToken, cmd, this.debug);
+        })
+        .then((res: ContextInfo): request.RequestPromise => {
+          if (this.debug) {
+            cmd.log('Response:')
+            cmd.log(res);
+            cmd.log('');
+          }
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
+          if (this.verbose) {
+            cmd.log(`Disconnecting site collection ${args.options.url} from its hubsite...`);
+          }
 
-        return request.post(requestOptions);
-      })
-      .then((res: string): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
+          const requestOptions: any = {
+            url: `${args.options.url}/_api/site/JoinHubSite('00000000-0000-0000-0000-000000000000')`,
+            headers: Utils.getRequestHeaders({
+              authorization: `Bearer ${siteAccessToken}`,
+              'X-RequestDigest': res.FormDigestValue,
+              accept: 'application/json;odata=nometadata'
+            }),
+            json: true
+          };
 
-        const json: ClientSvcResponse = JSON.parse(res);
-        const response: ClientSvcResponseContents = json[0];
-        if (response.ErrorInfo) {
-          cmd.log(new CommandError(response.ErrorInfo.ErrorMessage));
-        }
-        else {
+          if (this.debug) {
+            cmd.log('Executing web request...');
+            cmd.log(requestOptions);
+            cmd.log('');
+          }
+
+          return request.post(requestOptions);
+        })
+        .then((res: any): void => {
+          if (this.debug) {
+            cmd.log('Response:');
+            cmd.log(res);
+            cmd.log('');
+          }
+
           if (this.verbose) {
             cmd.log(vorpal.chalk.green('DONE'));
           }
-        }
-        cb();
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+
+          cb();
+        }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
     }
 
     if (args.options.confirm) {
@@ -161,8 +156,8 @@ class SpoHubSiteDisconnectCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online tenant admin
-    site using the ${chalk.blue(commands.CONNECT)} command.
+      `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online site using
+    the ${chalk.blue(commands.CONNECT)} command.
         
   Remarks:
 
@@ -171,10 +166,8 @@ class SpoHubSiteDisconnectCommand extends SpoCommand {
     availability.
 
     To disconnect a site collection from its hub site, you have to first connect
-    to a tenant admin site using the ${chalk.blue(commands.CONNECT)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso-admin.sharepoint.com`)}.
-    If you are connected to a different site and will try to manage tenant properties,
-    you will get an error.
+    to a SharePoint site using the ${chalk.blue(commands.CONNECT)} command,
+    eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
 
   Examples:
   

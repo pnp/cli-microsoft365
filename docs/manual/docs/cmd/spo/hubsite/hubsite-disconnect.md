@@ -23,11 +23,11 @@ Option|Description
 `--debug`|Runs command with debug logging
 
 !!! important
-    Before using this command, connect to a SharePoint Online tenant admin site, using the [spo connect](../connect.md) command.
+    Before using this command, connect to a SharePoint Online site, using the [spo connect](../connect.md) command.
 
 ## Remarks
 
-To disconnect a site collection from its hub site, you have to first connect to a tenant admin site using the [spo connect](../connect.md) command, eg. `spo connect https://contoso-admin.sharepoint.com`. If you are connected to a different site and will try to manage tenant properties, you will get an error.
+To disconnect a site collection from its hub site, you have to first connect to a SharePoint site using the [spo connect](../connect.md) command, eg. `spo connect https://contoso.sharepoint.com`.
 
 ## Examples
 
