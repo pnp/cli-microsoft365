@@ -133,6 +133,7 @@ pages:
       - disconnect: 'cmd/azmgmt/disconnect.md'
       - status: 'cmd/azmgmt/status.md'
       - flow:
+        - flow environment get: 'cmd/azmgmt/flow/flow-environment-get.md'
         - flow environment list: 'cmd/azmgmt/flow/flow-environment-list.md'
     - Azure Active Directory Graph (aad):
       - connect: 'cmd/aad/connect.md'
