@@ -5,5 +5,6 @@ export default {
   DISCONNECT: `${prefix} disconnect`,
   FLOW_ENVIRONMENT_GET: `${prefix} flow environment get`,
   FLOW_ENVIRONMENT_LIST: `${prefix} flow environment list`,
+  FLOW_LIST: `${prefix} flow list`,
   STATUS: `${prefix} status`
 };

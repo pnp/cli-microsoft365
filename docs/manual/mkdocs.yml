@@ -135,6 +135,7 @@ pages:
       - flow:
         - flow environment get: 'cmd/azmgmt/flow/flow-environment-get.md'
         - flow environment list: 'cmd/azmgmt/flow/flow-environment-list.md'
+        - flow list: 'cmd/azmgmt/flow/flow-list.md'
     - Azure Active Directory Graph (aad):
       - connect: 'cmd/aad/connect.md'
       - disconnect: 'cmd/aad/disconnect.md'
