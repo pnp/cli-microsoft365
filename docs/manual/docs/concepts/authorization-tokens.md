@@ -25,6 +25,7 @@ Office 365 CLI gets access to Office 365 through a custom Azure AD application n
 When specifying a custom Azure AD application to be used by the Office 365 CLI, you can either choose to use one application for all Office 365 services or a separate application for each service. To use one Azure AD application for all Office 365 CLI commands, set the `OFFICE365CLI_AADAPPID` environment variable to the ID of your Azure AD application. If you want to use a different Azure AD application for each Office 365 service use the following environment variables:
 
 - `OFFICE365CLI_AADAADAPPID` - for the ID of the Azure AD application to communicate with Azure AD Graph
+- `OFFICE365CLI_AADAZMGMTAPPID` - for the ID of the Azure AD application to communicate with the Azure Management Service
 - `OFFICE365CLI_AADGRAPHAPPID` - for the ID of the Azure AD application to communicate with the Microsoft Graph
 - `OFFICE365CLI_AADSPOAPPID` - for the ID of the Azure AD application to communicate with SharePoint Online
 
@@ -42,6 +43,8 @@ Office 365 CLI requires the following permissions to Office 365 services:
     - Read and write identity providers
 - Windows Azure Active Directory
     - Access the directory as the signed-in user
+- Windows Azure Service Management API
+    - Access Azure Service Management as organization users
 
 !!! attention
     After changing the ID of the Azure AD application used by the Office 365 CLI refresh the existing connections to Office 365 using the corresponding `<service> connect` command. If you try to use the existing connection, Office 365 CLI will fail when trying to refresh the existing access token.

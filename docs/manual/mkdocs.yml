@@ -128,6 +128,12 @@ pages:
         - o365group set: 'cmd/graph/o365group/o365group-set.md'
       - siteclassification:
         - siteclassification get: 'cmd/graph/siteclassification/siteclassification-get.md'
+    - Azure Management Service (azmgmt):
+      - connect: 'cmd/azmgmt/connect.md'
+      - disconnect: 'cmd/azmgmt/disconnect.md'
+      - status: 'cmd/azmgmt/status.md'
+      - flow:
+        - flow environment list: 'cmd/azmgmt/flow/flow-environment-list.md'
     - Azure Active Directory Graph (aad):
       - connect: 'cmd/aad/connect.md'
       - disconnect: 'cmd/aad/disconnect.md'
