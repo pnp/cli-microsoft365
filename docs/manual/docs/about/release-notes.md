@@ -6,7 +6,11 @@
 
 **SharePoint Online:**
 
+- [spo file get](../cmd/spo/file/file-get.md) - gets information about the specified file [#282](https://github.com/SharePoint/office365-cli/issues/282)
+- [spo page add](../cmd/spo/page/page-add.md) - creates modern page [#361](https://github.com/SharePoint/office365-cli/issues/361)
 - [spo page list](../cmd/spo/page/page-list.md) - lists all modern pages in the given site [#359](https://github.com/SharePoint/office365-cli/issues/359)
+- [spo page set](../cmd/spo/page/page-set.md) - updates modern page properties [#362](https://github.com/SharePoint/office365-cli/issues/362)
+- [spo propertybag remove](../cmd/spo/propertybag/propertybag-remove.md) - removes specified property from the property bag [#291](https://github.com/SharePoint/office365-cli/issues/291)
 - [spo sitedesign apply](../cmd/spo/sitedesign/sitedesign-apply.md) - applies a site design to an existing site collection [#339](https://github.com/SharePoint/office365-cli/issues/339)
 - [spo theme get](../cmd/spo/theme/theme-get.md) - gets custom theme information [#349](https://github.com/SharePoint/office365-cli/issues/349)
 - [spo theme list](../cmd/spo/theme/theme-list.md) - retrieves the list of custom themes [#332](https://github.com/SharePoint/office365-cli/issues/332)
@@ -17,12 +21,17 @@
 
 - [graph o365group remove](../cmd/graph/o365group/o365group-remove.md) - removes an Office 365 Group [#309](https://github.com/SharePoint/office365-cli/issues/309)
 - [graph o365group restore](../cmd/graph/o365group/o365group-restore.md) - restores a deleted Office 365 Group [#346](https://github.com/SharePoint/office365-cli/issues/346)
+- [graph siteclassification get](../cmd/graph/siteclassification/siteclassification-get.md) - gets site classification configuration [#303](https://github.com/SharePoint/office365-cli/issues/303)
 
 ### Updated commands
 
 **Microsoft Graph:**
 
 - [graph o365group list](../cmd/graph/o365group/o365group-list.md) - added support for listing deleted Office 365 Groups [#347](https://github.com/SharePoint/office365-cli/issues/347)
+
+### Changes
+
+- fixed bug in retrieving Office 365 groups in immersive mode solving [#351](https://github.com/SharePoint/office365-cli/issues/351)
 
 ## [v1.0.0](https://github.com/SharePoint/office365-cli/releases/tag/v1.0.0)
 
