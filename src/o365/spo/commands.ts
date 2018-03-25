@@ -50,6 +50,7 @@ export default {
   PROPERTYBAG_GET: `${prefix} propertybag get`,
   PROPERTYBAG_LIST: `${prefix} propertybag list`,
   PROPERTYBAG_REMOVE: `${prefix} propertybag remove`,
+  PROPERTYBAG_SET: `${prefix} propertybag set`,
   SERVICEPRINCIPAL_GRANT_LIST: `${prefix} serviceprincipal grant list`,
   SERVICEPRINCIPAL_GRANT_REVOKE: `${prefix} serviceprincipal grant revoke`,
   SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE: `${prefix} serviceprincipal permissionrequest approve`,

@@ -417,7 +417,7 @@ Set-PnPListItemPermission|SharePointPnPPowerShellOnline|
 Set-PnPListPermission|SharePointPnPPowerShellOnline|
 Set-PnPMasterPage|SharePointPnPPowerShellOnline|
 Set-PnPMinimalDownloadStrategy|SharePointPnPPowerShellOnline|
-Set-PnPPropertyBagValue|SharePointPnPPowerShellOnline|
+Set-PnPPropertyBagValue|SharePointPnPPowerShellOnline|[spo propertybag set](../cmd/spo/propertybag/propertybag-set.md)
 Set-PnPProvisioningTemplateMetadata|SharePointPnPPowerShellOnline|
 Set-PnPRequestAccessEmails|SharePointPnPPowerShellOnline|
 Set-PnPSearchConfiguration|SharePointPnPPowerShellOnline|
