@@ -62,7 +62,7 @@ class SpoListItemAddCommand extends SpoCommand {
     let listRestUrl: string = (args.options.listId ? 
         `${args.options.webUrl}/_api/web/lists/(guid'${encodeURIComponent(args.options.listId || "")}')`
       : `${args.options.webUrl}/_api/web/lists/getByTitle('${encodeURIComponent(args.options.listTitle || "")}')`);
-    let contentTypeId: string = '';
+    let contentTypeName: string = '';
     let listRootFolder: string = '';
 
     if (this.debug) {
@@ -83,7 +83,7 @@ class SpoListItemAddCommand extends SpoCommand {
         }
         
         const requestOptions: any = {
-          url: `${listRestUrl}/contenttypes`,
+          url: `${listRestUrl}/contenttypes?$select=Name,Id`,
           method: 'GET',
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${siteAccessToken}`,
@@ -110,22 +110,37 @@ class SpoListItemAddCommand extends SpoCommand {
 
         if (response.value.length && response.value.length > 0) {
 
-          // Use first defined content type in list if no content type specified in arguments
-          if (!args.options.contentType) {
-            contentTypeId = response.value[0].Id.StringValue
+          if (args.options.contentType) {
+            let foundContentType = response.value.filter( (ct: any) => { 
+              let contentTypeMatch: boolean = (ct['Id'].StringValue === args.options.contentType || ct.Name === args.options.contentType)
+              if (this.debug) {
+                cmd.log(`Checking content type value [${ct.Name}]: ${contentTypeMatch}`);
+              }
+              return contentTypeMatch
+            });
             if (this.debug) {
-              cmd.log(`using list's first content type id: ... ${contentTypeId}`);
+              cmd.log('content type filter output...');
+              cmd.log(foundContentType);
             }
-          } else {
-            contentTypeId = response.value.filter( (ct: any) => { 
-              ct['Id'].StringValue == args.options.contentType
-              || ct['Name'] == args.options.contentType
-            }) || { Id: { StringValue: '' }}.Id.StringValue
+    
+            if (foundContentType.length > 0) {
+              contentTypeName = foundContentType[0].Name;
+            }
           }
+
+          // After checking for content types, throw an error if the name is blank
+          if (!contentTypeName || contentTypeName == '') {
+            return Promise.reject(`Specified content type [${args.options.contentType}] doesn't exist on the target list`);
+          }
+
+        } else {
+
+          return Promise.reject(`Problem loading content types from the target list`);
+
         }
 
         if (this.debug) {
-          cmd.log(`using content type id: ... ${contentTypeId}`);
+          cmd.log(`using content type name: ... ${contentTypeName}`);
         }
         
         if (args.options.folder) {
@@ -188,6 +203,13 @@ class SpoListItemAddCommand extends SpoCommand {
           requestBody["listItemCreateInfo"] = {"FolderPath": {"DecodedUrl":`${(listRootFolder + '/' + args.options.folder).replace(/\/\//gi, '/')}`} }
         }
 
+        if (args.options.contentType && contentTypeName != '') {
+          if (this.verbose) {
+            cmd.log(`Specifying content type name [${contentTypeName}] in request body`);
+          }
+          requestBody.formValues.push({FieldName: 'ContentType', FieldValue: contentTypeName});
+        }
+
         const requestOptions: any = {
           url: `${listRestUrl}/AddValidateUpdateItemUsingPath()`,
           method: 'POST',
@@ -202,6 +224,9 @@ class SpoListItemAddCommand extends SpoCommand {
         if (this.debug) {
           cmd.log('Executing web request...');
           cmd.log(requestOptions);
+          cmd.log('');
+          cmd.log('Body:');
+          cmd.log(requestBody);
           cmd.log('');
         }
 
