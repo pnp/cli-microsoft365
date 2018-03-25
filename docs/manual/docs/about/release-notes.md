@@ -16,12 +16,23 @@
 - [spo theme list](../cmd/spo/theme/theme-list.md) - retrieves the list of custom themes [#332](https://github.com/SharePoint/office365-cli/issues/332)
 - [spo theme remove](../cmd/spo/theme/theme-remove.md) - removes existing theme [#331](https://github.com/SharePoint/office365-cli/issues/331)
 - [spo theme set](../cmd/spo/theme/theme-set.md) - add or update a theme [#330](https://github.com/SharePoint/office365-cli/issues/330), [#340](https://github.com/SharePoint/office365-cli/issues/340)
+- [spo web get](../cmd/spo/web/web-get.md) - retrieve information about the specified site [#188](https://github.com/SharePoint/office365-cli/issues/330), [#340](https://github.com/SharePoint/office365-cli/issues/188)
 
 **Microsoft Graph:**
 
 - [graph o365group remove](../cmd/graph/o365group/o365group-remove.md) - removes an Office 365 Group [#309](https://github.com/SharePoint/office365-cli/issues/309)
 - [graph o365group restore](../cmd/graph/o365group/o365group-restore.md) - restores a deleted Office 365 Group [#346](https://github.com/SharePoint/office365-cli/issues/346)
 - [graph siteclassification get](../cmd/graph/siteclassification/siteclassification-get.md) - gets site classification configuration [#303](https://github.com/SharePoint/office365-cli/issues/303)
+
+**Azure Management Service:**
+
+- [azmgmt connect](../cmd/azmgmt/connect.md) - connects to the Azure Management Service [#378](https://github.com/SharePoint/office365-cli/issues/378)
+- [azmgmt disconnect](../cmd/azmgmt/disconnect.md) - disconnects from the Azure Management Service [#378](https://github.com/SharePoint/office365-cli/issues/378)
+- [azmgmt status](../cmd/azmgmt/status.md) - shows Azure Management Service connection status [#378](https://github.com/SharePoint/office365-cli/issues/378)
+- [azmgmt flow environment get](../cmd/azmgmt/flow/flow-environment-get.md) - gets information about the specified Microsoft Flow environment [#380](https://github.com/SharePoint/office365-cli/issues/380)
+- [azmgmt flow environment list](../cmd/azmgmt/flow/flow-environment-list.md) - lists Microsoft Flow environments in the current tenant [#379](https://github.com/SharePoint/office365-cli/issues/379)
+- [azmgmt flow get](../cmd/azmgmt/flow/flow-get.md) - gets information about the specified Microsoft Flow [#382](https://github.com/SharePoint/office365-cli/issues/382)
+- [azmgmt flow list](../cmd/azmgmt/flow/flow-list.md) - lists Microsoft Flows in the given environment [#381](https://github.com/SharePoint/office365-cli/issues/381)
 
 ### Updated commands
 
