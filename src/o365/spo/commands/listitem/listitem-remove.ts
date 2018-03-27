@@ -9,7 +9,7 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
-import Auth from '../../../../Auth';
+import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -111,7 +111,7 @@ class SpoListItemRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to ${args.options.recycle? "recycle": "remove"} the list item ${args.options.id} from list ${args.options.listId || args.options.listTitle} located in site ${args.options.webUrl}?`,
+        message: `Are you sure you want to ${args.options.recycle ? "recycle" : "remove"} the list item ${args.options.id} from list ${args.options.listId || args.options.listTitle} located in site ${args.options.webUrl}?`,
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();
@@ -186,7 +186,7 @@ class SpoListItemRemoveCommand extends SpoCommand {
 
       if (!args.options.listId && !args.options.listTitle) {
         return 'Specify id or title';
-      }      
+      }
 
       return true;
     };

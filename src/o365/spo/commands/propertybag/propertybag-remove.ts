@@ -8,7 +8,7 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
-import Auth from '../../../../Auth';
+import { Auth } from '../../../../Auth';
 import { SpoPropertyBagBaseCommand, IdentityResponse } from './propertybag-base';
 import GlobalOptions from '../../../../GlobalOptions';
 import Utils from '../../../../Utils';

@@ -1,5 +1,5 @@
 import commands from '../commands';
-import Command, { CommandCancel, CommandError } from '../../../Command';
+import Command, { CommandCancel, CommandError, CommandOption, CommandValidate } from '../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
 import auth from '../GraphAuth';
@@ -7,7 +7,7 @@ const command: Command = require('./connect');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import Utils from '../../../Utils';
-import { Service } from '../../../Auth';
+import { Service, AuthType } from '../../../Auth';
 
 describe(commands.CONNECT, () => {
   let vorpal: Vorpal;
@@ -42,7 +42,10 @@ describe(commands.CONNECT, () => {
   });
 
   afterEach(() => {
-    Utils.restore(vorpal.find);
+    Utils.restore([
+      vorpal.find,
+      auth.cancel
+    ]);
   });
 
   after(() => {
@@ -118,24 +121,93 @@ describe(commands.CONNECT, () => {
     });
   });
 
+  it('connects to MS Graph using username and password when authType password set', (done) => {
+    auth.service = new Service('https://graph.microsoft.com');
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, authType: 'password', userName: 'user', password: 'password' } }, () => {
+      try {
+        assert.equal(auth.service.authType, AuthType.Password, 'Incorrect authType set');
+        assert.equal(auth.service.userName, 'user', 'Incorrect user name set');
+        assert.equal(auth.service.password, 'password', 'Incorrect password set');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('can be cancelled', () => {
     assert(command.cancel());
   });
 
   it('clears pending connection on cancel', () => {
-    auth.interval = {} as any;
-    Utils.restore(global.clearInterval);
-    const clearIntervalSpy = sinon.spy(global, 'clearInterval');
+    const authCancelStub = sinon.stub(auth, 'cancel').callsFake(() => {});
     (command.cancel() as CommandCancel)();
-    assert(clearIntervalSpy.called);
+    assert(authCancelStub.called);
   });
 
-  it('doesn\'t fail when no cancelled and no connection was pending', () => {
-    auth.interval = undefined as any;
-    Utils.restore(global.clearInterval);
-    const clearIntervalSpy = sinon.spy(global, 'clearInterval');
-    (command.cancel() as CommandCancel)();
-    assert.equal(clearIntervalSpy.called, false);
+  it('supports specifying authType', () => {
+    const options = (command.options() as CommandOption[]);
+    let containsOption = false;
+    options.forEach(o => {
+      if (o.option.indexOf('--authType') > -1) {
+        containsOption = true;
+      }
+    });
+    assert(containsOption);
+  });
+
+  it('supports specifying userName', () => {
+    const options = (command.options() as CommandOption[]);
+    let containsOption = false;
+    options.forEach(o => {
+      if (o.option.indexOf('--userName') > -1) {
+        containsOption = true;
+      }
+    });
+    assert(containsOption);
+  });
+
+  it('supports specifying password', () => {
+    const options = (command.options() as CommandOption[]);
+    let containsOption = false;
+    options.forEach(o => {
+      if (o.option.indexOf('--password') > -1) {
+        containsOption = true;
+      }
+    });
+    assert(containsOption);
+  });
+
+  it('fails validation if authType is set to password and userName and password not specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { authType: 'password' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation if authType is set to password and userName not specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { authType: 'password', password: 'password' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation if authType is set to password and password not specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { authType: 'password', userName: 'user' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('passes validation if authType is set to password and userName and password specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { authType: 'password', userName: 'user', password: 'password' } });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation if authType is set to deviceCode and userName and password not specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { authType: 'deviceCode' } });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation if authType is not set and userName and password not specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { } });
+    assert.equal(actual, true);
   });
 
   it('has help referring to the right command', () => {
@@ -174,7 +246,7 @@ describe(commands.CONNECT, () => {
 
   it('correctly handles lack of valid access token when connecting to MS Graph', (done) => {
     Utils.restore(auth.ensureAccessToken);
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject('Error getting access token'); });
     auth.service = new Service('https://graph.microsoft.com');
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false } }, () => {
@@ -190,12 +262,31 @@ describe(commands.CONNECT, () => {
 
   it('correctly handles lack of valid access token when connecting to MS Graph (debug)', (done) => {
     Utils.restore(auth.ensureAccessToken);
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject('Error getting access token'); });
     auth.service = new Service('https://graph.microsoft.com');
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(auth.ensureAccessToken);
+      }
+    });
+  });
+
+  it('ignores the error raised by cancelling device code auth flow', (done) => {
+    Utils.restore(auth.ensureAccessToken);
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject('Polling_Request_Cancelled'); });
+    auth.service = new Service('https://graph.microsoft.com');
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: {} }, () => {
+      try {
+        assert(cmdInstanceLogSpy.notCalled);
         done();
       }
       catch (e) {

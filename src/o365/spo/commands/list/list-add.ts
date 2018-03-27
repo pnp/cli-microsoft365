@@ -11,7 +11,7 @@ import {
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import { ListInstance } from "./ListInstance";
-import Auth from '../../../../Auth';
+import { Auth } from '../../../../Auth';
 import { ListTemplateType } from './ListTemplateType';
 import { DraftVisibilityType } from './DraftVisibilityType';
 import { ListExperience } from './ListExperience';
@@ -202,14 +202,14 @@ class SpoListAddCommand extends SpoCommand {
       'sendToLocationName',
       'sendToLocationUrl',
       'validationFormula',
-      'validationMessage' 
+      'validationMessage'
     ].forEach(o => {
       const value: any = (args.options as any)[o];
       if (value) {
         telemetryProps[o] = (typeof value !== 'undefined').toString();
       }
     });
-    
+
     // add boolean values
     SpoListAddCommand.booleanOptions.forEach(o => {
       const value: any = (args.options as any)[o];
