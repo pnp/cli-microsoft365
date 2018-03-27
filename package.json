@@ -52,6 +52,7 @@
     "van Hunen, Erwin <erwin.van.hunen@outlook.com>"
   ],
   "dependencies": {
+    "adal-node": "^0.1.28",
     "applicationinsights": "^1.0.1",
     "easy-table": "^1.1.1",
     "omelette": "^0.4.5",

@@ -1,5 +1,5 @@
 import auth from '../../SpoAuth';
-import Auth from '../../../../Auth';
+import { Auth } from '../../../../Auth';
 import config from '../../../../config';
 import * as request from 'request-promise-native';
 import commands from '../../commands';

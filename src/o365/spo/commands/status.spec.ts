@@ -280,20 +280,18 @@ describe(commands.STATUS, () => {
 
   it('correctly reports expiration time', (done) => {
     const date: Date = new Date();
-    const expiresAtDate: Date = new Date(0);
-    expiresAtDate.setUTCSeconds(date.getUTCSeconds());
 
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com/sites/team';
-    auth.service.expiresAt = date.getUTCSeconds();
+    auth.service.expiresOn = date.toISOString();
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
       let reportsCorrectValue: boolean = false;
       log.forEach(l => {
         if (l &&
           l.expiresAt &&
-          l.expiresAt.toString() === expiresAtDate.toString()) {
+          l.expiresAt === date.toISOString()) {
           reportsCorrectValue = true;
         }
       });
