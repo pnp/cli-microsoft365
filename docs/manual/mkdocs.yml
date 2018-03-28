@@ -41,6 +41,7 @@ pages:
       - file:
         - file get: 'cmd/spo/file/file-get.md'
         - file list: 'cmd/spo/file/file-list.md'
+        - file remove: 'cmd/spo/file/file-remove.md'
       - hubsite:
         - hubsite connect: 'cmd/spo/hubsite/hubsite-connect.md'
         - hubsite disconnect: 'cmd/spo/hubsite/hubsite-disconnect.md'

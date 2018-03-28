@@ -345,7 +345,7 @@ Remove-PnPCustomAction|SharePointPnPPowerShellOnline|[spo customaction remove](.
 Remove-PnPEventReceiver|SharePointPnPPowerShellOnline|
 Remove-PnPField|SharePointPnPPowerShellOnline|
 Remove-PnPFieldFromContentType|SharePointPnPPowerShellOnline|
-Remove-PnPFile|SharePointPnPPowerShellOnline|
+Remove-PnPFile|SharePointPnPPowerShellOnline|[spo file remove](../cmd/spo/file/file-remove.md)
 Remove-PnPFileFromProvisioningTemplate|SharePointPnPPowerShellOnline|
 Remove-PnPFolder|SharePointPnPPowerShellOnline|
 Remove-PnPGroup|SharePointPnPPowerShellOnline|

@@ -28,6 +28,7 @@ export default {
   EXTERNALUSER_LIST: `${prefix} externaluser list`,
   FILE_GET: `${prefix} file get`,
   FILE_LIST: `${prefix} file list`,
+  FILE_REMOVE: `${prefix} file remove`,
   HUBSITE_CONNECT: `${prefix} hubsite connect`,
   HUBSITE_DISCONNECT: `${prefix} hubsite disconnect`,
   HUBSITE_GET: `${prefix} hubsite get`,
