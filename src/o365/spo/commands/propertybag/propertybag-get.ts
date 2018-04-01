@@ -8,7 +8,7 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import { ContextInfo } from '../../spo';
-import Auth from '../../../../Auth';
+import { Auth } from '../../../../Auth';
 import { SpoPropertyBagBaseCommand, IdentityResponse, Property } from './propertybag-base';
 import GlobalOptions from '../../../../GlobalOptions';
 
@@ -184,7 +184,7 @@ class SpoPropertyBagGetCommand extends SpoPropertyBagBaseCommand {
         return formattedProperty;
       }
     }
-    
+
     return null;
   }
 }

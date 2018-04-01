@@ -16,7 +16,7 @@
 - [spo theme list](../cmd/spo/theme/theme-list.md) - retrieves the list of custom themes [#332](https://github.com/SharePoint/office365-cli/issues/332)
 - [spo theme remove](../cmd/spo/theme/theme-remove.md) - removes existing theme [#331](https://github.com/SharePoint/office365-cli/issues/331)
 - [spo theme set](../cmd/spo/theme/theme-set.md) - add or update a theme [#330](https://github.com/SharePoint/office365-cli/issues/330), [#340](https://github.com/SharePoint/office365-cli/issues/340)
-- [spo web get](../cmd/spo/web/web-get.md) - retrieve information about the specified site [#188](https://github.com/SharePoint/office365-cli/issues/330), [#340](https://github.com/SharePoint/office365-cli/issues/188)
+- [spo web get](../cmd/spo/web/web-get.md) - retrieve information about the specified site [#188](https://github.com/SharePoint/office365-cli/issues/188)
 
 **Microsoft Graph:**
 

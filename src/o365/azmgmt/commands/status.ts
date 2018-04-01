@@ -5,6 +5,7 @@ import Command, {
   CommandError
 } from '../../../Command';
 import Utils from '../../../Utils';
+import { AuthType } from '../../../Auth';
 
 const vorpal: Vorpal = require('../../../vorpal-init');
 
@@ -23,15 +24,13 @@ class AzmgmtStatusCommand extends Command {
       .then((): void => {
         if (auth.service.connected) {
           if (this.debug) {
-            const expiresAtDate: Date = new Date(0);
-            expiresAtDate.setUTCSeconds(auth.service.expiresAt);
-
             cmd.log({
               connectedAs: Utils.getUserNameFromAccessToken(auth.service.accessToken),
+              authType: AuthType[auth.service.authType],
               aadResource: auth.service.resource,
               accessToken: auth.service.accessToken,
               refreshToken: auth.service.refreshToken,
-              expiresAt: expiresAtDate
+              expiresAt: auth.service.expiresOn
             });
           }
           else {

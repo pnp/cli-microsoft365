@@ -2,12 +2,13 @@ import * as sinon from 'sinon';
 import * as assert from 'assert';
 import { fail } from 'assert';
 import auth, { Site } from './SpoAuth';
-import Auth from '../../Auth';
+import { Auth } from '../../Auth';
 import Utils from '../../Utils';
 import { CommandError } from '../../Command';
 
 describe('SpoAuth', () => {
   it('restores all persisted connection properties', (done) => {
+    const now = new Date();
     const persistedSite = {
       tenantId: 'tid',
       url: 'https://contoso-admin.sharepoint.com',
@@ -15,12 +16,12 @@ describe('SpoAuth', () => {
       accessTokens: {
         'SPO': {
           accessToken: 'abc',
-          expiresAt: 123
+          expiresOn: now.toISOString()
         }
       },
       connected: true,
       resource: 'https://contoso-admin.sharepoint.com',
-      expiresAt: 123,
+      expiresOn: now.toISOString(),
       refreshToken: 'def'
     };
     auth.site = new Site();
@@ -35,7 +36,7 @@ describe('SpoAuth', () => {
           assert.equal(auth.site.accessTokens, persistedSite.accessTokens);
           assert.equal(auth.site.connected, persistedSite.connected);
           assert.equal(auth.site.resource, persistedSite.resource);
-          assert.equal(auth.site.expiresAt, persistedSite.expiresAt);
+          assert.equal(auth.site.expiresOn, persistedSite.expiresOn);
           assert.equal(auth.site.refreshToken, persistedSite.refreshToken);
           done();
         }
@@ -100,10 +101,12 @@ describe('SpoAuth', () => {
     const stdout = {
       log: (msg: string) => { }
     };
+    const expiresOn = new Date();
+    expiresOn.setSeconds(expiresOn.getSeconds() + 1);
     auth.site = new Site();
     auth.site.accessTokens['https://contoso.sharepoint.com'] = {
       accessToken: 'ABC',
-      expiresAt: (new Date().getTime() / 1000) + 60
+      expiresOn: expiresOn.toISOString()
     };
     const authEnsureAccessTokenSpy = sinon.spy(Auth.prototype, 'ensureAccessToken');
     auth
@@ -127,10 +130,12 @@ describe('SpoAuth', () => {
     const stdout = {
       log: (msg: string) => { }
     };
+    const expiresOn = new Date();
+    expiresOn.setSeconds(expiresOn.getSeconds() - 1);
     auth.site = new Site();
     auth.site.accessTokens['https://contoso.sharepoint.com'] = {
       accessToken: 'ABC',
-      expiresAt: (new Date().getTime() / 1000) - 60
+      expiresOn: expiresOn.toISOString()
     };
     sinon.stub(Auth.prototype, 'ensureAccessToken').callsFake(() => Promise.resolve('DEF'));
     sinon.stub(auth as any, 'setServiceConnectionInfo').callsFake(() => Promise.resolve());
@@ -298,10 +303,12 @@ describe('SpoAuth', () => {
     const stdout = {
       log: (msg: string) => { }
     };
+    const expiresOn = new Date();
+    expiresOn.setSeconds(expiresOn.getSeconds() + 1);
     auth.site = new Site();
     auth.site.accessTokens['https://contoso.sharepoint.com'] = {
       accessToken: 'ABC',
-      expiresAt: (new Date().getTime() / 1000) + 60
+      expiresOn: expiresOn.toISOString()
     };
     const authGetAccessTokenSpy = sinon.spy(Auth.prototype, 'getAccessToken');
     auth
@@ -325,10 +332,12 @@ describe('SpoAuth', () => {
     const stdout = {
       log: (msg: string) => { }
     };
+    const expiresOn = new Date();
+    expiresOn.setSeconds(expiresOn.getSeconds() - 1);
     auth.site = new Site();
     auth.site.accessTokens['https://contoso.sharepoint.com'] = {
       accessToken: 'ABC',
-      expiresAt: (new Date().getTime() / 1000) - 60
+      expiresOn: expiresOn.toISOString()
     };
     sinon.stub(Auth.prototype, 'getAccessToken').callsFake(() => Promise.resolve('DEF'));
     sinon.stub(auth as any, 'setServiceConnectionInfo').callsFake(() => Promise.resolve());

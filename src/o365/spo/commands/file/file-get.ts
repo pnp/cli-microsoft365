@@ -9,7 +9,7 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
-import Auth from '../../../../Auth';
+import { Auth } from '../../../../Auth';
 import * as fs from 'fs';
 import * as path from 'path';
 import { FileProperties } from './FileProperties';

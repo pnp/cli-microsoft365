@@ -9,7 +9,7 @@ import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import { ContextInfo } from '../../spo';
 import GlobalOptions from '../../../../GlobalOptions';
-import Auth from '../../../../Auth';
+import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 

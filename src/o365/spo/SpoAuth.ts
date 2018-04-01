@@ -1,6 +1,6 @@
-import Auth, { Service, Logger } from '../../Auth';
+import { Auth, Logger, Service } from "../../Auth";
 import { CommandError } from '../../Command';
-import config from '../../config';
+import config from "../../config";
 
 interface Hash {
   [indexer: string]: Token;
@@ -8,7 +8,7 @@ interface Hash {
 
 interface Token {
   accessToken: string;
-  expiresAt: number;
+  expiresOn: string;
 }
 
 export class Site extends Service {
@@ -30,16 +30,18 @@ export class Site extends Service {
 }
 
 class SpoAuth extends Auth {
-  private SERVICE: string = 'SPO';
-
   constructor(public site: Site, appId: string) {
     super(site, appId);
+  }
+
+  protected serviceId(): string {
+    return 'SPO';
   }
 
   public restoreAuth(): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       this
-        .getServiceConnectionInfo<Site>(this.SERVICE)
+        .getServiceConnectionInfo<Site>(this.serviceId())
         .then((site: Site): void => {
           const s: Site = new Site();
           for (let k in site) {
@@ -56,11 +58,14 @@ class SpoAuth extends Auth {
 
   public ensureAccessToken(resource: string, stdout: Logger, debug: boolean = false): Promise<string> {
     return new Promise<string>((resolve: (accessToken: string) => void, reject: (error: any) => void): void => {
-      const now: number = new Date().getTime() / 1000;
+      const now: Date = new Date();
       const token: Token | undefined = this.site.accessTokens[resource];
-      if (token && token.expiresAt > now) {
-        resolve(this.site.accessTokens[resource].accessToken);
-        return;
+      if (token) {
+        const tokenExpiresOn: Date = new Date(token.expiresOn);
+        if (tokenExpiresOn > now) {
+          resolve(this.site.accessTokens[resource].accessToken);
+          return;
+        }
       }
 
       super
@@ -68,10 +73,10 @@ class SpoAuth extends Auth {
         .then((accessToken: string): void => {
           this.site.accessTokens[resource] = {
             accessToken: accessToken,
-            expiresAt: new Date().getTime() / 1000
+            expiresOn: new Date().toISOString()
           };
           this
-            .setServiceConnectionInfo(this.SERVICE, this.site)
+            .setServiceConnectionInfo(this.serviceId(), this.site)
             .then((): void => {
               resolve(accessToken);
             }, (error: any): void => {
@@ -88,11 +93,14 @@ class SpoAuth extends Auth {
 
   public getAccessToken(resource: string, refreshToken: string, stdout: Logger, debug: boolean = false): Promise<string> {
     return new Promise<string>((resolve: (accessToken: string) => void, reject: (error: any) => void): void => {
-      const now: number = new Date().getTime() / 1000;
+      const now: Date = new Date();
       const token: Token | undefined = this.site.accessTokens[resource];
-      if (token && token.expiresAt > now) {
-        resolve(this.site.accessTokens[resource].accessToken);
-        return;
+      if (token) {
+        const tokenExpiresOn: Date = new Date(token.expiresOn);
+        if (tokenExpiresOn > now) {
+          resolve(this.site.accessTokens[resource].accessToken);
+          return;
+        }
       }
 
       super
@@ -100,10 +108,10 @@ class SpoAuth extends Auth {
         .then((accessToken: string): void => {
           this.site.accessTokens[resource] = {
             accessToken: accessToken,
-            expiresAt: new Date().getTime() / 1000
+            expiresOn: new Date().toISOString()
           };
           this
-            .setServiceConnectionInfo(this.SERVICE, this.site)
+            .setServiceConnectionInfo(this.serviceId(), this.site)
             .then((): void => {
               resolve(accessToken);
             }, (error: any): void => {
@@ -119,11 +127,11 @@ class SpoAuth extends Auth {
   }
 
   public storeSiteConnectionInfo(): Promise<void> {
-    return this.setServiceConnectionInfo(this.SERVICE, this.site);
+    return this.setServiceConnectionInfo(this.serviceId(), this.site);
   }
 
   public clearSiteConnectionInfo(): Promise<void> {
-    return this.clearServiceConnectionInfo(this.SERVICE);
+    return this.clearServiceConnectionInfo(this.serviceId());
   }
 }
 

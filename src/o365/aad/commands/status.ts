@@ -5,6 +5,7 @@ import Command, {
   CommandError
 } from '../../../Command';
 import Utils from '../../../Utils';
+import { AuthType } from '../../../Auth';
 
 const vorpal: Vorpal = require('../../../vorpal-init');
 
@@ -23,15 +24,13 @@ class AadStatusCommand extends Command {
       .then((): void => {
         if (auth.service.connected) {
           if (this.debug) {
-            const expiresAtDate: Date = new Date(0);
-            expiresAtDate.setUTCSeconds(auth.service.expiresAt);
-
             cmd.log({
               connectedAs: Utils.getUserNameFromAccessToken(auth.service.accessToken),
+              authType: AuthType[auth.service.authType],
               aadResource: auth.service.resource,
               accessToken: auth.service.accessToken,
               refreshToken: auth.service.refreshToken,
-              expiresAt: expiresAtDate
+              expiresAt: auth.service.expiresOn
             });
           }
           else {
@@ -63,8 +62,10 @@ class AadStatusCommand extends Command {
       `  Remarks:
 
     If you are connected to Azure Active Directory Graph, the ${chalk.blue(commands.STATUS)} command
-    will show you information about the currently stored refresh and access token and the
-    expiration date and time of the access token when run in debug mode.
+    will show you information about the currently stored refresh and access
+    token and the expiration date and time of the access token when run in debug
+    mode. If you are connected using a user name and password, it will also show
+    you the name of the user used to authenticate.
 
   Examples:
   
