@@ -96,5 +96,6 @@ export default {
   WEB_ADD: `${prefix} web add`,
   WEB_GET: `${prefix} web get`,
   WEB_REMOVE: `${prefix} web remove`,
-  WEB_LIST: `${prefix} web list`
+  WEB_LIST: `${prefix} web list`,
+  LISTITEM_REMOVE: `${prefix} listitem remove`,
 };

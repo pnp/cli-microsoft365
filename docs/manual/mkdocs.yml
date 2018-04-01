@@ -61,6 +61,8 @@ pages:
         - page add: 'cmd/spo/page/page-add.md'
         - page list: 'cmd/spo/page/page-list.md'
         - page set: 'cmd/spo/page/page-set.md'
+      - listitem:
+        - listitem remove: 'cmd/spo/listitem/listitem-remove.md'
       - propertybag:
         - propertybag get: 'cmd/spo/propertybag/propertybag-get.md'
         - propertybag list: 'cmd/spo/propertybag/propertybag-list.md'
