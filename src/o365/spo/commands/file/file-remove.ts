@@ -54,8 +54,14 @@ class SpoFileRemoveCommand extends SpoCommand {
         cmd.log(`Retrieving access token for ${resource}...`);
       }
 
-      const serverRelativeSiteUrl: string = args.options.webUrl.substr(args.options.webUrl.indexOf('/', 8));
-
+      // concatenate trailing '/' if not provided
+      // so if the provided url is for the root site, the substr bellow will get the right value
+      let serverRelativeSiteUrl: string = args.options.webUrl;
+      if (serverRelativeSiteUrl[serverRelativeSiteUrl.length-1] !== '/') {
+        serverRelativeSiteUrl = `${serverRelativeSiteUrl}/`;
+      } 
+      serverRelativeSiteUrl = serverRelativeSiteUrl.substr(serverRelativeSiteUrl.indexOf('/', 8));
+      
       auth
         .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
         .then((accessToken: string): request.RequestPromise => {
@@ -71,7 +77,11 @@ class SpoFileRemoveCommand extends SpoCommand {
             requestUrl = `${args.options.webUrl}/_api/web/GetFileById(guid'${encodeURIComponent(args.options.id as string)}')`;
           }
           else {
-            requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${serverRelativeSiteUrl}/${encodeURIComponent(args.options.url as string)}')`;
+            let fileUrl = args.options.url as string;
+            if (!fileUrl.startsWith(serverRelativeSiteUrl)) {
+              fileUrl = `${serverRelativeSiteUrl}${fileUrl}`
+            }
+            requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${encodeURIComponent(fileUrl)}')`;
           }
 
           if (args.options.recycle) {

@@ -219,6 +219,508 @@ describe(commands.FILE_REMOVE, () => {
     });
   });
 
+  it('removes the file when webUrl does not includes a trailing /', (done) => {
+    const siteUrl: string = 'https://contoso.sharepoint.com';
+    const fileUrl: string = 'SharedDocuments/Document.docx';
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+
+      console.log(opts.url);
+
+      if (opts.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/'+fileUrl)}')`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve();
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
+    cmdInstance.action({ options: { debug: false, webUrl: siteUrl, url: fileUrl } }, () => {
+      let correctRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/'+fileUrl)}')`) > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.headers.accept &&
+          r.headers.accept.indexOf('application/json') === 0) {
+          correctRequestIssued = true;
+        }
+      });
+      try {
+        assert(correctRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('removes the file when webUrl includes a trailing /', (done) => {
+    const siteUrl: string = 'https://contoso.sharepoint.com/';
+    const fileUrl: string = 'SharedDocuments/Document.docx';
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+
+      if (opts.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/'+fileUrl)}')`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve();
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
+    cmdInstance.action({ options: { debug: false, webUrl: siteUrl, url: fileUrl } }, () => {
+      let correctRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/'+fileUrl)}')`) > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.headers.accept &&
+          r.headers.accept.indexOf('application/json') === 0) {
+          correctRequestIssued = true;
+        }
+      });
+      try {
+        assert(correctRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('removes the file when webUrl does not includes a trailing / and fileUrl is server relative', (done) => {
+    const siteUrl: string = 'https://contoso.sharepoint.com';
+    const fileUrl: string = '/SharedDocuments/Document.docx';
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+
+      if (opts.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent(fileUrl)}')`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve();
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
+    cmdInstance.action({ options: { debug: false, webUrl: siteUrl, url: fileUrl } }, () => {
+      let correctRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent(fileUrl)}')`) > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.headers.accept &&
+          r.headers.accept.indexOf('application/json') === 0) {
+          correctRequestIssued = true;
+        }
+      });
+      try {
+        assert(correctRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('removes the file when webUrl includes a trailing / and fileUrl is server relative', (done) => {
+    const siteUrl: string = 'https://contoso.sharepoint.com/';
+    const fileUrl: string = '/SharedDocuments/Document.docx';
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+
+      if (opts.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent(fileUrl)}')`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve();
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
+    cmdInstance.action({ options: { debug: false, webUrl: siteUrl, url: fileUrl } }, () => {
+      let correctRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent(fileUrl)}')`) > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.headers.accept &&
+          r.headers.accept.indexOf('application/json') === 0) {
+          correctRequestIssued = true;
+        }
+      });
+      try {
+        assert(correctRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('removes the file when webUrl (subsite) does not includes a trailing / ', (done) => {
+    const siteUrl: string = 'https://contoso.sharepoint.com/sites/subsite';
+    const fileUrl: string = 'SharedDocuments/Document.docx';
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+
+      if (opts.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/sites/subsite/'+fileUrl)}')`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve();
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
+    cmdInstance.action({ options: { debug: false, webUrl: siteUrl, url: fileUrl } }, () => {
+      let correctRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/sites/subsite/'+fileUrl)}')`) > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.headers.accept &&
+          r.headers.accept.indexOf('application/json') === 0) {
+          correctRequestIssued = true;
+        }
+      });
+      try {
+        assert(correctRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('removes the file when webUrl (subsite) includes a trailing /', (done) => {
+    const siteUrl: string = 'https://contoso.sharepoint.com/sites/subsite/';
+    const fileUrl: string = 'SharedDocuments/Document.docx';
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+
+      if (opts.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/sites/subsite/'+fileUrl)}')`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve();
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
+    cmdInstance.action({ options: { debug: false, webUrl: siteUrl, url: fileUrl } }, () => {
+      let correctRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/sites/subsite/'+fileUrl)}')`) > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.headers.accept &&
+          r.headers.accept.indexOf('application/json') === 0) {
+          correctRequestIssued = true;
+        }
+      });
+      try {
+        assert(correctRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('removes the file when webUrl (subsite) does not includes a trailing / and fileUrl is server relative', (done) => {
+    const siteUrl: string = 'https://contoso.sharepoint.com/sites/subsite';
+    const fileUrl: string = '/sites/subsite/SharedDocuments/Document.docx';
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+
+      if (opts.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent(fileUrl)}')`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve();
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
+    cmdInstance.action({ options: { debug: false, webUrl: siteUrl, url: fileUrl } }, () => {
+      let correctRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent(fileUrl)}')`) > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.headers.accept &&
+          r.headers.accept.indexOf('application/json') === 0) {
+          correctRequestIssued = true;
+        }
+      });
+      try {
+        assert(correctRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('removes the file when webUrl (subsite) includes a trailing / and fileUrl is server relative', (done) => {
+    const siteUrl: string = 'https://contoso.sharepoint.com/sites/subsite/';
+    const fileUrl: string = '/sites/subsite/SharedDocuments/Document.docx';
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+
+      if (opts.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent(fileUrl)}')`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve();
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
+    cmdInstance.action({ options: { debug: false, webUrl: siteUrl, url: fileUrl } }, () => {
+      let correctRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent(fileUrl)}')`) > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.headers.accept &&
+          r.headers.accept.indexOf('application/json') === 0) {
+          correctRequestIssued = true;
+        }
+      });
+      try {
+        assert(correctRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('removes the file when webUrl (subsite) does not includes a trailing / and fileUrl is site relative', (done) => {
+    const siteUrl: string = 'https://contoso.sharepoint.com/sites/subsite';
+    const fileUrl: string = 'SharedDocuments/Document.docx';
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+
+      if (opts.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/sites/subsite/'+fileUrl)}')`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve();
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
+    cmdInstance.action({ options: { debug: false, webUrl: siteUrl, url: fileUrl } }, () => {
+      let correctRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/sites/subsite/'+fileUrl)}')`) > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.headers.accept &&
+          r.headers.accept.indexOf('application/json') === 0) {
+          correctRequestIssued = true;
+        }
+      });
+      try {
+        assert(correctRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('removes the file when webUrl (subsite) includes a trailing / and fileUrl is site relative', (done) => {
+    const siteUrl: string = 'https://contoso.sharepoint.com/sites/subsite/';
+    const fileUrl: string = 'SharedDocuments/Document.docx';
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+
+      if (opts.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/sites/subsite/'+fileUrl)}')`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve();
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
+    cmdInstance.action({ options: { debug: false, webUrl: siteUrl, url: fileUrl } }, () => {
+      let correctRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/sites/subsite/'+fileUrl)}')`) > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.headers.accept &&
+          r.headers.accept.indexOf('application/json') === 0) {
+          correctRequestIssued = true;
+        }
+      });
+      try {
+        assert(correctRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+      }
+    });
+  });
+
   it('recycles the file when prompt confirmed (id)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
