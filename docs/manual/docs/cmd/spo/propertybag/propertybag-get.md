@@ -15,7 +15,7 @@ Option|Description
 `--help`|output usage information
 `-u, --webUrl <webUrl>`|The URL of the site from which the property bag value should be retrieved
 `-k, --key <key>`|Key of the property for which the value should be retrieved. Case-sensitive
-`-f, --folder [folder]`|Server- or site-relative URL of the folder from which to retrieve property bag value. Case-sensitive
+`-f, --folder [folder]`|Site-relative URL of the folder from which to retrieve property bag value. Case-sensitive
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
