@@ -183,7 +183,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
     });
   });
 
-  it('should property be removed successfully without prompting with confirmation argument', (done) => {
+  it('should remove property without prompting with confirmation argument', (done) => {
     stubAllPostRequests();
 
     auth.site = new Site();
@@ -209,7 +209,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
     });
   });
 
-  it('should user custom action removed successfully (verbose) without prompting with confirmation argument', (done) => {
+  it('should property be removed successfully (verbose) without prompting with confirmation argument', (done) => {
     stubAllPostRequests();
 
     auth.site = new Site();
@@ -235,7 +235,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
     });
   });
 
-  it('should prompt before removing custom action when confirmation argument not passed', (done) => {
+  it('should prompt before removing property when confirmation argument not passed', (done) => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
@@ -263,7 +263,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
     });
   });
 
-  it('should abort custom action remove when prompt not confirmed', (done) => {
+  it('should abort property remove when prompt not confirmed', (done) => {
     const postCallsSpy: sinon.SinonStub = stubAllPostRequests();
 
     auth.site = new Site();
@@ -289,7 +289,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
     });
   });
 
-  it('should remove custom action when prompt confirmed', (done) => {
+  it('should remove property when prompt confirmed', (done) => {
     const postCallsSpy: sinon.SinonStub = stubAllPostRequests();
     const removePropertySpy = sinon.spy((command as any), 'removeProperty');
 
