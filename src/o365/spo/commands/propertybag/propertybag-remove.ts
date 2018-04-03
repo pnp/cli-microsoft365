@@ -171,7 +171,7 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
       },
       {
         option: '-f, --folder [folder]',
-        description: 'Server- or site-relative URL of the folder from which to remove the property bag value',
+        description: 'Site-relative URL of the folder from which to remove the property bag value',
       },
       {
         option: '--confirm',
@@ -222,7 +222,7 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
       ${chalk.grey(config.delimiter)} ${commands.PROPERTYBAG_REMOVE} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder '/Shared Documents'
     
     Removes property bag value located in folder in site document library ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.PROPERTYBAG_REMOVE} --webUrl https://contoso.sharepoint.com/sites/test --k key1 --folder '/Shared Documents/MyFolder'
+      ${chalk.grey(config.delimiter)} ${commands.PROPERTYBAG_REMOVE} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder '/Shared Documents/MyFolder'
 
     Removes the value of the ${chalk.grey('key1')} property from the property bag located in site list ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
       ${chalk.grey(config.delimiter)} ${commands.PROPERTYBAG_REMOVE} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder /Lists/MyList

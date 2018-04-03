@@ -15,7 +15,7 @@ Option|Description
 `--help`|output usage information
 `-u, --webUrl <webUrl>`|The URL of the site from which the property should be removed
 `-k, --key <key>`|Key of the property to be removed. Case-sensitive
-`-f, --folder [folder]`|Server- or site-relative URL of the folder from which to remove the property bag value
+`-f, --folder [folder]`|Site-relative URL of the folder from which to remove the property bag value
 `--confirm`|Don't prompt for confirming removal of property bag value
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
