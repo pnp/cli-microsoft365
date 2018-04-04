@@ -30,6 +30,7 @@ export default {
   FILE_LIST: `${prefix} file list`,
   FILE_REMOVE: `${prefix} file remove`,
   HUBSITE_CONNECT: `${prefix} hubsite connect`,
+  HUBSITE_DATA_GET: `${prefix} hubsite data get`,
   HUBSITE_DISCONNECT: `${prefix} hubsite disconnect`,
   HUBSITE_GET: `${prefix} hubsite get`,
   HUBSITE_LIST: `${prefix} hubsite list`,
