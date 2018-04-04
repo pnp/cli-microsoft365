@@ -128,7 +128,7 @@ class SpoHubSiteDataGetCommand extends SpoCommand {
     a SharePoint site using the ${chalk.blue(commands.CONNECT)} command,
     eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
 
-    If the specified ${chalk.grey('webUrl')} doesn't refer to an existing hub site, you will get
+    If the specified ${chalk.grey('webUrl')} is not connected to a hub site site, you will get
     a ${chalk.grey('odata.null: true')} message.
 
   Examples:
