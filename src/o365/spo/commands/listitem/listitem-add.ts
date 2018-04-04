@@ -108,24 +108,22 @@ class SpoListItemAddCommand extends SpoCommand {
           cmd.log(response);
         }
 
-        if (response.value.length && response.value.length > 0) {
+        if (args.options.contentType) {
 
-          if (args.options.contentType) {
-            let foundContentType = response.value.filter( (ct: any) => { 
-              let contentTypeMatch: boolean = (ct['Id'].StringValue === args.options.contentType || ct.Name === args.options.contentType)
-              if (this.debug) {
-                cmd.log(`Checking content type value [${ct.Name}]: ${contentTypeMatch}`);
-              }
-              return contentTypeMatch
-            });
+          let foundContentType = response.value.filter( (ct: any) => { 
+            let contentTypeMatch: boolean = (ct['Id'].StringValue === args.options.contentType || ct.Name === args.options.contentType)
             if (this.debug) {
-              cmd.log('content type filter output...');
-              cmd.log(foundContentType);
+              cmd.log(`Checking content type value [${ct.Name}]: ${contentTypeMatch}`);
             }
-    
-            if (foundContentType.length > 0) {
-              contentTypeName = foundContentType[0].Name;
-            }
+            return contentTypeMatch
+          });
+          if (this.debug) {
+            cmd.log('content type filter output...');
+            cmd.log(foundContentType);
+          }
+  
+          if (foundContentType.length > 0) {
+            contentTypeName = foundContentType[0].Name;
           }
 
           // After checking for content types, throw an error if the name is blank
@@ -133,16 +131,12 @@ class SpoListItemAddCommand extends SpoCommand {
             return Promise.reject(`Specified content type [${args.options.contentType}] doesn't exist on the target list`);
           }
 
-        } else {
-
-          return Promise.reject(`Problem loading content types from the target list`);
-
+          if (this.debug) {
+            cmd.log(`using content type name: ... ${contentTypeName}`);
+          }
+          
         }
 
-        if (this.debug) {
-          cmd.log(`using content type name: ... ${contentTypeName}`);
-        }
-        
         if (args.options.folder) {
           
           if (this.debug) {
@@ -239,45 +233,37 @@ class SpoListItemAddCommand extends SpoCommand {
           cmd.log('');
         }
 
-        // If response is from /lists/(list)/items POST call, return response['data']
-        if (response["data"]) {
-          cmd.log(<ListItemInstance>response["data"])
+        // Response is from /AddValidateUpdateItemUsingPath POST call, perform get on added item to get all field values
+        let fieldValues: FieldValue[] = response["value"];
+        let idField = fieldValues.filter((thisField, index, values) => { return (thisField.FieldName == "Id") })
+        if (this.debug) {
+          cmd.log(`field values returned:`)
+          cmd.log(fieldValues)
+          cmd.log(`Id returned by AddValidateUpdateItemUsingPath: ${idField.length > 0 ? idField[0].FieldValue: undefined}`);
         }
 
-        // If response is from /AddValidateUpdateItemUsingPath POST call, perform get on added item to get all field values
-        if (response["value"] && response["value"].length && response["value"].length > 0) {
-          let fieldValues: FieldValue[] = response["value"];
-          let idField = fieldValues.filter((thisField, index, values) => { return (thisField.FieldName == "Id") })
-          if (this.debug) {
-            cmd.log(`field values returned:`)
-            cmd.log(fieldValues)
-            cmd.log(`Id returned by AddValidateUpdateItemUsingPath: ${idField.length > 0 ? idField[0].FieldValue: undefined}`);
-          }
-
-          if (idField.length == 0) {
-            return Promise.reject(`Item didn't add successfully`)
-          }
-
-          const requestOptions: any = {
-            url: `${listRestUrl}/items(${idField[0].FieldValue})`,
-            method: 'GET',
-            headers: Utils.getRequestHeaders({
-              authorization: `Bearer ${siteAccessToken}`,
-              'accept': 'application/json;odata=nometadata'
-            }),
-            json: true
-          };
-
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
-
-          return request.get(requestOptions);
+        if (idField.length == 0) {
+          return Promise.reject(`Item didn't add successfully`)
         }
 
-        return Promise.resolve()
+        const requestOptions: any = {
+          url: `${listRestUrl}/items(${idField[0].FieldValue})`,
+          method: 'GET',
+          headers: Utils.getRequestHeaders({
+            authorization: `Bearer ${siteAccessToken}`,
+            'accept': 'application/json;odata=nometadata'
+          }),
+          json: true
+        };
+
+        if (this.debug) {
+          cmd.log('Executing web request...');
+          cmd.log(requestOptions);
+          cmd.log('');
+        }
+
+        return request.get(requestOptions);
+
       })
       .then((response: any): void => {
         if (response) {
@@ -445,6 +431,7 @@ class SpoListItemAddCommand extends SpoCommand {
   }
 
   private ensureFolder(args: any, siteAccessToken: string, cmd: any, rootFolder: any, folderToEnsure: string) {
+
     let rootFolderPath = rootFolder['ServerRelativeUrl']
     let childFolderNames = folderToEnsure.split('/');
 
@@ -472,7 +459,7 @@ class SpoListItemAddCommand extends SpoCommand {
         cmd.log('');
       }
       checkFoldersPromise.push(new Promise((resolve, reject) => {
-        request.get(requestOptions).then((response) => {
+        request.get(requestOptions).then((response: any) => {
 
             if (this.debug) {
               cmd.log(`Folder ${folderName} found with response...`);

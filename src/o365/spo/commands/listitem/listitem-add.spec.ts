@@ -19,10 +19,15 @@ describe(commands.LISTITEM_ADD, () => {
   let telemetry: any;
 
   const expectedTitle = `List Item 1`;
+
   const expectedId = 147;
-  const expectedFolder = 'Folder1';
   let actualId = 0;
-  let actualFolder = ''
+
+  const expectedFolder = 'Folder1/InsideFolder1/InsideFolder2/Folder2';
+  let actualFolder = '';
+
+  const expectedContentType = 'Item';
+  let actualContentType = '';
 
   let postFakes = (opts: any) => {
     if (opts.url.indexOf('/common/oauth2/token') > -1) {
@@ -35,19 +40,24 @@ describe(commands.LISTITEM_ADD, () => {
       });
     }
     if (opts.url.indexOf('AddValidateUpdateItemUsingPath') > -1) {
+      const bodyString = JSON.stringify(opts.body);
+      const ctMatch = bodyString.match(/\"?FieldName\"?:\s*\"?ContentType\"?,\s*\"?FieldValue\"?:\s*\"?(\w*)\"?/i);
+      actualContentType = ctMatch ? ctMatch[1] : "";
+      if (bodyString.indexOf("fail adding me") > -1) return Promise.resolve({ value: [] })
       return Promise.resolve({ value: [ { FieldName: "Id", FieldValue: expectedId }] });
     }
     if (opts.url.indexOf('AddSubFolderUsingPath') > -1) {
-      console.log(opts.url)
       actualFolder = opts.url.match(/@a2='([^']+)'/i)[1];
-      return Promise.resolve();
+      console.log(opts.url + " - " + actualFolder)
+      if (actualFolder != "Folder2") return Promise.resolve();
+      else return Promise.reject("mock failed folder creation");
     }
     return Promise.reject('Invalid request');
   }
 
   let getFakes = (opts: any) => {
     if (opts.url.indexOf('contenttypes') > -1) {
-      return Promise.resolve({ value: [ {Id: { StringValue: "0x01" } } ] });
+      return Promise.resolve({ value: [ {Id: { StringValue: expectedContentType }, Name: "Item" } ] });
     }
     if (opts.url.indexOf('rootFolder') > -1) {
       return Promise.resolve({ ServerRelativeUrl: '/sites/project-xxx/Lists/Demo%20List'});
@@ -70,7 +80,11 @@ describe(commands.LISTITEM_ADD, () => {
     }
     if (opts.url.indexOf('GetFolderByServerRelativePath') > -1) {
       console.log(opts.url)
-      return Promise.reject('');
+      if (opts.url.indexOf('InsideFolder2') > -1) {
+        // mock InsideFolder2 or Folder2 needs creating
+        return Promise.reject('');
+      }
+      return Promise.resolve('');
     }
     return Promise.reject('Invalid request');
   }
@@ -194,6 +208,11 @@ describe(commands.LISTITEM_ADD, () => {
     assert.notEqual(actual, true);
   });
 
+  it('fails validation if listTitle and listId are specified together', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } });
+    assert.notEqual(actual, true);
+  });
+
   it('fails validation if the webUrl option not specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { title: 'Demo List' } });
     assert.notEqual(actual, true);
@@ -219,6 +238,45 @@ describe(commands.LISTITEM_ADD, () => {
     assert(actual);
   });
 
+  it('fails to create an item list item is added with \'fail me\' values', (done) => {
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'post').callsFake(postFakes);
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    let options: any = { 
+      debug: true, 
+      verbose: true,
+      listTitle: 'Demo List', 
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
+      Title: "fail adding me"
+    }
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert.equal(actualId, expectedId);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+    
+  });
+
   it('returns listItemInstance object when list item is added with correct values', (done) => {
 
     sinon.stub(request, 'get').callsFake(getFakes);
@@ -231,6 +289,7 @@ describe(commands.LISTITEM_ADD, () => {
 
     let options: any = { 
       debug: true, 
+      verbose: true,
       listTitle: 'Demo List', 
       webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
       Title: expectedTitle
@@ -250,13 +309,17 @@ describe(commands.LISTITEM_ADD, () => {
         done(e);
       }
       finally {
+        Utils.restore(request.get);
         Utils.restore(request.post);
       }
     });
     
   });
 
-  it('attempts to create a folder when list item is added with folder specified', (done) => {
+  it('attempts to create the listitem with the contenttype of \'Item\' when content type option 0x01 is specified', (done) => {
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'post').callsFake(postFakes);
 
     auth.site = new Site();
     auth.site.connected = true;
@@ -265,6 +328,49 @@ describe(commands.LISTITEM_ADD, () => {
 
     let options: any = { 
       debug: true, 
+      verbose: true,
+      listTitle: 'Demo List', 
+      webUrl: 'https://contoso.sharepoint.com/sites/project-y', 
+      contentType: expectedContentType,
+      Title: expectedTitle
+    }
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert(expectedContentType == actualContentType);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+
+  });
+
+  it('attempts to create a folder when list item is added with folder specified', (done) => {
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'post').callsFake(postFakes);
+
+    //let ensureFolderSpy = sinon.stub((command as any), 'ensureFolder');
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    let options: any = { 
+      debug: true, 
+      verbose: true,
       listTitle: 'Demo List', 
       webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
       Title: expectedTitle,
@@ -278,13 +384,56 @@ describe(commands.LISTITEM_ADD, () => {
     cmdInstance.action({ options: options }, () => {
 
       try {
-        assert.equal(actualFolder, expectedFolder);
+        assert(expectedFolder.substr(expectedFolder.lastIndexOf('/') + 1) == actualFolder);
         done();
       }
       catch (e) {
         done(e);
       }
       finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+    
+  });
+
+  it('fails to create a folder when list item is added with folder specified', (done) => {
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'post').callsFake(postFakes);
+
+    //let ensureFolderSpy = sinon.stub((command as any), 'ensureFolder');
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    let options: any = { 
+      debug: true, 
+      verbose: true,
+      listTitle: 'Demo List', 
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
+      Title: expectedTitle,
+      folder: 'Folder1/InsideFolder1/InsideFolder2'
+    }
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert(actualFolder != "InsideFolder2");
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
         Utils.restore(request.post);
       }
     });
