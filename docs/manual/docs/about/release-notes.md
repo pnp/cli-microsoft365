@@ -1,5 +1,19 @@
 # Release notes
 
+## [v1.2.0](https://github.com/SharePoint/office365-cli/releases/tag/v1.2.0)
+
+### New commands
+
+**SharePoint Online:**
+
+- [spo file remove](../cmd/spo/file/file-remove.md) - removes the specified file [#287](https://github.com/SharePoint/office365-cli/issues/287)
+- [spo listitem remove](../cmd/spo/listitem/listitem-remove.md) - removes the specified list item [#272](https://github.com/SharePoint/office365-cli/issues/272)
+- [spo propertybag set](../cmd/spo/propertybag/propertybag-set.md) - sets the value of the specified property in the property bag [#393](https://github.com/SharePoint/office365-cli/issues/393)
+
+### Changes
+
+- added support for authenticating using credentials solving [#388](https://github.com/SharePoint/office365-cli/issues/388)
+
 ## [v1.1.0](https://github.com/SharePoint/office365-cli/releases/tag/v1.1.0)
 
 ### New commands
