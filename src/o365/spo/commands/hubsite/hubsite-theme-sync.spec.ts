@@ -3,7 +3,7 @@ import Command, { CommandOption, CommandValidate, CommandError } from '../../../
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
-const command: Command = require('./hubsite-get');
+const command: Command = require('./hubsite-theme-sync');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import Utils from '../../../../Utils';
@@ -40,7 +40,7 @@ describe(commands.HUBSITE_THEME_SYNC, () => {
   afterEach(() => {
     Utils.restore([
       vorpal.find,
-      request.get
+      request.post
     ]);
   });
 
@@ -103,7 +103,7 @@ describe(commands.HUBSITE_THEME_SYNC, () => {
 
   it('syncs hub site theme to a web', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.webUrl.indexOf(`/_api/web/SyncHubSiteTheme`) > -1) {
+      if (opts.url.indexOf(`/_api/web/SyncHubSiteTheme`) > -1) {
         return Promise.resolve({
           value: []
         });
@@ -119,7 +119,7 @@ describe(commands.HUBSITE_THEME_SYNC, () => {
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/Project-X' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({
-          "webUrl": "https://contoso.sharepoint.com/sites/Project-X"
+          value: []
         }));
         done();
       }
@@ -131,7 +131,7 @@ describe(commands.HUBSITE_THEME_SYNC, () => {
 
   it('syncs hub site theme to a web (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.webUrl.indexOf(`/_api/web/SyncHubSiteTheme`) > -1) {
+      if (opts.url.indexOf(`/_api/web/SyncHubSiteTheme`) > -1) {
         return Promise.resolve({
           value: []
         });
@@ -147,7 +147,7 @@ describe(commands.HUBSITE_THEME_SYNC, () => {
     cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/Project-X' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({
-          "webUrl": "https://contoso.sharepoint.com/sites/Project-X"
+          value: []
         }));
         done();
       }
@@ -158,7 +158,7 @@ describe(commands.HUBSITE_THEME_SYNC, () => {
   });
 
   it('correctly handles error when hub site not found', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
       return Promise.reject({
         error: {
           "odata.error": {

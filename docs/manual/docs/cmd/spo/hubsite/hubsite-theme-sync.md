@@ -1,6 +1,6 @@
-# spo hubsite get
+# spo hubsite theme sync
 
-Gets information about the specified hub site
+Applies any theme updates from the parent hub site.
 
 !!! attention
     This command is based on a SharePoint API that is currently in preview and is subject to change once the API reached general availability.
@@ -27,8 +27,6 @@ Option|Description
 ## Remarks
 
 To apply hub site theme updates to a site, you have to first connect to a SharePoint site using the [spo connect](../connect.md) command, eg. `spo connect https://contoso.sharepoint.com`.
-
-If the specified `webUrl` is not connected to a hub site site, you will get a `ResourceNotFoundException` error.
 
 ## Examples
 

@@ -114,9 +114,6 @@ class SpoHubSiteThemeSyncCommand extends SpoCommand {
     a SharePoint site using the ${chalk.blue(commands.CONNECT)} command,
     eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
 
-    If the specified ${chalk.grey('web')} doesn't refer to an existing hub site, you will get
-    a ${chalk.grey('ResourceNotFoundException')} error.
-
   Examples:
   
     Applies any theme updates from the parent hub site to the web with url ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
