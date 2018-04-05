@@ -38,6 +38,7 @@ export default {
   HUBSITE_RIGHTS_GRANT: `${prefix} hubsite rights grant`,
   HUBSITE_RIGHTS_REVOKE: `${prefix} hubsite rights revoke`,
   HUBSITE_SET: `${prefix} hubsite set`,
+  HUBSITE_THEME_SYNC: `${prefix} hubsite theme sync`,
   HUBSITE_UNREGISTER: `${prefix} hubsite unregister`,
   LIST_ADD: `${prefix} list add`,
   LIST_GET: `${prefix} list get`,
