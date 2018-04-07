@@ -24,7 +24,7 @@ describe(commands.LISTITEM_ADD, () => {
   let actualId = 0;
 
   const expectedFolder = 'Folder1/InsideFolder1/InsideFolder2/Folder2';
-  let actualFolder = '';
+  let actualFolderCreated = '';
 
   const expectedContentType = 'Item';
   let actualContentType = '';
@@ -47,9 +47,9 @@ describe(commands.LISTITEM_ADD, () => {
       return Promise.resolve({ value: [ { FieldName: "Id", FieldValue: expectedId }] });
     }
     if (opts.url.indexOf('AddSubFolderUsingPath') > -1) {
-      actualFolder = opts.url.match(/@a2='([^']+)'/i)[1];
-      console.log(opts.url + " - " + actualFolder)
-      if (actualFolder != "Folder2") return Promise.resolve();
+      actualFolderCreated = opts.url.match(/@a2='([^']+)'/i)[1];
+      //console.log(opts.url + " - " + actualFolderCreated)
+      if (actualFolderCreated != "Folder2") return Promise.resolve();
       else return Promise.reject("mock failed folder creation");
     }
     return Promise.reject('Invalid request');
@@ -79,7 +79,7 @@ describe(commands.LISTITEM_ADD, () => {
       );
     }
     if (opts.url.indexOf('GetFolderByServerRelativePath') > -1) {
-      console.log(opts.url)
+      //console.log(opts.url)
       if (opts.url.indexOf('InsideFolder2') > -1) {
         // mock InsideFolder2 or Folder2 needs creating
         return Promise.reject('');
@@ -238,8 +238,10 @@ describe(commands.LISTITEM_ADD, () => {
     assert(actual);
   });
 
-  it('fails to create an item list item is added with \'fail me\' values', (done) => {
+  it('fails to create a list item when \'fail me\' values are used', (done) => {
 
+    actualId = 0;
+    
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -256,14 +258,10 @@ describe(commands.LISTITEM_ADD, () => {
       Title: "fail adding me"
     }
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: options }, () => {
 
       try {
-        assert.equal(actualId, expectedId);
+        assert.equal(actualId, 0);
         done();
       }
       catch (e) {
@@ -295,10 +293,6 @@ describe(commands.LISTITEM_ADD, () => {
       Title: expectedTitle
     }
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: options }, () => {
 
       try {
@@ -335,10 +329,6 @@ describe(commands.LISTITEM_ADD, () => {
       Title: expectedTitle
     }
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: options }, () => {
 
       try {
@@ -356,7 +346,43 @@ describe(commands.LISTITEM_ADD, () => {
 
   });
 
-  it('attempts to create a folder when list item is added with folder specified', (done) => {
+  it('fails to create the listitem when the specified contentType doesn\'t exist in the target list', (done) => {
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'post').callsFake(postFakes);
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    let options: any = { 
+      debug: true, 
+      verbose: true,
+      listTitle: 'Demo List', 
+      webUrl: 'https://contoso.sharepoint.com/sites/project-y', 
+      contentType: "Unexpected content type",
+      Title: expectedTitle
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert(expectedContentType == actualContentType);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+
+  });
+
+  it('creates a folder when list item is added with a folder specified that has one level deep folder to be created', (done) => {
 
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
@@ -377,14 +403,10 @@ describe(commands.LISTITEM_ADD, () => {
       folder: expectedFolder
     }
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: options }, () => {
 
       try {
-        assert(expectedFolder.substr(expectedFolder.lastIndexOf('/') + 1) == actualFolder);
+        assert(expectedFolder.substr(expectedFolder.lastIndexOf('/') + 1) == actualFolderCreated);
         done();
       }
       catch (e) {
@@ -398,7 +420,7 @@ describe(commands.LISTITEM_ADD, () => {
     
   });
 
-  it('fails to create a folder when list item is added with folder specified', (done) => {
+  it('creates a folder when list item is added with a folder specified that has two levels deep folders to be created', (done) => {
 
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
@@ -416,17 +438,53 @@ describe(commands.LISTITEM_ADD, () => {
       listTitle: 'Demo List', 
       webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
       Title: expectedTitle,
-      folder: 'Folder1/InsideFolder1/InsideFolder2'
+      folder: expectedFolder + "/Folder3"
     }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert("Folder3" == actualFolderCreated);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+    
+  });
+
+  it('doesn\'t create a folder when the folder already exists', (done) => {
+
+    actualFolderCreated = '';
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'post').callsFake(postFakes);
+
+    //let ensureFolderSpy = sinon.stub((command as any), 'ensureFolder');
 
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
+
+    let options: any = { 
+      debug: true, 
+      verbose: true,
+      listTitle: 'Demo List', 
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
+      Title: expectedTitle,
+      folder: "Folder3"
+    }
+
     cmdInstance.action({ options: options }, () => {
 
       try {
-        assert(actualFolder != "InsideFolder2");
+        assert(actualFolderCreated != "Folder3");
         done();
       }
       catch (e) {
