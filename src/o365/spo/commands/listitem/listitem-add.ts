@@ -359,14 +359,14 @@ class SpoListItemAddCommand extends SpoCommand {
   
     Add an item with Title ${chalk.grey('Demo Item')} and content type name ${chalk.grey('Item')}
     to list with title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_ADD} --contentType Item --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --title "Demo Item"
+      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_ADD} --contentType Item --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Item"
 
     Add an item with Title ${chalk.grey('Demo Multi Managed Metadata Field')} and a single-select metadata 
     field named SingleMetadataField to list with title ${chalk.grey('Demo List')} in site 
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} (note: correct term GUID must be 
     specified on the right-side of the pipe | character)
 
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_ADD} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --title "Demo Single Managed Metadata Field" --SingleMetadataField "TermLabel1|xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx;"
+      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_ADD} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Single Managed Metadata Field" --SingleMetadataField "TermLabel1|xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx;"
     
 
     Add an item with Title ${chalk.grey('Demo Multi Managed Metadata Field')} and a multi-select metadata 
@@ -374,25 +374,25 @@ class SpoListItemAddCommand extends SpoCommand {
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} (note: correct term GUIDs must be 
     specified on the right-side of the pipe | character)
 
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_ADD} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --title "Demo Multi Managed Metadata Field" --MultiMetadataField "TermLabel1|xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx;TermLabel2|xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx;"
+      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_ADD} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Multi Managed Metadata Field" --MultiMetadataField "TermLabel1|xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx;TermLabel2|xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx;"
   
 
     Add an item with Title ${chalk.grey('Demo Single Person Field')} and a single-select people field named 
     SinglePeopleField to list with title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
 
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_ADD} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --title "Demo Single Person Field" --SinglePeopleField "[{'Key':'i:0#.f|membership|markh@conotoso.com'}]"
+      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_ADD} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Single Person Field" --SinglePeopleField "[{'Key':'i:0#.f|membership|markh@conotoso.com'}]"
     
       
     Add an item with Title ${chalk.grey('Demo Multi Person Field')} and a multi-select people field named 
     MultiPeopleField to list with title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
 
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_ADD} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --title "Demo Multi Person Field" --MultiPeopleField "[{'Key':'i:0#.f|membership|markh@conotoso.com'},{'Key':'i:0#.f|membership|adamb@conotoso.com'}]"
+      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_ADD} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Multi Person Field" --MultiPeopleField "[{'Key':'i:0#.f|membership|markh@conotoso.com'},{'Key':'i:0#.f|membership|adamb@conotoso.com'}]"
     
       
     Add an item with Title ${chalk.grey('Demo Hyperlink Field')} and a hyperlink field named CustomHyperlink
     to list with title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
 
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_ADD} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --title "Demo Hyperlink Field" --CustomHyperlink "https://www.bing.com, Bing"
+      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_ADD} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Hyperlink Field" --CustomHyperlink "https://www.bing.com, Bing"
     
       
     More information:
