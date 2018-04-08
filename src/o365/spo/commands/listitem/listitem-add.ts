@@ -58,10 +58,12 @@ class SpoListItemAddCommand extends SpoCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
+    const listIdArgument = args.options.listId || "";
+    const listTitleArgument = args.options.listTitle || "";
     let siteAccessToken: string = '';
     let listRestUrl: string = (args.options.listId ? 
-        `${args.options.webUrl}/_api/web/lists/(guid'${encodeURIComponent(args.options.listId || "")}')`
-      : `${args.options.webUrl}/_api/web/lists/getByTitle('${encodeURIComponent(args.options.listTitle || "")}')`);
+        `${args.options.webUrl}/_api/web/lists/(guid'${encodeURIComponent(listIdArgument)}')`
+      : `${args.options.webUrl}/_api/web/lists/getByTitle('${encodeURIComponent(listTitleArgument)}')`);
     let contentTypeName: string = '';
     let listRootFolder: string = '';
 
@@ -137,6 +139,7 @@ class SpoListItemAddCommand extends SpoCommand {
           
         }
 
+        const folderArgument = args.options.folder || "";
         if (args.options.folder) {
           
           if (this.debug) {
@@ -167,8 +170,7 @@ class SpoListItemAddCommand extends SpoCommand {
 
             listRootFolder = rootFolderResponse["ServerRelativeUrl"];
     
-    
-            return this.ensureFolder(args, siteAccessToken, cmd, rootFolderResponse, args.options.folder || "")
+            return this.ensureFolder(args, siteAccessToken, cmd, rootFolderResponse, folderArgument)
               .then(ensureFolderResponse => {
 
                 if (this.debug) {
@@ -198,7 +200,7 @@ class SpoListItemAddCommand extends SpoCommand {
         }
 
         if (args.options.contentType && contentTypeName != '') {
-          if (this.verbose) {
+          if (this.debug) {
             cmd.log(`Specifying content type name [${contentTypeName}] in request body`);
           }
           requestBody.formValues.push({FieldName: 'ContentType', FieldValue: contentTypeName});
@@ -239,7 +241,7 @@ class SpoListItemAddCommand extends SpoCommand {
         if (this.debug) {
           cmd.log(`field values returned:`)
           cmd.log(fieldValues)
-          cmd.log(`Id returned by AddValidateUpdateItemUsingPath: ${idField.length > 0 ? idField[0].FieldValue: undefined}`);
+          cmd.log(`Id returned by AddValidateUpdateItemUsingPath: ${idField}`);
         }
 
         if (idField.length == 0) {
@@ -266,9 +268,7 @@ class SpoListItemAddCommand extends SpoCommand {
 
       })
       .then((response: any): void => {
-        if (response) {
-          cmd.log(<ListItemInstance>response)
-        }
+        cmd.log(<ListItemInstance>response)
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
@@ -485,15 +485,12 @@ class SpoListItemAddCommand extends SpoCommand {
 
       let sortedFolders = createFolders.sort((cf1, cf2) => {
         if (cf1.parentFolder > cf2.parentFolder) return 1;
-        if (cf1.parentFolder > cf2.parentFolder) return -1;
-        return 0;
+        return -1;
       })
 
       if (this.debug) {
         cmd.log(`Folders found:`);
         cmd.log(checkedFolders);
-        cmd.log(`Folders to create:`);
-        cmd.log(createFolders);
         cmd.log(`Folders to create (sorted):`);
         cmd.log(createFolders);
         cmd.log('');
