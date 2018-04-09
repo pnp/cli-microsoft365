@@ -7,7 +7,9 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
+import { ContextInfo } from '../../spo';
 import GlobalOptions from '../../../../GlobalOptions';
+import Auth from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -29,17 +31,35 @@ class SpoHubSiteThemeSyncCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
+    let siteAccessToken: string = '';
+
     auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
+    .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
+    .then((accessToken: string): request.RequestPromise => {
+      siteAccessToken = accessToken;
+
+      if (this.debug) {
+        cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
+      }
+
+      if (this.verbose) {
+        cmd.log(`Retrieving request digest...`);
+      }
+
+      return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
+    })
+    .then((res: ContextInfo): request.RequestPromise => {
+      if (this.debug) {
+        cmd.log('Response:')
+        cmd.log(res);
+        cmd.log('');
+      }
 
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/SyncHubSiteTheme`,
           headers: Utils.getRequestHeaders({
-            authorization: `Bearer ${auth.service.accessToken}`,
+            authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata'
           }),
           json: true
