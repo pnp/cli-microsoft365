@@ -18,7 +18,8 @@ describe(commands.HUBSITE_DATA_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
+    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
+    sinon.stub(command as any, 'getRequestDigestForSite').callsFake(() => Promise.resolve({ FormDigestValue: 'ABC' }));
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
       telemetry = t;
     });
@@ -47,7 +48,7 @@ describe(commands.HUBSITE_DATA_GET, () => {
   after(() => {
     Utils.restore([
       appInsights.trackEvent,
-      auth.ensureAccessToken,
+      auth.getAccessToken,
       auth.restoreAuth
     ]);
   });
@@ -330,13 +331,13 @@ describe(commands.HUBSITE_DATA_GET, () => {
   });
 
   it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.ensureAccessToken);
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
+    Utils.restore(auth.getAccessToken);
+    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
     auth.site = new Site();
     auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, () => {
+    cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/Sales', confirm: true } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
         done();
