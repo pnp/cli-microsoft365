@@ -7,6 +7,9 @@
 **SharePoint Online:**
 
 - [spo file remove](../cmd/spo/file/file-remove.md) - removes the specified file [#287](https://github.com/SharePoint/office365-cli/issues/287)
+- [spo hubsite data get](../cmd/spo/hubsite/hubsite-data-get.md) - gets hub site data for the specified site [#394](https://github.com/SharePoint/office365-cli/issues/394)
+- [spo hubsite theme sync](../cmd/spo/hubsite/hubsite-theme-sync.md) - applies any theme updates from the parent hub site [#401](https://github.com/SharePoint/office365-cli/issues/401)
+- [spo listitem add](../cmd/spo/listitem/listitem-add.md) - creates a list item in the specified list [#270](https://github.com/SharePoint/office365-cli/issues/270)
 - [spo listitem remove](../cmd/spo/listitem/listitem-remove.md) - removes the specified list item [#272](https://github.com/SharePoint/office365-cli/issues/272)
 - [spo propertybag set](../cmd/spo/propertybag/propertybag-set.md) - sets the value of the specified property in the property bag [#393](https://github.com/SharePoint/office365-cli/issues/393)
 
