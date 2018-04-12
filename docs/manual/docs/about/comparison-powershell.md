@@ -135,7 +135,7 @@ Update-UserType|Microsoft.Online.SharePoint.PowerShell|
 Upgrade-SPOSite|Microsoft.Online.SharePoint.PowerShell|
 Add-PnPApp|SharePointPnPPowerShellOnline|[spo app add](../cmd/spo/app/app-add.md)
 Add-PnPTenantCdnOrigin|SharePointPnPPowerShellOnline|[spo cdn origin add](../cmd/spo/cdn/cdn-origin-add.md)
-Add-PnPClientSidePage|SharePointPnPPowerShellOnline|
+Add-PnPClientSidePage|SharePointPnPPowerShellOnline|[spo page add](../cmd/spo/page/page-add.md)
 Add-PnPClientSidePageSection|SharePointPnPPowerShellOnline|
 Add-PnPClientSideText|SharePointPnPPowerShellOnline|
 Add-PnPClientSideWebPart|SharePointPnPPowerShellOnline|
@@ -228,7 +228,7 @@ Get-PnPDocumentSetTemplate|SharePointPnPPowerShellOnline|
 Get-PnPEventReceiver|SharePointPnPPowerShellOnline|
 Get-PnPFeature|SharePointPnPPowerShellOnline|
 Get-PnPField|SharePointPnPPowerShellOnline|
-Get-PnPFile|SharePointPnPPowerShellOnline|[spo file list](../cmd/spo/file/file-list.md)
+Get-PnPFile|SharePointPnPPowerShellOnline|[spo file get](../cmd/spo/file/file-get.md), [spo file list](../cmd/spo/file/file-list.md)
 Get-PnPFolder|SharePointPnPPowerShellOnline|
 Get-PnPFolderItem|SharePointPnPPowerShellOnline|
 Get-PnPGroup|SharePointPnPPowerShellOnline|
@@ -253,7 +253,7 @@ Get-PnPRequestAccessEmails|SharePointPnPPowerShellOnline|
 Get-PnPRoleDefinition|SharePointPnPPowerShellOnline|
 Get-PnPSearchConfiguration|SharePointPnPPowerShellOnline|
 Get-PnPSite|SharePointPnPPowerShellOnline|[spo site get](../cmd/spo/site/site-get.md), [spo site list](../cmd/spo/site/site-list.md)
-Get-PnPSiteClassification|SharePointPnPPowerShellOnline|
+Get-PnPSiteClassification|SharePointPnPPowerShellOnline|[graph siteclassification get](../cmd/graph/siteclassification/siteclassification-get.md)
 Get-PnPSiteClosure|SharePointPnPPowerShellOnline|
 Get-PnPSiteCollectionAdmin|SharePointPnPPowerShellOnline|
 Get-PnPSiteCollectionTermStore|SharePointPnPPowerShellOnline|
@@ -354,7 +354,7 @@ Remove-PnPJavaScriptLink|SharePointPnPPowerShellOnline|
 Remove-PnPList|SharePointPnPPowerShellOnline|[spo list remove](../cmd/spo/list/list-remove.md)
 Remove-PnPListItem|SharePointPnPPowerShellOnline|
 Remove-PnPNavigationNode|SharePointPnPPowerShellOnline|
-Remove-PnPPropertyBagValue|SharePointPnPPowerShellOnline|
+Remove-PnPPropertyBagValue|SharePointPnPPowerShellOnline|[spo propertybag remove](../cmd/spo/propertybag/propertybag-remove.md)
 Remove-PnPPublishingImageRendition|SharePointPnPPowerShellOnline|
 Remove-PnPRoleDefinition|SharePointPnPPowerShellOnline|
 Remove-PnPSiteClassification|SharePointPnPPowerShellOnline|
@@ -393,7 +393,7 @@ Send-PnPMail|SharePointPnPPowerShellOnline|
 Set-PnPAppSideLoading|SharePointPnPPowerShellOnline|
 Set-PnPAuditing|SharePointPnPPowerShellOnline|
 Set-PnPAvailablePageLayouts|SharePointPnPPowerShellOnline|
-Set-PnPClientSidePage|SharePointPnPPowerShellOnline|
+Set-PnPClientSidePage|SharePointPnPPowerShellOnline|[spo page set](../cmd/spo/page/page-set.md)
 Set-PnPClientSideText|SharePointPnPPowerShellOnline|
 Set-PnPClientSideWebPart|SharePointPnPPowerShellOnline|
 Set-PnPContext|SharePointPnPPowerShellOnline|
