@@ -47,6 +47,7 @@ export default {
   LIST_SET: `${prefix} list set`,
   LISTITEM_ADD: `${prefix} listitem add`,
   LISTITEM_REMOVE: `${prefix} listitem remove`,
+  LISTITEM_SET: `${prefix} listitem set`,
   PAGE_ADD: `${prefix} page add`,
   PAGE_LIST: `${prefix} page list`,
   PAGE_SET: `${prefix} page set`,
