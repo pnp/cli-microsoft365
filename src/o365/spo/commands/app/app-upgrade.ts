@@ -1,6 +1,6 @@
 import { ContextInfo } from './../../spo';
 import auth from '../../SpoAuth';
-import Auth from '../../../../Auth';
+import { Auth } from '../../../../Auth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';

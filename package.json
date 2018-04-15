@@ -1,6 +1,6 @@
 {
   "name": "@pnp/office365-cli",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Manage Microsoft Office 365 on any platform",
   "license": "MIT",
   "main": "./dist/index.js",
@@ -40,10 +40,13 @@
     "Georgiev, Velin <velin.georgiev@gmail.com>",
     "Hawrylak, Paweł <phawrylak@outlook.com>",
     "Hvam, Allan <ahp@delegate.dk>",
+    "Jaakke, Robert <robert.jaakke@mavention.nl>",
     "Kailasam, Balamurugan <kshsbala@engineer.com>",
     "Keijzers, Paul <KbWorks@users.noreply.github.com>",
     "Laskewitz, Daniel <daniel@laskewitz.nl>",
     "Mastykarz, Waldek <waldek@mastykarz.nl>",
+    "Powney, Mark <powney.mark@outlook.com>",
+    "Romano, Rodrigo <rodrigo@rodrigoromano.net>",
     "Schot, Albert-Jan <appie@digiwijs.nl>",
     "Schouten, Robert <robert.schouten@wortell.nl>",
     "Sitaraman, Rajesh <rajesh.sitaraman@outlook.com",
@@ -52,6 +55,7 @@
     "van Hunen, Erwin <erwin.van.hunen@outlook.com>"
   ],
   "dependencies": {
+    "adal-node": "^0.1.28",
     "applicationinsights": "^1.0.1",
     "easy-table": "^1.1.1",
     "omelette": "^0.4.5",

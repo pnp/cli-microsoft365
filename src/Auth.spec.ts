@@ -1,29 +1,24 @@
 import * as sinon from 'sinon';
 import * as assert from 'assert';
 import Utils from './Utils';
-import * as request from 'request-promise-native';
-import Auth, { Service } from './Auth';
+import { Auth, Service, AuthType } from './Auth';
 import * as os from 'os';
 import { KeychainTokenStorage } from './auth/KeychainTokenStorage';
 import { WindowsTokenStorage } from './auth/WindowsTokenStorage';
 import { FileTokenStorage } from './auth/FileTokenStorage';
 import { TokenStorage } from './auth/TokenStorage';
 import { fail } from 'assert';
+import { CommandError } from './Command';
 
 class MockService extends Service {
 }
 
 class MockAuth extends Auth {
+  protected serviceId(): string {
+    return 'mock';
+  }
   public getConnectionInfo(): Promise<MockService> {
     return this.getServiceConnectionInfo('mock');
-  }
-
-  public setConnectionInfo(): Promise<void> {
-    return this.setServiceConnectionInfo('mock', {});
-  }
-
-  public clearConnectionInfo(): Promise<void> {
-    return this.clearServiceConnectionInfo('mock');    
   }
 }
 
@@ -42,65 +37,33 @@ class MockTokenStorage implements TokenStorage {
 }
 
 describe('Auth', () => {
-  let log: string[];
+  let log: any[];
   let auth: Auth;
   let service: MockService;
   const resource: string = 'https://contoso.sharepoint.com';
   const appId: string = '9bc3ab49-b65d-410a-85ad-de819febfddc';
-  const deviceCode: string = 'GAAABAAEAiL9Kn2Z27Uu';
   const refreshToken: string = 'ref';
   const stdout: any = {
-    log: (msg: string) => {
+    log: (msg: any) => {
       log.push(msg);
     }
   }
-  let requestGetStub: sinon.SinonStub;
-
-  before(() => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === 'https://login.microsoftonline.com/common/oauth2/token' &&
-        opts.headers['Content-Type'] === 'application/x-www-form-urlencoded' &&
-        opts.headers.accept === 'application/json' &&
-        opts.body === `resource=${encodeURIComponent(resource)}&client_id=${appId}&grant_type=refresh_token&refresh_token=${refreshToken}`) {
-        return Promise.resolve('acc');
-      }
-
-      return Promise.reject('Invalid request');
-    });
-    requestGetStub = sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://login.microsoftonline.com/common/oauth2/devicecode?resource=${resource}&client_id=${appId}` &&
-        opts.headers.accept === 'application/json') {
-        return Promise.resolve({
-          interval: 5,
-          device_code: deviceCode,
-          message: 'To sign in, use a web browser to open the page https://aka.ms/devicelogin. Enter the code GXGPCE4CC to authenticate.'
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-  });
+  const stdoutLogSpy = sinon.spy(stdout, 'log');
 
   beforeEach(() => {
     log = [];
     service = new MockService();
-    auth = new Auth(service, appId);
+    auth = new MockAuth(service, appId);
   });
 
   afterEach(() => {
   });
 
-  after(() => {
-    Utils.restore([
-      request.post,
-      request.get
-    ]);
-  });
-
   it('returns existing access token if still valid', (done) => {
-    const now = new Date().getTime() / 1000;
+    const now = new Date();
+    now.setSeconds(now.getSeconds() + 1);
     service.accessToken = 'abc';
-    service.expiresAt = now + 1000;
+    service.expiresOn = now.toISOString();
     auth.ensureAccessToken(resource, stdout).then((accessToken) => {
       try {
         assert.equal(accessToken, service.accessToken);
@@ -115,9 +78,10 @@ describe('Auth', () => {
   });
 
   it('returns existing access token if still valid (debug)', (done) => {
-    const now = new Date().getTime() / 1000;
+    const now = new Date();
+    now.setSeconds(now.getSeconds() + 1);
     service.accessToken = 'abc';
-    service.expiresAt = now + 1000;
+    service.expiresOn = now.toISOString();
     auth.ensureAccessToken(resource, stdout, true).then((accessToken) => {
       try {
         assert.equal(accessToken, service.accessToken);
@@ -133,6 +97,9 @@ describe('Auth', () => {
 
   it('retrieves new access token using existing refresh token', (done) => {
     service.refreshToken = refreshToken;
+    sinon.stub((auth as any).authCtx, 'acquireTokenWithRefreshToken').callsArgWith(3, undefined, { accessToken: service.accessToken });
+    sinon.stub(auth as any, 'setServiceConnectionInfo').callsFake(() => Promise.resolve());
+
     auth.ensureAccessToken(resource, stdout).then((accessToken) => {
       try {
         assert.equal(accessToken, service.accessToken);
@@ -148,6 +115,9 @@ describe('Auth', () => {
 
   it('retrieves new access token using existing refresh token (debug)', (done) => {
     service.refreshToken = refreshToken;
+    sinon.stub((auth as any).authCtx, 'acquireTokenWithRefreshToken').callsArgWith(3, undefined, { accessToken: service.accessToken });
+    sinon.stub(auth as any, 'setServiceConnectionInfo').callsFake(() => Promise.resolve());
+
     auth.ensureAccessToken(resource, stdout, true).then((accessToken) => {
       try {
         assert.equal(accessToken, service.accessToken);
@@ -162,369 +132,183 @@ describe('Auth', () => {
   });
 
   it('handles error when retrieving new access token using existing refresh token', (done) => {
-    Utils.restore(request.post);
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === 'https://login.microsoftonline.com/common/oauth2/token' &&
-        opts.headers['Content-Type'] === 'application/x-www-form-urlencoded' &&
-        opts.headers.accept === 'application/json' &&
-        opts.body === `resource=${encodeURIComponent(resource)}&client_id=${appId}&grant_type=refresh_token&refresh_token=${refreshToken}`) {
-        return Promise.reject({
-          error: {
-            "error": "error",
-            "error_description": "Error\r\nTrace ID: 14613dff-d719-4b49-a937-b623263415a9\r\nCorrelation ID: f4e1c3a8-15a8-4ae4-8389-19a5a0ce2e06\r\nTimestamp: 2016-03-12 01:18:44Z",
-            "error_codes": [
-              70016
-            ],
-            "timestamp": "2016-03-12 01:18:44Z",
-            "trace_id": "14613dff-d719-4b49-a937-b623263415a9",
-            "correlation_id": "f4e1c3a8-15a8-4ae4-8389-19a5a0ce2e06"
-          }
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
     service.refreshToken = refreshToken;
-    auth.ensureAccessToken(resource, stdout)
-      .then((accessToken) => {
-        done('Got access token');
-      }, (err: any) => {
+    sinon.stub((auth as any).authCtx, 'acquireTokenWithRefreshToken').callsArgWith(3, { message: 'An error has occurred' }, undefined);
+
+    auth.ensureAccessToken(resource, stdout).then((accessToken) => {
+      done('Got access token');
+    }, (err) => {
+      try {
+        assert.equal(err, 'An error has occurred');
         done();
-      });
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 
   it('handles error when retrieving new access token using existing refresh token (debug)', (done) => {
-    Utils.restore(request.post);
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === 'https://login.microsoftonline.com/common/oauth2/token' &&
-        opts.headers['Content-Type'] === 'application/x-www-form-urlencoded' &&
-        opts.headers.accept === 'application/json' &&
-        opts.body === `resource=${encodeURIComponent(resource)}&client_id=${appId}&grant_type=refresh_token&refresh_token=${refreshToken}`) {
-        return Promise.reject({
-          error: {
-            "error": "error",
-            "error_description": "Error\r\nTrace ID: 14613dff-d719-4b49-a937-b623263415a9\r\nCorrelation ID: f4e1c3a8-15a8-4ae4-8389-19a5a0ce2e06\r\nTimestamp: 2016-03-12 01:18:44Z",
-            "error_codes": [
-              70016
-            ],
-            "timestamp": "2016-03-12 01:18:44Z",
-            "trace_id": "14613dff-d719-4b49-a937-b623263415a9",
-            "correlation_id": "f4e1c3a8-15a8-4ae4-8389-19a5a0ce2e06"
-          }
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
     service.refreshToken = refreshToken;
-    auth.ensureAccessToken(resource, stdout, true)
-      .then((accessToken) => {
-        done('Got access token');
-      }, (err: any) => {
-        done();
-      });
-  });
+    sinon.stub((auth as any).authCtx, 'acquireTokenWithRefreshToken').callsArgWith(3, { message: 'An error has occurred' }, undefined);
 
-  it('starts device code authentication flow when no refresh token available', (done) => {
-    sinon.stub(global, 'setInterval').callsFake(() => {
+    auth.ensureAccessToken(resource, stdout, true).then((accessToken) => {
+      done('Got access token');
+    }, (err) => {
       try {
-        assert(requestGetStub.calledOnce);
+        assert.equal(err, 'An error has occurred');
         done();
       }
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(setInterval);
-      }
     });
-    auth.ensureAccessToken(resource, stdout, true);
   });
 
-  it('checks if the device code auth completed on the given interval', (done) => {
-    sinon.stub(global, 'setInterval').callsFake((cb, interval) => {
+  it('shows AAD error when retrieving new access token using existing refresh token', (done) => {
+    service.refreshToken = refreshToken;
+    sinon.stub((auth as any).authCtx, 'acquireTokenWithRefreshToken').callsArgWith(3, { message: 'An error has occurred' }, { error_description: 'AADSTS00000 An error has occurred' });
+
+    auth.ensureAccessToken(resource, stdout).then((accessToken) => {
+      done('Got access token');
+    }, (err) => {
       try {
-        assert.equal(interval, 5000);
+        assert.equal(err, 'AADSTS00000 An error has occurred');
         done();
       }
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(setInterval);
-      }
     });
-    auth.ensureAccessToken(resource, stdout, true);
   });
 
-  it('waits if device code auth is still pending', (done) => {
-    Utils.restore(request.post);
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === 'https://login.microsoftonline.com/common/oauth2/token' &&
-        opts.headers['Content-Type'] === 'application/x-www-form-urlencoded' &&
-        opts.headers.accept === 'application/json' &&
-        opts.body === `resource=${encodeURIComponent(resource)}&client_id=${appId}&grant_type=device_code&code=${deviceCode}`) {
-        return Promise.reject({
-          error: {
-            "error": "authorization_pending",
-            "error_description": "AADSTS70016: Pending end-user authorization.\r\nTrace ID: 14613dff-d719-4b49-a937-b623263415a9\r\nCorrelation ID: f4e1c3a8-15a8-4ae4-8389-19a5a0ce2e06\r\nTimestamp: 2016-03-12 01:18:44Z",
-            "error_codes": [
-              70016
-            ],
-            "timestamp": "2016-03-12 01:18:44Z",
-            "trace_id": "14613dff-d719-4b49-a937-b623263415a9",
-            "correlation_id": "f4e1c3a8-15a8-4ae4-8389-19a5a0ce2e06"
-          }
-        });
+  it('starts device code authentication flow when no refresh token available and no authType specified', (done) => {
+    const acquireUserCodeStub = sinon.stub((auth as any).authCtx, 'acquireUserCode').callsArgWith(3, undefined, {});
+    sinon.stub((auth as any).authCtx, 'acquireTokenWithDeviceCode').callsArgWith(3, undefined, {});
+    sinon.stub(auth as any, 'setServiceConnectionInfo').callsFake(() => Promise.resolve());
+
+    auth.ensureAccessToken(resource, stdout).then((accessToken) => {
+      try {
+        assert(acquireUserCodeStub.called);
+        done();
       }
-
-      return Promise.reject('Invalid request');
+      catch (e) {
+        done(e);
+      }
+    }, (err) => {
+      done(err);
     });
-    sinon.stub(global, 'setInterval').callsFake((cb) => {
-      cb();
-      // wait for the promise inside the callback to continue
-      setTimeout(() => {
-        let isWaiting = log.length === 1 && log[0] === 'To sign in, use a web browser to open the page https://aka.ms/devicelogin. Enter the code GXGPCE4CC to authenticate.';
-
-        try {
-          assert(isWaiting);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-        finally {
-          Utils.restore(setInterval);
-        }
-      }, 1);
-    });
-    auth.ensureAccessToken(resource, stdout);
   });
 
-  it('waits if device code auth is still pending (debug)', (done) => {
-    Utils.restore(request.post);
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === 'https://login.microsoftonline.com/common/oauth2/token' &&
-        opts.headers['Content-Type'] === 'application/x-www-form-urlencoded' &&
-        opts.headers.accept === 'application/json' &&
-        opts.body === `resource=${encodeURIComponent(resource)}&client_id=${appId}&grant_type=device_code&code=${deviceCode}`) {
-        return Promise.reject({
-          error: {
-            "error": "authorization_pending",
-            "error_description": "AADSTS70016: Pending end-user authorization.\r\nTrace ID: 14613dff-d719-4b49-a937-b623263415a9\r\nCorrelation ID: f4e1c3a8-15a8-4ae4-8389-19a5a0ce2e06\r\nTimestamp: 2016-03-12 01:18:44Z",
-            "error_codes": [
-              70016
-            ],
-            "timestamp": "2016-03-12 01:18:44Z",
-            "trace_id": "14613dff-d719-4b49-a937-b623263415a9",
-            "correlation_id": "f4e1c3a8-15a8-4ae4-8389-19a5a0ce2e06"
-          }
-        });
+  it('handles error when obtaining device code failed', (done) => {
+    sinon.stub((auth as any).authCtx, 'acquireUserCode').callsArgWith(3, { message: 'An error has occurred' }, undefined);
+
+    auth.ensureAccessToken(resource, stdout).then((accessToken) => {
+      done('Got access token');
+    }, (err) => {
+      try {
+        assert.equal(err, 'An error has occurred');
+        done();
       }
-
-      return Promise.reject('Invalid request');
+      catch (e) {
+        done(e);
+      }
     });
-    sinon.stub(global, 'setInterval').callsFake((cb) => {
-      cb();
-      // wait for the promise inside the callback to continue
-      setTimeout(() => {
-        let isWaiting = false;
-        log.forEach(l => {
-          if (l && l === 'Authorization pending...') {
-            isWaiting = true;
-          }
-        });
+  });
 
-        try {
-          assert(isWaiting);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-        finally {
-          Utils.restore(setInterval);
-        }
-      }, 1);
+  it('shows AAD error when obtaining device code failed', (done) => {
+    sinon.stub((auth as any).authCtx, 'acquireUserCode').callsArgWith(3, { message: 'An error has occurred' }, { error_description: 'AADSTS00000 An error has occurred' });
+
+    auth.ensureAccessToken(resource, stdout).then((accessToken) => {
+      done('Got access token');
+    }, (err) => {
+      try {
+        assert.equal(err, 'AADSTS00000 An error has occurred');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    auth.ensureAccessToken(resource, stdout, true);
   });
 
   it('correctly handles device code auth error', (done) => {
-    Utils.restore([
-      request.post,
-      setInterval
-    ]);
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === 'https://login.microsoftonline.com/common/oauth2/token' &&
-        opts.headers['Content-Type'] === 'application/x-www-form-urlencoded' &&
-        opts.headers.accept === 'application/json' &&
-        opts.body === `resource=${encodeURIComponent(resource)}&client_id=${appId}&grant_type=device_code&code=${deviceCode}`) {
-        return Promise.reject({
-          error: {
-            "error": "error",
-            "error_description": "Error\r\nTrace ID: 14613dff-d719-4b49-a937-b623263415a9\r\nCorrelation ID: f4e1c3a8-15a8-4ae4-8389-19a5a0ce2e06\r\nTimestamp: 2016-03-12 01:18:44Z",
-            "error_codes": [
-              70016
-            ],
-            "timestamp": "2016-03-12 01:18:44Z",
-            "trace_id": "14613dff-d719-4b49-a937-b623263415a9",
-            "correlation_id": "f4e1c3a8-15a8-4ae4-8389-19a5a0ce2e06"
-          }
-        });
-      }
+    sinon.stub((auth as any).authCtx, 'acquireUserCode').callsArgWith(3, undefined, {});
+    sinon.stub((auth as any).authCtx, 'acquireTokenWithDeviceCode').callsArgWith(3, { message: 'An error has occurred' }, undefined);
 
-      return Promise.reject('Invalid request');
+    auth.ensureAccessToken(resource, stdout).then((accessToken) => {
+      done('Got access token');
+    }, (err) => {
+      try {
+        assert.equal(err, 'An error has occurred');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    sinon.stub(global, 'setInterval').callsFake((cb) => {
-      cb();
-    });
-    auth.ensureAccessToken(resource, stdout)
-      .then((accessToken) => {
-        done('Got access token');
-      }, (err: any) => {
-        if (err === 'error') {
-          done();
-        }
-        else {
-          done(err);
-        }
-      });
   });
 
   it('correctly handles device code auth error (debug)', (done) => {
-    Utils.restore([
-      request.post,
-      setInterval
-    ]);
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === 'https://login.microsoftonline.com/common/oauth2/token' &&
-        opts.headers['Content-Type'] === 'application/x-www-form-urlencoded' &&
-        opts.headers.accept === 'application/json' &&
-        opts.body === `resource=${encodeURIComponent(resource)}&client_id=${appId}&grant_type=device_code&code=${deviceCode}`) {
-        return Promise.reject({
-          error: {
-            "error": "error",
-            "error_description": "Error\r\nTrace ID: 14613dff-d719-4b49-a937-b623263415a9\r\nCorrelation ID: f4e1c3a8-15a8-4ae4-8389-19a5a0ce2e06\r\nTimestamp: 2016-03-12 01:18:44Z",
-            "error_codes": [
-              70016
-            ],
-            "timestamp": "2016-03-12 01:18:44Z",
-            "trace_id": "14613dff-d719-4b49-a937-b623263415a9",
-            "correlation_id": "f4e1c3a8-15a8-4ae4-8389-19a5a0ce2e06"
-          }
-        });
-      }
+    sinon.stub((auth as any).authCtx, 'acquireUserCode').callsArgWith(3, undefined, {});
+    sinon.stub((auth as any).authCtx, 'acquireTokenWithDeviceCode').callsArgWith(3, { message: 'An error has occurred' }, undefined);
 
-      return Promise.reject('Invalid request');
+    auth.ensureAccessToken(resource, stdout, true).then((accessToken) => {
+      done('Got access token');
+    }, (err) => {
+      try {
+        assert.equal(err, 'An error has occurred');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    sinon.stub(global, 'setInterval').callsFake((cb) => {
-      cb();
+  });
+
+  it('shows AAD error when device code auth fails', (done) => {
+    sinon.stub((auth as any).authCtx, 'acquireUserCode').callsArgWith(3, undefined, {});
+    sinon.stub((auth as any).authCtx, 'acquireTokenWithDeviceCode').callsArgWith(3, { message: 'An error has occurred' }, { error_description: 'AADSTS00000 An error has occurred' });
+
+    auth.ensureAccessToken(resource, stdout).then((accessToken) => {
+      done('Got access token');
+    }, (err) => {
+      try {
+        assert.equal(err, 'AADSTS00000 An error has occurred');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    auth.ensureAccessToken(resource, stdout, true)
-      .then((accessToken) => {
-        done('Got access token');
-      }, (err: any) => {
-        if (err === 'error') {
-          done();
-        }
-        else {
-          done(err);
-        }
-      });
   });
 
   it('retrieves access token after device code auth completed', (done) => {
-    Utils.restore([
-      request.post,
-      setInterval
-    ]);
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === 'https://login.microsoftonline.com/common/oauth2/token' &&
-        opts.headers['Content-Type'] === 'application/x-www-form-urlencoded' &&
-        opts.headers.accept === 'application/json' &&
-        opts.body === `resource=${encodeURIComponent(resource)}&client_id=${appId}&grant_type=device_code&code=${deviceCode}`) {
-        return Promise.resolve({
-          access_token: 'acc',
-          refresh_token: 'ref',
-          expires_on: 0
-        });
-      }
+    sinon.stub((auth as any).authCtx, 'acquireUserCode').callsArgWith(3, undefined, {});
+    sinon.stub((auth as any).authCtx, 'acquireTokenWithDeviceCode').callsArgWith(3, undefined, { accessToken: 'abc' });
+    sinon.stub(auth as any, 'setServiceConnectionInfo').callsFake(() => Promise.resolve());
 
-      return Promise.reject('Invalid request');
+    auth.ensureAccessToken(resource, stdout).then((accessToken) => {
+      try {
+        assert.equal(accessToken, 'abc');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    }, (err) => {
+      done(err);
     });
-    sinon.stub(global, 'setInterval').callsFake((cb) => {
-      cb();
-    });
-    auth.ensureAccessToken(resource, stdout)
-      .then((accessToken) => {
-        try {
-          assert.equal(accessToken, 'acc');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, (err: any) => {
-        done(err);
-      });
   });
 
   it('retrieves access token after device code auth completed (debug)', (done) => {
-    Utils.restore([
-      request.post,
-      setInterval
-    ]);
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === 'https://login.microsoftonline.com/common/oauth2/token' &&
-        opts.headers['Content-Type'] === 'application/x-www-form-urlencoded' &&
-        opts.headers.accept === 'application/json' &&
-        opts.body === `resource=${encodeURIComponent(resource)}&client_id=${appId}&grant_type=device_code&code=${deviceCode}`) {
-        return Promise.resolve({
-          access_token: 'acc',
-          refresh_token: 'ref',
-          expires_on: 0
-        });
-      }
+    sinon.stub((auth as any).authCtx, 'acquireUserCode').callsArgWith(3, undefined, {});
+    sinon.stub((auth as any).authCtx, 'acquireTokenWithDeviceCode').callsArgWith(3, undefined, { accessToken: 'abc' });
+    sinon.stub(auth as any, 'setServiceConnectionInfo').callsFake(() => Promise.resolve());
 
-      return Promise.reject('Invalid request');
-    });
-    sinon.stub(global, 'setInterval').callsFake((cb) => {
-      cb();
-    });
-    auth.ensureAccessToken(resource, stdout, true)
-      .then((accessToken) => {
-        try {
-          assert.equal(accessToken, 'acc');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, (err: any) => {
-        done(err);
-      });
-  });
-
-  it('retrieves access token using refresh token', (done) => {
-    Utils.restore(request.post);
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === 'https://login.microsoftonline.com/common/oauth2/token' &&
-        opts.headers['Content-Type'] === 'application/x-www-form-urlencoded' &&
-        opts.headers.accept === 'application/json' &&
-        opts.body === `resource=${encodeURIComponent(resource)}&client_id=${appId}&grant_type=refresh_token&refresh_token=${refreshToken}`) {
-        return Promise.resolve({
-          access_token: 'acc',
-          refresh_token: 'ref',
-          expires_on: 0
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-    auth.getAccessToken(resource, refreshToken, stdout).then((accessToken) => {
+    auth.ensureAccessToken(resource, stdout, true).then((accessToken) => {
       try {
-        assert.equal(accessToken, 'acc');
+        assert.equal(accessToken, 'abc');
         done();
       }
       catch (e) {
@@ -535,25 +319,15 @@ describe('Auth', () => {
     });
   });
 
-  it('retrieves access token using refresh token (debug)', (done) => {
-    Utils.restore(request.post);
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === 'https://login.microsoftonline.com/common/oauth2/token' &&
-        opts.headers['Content-Type'] === 'application/x-www-form-urlencoded' &&
-        opts.headers.accept === 'application/json' &&
-        opts.body === `resource=${encodeURIComponent(resource)}&client_id=${appId}&grant_type=refresh_token&refresh_token=${refreshToken}`) {
-        return Promise.resolve({
-          access_token: 'acc',
-          refresh_token: 'ref',
-          expires_on: 0
-        });
-      }
+  it('retrieves token using device code authentication flow when authType deviceCode specified', (done) => {
+    sinon.stub((auth as any).authCtx, 'acquireUserCode').callsArgWith(3, undefined, {});
+    const acquireTokenWithDeviceCodeStub = sinon.stub((auth as any).authCtx, 'acquireTokenWithDeviceCode').callsArgWith(3, undefined, {});
+    sinon.stub(auth as any, 'setServiceConnectionInfo').callsFake(() => Promise.resolve());
 
-      return Promise.reject('Invalid request');
-    });
-    auth.getAccessToken(resource, refreshToken, stdout, true).then((accessToken) => {
+    auth.service.authType = AuthType.DeviceCode;
+    auth.ensureAccessToken(resource, stdout).then((accessToken) => {
       try {
-        assert.equal(accessToken, 'acc');
+        assert(acquireTokenWithDeviceCodeStub.called);
         done();
       }
       catch (e) {
@@ -564,51 +338,200 @@ describe('Auth', () => {
     });
   });
 
-  it('handles error when retrieving access token using refresh token', (done) => {
-    Utils.restore(request.post);
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === 'https://login.microsoftonline.com/common/oauth2/token' &&
-        opts.headers['Content-Type'] === 'application/x-www-form-urlencoded' &&
-        opts.headers.accept === 'application/json' &&
-        opts.body === `resource=${encodeURIComponent(resource)}&client_id=${appId}&grant_type=refresh_token&refresh_token=${refreshToken}`) {
-        return Promise.reject('error');
-      }
+  it('cancels active device code authentication flow when authentication cancelled', () => {
+    (auth as any).userCodeInfo = {};
+    const cancelRequestToGetTokenWithDeviceCodeStub = sinon.stub((auth as any).authCtx, 'cancelRequestToGetTokenWithDeviceCode').callsFake(() => { });
 
-      return Promise.reject('Invalid request');
-    });
-    auth.getAccessToken(resource, refreshToken, stdout, true).then((accessToken) => {
-      done('Retrieved access token');
-    }, (err) => {
-      if (err === 'error') {
+    auth.cancel();
+    assert(cancelRequestToGetTokenWithDeviceCodeStub.called);
+  });
+
+  it('doesn\'t cancel device code authentication flow when authentication cancelled but no flow active', () => {
+    (auth as any).userCodeInfo = undefined;
+    const cancelRequestToGetTokenWithDeviceCodeStub = sinon.stub((auth as any).authCtx, 'cancelRequestToGetTokenWithDeviceCode').callsFake(() => { });
+
+    auth.cancel();
+    assert(cancelRequestToGetTokenWithDeviceCodeStub.notCalled);
+  });
+
+  it('retrieves token using password flow when authType password specified', (done) => {
+    const acquireTokenWithUsernamePassword = sinon.stub((auth as any).authCtx, 'acquireTokenWithUsernamePassword').callsArgWith(4, undefined, {});
+    sinon.stub(auth as any, 'setServiceConnectionInfo').callsFake(() => Promise.resolve());
+
+    auth.service.authType = AuthType.Password;
+    auth.ensureAccessToken(resource, stdout).then((accessToken) => {
+      try {
+        assert(acquireTokenWithUsernamePassword.called);
         done();
       }
-      else {
-        done(err);
+      catch (e) {
+        done(e);
+      }
+    }, (err) => {
+      done(err);
+    });
+  });
+
+  it('retrieves token using password flow when authType password specified (debug)', (done) => {
+    const acquireTokenWithUsernamePassword = sinon.stub((auth as any).authCtx, 'acquireTokenWithUsernamePassword').callsArgWith(4, undefined, {});
+    sinon.stub(auth as any, 'setServiceConnectionInfo').callsFake(() => Promise.resolve());
+
+    auth.service.authType = AuthType.Password;
+    auth.ensureAccessToken(resource, stdout, true).then((accessToken) => {
+      try {
+        assert(acquireTokenWithUsernamePassword.called);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    }, (err) => {
+      done(err);
+    });
+  });
+
+  it('handles error when retrieving token using password flow failed', (done) => {
+    sinon.stub((auth as any).authCtx, 'acquireTokenWithUsernamePassword').callsArgWith(4, { message: 'An error has occurred' }, undefined);
+
+    auth.service.authType = AuthType.Password;
+    auth.ensureAccessToken(resource, stdout).then((accessToken) => {
+      done('Got access token');
+    }, (err) => {
+      try {
+        assert.equal(err, 'An error has occurred');
+        done();
+      }
+      catch (e) {
+        done(e);
       }
     });
   });
 
-  it('handles error when starting device code authentication flow when no refresh token available', (done) => {
-    Utils.restore(request.get);
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://login.microsoftonline.com/common/oauth2/devicecode?resource=${resource}&client_id=${appId}` &&
-        opts.headers.accept === 'application/json') {
-        return Promise.reject('error');
-      }
+  it('logs error when retrieving token using password flow failed in debug mode', (done) => {
+    sinon.stub((auth as any).authCtx, 'acquireTokenWithUsernamePassword').callsArgWith(4, { message: 'An error has occurred' }, { error_description: 'An error has occurred' });
 
-      return Promise.reject('Invalid request');
+    auth.service.authType = AuthType.Password;
+    auth.ensureAccessToken(resource, stdout, true).then((accessToken) => {
+      done('Got access token');
+    }, (err) => {
+      try {
+        assert(stdoutLogSpy.calledWith({ error_description: 'An error has occurred' }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    auth.ensureAccessToken(resource, stdout, true)
-      .then((response) => {
-        done('Resolved promise despite error');
-      }, (err) => {
-        if (err === 'error') {
-          done();
-        }
-        else {
-          done(err);
-        }
-      });
+  });
+
+  it('returns access token if persisting connection fails', (done) => {
+    sinon.stub((auth as any).authCtx, 'acquireUserCode').callsArgWith(3, undefined, {});
+    sinon.stub((auth as any).authCtx, 'acquireTokenWithDeviceCode').callsArgWith(3, undefined, {});
+    sinon.stub(auth as any, 'setServiceConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
+
+    auth.ensureAccessToken(resource, stdout).then((accessToken) => {
+      done();
+    }, (err) => {
+      done(err);
+    });
+  });
+
+  it('logs error message if persisting connection fails in debug mode', (done) => {
+    sinon.stub((auth as any).authCtx, 'acquireUserCode').callsArgWith(3, undefined, {});
+    sinon.stub((auth as any).authCtx, 'acquireTokenWithDeviceCode').callsArgWith(3, undefined, {});
+    sinon.stub(auth as any, 'setServiceConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
+
+    auth.ensureAccessToken(resource, stdout, true).then((accessToken) => {
+      try {
+        assert(stdoutLogSpy.calledWith(new CommandError('An error has occurred')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    }, (err) => {
+      done(err);
+    });
+  });
+
+  it('gets access token using refresh token for the specified resource', (done) => {
+    sinon.stub((auth as any).authCtx, 'acquireTokenWithRefreshToken').callsArgWith(3, undefined, { accessToken: 'acc' });
+
+    auth.getAccessToken(resource, 'ref', stdout).then((accessToken) => {
+      try {
+        assert(accessToken, 'abc');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    }, (err) => {
+      done(err);
+    });
+  });
+
+  it('gets access token using refresh token for the specified resource (debug)', (done) => {
+    sinon.stub((auth as any).authCtx, 'acquireTokenWithRefreshToken').callsArgWith(3, undefined, { accessToken: 'acc' });
+
+    auth.getAccessToken(resource, 'ref', stdout, true).then((accessToken) => {
+      try {
+        assert(accessToken, 'abc');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    }, (err) => {
+      done(err);
+    });
+  });
+
+  it('handles error when getting access token using refresh token for the specified resource', (done) => {
+    sinon.stub((auth as any).authCtx, 'acquireTokenWithRefreshToken').callsArgWith(3, { message: 'An error has occurred' }, undefined);
+
+    auth.getAccessToken(resource, 'ref', stdout).then((accessToken) => {
+      done('Got access token');
+    }, (err) => {
+      try {
+        assert.equal(err, 'An error has occurred');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('shows AAD error when getting access token using refresh token for the specified resource', (done) => {
+    sinon.stub((auth as any).authCtx, 'acquireTokenWithRefreshToken').callsArgWith(3, { message: 'An error has occurred' }, { error_description: 'AADSTS00000 An error has occurred' });
+
+    auth.getAccessToken(resource, 'ref', stdout).then((accessToken) => {
+      done('Got access token');
+    }, (err) => {
+      try {
+        assert.equal(err, 'AADSTS00000 An error has occurred');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('logs the error message when getting access token using refresh token for the specified resource failed in debug mode', (done) => {
+    sinon.stub((auth as any).authCtx, 'acquireTokenWithRefreshToken').callsArgWith(3, { message: 'An error has occurred' }, undefined);
+
+    auth.getAccessToken(resource, 'ref', stdout, true).then((accessToken) => {
+      done('Got access token');
+    }, (err) => {
+      try {
+        assert(stdoutLogSpy.calledWith({ message: 'An error has occurred' }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 
   it('configures KeychainTokenStorage as token storage when OS is macOS', (done) => {
@@ -657,10 +580,39 @@ describe('Auth', () => {
   });
 
   it('restores authentication', (done) => {
+    const mockStorage = {
+      get: () => Promise.resolve(JSON.stringify({ resource: 'mock' }))
+    };
+    sinon.stub(auth, 'getTokenStorage').callsFake(() => mockStorage);
+
     auth
       .restoreAuth()
       .then(() => {
-        done();
+        try {
+          assert.equal(auth.service.resource, 'mock');
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, (err) => {
+        done(err);
+      });
+  });
+
+  it('handles error when restoring authentication', (done) => {
+    sinon.stub(auth as any, 'getServiceConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
+
+    auth
+      .restoreAuth()
+      .then(() => {
+        try {
+          assert.equal(auth.service.connected, false);
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
       }, (err) => {
         done(err);
       });
@@ -712,15 +664,15 @@ describe('Auth', () => {
 
   it('stores connection information in the configured token storage', (done) => {
     const mockStorage = new MockTokenStorage();
-    const mockStorageGetStub = sinon.stub(mockStorage, 'set').callsFake(() => Promise.resolve());
+    const mockStorageSetStub = sinon.stub(mockStorage, 'set').callsFake(() => Promise.resolve());
     const mockAuth = new MockAuth(new MockService());
     sinon.stub(mockAuth, 'getTokenStorage').callsFake(() => mockStorage);
 
     mockAuth
-      .setConnectionInfo()
+      .storeConnectionInfo()
       .then(() => {
         try {
-          assert(mockStorageGetStub.called);
+          assert(mockStorageSetStub.called);
           done();
         }
         catch (e) {
@@ -740,6 +692,24 @@ describe('Auth', () => {
       .then(() => {
         try {
           assert(mockStorageRemoveStub.called);
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
+  });
+
+  it('stores connection information for the specified service', (done) => {
+    const mockService = new MockService();
+    const mockAuth = new MockAuth(mockService);
+    const setServiceConnectionInfoStub = sinon.stub(mockAuth as any, 'setServiceConnectionInfo').callsFake((serviceId, service) => Promise.resolve());
+
+    mockAuth
+      .storeConnectionInfo()
+      .then(() => {
+        try {
+          assert(setServiceConnectionInfoStub.calledWith((mockAuth as any).serviceId(), mockService));
           done();
         }
         catch (e) {

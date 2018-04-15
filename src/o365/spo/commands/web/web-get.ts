@@ -10,7 +10,7 @@ import {
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import { WebPropertiesCollection } from "./WebPropertiesCollection";
-import Auth from '../../../../Auth';
+import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 

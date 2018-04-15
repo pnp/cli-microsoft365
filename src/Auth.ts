@@ -1,17 +1,20 @@
-import * as request from 'request-promise-native';
-import Utils from './Utils';
 import * as os from 'os';
 import { TokenStorage } from './auth/TokenStorage';
 import { KeychainTokenStorage } from './auth/KeychainTokenStorage';
 import { WindowsTokenStorage } from './auth/WindowsTokenStorage';
 import { FileTokenStorage } from './auth/FileTokenStorage';
+import { AuthenticationContext, TokenResponse, ErrorResponse, UserCodeInfo, Logging, LoggingLevel } from 'adal-node';
+import { CommandError } from './Command';
 
 export class Service {
-  connected: boolean;
+  connected: boolean = false;
   resource: string;
-  accessToken: string;
+  accessToken: string = '';
   refreshToken?: string;
-  expiresAt: number;
+  expiresOn: string = '';
+  authType: AuthType = AuthType.DeviceCode;
+  userName?: string;
+  password?: string;
 
   constructor(resource: string = '') {
     this.resource = resource;
@@ -22,52 +25,59 @@ export class Service {
     this.resource = '';
     this.accessToken = '';
     this.refreshToken = undefined;
-    this.expiresAt = -1;
+    this.expiresOn = '';
+    this.authType = AuthType.DeviceCode;
+    this.userName = undefined;
+    this.password = undefined;
   }
-}
-
-interface Token {
-  access_token: string;
-  refresh_token: string;
-  expires_on: number;
-}
-
-interface Error {
-  error: {
-    error: string;
-    error_description: string;
-  };
-}
-
-interface DeviceCode {
-  interval: number;
-  device_code: string;
-  message: string;
 }
 
 export interface Logger {
   log: (msg: any) => void
 }
 
-export default class Auth {
-  public interval: NodeJS.Timer;
+export enum AuthType {
+  DeviceCode,
+  Password
+}
+
+export abstract class Auth {
+  protected authCtx: AuthenticationContext;
+  private userCodeInfo?: UserCodeInfo;
+
+  protected abstract serviceId(): string;
 
   constructor(public service: Service, private appId?: string) {
+    this.authCtx = new AuthenticationContext('https://login.microsoftonline.com/common');
   }
 
   public restoreAuth(): Promise<void> {
-    return Promise.resolve();
+    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
+      this
+        .getServiceConnectionInfo<Service>(this.serviceId())
+        .then((service: Service): void => {
+          this.service = service;
+          resolve();
+        }, (error: any): void => {
+          resolve();
+        });
+    });
   }
 
   public ensureAccessToken(resource: string, stdout: Logger, debug: boolean = false): Promise<string> {
-    if (debug) {
-      stdout.log(`Starting Auth.ensureAccessToken. resource: ${resource}, debug: ${debug}`);
-    }
+    /* istanbul ignore next */
+    Logging.setLoggingOptions({
+      level: debug ? 3 : 0,
+      log: (level: LoggingLevel, message: string, error?: Error): void => {
+        stdout.log(message);
+      }
+    });
 
-    return new Promise<string>((resolve: (accessToken: string) => void, reject: (err: any) => void) => {
-      const now: number = new Date().getTime() / 1000;
+    return new Promise<string>((resolve: (accessToken: string) => void, reject: (error: any) => void): void => {
+      const now: Date = new Date();
+      const expiresOn: Date = new Date(this.service.expiresOn);
 
-      if (this.service.expiresAt > now &&
+      if (expiresOn > now &&
         this.service.accessToken !== undefined) {
         if (debug) {
           stdout.log(`Existing access token ${this.service.accessToken} still valid. Returning...`);
@@ -77,140 +87,151 @@ export default class Auth {
       }
       else {
         if (debug) {
-          stdout.log(`No existing access token or expired. Token: ${this.service.accessToken}, ExpiresAt: ${this.service.expiresAt}`);
+          stdout.log(`No existing access token or expired. Token: ${this.service.accessToken}, ExpiresAt: ${this.service.expiresOn}`);
         }
       }
+
+      let getTokenPromise: (resource: string, stdout: Logger, debug: boolean) => Promise<TokenResponse> = this.ensureAccessTokenWithDeviceCode.bind(this);
 
       if (this.service.refreshToken) {
-        if (debug) {
-          stdout.log(`Retrieving new access token using existing refresh token ${this.service.refreshToken}`);
-        }
-
-        const requestOptions: any = {
-          url: 'https://login.microsoftonline.com/common/oauth2/token',
-          headers: Utils.getRequestHeaders({
-            'Content-Type': 'application/x-www-form-urlencoded',
-            accept: 'application/json'
-          }),
-          body: `resource=${encodeURIComponent(resource)}&client_id=${this.appId}&grant_type=refresh_token&refresh_token=${this.service.refreshToken}`,
-          json: true
-        };
-
-        if (debug) {
-          stdout.log('Executing web request...');
-          stdout.log(requestOptions);
-          stdout.log('');
-        }
-
-        request.post(requestOptions)
-          .then((json: Token): void => {
-            if (debug) {
-              stdout.log('Response:');
-              stdout.log(json);
-              stdout.log('');
-            }
-
-            this.service.accessToken = json.access_token;
-            this.service.refreshToken = json.refresh_token;
-            this.service.expiresAt = json.expires_on;
-            resolve(json.access_token);
-          }, (json: Error): void => {
-            if (debug) {
-              stdout.log('Response:');
-              stdout.log(json);
-              stdout.log('');
-            }
-
-            reject(json.error.error);
-            return;
-          });
+        getTokenPromise = this.ensureAccessTokenWithRefreshToken.bind(this);
       }
       else {
-        if (debug) {
-          stdout.log('No existing refresh token. Starting new device code flow...');
+        switch (this.service.authType) {
+          case AuthType.DeviceCode:
+            getTokenPromise = this.ensureAccessTokenWithDeviceCode.bind(this);
+            break;
+          case AuthType.Password:
+            getTokenPromise = this.ensureAccessTokenWithPassword.bind(this);
+            break;
         }
+      }
 
-        const requestOptions: any = {
-          url: `https://login.microsoftonline.com/common/oauth2/devicecode?resource=${resource}&client_id=${this.appId}`,
-          headers: Utils.getRequestHeaders({
-            accept: 'application/json'
-          }),
-          json: true
-        };
+      getTokenPromise(resource, stdout, debug)
+        .then((tokenResponse: TokenResponse): Promise<void> => {
+          this.service.accessToken = tokenResponse.accessToken;
+          this.service.refreshToken = tokenResponse.refreshToken;
+          this.service.expiresOn = tokenResponse.expiresOn as string;
+          return this.setServiceConnectionInfo(this.serviceId(), this.service);
+        }, (error: any): void => {
+          reject(error);
+        })
+        .then((): void => {
+          resolve(this.service.accessToken);
+        }, (error: any): void => {
+          if (debug) {
+            stdout.log(new CommandError(error));
+          }
+          resolve(this.service.accessToken);
+        });
+    });
+  }
 
-        if (debug) {
-          stdout.log('Executing web request...');
-          stdout.log(requestOptions);
-          stdout.log('');
-        }
+  private ensureAccessTokenWithRefreshToken(resource: string, stdout: Logger, debug: boolean): Promise<TokenResponse> {
+    return new Promise<TokenResponse>((resolve: (tokenResponse: TokenResponse) => void, reject: (error: any) => void): void => {
+      if (debug) {
+        stdout.log(`Retrieving new access token using existing refresh token ${this.service.refreshToken}`);
+      }
 
-        request.get(requestOptions)
-          .then((json: DeviceCode): void => {
-            if (debug) {
-              stdout.log('Response:');
-              stdout.log(json);
-              stdout.log('');
-            }
+      this.authCtx.acquireTokenWithRefreshToken(
+        this.service.refreshToken as string,
+        this.appId as string,
+        resource,
+        (error: Error, response: TokenResponse | ErrorResponse): void => {
+          if (debug) {
+            stdout.log('Response:');
+            stdout.log(response);
+            stdout.log('');
+          }
 
-            const interval = json.interval;
-            const deviceCode = json.device_code;
-            stdout.log(json.message);
+          if (error) {
+            reject((response && (response as any).error_description) || error.message);
+            return;
+          }
 
-            this.interval = setInterval((): void => {
-              const authCheckRequestOptions: any = {
-                url: 'https://login.microsoftonline.com/common/oauth2/token',
-                headers: Utils.getRequestHeaders({
-                  'Content-Type': 'application/x-www-form-urlencoded',
-                  accept: 'application/json'
-                }),
-                body: `resource=${encodeURIComponent(resource)}&client_id=${this.appId}&grant_type=device_code&code=${deviceCode}`,
-                json: true
-              };
+          resolve(<TokenResponse>response);
+        });
+    });
+  }
 
+  private ensureAccessTokenWithDeviceCode(resource: string, stdout: Logger, debug: boolean): Promise<TokenResponse> {
+    if (debug) {
+      stdout.log(`Starting Auth.ensureAccessTokenWithDeviceCode. resource: ${resource}, debug: ${debug}`);
+    }
+
+    return new Promise<TokenResponse>((resolve: (tokenResponse: TokenResponse) => void, reject: (err: any) => void) => {
+      if (debug) {
+        stdout.log('No existing refresh token. Starting new device code flow...');
+      }
+
+      this.authCtx.acquireUserCode(resource, this.appId as string, 'en-us',
+        (error: Error, response: UserCodeInfo): void => {
+          if (debug) {
+            stdout.log('Response:');
+            stdout.log(response);
+            stdout.log('');
+          }
+
+          if (error) {
+            reject((response && (response as any).error_description) || error.message);
+            return;
+          }
+
+          stdout.log(response.message);
+
+          this.userCodeInfo = response;
+          this.authCtx.acquireTokenWithDeviceCode(resource, this.appId as string, response,
+            (error: Error, response: TokenResponse | ErrorResponse): void => {
               if (debug) {
-                stdout.log('Executing web request:');
-                stdout.log(authCheckRequestOptions);
+                stdout.log('Response:');
+                stdout.log(response);
                 stdout.log('');
               }
 
-              request.post(authCheckRequestOptions)
-                .then((json: Token): void => {
-                  if (debug) {
-                    stdout.log('Response:');
-                    stdout.log(json);
-                    stdout.log('');
-                  }
+              if (error) {
+                reject((response && (response as any).error_description) || error.message);
+                return;
+              }
 
-                  this.service.accessToken = json.access_token;
-                  this.service.refreshToken = json.refresh_token;
-                  this.service.expiresAt = json.expires_on;
-                  clearInterval(this.interval);
-                  resolve(this.service.accessToken);
-                  return;
-                }, (rej2: Error): void => {
-                  if (rej2.error.error !== 'authorization_pending') {
-                    if (debug) {
-                      stdout.log('Response:');
-                      stdout.log(rej2);
-                      stdout.log('');
-                    }
-
-                    clearInterval(this.interval);
-                    reject(rej2.error.error);
-                    return;
-                  }
-                  else {
-                    if (debug) {
-                      stdout.log('Authorization pending...');
-                    }
-                  }
-                });
-            }, interval * 1000);
-          }, (err: any): void => {
-            reject(err);
-          });
-      }
+              this.userCodeInfo = undefined;
+              resolve(<TokenResponse>response);
+            });
+        });
     });
+  }
+
+  private ensureAccessTokenWithPassword(resource: string, stdout: Logger, debug: boolean): Promise<TokenResponse> {
+    return new Promise<TokenResponse>((resolve: (tokenResponse: TokenResponse) => void, reject: (error: any) => void): void => {
+      if (debug) {
+        stdout.log(`Retrieving new access token using credentials...`);
+      }
+
+      this.authCtx.acquireTokenWithUsernamePassword(
+        resource,
+        this.service.userName as string,
+        this.service.password as string,
+        this.appId as string,
+        (error: Error, response: TokenResponse | ErrorResponse): void => {
+          if (debug) {
+            stdout.log('Response:');
+            stdout.log(response);
+            stdout.log('');
+          }
+
+          if (error) {
+            reject((response && (response as any).error_description) || error.message);
+            return;
+          }
+
+          resolve(<TokenResponse>response);
+        });
+    });
+  }
+
+  public cancel(): void {
+    if (this.userCodeInfo) {
+      this.authCtx.cancelRequestToGetTokenWithDeviceCode(this.userCodeInfo as UserCodeInfo, /* istanbul ignore next */(error: Error, response: TokenResponse | ErrorResponse): void => { });
+    }
   }
 
   public getAccessToken(resource: string, refreshToken: string, stdout: Logger, debug: boolean = false): Promise<string> {
@@ -223,33 +244,27 @@ export default class Auth {
         stdout.log(`Retrieving access token for ${resource} using refresh token ${refreshToken}`);
       }
 
-      const requestOptions: any = {
-        url: 'https://login.microsoftonline.com/common/oauth2/token',
-        headers: Utils.getRequestHeaders({
-          'Content-Type': 'application/x-www-form-urlencoded',
-          accept: 'application/json'
-        }),
-        body: `resource=${encodeURIComponent(resource)}&client_id=${this.appId}&grant_type=refresh_token&refresh_token=${refreshToken}`,
-        json: true
-      };
+      this.authCtx.acquireTokenWithRefreshToken(refreshToken, this.appId as string, resource,
+        (error: Error, response: TokenResponse | ErrorResponse): void => {
+          if (error) {
+            if (debug) {
+              stdout.log('Error:');
+              stdout.log(error);
+              stdout.log('');
+            }
 
-      if (debug) {
-        stdout.log('Executing web request...');
-        stdout.log(requestOptions);
-        stdout.log('');
-      }
+            reject((response && (response as any).error_description) || error.message);
+            return;
+          }
 
-      request.post(requestOptions)
-        .then((json: Token): void => {
           if (debug) {
             stdout.log('Response:');
-            stdout.log(json);
+            stdout.log(response);
             stdout.log('');
           }
 
-          resolve(json.access_token);
-        }, (err: any): void => {
-          reject(err);
+          const tokenResponse: TokenResponse = <TokenResponse>response;
+          resolve(tokenResponse.accessToken);
         });
     });
   }
@@ -282,9 +297,17 @@ export default class Auth {
     return tokenStorage.set(service, JSON.stringify(connectionInfo));
   }
 
+  public storeConnectionInfo(): Promise<void> {
+    return this.setServiceConnectionInfo(this.serviceId(), this.service);
+  }
+
   protected clearServiceConnectionInfo(service: string): Promise<void> {
     const tokenStorage = this.getTokenStorage();
     return tokenStorage.remove(service);
+  }
+
+  public clearConnectionInfo(): Promise<void> {
+    return this.clearServiceConnectionInfo(this.serviceId());
   }
 
   public getTokenStorage(): TokenStorage {

@@ -41,8 +41,10 @@ pages:
       - file:
         - file get: 'cmd/spo/file/file-get.md'
         - file list: 'cmd/spo/file/file-list.md'
+        - file remove: 'cmd/spo/file/file-remove.md'
       - hubsite:
         - hubsite connect: 'cmd/spo/hubsite/hubsite-connect.md'
+        - hubsite data get: 'cmd/spo/hubsite/hubsite-data-get.md'
         - hubsite disconnect: 'cmd/spo/hubsite/hubsite-disconnect.md'
         - hubsite get: 'cmd/spo/hubsite/hubsite-get.md'
         - hubsite list: 'cmd/spo/hubsite/hubsite-list.md'
@@ -50,6 +52,7 @@ pages:
         - hubsite rights grant: 'cmd/spo/hubsite/hubsite-rights-grant.md'
         - hubsite rights revoke: 'cmd/spo/hubsite/hubsite-rights-revoke.md'
         - hubsite set: 'cmd/spo/hubsite/hubsite-set.md'
+        - hubsite theme sync: 'cmd/spo/hubsite/hubsite-theme-sync.md'
         - hubsite unregister: 'cmd/spo/hubsite/hubsite-unregister.md'
       - list:
         - list add: 'cmd/spo/list/list-add.md'
@@ -57,6 +60,9 @@ pages:
         - list list: 'cmd/spo/list/list-list.md'
         - list remove: 'cmd/spo/list/list-remove.md'
         - list set: 'cmd/spo/list/list-set.md'
+      - listitem:
+        - listitem add: 'cmd/spo/listitem/listitem-add.md'
+        - listitem remove: 'cmd/spo/listitem/listitem-remove.md'
       - page:
         - page add: 'cmd/spo/page/page-add.md'
         - page list: 'cmd/spo/page/page-list.md'
@@ -65,6 +71,7 @@ pages:
         - propertybag get: 'cmd/spo/propertybag/propertybag-get.md'
         - propertybag list: 'cmd/spo/propertybag/propertybag-list.md'
         - propertybag remove: 'cmd/spo/propertybag/propertybag-remove.md'
+        - propertybag set: 'cmd/spo/propertybag/propertybag-set.md'
       - serviceprincipal:
         - serviceprincipal grant list: 'cmd/spo/serviceprincipal/serviceprincipal-grant-list.md'
         - serviceprincipal grant revoke: 'cmd/spo/serviceprincipal/serviceprincipal-grant-revoke.md'

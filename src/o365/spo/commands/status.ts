@@ -5,6 +5,7 @@ import Command, {
   CommandError
 } from '../../../Command';
 import Utils from '../../../Utils';
+import { AuthType } from '../../../Auth';
 
 const vorpal: Vorpal = require('../../../vorpal-init');
 
@@ -23,16 +24,14 @@ class SpoStatusCommand extends Command {
       .then((): void => {
         if (auth.site.connected) {
           if (this.debug) {
-            const expiresAtDate: Date = new Date(0);
-            expiresAtDate.setUTCSeconds(auth.service.expiresAt);
-
             cmd.log({
               connectedAs: Utils.getUserNameFromAccessToken(auth.service.accessToken),
               isTenantAdmin: auth.site.isTenantAdminSite(),
+              authType: AuthType[auth.service.authType],
               aadResource: auth.service.resource,
               accessToken: auth.service.accessToken,
               refreshToken: auth.service.refreshToken,
-              expiresAt: expiresAtDate
+              expiresAt: auth.service.expiresOn
             });
           }
           else {
@@ -64,8 +63,9 @@ class SpoStatusCommand extends Command {
       `  Remarks:
 
     If you are connected to a SharePoint Online, the ${chalk.blue(commands.STATUS)} command
-    will show you information about the site to which you are connected, the currently stored
-    refresh and access token and the expiration date and time of the access token.
+    will show you information about the site to which you are connected, the
+    currently stored refresh and access token and the expiration date and time
+    of the access token.
 
   Examples:
   

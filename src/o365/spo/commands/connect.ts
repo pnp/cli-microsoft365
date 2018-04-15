@@ -1,12 +1,13 @@
 import auth from '../SpoAuth';
 import { ContextInfo } from '../spo';
-import Auth from '../../../Auth';
+import { Auth, AuthType } from '../../../Auth';
 import config from '../../../config';
 import * as request from 'request-promise-native';
 import commands from '../commands';
 import GlobalOptions from '../../../GlobalOptions';
 import Command, {
   CommandCancel,
+  CommandOption,
   CommandValidate,
   CommandError
 } from '../../../Command';
@@ -18,7 +19,13 @@ const vorpal: Vorpal = require('../../../vorpal-init');
 
 interface CommandArgs {
   url: string;
-  options: GlobalOptions;
+  options: Options;
+}
+
+interface Options extends GlobalOptions {
+  authType?: string;
+  userName?: string;
+  password?: string;
 }
 
 class SpoConnectCommand extends Command {
@@ -56,6 +63,12 @@ class SpoConnectCommand extends Command {
 
       const resource = Auth.getResourceFromUrl(args.url);
       auth.site.url = args.url;
+
+      if (args.options.authType === 'password') {
+        auth.service.authType = AuthType.Password;
+        auth.service.userName = args.options.userName;
+        auth.service.password = args.options.password;
+      }
 
       if (auth.site.isTenantAdminSite()) {
         auth
@@ -134,14 +147,16 @@ class SpoConnectCommand extends Command {
               cmd.log(`Successfully connected to ${args.url}`);
             }
             cb();
-          }, (rej: Error): void => {
+          }, (rej: string): void => {
             if (this.debug) {
               cmd.log('Error:');
               cmd.log(rej);
               cmd.log('');
             }
 
-            cmd.log(new CommandError(rej.message));
+            if (rej !== 'Polling_Request_Cancelled') {
+              cmd.log(new CommandError(rej));
+            }
             cb();
             return;
           });
@@ -160,14 +175,16 @@ class SpoConnectCommand extends Command {
           })
           .then((): void => {
             cb();
-          }, (rej: Error): void => {
+          }, (rej: string): void => {
             if (this.debug) {
               cmd.log('Error:');
               cmd.log(rej);
               cmd.log('');
             }
 
-            cmd.log(new CommandError(rej.message));
+            if (rej !== 'Polling_Request_Cancelled') {
+              cmd.log(new CommandError(rej));
+            }
             cb();
           });
       }
@@ -188,17 +205,46 @@ class SpoConnectCommand extends Command {
       });
   }
 
+  public options(): CommandOption[] {
+    const options: CommandOption[] = [
+      {
+        option: '-t, --authType [authType]',
+        description: 'The type of authentication to use. Allowed values deviceCode|password. Default deviceCode',
+        autocomplete: ['deviceCode', 'password']
+      },
+      {
+        option: '-u, --userName [userName]',
+        description: 'Name of the user to authenticate. Required when authType is set to password'
+      },
+      {
+        option: '-p, --password [password]',
+        description: 'Password for the user. Required when authType is set to password'
+      }
+    ];
+
+    const parentOptions: CommandOption[] = super.options();
+    return options.concat(parentOptions);
+  }
+
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
+      if (args.options.authType === 'password') {
+        if (!args.options.userName) {
+          return 'Required option userName missing';
+        }
+
+        if (!args.options.password) {
+          return 'Required option password missing';
+        }
+      }
+
       return SpoCommand.isValidSharePointUrl(args.url);
     };
   }
 
   public cancel(): CommandCancel {
     return (): void => {
-      if (auth.interval) {
-        clearInterval(auth.interval);
-      }
+      auth.cancel();
     }
   }
 
@@ -212,30 +258,43 @@ class SpoConnectCommand extends Command {
         
   Remarks:
 
-    Using the ${chalk.blue(commands.CONNECT)} command, you can connect to any SharePoint Online site.
-    Depending on the command you want to use, you might be required to connect
-    to a SharePoint Online tenant admin site (suffixed with ${chalk.grey('-admin')},
+    Using the ${chalk.blue(commands.CONNECT)} command, you can connect to any SharePoint Online
+    site. Depending on the command you want to use, you might be required to
+    connect to a SharePoint Online tenant admin site (suffixed with ${chalk.grey('-admin')},
     eg. ${chalk.grey('https://contoso-admin.sharepoint.com')}) or a regular site.
 
-    The ${chalk.blue(commands.CONNECT)} command uses device code OAuth flow to connect
-    to SharePoint Online.
+    By default, the ${chalk.blue(commands.CONNECT)} command uses device code OAuth flow
+    to connect to SharePoint Online. Alternatively, you can
+    authenticate using a user name and password, which is convenient for CI/CD
+    scenarios, but which comes with its own limitations. See the Office 365 CLI
+    manual for more information.
     
-    When connecting to a SharePoint site, the ${chalk.blue(commands.CONNECT)} command stores in memory
-    the access token and the refresh token for the specified site. Both tokens
-    are cleared from memory after exiting the CLI or by calling
-    the ${chalk.blue(commands.DISCONNECT)} command.
+    When connecting to a SharePoint site, the ${chalk.blue(commands.CONNECT)} command
+    stores in memory the access token and the refresh token for the specified
+    site. Both tokens are cleared from memory after exiting the CLI or by
+    calling the ${chalk.blue(commands.DISCONNECT)} command.
+
+    When connecting to SharePoint Online using the user name and
+    password, next to the access and refresh token, the Office 365 CLI will
+    store the user credentials so that it can automatically reauthenticate if
+    necessary. Similarly to the tokens, the credentials are removed by
+    reconnecting using the device code or by calling the ${chalk.blue(commands.DISCONNECT)}
+    command.
 
   Examples:
   
-    Connect to a SharePoint Online tenant admin site
+    Connect to a SharePoint Online tenant admin site using the device code
       ${chalk.grey(config.delimiter)} ${commands.CONNECT} https://contoso-admin.sharepoint.com
 
-    Connect to a SharePoint Online tenant admin site in debug mode including
-    detailed debug information in the console output
+    Connect to a SharePoint Online tenant admin site using the device code in
+    debug mode including detailed debug information in the console output
       ${chalk.grey(config.delimiter)} ${commands.CONNECT} --debug https://contoso-admin.sharepoint.com
       
-    Connect to a regular SharePoint Online site
+    Connect to a regular SharePoint Online site using the device code
       ${chalk.grey(config.delimiter)} ${commands.CONNECT} https://contoso.sharepoint.com/sites/team
+
+    Connect to a SharePoint Online tenant admin site using a user name and password
+      ${chalk.grey(config.delimiter)} ${commands.CONNECT} https://contoso-admin.sharepoint.com --authType password --userName user@contoso.com --password pass@word1
 `);
   }
 }

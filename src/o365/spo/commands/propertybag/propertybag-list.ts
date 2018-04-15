@@ -8,7 +8,7 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import { ContextInfo } from '../../spo';
-import Auth from '../../../../Auth';
+import { Auth } from '../../../../Auth';
 import { SpoPropertyBagBaseCommand, IdentityResponse, Property } from './propertybag-base';
 import GlobalOptions from '../../../../GlobalOptions';
 
@@ -103,7 +103,7 @@ class SpoPropertyBagListCommand extends SpoPropertyBagBaseCommand {
       },
       {
         option: '-f, --folder [folder]',
-        description: 'Server- or site-relative URL of the folder from which to retrieve property bag value. Case-sensitive',
+        description: 'Site-relative URL of the folder from which to retrieve property bag value. Case-sensitive',
       }
     ];
 

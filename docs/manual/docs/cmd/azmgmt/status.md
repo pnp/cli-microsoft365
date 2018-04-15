@@ -22,7 +22,7 @@ Option|Description
 !!! attention
     This command is based on an API that is currently in preview and is subject to change once the API reached general availability.
 
-If you are connected to the Azure Management Service, the `azmgmt status` command will show you information about the currently stored refresh and access token and the expiration date and time of the access token when run in debug mode.
+If you are connected to the Azure Management Service, the `azmgmt status` command will show you information about the currently stored refresh and access token and the expiration date and time of the access token when run in debug mode. If you are connected using a user name and password, it will also show you the name of the user used to authenticate.
 
 ## Examples
 

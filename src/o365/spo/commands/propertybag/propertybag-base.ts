@@ -3,6 +3,7 @@ import * as request from 'request-promise-native';
 import Utils from '../../../../Utils';
 import { ClientSvcResponseContents, ClientSvcResponse } from "../../spo";
 import config from '../../../../config';
+import { BasePermissions } from "../../common/base-permissions";
 
 export interface Property {
   key: string;
@@ -243,6 +244,58 @@ export abstract class SpoPropertyBagBaseCommand extends SpoCommand {
         }
 
         reject('Cannot proceed. AllProperties not found'); // this is not supposed to happen
+      }, (err: any): void => { reject(err); })
+    });
+  }
+
+  /**
+   * Gets EffectiveBasePermissions for web return type is "_ObjectType_\":\"SP.Web\".
+   * Note: This method can be moved as common method if is to be used for other commands.
+   */
+  protected getEffectiveBasePermissions(webObjectIdentity: string, webUrl: string, cmd: CommandInstance): Promise<BasePermissions> {
+
+    let basePermissionsResult = new BasePermissions();
+
+    const requestOptions: any = {
+      url: `${webUrl}/_vti_bin/client.svc/ProcessQuery`,
+      headers: Utils.getRequestHeaders({
+        authorization: `Bearer ${this.siteAccessToken}`,
+        'X-RequestDigest': this.formDigestValue
+      }),
+      body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="11" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="EffectiveBasePermissions" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="${webObjectIdentity}" /></ObjectPaths></Request>`
+    };
+
+    if (this.debug) {
+      cmd.log('Request:');
+      cmd.log(JSON.stringify(requestOptions));
+      cmd.log('');
+    }
+
+    return new Promise<BasePermissions>((resolve: any, reject: any): void => {
+      request.post(requestOptions).then((res: any) => {
+
+        if (this.debug) {
+          cmd.log('Response:');
+          cmd.log(JSON.stringify(res));
+          cmd.log('');
+
+          cmd.log('Attempt to get the web EffectiveBasePermissions');
+        }
+
+        const json: ClientSvcResponse = JSON.parse(res);
+        const contents: ClientSvcResponseContents = json.find(x => { return x['ErrorInfo']; });
+        if (contents && contents.ErrorInfo) {
+          return reject(contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error');
+        }
+
+        const permissionsObj = json.find(x => { return x['EffectiveBasePermissions'] });
+        if (permissionsObj) {
+          basePermissionsResult.high = permissionsObj['EffectiveBasePermissions']['High'];
+          basePermissionsResult.low = permissionsObj['EffectiveBasePermissions']['Low'];
+          return resolve(basePermissionsResult);
+        }
+
+        reject('Cannot proceed. EffectiveBasePermissions not found'); // this is not supposed to happen
       }, (err: any): void => { reject(err); })
     });
   }

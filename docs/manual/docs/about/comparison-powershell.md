@@ -157,7 +157,7 @@ Add-PnPIndexedProperty|SharePointPnPPowerShellOnline|
 Add-PnPJavaScriptBlock|SharePointPnPPowerShellOnline|
 Add-PnPJavaScriptLink|SharePointPnPPowerShellOnline|
 Add-PnPListFoldersToProvisioningTemplate|SharePointPnPPowerShellOnline|
-Add-PnPListItem|SharePointPnPPowerShellOnline|
+Add-PnPListItem|SharePointPnPPowerShellOnline|[spo listitem add](../cmd/spo/listitem/listitem-add.md)
 Add-PnPMasterPage|SharePointPnPPowerShellOnline|
 Add-PnPNavigationNode|SharePointPnPPowerShellOnline|
 Add-PnPOffice365GroupToSite|SharePointPnPPowerShellOnline|
@@ -345,14 +345,14 @@ Remove-PnPCustomAction|SharePointPnPPowerShellOnline|[spo customaction remove](.
 Remove-PnPEventReceiver|SharePointPnPPowerShellOnline|
 Remove-PnPField|SharePointPnPPowerShellOnline|
 Remove-PnPFieldFromContentType|SharePointPnPPowerShellOnline|
-Remove-PnPFile|SharePointPnPPowerShellOnline|
+Remove-PnPFile|SharePointPnPPowerShellOnline|[spo file remove](../cmd/spo/file/file-remove.md)
 Remove-PnPFileFromProvisioningTemplate|SharePointPnPPowerShellOnline|
 Remove-PnPFolder|SharePointPnPPowerShellOnline|
 Remove-PnPGroup|SharePointPnPPowerShellOnline|
 Remove-PnPIndexedProperty|SharePointPnPPowerShellOnline|
 Remove-PnPJavaScriptLink|SharePointPnPPowerShellOnline|
 Remove-PnPList|SharePointPnPPowerShellOnline|[spo list remove](../cmd/spo/list/list-remove.md)
-Remove-PnPListItem|SharePointPnPPowerShellOnline|
+Remove-PnPListItem|SharePointPnPPowerShellOnline|[spo listitem remove](../cmd/spo/listitem/listitem-remove.md)
 Remove-PnPNavigationNode|SharePointPnPPowerShellOnline|
 Remove-PnPPropertyBagValue|SharePointPnPPowerShellOnline|[spo propertybag remove](../cmd/spo/propertybag/propertybag-remove.md)
 Remove-PnPPublishingImageRendition|SharePointPnPPowerShellOnline|
@@ -417,7 +417,7 @@ Set-PnPListItemPermission|SharePointPnPPowerShellOnline|
 Set-PnPListPermission|SharePointPnPPowerShellOnline|
 Set-PnPMasterPage|SharePointPnPPowerShellOnline|
 Set-PnPMinimalDownloadStrategy|SharePointPnPPowerShellOnline|
-Set-PnPPropertyBagValue|SharePointPnPPowerShellOnline|
+Set-PnPPropertyBagValue|SharePointPnPPowerShellOnline|[spo propertybag set](../cmd/spo/propertybag/propertybag-set.md)
 Set-PnPProvisioningTemplateMetadata|SharePointPnPPowerShellOnline|
 Set-PnPRequestAccessEmails|SharePointPnPPowerShellOnline|
 Set-PnPSearchConfiguration|SharePointPnPPowerShellOnline|

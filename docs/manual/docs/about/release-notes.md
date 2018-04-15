@@ -1,5 +1,22 @@
 # Release notes
 
+## [v1.2.0](https://github.com/SharePoint/office365-cli/releases/tag/v1.2.0)
+
+### New commands
+
+**SharePoint Online:**
+
+- [spo file remove](../cmd/spo/file/file-remove.md) - removes the specified file [#287](https://github.com/SharePoint/office365-cli/issues/287)
+- [spo hubsite data get](../cmd/spo/hubsite/hubsite-data-get.md) - gets hub site data for the specified site [#394](https://github.com/SharePoint/office365-cli/issues/394)
+- [spo hubsite theme sync](../cmd/spo/hubsite/hubsite-theme-sync.md) - applies any theme updates from the parent hub site [#401](https://github.com/SharePoint/office365-cli/issues/401)
+- [spo listitem add](../cmd/spo/listitem/listitem-add.md) - creates a list item in the specified list [#270](https://github.com/SharePoint/office365-cli/issues/270)
+- [spo listitem remove](../cmd/spo/listitem/listitem-remove.md) - removes the specified list item [#272](https://github.com/SharePoint/office365-cli/issues/272)
+- [spo propertybag set](../cmd/spo/propertybag/propertybag-set.md) - sets the value of the specified property in the property bag [#393](https://github.com/SharePoint/office365-cli/issues/393)
+
+### Changes
+
+- added support for authenticating using credentials solving [#388](https://github.com/SharePoint/office365-cli/issues/388)
+
 ## [v1.1.0](https://github.com/SharePoint/office365-cli/releases/tag/v1.1.0)
 
 ### New commands
@@ -16,7 +33,7 @@
 - [spo theme list](../cmd/spo/theme/theme-list.md) - retrieves the list of custom themes [#332](https://github.com/SharePoint/office365-cli/issues/332)
 - [spo theme remove](../cmd/spo/theme/theme-remove.md) - removes existing theme [#331](https://github.com/SharePoint/office365-cli/issues/331)
 - [spo theme set](../cmd/spo/theme/theme-set.md) - add or update a theme [#330](https://github.com/SharePoint/office365-cli/issues/330), [#340](https://github.com/SharePoint/office365-cli/issues/340)
-- [spo web get](../cmd/spo/web/web-get.md) - retrieve information about the specified site [#188](https://github.com/SharePoint/office365-cli/issues/330), [#340](https://github.com/SharePoint/office365-cli/issues/188)
+- [spo web get](../cmd/spo/web/web-get.md) - retrieve information about the specified site [#188](https://github.com/SharePoint/office365-cli/issues/188)
 
 **Microsoft Graph:**
 

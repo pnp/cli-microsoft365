@@ -1,0 +1,47 @@
+# spo hubsite data get
+
+Get hub site data for the specified site
+
+!!! attention
+    This command is based on a SharePoint API that is currently in preview and is subject to change once the API reached general availability.
+
+## Usage
+
+```sh
+spo hubsite data get [options]
+```
+
+## Options
+
+Option|Description
+------|-----------
+`--help`|output usage information
+`-u, --webUrl <webUrl>`|URL of the site for which to retrieve hub site data
+`-f, --forceRefresh`|Set, to refresh the server cache with the latest updates
+`-o, --output [output]`|Output type. `json|text`. Default `text`
+`--verbose`|Runs command with verbose logging
+`--debug`|Runs command with debug logging
+
+!!! important
+    Before using this command, connect to a SharePoint Online site, using the [spo connect](../connect.md) command.
+
+## Remarks
+
+To get hub site data for a site, you have to first connect to a SharePoint site using the [spo connect](../connect.md) command, eg. `spo connect https://contoso.sharepoint.com`.
+
+By default, the hub site data is returned from the server's cache. To refresh the data with the latest updates, use the `-f, --forceRefresh` option. Use this option, if you just made changes and need to see them right
+away.
+
+If the specified site is not connected to a hub site site and is not a hub site itself, no data will be retrieved.
+
+## Examples
+
+Get information about the hub site data for a site with URL https://contoso.sharepoint.com/sites/project-x
+
+```sh
+spo hubsite data get --webUrl https://contoso.sharepoint.com/sites/project-x
+```
+
+## More information
+
+- SharePoint hub sites new in Office 365: [https://techcommunity.microsoft.com/t5/SharePoint-Blog/SharePoint-hub-sites-new-in-Office-365/ba-p/109547](https://techcommunity.microsoft.com/t5/SharePoint-Blog/SharePoint-hub-sites-new-in-Office-365/ba-p/109547)
