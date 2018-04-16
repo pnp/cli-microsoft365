@@ -100,7 +100,8 @@ export default {
   THEME_REMOVE: `${prefix} theme remove`,
   THEME_SET: `${prefix} theme set`,
   WEB_ADD: `${prefix} web add`,
+  WEB_CLIENTSIDEWEBPART: `${prefix} web clientsidewebpart`,
   WEB_GET: `${prefix} web get`,
   WEB_REMOVE: `${prefix} web remove`,
   WEB_LIST: `${prefix} web list`
-};
+};    
