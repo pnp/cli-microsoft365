@@ -48,6 +48,7 @@ export default {
   LISTITEM_ADD: `${prefix} listitem add`,
   LISTITEM_REMOVE: `${prefix} listitem remove`,
   PAGE_ADD: `${prefix} page add`,
+  PAGE_CONTROL_LIST: `${prefix} page control list`,
   PAGE_LIST: `${prefix} page list`,
   PAGE_SET: `${prefix} page set`,
   PROPERTYBAG_GET: `${prefix} propertybag get`,
