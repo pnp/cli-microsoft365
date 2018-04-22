@@ -26,6 +26,7 @@ export default {
   CUSTOMACTION_REMOVE: `${prefix} customaction remove`,
   DISCONNECT: `${prefix} disconnect`,
   EXTERNALUSER_LIST: `${prefix} externaluser list`,
+  FILE_COPY: `${prefix} file copy`,
   FILE_GET: `${prefix} file get`,
   FILE_LIST: `${prefix} file list`,
   FILE_REMOVE: `${prefix} file remove`,
