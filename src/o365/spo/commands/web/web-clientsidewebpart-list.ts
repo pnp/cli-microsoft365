@@ -3,9 +3,8 @@ import config from '../../../../config';
 import commands from '../../commands';
 import * as request from 'request-promise-native';
 import GlobalOptions from '../../../../GlobalOptions';
-import {
-  CommandOption,
-  CommandValidate
+import {CommandOption,
+  CommandValidate, CommandError
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
@@ -38,7 +37,7 @@ class SpoWebClientSideWebPart extends SpoCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     auth
-    .ensureAccessToken(auth.service.resource, cmd, this.debug)
+    .getAccessToken(auth.service.resource, auth.service.refreshToken as string, cmd, this.debug)
     .then((): request.RequestPromise => {
       const requestOptions: any = {
         url: `${args.options.webUrl}/_api/web/GetClientSideWebParts`,
@@ -55,7 +54,7 @@ class SpoWebClientSideWebPart extends SpoCommand {
         cmd.log('');
       }
 
-      return request.post(requestOptions);
+      return request.get(requestOptions);
     })
     .then((res: GetClientSideWebPartsRsp): void => {
       if (this.debug) {
@@ -65,27 +64,36 @@ class SpoWebClientSideWebPart extends SpoCommand {
       }
 
       let clientSideWebparts : any[] = [];
-      res.value.filter(component=>component.ComponentType == 1).forEach(component => {
-        clientSideWebparts.push(
-          { 
-            Id : component.Id,
-            Name : component.Name,
-            Title : JSON.parse(component.Manifest).preconfiguredEntries[0].title.default
-          });
+      res.value.forEach(component => {
+        if(component.ComponentType === 1)
+        {
+          clientSideWebparts.push(
+            { 
+              Id : component.Id.replace("{","").replace("}",""),
+              Name : component.Name,
+              Title : JSON.parse(component.Manifest).preconfiguredEntries[0].title.default
+            });
+        }
       });
+
+      if(clientSideWebparts.length == 0) {
+        cmd.log(new CommandError("No client side webparts could be returned for this web."));
+      }
     
       cmd.log(clientSideWebparts);
 
       cb();
-    },(err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+    },(err: any): 
+      void => 
+      this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
         option: '-u, --webUrl <webUrl>',
-        description: 'Web full url'
-      },
+        description: 'URL of the site for which to retrieve the information'
+      }
     ];
 
     const parentOptions: CommandOption[] = super.options();
@@ -94,16 +102,16 @@ class SpoWebClientSideWebPart extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-
-      if (!args.options.webUrl) {
+      if(!args.options.webUrl)
+      {
+        return 'Required option webUrl missing';
+      }
+      else {
         const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
         if (isValidSharePointUrl !== true) {
           return isValidSharePointUrl;
         }
-
-        return 'webUrl is not a valid SharePoint Url';
       }
-
       return true;
     };
   }
@@ -121,7 +129,7 @@ class SpoWebClientSideWebPart extends SpoCommand {
       ${chalk.blue(commands.CONNECT)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
     
     Examples:
-      Lists all clientsidewebparts for the web
+      Lists all the available clientsidewebparts for the web
       ${chalk.grey(config.delimiter)} ${commands.WEB_CLIENTSIDEWEBPART_LIST} --u https://contoso.sharepoint.com
 
     ` );
