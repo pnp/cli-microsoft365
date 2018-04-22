@@ -190,7 +190,7 @@ Connect-PnPMicrosoftGraph|SharePointPnPPowerShellOnline|
 Connect-PnPOnline|SharePointPnPPowerShellOnline|[spo connect](../cmd/spo/connect.md)
 Convert-PnPFolderToProvisioningTemplate|SharePointPnPPowerShellOnline|
 Convert-PnPProvisioningTemplate|SharePointPnPPowerShellOnline|
-Copy-PnPFile|SharePointPnPPowerShellOnline|
+Copy-PnPFile|SharePointPnPPowerShellOnline|[spo file copy](../cmd/spo/file/file-copy.md)
 Copy-PnPItemProxy|SharePointPnPPowerShellOnline|
 Disable-PnPFeature|SharePointPnPPowerShellOnline|
 Disable-PnPInPlaceRecordsManagementForSite|SharePointPnPPowerShellOnline|
