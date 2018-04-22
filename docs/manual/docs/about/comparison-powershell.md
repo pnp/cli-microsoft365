@@ -217,7 +217,7 @@ Get-PnPAvailableClientSideComponents|SharePointPnPPowerShellOnline|
 Get-PnPAzureADManifestKeyCredentials|SharePointPnPPowerShellOnline|
 Get-PnPAzureCertificate|SharePointPnPPowerShellOnline|
 Get-PnPClientSideComponent|SharePointPnPPowerShellOnline|
-Get-PnPClientSidePage|SharePointPnPPowerShellOnline|
+Get-PnPClientSidePage|SharePointPnPPowerShellOnline|[spo page control get](../cmd/spo/page/page-control-get.md)
 Get-PnPConnection|SharePointPnPPowerShellOnline|
 Get-PnPContentType|SharePointPnPPowerShellOnline|
 Get-PnPContentTypePublishingHubUrl|SharePointPnPPowerShellOnline|

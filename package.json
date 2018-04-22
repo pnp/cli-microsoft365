@@ -77,6 +77,9 @@
     "typescript": "^2.6.2"
   },
   "nyc": {
-    "exclude": "**/*.spec.js"
+    "exclude": [
+      "**/*.spec.js",
+      "**/clientsidepages.js"
+    ]
   }
 }
