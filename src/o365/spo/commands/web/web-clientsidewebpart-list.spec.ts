@@ -8,7 +8,7 @@ import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import Utils from '../../../../Utils';
 
-describe(commands.WEB_CLIENTSIDEWEBPART, () => {
+describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
   let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
@@ -57,7 +57,7 @@ describe(commands.WEB_CLIENTSIDEWEBPART, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.WEB_CLIENTSIDEWEBPART), true);
+    assert.equal(command.name.startsWith(commands.WEB_CLIENTSIDEWEBPART_LIST), true);
   });
 
   it('has a description', () => {
@@ -81,7 +81,7 @@ describe(commands.WEB_CLIENTSIDEWEBPART, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, () => {
       try {
-        assert.equal(telemetry.name, commands.WEB_CLIENTSIDEWEBPART);
+        assert.equal(telemetry.name, commands.WEB_CLIENTSIDEWEBPART_LIST);
         done();
       }
       catch (e) {

@@ -9,6 +9,7 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
+import { GetClientSideWebPartsRsp } from './GetClientSideWebPartsRsp';
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
 interface CommandArgs {
@@ -22,7 +23,7 @@ interface Options extends GlobalOptions {
 class SpoWebClientSideWebPart extends SpoCommand {
   
   public get name(): string {
-    return commands.WEB_CLIENTSIDEWEBPART;
+    return commands.WEB_CLIENTSIDEWEBPART_LIST;
   }
 
   public get description(): string {
@@ -43,7 +44,7 @@ class SpoWebClientSideWebPart extends SpoCommand {
         url: `${args.options.webUrl}/_api/web/GetClientSideWebParts`,
         headers: Utils.getRequestHeaders({
           authorization: `Bearer ${auth.service.accessToken}`,
-          accept: 'application/json;odata.metadata=none'
+          accept: 'application/json;odata=nometadata'
         }),
         json: true
       };
@@ -54,17 +55,29 @@ class SpoWebClientSideWebPart extends SpoCommand {
         cmd.log('');
       }
 
-      return request.get(requestOptions);
+      return request.post(requestOptions);
     })
-    .then((res: any): void => {
+    .then((res: GetClientSideWebPartsRsp): void => {
       if (this.debug) {
         cmd.log('Response:')
         cmd.log(res);
         cmd.log('');
       }
 
+      let clientSideWebparts : any[] = [];
+      res.value.filter(component=>component.ComponentType == 1).forEach(component => {
+        clientSideWebparts.push(
+          { 
+            Id : component.Id,
+            Name : component.Name,
+            Title : JSON.parse(component.Manifest).preconfiguredEntries[0].title.default
+          });
+      });
+    
+      cmd.log(clientSideWebparts);
+
       cb();
-    });
+    },(err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
 
   public options(): CommandOption[] {
@@ -104,11 +117,13 @@ class SpoWebClientSideWebPart extends SpoCommand {
 
     Remarks:
     
-      To create a subsite, you have to first connect to SharePoint using the
+      To get the list of available ClientSideWebpart, you have to first connect to SharePoint using the
       ${chalk.blue(commands.CONNECT)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
     
     Examples:
-    
+      Lists all clientsidewebparts for the web
+      ${chalk.grey(config.delimiter)} ${commands.WEB_CLIENTSIDEWEBPART_LIST} --u https://contoso.sharepoint.com
+
     ` );
   }
 }
