@@ -11,6 +11,9 @@
 - [spo hubsite theme sync](../cmd/spo/hubsite/hubsite-theme-sync.md) - applies any theme updates from the parent hub site [#401](https://github.com/SharePoint/office365-cli/issues/401)
 - [spo listitem add](../cmd/spo/listitem/listitem-add.md) - creates a list item in the specified list [#270](https://github.com/SharePoint/office365-cli/issues/270)
 - [spo listitem remove](../cmd/spo/listitem/listitem-remove.md) - removes the specified list item [#272](https://github.com/SharePoint/office365-cli/issues/272)
+- [spo page control get](../cmd/spo/page/page-control-get.md) - gets information about the specific control on a modern page [#414](https://github.com/SharePoint/office365-cli/issues/414)
+- [spo page control list](../cmd/spo/page/page-control-list.md) - lists controls on the specific modern page [#413](https://github.com/SharePoint/office365-cli/issues/413)
+- [spo page get](../cmd/spo/page/page-get.md) - gets information about the specific modern page [#360](https://github.com/SharePoint/office365-cli/issues/360)
 - [spo propertybag set](../cmd/spo/propertybag/propertybag-set.md) - sets the value of the specified property in the property bag [#393](https://github.com/SharePoint/office365-cli/issues/393)
 
 ### Changes
