@@ -25,6 +25,7 @@ interface Options extends GlobalOptions {
   listTitle?: string;
   id: string;
   contentType?: string;
+  systemUpdate?: boolean;
 }
 
 class SpoListItemSetCommand extends SpoCommand {
@@ -45,6 +46,7 @@ class SpoListItemSetCommand extends SpoCommand {
     telemetryProps.listId = typeof args.options.listId !== 'undefined';
     telemetryProps.listTitle = typeof args.options.listTitle !== 'undefined';
     telemetryProps.contentType = typeof args.options.contentType !== 'undefined';
+    telemetryProps.systemUpdate = typeof args.options.systemUpdate !== 'undefined';
     return telemetryProps;
   }
 
@@ -58,17 +60,91 @@ class SpoListItemSetCommand extends SpoCommand {
       : `${args.options.webUrl}/_api/web/lists/getByTitle('${encodeURIComponent(listTitleArgument)}')`);
     let contentTypeName: string = '';
 
+    let environmentSiteId = '';
+    let environmentWebId = '';
+    let environmentListId = '';
+
     if (this.debug) {
       cmd.log(`Retrieving access token for ${resource}...`);
     }
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise | Promise<void> => {
+      .then((accessToken: string): request.RequestPromise | Promise<Array<any>> => {
         siteAccessToken = accessToken;
 
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}.`);
+        }
+
+        if (args.options.systemUpdate) {
+          if (this.verbose) {
+            cmd.log(`Getting site, web, and list id's...`);
+          }
+
+          const siteRequestOptions: any = {
+            url: `${args.options.webUrl}/_api/site/id`,
+            headers: Utils.getRequestHeaders({
+              authorization: `Bearer ${siteAccessToken}`,
+              'accept': 'application/json;odata=nometadata'
+            }),
+            json: true
+          };
+
+          const webRequestOptions: any = {
+            url: `${args.options.webUrl}/_api/web/id`,
+            headers: Utils.getRequestHeaders({
+              authorization: `Bearer ${siteAccessToken}`,
+              'accept': 'application/json;odata=nometadata'
+            }),
+            json: true
+          };
+
+          const listRequestOptions: any = {
+            url: `${listRestUrl}/id`,
+            headers: Utils.getRequestHeaders({
+              authorization: `Bearer ${siteAccessToken}`,
+              'accept': 'application/json;odata=nometadata'
+            }),
+            json: true
+          };
+
+          if (this.debug) {
+            cmd.log('Executing web request for site id...');
+            cmd.log(siteRequestOptions);
+            cmd.log('');
+            cmd.log('Executing web request for web id...');
+            cmd.log(webRequestOptions);
+            cmd.log('');
+            cmd.log('Executing web request for list id...');
+            cmd.log(listRequestOptions);
+            cmd.log('');
+          }
+
+          return Promise.all([
+            request.get(siteRequestOptions),
+            request.get(webRequestOptions),
+            request.get(listRequestOptions)
+          ]);
+        }
+        else {
+          return Promise.resolve([]);
+        }
+      })
+      .then((dataReturrned: Array<any>): request.RequestPromise | Promise<void> => {
+
+        if (dataReturrned.length > 0) {
+
+          environmentSiteId = dataReturrned[0];
+          environmentWebId = dataReturrned[1];
+          environmentListId = dataReturrned[2];
+  
+          if (this.debug) {
+            cmd.log(`Retrieved site id ${environmentSiteId}.`);
+            cmd.log(`Retrieved web id ${environmentWebId}.`);
+            cmd.log(`Retrieved list id ${environmentListId}.`);
+          }
+  
         }
 
         if (args.options.contentType) {
@@ -139,7 +215,20 @@ class SpoListItemSetCommand extends SpoCommand {
           cmd.log(`Updating item in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
         }
 
-        const requestBody: any = {
+        const requestBody: any = args.options.systemUpdate ?
+          `<?xml version="1.0" encoding="UTF-8"?>
+          <Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="SharePoint PnP PowerShell Library">
+             <Actions>
+                <Method Name="ParseAndSetFieldValue" Id="151" ObjectPathId="147" Version="12">
+                  ${this.mapRequestBody(args.options).join()}
+                </Method>
+                <Method Name="SystemUpdate" Id="152" ObjectPathId="147" Version="12" />
+             </Actions>
+             <ObjectPaths>
+                <Identity Id="147" Name="df5e5e9e-1010-5000-3d41-b640a8849ce7|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${environmentSiteId}:web:${environmentWebId}:list:${environmentListId}:item:${args.options.id},${args.options.id}" />
+             </ObjectPaths>
+          </Request>`
+        : {
           formValues: this.mapRequestBody(args.options)
         };
 
@@ -238,6 +327,10 @@ class SpoListItemSetCommand extends SpoCommand {
       {
         option: '-c, --contentType [contentType]',
         description: 'The name or the ID of the content type to associate with the updated item'
+      },
+      {
+        option: '-s, --systemUpdate',
+        description: 'Update the item without updating the modified date and modified by fields'
       }
     ];
 
@@ -252,7 +345,10 @@ class SpoListItemSetCommand extends SpoCommand {
         'listId',
         'listTitle',
         'id',
-        'contentType'
+        'contentType',
+      ],
+      boolean: [
+        'systemUpdate'
       ]
     };
   }
@@ -338,16 +434,25 @@ class SpoListItemSetCommand extends SpoCommand {
       'webUrl',
       'id',
       'contentType',
+      'systemUpdate',
       'debug',
       'verbose'
     ];
 
     Object.keys(options).forEach(key => {
       if (excludeOptions.indexOf(key) === -1) {
-        requestBody.push({ FieldName: key, FieldValue: (<any>options)[key] });
+        if (options.systemUpdate) {
+          requestBody.push(`
+            <Parameters>
+              <Parameter Type="String">${key}</Parameter>
+              <Parameter Type="String">${(<any>options)[key]}</Parameter>
+            </Parameters>`);
+        } else {
+          requestBody.push({ FieldName: key, FieldValue: (<any>options)[key] });
+        }
       }
     });
-
+  
     return requestBody;
   }
 
