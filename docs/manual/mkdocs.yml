@@ -139,6 +139,8 @@ pages:
         - o365group set: 'cmd/graph/o365group/o365group-set.md'
       - siteclassification:
         - siteclassification get: 'cmd/graph/siteclassification/siteclassification-get.md'
+      - user:
+        - user list: 'cmd/graph/user/user-list.md'
     - Azure Management Service (azmgmt):
       - connect: 'cmd/azmgmt/connect.md'
       - disconnect: 'cmd/azmgmt/disconnect.md'
