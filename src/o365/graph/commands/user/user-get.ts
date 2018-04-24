@@ -1,0 +1,162 @@
+import auth from '../../GraphAuth';
+import config from '../../../../config';
+import commands from '../../commands';
+import * as request from 'request-promise-native';
+import GlobalOptions from '../../../../GlobalOptions';
+import {
+  CommandOption, CommandValidate
+} from '../../../../Command';
+import Utils from '../../../../Utils';
+import GraphCommand from '../../GraphCommand';
+
+const vorpal: Vorpal = require('../../../../vorpal-init');
+
+interface CommandArgs {
+  options: Options;
+}
+
+interface Options extends GlobalOptions {
+  id?: string;
+  userName?: string;
+  properties?: string;
+}
+
+class GraphUserGetCommand extends GraphCommand {
+  public get name(): string {
+    return `${commands.USER_GET}`;
+  }
+
+  public get description(): string {
+    return 'Gets information about the specified user';
+  }
+
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.id = typeof args.options.id !== 'undefined';
+    telemetryProps.userName = typeof args.options.userName !== 'undefined';
+    telemetryProps.properties = args.options.properties;
+    return telemetryProps;
+  }
+
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    const properties: string = args.options.properties ?
+      `?$select=${args.options.properties.split(',').map(p => encodeURIComponent(p.trim())).join(',')}` :
+      '';
+
+    auth
+      .ensureAccessToken(auth.service.resource, cmd, this.debug)
+      .then((): request.RequestPromise => {
+        const requestOptions: any = {
+          url: `${auth.service.resource}/v1.0/users/${encodeURIComponent(args.options.id ? args.options.id : args.options.userName as string)}${properties}`,
+          headers: Utils.getRequestHeaders({
+            authorization: `Bearer ${auth.service.accessToken}`,
+            accept: 'application/json;odata.metadata=none'
+          }),
+          json: true
+        };
+
+        if (this.debug) {
+          cmd.log('Executing web request...');
+          cmd.log(requestOptions);
+          cmd.log('');
+        }
+
+        return request.get(requestOptions);
+      })
+      .then((res: any): void => {
+        if (this.debug) {
+          cmd.log('Response:')
+          cmd.log(res);
+          cmd.log('');
+        }
+
+        cmd.log(res);
+
+        if (this.verbose) {
+          cmd.log(vorpal.chalk.green('DONE'));
+        }
+
+        cb();
+      }, (err: any) => this.handleRejectedODataJsonPromise(err, cmd, cb));
+  }
+
+  public options(): CommandOption[] {
+    const options: CommandOption[] = [
+      {
+        option: '-i, --id [id]',
+        description: 'The ID of the user to retrieve information for. Specify id or userName but not both'
+      },
+      {
+        option: '-n, --userName [userName]',
+        description: 'The name of the user to retrieve information for. Specify id or userName but not both'
+      },
+      {
+        option: '-p, --properties [properties]',
+        description: 'Comma-separated list of properties to retrieve'
+      }
+    ];
+
+    const parentOptions: CommandOption[] = super.options();
+    return options.concat(parentOptions);
+  }
+
+  public validate(): CommandValidate {
+    return (args: CommandArgs): boolean | string => {
+      if (!args.options.id && !args.options.userName) {
+        return 'Specify either id or userName';
+      }
+
+      if (args.options.id && args.options.userName) {
+        return 'Specify either id or userName but not both';
+      }
+
+      if (args.options.id &&
+        !Utils.isValidGuid(args.options.id)) {
+        return `${args.options.id} is not a valid GUID`;
+      }
+
+      return true;
+    };
+  }
+
+  public commandHelp(args: {}, log: (help: string) => void): void {
+    const chalk = vorpal.chalk;
+    log(vorpal.find(this.name).helpInformation());
+    log(
+      `  ${chalk.yellow('Important:')} before using this command, connect to the Microsoft Graph
+    using the ${chalk.blue(commands.CONNECT)} command.
+        
+  Remarks:
+
+    To get information about a user, you have to first connect to
+    the Microsoft Graph using the ${chalk.blue(commands.CONNECT)} command,
+    eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT}`)}.
+
+    You can retrieve information about a user, either by specifying that user's
+    id or user name (${chalk.grey(`userPrincipalName`)}), but not both.
+
+    If the user with the specified id or user name doesn't exist, you will get
+    a ${chalk.grey(`Resource 'xyz' does not exist or one of its queried reference-property`)}
+    ${chalk.grey(`objects are not present.`)} error.
+
+  Examples:
+  
+    Get information about the user with id ${chalk.grey(`1caf7dcd-7e83-4c3a-94f7-932a1299c844`)}
+      ${chalk.grey(config.delimiter)} ${this.name} --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844
+
+    Get information about the user with user name ${chalk.grey(`AarifS@contoso.onmicrosoft.com`)}
+      ${chalk.grey(config.delimiter)} ${this.name} --userName AarifS@contoso.onmicrosoft.com
+
+    For the user with id ${chalk.grey(`1caf7dcd-7e83-4c3a-94f7-932a1299c844`)}
+    retrieve the user name, e-mail address and full name
+      ${chalk.grey(config.delimiter)} ${this.name} --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --properties userPrincipalName,mail,displayName
+  
+  More information:
+    
+    Microsoft Graph User properties
+      https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/resources/user#properties
+`);
+  }
+}
+
+module.exports = new GraphUserGetCommand();
