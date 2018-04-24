@@ -140,6 +140,7 @@ pages:
       - siteclassification:
         - siteclassification get: 'cmd/graph/siteclassification/siteclassification-get.md'
       - user:
+        - user get: 'cmd/graph/user/user-get.md'
         - user list: 'cmd/graph/user/user-list.md'
     - Azure Management Service (azmgmt):
       - connect: 'cmd/azmgmt/connect.md'

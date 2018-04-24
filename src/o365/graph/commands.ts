@@ -11,5 +11,6 @@ export default {
   O365GROUP_RESTORE: `${prefix} o365group restore`,
   SITECLASSIFICATION_GET: `${prefix} siteclassification get`,
   STATUS: `${prefix} status`,
+  USER_GET: `${prefix} user get`,
   USER_LIST: `${prefix} user list`
 };
