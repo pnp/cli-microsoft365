@@ -349,7 +349,7 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
-        parentWebUrl: "https://contoso.sharepoint.com",
+        webUrl: "https://contoso.sharepoint.com",
         debug: false
       }
     }, () => {

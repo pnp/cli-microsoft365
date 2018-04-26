@@ -9,6 +9,7 @@ import {CommandOption,
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import { GetClientSideWebPartsRsp } from './GetClientSideWebPartsRsp';
+import { Auth } from '../../../../Auth';
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
 interface CommandArgs {
@@ -36,13 +37,19 @@ class SpoWebClientSideWebPart extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
+
+    if (this.debug) {
+      cmd.log(`Retrieving access token for ${resource}...`);
+    }
+
     auth
-    .getAccessToken(auth.service.resource, auth.service.refreshToken as string, cmd, this.debug)
-    .then((): request.RequestPromise => {
+    .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
+    .then((accessToken: string): request.RequestPromise => {
       const requestOptions: any = {
         url: `${args.options.webUrl}/_api/web/GetClientSideWebParts`,
         headers: Utils.getRequestHeaders({
-          authorization: `Bearer ${auth.service.accessToken}`,
+          authorization: `Bearer ${accessToken}`,
           accept: 'application/json;odata=nometadata'
         }),
         json: true
