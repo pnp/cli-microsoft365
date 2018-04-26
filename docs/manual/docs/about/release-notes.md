@@ -15,6 +15,12 @@
 - [spo page control list](../cmd/spo/page/page-control-list.md) - lists controls on the specific modern page [#413](https://github.com/SharePoint/office365-cli/issues/413)
 - [spo page get](../cmd/spo/page/page-get.md) - gets information about the specific modern page [#360](https://github.com/SharePoint/office365-cli/issues/360)
 - [spo propertybag set](../cmd/spo/propertybag/propertybag-set.md) - sets the value of the specified property in the property bag [#393](https://github.com/SharePoint/office365-cli/issues/393)
+- [spo web clientsidewebpart list](../cmd/spo/web/web-clientsidewebpart-list.md) - lists available client-side web parts [#367](https://github.com/SharePoint/office365-cli/issues/367)
+
+**Microsoft Graph:**
+
+- [graph user get](../cmd/graph/user/user-get.md) - gets information about the specified user [#326](https://github.com/SharePoint/office365-cli/issues/326)
+- [graph user list](../cmd/graph/user/user-list.md) - lists users matching specified criteria [#327](https://github.com/SharePoint/office365-cli/issues/327)
 
 ### Changes
 
