@@ -5,11 +5,7 @@ import * as fs from 'fs';
 
 describe('appInsights', () => {
   afterEach(() => {
-    Utils.restore([
-      fs.existsSync,
-      fs.readFileSync,
-      fs.writeFileSync
-    ]);
+    Utils.restore(fs.existsSync);
     delete require.cache[require.resolve('./appInsights')];
   });
 
