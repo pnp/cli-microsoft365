@@ -15,28 +15,7 @@ appInsights.defaultClient.commonProperties = {
   version: version
 };
 appInsights.defaultClient.context.tags['ai.session.id'] = crypto.randomBytes(24).toString('base64');
-appInsights.defaultClient.context.tags['ai.user.id'] = getUserId();
-
-export function getUserId(): string {
-  const filePath: string = path.join(__dirname, `..${path.sep}.user`);
-  let userId: string = '';
-
-  try {
-    if (fs.existsSync(filePath)) {
-      userId = fs.readFileSync(filePath, 'utf-8');
-    }
-  }
-  catch { }
-
-  if (!userId) {
-    userId = crypto.randomBytes(24).toString('base64');
-    try {
-      fs.writeFileSync(filePath, userId);
-    }
-    catch { }
-  }
-
-  return userId;
-}
+delete appInsights.defaultClient.context.tags['ai.cloud.roleInstance'];
+delete appInsights.defaultClient.context.tags['ai.cloud.role'];
 
 export default appInsights.defaultClient;
