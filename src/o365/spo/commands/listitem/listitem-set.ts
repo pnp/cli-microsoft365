@@ -69,7 +69,7 @@ class SpoListItemSetCommand extends SpoCommand {
     }
 
     auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
+      .ensureAccessToken(resource, cmd, this.debug)
       .then((accessToken: string): request.RequestPromise | Promise<any> => {
         siteAccessToken = accessToken;
 
@@ -82,7 +82,7 @@ class SpoListItemSetCommand extends SpoCommand {
 
         if (args.options.systemUpdate) {
           if (this.verbose) {
-            cmd.log(`Getting site, web, and list id's...`);
+            cmd.log(`Getting list id...`);
           }
 
           const listRequestOptions: any = {
@@ -517,16 +517,18 @@ class SpoListItemSetCommand extends SpoCommand {
 
         const contents: ClientSvcResponseContents = json.find(x => { return x['ErrorInfo']; });
         if (contents && contents.ErrorInfo) {
-          return reject(contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error');
+          reject(contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error');
         }
 
         const identityObject = json.find(x => { return x['_ObjectIdentity_'] });
         if (identityObject) {
-          return resolve( identityObject['_ObjectIdentity_'] );
+          resolve( identityObject['_ObjectIdentity_'] );
         }
 
         reject('Cannot proceed. _ObjectIdentity_ not found'); // this is not supposed to happen
-      }, (err: any): void => { reject(err); });
+      }, (err: any): void => { reject(err); }).catch((err) => {
+        reject(err); 
+      });
     });
   }
 

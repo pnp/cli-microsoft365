@@ -45,6 +45,34 @@ describe(commands.LISTITEM_SET, () => {
       return Promise.resolve({ value: [ { ItemId: expectedId }] });
 
     }
+    if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+      console.log(`CSOM request ${opts.body}`)
+      // requestObjectIdentity mock
+      if (opts.body.indexOf('Name="Current"') > -1) {
+        return Promise.resolve(
+          [
+            {
+              "SchemaVersion": "15.0.0.0",
+              "LibraryVersion": "16.0.7618.1204",
+              "ErrorInfo":null,
+              "TraceCorrelationId": "3e3e629e-30cc-5000-9f31-cf83b8e70021"
+            },
+            {
+              "_ObjectType_": "SP.Web", 
+              "_ObjectIdentity_": "d704ae73-d5ed-459e-80b0-b8103c5fb6e0|8f2be65d-f195-4699-b0de-24aca3384ba9:site:0ead8b78-89e5-427f-b1bc-6e5a77ac191c:web:4c076c07-e3f1-49a8-ad01-dbb70b263cd7",
+              "ServerRelativeUrl": "\\u002fsites\\u002futasdev01"
+            }
+          ]
+        )
+      }
+      if (opts.body.indexOf('SystemUpdate') > -1) {
+        actualId = expectedId;
+        return Promise.resolve(
+          ']SchemaVersion":"15.0.0.0","LibraryVersion":"16.0.7618.1204","ErrorInfo":null,"TraceCorrelationId":"3e3e629e-f0e9-5000-9f31-c6758b453a4a"'
+        )
+      }
+    }
+    console.log('Invalid POST request')
     return Promise.reject('Invalid request');
   }
 
@@ -68,13 +96,17 @@ describe(commands.LISTITEM_SET, () => {
         }
       );
     }
+    if (opts.url.indexOf('/id') > -1) {
+      return Promise.resolve({ value: "f64041f2-9818-4b67-92ff-3bc5dbbef27e" });
+    }
+    console.log('Invalid GET request')
     return Promise.reject('Invalid request');
   }
   
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
       telemetry = t;
     });
@@ -235,6 +267,7 @@ describe(commands.LISTITEM_SET, () => {
     let options: any = { 
       debug: false, 
       listTitle: 'Demo List', 
+      id: 47,
       webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
       Title: "fail updating me"
     }
@@ -271,6 +304,7 @@ describe(commands.LISTITEM_SET, () => {
     let options: any = { 
       debug: true, 
       listTitle: 'Demo List', 
+      id: 47,
       webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
       Title: expectedTitle
     }
@@ -305,6 +339,7 @@ describe(commands.LISTITEM_SET, () => {
     let options: any = { 
       debug: false, 
       listTitle: 'Demo List', 
+      id: 47,
       webUrl: 'https://contoso.sharepoint.com/sites/project-y', 
       contentType: 'Item',
       Title: expectedTitle
@@ -340,6 +375,7 @@ describe(commands.LISTITEM_SET, () => {
     let options: any = { 
       debug: true, 
       listTitle: 'Demo List', 
+      id: 47,
       webUrl: 'https://contoso.sharepoint.com/sites/project-y', 
       contentType: expectedContentType,
       Title: expectedTitle
@@ -375,6 +411,7 @@ describe(commands.LISTITEM_SET, () => {
     let options: any = { 
       debug: false, 
       listTitle: 'Demo List', 
+      id: 47,
       webUrl: 'https://contoso.sharepoint.com/sites/project-y', 
       contentType: "Unexpected content type",
       Title: expectedTitle
@@ -384,6 +421,45 @@ describe(commands.LISTITEM_SET, () => {
 
       try {
         assert(expectedContentType == actualContentType);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+
+  });
+
+
+  it('successfully updates the listitem when the systemUpdate parameter is specified', (done) => {
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'post').callsFake(postFakes);
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    actualId = 0;
+
+    let options: any = { 
+      debug: false, 
+      listTitle: 'Demo List', 
+      id: 47,
+      webUrl: 'https://contoso.sharepoint.com/sites/project-y', 
+      Title: expectedTitle,
+      systemUpdate: true
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert.equal(actualId, expectedId);
         done();
       }
       catch (e) {
