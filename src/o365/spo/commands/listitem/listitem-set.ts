@@ -12,6 +12,7 @@ import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import { Auth } from '../../../../Auth';
 import { ListItemInstance } from './ListItemInstance';
+import { ContextInfo, ClientSvcResponseContents, ClientSvcResponse } from '../../spo';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -60,8 +61,7 @@ class SpoListItemSetCommand extends SpoCommand {
       : `${args.options.webUrl}/_api/web/lists/getByTitle('${encodeURIComponent(listTitleArgument)}')`);
     let contentTypeName: string = '';
 
-    let environmentSiteId = '';
-    let environmentWebId = '';
+    let formDigestValue = '';
     let environmentListId = '';
 
     if (this.debug) {
@@ -70,35 +70,20 @@ class SpoListItemSetCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise | Promise<Array<any>> => {
+      .then((accessToken: string): request.RequestPromise | Promise<any> => {
         siteAccessToken = accessToken;
 
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}.`);
+          cmd.log(``);
+          cmd.log(`auth object:`);
+          cmd.log(auth);
         }
 
         if (args.options.systemUpdate) {
           if (this.verbose) {
             cmd.log(`Getting site, web, and list id's...`);
           }
-
-          const siteRequestOptions: any = {
-            url: `${args.options.webUrl}/_api/site/id`,
-            headers: Utils.getRequestHeaders({
-              authorization: `Bearer ${siteAccessToken}`,
-              'accept': 'application/json;odata=nometadata'
-            }),
-            json: true
-          };
-
-          const webRequestOptions: any = {
-            url: `${args.options.webUrl}/_api/web/id`,
-            headers: Utils.getRequestHeaders({
-              authorization: `Bearer ${siteAccessToken}`,
-              'accept': 'application/json;odata=nometadata'
-            }),
-            json: true
-          };
 
           const listRequestOptions: any = {
             url: `${listRestUrl}/id`,
@@ -110,38 +95,27 @@ class SpoListItemSetCommand extends SpoCommand {
           };
 
           if (this.debug) {
-            cmd.log('Executing web request for site id...');
-            cmd.log(siteRequestOptions);
-            cmd.log('');
-            cmd.log('Executing web request for web id...');
-            cmd.log(webRequestOptions);
-            cmd.log('');
             cmd.log('Executing web request for list id...');
             cmd.log(listRequestOptions);
             cmd.log('');
           }
 
-          return Promise.all([
-            request.get(siteRequestOptions),
-            request.get(webRequestOptions),
-            request.get(listRequestOptions)
-          ]);
+          return request.get(listRequestOptions)
+
         }
         else {
-          return Promise.resolve([]);
+          return Promise.resolve();
         }
       })
-      .then((dataReturrned: Array<any>): request.RequestPromise | Promise<void> => {
+      .then((dataReturned: any): request.RequestPromise | Promise<void> => {
 
-        if (dataReturrned.length > 0) {
+        if (dataReturned) {
 
-          environmentSiteId = dataReturrned[0];
-          environmentWebId = dataReturrned[1];
-          environmentListId = dataReturrned[2];
+          environmentListId = dataReturned.value;
   
           if (this.debug) {
-            cmd.log(`Retrieved site id ${environmentSiteId}.`);
-            cmd.log(`Retrieved web id ${environmentWebId}.`);
+            cmd.log(`data returned[0]:`);
+            cmd.log(dataReturned);
             cmd.log(`Retrieved list id ${environmentListId}.`);
           }
   
@@ -210,23 +184,49 @@ class SpoListItemSetCommand extends SpoCommand {
             cmd.log(`using content type name: ${contentTypeName}`);
           }
         }
+        if (args.options.systemUpdate) {
+          if (this.debug) {
+            cmd.log(`getting requets digest for systemUpdate request`);
+          }
+          return this.getRequestDigest(cmd, this.debug);
+        } 
+        else {
+          return Promise.resolve();
+        }
+      })
+      .then((res: ContextInfo): Promise<string> => {
+        if (this.debug) {
+          cmd.log('Response:')
+          cmd.log(res);
+          cmd.log('');
+        }
 
         if (this.verbose) {
           cmd.log(`Updating item in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
         }
 
+        formDigestValue = args.options.systemUpdate ? res['FormDigestValue'] : "";
+
+        if (args.options.systemUpdate) {
+
+          return this.requestObjectIdentity(args.options.webUrl, cmd, formDigestValue, siteAccessToken);
+
+        }
+          
+        return Promise.resolve("");
+
+      }).then((objectIdentity: string): request.RequestPromise => {
+
         const requestBody: any = args.options.systemUpdate ?
-          `<?xml version="1.0" encoding="UTF-8"?>
-          <Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="SharePoint PnP PowerShell Library">
-             <Actions>
-                <Method Name="ParseAndSetFieldValue" Id="151" ObjectPathId="147" Version="12">
-                  ${this.mapRequestBody(args.options).join()}
-                </Method>
-                <Method Name="SystemUpdate" Id="152" ObjectPathId="147" Version="12" />
-             </Actions>
-             <ObjectPaths>
-                <Identity Id="147" Name="df5e5e9e-1010-5000-3d41-b640a8849ce7|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${environmentSiteId}:web:${environmentWebId}:list:${environmentListId}:item:${args.options.id},${args.options.id}" />
-             </ObjectPaths>
+          `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009">
+            <Actions>
+              <Method Name="ParseAndSetFieldValue" Id="1" ObjectPathId="147">${this.mapRequestBody(args.options).join()}
+              </Method>
+              <Method Name="SystemUpdate" Id="2" ObjectPathId="147" />
+            </Actions>
+            <ObjectPaths>
+              <Identity Id="147" Name="${objectIdentity}:list:${environmentListId}:item:${args.options.id},1" />
+            </ObjectPaths>
           </Request>`
         : {
           formValues: this.mapRequestBody(args.options)
@@ -243,7 +243,15 @@ class SpoListItemSetCommand extends SpoCommand {
           });
         }
 
-        const requestOptions: any = {
+        let requestOptions: any = args.options.systemUpdate ? {
+          url: `${args.options.webUrl}_vti_bin/client.svc/ProcessQuery`,
+          headers: Utils.getRequestHeaders({
+            authorization: `Bearer ${siteAccessToken}`,
+            'Content-Type': 'text/xml',
+            'X-RequestDigest': formDigestValue,
+          }),
+          body: requestBody 
+        } : {
           url: `${listRestUrl}/items(${args.options.id})/ValidateUpdateListItem()`,
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${siteAccessToken}`,
@@ -252,7 +260,7 @@ class SpoListItemSetCommand extends SpoCommand {
           body: requestBody,
           json: true
         };
-
+  
         if (this.debug) {
           cmd.log('Executing web request...');
           cmd.log(requestOptions);
@@ -271,20 +279,38 @@ class SpoListItemSetCommand extends SpoCommand {
           cmd.log('');
         }
 
-        // Response is from /ValidateUpdateListItem POST call, perform get on updated item to get all field values
-        const returnedData: any = response.value;
-        if (this.debug) {
-          cmd.log(`Returned data:`)
-          cmd.log(returnedData)
-          cmd.log(`ItemId returned by ValidateUpdateListItem: ${returnedData[0].ItemId}`);
-        }
+        let itemId: number = 0;
 
-        if (!returnedData[0].ItemId) {
-          return Promise.reject(`Item didn't update successfully`)
+        if (args.options.systemUpdate) {
+
+          if (response.indexOf("ErrorMessage") > -1) {
+            return Promise.reject(`Error occurred in systemUpdate operation - ${response}`);
+          }
+          else {
+            itemId = Number(args.options.id);
+          }
+
+        }
+        else {
+
+          // Response is from /ValidateUpdateListItem POST call, perform get on updated item to get all field values
+          const returnedData: any = response.value;
+          if (this.debug) {
+            cmd.log(`Returned data:`)
+            cmd.log(returnedData)
+          }
+
+          if (!returnedData[0].ItemId) {
+            return Promise.reject(`Item didn't update successfully`)
+          }
+          else {
+            itemId = returnedData[0].ItemId
+          }
+  
         }
 
         const requestOptions: any = {
-          url: `${listRestUrl}/items(${returnedData[0].ItemId})`,
+          url: `${listRestUrl}/items(${itemId})`,
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata'
@@ -454,6 +480,54 @@ class SpoListItemSetCommand extends SpoCommand {
     });
   
     return requestBody;
+  }
+
+  /**
+   * Requests web object itentity for the current web.
+   * This request has to be send before we can construct the property bag request.
+   * The response data looks like:
+   * _ObjectIdentity_=<GUID>|<GUID>:site:<GUID>:web:<GUID>
+   * _ObjectType_=SP.Web
+   * ServerRelativeUrl=/sites/contoso
+   * The ObjectIdentity is needed to create another request to retrieve the property bag or set property.
+   * @param webUrl web url
+   * @param cmd command cmd
+   */
+  protected requestObjectIdentity(webUrl: string, cmd: CommandInstance, formDigestValue: string, siteAccessToken: string): Promise<string> {
+    const requestOptions: any = {
+      url: `${webUrl}/_vti_bin/client.svc/ProcessQuery`,
+      headers: Utils.getRequestHeaders({
+        authorization: `Bearer ${siteAccessToken}`,
+        'X-RequestDigest': formDigestValue
+      }),
+      body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="1" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="ServerRelativeUrl" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Property Id="5" ParentId="3" Name="Web" /><StaticProperty Id="3" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /></ObjectPaths></Request>`
+    };
+
+    return new Promise<string>((resolve: any, reject: any): void => {
+      request.post(requestOptions).then((res: any) => {
+        if (this.debug) {
+          cmd.log('Response:');
+          cmd.log(JSON.stringify(res));
+          cmd.log('');
+
+          cmd.log('Attempt to get _ObjectIdentity_ key values');
+        }
+
+        const json: ClientSvcResponse = JSON.parse(res);
+
+        const contents: ClientSvcResponseContents = json.find(x => { return x['ErrorInfo']; });
+        if (contents && contents.ErrorInfo) {
+          return reject(contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error');
+        }
+
+        const identityObject = json.find(x => { return x['_ObjectIdentity_'] });
+        if (identityObject) {
+          return resolve( identityObject['_ObjectIdentity_'] );
+        }
+
+        reject('Cannot proceed. _ObjectIdentity_ not found'); // this is not supposed to happen
+      }, (err: any): void => { reject(err); });
+    });
   }
 
 }
