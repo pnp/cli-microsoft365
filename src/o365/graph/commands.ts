@@ -12,5 +12,6 @@ export default {
   SITECLASSIFICATION_GET: `${prefix} siteclassification get`,
   STATUS: `${prefix} status`,
   USER_GET: `${prefix} user get`,
-  USER_LIST: `${prefix} user list`
+  USER_LIST: `${prefix} user list`,
+  USER_SENDMAIL: `${prefix} user sendmail`
 };
