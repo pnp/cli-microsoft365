@@ -143,6 +143,7 @@ pages:
       - user:
         - user get: 'cmd/graph/user/user-get.md'
         - user list: 'cmd/graph/user/user-list.md'
+        - user sendmail: 'cmd/graph/user/user-sendmail.md'
     - Azure Management Service (azmgmt):
       - connect: 'cmd/azmgmt/connect.md'
       - disconnect: 'cmd/azmgmt/disconnect.md'

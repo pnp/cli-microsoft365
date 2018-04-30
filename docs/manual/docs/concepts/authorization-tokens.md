@@ -41,6 +41,7 @@ Office 365 CLI requires the following permissions to Office 365 services:
     - Read and write directory data
     - Access directory as the signed in user
     - Read and write identity providers
+    - Send mail as a user
 - Windows Azure Active Directory
     - Access the directory as the signed-in user
 - Windows Azure Service Management API
