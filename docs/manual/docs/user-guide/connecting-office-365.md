@@ -99,6 +99,18 @@ To authorize for communicating with Office 365 API, the Office 365 CLI uses the 
 
 If you authenticate using credentials, the authentication and authorization are a part of the same request that Office 365 CLI issues towards Azure AD. If either authentication or authorization fails, you will see a corresponding error message explaining what went wrong.
 
+## Re-consent the PnP Office 365 Management Shell Azure AD application
+
+Office 365 CLI uses the _PnP Office 365 Management Shell_ Azure AD application to connect to your Office 365 tenant on your behalf. As we add new commands to the CLI, it's possible, that new permissions will be added to the _PnP Office 365 Management Shell_ Azure AD application. To be able to use the newly added commands which depend on these new permissions, you will have to re-approve the _PnP Office 365 Management Shell_ Azure AD application in your Azure AD. This process is also known as _re-consenting the Azure AD application_.
+
+To re-consent the _PnP Office 365 Management Shell_ application in your Azure AD, in the command line execute:
+
+```sh
+o365 --reconsent
+```
+
+Office 365 CLI will provide you with a URL that you should open in the web browser and sign in with your organizational account. After authenticating, Azure AD will prompt you to approve the new set of permissions. Once you approved the permissions, you will be redirected to an empty page. You can now use all commands in the Office 365 CLI.
+
 ## Connecting to Office 365 via a proxy
 
 All communication between the Office 365 CLI and Office 365 APIs happens via web requests. If you're behind a proxy, you should set up an environment variable to allow Office 365 CLI to connect to Office 365. More information about the necessary configuration steps is available at [https://github.com/request/request#controlling-proxy-behaviour-using-environment-variables](https://github.com/request/request#controlling-proxy-behaviour-using-environment-variables).
