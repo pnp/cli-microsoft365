@@ -151,7 +151,7 @@ Add-PnPFieldFromXml|SharePointPnPPowerShellOnline|
 Add-PnPFieldToContentType|SharePointPnPPowerShellOnline|
 Add-PnPFile|SharePointPnPPowerShellOnline|
 Add-PnPFileToProvisioningTemplate|SharePointPnPPowerShellOnline|
-Add-PnPFolder|SharePointPnPPowerShellOnline|
+Add-PnPFolder|SharePointPnPPowerShellOnline|[spo folder add](../cmd/spo/folder/folder-add.md)
 Add-PnPHtmlPublishingPageLayout|SharePointPnPPowerShellOnline|
 Add-PnPIndexedProperty|SharePointPnPPowerShellOnline|
 Add-PnPJavaScriptBlock|SharePointPnPPowerShellOnline|
@@ -229,7 +229,7 @@ Get-PnPEventReceiver|SharePointPnPPowerShellOnline|
 Get-PnPFeature|SharePointPnPPowerShellOnline|
 Get-PnPField|SharePointPnPPowerShellOnline|
 Get-PnPFile|SharePointPnPPowerShellOnline|[spo file get](../cmd/spo/file/file-get.md), [spo file list](../cmd/spo/file/file-list.md)
-Get-PnPFolder|SharePointPnPPowerShellOnline|
+Get-PnPFolder|SharePointPnPPowerShellOnline|[spo folder get](../cmd/spo/folder/folder-get.md), [spo folder list](../cmd/spo/folder/folder-list.md)
 Get-PnPFolderItem|SharePointPnPPowerShellOnline|
 Get-PnPGroup|SharePointPnPPowerShellOnline|
 Get-PnPGroupMembers|SharePointPnPPowerShellOnline|
@@ -347,7 +347,7 @@ Remove-PnPField|SharePointPnPPowerShellOnline|
 Remove-PnPFieldFromContentType|SharePointPnPPowerShellOnline|
 Remove-PnPFile|SharePointPnPPowerShellOnline|[spo file remove](../cmd/spo/file/file-remove.md)
 Remove-PnPFileFromProvisioningTemplate|SharePointPnPPowerShellOnline|
-Remove-PnPFolder|SharePointPnPPowerShellOnline|
+Remove-PnPFolder|SharePointPnPPowerShellOnline|[spo folder remove](../cmd/spo/folder/folder-remove.md)
 Remove-PnPGroup|SharePointPnPPowerShellOnline|
 Remove-PnPIndexedProperty|SharePointPnPPowerShellOnline|
 Remove-PnPJavaScriptLink|SharePointPnPPowerShellOnline|
