@@ -43,6 +43,11 @@ pages:
         - file get: 'cmd/spo/file/file-get.md'
         - file list: 'cmd/spo/file/file-list.md'
         - file remove: 'cmd/spo/file/file-remove.md'
+      - folder:
+        - folder add: 'cmd/spo/folder/folder-add.md'
+        - folder get: 'cmd/spo/folder/folder-get.md'
+        - folder list: 'cmd/spo/folder/folder-list.md'
+        - folder remove: 'cmd/spo/folder/folder-remove.md'
       - hubsite:
         - hubsite connect: 'cmd/spo/hubsite/hubsite-connect.md'
         - hubsite data get: 'cmd/spo/hubsite/hubsite-data-get.md'

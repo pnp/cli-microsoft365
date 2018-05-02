@@ -1,0 +1,35 @@
+# spo folder list
+
+Returns all folders under the specified parent folder
+
+## Usage
+
+```sh
+spo folder list [options]
+```
+
+## Options
+
+Option|Description
+------|-----------
+`--help`|output usage information
+`-u, --webUrl <webUrl>`|The URL of the site where the folders to list are located
+`-p, --parentFolderUrl <parentFolderUrl>`|Site-relative URL of the parent folder
+`-o, --output [output]`|Output type. `json|text`. Default `text`
+`--verbose`|Runs command with verbose logging
+`--debug`|Runs command with debug logging
+
+!!! important
+    Before using this command, connect to a SharePoint Online site, using the [spo connect](../connect.md) command.
+
+## Remarks
+
+To get list of folders under parent folder, you have to first connect to SharePoint using the [spo connect](../connect.md) command, eg. `spo connect https://contoso.sharepoint.com`.
+
+## Examples
+
+Gets list of folders under a parent folder with site-relative url _/Shared Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
+
+```sh
+spo folder list --webUrl https://contoso.sharepoint.com/sites/project-x --parentFolderUrl '/Shared Documents'
+```
