@@ -46,10 +46,25 @@ describe(commands.LISTITEM_SET, () => {
 
     }
     if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-      console.log(`CSOM request ${opts.body}`)
+
       // requestObjectIdentity mock
       if (opts.body.indexOf('Name="Current"') > -1) {
-        return Promise.resolve(
+
+        if (opts.url.indexOf('rejectme.com') > -1 ) {
+
+          return Promise.reject('Failed request')
+
+        }
+
+        if (opts.url.indexOf('returnerror.com') > -1) {
+
+          return Promise.resolve(JSON.stringify(
+            [{"ErrorInfo": "error occurred"}]
+          ))
+
+        }
+
+        return Promise.resolve(JSON.stringify(
           [
             {
               "SchemaVersion": "15.0.0.0",
@@ -60,12 +75,21 @@ describe(commands.LISTITEM_SET, () => {
             {
               "_ObjectType_": "SP.Web", 
               "_ObjectIdentity_": "d704ae73-d5ed-459e-80b0-b8103c5fb6e0|8f2be65d-f195-4699-b0de-24aca3384ba9:site:0ead8b78-89e5-427f-b1bc-6e5a77ac191c:web:4c076c07-e3f1-49a8-ad01-dbb70b263cd7",
-              "ServerRelativeUrl": "\\u002fsites\\u002futasdev01"
+              "ServerRelativeUrl": "\\u002fsites\\u002fprojectx"
             }
-          ]
+          ])
         )
+
       }
       if (opts.body.indexOf('SystemUpdate') > -1) {
+
+        if (opts.body.indexOf('systemUpdate error') > -1) {
+          return Promise.resolve(
+            'ErrorMessage": "systemUpdate error"}'
+          )
+
+        }
+
         actualId = expectedId;
         return Promise.resolve(
           ']SchemaVersion":"15.0.0.0","LibraryVersion":"16.0.7618.1204","ErrorInfo":null,"TraceCorrelationId":"3e3e629e-f0e9-5000-9f31-c6758b453a4a"'
@@ -448,9 +472,9 @@ describe(commands.LISTITEM_SET, () => {
     actualId = 0;
 
     let options: any = { 
-      debug: false, 
+      debug: true, 
       listTitle: 'Demo List', 
-      id: 47,
+      id: 147,
       webUrl: 'https://contoso.sharepoint.com/sites/project-y', 
       Title: expectedTitle,
       systemUpdate: true
@@ -473,6 +497,122 @@ describe(commands.LISTITEM_SET, () => {
 
   });
 
+  it('fails to get _ObjecttIdentity_ when the systemUpdate parameter is specified', (done) => {
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'post').callsFake(postFakes);
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    actualId = 0;
+
+    let options: any = { 
+      debug: true, 
+      listTitle: 'Demo List', 
+      id: 147,
+      webUrl: 'https://rejectme.com/sites/project-y', 
+      Title: expectedTitle,
+      systemUpdate: true
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert(actualId !== expectedId);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+
+  });
+
+  it('fails to get _ObjecttIdentity_ when an error is returned by the _ObjectIdentity_ CSOM request and systemUpdate parameter is specified', (done) => {
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'post').callsFake(postFakes);
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    actualId = 0;
+
+    let options: any = { 
+      debug: false, 
+      listTitle: 'Demo List', 
+      id: 147,
+      webUrl: 'https://returnerror.com/sites/project-y', 
+      Title: expectedTitle,
+      systemUpdate: true
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert(actualId !== expectedId);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+
+  });
+
+  it('fails to update the list item when systemUpdate parameter is specified', (done) => {
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'post').callsFake(postFakes);
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    actualId = 0;
+
+    let options: any = { 
+      debug: true, 
+      listTitle: 'Demo List', 
+      id: 147,
+      webUrl: 'https://contoso.sharepoint.com/sites/project-y', 
+      Title: "systemUpdate error",
+      contentType: "Item",
+      systemUpdate: true
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert(actualId !== expectedId);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+
+  });
+
+  
 
   it('has help referring to the right command', () => {
     const cmd: any = {
@@ -509,8 +649,8 @@ describe(commands.LISTITEM_SET, () => {
   });
 
   it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.getAccessToken);
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
+    Utils.restore(auth.ensureAccessToken);
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';

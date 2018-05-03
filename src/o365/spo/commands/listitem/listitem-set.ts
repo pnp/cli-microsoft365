@@ -217,10 +217,17 @@ class SpoListItemSetCommand extends SpoCommand {
 
       }).then((objectIdentity: string): request.RequestPromise => {
 
+        const additionalContentType = (args.options.systemUpdate && args.options.contentType && contentTypeName !== '') ? `
+              <Parameters>
+                <Parameter Type="String">ContentType</Parameter>
+                <Parameter Type="String">${contentTypeName}</Parameter>
+              </Parameters>` 
+            : ``;
+
         const requestBody: any = args.options.systemUpdate ?
           `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009">
             <Actions>
-              <Method Name="ParseAndSetFieldValue" Id="1" ObjectPathId="147">${this.mapRequestBody(args.options).join()}
+              <Method Name="ParseAndSetFieldValue" Id="1" ObjectPathId="147">${this.mapRequestBody(args.options).join()}${additionalContentType}
               </Method>
               <Method Name="SystemUpdate" Id="2" ObjectPathId="147" />
             </Actions>
@@ -232,7 +239,7 @@ class SpoListItemSetCommand extends SpoCommand {
           formValues: this.mapRequestBody(args.options)
         };
 
-        if (args.options.contentType && contentTypeName !== '') {
+        if (args.options.contentType && contentTypeName !== '' && !args.options.systemUpdate) {
           if (this.debug) {
             cmd.log(`Specifying content type name [${contentTypeName}] in request body`);
           }
@@ -241,10 +248,11 @@ class SpoListItemSetCommand extends SpoCommand {
             FieldName: 'ContentType',
             FieldValue: contentTypeName
           });
+
         }
 
         let requestOptions: any = args.options.systemUpdate ? {
-          url: `${args.options.webUrl}_vti_bin/client.svc/ProcessQuery`,
+          url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${siteAccessToken}`,
             'Content-Type': 'text/xml',
@@ -505,6 +513,7 @@ class SpoListItemSetCommand extends SpoCommand {
 
     return new Promise<string>((resolve: any, reject: any): void => {
       request.post(requestOptions).then((res: any) => {
+
         if (this.debug) {
           cmd.log('Response:');
           cmd.log(JSON.stringify(res));
@@ -526,7 +535,7 @@ class SpoListItemSetCommand extends SpoCommand {
         }
 
         reject('Cannot proceed. _ObjectIdentity_ not found'); // this is not supposed to happen
-      }, (err: any): void => { reject(err); }).catch((err) => {
+      }).catch((err) => {
         reject(err); 
       });
     });
