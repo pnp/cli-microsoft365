@@ -1,6 +1,7 @@
 export interface ContextInfo {
   FormDigestTimeoutSeconds: number;
   FormDigestValue: string;
+  WebFullUrl: string;
 }
 
 export interface ClientSvcResponse extends Array<any | ClientSvcResponseContents> {
