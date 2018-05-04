@@ -48,6 +48,9 @@ export default {
   LISTITEM_ADD: `${prefix} listitem add`,
   LISTITEM_REMOVE: `${prefix} listitem remove`,
   PAGE_ADD: `${prefix} page add`,
+  PAGE_CONTROL_GET: `${prefix} page control get`,
+  PAGE_CONTROL_LIST: `${prefix} page control list`,
+  PAGE_GET: `${prefix} page get`,
   PAGE_LIST: `${prefix} page list`,
   PAGE_SET: `${prefix} page set`,
   PROPERTYBAG_GET: `${prefix} propertybag get`,
@@ -100,7 +103,8 @@ export default {
   THEME_REMOVE: `${prefix} theme remove`,
   THEME_SET: `${prefix} theme set`,
   WEB_ADD: `${prefix} web add`,
+  WEB_CLIENTSIDEWEBPART_LIST: `${prefix} web clientsidewebpart list`,
   WEB_GET: `${prefix} web get`,
   WEB_REMOVE: `${prefix} web remove`,
   WEB_LIST: `${prefix} web list`
-};
+};    

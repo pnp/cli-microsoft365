@@ -65,6 +65,9 @@ pages:
         - listitem remove: 'cmd/spo/listitem/listitem-remove.md'
       - page:
         - page add: 'cmd/spo/page/page-add.md'
+        - page control get: 'cmd/spo/page/page-control-get.md'
+        - page control list: 'cmd/spo/page/page-control-list.md'
+        - page get: 'cmd/spo/page/page-get.md'
         - page list: 'cmd/spo/page/page-list.md'
         - page set: 'cmd/spo/page/page-set.md'
       - propertybag:
@@ -119,6 +122,7 @@ pages:
         - theme set: 'cmd/spo/theme/theme-set.md'
       - web:
         - web add: 'cmd/spo/web/web-add.md'
+        - web clientsidewebpart list: 'cmd/spo/web/web-clientsidewebpart-list.md'
         - web get: 'cmd/spo/web/web-get.md'
         - web list: 'cmd/spo/web/web-list.md'
         - web remove: 'cmd/spo/web/web-remove.md'
@@ -135,6 +139,9 @@ pages:
         - o365group set: 'cmd/graph/o365group/o365group-set.md'
       - siteclassification:
         - siteclassification get: 'cmd/graph/siteclassification/siteclassification-get.md'
+      - user:
+        - user get: 'cmd/graph/user/user-get.md'
+        - user list: 'cmd/graph/user/user-list.md'
     - Azure Management Service (azmgmt):
       - connect: 'cmd/azmgmt/connect.md'
       - disconnect: 'cmd/azmgmt/disconnect.md'
