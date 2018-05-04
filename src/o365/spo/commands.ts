@@ -31,6 +31,7 @@ export default {
   FILE_LIST: `${prefix} file list`,
   FILE_REMOVE: `${prefix} file remove`,
   FOLDER_ADD: `${prefix} folder add`,
+  FOLDER_COPY: `${prefix} folder copy`,
   FOLDER_GET: `${prefix} folder get`,
   FOLDER_LIST: `${prefix} folder list`,
   FOLDER_REMOVE: `${prefix} folder remove`,
