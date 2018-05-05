@@ -76,6 +76,7 @@ export default {
   SITE_CLASSIC_SET: `${prefix} site classic set`,
   SITE_GET: `${prefix} site get`,
   SITE_LIST: `${prefix} site list`,
+  SITE_OFFICE365GROUP_SET: `${prefix} site office365group set`,
   SITE_SET: `${prefix} site set`,
   SITEDESIGN_ADD: `${prefix} sitedesign add`,
   SITEDESIGN_APPLY: `${prefix} sitedesign apply`,

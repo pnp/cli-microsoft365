@@ -341,4 +341,19 @@ describe('Command', () => {
     }, cmd, () => {});
     assert(logSpy.calledWith(new CommandError('abc')));
   });
+
+  it('displays error message coming from ADALJS', () => {
+    const l: any[] = [];
+    const log = (msg?: string) => { l.push(msg); };
+    const logSpy = sinon.spy(log);
+    const cmd = {
+      log: logSpy,
+      prompt: () => {}
+    };
+    const mock = new MockCommand2();
+    mock.handlePromiseError({
+      error: { error_description: 'abc' }
+    }, cmd, () => {});
+    assert(logSpy.calledWith(new CommandError('abc')));
+  });
 });
