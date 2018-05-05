@@ -4,7 +4,6 @@
 :--------------: | :---------:
 [![CircleCI](https://circleci.com/gh/SharePoint/office365-cli/tree/master.svg?style=shield&circle-token=ce99e8046a231e1959248a61e7e32f9ae1abc8cf)](https://circleci.com/gh/SharePoint/office365-cli/tree/master)|[![CircleCI](https://circleci.com/gh/SharePoint/office365-cli/tree/dev.svg?style=shield&circle-token=ce99e8046a231e1959248a61e7e32f9ae1abc8cf)](https://circleci.com/gh/SharePoint/office365-cli/tree/dev)
 [![Coverage Status](https://coveralls.io/repos/github/SharePoint/office365-cli/badge.svg?branch=master)](https://coveralls.io/github/SharePoint/office365-cli?branch=master)|[![Coverage Status](https://coveralls.io/repos/github/SharePoint/office365-cli/badge.svg?branch=dev)](https://coveralls.io/github/SharePoint/office365-cli?branch=dev)
-[![bitHound Dependencies](https://www.bithound.io/github/SharePoint/office365-cli/badges/dependencies.svg)](https://www.bithound.io/github/SharePoint/office365-cli/master/dependencies/npm)|[![bitHound Dependencies](https://www.bithound.io/github/SharePoint/office365-cli/badges/dependencies.svg)](https://www.bithound.io/github/SharePoint/office365-cli/dev/dependencies/npm)
 
 # Office 365 CLI
 
