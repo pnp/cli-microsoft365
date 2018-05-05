@@ -113,7 +113,7 @@ Set-SPOMultiGeoExperience|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOSite|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOSiteDesign|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign set](../cmd/spo/sitedesign/sitedesign-set.md)
 Set-SPOSiteGroup|Microsoft.Online.SharePoint.PowerShell|
-Set-SPOSiteOffice365Group|Microsoft.Online.SharePoint.PowerShell|
+Set-SPOSiteOffice365Group|Microsoft.Online.SharePoint.PowerShell|[spo site o365group set](../cmd/spo/site/site-o365group-set.md)
 Set-SPOSiteScript|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOStorageEntity|Microsoft.Online.SharePoint.PowerShell|[spo storageentity set](../cmd/spo/storageentity/storageentity-set.md)
 Set-SPOTenant|Microsoft.Online.SharePoint.PowerShell|

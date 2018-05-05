@@ -101,6 +101,7 @@ pages:
         - site classic add: 'cmd/spo/site/site-classic-add.md'
         - site classic list: 'cmd/spo/site/site-classic-list.md'
         - site classic set: 'cmd/spo/site/site-classic-set.md'
+        - site o365group set: 'cmd/spo/site/site-o365group-set.md'
       - sitedesign:
         - sitedesign add: 'cmd/spo/sitedesign/sitedesign-add.md'
         - sitedesign apply: 'cmd/spo/sitedesign/sitedesign-apply.md'
