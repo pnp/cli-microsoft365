@@ -1,5 +1,25 @@
 # Release notes
 
+## [v1.3.0](https://github.com/SharePoint/office365-cli/releases/tag/v1.3.0)
+
+### New commands
+
+**SharePoint Online:**
+
+- [spo file copy](../cmd/spo/file/file-copy.md) - copies a file to another location [#286](https://github.com/SharePoint/office365-cli/issues/286)
+- [spo folder add](../cmd/spo/folder/folder-add.md) - creates a folder within a parent folder [#425](https://github.com/SharePoint/office365-cli/issues/425)
+- [spo folder get](../cmd/spo/folder/folder-get.md) - gets information about the specified folder [#427](https://github.com/SharePoint/office365-cli/issues/427)
+- [spo folder list](../cmd/spo/folder/folder-list.md) - returns all folders under the specified parent folder [#428](https://github.com/SharePoint/office365-cli/issues/428)
+- [spo folder remove](../cmd/spo/folder/folder-remove.md) - deletes the specified folder [#426](https://github.com/SharePoint/office365-cli/issues/426)
+
+**Microsoft Graph:**
+
+- [graph user sendmail](../cmd/graph/user/user-sendmail.md) - sends e-mail on behalf of the current user [#328](https://github.com/SharePoint/office365-cli/issues/328)
+
+### Changes
+
+- added support for re-consenting the AAD app [#421](https://github.com/SharePoint/office365-cli/issues/421)
+
 ## [v1.2.0](https://github.com/SharePoint/office365-cli/releases/tag/v1.2.0)
 
 ### New commands
