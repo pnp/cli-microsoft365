@@ -122,6 +122,7 @@ pages:
       - tenant:
         - tenant appcatalogurl get: 'cmd/spo/tenant/tenant-appcatalogurl-get.md'
       - theme:
+        - theme apply: 'cmd/spo/theme/theme-apply.md'
         - theme get: 'cmd/spo/theme/theme-get.md'
         - theme list: 'cmd/spo/theme/theme-list.md'
         - theme remove: 'cmd/spo/theme/theme-remove.md'
