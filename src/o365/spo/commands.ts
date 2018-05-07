@@ -34,6 +34,7 @@ export default {
   FOLDER_GET: `${prefix} folder get`,
   FOLDER_LIST: `${prefix} folder list`,
   FOLDER_REMOVE: `${prefix} folder remove`,
+  HIDEDEFAULTTHEMES_GET: `${prefix} hidedefaultthemes get`,
   HUBSITE_CONNECT: `${prefix} hubsite connect`,
   HUBSITE_DATA_GET: `${prefix} hubsite data get`,
   HUBSITE_DISCONNECT: `${prefix} hubsite disconnect`,
@@ -113,4 +114,4 @@ export default {
   WEB_GET: `${prefix} web get`,
   WEB_REMOVE: `${prefix} web remove`,
   WEB_LIST: `${prefix} web list`
-};    
+};
