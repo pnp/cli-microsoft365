@@ -103,6 +103,7 @@ export default {
   STORAGEENTITY_SET: `${prefix} storageentity set`,
   STORAGEENTITY_REMOVE: `${prefix} storageentity remove`,
   TENANT_APPCATALOGURL_GET: `${prefix} tenant appcatalogurl get`,
+  THEME_APPLY: `${prefix} theme apply`,
   THEME_GET: `${prefix} theme get`,
   THEME_LIST: `${prefix} theme list`,
   THEME_REMOVE: `${prefix} theme remove`,
