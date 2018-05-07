@@ -35,6 +35,7 @@ export default {
   FOLDER_LIST: `${prefix} folder list`,
   FOLDER_REMOVE: `${prefix} folder remove`,
   HIDEDEFAULTTHEMES_GET: `${prefix} hidedefaultthemes get`,
+  HIDEDEFAULTTHEMES_SET: `${prefix} hidedefaultthemes set`,
   HUBSITE_CONNECT: `${prefix} hubsite connect`,
   HUBSITE_DATA_GET: `${prefix} hubsite data get`,
   HUBSITE_DISCONNECT: `${prefix} hubsite disconnect`,

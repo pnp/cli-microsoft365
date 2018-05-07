@@ -50,6 +50,7 @@ pages:
         - folder remove: 'cmd/spo/folder/folder-remove.md'
       - hidedefaultthemes:
         - hidedefaultthemes get: 'cmd/spo/hidedefaultthemes/hidedefaultthemes-get.md'
+        - hidedefaultthemes set: 'cmd/spo/hidedefaultthemes/hidedefaultthemes-set.md'
       - hubsite:
         - hubsite connect: 'cmd/spo/hubsite/hubsite-connect.md'
         - hubsite data get: 'cmd/spo/hubsite/hubsite-data-get.md'
