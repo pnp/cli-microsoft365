@@ -236,19 +236,24 @@ export default abstract class Command {
             cmd.log(new CommandError(response.error.message));
           }
           else {
-            try {
-              const error: any = JSON.parse(response.error);
-              if (error &&
-                error.error &&
-                error.error.message) {
-                cmd.log(new CommandError(error.error.message));
+            if (response.error.error_description) {
+              cmd.log(new CommandError(response.error.error_description));
+            }
+            else {
+              try {
+                const error: any = JSON.parse(response.error);
+                if (error &&
+                  error.error &&
+                  error.error.message) {
+                  cmd.log(new CommandError(error.error.message));
+                }
+                else {
+                  cmd.log(new CommandError(response.error));
+                }
               }
-              else {
+              catch {
                 cmd.log(new CommandError(response.error));
               }
-            }
-            catch {
-              cmd.log(new CommandError(response.error));
             }
           }
         }
