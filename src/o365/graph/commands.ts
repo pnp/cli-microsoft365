@@ -3,6 +3,7 @@ const prefix: string = 'graph';
 export default {
   CONNECT: `${prefix} connect`,
   DISCONNECT: `${prefix} disconnect`,
+  GROUPSETTINGTEMPLATE_GET: `${prefix} groupsettingtemplate get`,
   O365GROUP_ADD: `${prefix} o365group add`,
   O365GROUP_GET: `${prefix} o365group get`,
   O365GROUP_LIST: `${prefix} o365group list`,
