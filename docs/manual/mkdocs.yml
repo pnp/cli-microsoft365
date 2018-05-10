@@ -142,6 +142,7 @@ pages:
       - disconnect: 'cmd/graph/disconnect.md'
       - status: 'cmd/graph/status.md'
       - groupsettingtemplate:
+        - groupsettingtemplate get: 'cmd/graph/groupsettingtemplate/groupsettingtemplate-get.md'
         - groupsettingtemplate list: 'cmd/graph/groupsettingtemplate/groupsettingtemplate-list.md'
       - o365group:
         - o365group add: 'cmd/graph/o365group/o365group-add.md'
