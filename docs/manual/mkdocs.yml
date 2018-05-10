@@ -141,6 +141,8 @@ pages:
       - connect: 'cmd/graph/connect.md'
       - disconnect: 'cmd/graph/disconnect.md'
       - status: 'cmd/graph/status.md'
+      - groupsetting:
+        - groupsetting add: 'cmd/graph/groupsetting/groupsetting-add.md'
       - groupsettingtemplate:
         - groupsettingtemplate get: 'cmd/graph/groupsettingtemplate/groupsettingtemplate-get.md'
         - groupsettingtemplate list: 'cmd/graph/groupsettingtemplate/groupsettingtemplate-list.md'
