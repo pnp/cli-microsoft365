@@ -45,6 +45,7 @@ pages:
         - file remove: 'cmd/spo/file/file-remove.md'
       - folder:
         - folder add: 'cmd/spo/folder/folder-add.md'
+        - folder copy: 'cmd/spo/folder/folder-copy.md'
         - folder get: 'cmd/spo/folder/folder-get.md'
         - folder list: 'cmd/spo/folder/folder-list.md'
         - folder remove: 'cmd/spo/folder/folder-remove.md'
