@@ -3,6 +3,7 @@ import Table = require('easy-table');
 import * as os from 'os';
 const vorpal: Vorpal = require('./vorpal-init');
 import { CommandError } from './Command';
+import * as url from 'url';
 
 export default class Utils {
   public static escapeXml(s: any | undefined) {
@@ -176,5 +177,56 @@ export default class Utils {
     }
 
     return userName;
+  }
+
+  /**
+   * Returns server relative path.
+   * @param webUrl web full or web relative url e.g. https://contoso.sharepoint.com/sites/team1
+   * @param siteRelativePath site relative path e.g. /Shared Documents
+   * @example
+   * // returns "/sites/team1"
+   * Utils.getServerRelativePath("https://contoso.sharepoint.com/sites/team1");
+   * @example
+   * // returns "/sites/team1/Shared Documents"
+   * Utils.getServerRelativePath("https://contoso.sharepoint.com/sites/team1", "/Shared Documents");
+   * @example
+   * // returns "/sites/team1/Shared Documents"
+   * Utils.getServerRelativePath("/sites/team1/", "/Shared Documents");
+   */
+  public static getServerRelativePath(webUrl: string, siteRelativePath: string = ""): string {
+    const tenantUrl: string = `${url.parse(webUrl).protocol}//${url.parse(webUrl).hostname}`;
+    let webRelativePath: string = webUrl.replace(tenantUrl, '');
+
+    // add '/' at 0
+    if (webRelativePath.charAt(0) !== '/') {
+      webRelativePath = `/${webRelativePath}`;
+    }
+
+    // remove last '/' of webRelativePath
+    if (webRelativePath.length > 1 &&
+      webRelativePath.lastIndexOf('/') === webRelativePath.length - 1) {
+      webRelativePath = webRelativePath.substring(0, webRelativePath.length - 1);
+    }
+
+    if (siteRelativePath !== '') {
+      // add '/' at 0 for siteRelativePath 
+      if (siteRelativePath.charAt(0) !== '/') {
+        siteRelativePath = `/${siteRelativePath}`;
+      }
+
+      // remove last '/' of siteRelativePath
+      if (siteRelativePath.lastIndexOf('/') === siteRelativePath.length - 1) {
+        siteRelativePath = siteRelativePath.substring(0, siteRelativePath.length - 1);
+      }
+
+      if (webRelativePath === '/' && siteRelativePath !== '') {
+        webRelativePath = siteRelativePath;
+      }
+      else {
+        webRelativePath = `${webRelativePath}${siteRelativePath}`;
+      }
+    }
+
+    return webRelativePath;
   }
 }

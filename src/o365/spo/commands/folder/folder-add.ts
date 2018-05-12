@@ -11,7 +11,6 @@ import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import { Auth } from '../../../../Auth';
 import { FolderProperties } from './FolderProperties';
-import { FolderBaseCommand } from './folder-base';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -25,7 +24,7 @@ interface Options extends GlobalOptions {
   name: string;
 }
 
-class SpoFolderAddCommand extends FolderBaseCommand {
+class SpoFolderAddCommand extends SpoCommand {
   public get name(): string {
     return commands.FOLDER_ADD;
   }
@@ -50,9 +49,9 @@ class SpoFolderAddCommand extends FolderBaseCommand {
         if (this.verbose) {
           cmd.log(`Adding folder to site ${args.options.webUrl}...`);
         }
-
-        const webRelativeUrl: string = this.getWebRelativeUrlFromWebUrl(args.options.webUrl);
-        const serverRelativeUrl: string = `${webRelativeUrl}${this.formatRelativeUrl(args.options.parentFolderUrl)}/${args.options.name}`;
+        
+        const parentFolderServerRelativeUrl: string = Utils.getServerRelativePath(args.options.webUrl, args.options.parentFolderUrl);
+        const serverRelativeUrl: string =  `${parentFolderServerRelativeUrl}/${args.options.name}`;
         const requestUrl: string = `${args.options.webUrl}/_api/web/folders`;
         const requestOptions: any = {
           url: requestUrl,

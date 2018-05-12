@@ -9,9 +9,10 @@ import {
 import SpoCommand from '../../SpoCommand';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import { Auth } from '../../../../Auth';
-import { SpoPropertyBagBaseCommand, IdentityResponse } from './propertybag-base';
+import { SpoPropertyBagBaseCommand } from './propertybag-base';
 import GlobalOptions from '../../../../GlobalOptions';
 import Utils from '../../../../Utils';
+import { ClientSvc, IdentityResponse } from '../../common/ClientSvc';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -45,6 +46,7 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const removeProperty = (): void => {
       const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
+      const clientSvcCommons: ClientSvc = new ClientSvc(cmd, this.debug);
 
       if (this.debug) {
         cmd.log(`Retrieving access token for ${resource}...`);
@@ -70,7 +72,7 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
             cmd.log('');
           }
 
-          return this.requestObjectIdentity(args.options.webUrl, cmd);
+          return clientSvcCommons.getCurrentWebIdentity(args.options.webUrl, this.siteAccessToken, this.formDigestValue);
         })
         .then((identityResp: IdentityResponse): Promise<IdentityResponse> => {
           if (this.debug) {
@@ -82,7 +84,7 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
           const opts: Options = args.options;
           if (opts.folder) {
             // get the folder guid instead of the web guid
-            return this.requestFolderObjectIdentity(identityResp, opts.webUrl, opts.folder, cmd)
+            return clientSvcCommons.getFolderIdentity(identityResp.objectIdentity, opts.webUrl, opts.folder, this.siteAccessToken, this.formDigestValue)
           }
           return new Promise<IdentityResponse>(resolve => { return resolve(identityResp); });
         })

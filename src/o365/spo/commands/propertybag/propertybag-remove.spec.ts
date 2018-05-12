@@ -7,8 +7,8 @@ const command: Command = require('./propertybag-remove');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import Utils from '../../../../Utils';
-import { IdentityResponse } from './propertybag-base';
 import config from '../../../../config';
+import { IdentityResponse } from '../../common/ClientSvc';
 
 describe(commands.PROPERTYBAG_REMOVE, () => {
   let vorpal: Vorpal;

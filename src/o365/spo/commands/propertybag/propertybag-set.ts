@@ -1,18 +1,19 @@
 import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
+import SpoCommand from '../../SpoCommand';
 import * as request from 'request-promise-native';
 import {
   CommandOption,
   CommandValidate
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import { Auth } from '../../../../Auth';
-import { SpoPropertyBagBaseCommand, IdentityResponse } from './propertybag-base';
+import { SpoPropertyBagBaseCommand } from './propertybag-base';
 import GlobalOptions from '../../../../GlobalOptions';
 import Utils from '../../../../Utils';
 import { BasePermissions, PermissionKind } from '../../common/base-permissions';
+import { ClientSvc, IdentityResponse } from '../../common/ClientSvc';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -44,6 +45,8 @@ class SpoPropertyBagSetCommand extends SpoPropertyBagBaseCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
+    const clientSvcCommons: ClientSvc = new ClientSvc(cmd, this.debug);
+    
     let webIdentityResp: IdentityResponse;
 
     if (this.debug) {
@@ -70,14 +73,14 @@ class SpoPropertyBagSetCommand extends SpoPropertyBagBaseCommand {
           cmd.log('');
         }
 
-        return this.requestObjectIdentity(args.options.webUrl, cmd);
+        return clientSvcCommons.getCurrentWebIdentity(args.options.webUrl, this.siteAccessToken, this.formDigestValue);
       })
       .then((identityResp: IdentityResponse): Promise<boolean> => {
         webIdentityResp = identityResp;
 
         // Check if web no script enabled or not
         // Cannot set property bag value if no script is enabled
-        return this.isNoScriptSite(identityResp, args.options, cmd);
+        return this.isNoScriptSite(identityResp, args.options, clientSvcCommons);
       })
       .then((isNoScriptSite: boolean): Promise<IdentityResponse> => {
         if (isNoScriptSite) {
@@ -87,7 +90,7 @@ class SpoPropertyBagSetCommand extends SpoPropertyBagBaseCommand {
         const opts: Options = args.options;
         if (opts.folder) {
           // get the folder guid instead of the web guid
-          return this.requestFolderObjectIdentity(webIdentityResp, opts.webUrl, opts.folder, cmd);
+          return clientSvcCommons.getFolderIdentity(webIdentityResp.objectIdentity, opts.webUrl, opts.folder, this.siteAccessToken, this.formDigestValue);
         }
 
         return new Promise<IdentityResponse>(resolve => { return resolve(webIdentityResp); });
@@ -153,9 +156,9 @@ class SpoPropertyBagSetCommand extends SpoPropertyBagBaseCommand {
    * @param options command options
    * @param cmd command instance
    */
-  private isNoScriptSite(webIdentityResp: IdentityResponse, options: Options, cmd: CommandInstance): Promise<boolean> {
+  private isNoScriptSite(webIdentityResp: IdentityResponse, options: Options, clientSvcCommons: ClientSvc): Promise<boolean> {
     return new Promise<boolean>((resolve: (isNoScriptSite: boolean) => void, reject: (error: any) => void): void => {
-      this.getEffectiveBasePermissions(webIdentityResp.objectIdentity, options.webUrl, cmd)
+      clientSvcCommons.getEffectiveBasePermissions(webIdentityResp.objectIdentity, options.webUrl, this.siteAccessToken, this.formDigestValue)
         .then((basePermissionsResp: BasePermissions): void => {
           resolve(basePermissionsResp.has(PermissionKind.AddAndCustomizePages) === false);
         })

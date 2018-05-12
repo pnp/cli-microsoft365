@@ -7,7 +7,7 @@ const command: Command = require('./propertybag-list');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import Utils from '../../../../Utils';
-import { IdentityResponse } from './propertybag-base';
+import { ClientSvc, IdentityResponse } from '../../common/ClientSvc';
 
 describe(commands.PROPERTYBAG_LIST, () => {
   let vorpal: Vorpal;
@@ -115,7 +115,8 @@ describe(commands.PROPERTYBAG_LIST, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find
+      vorpal.find,
+      request.post
     ]);
   });
 
@@ -376,7 +377,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
 
-    const requestObjectIdentitySpy = sinon.spy((command as any), 'requestObjectIdentity');
+    const requestObjectIdentitySpy = sinon.spy(ClientSvc.prototype, 'getCurrentWebIdentity');
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com'
     }
@@ -392,8 +393,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
-        Utils.restore((command as any)['requestObjectIdentity']);
+        Utils.restore([request.post, requestObjectIdentitySpy]);
       }
     });
   });
@@ -407,7 +407,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
 
-    const requestObjectIdentitySpy = sinon.spy((command as any), 'requestObjectIdentity');
+    const requestObjectIdentitySpy = sinon.spy(ClientSvc.prototype, 'getCurrentWebIdentity');
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com'
     }
@@ -423,8 +423,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
-        Utils.restore((command as any)['requestObjectIdentity']);
+        Utils.restore([request.post, requestObjectIdentitySpy]);
       }
     });
   });
