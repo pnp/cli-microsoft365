@@ -427,7 +427,7 @@ Set-PnPIndexedProperties|SharePointPnPPowerShellOnline|
 Set-PnPInformationRightsManagement|SharePointPnPPowerShellOnline|
 Set-PnPInPlaceRecordsManagement|SharePointPnPPowerShellOnline|
 Set-PnPList|SharePointPnPPowerShellOnline|[spo list set](../cmd/spo/list/list-set.md)
-Set-PnPListItem|SharePointPnPPowerShellOnline|
+Set-PnPListItem|SharePointPnPPowerShellOnline|[spo listitem set](../cmd/spo/listitem/listitem-set.md)
 Set-PnPListItemAsRecord|SharePointPnPPowerShellOnline|
 Set-PnPListItemPermission|SharePointPnPPowerShellOnline|
 Set-PnPListPermission|SharePointPnPPowerShellOnline|
