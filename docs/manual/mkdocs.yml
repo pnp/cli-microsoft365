@@ -144,6 +144,7 @@ pages:
       - status: 'cmd/graph/status.md'
       - groupsetting:
         - groupsetting add: 'cmd/graph/groupsetting/groupsetting-add.md'
+        - groupsetting get: 'cmd/graph/groupsetting/groupsetting-get.md'
       - groupsettingtemplate:
         - groupsettingtemplate get: 'cmd/graph/groupsettingtemplate/groupsettingtemplate-get.md'
         - groupsettingtemplate list: 'cmd/graph/groupsettingtemplate/groupsettingtemplate-list.md'
