@@ -11,7 +11,6 @@ import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import { Auth } from '../../../../Auth';
 import { FolderProperties } from './FolderProperties';
-import { FolderBaseCommand } from './folder-base';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -24,7 +23,7 @@ interface Options extends GlobalOptions {
   parentFolderUrl: string;
 }
 
-class SpoFolderListCommand extends FolderBaseCommand {
+class SpoFolderListCommand extends SpoCommand {
   public get name(): string {
     return commands.FOLDER_LIST;
   }
@@ -54,8 +53,7 @@ class SpoFolderListCommand extends FolderBaseCommand {
           cmd.log(`Retrieving folders from site ${args.options.webUrl} parent folder ${args.options.parentFolderUrl}...`);
         }
 
-        const webRelativeUrl: string = this.getWebRelativeUrlFromWebUrl(args.options.webUrl);
-        const serverRelativeUrl: string = `${webRelativeUrl}${this.formatRelativeUrl(args.options.parentFolderUrl)}`;
+        const serverRelativeUrl: string =  Utils.getServerRelativePath(args.options.webUrl, args.options.parentFolderUrl);
         const requestUrl: string = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(serverRelativeUrl)}')/folders`;
         const requestOptions: any = {
           url: requestUrl,

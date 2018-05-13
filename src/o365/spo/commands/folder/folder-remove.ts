@@ -10,7 +10,6 @@ import {
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import { Auth } from '../../../../Auth';
-import { FolderBaseCommand } from './folder-base';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -25,7 +24,7 @@ interface Options extends GlobalOptions {
   confirm?: boolean;
 }
 
-class SpoFolderRemoveCommand extends FolderBaseCommand {
+class SpoFolderRemoveCommand extends SpoCommand {
   public get name(): string {
     return commands.FOLDER_REMOVE;
   }
@@ -58,9 +57,8 @@ class SpoFolderRemoveCommand extends FolderBaseCommand {
           if (this.verbose) {
             cmd.log(`Removing folder in site at ${args.options.webUrl}...`);
           }
-
-          const webRelativeUrl: string = this.getWebRelativeUrlFromWebUrl(args.options.webUrl);
-          const serverRelativeUrl: string = `${webRelativeUrl}${this.formatRelativeUrl(args.options.folderUrl)}`;
+          
+          const serverRelativeUrl: string =  Utils.getServerRelativePath(args.options.webUrl, args.options.folderUrl);
           let requestUrl: string = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(serverRelativeUrl)}')`;
           if (args.options.recycle) {
             requestUrl += `/recycle()`;
