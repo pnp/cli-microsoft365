@@ -45,9 +45,13 @@ pages:
         - file remove: 'cmd/spo/file/file-remove.md'
       - folder:
         - folder add: 'cmd/spo/folder/folder-add.md'
+        - folder copy: 'cmd/spo/folder/folder-copy.md'
         - folder get: 'cmd/spo/folder/folder-get.md'
         - folder list: 'cmd/spo/folder/folder-list.md'
         - folder remove: 'cmd/spo/folder/folder-remove.md'
+      - hidedefaultthemes:
+        - hidedefaultthemes get: 'cmd/spo/hidedefaultthemes/hidedefaultthemes-get.md'
+        - hidedefaultthemes set: 'cmd/spo/hidedefaultthemes/hidedefaultthemes-set.md'
       - hubsite:
         - hubsite connect: 'cmd/spo/hubsite/hubsite-connect.md'
         - hubsite data get: 'cmd/spo/hubsite/hubsite-data-get.md'
@@ -98,6 +102,7 @@ pages:
         - site classic add: 'cmd/spo/site/site-classic-add.md'
         - site classic list: 'cmd/spo/site/site-classic-list.md'
         - site classic set: 'cmd/spo/site/site-classic-set.md'
+        - site o365group set: 'cmd/spo/site/site-o365group-set.md'
       - sitedesign:
         - sitedesign add: 'cmd/spo/sitedesign/sitedesign-add.md'
         - sitedesign apply: 'cmd/spo/sitedesign/sitedesign-apply.md'
@@ -122,6 +127,7 @@ pages:
       - tenant:
         - tenant appcatalogurl get: 'cmd/spo/tenant/tenant-appcatalogurl-get.md'
       - theme:
+        - theme apply: 'cmd/spo/theme/theme-apply.md'
         - theme get: 'cmd/spo/theme/theme-get.md'
         - theme list: 'cmd/spo/theme/theme-list.md'
         - theme remove: 'cmd/spo/theme/theme-remove.md'
@@ -137,7 +143,11 @@ pages:
       - disconnect: 'cmd/graph/disconnect.md'
       - status: 'cmd/graph/status.md'
       - groupsetting:
-        - groupsetting get: 'cmd/graph/groupsetting/groupsetting-get.md'
+        - groupsetting add: 'cmd/graph/groupsetting/groupsetting-add.md'
+		- groupsetting get: 'cmd/graph/groupsetting/groupsetting-get.md'
+      - groupsettingtemplate:
+        - groupsettingtemplate get: 'cmd/graph/groupsettingtemplate/groupsettingtemplate-get.md'
+        - groupsettingtemplate list: 'cmd/graph/groupsettingtemplate/groupsettingtemplate-list.md'
       - o365group:
         - o365group add: 'cmd/graph/o365group/o365group-add.md'
         - o365group get: 'cmd/graph/o365group/o365group-get.md'

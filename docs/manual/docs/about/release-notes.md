@@ -8,12 +8,20 @@
 
 - [spo file copy](../cmd/spo/file/file-copy.md) - copies a file to another location [#286](https://github.com/SharePoint/office365-cli/issues/286)
 - [spo folder add](../cmd/spo/folder/folder-add.md) - creates a folder within a parent folder [#425](https://github.com/SharePoint/office365-cli/issues/425)
+- [spo folder copy](../cmd/spo/folder/folder-copy.md) - copies a folder to another location [#424](https://github.com/SharePoint/office365-cli/issues/424)
 - [spo folder get](../cmd/spo/folder/folder-get.md) - gets information about the specified folder [#427](https://github.com/SharePoint/office365-cli/issues/427)
 - [spo folder list](../cmd/spo/folder/folder-list.md) - returns all folders under the specified parent folder [#428](https://github.com/SharePoint/office365-cli/issues/428)
 - [spo folder remove](../cmd/spo/folder/folder-remove.md) - deletes the specified folder [#426](https://github.com/SharePoint/office365-cli/issues/426)
+- [spo hidedefaultthemes get](../cmd/spo/hidedefaultthemes/hidedefaultthemes-get.md) - gets the current value of the HideDefaultThemes setting [#341](https://github.com/SharePoint/office365-cli/issues/341)
+- [spo hidedefaultthemes set](../cmd/spo/hidedefaultthemes/hidedefaultthemes-set.md) - sets the value of the HideDefaultThemes setting [#342](https://github.com/SharePoint/office365-cli/issues/342)
+- [spo site o365group set](../cmd/spo/site/site-o365group-set.md) - connects site collection to an Office 365 Group [#431](https://github.com/SharePoint/office365-cli/issues/431)
+- [spo theme apply](../cmd/spo/theme/theme-apply.md) - applies theme to the specified site [#343](https://github.com/SharePoint/office365-cli/issues/343)
 
 **Microsoft Graph:**
 
+- [graph groupsetting add](../cmd/graph/groupsetting/groupsetting-add.md) - creates a group setting [#443](https://github.com/SharePoint/office365-cli/issues/443)
+- [graph groupsettingtemplate get](../cmd/graph/groupsettingtemplate/groupsettingtemplate-get.md) - gets information about the specified Azure AD group settings template [#442](https://github.com/SharePoint/office365-cli/issues/442)
+- [graph groupsettingtemplate list](../cmd/graph/groupsettingtemplate/groupsettingtemplate-list.md) - lists Azure AD group settings templates [#441](https://github.com/SharePoint/office365-cli/issues/441)
 - [graph user sendmail](../cmd/graph/user/user-sendmail.md) - sends e-mail on behalf of the current user [#328](https://github.com/SharePoint/office365-cli/issues/328)
 
 ### Changes

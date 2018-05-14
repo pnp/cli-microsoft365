@@ -31,9 +31,12 @@ export default {
   FILE_LIST: `${prefix} file list`,
   FILE_REMOVE: `${prefix} file remove`,
   FOLDER_ADD: `${prefix} folder add`,
+  FOLDER_COPY: `${prefix} folder copy`,
   FOLDER_GET: `${prefix} folder get`,
   FOLDER_LIST: `${prefix} folder list`,
   FOLDER_REMOVE: `${prefix} folder remove`,
+  HIDEDEFAULTTHEMES_GET: `${prefix} hidedefaultthemes get`,
+  HIDEDEFAULTTHEMES_SET: `${prefix} hidedefaultthemes set`,
   HUBSITE_CONNECT: `${prefix} hubsite connect`,
   HUBSITE_DATA_GET: `${prefix} hubsite data get`,
   HUBSITE_DISCONNECT: `${prefix} hubsite disconnect`,
@@ -76,6 +79,7 @@ export default {
   SITE_CLASSIC_SET: `${prefix} site classic set`,
   SITE_GET: `${prefix} site get`,
   SITE_LIST: `${prefix} site list`,
+  SITE_O365GROUP_SET: `${prefix} site o365group set`,
   SITE_SET: `${prefix} site set`,
   SITEDESIGN_ADD: `${prefix} sitedesign add`,
   SITEDESIGN_APPLY: `${prefix} sitedesign apply`,
@@ -103,6 +107,7 @@ export default {
   STORAGEENTITY_SET: `${prefix} storageentity set`,
   STORAGEENTITY_REMOVE: `${prefix} storageentity remove`,
   TENANT_APPCATALOGURL_GET: `${prefix} tenant appcatalogurl get`,
+  THEME_APPLY: `${prefix} theme apply`,
   THEME_GET: `${prefix} theme get`,
   THEME_LIST: `${prefix} theme list`,
   THEME_REMOVE: `${prefix} theme remove`,
@@ -112,4 +117,4 @@ export default {
   WEB_GET: `${prefix} web get`,
   WEB_REMOVE: `${prefix} web remove`,
   WEB_LIST: `${prefix} web list`
-};    
+};
