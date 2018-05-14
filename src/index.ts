@@ -2,6 +2,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import * as updateNotifier from 'update-notifier';
 import config from './config';
 import Command from './Command';
 import appInsights from './appInsights';
@@ -21,6 +22,8 @@ const readdirR = (dir: string): string | string[] => {
 appInsights.trackEvent({
   name: 'started'
 });
+
+updateNotifier({pkg: packageJSON}).notify({defer: false});
 
 fs.realpath(__dirname, (err: NodeJS.ErrnoException, resolvedPath: string): void => {
   const commandsDir: string = path.join(resolvedPath, './o365');
