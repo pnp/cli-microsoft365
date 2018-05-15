@@ -70,8 +70,8 @@ export default abstract class Command {
   public action(): CommandAction {
     const cmd: Command = this;
     return function (this: CommandInstance, args: CommandArgs, cb: () => void) {
-      cmd._debug = args.options.debug || false;
-      cmd._verbose = cmd._debug || args.options.verbose || false;
+      cmd._debug = args.options.debug || process.env.OFFICE365CLI_DEBUG === '1' || false;
+      cmd._verbose = cmd._debug || args.options.verbose || process.env.OFFICE365CLI_VERBOSE === '1' || false;
 
       appInsights.trackEvent({
         name: cmd.getCommandName(),
