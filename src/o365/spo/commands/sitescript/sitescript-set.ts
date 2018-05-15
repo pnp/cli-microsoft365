@@ -157,7 +157,7 @@ class SpoSiteScriptSetCommand extends SpoCommand {
       if (args.options.version) {
         const version: number = parseInt(args.options.version);
         if (isNaN(version)) {
-          return `${args.options.verbose} is not a number`;
+          return `${args.options.version} is not a number`;
         }
       }
 

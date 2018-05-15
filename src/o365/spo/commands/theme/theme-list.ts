@@ -55,7 +55,7 @@ class SpoThemeListCommand extends SpoCommand {
         return request.post(requestOptions);
       })
       .then((rawRes: any): void => {
-        if (args.options.debug) {
+        if (this.debug) {
           cmd.log('Response:');
           cmd.log(rawRes);
           cmd.log('');
