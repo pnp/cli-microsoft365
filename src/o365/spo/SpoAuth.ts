@@ -12,8 +12,8 @@ interface Token {
 }
 
 export class Site extends Service {
-  tenantId: string;
-  url: string;
+  tenantId!: string;
+  url!: string;
   accessTokens: Hash = {};
 
   public disconnect(): void {
