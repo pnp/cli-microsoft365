@@ -5,7 +5,7 @@ import * as path from 'path';
 
 class Autocomplete {
   private static autocompleteFilePath: string = path.join(__dirname, `..${path.sep}commands.json`);
-  private omelette: Omelette;
+  private omelette!: Omelette;
   private commands: any = {};
 
   constructor() {
