@@ -247,7 +247,7 @@ Get-PnPInformationRightsManagement|SharePointPnPPowerShellOnline|
 Get-PnPInPlaceRecordsManagement|SharePointPnPPowerShellOnline|
 Get-PnPJavaScriptLink|SharePointPnPPowerShellOnline|
 Get-PnPList|SharePointPnPPowerShellOnline|[spo list get](../cmd/spo/list/list-get.md), [spo list list](../cmd/spo/list/list-list.md)
-Get-PnPListItem|SharePointPnPPowerShellOnline|
+Get-PnPListItem|SharePointPnPPowerShellOnline|[spo listitem get](../cmd/spo/listitem/listitem-get.md)
 Get-PnPListRecordDeclaration|SharePointPnPPowerShellOnline|
 Get-PnPMasterPage|SharePointPnPPowerShellOnline|
 Get-PnPNavigationNode|SharePointPnPPowerShellOnline|
