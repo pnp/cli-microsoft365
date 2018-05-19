@@ -39,7 +39,7 @@ class SpoListItemSetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Creates a list item in the specified list';
+    return 'Update the specified list item';
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
