@@ -48,7 +48,11 @@ describe(commands.APP_DEPLOY, () => {
   });
 
   afterEach(() => {
-    Utils.restore(vorpal.find);
+    Utils.restore([
+      vorpal.find,
+      request.get,
+      request.post
+    ]);
   });
 
   after(() => {
@@ -56,9 +60,7 @@ describe(commands.APP_DEPLOY, () => {
       appInsights.trackEvent,
       auth.ensureAccessToken,
       auth.getAccessToken,
-      auth.restoreAuth,
-      request.get,
-      request.post
+      auth.restoreAuth
     ]);
   });
 
@@ -275,6 +277,153 @@ describe(commands.APP_DEPLOY, () => {
     });
   });
 
+  it('deploys app specified using its name in the tenant app catalog', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps?$filter=Title eq 'solution'`) > -1) {
+        return Promise.resolve({
+          value: [{
+            ID: 'b2307a39-e878-458b-bc90-03bc578531d6'
+          }]
+        });
+      }
+
+      if (opts.url.indexOf(`search/query?querytext='contentclass:STS_Site%20AND%20SiteTemplate:APPCATALOG'`) > -1) {
+        return Promise.resolve({
+          PrimaryQueryResult: {
+            RelevantResults: {
+              RowCount: 1,
+              Table: {
+                Rows: [{
+                  Cells: [
+                    {
+                      Key: 'ID',
+                      Value: '1',
+                      ValueType: 'Number'
+                    },
+                    {
+                      Key: 'SPWebUrl',
+                      Value: 'https://contoso.sharepoint.com/sites/apps',
+                      ValueType: 'String'
+                    }
+                  ]
+                }]
+              }
+            }
+          }
+        } as SearchResponse);
+      }
+
+      return Promise.reject('Invalid request');
+    });
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        return Promise.resolve({
+          FormDigestValue: 'abc'
+        });
+      }
+
+      if (opts.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve();
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, name: 'solution.sppkg' } }, () => {
+      try {
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('deploys app specified using its name in the tenant app catalog (debug)', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps?$filter=Title eq 'solution'`) > -1) {
+        return Promise.resolve({
+          value: [{
+            ID: 'b2307a39-e878-458b-bc90-03bc578531d6'
+          }]
+        });
+      }
+
+      if (opts.url.indexOf(`search/query?querytext='contentclass:STS_Site%20AND%20SiteTemplate:APPCATALOG'`) > -1) {
+        return Promise.resolve({
+          PrimaryQueryResult: {
+            RelevantResults: {
+              RowCount: 1,
+              Table: {
+                Rows: [{
+                  Cells: [
+                    {
+                      Key: 'ID',
+                      Value: '1',
+                      ValueType: 'Number'
+                    },
+                    {
+                      Key: 'SPWebUrl',
+                      Value: 'https://contoso.sharepoint.com/sites/apps',
+                      ValueType: 'String'
+                    }
+                  ]
+                }]
+              }
+            }
+          }
+        } as SearchResponse);
+      }
+
+      return Promise.reject('Invalid request');
+    });
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        return Promise.resolve({
+          FormDigestValue: 'abc'
+        });
+      }
+
+      if (opts.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve();
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: true, name: 'solution.sppkg' } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('deploys app in the tenant app catalog skipping feature deployment when the skipFeatureDeployment flag provided', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`search/query?querytext='contentclass:STS_Site%20AND%20SiteTemplate:APPCATALOG'`) > -1) {
@@ -338,7 +487,7 @@ describe(commands.APP_DEPLOY, () => {
           r.headers.authorization.indexOf('Bearer ') === 0 &&
           r.headers.accept &&
           r.headers.accept.indexOf('application/json') === 0 &&
-          r.body === JSON.stringify({'skipFeatureDeployment': true})) {
+          r.body === JSON.stringify({ 'skipFeatureDeployment': true })) {
           correctRequestIssued = true;
         }
       });
@@ -421,7 +570,7 @@ describe(commands.APP_DEPLOY, () => {
           r.headers.authorization.indexOf('Bearer ') === 0 &&
           r.headers.accept &&
           r.headers.accept.indexOf('application/json') === 0 &&
-          r.body === JSON.stringify({'skipFeatureDeployment': false})) {
+          r.body === JSON.stringify({ 'skipFeatureDeployment': false })) {
           correctRequestIssued = true;
         }
       });
@@ -832,6 +981,32 @@ describe(commands.APP_DEPLOY, () => {
     });
   });
 
+  it('correctly handles failure when app specified by its name not found in app catalog', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps?$filter=Title eq 'solution'`) > -1) {
+        return Promise.resolve({
+          value: []
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, name: 'solution.sppkg', appCatalogUrl: 'https://contoso.sharepoint.com/sites/apps' } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('App with name solution.sppkg not found')))
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('correctly handles random API error', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf('/_api/contextinfo') > -1) {
@@ -884,7 +1059,7 @@ describe(commands.APP_DEPLOY, () => {
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.reject({ error: JSON.stringify({message: 'An error has occurred'}) });
+          return Promise.reject({ error: JSON.stringify({ message: 'An error has occurred' }) });
         }
       }
 
@@ -958,23 +1133,48 @@ describe(commands.APP_DEPLOY, () => {
     });
   });
 
-  it('fails validation if the id option not specified', () => {
+  it('fails validation if neither the id nor the name are specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: {} });
     assert.notEqual(actual, true);
   });
 
+  it('fails validation if both the id and the name are specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', name: 'solution.sppkg' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation if the id is not a valid GUID', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { id: 'invalid' } });
+    assert.notEqual(actual, true);
+  });
+
   it('fails validation if the appCatalogUrl option is not a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '123', appCatalogUrl: 'foo' } });
+    const actual = (command.validate() as CommandValidate)({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'foo' } });
     assert.notEqual(actual, true);
   });
 
   it('passes validation when the id is specified and the appCatalogUrl is not', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '123' } });
+    const actual = (command.validate() as CommandValidate)({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
     assert.equal(actual, true);
   });
 
   it('passes validation when the id and appCatalogUrl options are specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '123', appCatalogUrl: 'https://contoso.sharepoint.com' } });
+    const actual = (command.validate() as CommandValidate)({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com' } });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation when the name is specified and the appCatalogUrl is not', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { name: 'solution.sppkg' } });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation when the name and appCatalogUrl options are specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { name: 'solution.sppkg', appCatalogUrl: 'https://contoso.sharepoint.com' } });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation when the name is specified without the extension', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { name: 'solution' } });
     assert.equal(actual, true);
   });
 
@@ -991,13 +1191,13 @@ describe(commands.APP_DEPLOY, () => {
 
   it('has help referring to the right command', () => {
     const cmd: any = {
-      log: (msg: string) => {},
-      prompt: () => {},
-      helpInformation: () => {}
+      log: (msg: string) => { },
+      prompt: () => { },
+      helpInformation: () => { }
     };
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
-    cmd.help({}, () => {});
+    cmd.help({}, () => { });
     assert(find.calledWith(commands.APP_DEPLOY));
   });
 
@@ -1007,12 +1207,12 @@ describe(commands.APP_DEPLOY, () => {
       log: (msg: string) => {
         _log.push(msg);
       },
-      prompt: () => {},
-      helpInformation: () => {}
+      prompt: () => { },
+      helpInformation: () => { }
     };
     sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
-    cmd.help({}, () => {});
+    cmd.help({}, () => { });
     let containsExamples: boolean = false;
     _log.forEach(l => {
       if (l && l.indexOf('Examples:') > -1) {

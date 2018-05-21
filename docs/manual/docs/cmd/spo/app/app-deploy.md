@@ -13,7 +13,8 @@ spo app deploy [options]
 Option|Description
 ------|-----------
 `--help`|output usage information
-`-i, --id <id>`|ID of the app to deploy. Needs to be available in the tenant app catalog.
+`-i, --id [id]`|ID of the app to deploy. Specify the `id` or the `name` but not both.
+`-n, --name [name]`|Name of the app to deploy. Specify the `id` or the `name` but not both.
 `-u, --appCatalogUrl [appCatalogUrl]`|(optional) URL of the tenant app catalog site. If not specified, the CLI will try to resolve it automatically
 `--skipFeatureDeployment`|If the app supports tenant-wide deployment, deploy it to the whole tenant
 `-o, --output [output]`|Output type. `json|text`. Default `text`
@@ -36,19 +37,25 @@ If the app with the specified ID doesn't exist in the tenant app catalog, the co
 Deploy the specified app in the tenant app catalog. Try to resolve the URL of the tenant app catalog automatically.
 
 ```sh
-spo app deploy -i 058140e3-0e37-44fc-a1d3-79c487d371a3
+spo app deploy --id 058140e3-0e37-44fc-a1d3-79c487d371a3
+```
+
+Deploy the app with the specified name in the tenant app catalog. Try to resolve the URL of the tenant app catalog automatically.
+
+```sh
+spo app deploy ---name solution
 ```
 
 Deploy the specified app in the tenant app catalog located at _https://contoso.sharepoint.com/sites/apps_
 
 ```sh
-spo app deploy -i 058140e3-0e37-44fc-a1d3-79c487d371a3 -u https://contoso.sharepoint.com/sites/apps
+spo app deploy --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --appCatalogUrl https://contoso.sharepoint.com/sites/apps
 ```
 
 Deploy the specified app to the whole tenant at once. Features included in the solution will not be activated.
 
 ```sh
-spo app deploy -i 058140e3-0e37-44fc-a1d3-79c487d371a3 --skipFeatureDeployment
+spo app deploy --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --skipFeatureDeployment
 ```
 
 ## More information
