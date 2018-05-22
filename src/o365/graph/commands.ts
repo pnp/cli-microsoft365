@@ -5,6 +5,7 @@ export default {
   DISCONNECT: `${prefix} disconnect`,
   GROUPSETTING_ADD: `${prefix} groupsetting add`,
   GROUPSETTING_GET: `${prefix} groupsetting get`,
+  GROUPSETTING_LIST: `${prefix} groupsetting list`,
   GROUPSETTINGTEMPLATE_GET: `${prefix} groupsettingtemplate get`,
   GROUPSETTINGTEMPLATE_LIST: `${prefix} groupsettingtemplate list`,
   O365GROUP_ADD: `${prefix} o365group add`,
