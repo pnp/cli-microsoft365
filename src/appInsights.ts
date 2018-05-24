@@ -12,7 +12,8 @@ appInsights.start();
 // in the telemetry
 const version: string = `${packageJSON.version}${fs.existsSync(path.join(__dirname, `..${path.sep}src`)) ? '-dev' : ''}`;
 appInsights.defaultClient.commonProperties = {
-  version: version
+  version: version,
+  node: process.version
 };
 appInsights.defaultClient.context.tags['ai.session.id'] = crypto.randomBytes(24).toString('base64');
 delete appInsights.defaultClient.context.tags['ai.cloud.roleInstance'];
