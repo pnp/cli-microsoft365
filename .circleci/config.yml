@@ -1,7 +1,7 @@
 defaults: &defaults
   working_directory: ~/office365-cli
   docker:
-    - image: circleci/node:6.11.5
+    - image: circleci/node:8.11.2
 
 version: 2
 jobs:
