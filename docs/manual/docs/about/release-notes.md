@@ -21,6 +21,7 @@
 
 - [graph groupsetting add](../cmd/graph/groupsetting/groupsetting-add.md) - creates a group setting [#443](https://github.com/SharePoint/office365-cli/issues/443)
 - [graph groupsetting get](../cmd/graph/groupsetting/groupsetting-get.md) - gets information about the particular group setting [#450](https://github.com/SharePoint/office365-cli/issues/450)
+- [graph groupsetting list](../cmd/graph/groupsetting/groupsetting-list.md) - lists Azure AD group settings [#449](https://github.com/SharePoint/office365-cli/issues/449)
 - [graph groupsettingtemplate get](../cmd/graph/groupsettingtemplate/groupsettingtemplate-get.md) - gets information about the specified Azure AD group settings template [#442](https://github.com/SharePoint/office365-cli/issues/442)
 - [graph groupsettingtemplate list](../cmd/graph/groupsettingtemplate/groupsettingtemplate-list.md) - lists Azure AD group settings templates [#441](https://github.com/SharePoint/office365-cli/issues/441)
 - [graph user sendmail](../cmd/graph/user/user-sendmail.md) - sends e-mail on behalf of the current user [#328](https://github.com/SharePoint/office365-cli/issues/328)
@@ -29,6 +30,7 @@
 
 - added support for re-consenting the AAD app [#421](https://github.com/SharePoint/office365-cli/issues/421)
 - added update notification [#200](https://github.com/SharePoint/office365-cli/issues/200)
+- extended the 'spo app deploy' command to support specifying app using its name [#404](https://github.com/SharePoint/office365-cli/issues/404)
 
 ## [v1.2.0](https://github.com/SharePoint/office365-cli/releases/tag/v1.2.0)
 
