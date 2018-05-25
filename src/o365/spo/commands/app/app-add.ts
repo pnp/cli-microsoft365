@@ -94,6 +94,14 @@ class SpoAppAddCommand extends SpoCommand {
           cmd.log('');
         }
 
+        const json: any = JSON.parse(res);
+        if (args.options.output === 'json') {
+          cmd.log(json);
+        }
+        else {
+          cmd.log(json.UniqueId);
+        }
+
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
         }
