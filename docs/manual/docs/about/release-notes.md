@@ -31,6 +31,7 @@
 - added support for re-consenting the AAD app [#421](https://github.com/SharePoint/office365-cli/issues/421)
 - added update notification [#200](https://github.com/SharePoint/office365-cli/issues/200)
 - extended the 'spo app deploy' command to support specifying app using its name [#404](https://github.com/SharePoint/office365-cli/issues/404)
+- extended the 'spo app add' command to return the information about the added app [#463](https://github.com/SharePoint/office365-cli/issues/463)
 
 ## [v1.2.0](https://github.com/SharePoint/office365-cli/releases/tag/v1.2.0)
 
