@@ -69,7 +69,7 @@ class SpoListItemSetCommand extends SpoCommand {
     }
 
     auth
-      .ensureAccessToken(resource, cmd, this.debug)
+      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
       .then((accessToken: string): request.RequestPromise | Promise<any> => {
         siteAccessToken = accessToken;
 
