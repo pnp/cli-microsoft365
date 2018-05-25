@@ -279,11 +279,9 @@ describe(commands.APP_DEPLOY, () => {
 
   it('deploys app specified using its name in the tenant app catalog', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps?$filter=Title eq 'solution'`) > -1) {
+      if (opts.url.indexOf(`/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('solution.sppkg')?$select=UniqueId`) > -1) {
         return Promise.resolve({
-          value: [{
-            ID: 'b2307a39-e878-458b-bc90-03bc578531d6'
-          }]
+          UniqueId: 'b2307a39-e878-458b-bc90-03bc578531d6'
         });
       }
 
@@ -352,11 +350,9 @@ describe(commands.APP_DEPLOY, () => {
 
   it('deploys app specified using its name in the tenant app catalog (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps?$filter=Title eq 'solution'`) > -1) {
+      if (opts.url.indexOf(`/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('solution.sppkg')?$select=UniqueId`) > -1) {
         return Promise.resolve({
-          value: [{
-            ID: 'b2307a39-e878-458b-bc90-03bc578531d6'
-          }]
+          UniqueId: 'b2307a39-e878-458b-bc90-03bc578531d6'
         });
       }
 
@@ -487,7 +483,7 @@ describe(commands.APP_DEPLOY, () => {
           r.headers.authorization.indexOf('Bearer ') === 0 &&
           r.headers.accept &&
           r.headers.accept.indexOf('application/json') === 0 &&
-          r.body === JSON.stringify({ 'skipFeatureDeployment': true })) {
+          JSON.stringify(r.body) === JSON.stringify({ 'skipFeatureDeployment': true })) {
           correctRequestIssued = true;
         }
       });
@@ -570,7 +566,7 @@ describe(commands.APP_DEPLOY, () => {
           r.headers.authorization.indexOf('Bearer ') === 0 &&
           r.headers.accept &&
           r.headers.accept.indexOf('application/json') === 0 &&
-          r.body === JSON.stringify({ 'skipFeatureDeployment': false })) {
+          JSON.stringify(r.body) === JSON.stringify({ 'skipFeatureDeployment': false })) {
           correctRequestIssued = true;
         }
       });
@@ -947,7 +943,7 @@ describe(commands.APP_DEPLOY, () => {
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.reject({
-            error: JSON.stringify({
+            error: {
               'odata.error': {
                 code: '-1, Microsoft.SharePoint.Client.ResourceNotFoundException',
                 message: {
@@ -955,7 +951,7 @@ describe(commands.APP_DEPLOY, () => {
                   value: "Exception of type 'Microsoft.SharePoint.Client.ResourceNotFoundException' was thrown."
                 }
               }
-            })
+            }
           });
         }
       }
@@ -983,9 +979,17 @@ describe(commands.APP_DEPLOY, () => {
 
   it('correctly handles failure when app specified by its name not found in app catalog', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps?$filter=Title eq 'solution'`) > -1) {
-        return Promise.resolve({
-          value: []
+      if (opts.url.indexOf(`/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('solution.sppkg')?$select=UniqueId`) > -1) {
+        return Promise.reject({
+          error: {
+            "odata.error": {
+              "code": "-2147024894, System.IO.FileNotFoundException",
+              "message": {
+                "lang": "en-US",
+                "value": "File Not Found."
+              }
+            }
+          }
         });
       }
 
@@ -998,7 +1002,8 @@ describe(commands.APP_DEPLOY, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, name: 'solution.sppkg', appCatalogUrl: 'https://contoso.sharepoint.com/sites/apps' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('App with name solution.sppkg not found')))
+        console.log(log);
+        assert(cmdInstanceLogSpy.calledWith(new CommandError('File Not Found.')))
         done();
       }
       catch (e) {
@@ -1099,14 +1104,14 @@ describe(commands.APP_DEPLOY, () => {
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.reject({
-            error: JSON.stringify({
+            error: {
               'odata.error': {
                 code: '-1, Microsoft.SharePoint.Client.InvalidOperationException',
                 message: {
                   value: 'An error has occurred'
                 }
               }
-            })
+            }
           });
         }
       }

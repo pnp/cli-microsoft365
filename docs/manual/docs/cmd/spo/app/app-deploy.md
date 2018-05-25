@@ -43,7 +43,7 @@ spo app deploy --id 058140e3-0e37-44fc-a1d3-79c487d371a3
 Deploy the app with the specified name in the tenant app catalog. Try to resolve the URL of the tenant app catalog automatically.
 
 ```sh
-spo app deploy ---name solution
+spo app deploy --name solution.sppkg
 ```
 
 Deploy the specified app in the tenant app catalog located at _https://contoso.sharepoint.com/sites/apps_
