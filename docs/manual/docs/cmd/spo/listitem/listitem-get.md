@@ -13,7 +13,7 @@ spo listitem get [options]
 Option|Description
 ------|-----------
 `--help`|output usage information
-`-u, --webUrl <webUrl>`|URL of the site where the item should be retrieved
+`-u, --webUrl <webUrl>`|URL of the site from which the item should be retrieved
 `-l, --listId [listId]`|ID of the list where the item should be retrieved. Specify `listId` or `listTitle` but not both
 `-t, --listTitle [listTitle]`|Title of the list where the item should be retrieved. Specify `listId` or `listTitle` but not both
 `-i, --id [listItemId]`|ID of the item to retrieve

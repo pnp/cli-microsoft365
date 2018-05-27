@@ -108,7 +108,7 @@ class SpoListItemSetCommand extends SpoCommand {
     const options: CommandOption[] = [
       {
         option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the item should be updated'
+        description: 'URL of the site from which the item should be retrieved'
       },
       {
         option: '-i, --id <id>',
