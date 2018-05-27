@@ -12,7 +12,6 @@ import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import { Auth } from '../../../../Auth';
 import { ListItemInstance } from './ListItemInstance';
-import { ContextInfo, ClientSvcResponseContents, ClientSvcResponse } from '../../spo';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -25,8 +24,7 @@ interface Options extends GlobalOptions {
   listId?: string;
   listTitle?: string;
   id: string;
-  contentType?: string;
-  systemUpdate?: boolean;
+  field?: string;
 }
 
 class SpoListItemSetCommand extends SpoCommand {
@@ -63,7 +61,7 @@ class SpoListItemSetCommand extends SpoCommand {
     }
 
     auth
-      .ensureAccessToken(resource, cmd, this.debug)
+      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
       .then((accessToken: string): request.RequestPromise | Promise<any> => {
         siteAccessToken = accessToken;
 
@@ -74,8 +72,16 @@ class SpoListItemSetCommand extends SpoCommand {
           cmd.log(auth);
         }
 
+        const fieldSelect = args.options.field ? 
+          `?$select=${args.options.field}` :
+          (
+            args.options.output === 'text' ? 
+            `?$select=Id,Title` : 
+            ``
+          )
+
         const requestOptions: any = {
-          url: `${listRestUrl}/items(${args.options.id})`,
+          url: `${listRestUrl}/items(${args.options.id})${fieldSelect}`,
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata'
@@ -116,7 +122,7 @@ class SpoListItemSetCommand extends SpoCommand {
         description: 'Title of the list from which to retrieve the item. Specify listId or listTitle but not both'
       },
       {
-        option: '-f, --fields [fields]',
+        option: '-f, --field [fields]',
         description: 'Comma-separated list of fields to retrieve. Will retrieve all fields if not specified'
       },
     ];
@@ -132,7 +138,7 @@ class SpoListItemSetCommand extends SpoCommand {
         'listId',
         'listTitle',
         'id',
-        'fields',
+        'field',
       ]
     };
   }
@@ -146,6 +152,10 @@ class SpoListItemSetCommand extends SpoCommand {
       const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
       if (isValidSharePointUrl !== true) {
         return isValidSharePointUrl;
+      }
+
+      if (!args.options.id) {
+        return `Specify id`;
       }
 
       if (!args.options.listId && !args.options.listTitle) {
@@ -183,26 +193,6 @@ class SpoListItemSetCommand extends SpoCommand {
       ${chalk.grey(config.delimiter)} ${commands.LISTITEM_GET} --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x
 
    `);
-  }
-
-  private mapRequestBody(options: Options): any {
-    const requestBody: any = [];
-    const excludeOptions: string[] = [
-      'listTitle',
-      'listId',
-      'webUrl',
-      'id',
-      'debug',
-      'verbose'
-    ];
-
-    Object.keys(options).forEach(key => {
-      if (excludeOptions.indexOf(key) === -1) {
-        requestBody.push({ FieldName: key, FieldValue: (<any>options)[key] });
-      }
-    });
-  
-    return requestBody;
   }
 
 }
