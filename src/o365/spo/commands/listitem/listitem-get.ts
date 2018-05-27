@@ -27,7 +27,7 @@ interface Options extends GlobalOptions {
   field?: string;
 }
 
-class SpoListItemSetCommand extends SpoCommand {
+class SpoListItemGetCommand extends SpoCommand {
   public allowUnknownOptions(): boolean | undefined {
     return true;
   }
@@ -198,4 +198,4 @@ class SpoListItemSetCommand extends SpoCommand {
 
 }
 
-module.exports = new SpoListItemSetCommand();
+module.exports = new SpoListItemGetCommand();
