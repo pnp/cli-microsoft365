@@ -75,7 +75,7 @@ class SpoListItemSetCommand extends SpoCommand {
         const fieldSelect = args.options.field ? 
           `?$select=${args.options.field}` :
           (
-            args.options.output === 'text' ? 
+            (!args.options.output || args.options.output === 'text') ? 
             `?$select=Id,Title` : 
             ``
           )
@@ -98,6 +98,7 @@ class SpoListItemSetCommand extends SpoCommand {
         return request.get(requestOptions);
       })
       .then((response: any): void => {
+        (!args.options.output || args.options.output === 'text') && delete response["ID"]
         cmd.log(<ListItemInstance>response);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
@@ -123,7 +124,7 @@ class SpoListItemSetCommand extends SpoCommand {
       },
       {
         option: '-f, --field [fields]',
-        description: 'Comma-separated list of fields to retrieve. Will retrieve all fields if not specified'
+        description: 'Comma-separated list of fields to retrieve. Will retrieve all fields if not specified and json output is requested'
       },
     ];
 
@@ -154,10 +155,6 @@ class SpoListItemSetCommand extends SpoCommand {
         return isValidSharePointUrl;
       }
 
-      if (!args.options.id) {
-        return `Specify id`;
-      }
-
       if (!args.options.listId && !args.options.listTitle) {
         return `Specify listId or listTitle`;
       }
@@ -169,6 +166,10 @@ class SpoListItemSetCommand extends SpoCommand {
       if (args.options.listId &&
         !Utils.isValidGuid(args.options.listId)) {
         return `${args.options.listId} in option listId is not a valid GUID`;
+      }
+
+      if (!args.options.id) {
+        return `Specify id`;
       }
 
       return true;
