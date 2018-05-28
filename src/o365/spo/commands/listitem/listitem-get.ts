@@ -73,7 +73,7 @@ class SpoListItemGetCommand extends SpoCommand {
         }
 
         const fieldSelect = args.options.field ? 
-          `?$select=${args.options.field}` :
+          `?$select=${encodeURIComponent(args.options.field)}` :
           (
             (!args.options.output || args.options.output === 'text') ? 
             `?$select=Id,Title` : 
