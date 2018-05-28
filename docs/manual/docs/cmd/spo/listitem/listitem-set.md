@@ -1,6 +1,6 @@
 # spo listitem set
 
-Creates a list item in the specified list
+Updates a list item in the specified list
 
 ## Usage
 
