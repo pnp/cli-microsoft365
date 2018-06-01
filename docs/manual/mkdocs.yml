@@ -49,6 +49,7 @@ pages:
         - folder get: 'cmd/spo/folder/folder-get.md'
         - folder list: 'cmd/spo/folder/folder-list.md'
         - folder remove: 'cmd/spo/folder/folder-remove.md'
+        - folder rename: 'cmd/spo/folder/folder-rename.md'
       - hidedefaultthemes:
         - hidedefaultthemes get: 'cmd/spo/hidedefaultthemes/hidedefaultthemes-get.md'
         - hidedefaultthemes set: 'cmd/spo/hidedefaultthemes/hidedefaultthemes-set.md'

@@ -393,7 +393,7 @@ Remove-PnPWikiPage|SharePointPnPPowerShellOnline|
 Remove-PnPWorkflowDefinition|SharePointPnPPowerShellOnline|
 Remove-PnPWorkflowSubscription|SharePointPnPPowerShellOnline|
 Rename-PnPFile|SharePointPnPPowerShellOnline|
-Rename-PnPFolder|SharePointPnPPowerShellOnline|
+Rename-PnPFolder|SharePointPnPPowerShellOnline|[spo folder rename](../cmd/spo/folder/folder-rename.md)
 Request-PnPReIndexList|SharePointPnPPowerShellOnline|
 Request-PnPReIndexWeb|SharePointPnPPowerShellOnline|
 Restore-PnPRecycleBinItem|SharePointPnPPowerShellOnline|
