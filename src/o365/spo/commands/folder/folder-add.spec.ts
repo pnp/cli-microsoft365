@@ -7,6 +7,7 @@ const command: Command = require('./folder-add');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import Utils from '../../../../Utils';
+const packageJson = require('../../../../../package.json');
 
 describe(commands.FOLDER_ADD, () => {
   let vorpal: Vorpal;
@@ -195,7 +196,7 @@ describe(commands.FOLDER_ADD, () => {
         headers:
          { authorization: 'Bearer ABC',
            accept: 'application/json;odata=nometadata',
-           'User-Agent': 'NONISV|SharePointPnP|Office365CLI/1.3.0' },
+           'User-Agent': `NONISV|SharePointPnP|Office365CLI/${packageJson.version}` },
         body: { ServerRelativeUrl: '/Shared Documents/abc' },
         json: true }));
         done();
@@ -228,7 +229,7 @@ describe(commands.FOLDER_ADD, () => {
         headers:
          { authorization: 'Bearer ABC',
            accept: 'application/json;odata=nometadata',
-           'User-Agent': 'NONISV|SharePointPnP|Office365CLI/1.3.0' },
+           'User-Agent': `NONISV|SharePointPnP|Office365CLI/${packageJson.version}` },
         body: { ServerRelativeUrl: '/sites/test1/Shared Documents/abc' },
         json: true }));
         done();
