@@ -226,9 +226,9 @@ describe(commands.STATUS, () => {
     Utils.restore(auth.restoreAuth);
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
     cmdInstance.action = command.action();
-    cmdInstance.action({options:{}}, () => {
+    cmdInstance.action({options:{}}, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('An error has occurred')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {

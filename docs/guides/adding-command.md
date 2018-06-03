@@ -55,7 +55,7 @@ class MyCommand extends Command {
     return 'My command';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     // command implementation goes here
 
     cb(); // notify that the command completed
@@ -110,7 +110,7 @@ When executing the command completed, you should notify the CLI of it, by callin
 class SpoMyCommand extends Command {
   // ...
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     // command implementation goes here
 
     cb(); // notify that the command completed
@@ -121,6 +121,24 @@ class SpoMyCommand extends Command {
 ```
 
 > **Important:** if you don't call the callback method, the CLI won't exit to the command prompt and users won't be able to run additional commands.
+
+If an error occurred while executing the command, pass the error message that should be displayed to the user to the callback method:
+
+```ts
+class SpoMyCommand extends Command {
+  // ...
+
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+    // command implementation goes here
+
+    cb('An error has occurred'); // notify that an error has occurred
+  }
+
+  // ...
+}
+```
+
+> **Important:** if you don't pass the error that occurred to the callback, in non-immersive mode, the CLI will exit with a 0 error code indicating a successful execution. If you use the CLI in a script, the script would continue executing which could lead to incorrect results.
 
 ### Defining command help
 

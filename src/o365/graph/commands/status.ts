@@ -18,7 +18,7 @@ class GraphStatusCommand extends Command {
     return 'Shows Microsoft Graph connection status';
   }
 
-  public commandAction(cmd: CommandInstance, args: {}, cb: () => void): void {
+  public commandAction(cmd: CommandInstance, args: {}, cb: (err?: any) => void): void {
     auth
       .restoreAuth()
       .then((): void => {
@@ -50,8 +50,7 @@ class GraphStatusCommand extends Command {
         }
         cb();
       }, (error: any): void => {
-        cmd.log(new CommandError(error));
-        cb();
+        cb(new CommandError(error));
       });
   }
 

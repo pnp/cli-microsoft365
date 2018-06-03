@@ -85,7 +85,7 @@ class MockCommand2 extends Command {
     log('MockCommand2 help');
   }
 
-  public handlePromiseError(response: any, cmd: CommandInstance, callback: () => void): void {
+  public handlePromiseError(response: any, cmd: CommandInstance, callback: (err?: any) => void): void {
     this.handleRejectedODataJsonPromise(response, cmd, callback);
   }
 }
@@ -286,12 +286,9 @@ describe('Command', () => {
   });
 
   it('displays error message when it\'s serialized in the error property', () => {
-    const l: any[] = [];
-    const log = (msg?: string) => { l.push(msg); };
-    const logSpy = sinon.spy(log);
     const cmd = {
-      log: logSpy,
-      prompt: () => {}
+      log: (msg?: string) => { },
+      prompt: () => { }
     };
     const mock = new MockCommand2();
     mock.handlePromiseError({
@@ -300,17 +297,15 @@ describe('Command', () => {
           message: 'An error has occurred'
         }
       })
-    }, cmd, () => {});
-    assert(logSpy.calledWith(new CommandError('An error has occurred')));
+    }, cmd, (err?: any) => {
+      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+    });
   });
 
   it('displays the raw error message when the serialized value from the error property is not an error object', () => {
-    const l: any[] = [];
-    const log = (msg?: string) => { l.push(msg); };
-    const logSpy = sinon.spy(log);
     const cmd = {
-      log: logSpy,
-      prompt: () => {}
+      log: (msg?: string) => { },
+      prompt: () => { }
     };
     const mock = new MockCommand2();
     mock.handlePromiseError({
@@ -319,41 +314,38 @@ describe('Command', () => {
           id: '123'
         }
       })
-    }, cmd, () => {});
-    assert(logSpy.calledWith(new CommandError(JSON.stringify({
-      error: {
-        id: '123'
-      }
-    }))));
+    }, cmd, (err?: any) => {
+      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(JSON.stringify({
+        error: {
+          id: '123'
+        }
+      }))));
+    });
   });
 
   it('displays the raw error message when the serialized value from the error property is not a JSON object', () => {
-    const l: any[] = [];
-    const log = (msg?: string) => { l.push(msg); };
-    const logSpy = sinon.spy(log);
     const cmd = {
-      log: logSpy,
-      prompt: () => {}
+      log: (msg?: string) => { },
+      prompt: () => { }
     };
     const mock = new MockCommand2();
     mock.handlePromiseError({
       error: 'abc'
-    }, cmd, () => {});
-    assert(logSpy.calledWith(new CommandError('abc')));
+    }, cmd, (err?: any) => {
+      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
+    });
   });
 
   it('displays error message coming from ADALJS', () => {
-    const l: any[] = [];
-    const log = (msg?: string) => { l.push(msg); };
-    const logSpy = sinon.spy(log);
     const cmd = {
-      log: logSpy,
-      prompt: () => {}
+      log: (msg?: string) => { },
+      prompt: () => { }
     };
     const mock = new MockCommand2();
     mock.handlePromiseError({
       error: { error_description: 'abc' }
-    }, cmd, () => {});
-    assert(logSpy.calledWith(new CommandError('abc')));
+    }, cmd, (err?: any) => {
+      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
+    });
   });
 });

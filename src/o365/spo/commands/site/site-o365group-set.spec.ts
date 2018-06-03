@@ -90,9 +90,9 @@ describe(commands.SITE_O365GROUP_SET, () => {
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, () => {
+    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Connect to a SharePoint Online site first')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Connect to a SharePoint Online site first')));
         done();
       }
       catch (e) {
@@ -378,9 +378,9 @@ describe(commands.SITE_O365GROUP_SET, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, () => {
+    cmdInstance.action({ options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('The group alias already exists.')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('The group alias already exists.')));
         done();
       }
       catch (e) {
@@ -408,9 +408,9 @@ describe(commands.SITE_O365GROUP_SET, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, () => {
+    cmdInstance.action({ options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('This site already has an O365 Group attached.')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('This site already has an O365 Group attached.')));
         done();
       }
       catch (e) {
@@ -428,9 +428,9 @@ describe(commands.SITE_O365GROUP_SET, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, () => {
+    cmdInstance.action({ options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('An error has occurred')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -521,9 +521,9 @@ describe(commands.SITE_O365GROUP_SET, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, () => {
+    cmdInstance.action({ options: { debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
         done();
       }
       catch (e) {

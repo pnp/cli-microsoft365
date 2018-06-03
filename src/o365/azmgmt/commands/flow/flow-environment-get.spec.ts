@@ -91,9 +91,9 @@ describe(commands.FLOW_ENVIRONMENT_GET, () => {
     auth.service = new Service('https://management.azure.com/');
     auth.service.connected = false;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, () => {
+    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Connect to the Azure Management Service first')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Connect to the Azure Management Service first')));
         done();
       }
       catch (e) {
@@ -175,9 +175,9 @@ describe(commands.FLOW_ENVIRONMENT_GET, () => {
     auth.service = new Service('https://management.azure.com/');
     auth.service.connected = true;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, name: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' } }, () => {
+    cmdInstance.action({ options: { debug: false, name: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' } }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError(`Access to the environment 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' is denied.`)));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Access to the environment 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' is denied.`)));
         done();
       }
       catch (e) {
@@ -203,9 +203,9 @@ describe(commands.FLOW_ENVIRONMENT_GET, () => {
     auth.service = new Service('https://management.azure.com/');
     auth.service.connected = true;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, name: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } }, () => {
+    cmdInstance.action({ options: { debug: false, name: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('An error has occurred')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -286,9 +286,9 @@ describe(commands.FLOW_ENVIRONMENT_GET, () => {
     auth.service = new Service('https://management.azure.com/');
     auth.service.connected = true;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, () => {
+    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
         done();
       }
       catch (e) {

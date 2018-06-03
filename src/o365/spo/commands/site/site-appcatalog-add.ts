@@ -37,7 +37,7 @@ class SiteAppCatalogAddCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     const url: string = args.options.url;
 
     auth
@@ -87,7 +87,8 @@ class SiteAppCatalogAddCommand extends SpoCommand {
         const json: ClientSvcResponse = JSON.parse(res);
         const response: ClientSvcResponseContents = json[0];
         if (response.ErrorInfo) {
-          cmd.log(new CommandError(response.ErrorInfo.ErrorMessage));
+          cb(new CommandError(response.ErrorInfo.ErrorMessage));
+          return;
         }
         else {
           if (this.verbose) {

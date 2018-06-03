@@ -29,7 +29,7 @@ class SpoServicePrincipalPermissionRequestListCommand extends SpoCommand {
     return true;
   }
 
-  public commandAction(cmd: CommandInstance, args: {}, cb: () => void): void {
+  public commandAction(cmd: CommandInstance, args: {}, cb: (err?: any) => void): void {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
       .then((accessToken: string): request.RequestPromise => {
@@ -77,7 +77,8 @@ class SpoServicePrincipalPermissionRequestListCommand extends SpoCommand {
         const json: ClientSvcResponse = JSON.parse(res);
         const response: ClientSvcResponseContents = json[0];
         if (response.ErrorInfo) {
-          cmd.log(new CommandError(response.ErrorInfo.ErrorMessage));
+          cb(new CommandError(response.ErrorInfo.ErrorMessage));
+          return;
         }
         else {
           const result: SPOWebAppServicePrincipalPermissionRequest[] = json[json.length - 1]._Child_Items_;

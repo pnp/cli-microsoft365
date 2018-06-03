@@ -12,7 +12,6 @@ describe(commands.THEME_REMOVE, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
   let trackEvent: any;
   let telemetry: any;
   let promptOptions: any;
@@ -39,7 +38,6 @@ describe(commands.THEME_REMOVE, () => {
         cb({ continue: false });
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
     auth.site = new Site();
     requests = [];
     telemetry = null;
@@ -99,9 +97,9 @@ describe(commands.THEME_REMOVE, () => {
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, () => {
+    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Connect to a SharePoint Online site first')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Connect to a SharePoint Online site first')));
         done();
       }
       catch (e) {
@@ -308,9 +306,9 @@ describe(commands.THEME_REMOVE, () => {
         name: 'Contoso',
         confirm: true
       }
-    }, () => {
+    }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('An error has occurred')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {

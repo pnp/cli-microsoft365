@@ -315,9 +315,9 @@ describe(commands.CONNECT, () => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject('Error getting access token'); });
     auth.site = new Site();
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false }, url: 'https://contoso-admin.sharepoint.com' }, () => {
+    cmdInstance.action({ options: { debug: false }, url: 'https://contoso-admin.sharepoint.com' }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
         done();
       }
       catch (e) {
@@ -331,9 +331,9 @@ describe(commands.CONNECT, () => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject('Error getting access token'); });
     auth.site = new Site();
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true }, url: 'https://contoso-admin.sharepoint.com' }, () => {
+    cmdInstance.action({ options: { debug: true }, url: 'https://contoso-admin.sharepoint.com' }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
         done();
       }
       catch (e) {
@@ -350,9 +350,9 @@ describe(commands.CONNECT, () => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject('Error getting access token'); });
     auth.site = new Site();
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false }, url: 'https://contoso.sharepoint.com' }, () => {
+    cmdInstance.action({ options: { debug: false }, url: 'https://contoso.sharepoint.com' }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
         done();
       }
       catch (e) {
@@ -366,9 +366,9 @@ describe(commands.CONNECT, () => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject('Error getting access token'); });
     auth.site = new Site();
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true }, url: 'https://contoso.sharepoint.com' }, () => {
+    cmdInstance.action({ options: { debug: true }, url: 'https://contoso.sharepoint.com' }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
         done();
       }
       catch (e) {

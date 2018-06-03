@@ -6,7 +6,7 @@ export default abstract class AadCommand extends Command {
   public action(): CommandAction {
     const cmd: AadCommand = this;
 
-    return function (this: CommandInstance, args: any, cb: () => void) {
+    return function (this: CommandInstance, args: any, cb: (err?: any) => void) {
       auth
         .restoreAuth()
         .then((): void => {
@@ -20,15 +20,13 @@ export default abstract class AadCommand extends Command {
           appInsights.flush();
 
           if (!auth.service.connected) {
-            this.log(new CommandError('Connect to Azure Active Directory Graph first'));
-            cb();
+            cb(new CommandError('Connect to Azure Active Directory Graph first'));
             return;
           }
 
           cmd.commandAction(this, args, cb);
         }, (error: any): void => {
-          this.log(new CommandError(error));
-          cb();
+          cb(new CommandError(error));
         });
     }
   }

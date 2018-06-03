@@ -29,7 +29,7 @@ class SpoFolderGetCommand extends SpoCommand {
     return 'Gets information about the specified folder';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
     let siteAccessToken: string = '';
 
@@ -81,8 +81,7 @@ class SpoFolderGetCommand extends SpoCommand {
         cb();
       }, (err: any): void => {
         if (err.statusCode && err.statusCode === 500) {
-          cmd.log(new CommandError('Please check the folder URL. Folder might not exist on the specified URL'));
-          cb();
+          cb(new CommandError('Please check the folder URL. Folder might not exist on the specified URL'));
           return;
         }
 

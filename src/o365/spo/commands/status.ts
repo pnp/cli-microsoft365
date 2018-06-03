@@ -18,7 +18,7 @@ class SpoStatusCommand extends Command {
     return 'Shows SharePoint Online site connection status';
   }
 
-  public commandAction(cmd: CommandInstance, args: {}, cb: () => void): void {
+  public commandAction(cmd: CommandInstance, args: {}, cb: (err?: any) => void): void {
     auth
       .restoreAuth()
       .then((): void => {
@@ -51,8 +51,7 @@ class SpoStatusCommand extends Command {
         }
         cb();
       }, (error: any): void => {
-        cmd.log(new CommandError(error));
-        cb();
+        cb(new CommandError(error));
       });
   }
 

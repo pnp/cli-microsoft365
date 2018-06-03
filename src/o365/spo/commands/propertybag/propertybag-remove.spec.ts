@@ -172,9 +172,9 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { webUrl: 'https://contoso.sharepoint.com/sites/abc' } }, () => {
+    cmdInstance.action({ options: { webUrl: 'https://contoso.sharepoint.com/sites/abc' } }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Connect to a SharePoint Online site first')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Connect to a SharePoint Online site first')));
         done();
       }
       catch (e) {
@@ -521,10 +521,9 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       confirm: true
     }
 
-    cmdInstance.action({ options: options }, () => {
-
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('requestObjectIdentity error')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('requestObjectIdentity error')));
         done();
       }
       catch (e) {
@@ -551,10 +550,9 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       confirm: true
     }
 
-    cmdInstance.action({ options: options }, () => {
-
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('requestObjectIdentity ClientSvc error')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('requestObjectIdentity ClientSvc error')));
         done();
       }
       catch (e) {
@@ -581,10 +579,9 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       debug: true
     }
 
-    cmdInstance.action({ options: options }, () => {
-
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('abc')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
         done();
       }
       catch (e) {
@@ -610,10 +607,9 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       confirm: true
     }
 
-    cmdInstance.action({ options: options }, () => {
-
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('requestFolderObjectIdentity error')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('requestFolderObjectIdentity error')));
         done();
       }
       catch (e) {
@@ -639,10 +635,9 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       confirm: true
     }
 
-    cmdInstance.action({ options: options }, () => {
-
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('ClientSvc unknown error')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
         done();
       }
       catch (e) {
@@ -667,10 +662,9 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       confirm: true
     }
 
-    cmdInstance.action({ options: options }, () => {
-
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Cannot proceed. Folder _ObjectIdentity_ not found')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Cannot proceed. Folder _ObjectIdentity_ not found')));
         done();
       }
       catch (e) {
@@ -696,10 +690,10 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       confirm: true
     }
 
-    cmdInstance.action({ options: options }, () => {
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
         assert(removePropertySpy.calledOnce === true);
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('removeProperty promise error')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('removeProperty promise error')));
         done();
       }
       catch (e) {
@@ -725,9 +719,9 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       confirm: true
     }
 
-    cmdInstance.action({ options: options }, () => {
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('removeProperty error')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('removeProperty error')));
         done();
       }
       catch (e) {
@@ -753,9 +747,9 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       confirm: true
     }
 
-    cmdInstance.action({ options: options }, () => {
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('ClientSvc unknown error')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
         done();
       }
       catch (e) {
@@ -904,9 +898,9 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
         key: 'key1',
         confirm: true
       }
-    }, () => {
+    }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
         done();
       }
       catch (e) {

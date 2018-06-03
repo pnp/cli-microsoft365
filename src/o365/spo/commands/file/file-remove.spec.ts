@@ -12,7 +12,6 @@ describe(commands.FILE_REMOVE, () => {
   let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
   let trackEvent: any;
   let telemetry: any;
   let requests: any[];
@@ -38,7 +37,6 @@ describe(commands.FILE_REMOVE, () => {
         cb({ continue: false });
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
     auth.site = new Site();
     telemetry = null;
     requests = [];
@@ -98,9 +96,9 @@ describe(commands.FILE_REMOVE, () => {
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf' } }, () => {
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf' } }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Connect to a SharePoint Online site first')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Connect to a SharePoint Online site first')));
         done();
       }
       catch (e) {
@@ -884,10 +882,9 @@ describe(commands.FILE_REMOVE, () => {
         webUrl: 'https://contoso.sharepoint.com',
         confirm: true
       }
-    }, () => {
-
+    }, (error?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError(err)));
+        assert.equal(JSON.stringify(error), JSON.stringify(new CommandError(err)));
         done();
       }
       catch (e) {
@@ -1130,9 +1127,9 @@ describe(commands.FILE_REMOVE, () => {
         debug: false,
         confirm: true
       }
-    }, () => {
+    }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
         done();
       }
       catch (e) {

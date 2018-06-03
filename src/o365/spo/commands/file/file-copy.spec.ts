@@ -159,9 +159,9 @@ describe(commands.FILE_COPY, () => {
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com' } }, () => {
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com' } }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Connect to a SharePoint Online site first')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Connect to a SharePoint Online site first')));
         done();
       }
       catch (e) {
@@ -242,9 +242,9 @@ describe(commands.FILE_COPY, () => {
         sourceUrl: 'abc/abc.pdf',
         targetUrl: 'abc'
       }
-    }, () => {
+    }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.lastCall.calledWith(new CommandError('File not found.')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('File not found.')));
         done();
       }
       catch (e) {
@@ -331,9 +331,9 @@ describe(commands.FILE_COPY, () => {
         targetUrl: 'abc',
         deleteIfAlreadyExists: true
       }
-    }, () => {
+    }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.lastCall.calledWith(new CommandError('abc')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
         done();
       }
       catch (e) {
@@ -362,9 +362,9 @@ describe(commands.FILE_COPY, () => {
         targetUrl: '/abc/',
         deleteIfAlreadyExists: true
       }
-    }, () => {
+    }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.lastCall.calledWith(new CommandError('abc')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
         done();
       }
       catch (e) {
@@ -393,9 +393,9 @@ describe(commands.FILE_COPY, () => {
         targetUrl: 'abc',
         deleteIfAlreadyExists: true
       }
-    }, () => {
+    }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.lastCall.calledWith(new CommandError('error')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('error')));
         done();
       }
       catch (e) {
@@ -425,9 +425,9 @@ describe(commands.FILE_COPY, () => {
         targetUrl: 'abc',
         deleteIfAlreadyExists: true
       }
-    }, () => {
+    }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.lastCall.calledWith(new CommandError('error1')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('error1')));
         done();
       }
       catch (e) {
@@ -457,9 +457,9 @@ describe(commands.FILE_COPY, () => {
         targetUrl: 'abc',
         deleteIfAlreadyExists: true
       }
-    }, () => {
+    }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.lastCall.calledWith(new CommandError('error2')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('error2')));
         done();
       }
       catch (e) {
@@ -744,9 +744,9 @@ describe(commands.FILE_COPY, () => {
         webUrl: "https://contoso.sharepoint.com",
         debug: false
       }
-    }, () => {
+    }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
         done();
       }
       catch (e) {

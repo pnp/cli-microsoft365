@@ -113,9 +113,9 @@ describe(commands.FOLDER_REMOVE, () => {
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents' } }, () => {
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents' } }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Connect to a SharePoint Online site first')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Connect to a SharePoint Online site first')));
         done();
       }
       catch (e) {
@@ -319,9 +319,9 @@ describe(commands.FOLDER_REMOVE, () => {
         webUrl: 'https://contoso.sharepoint.com', 
         folderUrl: '/Shared Documents/Folder1', 
         recycle: true 
-      } }, () => {
+      } }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.lastCall.calledWith(new CommandError('error1')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('error1')));
         done();
       }
       catch (e) {
@@ -420,9 +420,9 @@ describe(commands.FOLDER_REMOVE, () => {
         debug: false,
         confirm: true
       }
-    }, () => {
+    }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
         done();
       }
       catch (e) {

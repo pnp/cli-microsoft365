@@ -43,7 +43,7 @@ class SpoCdnSetCommand extends SpoCommand {
     return true;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     const cdnTypeString: string = args.options.type || 'Public';
     const cdnType: number = cdnTypeString === 'Private' ? 1 : 0;
     const enabled: boolean = args.options.enabled === 'true';
@@ -95,7 +95,8 @@ class SpoCdnSetCommand extends SpoCommand {
         const json: ClientSvcResponse = JSON.parse(res);
         const response: ClientSvcResponseContents = json[0];
         if (response.ErrorInfo) {
-          cmd.log(new CommandError(response.ErrorInfo.ErrorMessage));
+          cb(new CommandError(response.ErrorInfo.ErrorMessage));
+          return;
         }
         else {
           if (this.verbose) {

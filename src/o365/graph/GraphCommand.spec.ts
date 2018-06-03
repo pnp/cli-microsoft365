@@ -45,10 +45,9 @@ describe('GraphCommand', () => {
       prompt: () => {},
       action: command.action()
     };
-    const cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    cmdInstance.action({options:{}}, () => {
+    cmdInstance.action({options:{}}, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('An error has occurred')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {

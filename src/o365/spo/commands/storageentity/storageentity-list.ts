@@ -79,6 +79,7 @@ class SpoStorageEntityListCommand extends SpoCommand {
             if (this.verbose) {
               cmd.log('No tenant properties found');
             }
+            cb();
             return;
           }
 
@@ -100,12 +101,10 @@ class SpoStorageEntityListCommand extends SpoCommand {
               }
             }));
           }
+          cb();
         }
         catch (e) {
-          this.handleError(e, cmd);
-        }
-        finally {
-          cb();
+          this.handleError(e, cmd, cb);
         }
       }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
   }

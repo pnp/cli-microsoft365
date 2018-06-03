@@ -32,7 +32,7 @@ class SpoPageGetCommand extends SpoCommand {
     return 'Gets information about the specific modern page';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
 
     if (this.debug) {
@@ -81,8 +81,7 @@ class SpoPageGetCommand extends SpoCommand {
         }
 
         if (res.ListItemAllFields.ClientSideApplicationId !== 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec') {
-          cmd.log(new CommandError(`Page ${args.options.name} is not a modern page.`));
-          cb();
+          cb(new CommandError(`Page ${args.options.name} is not a modern page.`));
           return;
         }
 

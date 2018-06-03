@@ -164,9 +164,9 @@ describe(commands.FOLDER_RENAME, () => {
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { webUrl: 'https://contoso.sharepoint.com/sites/abc' } }, () => {
+    cmdInstance.action({ options: { webUrl: 'https://contoso.sharepoint.com/sites/abc' } }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Connect to a SharePoint Online site first')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Connect to a SharePoint Online site first')));
         done();
       }
       catch (e) {
@@ -273,10 +273,9 @@ describe(commands.FOLDER_RENAME, () => {
       name: 'test1',
       verbose: true
     }
-    cmdInstance.action({ options: options }, () => {
-
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.lastCall.calledWith(new CommandError('requestObjectIdentity error')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('requestObjectIdentity error')));
         done();
       }
       catch (e) {
@@ -301,10 +300,9 @@ describe(commands.FOLDER_RENAME, () => {
       name: 'test1',
       verbose: true
     }
-    cmdInstance.action({ options: options }, () => {
-
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.lastCall.calledWith(new CommandError('requestObjectIdentity ClientSvc error')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('requestObjectIdentity ClientSvc error')));
         done();
       }
       catch (e) {
@@ -328,10 +326,9 @@ describe(commands.FOLDER_RENAME, () => {
       name: 'test1',
       verbose: true
     }
-    cmdInstance.action({ options: options }, () => {
-
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.lastCall.calledWith(new CommandError('abc 1')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('abc 1')));
         done();
       }
       catch (e) {
@@ -356,10 +353,9 @@ describe(commands.FOLDER_RENAME, () => {
       name: 'test1',
       verbose: true
     }
-    cmdInstance.action({ options: options }, () => {
-
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.lastCall.calledWith(new CommandError('requestFolderObjectIdentity error')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('requestFolderObjectIdentity error')));
         done();
       }
       catch (e) {
@@ -385,9 +381,9 @@ describe(commands.FOLDER_RENAME, () => {
       verbose: true
     }
 
-    cmdInstance.action({ options: options }, () => {
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.lastCall.calledWith(new CommandError('ClientSvc unknown error')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
         done();
       }
       catch (e) {
@@ -411,9 +407,9 @@ describe(commands.FOLDER_RENAME, () => {
       name: 'abc'
     }
 
-    cmdInstance.action({ options: options }, () => {
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.lastCall.calledWith(new CommandError('Cannot proceed. Folder _ObjectIdentity_ not found')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Cannot proceed. Folder _ObjectIdentity_ not found')));
         done();
       }
       catch (e) {
@@ -437,9 +433,9 @@ describe(commands.FOLDER_RENAME, () => {
       name: 'abc'
     }
 
-    cmdInstance.action({ options: options }, () => {
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.lastCall.calledWith(new CommandError('folder remove promise error')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('folder remove promise error')));
         done();
       }
       catch (e) {
@@ -464,9 +460,9 @@ describe(commands.FOLDER_RENAME, () => {
       name: 'abc'
     }
 
-    cmdInstance.action({ options: options }, () => {
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.lastCall.calledWith(new CommandError('File Not Found')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('File Not Found')));
         done();
       }
       catch (e) {
@@ -492,9 +488,9 @@ describe(commands.FOLDER_RENAME, () => {
       verbose: true
     }
 
-    cmdInstance.action({ options: options }, () => {
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.lastCall.calledWith(new CommandError('ClientSvc unknown error')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
         done();
       }
       catch (e) {
@@ -604,9 +600,9 @@ describe(commands.FOLDER_RENAME, () => {
         value: 'value1',
 
       }
-    }, () => {
+    }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
         done();
       }
       catch (e) {

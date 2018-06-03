@@ -94,9 +94,9 @@ describe(commands.SITECLASSIFICATION_GET, () => {
     auth.service = new Service('https://graph.microsoft.com');
     auth.service.connected = false;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, () => {
+    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Connect to the Microsoft Graph first')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Connect to the Microsoft Graph first')));
         done();
       }
       catch (e) {
@@ -140,7 +140,7 @@ describe(commands.SITECLASSIFICATION_GET, () => {
     assert(containsExamples);
   });
 
-  it('Handles Office 365 Tenant siteclassification is not enabled', (done) => {
+  it('handles Office 365 Tenant siteclassification is not enabled', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/settings`) {
         return Promise.resolve({
@@ -155,9 +155,9 @@ describe(commands.SITECLASSIFICATION_GET, () => {
     auth.service = new Service('https://graph.microsoft.com');
     auth.service.connected = true;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false } }, () => {
+    cmdInstance.action({ options: { debug: false } }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Site classification is not enabled.')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Site classification is not enabled.')));
         done();
       }
       catch (e) {
@@ -166,7 +166,7 @@ describe(commands.SITECLASSIFICATION_GET, () => {
     });
   });
 
-  it('Handles Office 365 Tenant siteclassification missing DirectorySettingTemplate', (done) => {
+  it('handles Office 365 Tenant siteclassification missing DirectorySettingTemplate', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/settings`) {
         return Promise.resolve({
@@ -240,9 +240,9 @@ describe(commands.SITECLASSIFICATION_GET, () => {
     auth.service = new Service('https://graph.microsoft.com');
     auth.service.connected = true;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false } }, () => {
+    cmdInstance.action({ options: { debug: false } }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError("Missing DirectorySettingTemplate for \"Group.Unified\"")));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("Missing DirectorySettingTemplate for \"Group.Unified\"")));
         done();
       }
       catch (e) {
@@ -525,9 +525,9 @@ describe(commands.SITECLASSIFICATION_GET, () => {
     auth.service = new Service('https://graph.microsoft.com');
     auth.service.connected = true;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, () => {
+    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
         done();
       }
       catch (e) {

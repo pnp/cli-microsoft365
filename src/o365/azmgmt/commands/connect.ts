@@ -32,7 +32,7 @@ class AzmgmtConnectCommand extends Command {
     return 'Connects to the Azure Management Service';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     const chalk: any = vorpal.chalk;
 
     appInsights.trackEvent({
@@ -83,7 +83,8 @@ class AzmgmtConnectCommand extends Command {
           }
 
           if (rej !== 'Polling_Request_Cancelled') {
-            cmd.log(new CommandError(rej));
+            cb(new CommandError(rej));
+            return;
           }
           cb();
         });

@@ -108,9 +108,9 @@ describe(commands.CUSTOMACTION_LIST, () => {
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/abc' } }, () => {
+    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/abc' } }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Connect to a SharePoint Online site first')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Connect to a SharePoint Online site first')));
         done();
       }
       catch (e) {
@@ -453,10 +453,9 @@ describe(commands.CUSTOMACTION_LIST, () => {
         url: 'https://contoso.sharepoint.com',
         scope: 'All'
       }
-    }, () => {
-
+    }, (error?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError(err)));
+        assert.equal(JSON.stringify(error), JSON.stringify(new CommandError(err)));
         done();
       }
       catch (e) {
@@ -499,10 +498,9 @@ describe(commands.CUSTOMACTION_LIST, () => {
         url: 'https://contoso.sharepoint.com',
         scope: 'All'
       }
-    }, () => {
-
+    }, (error?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError(err)));
+        assert.equal(JSON.stringify(error), JSON.stringify(new CommandError(err)));
         done();
       }
       catch (e) {
@@ -773,9 +771,9 @@ describe(commands.CUSTOMACTION_LIST, () => {
         url: "https://contoso.sharepoint.com",
         debug: false
       }
-    }, () => {
+    }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
         done();
       }
       catch (e) {
