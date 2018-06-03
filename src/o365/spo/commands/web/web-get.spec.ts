@@ -107,9 +107,9 @@ describe(commands.WEB_GET, () => {
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com' } }, () => {
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com' } }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Connect to a SharePoint Online site first')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Connect to a SharePoint Online site first')));
         done();
       }
       catch (e) {
@@ -364,10 +364,9 @@ describe(commands.WEB_GET, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
       }
-    }, () => {
-
+    }, (error?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError(err)));
+        assert.equal(JSON.stringify(error), JSON.stringify(new CommandError(err)));
         done();
       }
       catch (e) {
@@ -508,9 +507,9 @@ describe(commands.WEB_GET, () => {
         webUrl: "https://contoso.sharepoint.com",
         debug: false
       }
-    }, () => {
+    }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
         done();
       }
       catch (e) {

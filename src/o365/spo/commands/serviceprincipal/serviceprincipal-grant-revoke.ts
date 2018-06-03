@@ -37,7 +37,7 @@ class SpoServicePrincipalGrantRevokeCommand extends SpoCommand {
     return true;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
       .then((accessToken: string): request.RequestPromise => {
@@ -85,7 +85,8 @@ class SpoServicePrincipalGrantRevokeCommand extends SpoCommand {
         const json: ClientSvcResponse = JSON.parse(res);
         const response: ClientSvcResponseContents = json[0];
         if (response.ErrorInfo) {
-          cmd.log(new CommandError(response.ErrorInfo.ErrorMessage));
+          cb(new CommandError(response.ErrorInfo.ErrorMessage));
+          return;
         }
         else {
           if (this.verbose) {

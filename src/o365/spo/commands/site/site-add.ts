@@ -67,7 +67,7 @@ class SiteAddCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     const isTeamSite: boolean = args.options.type !== 'CommunicationSite';
 
     auth
@@ -168,7 +168,8 @@ class SiteAddCommand extends SpoCommand {
 
         if (isTeamSite) {
           if (res.ErrorMessage !== null) {
-            cmd.log(new CommandError(res.ErrorMessage));
+            cb(new CommandError(res.ErrorMessage));
+            return;
           }
           else {
             cmd.log(res.SiteUrl);

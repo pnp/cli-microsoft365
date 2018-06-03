@@ -46,7 +46,7 @@ class SpoStorageEntitySetCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     if (this.debug) {
       cmd.log(`key option set. Retrieving access token for ${auth.service.resource}...`);
     }
@@ -98,13 +98,14 @@ class SpoStorageEntitySetCommand extends SpoCommand {
         const json: ClientSvcResponse = JSON.parse(res);
         const response: ClientSvcResponseContents = json[0];
         if (response.ErrorInfo) {
-          cmd.log(new CommandError(response.ErrorInfo.ErrorMessage));
-
           if (this.verbose && response.ErrorInfo.ErrorMessage.indexOf('Access denied.') > -1) {
             cmd.log('');
             cmd.log(`This error is often caused by invalid URL of the app catalog site. Verify, that the URL you specified as an argument of the ${commands.STORAGEENTITY_SET} command is a valid app catalog URL and try again.`);
             cmd.log('');
           }
+
+          cb(new CommandError(response.ErrorInfo.ErrorMessage));
+          return;
         }
         else {
           if (this.verbose) {

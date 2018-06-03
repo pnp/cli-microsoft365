@@ -13,7 +13,7 @@ export default abstract class SpoCommand extends Command {
   public action(): CommandAction {
     const cmd: SpoCommand = this;
 
-    return function (this: CommandInstance, args: any, cb: () => void) {
+    return function (this: CommandInstance, args: any, cb: (err?: any) => void) {
       auth
         .restoreAuth()
         .then((): void => {
@@ -27,23 +27,21 @@ export default abstract class SpoCommand extends Command {
           appInsights.flush();
 
           if (!auth.site.connected) {
-            this.log(new CommandError('Connect to a SharePoint Online site first'));
-            cb();
+            // this.log(new CommandError('Connect to a SharePoint Online site first'));
+            cb(new CommandError('Connect to a SharePoint Online site first'));
             return;
           }
 
           if (cmd.requiresTenantAdmin()) {
             if (!auth.site.isTenantAdminSite()) {
-              this.log(new CommandError(`${auth.site.url} is not a tenant admin site. Connect to your tenant admin site and try again`));
-              cb();
+              cb(new CommandError(`${auth.site.url} is not a tenant admin site. Connect to your tenant admin site and try again`));
               return;
             }
           }
 
           cmd.commandAction(this, args, cb);
         }, (error: any): void => {
-          this.log(new CommandError(error));
-          cb();
+          cb(new CommandError(error));
         });
     }
   }

@@ -29,7 +29,7 @@ class GraphO365SiteClassificationGetCommand extends GraphCommand {
     return 'Gets site classification configuration';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
       .then((): request.RequestPromise => {
@@ -58,8 +58,7 @@ class GraphO365SiteClassificationGetCommand extends GraphCommand {
         }
 
         if (res.value.length == 0) {
-          cmd.log(new CommandError('Site classification is not enabled.'));
-          cb();
+          cb(new CommandError('Site classification is not enabled.'));
           return;
         }
 
@@ -68,8 +67,7 @@ class GraphO365SiteClassificationGetCommand extends GraphCommand {
         });
 
         if (unifiedGroupSetting == null || unifiedGroupSetting.length == 0) {
-          cmd.log(new CommandError("Missing DirectorySettingTemplate for \"Group.Unified\""));
-          cb();
+          cb(new CommandError("Missing DirectorySettingTemplate for \"Group.Unified\""));
           return;
         }
 

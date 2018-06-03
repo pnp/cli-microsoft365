@@ -53,7 +53,7 @@ class SpoWebAddCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     const resource: string = Auth.getResourceFromUrl(args.options.parentWebUrl);
     let siteAccessToken: string = '';
     let siteInfo: any = null;
@@ -213,7 +213,8 @@ class SpoWebAddCommand extends SpoCommand {
         const json: ClientSvcResponse = JSON.parse(res);
         const response: ClientSvcResponseContents = json[0];
         if (response.ErrorInfo) {
-          cmd.log(new CommandError(response.ErrorInfo.ErrorMessage));
+          cb(new CommandError(response.ErrorInfo.ErrorMessage));
+          return;
         }
         else {
           cmd.log(siteInfo);
@@ -238,18 +239,16 @@ class SpoWebAddCommand extends SpoCommand {
         if (err.error &&
           err.error['odata.error'] &&
           err.error['odata.error'].message) {
-          cmd.log(new CommandError(err.error['odata.error'].message.value));
+          cb(new CommandError(err.error['odata.error'].message.value));
         }
         else {
           if (err instanceof Error) {
-            cmd.log(new CommandError(err.message));
+            cb(new CommandError(err.message));
           }
           else {
-            cmd.log(new CommandError(err));
+            cb(new CommandError(err));
           }
         }
-
-        cb();
       });
   }
 

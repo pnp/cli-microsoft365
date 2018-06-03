@@ -91,9 +91,9 @@ describe(commands.FLOW_ENVIRONMENT_LIST, () => {
     auth.service = new Service('https://management.azure.com/');
     auth.service.connected = false;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, () => {
+    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Connect to the Azure Management Service first')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Connect to the Azure Management Service first')));
         done();
       }
       catch (e) {
@@ -477,9 +477,9 @@ describe(commands.FLOW_ENVIRONMENT_LIST, () => {
     auth.service = new Service('https://management.azure.com/');
     auth.service.connected = true;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false } }, () => {
+    cmdInstance.action({ options: { debug: false } }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`)));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`)));
         done();
       }
       catch (e) {
@@ -539,9 +539,9 @@ describe(commands.FLOW_ENVIRONMENT_LIST, () => {
     auth.service = new Service('https://management.azure.com/');
     auth.service.connected = true;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, () => {
+    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
         done();
       }
       catch (e) {

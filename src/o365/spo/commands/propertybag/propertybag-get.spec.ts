@@ -167,9 +167,9 @@ describe(commands.PROPERTYBAG_GET, () => {
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { webUrl: 'https://contoso.sharepoint.com/sites/abc' } }, () => {
+    cmdInstance.action({ options: { webUrl: 'https://contoso.sharepoint.com/sites/abc' } }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Connect to a SharePoint Online site first')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Connect to a SharePoint Online site first')));
         done();
       }
       catch (e) {
@@ -349,11 +349,10 @@ describe(commands.PROPERTYBAG_GET, () => {
       folder: '/'
     }
 
-    cmdInstance.action({ options: options }, () => {
-
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
         assert(getFolderPropertyBagSpy.calledOnce === true);
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('abc')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
         done();
       }
       catch (e) {
@@ -379,11 +378,10 @@ describe(commands.PROPERTYBAG_GET, () => {
       debug: false
     }
 
-    cmdInstance.action({ options: options }, () => {
-
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
         assert(getWebPropertyBagSpy.calledOnce === true);
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('abc1')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('abc1')));
         done();
       }
       catch (e) {
@@ -411,11 +409,10 @@ describe(commands.PROPERTYBAG_GET, () => {
       verbose: true
     }
 
-    cmdInstance.action({ options: options }, () => {
-
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
         assert(getFolderPropertyBagSpy.calledOnce === true);
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('getFolderPropertyBag error')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('getFolderPropertyBag error')));
         done();
       }
       catch (e) {
@@ -441,11 +438,10 @@ describe(commands.PROPERTYBAG_GET, () => {
       webUrl: 'https://contoso.sharepoint.com'
     }
 
-    cmdInstance.action({ options: options }, () => {
-
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
         assert(getWebPropertyBagSpy.calledOnce === true);
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('getWebPropertyBag error')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('getWebPropertyBag error')));
         done();
       }
       catch (e) {
@@ -472,11 +468,10 @@ describe(commands.PROPERTYBAG_GET, () => {
       webUrl: 'https://contoso.sharepoint.com'
     }
 
-    cmdInstance.action({ options: options }, () => {
-
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
         assert(requestObjectIdentitySpy.calledOnce === true);
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('requestObjectIdentity error')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('requestObjectIdentity error')));
         done();
       }
       catch (e) {
@@ -502,11 +497,10 @@ describe(commands.PROPERTYBAG_GET, () => {
       webUrl: 'https://contoso.sharepoint.com'
     }
 
-    cmdInstance.action({ options: options }, () => {
-
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
         assert(requestObjectIdentitySpy.calledOnce === true);
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('ClientSvc unknown error')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
         done();
       }
       catch (e) {
@@ -533,10 +527,9 @@ describe(commands.PROPERTYBAG_GET, () => {
       folder: '/'
     }
 
-    cmdInstance.action({ options: options }, () => {
-
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('ClientSvc unknown error')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
         done();
       }
       catch (e) {
@@ -561,10 +554,9 @@ describe(commands.PROPERTYBAG_GET, () => {
       key: 'vti_parentid'
     }
 
-    cmdInstance.action({ options: options }, () => {
-
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('ClientSvc unknown error')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
         done();
       }
       catch (e) {
@@ -853,10 +845,9 @@ describe(commands.PROPERTYBAG_GET, () => {
       key: 'vti_parentid'
     }
 
-    cmdInstance.action({ options: options }, () => {
-
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Cannot proceed. _ObjectIdentity_ not found')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Cannot proceed. _ObjectIdentity_ not found')));
         done();
       }
       catch (e) {
@@ -880,10 +871,9 @@ describe(commands.PROPERTYBAG_GET, () => {
       key: 'vti_parentid'
     }
 
-    cmdInstance.action({ options: options }, () => {
-
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Cannot proceed. Properties not found')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Cannot proceed. Properties not found')));
         done();
       }
       catch (e) {
@@ -906,10 +896,9 @@ describe(commands.PROPERTYBAG_GET, () => {
       key: 'vti_parentid'
     }
 
-    cmdInstance.action({ options: options }, () => {
-
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Cannot proceed. AllProperties not found')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Cannot proceed. AllProperties not found')));
         done();
       }
       catch (e) {
@@ -932,11 +921,9 @@ describe(commands.PROPERTYBAG_GET, () => {
       key: 'vti_parentid'
     }
 
-    cmdInstance.action({ options: options }, () => {
-
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        const out = cmdInstanceLogSpy.lastCall.args[0];
-        assert.equal(out.message, 'error1');
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('error1')));
         done();
       }
       catch (e) {
@@ -1313,9 +1300,9 @@ describe(commands.PROPERTYBAG_GET, () => {
       options: {
         webUrl: "https://contoso.sharepoint.com"
       }
-    }, () => {
+    }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
         done();
       }
       catch (e) {

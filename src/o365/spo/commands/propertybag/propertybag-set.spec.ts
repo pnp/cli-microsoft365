@@ -14,7 +14,6 @@ describe(commands.PROPERTYBAG_SET, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
   let trackEvent: any;
   let telemetry: any;
   const stubAllPostRequests = (
@@ -133,7 +132,6 @@ describe(commands.PROPERTYBAG_SET, () => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
     auth.site = new Site();
     telemetry = null;
   });
@@ -191,9 +189,9 @@ describe(commands.PROPERTYBAG_SET, () => {
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { webUrl: 'https://contoso.sharepoint.com/sites/abc' } }, () => {
+    cmdInstance.action({ options: { webUrl: 'https://contoso.sharepoint.com/sites/abc' } }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Connect to a SharePoint Online site first')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Connect to a SharePoint Online site first')));
         done();
       }
       catch (e) {
@@ -408,10 +406,9 @@ describe(commands.PROPERTYBAG_SET, () => {
 
     }
 
-    cmdInstance.action({ options: options }, () => {
-
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('requestObjectIdentity error')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('requestObjectIdentity error')));
         done();
       }
       catch (e) {
@@ -439,10 +436,9 @@ describe(commands.PROPERTYBAG_SET, () => {
 
     }
 
-    cmdInstance.action({ options: options }, () => {
-
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('requestObjectIdentity ClientSvc error')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('requestObjectIdentity ClientSvc error')));
         done();
       }
       catch (e) {
@@ -469,10 +465,9 @@ describe(commands.PROPERTYBAG_SET, () => {
       debug: true
     }
 
-    cmdInstance.action({ options: options }, () => {
-
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('abc')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
         done();
       }
       catch (e) {
@@ -500,10 +495,9 @@ describe(commands.PROPERTYBAG_SET, () => {
 
     }
 
-    cmdInstance.action({ options: options }, () => {
-
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('requestFolderObjectIdentity error')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('requestFolderObjectIdentity error')));
         done();
       }
       catch (e) {
@@ -531,10 +525,9 @@ describe(commands.PROPERTYBAG_SET, () => {
 
     }
 
-    cmdInstance.action({ options: options }, () => {
-
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('ClientSvc unknown error')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
         done();
       }
       catch (e) {
@@ -560,10 +553,9 @@ describe(commands.PROPERTYBAG_SET, () => {
 
     }
 
-    cmdInstance.action({ options: options }, () => {
-
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Cannot proceed. Folder _ObjectIdentity_ not found')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Cannot proceed. Folder _ObjectIdentity_ not found')));
         done();
       }
       catch (e) {
@@ -606,10 +598,9 @@ describe(commands.PROPERTYBAG_SET, () => {
       debug: true
     }
 
-    cmdInstance.action({ options: options }, () => {
-
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Site has NoScript enabled, and setting property bag values is not supported')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Site has NoScript enabled, and setting property bag values is not supported')));
         done();
       }
       catch (e) {
@@ -636,10 +627,9 @@ describe(commands.PROPERTYBAG_SET, () => {
       debug: true
     }
 
-    cmdInstance.action({ options: options }, () => {
-
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('getEffectiveBasePermissions abc')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('getEffectiveBasePermissions abc')));
         done();
       }
       catch (e) {
@@ -666,10 +656,9 @@ describe(commands.PROPERTYBAG_SET, () => {
       verbose: true
     }
 
-    cmdInstance.action({ options: options }, () => {
-
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('getEffectiveBasePermissions error')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('getEffectiveBasePermissions error')));
         done();
       }
       catch (e) {
@@ -696,10 +685,9 @@ describe(commands.PROPERTYBAG_SET, () => {
       debug: true
     }
 
-    cmdInstance.action({ options: options }, () => {
-
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('ClientSvc unknown error')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
         done();
       }
       catch (e) {
@@ -724,10 +712,9 @@ describe(commands.PROPERTYBAG_SET, () => {
       value: 'value1'
     }
 
-    cmdInstance.action({ options: options }, () => {
-
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Cannot proceed. EffectiveBasePermissions not found')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Cannot proceed. EffectiveBasePermissions not found')));
         done();
       }
       catch (e) {
@@ -755,10 +742,10 @@ describe(commands.PROPERTYBAG_SET, () => {
 
     }
 
-    cmdInstance.action({ options: options }, () => {
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
         assert(setPropertySpy.calledOnce === true);
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('setProperty promise error')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('setProperty promise error')));
         done();
       }
       catch (e) {
@@ -786,9 +773,9 @@ describe(commands.PROPERTYBAG_SET, () => {
 
     }
 
-    cmdInstance.action({ options: options }, () => {
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('setProperty error')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('setProperty error')));
         done();
       }
       catch (e) {
@@ -816,9 +803,9 @@ describe(commands.PROPERTYBAG_SET, () => {
 
     }
 
-    cmdInstance.action({ options: options }, () => {
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('ClientSvc unknown error')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
         done();
       }
       catch (e) {
@@ -983,9 +970,9 @@ describe(commands.PROPERTYBAG_SET, () => {
         value: 'value1',
 
       }
-    }, () => {
+    }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
         done();
       }
       catch (e) {

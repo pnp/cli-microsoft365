@@ -19,7 +19,7 @@ class SpoTenantAppCatalogUrlGetCommand extends SpoCommand {
     return 'Gets the URL of the tenant app catalog';
   }
 
-  public commandAction(cmd: CommandInstance, args: any, cb: () => void): void {
+  public commandAction(cmd: CommandInstance, args: any, cb: (err?: any) => void): void {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
       .then((accessToken: string): request.RequestPromise => {
@@ -63,7 +63,8 @@ class SpoTenantAppCatalogUrlGetCommand extends SpoCommand {
         const json: ClientSvcResponse = JSON.parse(res);
         const response: ClientSvcResponseContents = json[0];
         if (response.ErrorInfo) {
-          cmd.log(new CommandError(response.ErrorInfo.ErrorMessage));
+          cb(new CommandError(response.ErrorInfo.ErrorMessage));
+          return;
         }
         else {
           const catalogUrl: string = json.pop().CorporateCatalogUrl;

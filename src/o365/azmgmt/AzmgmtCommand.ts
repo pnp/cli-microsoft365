@@ -6,7 +6,7 @@ export default abstract class AzmgmtCommand extends Command {
   public action(): CommandAction {
     const cmd: AzmgmtCommand = this;
 
-    return function (this: CommandInstance, args: any, cb: () => void) {
+    return function (this: CommandInstance, args: any, cb: (err?: any) => void) {
       auth
         .restoreAuth()
         .then((): void => {
@@ -20,15 +20,13 @@ export default abstract class AzmgmtCommand extends Command {
           appInsights.flush();
 
           if (!auth.service.connected) {
-            this.log(new CommandError('Connect to the Azure Management Service first'));
-            cb();
+            cb(new CommandError('Connect to the Azure Management Service first'));
             return;
           }
 
           cmd.commandAction(this, args, cb);
         }, (error: any): void => {
-          this.log(new CommandError(error));
-          cb();
+          cb(new CommandError(error));
         });
     }
   }

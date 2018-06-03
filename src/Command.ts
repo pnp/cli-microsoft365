@@ -10,7 +10,7 @@ export interface CommandOption {
 }
 
 export interface CommandAction {
-  (this: CommandInstance, args: any, cb: () => void): void
+  (this: CommandInstance, args: any, cb: (err?: any) => void): void
 }
 
 export interface CommandValidate {
@@ -196,48 +196,46 @@ export default abstract class Command {
     return commandName;
   }
 
-  protected handleRejectedODataPromise(rawResponse: any, cmd: CommandInstance, callback: () => void): void {
+  protected handleRejectedODataPromise(rawResponse: any, cmd: CommandInstance, callback: (err?: any) => void): void {
     const res: any = JSON.parse(JSON.stringify(rawResponse));
     if (res.error) {
       try {
         const err: ODataError = JSON.parse(res.error);
-        cmd.log(new CommandError(err['odata.error'].message.value));
+        callback(new CommandError(err['odata.error'].message.value));
       }
       catch {
-        cmd.log(new CommandError(res.error));
+        callback(new CommandError(res.error));
       }
     }
     else {
       if (rawResponse instanceof Error) {
-        cmd.log(new CommandError(rawResponse.message));
+        callback(new CommandError(rawResponse.message));
       }
       else {
-        cmd.log(new CommandError(rawResponse));
+        callback(new CommandError(rawResponse));
       }
     }
-
-    callback();
   }
 
-  protected handleRejectedODataJsonPromise(response: any, cmd: CommandInstance, callback: () => void): void {
+  protected handleRejectedODataJsonPromise(response: any, cmd: CommandInstance, callback: (err?: any) => void): void {
     if (response.error &&
       response.error['odata.error'] &&
       response.error['odata.error'].message) {
-      cmd.log(new CommandError(response.error['odata.error'].message.value));
+      callback(new CommandError(response.error['odata.error'].message.value));
     }
     else {
       if (response.error) {
         if (response.error.error &&
           response.error.error.message) {
-          cmd.log(new CommandError(response.error.error.message));
+          callback(new CommandError(response.error.error.message));
         }
         else {
           if (response.error.message) {
-            cmd.log(new CommandError(response.error.message));
+            callback(new CommandError(response.error.message));
           }
           else {
             if (response.error.error_description) {
-              cmd.log(new CommandError(response.error.error_description));
+              callback(new CommandError(response.error.error_description));
             }
             else {
               try {
@@ -245,14 +243,14 @@ export default abstract class Command {
                 if (error &&
                   error.error &&
                   error.error.message) {
-                  cmd.log(new CommandError(error.error.message));
+                  callback(new CommandError(error.error.message));
                 }
                 else {
-                  cmd.log(new CommandError(response.error));
+                  callback(new CommandError(response.error));
                 }
               }
               catch {
-                cmd.log(new CommandError(response.error));
+                callback(new CommandError(response.error));
               }
             }
           }
@@ -260,29 +258,25 @@ export default abstract class Command {
       }
       else {
         if (response instanceof Error) {
-          cmd.log(new CommandError(response.message));
+          callback(new CommandError(response.message));
         }
         else {
-          cmd.log(new CommandError(response));
+          callback(new CommandError(response));
         }
       }
     }
-
-    callback();
   }
 
-  protected handleError(rawResponse: any, cmd: CommandInstance): void {
+  protected handleError(rawResponse: any, cmd: CommandInstance, callback: (err?: any) => void): void {
     if (rawResponse instanceof Error) {
-      cmd.log(new CommandError(rawResponse.message));
+      callback(new CommandError(rawResponse.message));
     }
     else {
-      cmd.log(new CommandError(rawResponse));
+      callback(new CommandError(rawResponse));
     }
   }
 
-  protected handleRejectedPromise(rawResponse: any, cmd: CommandInstance, callback: () => void): void {
-    this.handleError(rawResponse, cmd);
-
-    callback();
+  protected handleRejectedPromise(rawResponse: any, cmd: CommandInstance, callback: (err?: any) => void): void {
+    this.handleError(rawResponse, cmd, callback);
   }
 }

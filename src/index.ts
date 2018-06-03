@@ -81,6 +81,11 @@ fs.realpath(__dirname, (err: NodeJS.ErrnoException, resolvedPath: string): void 
   try {
     if (process.argv.length > 2) {
       vorpal.delimiter('');
+      vorpal.on('client_command_error', (err?: any): void => {
+        if (v) {
+          process.exit(1);
+        }
+      });
     }
     v = vorpal.parse(process.argv);
 
@@ -96,6 +101,6 @@ fs.realpath(__dirname, (err: NodeJS.ErrnoException, resolvedPath: string): void 
       exception: e
     });
     appInsights.flush();
-    process.exit(0);
+    process.exit(1);
   }
 });
