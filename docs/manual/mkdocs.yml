@@ -139,6 +139,9 @@ pages:
         - web get: 'cmd/spo/web/web-get.md'
         - web list: 'cmd/spo/web/web-list.md'
         - web remove: 'cmd/spo/web/web-remove.md'
+    - SharePoint Framework (spfx):
+      - project:
+        - project upgrade: 'cmd/spfx/project/project-upgrade.md'
     - Microsoft Graph (graph):
       - connect: 'cmd/graph/connect.md'
       - disconnect: 'cmd/graph/disconnect.md'

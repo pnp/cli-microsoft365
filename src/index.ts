@@ -23,7 +23,7 @@ appInsights.trackEvent({
   name: 'started'
 });
 
-updateNotifier({pkg: packageJSON}).notify({defer: false});
+updateNotifier({ pkg: packageJSON }).notify({ defer: false });
 
 fs.realpath(__dirname, (err: NodeJS.ErrnoException, resolvedPath: string): void => {
   const commandsDir: string = path.join(resolvedPath, './o365');
@@ -33,10 +33,13 @@ fs.realpath(__dirname, (err: NodeJS.ErrnoException, resolvedPath: string): void 
     if (file.indexOf(`${path.sep}commands${path.sep}`) > -1 &&
       file.indexOf('.spec.js') === -1 &&
       file.indexOf('.js.map') === -1) {
-      const cmd: any = require(file);
-      if (cmd instanceof Command) {
-        cmd.init(vorpal);
+      try {
+        const cmd: any = require(file);
+        if (cmd instanceof Command) {
+          cmd.init(vorpal);
+        }
       }
+      catch { }
     }
   });
 

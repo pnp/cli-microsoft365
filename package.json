@@ -1,7 +1,7 @@
 {
   "name": "@pnp/office365-cli",
   "version": "1.4.0",
-  "description": "Manage Microsoft Office 365 on any platform",
+  "description": "Manage Microsoft Office 365 and SharePoint Framework projects on any platform",
   "license": "MIT",
   "main": "./dist/index.js",
   "bin": {
@@ -24,7 +24,9 @@
   },
   "keywords": [
     "office 365",
+    "sharepoint framework",
     "o365",
+    "spfx",
     "sharepoint online",
     "sharepoint"
   ],
@@ -60,6 +62,7 @@
     "easy-table": "^1.1.1",
     "omelette": "^0.4.11",
     "request-promise-native": "^1.0.5",
+    "strip-json-comments": "^2.0.1",
     "update-notifier": "^2.5.0",
     "vorpal": "github:pnp/vorpal"
   },
