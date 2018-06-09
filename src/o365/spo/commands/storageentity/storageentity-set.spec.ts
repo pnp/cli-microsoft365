@@ -402,6 +402,7 @@ describe(commands.STORAGEENTITY_SET, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, key: 'Property1', value: 'Lorem', description: 'ipsum', comment: 'dolor', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       let accessDeniedErrorHandled = false;
+      console.log(log);
       log.forEach(l => {
         if (l && typeof l === 'string' && l.indexOf('This error is often caused by invalid URL of the app catalog site.') > -1) {
           accessDeniedErrorHandled = true;
