@@ -1,5 +1,17 @@
 # Release notes
 
+## [v1.4.0](https://github.com/SharePoint/office365-cli/releases/tag/v1.4.0)
+
+### New commands
+
+**SharePoint Online:**
+
+- [spo folder rename](../cmd/spo/folder/folder-rename.md) - renames a folder [#429](https://github.com/SharePoint/office365-cli/issues/429)
+
+### Changes
+
+- refactored to return non-zero error code on error solving [#468](https://github.com/SharePoint/office365-cli/issues/468)
+
 ## [v1.3.0](https://github.com/SharePoint/office365-cli/releases/tag/v1.3.0)
 
 ### New commands
