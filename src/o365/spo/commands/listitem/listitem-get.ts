@@ -53,7 +53,7 @@ class SpoListItemGetCommand extends SpoCommand {
     const listTitleArgument = args.options.listTitle || '';
     let siteAccessToken: string = '';
     const listRestUrl: string = (args.options.listId ?
-      `${args.options.webUrl}/_api/web/lists/(guid'${encodeURIComponent(listIdArgument)}')`
+      `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(listIdArgument)}')`
       : `${args.options.webUrl}/_api/web/lists/getByTitle('${encodeURIComponent(listTitleArgument)}')`);
 
     if (this.debug) {
