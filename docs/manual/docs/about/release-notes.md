@@ -8,6 +8,10 @@
 
 - [spo folder rename](../cmd/spo/folder/folder-rename.md) - renames a folder [#429](https://github.com/SharePoint/office365-cli/issues/429)
 
+**SharePoint Framework:**
+
+- [spfx project upgrade](../cmd/spfx/project/project-upgrade.md) - upgrades SharePoint Framework project to the specified version [#471](https://github.com/SharePoint/office365-cli/issues/471)
+
 ### Changes
 
 - refactored to return non-zero error code on error solving [#468](https://github.com/SharePoint/office365-cli/issues/468)
