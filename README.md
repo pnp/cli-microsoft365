@@ -9,7 +9,7 @@
 
 [![Join the chat at https://gitter.im/office365-cli/cli](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/office365-cli/cli?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-Using the Office 365 CLI, you can manage your Microsoft Office 365 tenant on any platform. No matter if you are on Windows, macOS or Linux, using Bash, Cmder or PowerShell, using the Office 365 CLI you can configure Office 365 and build automation scripts.
+Using the Office 365 CLI, you can manage your Microsoft Office 365 tenant and SharePoint Framework projects on any platform. No matter if you are on Windows, macOS or Linux, using Bash, Cmder or PowerShell, using the Office 365 CLI you can configure Office 365, manage SharePoint Framework projects and build automation scripts.
 
 [![asciicast](https://asciinema.org/a/TJORGWjhqrbOSOQHe7fh3c11S.png)](https://asciinema.org/a/TJORGWjhqrbOSOQHe7fh3c11S)
 
