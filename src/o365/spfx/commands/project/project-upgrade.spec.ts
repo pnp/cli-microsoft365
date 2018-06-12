@@ -498,7 +498,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.5.0' } }, (err?: any) => {
       const findings: Finding[] = log[0];
-      assert.equal(findings.length, 23);
+      assert.equal(findings.length, 25);
     });
   });
 
@@ -508,7 +508,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.5.0', debug: true } }, (err?: any) => {
       const findings: Finding[] = log[3];
-      assert.equal(findings.length, 23);
+      assert.equal(findings.length, 25);
     });
   });
 
@@ -518,7 +518,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.5.0' } }, (err?: any) => {
       const findings: Finding[] = log[0];
-      assert.equal(findings.length, 23);
+      assert.equal(findings.length, 25);
     });
   });
 
@@ -528,7 +528,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.5.0' } }, (err?: any) => {
       const findings: Finding[] = log[0];
-      assert.equal(findings.length, 23);
+      assert.equal(findings.length, 25);
     });
   });
 
@@ -538,7 +538,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.5.0' } }, (err?: any) => {
       const findings: Finding[] = log[0];
-      assert.equal(findings.length, 22);
+      assert.equal(findings.length, 24);
     });
   });
 

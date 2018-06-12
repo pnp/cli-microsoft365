@@ -28,6 +28,8 @@ import { FN011001_MAN_webpart_schema } from "./rules/FN011001_MAN_webpart_schema
 import { FN011002_MAN_applicationCustomizer_schema } from "./rules/FN011002_MAN_applicationCustomizer_schema";
 import { FN011003_MAN_listViewCommandSet_schema } from "./rules/FN011003_MAN_listViewCommandSet_schema";
 import { FN011004_MAN_fieldCustomizer_schema } from "./rules/FN011004_MAN_fieldCustomizer_schema";
+import { FN012001_TSC_module } from "./rules/FN012001_TSC_module";
+import { FN012002_TSC_moduleResolution } from "./rules/FN012002_TSC_moduleResolution";
 
 module.exports = [
   new FN001001_DEP_microsoft_sp_core_library('1.5.0'),
@@ -59,6 +61,7 @@ module.exports = [
   new FN011001_MAN_webpart_schema('https://developer.microsoft.com/json-schemas/spfx/client-side-web-part-manifest.schema.json'),
   new FN011002_MAN_applicationCustomizer_schema('https://developer.microsoft.com/json-schemas/spfx/client-side-extension-manifest.schema.json'),
   new FN011003_MAN_listViewCommandSet_schema('https://developer.microsoft.com/json-schemas/spfx/command-set-extension-manifest.schema.json'),
-  new FN011004_MAN_fieldCustomizer_schema('https://developer.microsoft.com/json-schemas/spfx/client-side-extension-manifest.schema.json')
-
+  new FN011004_MAN_fieldCustomizer_schema('https://developer.microsoft.com/json-schemas/spfx/client-side-extension-manifest.schema.json'),
+  new FN012001_TSC_module('esnext'),
+  new FN012002_TSC_moduleResolution('node')
 ];
