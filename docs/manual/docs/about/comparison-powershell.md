@@ -417,7 +417,7 @@ Set-PnPDefaultPageLayout|SharePointPnPPowerShellOnline|
 Set-PnPDocumentSetField|SharePointPnPPowerShellOnline|
 Set-PnPField|SharePointPnPPowerShellOnline|
 Set-PnPFileCheckedIn|SharePointPnPPowerShellOnline|
-Set-PnPFileCheckedOut|SharePointPnPPowerShellOnline|
+Set-PnPFileCheckedOut|SharePointPnPPowerShellOnline|[spo file checkout](../cmd/spo/file/file-checkout.md)
 Set-PnPGroup|SharePointPnPPowerShellOnline|
 Set-PnPGroupPermissions|SharePointPnPPowerShellOnline|
 Set-PnPHideDefaultThemes|SharePointPnPPowerShellOnline|[spo hidedefaultthemes set](../cmd/spo/hidedefaultthemes/hidedefaultthemes-set.md)
