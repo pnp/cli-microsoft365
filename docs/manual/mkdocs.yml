@@ -39,6 +39,7 @@ pages:
       - externaluser:
         - externaluser list: 'cmd/spo/externaluser/externaluser-list.md'
       - file:
+        - file checkin: 'cmd/spo/file/file-checkin.md'
         - file checkout: 'cmd/spo/file/file-checkout.md'
         - file copy: 'cmd/spo/file/file-copy.md'
         - file get: 'cmd/spo/file/file-get.md'
