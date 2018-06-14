@@ -3,7 +3,7 @@ import { Project } from "../model";
 import { Rule } from "./Rule";
 
 export abstract class DependencyRule extends Rule {
-  constructor(protected packageName: string, protected packageVersion: string, protected isDevDep: boolean = false, protected isOptional: boolean = false) {
+  constructor(protected packageName: string, protected packageVersion: string, protected isDevDep: boolean = false, protected isOptional: boolean = false, protected add: boolean = true) {
     super();
   }
 
@@ -12,11 +12,12 @@ export abstract class DependencyRule extends Rule {
   }
 
   get description(): string {
-    return `Upgrade SharePoint Framework ${(this.isDevDep ? 'dev ' : '')}dependency package ${this.packageName}`;
+    return `${(this.add ? 'Upgrade' : 'Remove')} SharePoint Framework ${(this.isDevDep ? 'dev ' : '')}dependency package ${this.packageName}`;
   };
 
   get resolution(): string {
-    return `npm update ${this.packageName}@${this.packageVersion}`;
+    return this.add ? `npm update ${this.packageName}@${this.packageVersion}` :
+      `npm uninstall ${this.packageName}`;
   };
 
   get resolutionType(): string {
@@ -38,14 +39,21 @@ export abstract class DependencyRule extends Rule {
 
     const projectDependencies: Hash | undefined = this.isDevDep ? project.packageJson.devDependencies : project.packageJson.dependencies;
     const packageVersion: string | undefined = projectDependencies ? projectDependencies[this.packageName] : undefined;
-    if (packageVersion) {
-      if (packageVersion !== this.packageVersion) {
-        this.addFinding(findings);
+    if (this.add) {
+      if (packageVersion) {
+        if (packageVersion !== this.packageVersion) {
+          this.addFinding(findings);
+        }
+      }
+      else {
+        if (!this.isOptional) {
+          this.addFindingWithCustomInfo(this.packageName, `Install SharePoint Framework ${(this.isDevDep ? 'dev ' : '')}dependency package ${this.packageName}`, `npm i ${this.packageName}@${this.packageVersion}${(this.isDevDep ? ' -D' : '')}`, this.file, findings);
+        }
       }
     }
     else {
-      if (!this.isOptional) {
-        this.addFindingWithCustomInfo(this.packageName, `Install SharePoint Framework ${(this.isDevDep ? 'dev ' : '')}dependency package ${this.packageName}`, `npm i ${this.packageName}@${this.packageVersion}${(this.isDevDep ? ' -D' : '')}`, this.file, findings);
+      if (packageVersion) {
+        this.addFinding(findings);
       }
     }
   }
