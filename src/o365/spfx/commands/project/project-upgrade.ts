@@ -27,6 +27,7 @@ class SpfxProjectUpgradeCommand extends Command {
   private projectRootPath: string | null = null;
   private allFindings: Finding[] = [];
   private supportedVersions: string[] = [
+    '1.3.4',
     '1.4.0',
     '1.4.1',
     '1.5.0'
@@ -234,6 +235,22 @@ class SpfxProjectUpgradeCommand extends Command {
     });
     project.manifests = manifests;
 
+    const gulpfileJsPath: string = path.join(projectRootPath, 'gulpfile.js');
+    if (fs.existsSync(gulpfileJsPath)) {
+      project.gulpfileJs = {
+        src: fs.readFileSync(gulpfileJsPath, 'utf-8')
+      };
+    }
+
+    project.vsCode = {};
+    const vsCodeSettingsPath: string = path.join(projectRootPath, '.vscode', 'settings.json');
+    if (fs.existsSync(vsCodeSettingsPath)) {
+      try {
+        project.vsCode.settingsJson = JSON.parse(Utils.removeSingleLineComments(fs.readFileSync(vsCodeSettingsPath, 'utf-8')));
+      }
+      catch { }
+    }
+
     return project;
   }
 
@@ -258,6 +275,14 @@ ${f.resolution}
           resolution = `In file [${f.file}](${f.file}) update the code as follows:
 
 \`\`\`json
+${f.resolution}
+\`\`\`
+`;
+          break;
+        case 'js':
+          resolution = `In file [${f.file}](${f.file}) update the code as follows:
+
+\`\`\`js
 ${f.resolution}
 \`\`\`
 `;
@@ -409,7 +434,7 @@ ${f.resolution}
     expected.
 
     Using this command you can upgrade SharePoint Framework projects built using
-    versions: 1.4.0, 1.4.1 and 1.5.0.
+    versions: 1.3.4, 1.4.0, 1.4.1 and 1.5.0.
 
   Examples:
   
