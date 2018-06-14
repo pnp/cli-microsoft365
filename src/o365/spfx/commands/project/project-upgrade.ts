@@ -71,12 +71,13 @@ class SpfxProjectUpgradeCommand extends Command {
       return;
     }
 
-    if (pos > this.supportedVersions.indexOf(this.toVersion)) {
+    const posTo: number = this.supportedVersions.indexOf(this.toVersion);
+    if (pos > posTo) {
       cb(new CommandError('You cannot downgrade a project'));
       return;
     }
 
-    if (pos === this.supportedVersions.indexOf(this.toVersion)) {
+    if (pos === posTo) {
       cb(new CommandError('Project doesn\'t need to be upgraded'));
       return;
     }
@@ -93,7 +94,7 @@ class SpfxProjectUpgradeCommand extends Command {
 
     // reverse the list of versions to upgrade to, so that most recent findings
     // will end up on top already. Saves us reversing a larger array later
-    const versionsToUpgradeTo: string[] = this.supportedVersions.slice(pos + 1).reverse();
+    const versionsToUpgradeTo: string[] = this.supportedVersions.slice(pos + 1, posTo + 1).reverse();
     versionsToUpgradeTo.forEach(v => {
       try {
         const rules: Rule[] = require(`./project-upgrade/upgrade-${v}`);
