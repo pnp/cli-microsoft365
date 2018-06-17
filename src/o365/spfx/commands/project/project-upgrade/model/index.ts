@@ -10,6 +10,8 @@ export * from './ServeJson';
 export * from './TsConfigJson'
 export * from './TsLintJson';
 export * from './VsCode';
+export * from './VsCodeExtensionsJson';
+export * from './VsCodeLaunchJson';
 export * from './VsCodeSettingsJson';
 export * from './WriteManifestsJson';
 export * from './YoRcJson';
