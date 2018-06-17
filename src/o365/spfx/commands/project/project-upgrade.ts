@@ -27,6 +27,8 @@ class SpfxProjectUpgradeCommand extends Command {
   private projectRootPath: string | null = null;
   private allFindings: Finding[] = [];
   private supportedVersions: string[] = [
+    '1.3.2',
+    '1.3.4',
     '1.4.1',
     '1.5.0'
   ];
@@ -232,6 +234,23 @@ class SpfxProjectUpgradeCommand extends Command {
       }
     });
     project.manifests = manifests;
+
+    project.vsCode = {};
+    const vsCodeExtensionsPath: string = path.join(projectRootPath, '.vscode', 'extensions.json');
+    if (fs.existsSync(vsCodeExtensionsPath)) {
+      try {
+        project.vsCode.extensionsJson = JSON.parse(Utils.removeSingleLineComments(fs.readFileSync(vsCodeExtensionsPath, 'utf-8')));
+      }
+      catch { }
+    }
+
+    const vsCodeLaunchPath: string = path.join(projectRootPath, '.vscode', 'launch.json');
+    if (fs.existsSync(vsCodeLaunchPath)) {
+      try {
+        project.vsCode.launchJson = JSON.parse(Utils.removeSingleLineComments(fs.readFileSync(vsCodeLaunchPath, 'utf-8')));
+      }
+      catch { }
+    }
 
     return project;
   }
