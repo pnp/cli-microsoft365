@@ -188,7 +188,7 @@ class SpoListItemSetCommand extends SpoCommand {
           if (this.debug) {
             cmd.log(`getting requets digest for systemUpdate request`);
           }
-          return this.getRequestDigest(cmd, this.debug);
+          return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
         } 
         else {
           return Promise.resolve();
