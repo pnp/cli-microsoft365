@@ -361,7 +361,7 @@ describe(commands.FILE_GET, () => {
   it('uses correct API url when id option is passed', (done) => {
     stubAuth();
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    const getStub: any = sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf('/_api/web/GetFileById(') > -1) {
         return Promise.resolve('Correct Url')
       }
@@ -385,7 +385,8 @@ describe(commands.FILE_GET, () => {
     }, () => {
 
       try {
-        assert(1 === 1);
+        assert.equal(getStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileById(\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')');
+        assert.equal(getStub.lastCall.args[0].headers.authorization, 'Bearer ABC');
         done();
       }
       catch (e) {
@@ -403,7 +404,7 @@ describe(commands.FILE_GET, () => {
   it('uses correct API url when url option is passed', (done) => {
     stubAuth();
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    const getStub: any = sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf('/_api/web/GetFileByServerRelativeUrl(') > -1) {
         return Promise.resolve('Correct Url')
       }
@@ -425,7 +426,8 @@ describe(commands.FILE_GET, () => {
     }, () => {
 
       try {
-        assert(1 === 1);
+        assert.equal(getStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativeUrl(\'%2Fsites%2Fproject-x%2FDocuments%2FTest1.docx\')');
+        assert.equal(getStub.lastCall.args[0].headers.authorization, 'Bearer ABC');
         done();
       }
       catch (e) {
@@ -440,15 +442,11 @@ describe(commands.FILE_GET, () => {
     });
   });
 
-  it('uses correct API url when url and id are both not passed', (done) => {
+  it('should handle promise rejection', (done) => {
     stubAuth();
-
+    const expectedError: any = JSON.stringify({"odata.error":{"code":"-2130575338, Microsoft.SharePoint.SPException","message":{"lang":"en-US","value":"Error: File Not Found."}}});
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === '') {
-        return Promise.resolve('Correct Url')
-      }
-
-      return Promise.reject('Invalid request');
+      return Promise.reject(expectedError);
     });
 
     auth.site = new Site();
@@ -461,10 +459,10 @@ describe(commands.FILE_GET, () => {
         debug: false,
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       }
-    }, () => {
+    }, (err: any) => {
 
       try {
-        assert(1 === 1);
+        assert.equal(JSON.stringify(err.message), JSON.stringify(expectedError));
         done();
       }
       catch (e) {
