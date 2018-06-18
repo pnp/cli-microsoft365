@@ -15,7 +15,7 @@ Option|Description
 `--help`|output usage information
 `-w, --webUrl <webUrl>`|The URL of the site where the file is located
 `-u, --url [url]`|The server-relative URL of the file to retrieve. Specify either `url` or `id` but not both
-`-i, --id [id]`|The ID of the file to retrieve. Specify either `url` or `id` but not both
+`-i, --id [id]`|The UniqueId (GUID) of the file to retrieve. Specify either `url` or `id` but not both
 `--asString`|Set to retrieve the contents of the specified file as string
 `--asListItem`|Set to retrieve the underlying list item
 `--asFile`|Set to save the file to the path specified in the path option
@@ -33,25 +33,25 @@ To get a file, you have to first connect to a SharePoint Online site using the [
 
 ## Examples
 
-Get file properties for file with id _b2307a39-e878-458b-bc90-03bc578531d6_ located in site _https://contoso.sharepoint.com/sites/project-x_
+Get file properties for file with id (UniqueId) _b2307a39-e878-458b-bc90-03bc578531d6_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
 spo file get --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6'
 ```
 
-Get contents of the file with id _b2307a39-e878-458b-bc90-03bc578531d6_ located in site _https://contoso.sharepoint.com/sites/project-x_
+Get contents of the file with id (UniqueId) _b2307a39-e878-458b-bc90-03bc578531d6_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
 spo file get --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6' --asString
 ```
 
-Get list item properties for file with id _b2307a39-e878-458b-bc90-03bc578531d6_ located in site _https://contoso.sharepoint.com/sites/project-x_
+Get list item properties for file with id (UniqueId) _b2307a39-e878-458b-bc90-03bc578531d6_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
 spo file get --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6' --asListItem
 ```
 
-Save file with id _b2307a39-e878-458b-bc90-03bc578531d6_ located in site _https://contoso.sharepoint.com/sites/project-x_ to local file _/Users/user/documents/SavedAsTest1.docx_
+Save file with id (UniqueId) _b2307a39-e878-458b-bc90-03bc578531d6_ located in site _https://contoso.sharepoint.com/sites/project-x_ to local file _/Users/user/documents/SavedAsTest1.docx_
 
 ```sh
 spo file get --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6' --asFile --path /Users/user/documents/SavedAsTest1.docx

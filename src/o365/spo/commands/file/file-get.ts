@@ -149,7 +149,7 @@ class SpoFileGetCommand extends SpoCommand {
       },
       {
         option: '-i, --id [id]',
-        description: 'The ID of the file to retrieve. Specify either url or id but not both'
+        description: 'The UniqueId (GUID) of the file to retrieve. Specify either url or id but not both'
       },
       {
         option: '--asString',
@@ -236,20 +236,20 @@ class SpoFileGetCommand extends SpoCommand {
         
   Examples:
   
-    Get file properties for file with id ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
+    Get file properties for file with id (UniqueId) ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
     located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
       ${chalk.grey(config.delimiter)} ${commands.FILE_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6'
 
-    Get contents of the file with id ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
+    Get contents of the file with id (UniqueId) ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
     located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
       ${chalk.grey(config.delimiter)} ${commands.FILE_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6' --asString
 
-    Get list item properties for file with id
+    Get list item properties for file with id (UniqueId)
     ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')} located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
       ${chalk.grey(config.delimiter)} ${commands.FILE_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6' --asListItem   
 
-    Save file with id ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')} located
+    Save file with id (UniqueId) ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')} located
     in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} to local file
     ${chalk.grey('/Users/user/documents/SavedAsTest1.docx')}
       ${chalk.grey(config.delimiter)} ${commands.FILE_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6' --asFile --path /Users/user/documents/SavedAsTest1.docx
