@@ -1,6 +1,6 @@
 export interface PackageSolutionJson {
   $schema: string;
-  solution: {
+  solution?: {
     includeClientSideAssets?: boolean;
     skipFeatureDeployment?: boolean | string;
   }

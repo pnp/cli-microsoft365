@@ -40,7 +40,8 @@ export class FN006002_CFG_PS_includeClientSideAssets extends Rule {
   };
 
   visit(project: Project, findings: Finding[]): void {
-    if (!project.packageSolutionJson) {
+    if (!project.packageSolutionJson ||
+      !project.packageSolutionJson.solution) {
       return;
     }
 
