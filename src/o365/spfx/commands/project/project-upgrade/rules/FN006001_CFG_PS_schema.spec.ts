@@ -16,7 +16,8 @@ describe('FN006001_CFG_PS_schema', () => {
     const project: Project = {
       path: '/usr/tmp',
       packageSolutionJson: {
-        $schema: 'test-schema'
+        $schema: 'test-schema',
+        solution: {}
       }
     };
     rule.visit(project, findings);
