@@ -60,7 +60,7 @@ Each command in the Office 365 CLI belongs to a service, for example the [spo si
 
 ## Communicating with Office 365
 
-Before a command can connect to Office 365, it requires a valid access token. Office 365 CLI offers you two methods to obtain a valid access token: [Auth.ensureAccessToken](https://github.com/SharePoint/office365-cli/blob/8b4ede874923fbe5fd84ebe79dc20206da18a529/src/Auth.ts#L62-L214) and [Auth.getAccessToken](https://github.com/SharePoint/office365-cli/blob/8b4ede874923fbe5fd84ebe79dc20206da18a529/src/Auth.ts#L216-L255). While the methods seem similar, they work differently and are meant for different purposes.
+Before a command can connect to Office 365, it requires a valid access token. Office 365 CLI offers you two methods to obtain a valid access token: [Auth.ensureAccessToken](https://github.com/pnp/office365-cli/blob/8b4ede874923fbe5fd84ebe79dc20206da18a529/src/Auth.ts#L62-L214) and [Auth.getAccessToken](https://github.com/pnp/office365-cli/blob/8b4ede874923fbe5fd84ebe79dc20206da18a529/src/Auth.ts#L216-L255). While the methods seem similar, they work differently and are meant for different purposes.
 
 ### Refresh access token for the current resource
 

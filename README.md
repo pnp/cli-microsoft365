@@ -2,8 +2,8 @@
 
 @latest (master) | @next (dev)
 :--------------: | :---------:
-[![CircleCI](https://circleci.com/gh/SharePoint/office365-cli/tree/master.svg?style=shield&circle-token=ce99e8046a231e1959248a61e7e32f9ae1abc8cf)](https://circleci.com/gh/SharePoint/office365-cli/tree/master)|[![CircleCI](https://circleci.com/gh/SharePoint/office365-cli/tree/dev.svg?style=shield&circle-token=ce99e8046a231e1959248a61e7e32f9ae1abc8cf)](https://circleci.com/gh/SharePoint/office365-cli/tree/dev)
-[![Coverage Status](https://coveralls.io/repos/github/SharePoint/office365-cli/badge.svg?branch=master)](https://coveralls.io/github/SharePoint/office365-cli?branch=master)|[![Coverage Status](https://coveralls.io/repos/github/SharePoint/office365-cli/badge.svg?branch=dev)](https://coveralls.io/github/SharePoint/office365-cli?branch=dev)
+[![CircleCI](https://circleci.com/gh/pnp/office365-cli/tree/master.svg?style=shield&circle-token=ce99e8046a231e1959248a61e7e32f9ae1abc8cf)](https://circleci.com/gh/pnp/office365-cli/tree/master)|[![CircleCI](https://circleci.com/gh/pnp/office365-cli/tree/dev.svg?style=shield&circle-token=ce99e8046a231e1959248a61e7e32f9ae1abc8cf)](https://circleci.com/gh/pnp/office365-cli/tree/dev)
+[![Coverage Status](https://coveralls.io/repos/github/pnp/office365-cli/badge.svg?branch=master)](https://coveralls.io/github/pnp/office365-cli?branch=master)|[![Coverage Status](https://coveralls.io/repos/github/pnp/office365-cli/badge.svg?branch=dev)](https://coveralls.io/github/pnp/office365-cli?branch=dev)
 
 # Office 365 CLI
 
@@ -69,7 +69,7 @@ See the [User Guide](docs/manual/docs/user-guide/installing-cli.md) to learn mor
 
 ## Sharing is Caring
 
-We'd love your help! If you have ideas for new features or feedback, let us know by creating an issue in the [issues list](https://github.com/SharePoint/office365-cli/issues). Before you submit a PR with your improvements, please review our [project guides](./docs/guides/index.md).
+We'd love your help! If you have ideas for new features or feedback, let us know by creating an issue in the [issues list](https://github.com/pnp/office365-cli/issues). Before you submit a PR with your improvements, please review our [project guides](./docs/guides/index.md).
 
 ## Legal
 

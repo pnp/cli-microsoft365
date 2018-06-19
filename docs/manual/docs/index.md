@@ -54,7 +54,7 @@ See the [User Guide](user-guide/installing-cli.md) to learn more about the Offic
 
 ## SharePoint Patterns and Practices
 
-Office 365 CLI is an open-source project driven by the [SharePoint Patterns and Practices](https://aka.ms/sppnp) initiative. The project is built and managed publicly on GitHub at [https://github.com/SharePoint/office365-cli](https://github.com/SharePoint/office365-cli) and accepts community contributions. We would encourage you to try it and [tell us what you think](https://github.com/SharePoint/office365-cli/issues). We would also love your help! We have a number of feature requests that are a [good starting point](https://github.com/SharePoint/office365-cli/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) to contribute to the project.
+Office 365 CLI is an open-source project driven by the [SharePoint Patterns and Practices](https://aka.ms/sppnp) initiative. The project is built and managed publicly on GitHub at [https://github.com/pnp/office365-cli](https://github.com/pnp/office365-cli) and accepts community contributions. We would encourage you to try it and [tell us what you think](https://github.com/pnp/office365-cli/issues). We would also love your help! We have a number of feature requests that are a [good starting point](https://github.com/pnp/office365-cli/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) to contribute to the project.
 
 _“Sharing is caring”_
 

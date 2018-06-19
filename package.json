@@ -10,11 +10,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SharePoint/office365-cli.git"
+    "url": "git+https://github.com/pnp/office365-cli.git"
   },
-  "homepage": "https://sharepoint.github.io/office365-cli/",
+  "homepage": "https://pnp.github.io/office365-cli/",
   "bugs": {
-    "url": "https://github.com/SharePoint/office365-cli/issues"
+    "url": "https://github.com/pnp/office365-cli/issues"
   },
   "scripts": {
     "build": "tsc -p .",
@@ -30,7 +30,7 @@
     "sharepoint online",
     "sharepoint"
   ],
-  "author": "https://github.com/SharePoint/office365-cli/graphs/contributors",
+  "author": "https://github.com/pnp/office365-cli/graphs/contributors",
   "maintainers": [
     {
       "name": "waldekm",
