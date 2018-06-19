@@ -16,7 +16,8 @@ describe('FN008001_CFG_TSL_schema', () => {
     const project: Project = {
       path: '/usr/tmp',
       tsLintJson: {
-        $schema: 'test-schema'
+        $schema: 'test-schema',
+        "no-unused-imports": false
       }
     };
     rule.visit(project, findings);
