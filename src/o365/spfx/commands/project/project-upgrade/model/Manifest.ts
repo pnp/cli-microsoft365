@@ -10,3 +10,8 @@ export interface Manifest {
     }
   }[];
 }
+
+export interface CommandSetManifest extends Manifest {
+  commands?: Object;
+  items?: Object;
+}

@@ -1,3 +1,8 @@
 export interface TsLintJson {
-  $schema: string;
+  $schema?: string;
+  lintConfig?: {
+    rules?: {
+      [key: string]: boolean;
+    }
+  }
 }
