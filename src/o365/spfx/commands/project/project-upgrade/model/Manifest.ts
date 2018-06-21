@@ -4,4 +4,6 @@ export interface Manifest {
   $schema: string;
   componentType: string;
   extensionType?: string;
+  requiresCustomScript?: boolean;
+  safeWithCustomScriptDisabled?: boolean;
 }
