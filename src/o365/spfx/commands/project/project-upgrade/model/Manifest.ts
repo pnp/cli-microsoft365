@@ -9,6 +9,8 @@ export interface Manifest {
       default?: string;
     }
   }[];
+  requiresCustomScript?: boolean;
+  safeWithCustomScriptDisabled?: boolean;
 }
 
 export interface CommandSetManifest extends Manifest {

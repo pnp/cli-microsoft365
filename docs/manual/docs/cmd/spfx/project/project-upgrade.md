@@ -27,7 +27,7 @@ The `spfx project upgrade` command helps you upgrade your SharePoint Framework p
 
 This command doesn't change your project files. Instead, it gives you a report with all steps necessary to upgrade your project to the specified version of the SharePoint Framework. Changing project files is error-prone, especially when it comes to updating your solution's code. This is why at this moment, this command produces a report that you can use yourself to perform the necessary updates and verify that everything is working as expected.
 
-Using this command you can upgrade SharePoint Framework projects built using versions: 1.2.0, 1.3.0, 1.3.1, 1.3.2, 1.3.4, 1.4.0, 1.4.1, 1.5.0 and 1.5.1.
+Using this command you can upgrade SharePoint Framework projects built using versions: 1.1.1, 1.1.3, 1.2.0, 1.3.0, 1.3.1, 1.3.2, 1.3.4, 1.4.0, 1.4.1, 1.5.0 and 1.5.1.
 
 ## Examples
 
