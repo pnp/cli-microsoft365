@@ -10,6 +10,7 @@
 - [spo file checkout](../cmd/spo/file/file-checkout.md) - checks out specified file [#285](https://github.com/pnp/office365-cli/issues/285)
 - [spo folder rename](../cmd/spo/folder/folder-rename.md) - renames a folder [#429](https://github.com/pnp/office365-cli/issues/429)
 - [spo listitem get](../cmd/spo/listitem/listitem-get.md) - gets a list item from the specified list [#269](https://github.com/pnp/office365-cli/issues/269)
+- [spo listitem set](../cmd/spo/listitem/listitem-set.md) - updates a list item in the specified list [#271](https://github.com/pnp/office365-cli/issues/271)
 
 **SharePoint Framework:**
 
@@ -19,6 +20,13 @@
 
 - refactored to return non-zero error code on error solving [#468](https://github.com/pnp/office365-cli/issues/468)
 - fixed adding item to list referenced by id solving [#473](https://github.com/pnp/office365-cli/issues/473)
+- added support for upgrading projects built using SharePoint Framework v1.4.0 [#478](https://github.com/pnp/office365-cli/issues/478)
+- added support for upgrading projects built using SharePoint Framework v1.3.4 [#479](https://github.com/pnp/office365-cli/issues/479)
+- added support for upgrading projects built using SharePoint Framework v1.3.2 [#481](https://github.com/pnp/office365-cli/issues/481)
+- added support for upgrading projects built using SharePoint Framework v1.3.1 [#482](https://github.com/pnp/office365-cli/issues/482)
+- added support for upgrading projects built using SharePoint Framework v1.3.0 [#483](https://github.com/pnp/office365-cli/issues/483)
+- added support for upgrading projects built using SharePoint Framework v1.2.0 [#484](https://github.com/pnp/office365-cli/issues/484)
+- clarified usage of the [spo file get](../cmd/spo/file/file-get.md) command [#497](https://github.com/pnp/office365-cli/pull/497)
 
 ## [v1.3.0](https://github.com/pnp/office365-cli/releases/tag/v1.3.0)
 
