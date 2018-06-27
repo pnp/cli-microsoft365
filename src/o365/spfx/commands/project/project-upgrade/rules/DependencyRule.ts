@@ -16,7 +16,8 @@ export abstract class DependencyRule extends Rule {
   };
 
   get resolution(): string {
-    return this.add ? `npm update ${this.packageName}@${this.packageVersion}` :
+    return this.add ?
+      `npm i ${this.packageName}@${this.packageVersion} --save-exact${(this.isDevDep ? ' -D' : '')}` :
       `npm uninstall ${this.packageName}`;
   };
 
@@ -47,7 +48,7 @@ export abstract class DependencyRule extends Rule {
       }
       else {
         if (!this.isOptional) {
-          this.addFindingWithCustomInfo(this.packageName, `Install SharePoint Framework ${(this.isDevDep ? 'dev ' : '')}dependency package ${this.packageName}`, `npm i ${this.packageName}@${this.packageVersion}${(this.isDevDep ? ' -D' : '')}`, this.file, findings);
+          this.addFindingWithCustomInfo(this.packageName, this.description.replace('Upgrade', 'Install'), this.resolution, this.file, findings);
         }
       }
     }
