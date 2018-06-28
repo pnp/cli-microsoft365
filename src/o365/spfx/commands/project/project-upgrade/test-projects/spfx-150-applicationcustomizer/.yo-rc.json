@@ -1,0 +1,12 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "solutionName": "spfx",
+    "environment": "spo",
+    "skipFeatureDeployment": "false",
+    "componentType": "extension",
+    "extensionType": "ApplicationCustomizer",
+    "componentName": "HelloWorld",
+    "componentDescription": "HelloWorld",
+    "isCreatingSolution": true
+  }
+}
