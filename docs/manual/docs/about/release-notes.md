@@ -27,6 +27,7 @@
 - added support for upgrading projects built using SharePoint Framework v1.3.0 [#483](https://github.com/pnp/office365-cli/issues/483)
 - added support for upgrading projects built using SharePoint Framework v1.2.0 [#484](https://github.com/pnp/office365-cli/issues/484)
 - clarified usage of the [spo file get](../cmd/spo/file/file-get.md) command [#497](https://github.com/pnp/office365-cli/pull/497)
+- added support for upgrading projects built using SharePoint Framework v1.5.0 [#505](https://github.com/pnp/office365-cli/issues/505)
 
 ## [v1.3.0](https://github.com/pnp/office365-cli/releases/tag/v1.3.0)
 
