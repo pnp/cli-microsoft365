@@ -62,6 +62,7 @@
     "easy-table": "^1.1.1",
     "omelette": "^0.4.11",
     "request-promise-native": "^1.0.5",
+    "semver": "^5.5.0",
     "strip-json-comments": "^2.0.1",
     "update-notifier": "^2.5.0",
     "vorpal": "github:pnp/vorpal"
@@ -72,6 +73,7 @@
     "@types/node": "^8.9.3",
     "@types/request": "^2.47.0",
     "@types/request-promise-native": "^1.0.14",
+    "@types/semver": "^5.5.0",
     "@types/sinon": "^4.3.3",
     "@types/update-notifier": "^2.2.0",
     "coveralls": "^3.0.1",

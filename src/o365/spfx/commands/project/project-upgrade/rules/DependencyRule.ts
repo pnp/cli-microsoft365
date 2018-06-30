@@ -1,6 +1,7 @@
 import { Finding, Hash } from "../";
 import { Project } from "../model";
 import { Rule } from "./Rule";
+import { lt, valid, validRange } from "semver";
 
 export abstract class DependencyRule extends Rule {
   constructor(protected packageName: string, protected packageVersion: string, protected isDevDep: boolean = false, protected isOptional: boolean = false, protected add: boolean = true) {
@@ -39,11 +40,20 @@ export abstract class DependencyRule extends Rule {
     }
 
     const projectDependencies: Hash | undefined = this.isDevDep ? project.packageJson.devDependencies : project.packageJson.dependencies;
-    const packageVersion: string | undefined = projectDependencies ? projectDependencies[this.packageName] : undefined;
+    const versionEntry: string | null = projectDependencies ? projectDependencies[this.packageName] : '';
+    const packageVersion: string | null = valid(versionEntry);
+    const versionRange: string | null = validRange(versionEntry);
     if (this.add) {
-      if (packageVersion) {
-        if (packageVersion !== this.packageVersion) {
-          this.addFinding(findings);
+      if (versionEntry) {
+        if (packageVersion) {
+          if (lt(packageVersion, this.packageVersion)) {
+            this.addFinding(findings);
+          }
+        }
+        else {
+          if (versionRange) {
+            this.addFinding(findings);
+          }
         }
       }
       else {
@@ -53,7 +63,7 @@ export abstract class DependencyRule extends Rule {
       }
     }
     else {
-      if (packageVersion) {
+      if (versionEntry) {
         this.addFinding(findings);
       }
     }
