@@ -120,6 +120,7 @@ export default {
   WEB_ADD: `${prefix} web add`,
   WEB_CLIENTSIDEWEBPART_LIST: `${prefix} web clientsidewebpart list`,
   WEB_GET: `${prefix} web get`,
+  WEB_LIST: `${prefix} web list`,
   WEB_REMOVE: `${prefix} web remove`,
-  WEB_LIST: `${prefix} web list`
+  WEB_SET: `${prefix} web set`
 };

@@ -143,6 +143,7 @@ pages:
         - web get: 'cmd/spo/web/web-get.md'
         - web list: 'cmd/spo/web/web-list.md'
         - web remove: 'cmd/spo/web/web-remove.md'
+        - web set: 'cmd/spo/web/web-set.md'
     - SharePoint Framework (spfx):
       - project:
         - project upgrade: 'cmd/spfx/project/project-upgrade.md'
