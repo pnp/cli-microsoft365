@@ -1,5 +1,18 @@
 # Release notes
 
+## [v1.5.0](https://github.com/pnp/office365-cli/releases/tag/v1.5.0)
+
+### New commands
+
+**SharePoint Online:**
+
+- [spo web set](../cmd/spo/web/web-set.md) - updates subsite properties [#191](https://github.com/pnp/office365-cli/issues/191)
+
+### Changes
+
+- fixed exit code on error in the 'spo site add' command [#511](https://github.com/pnp/office365-cli/issues/511)
+- Added support for retrieving apps by their name [#516](https://github.com/pnp/office365-cli/issues/516)
+
 ## [v1.4.0](https://github.com/pnp/office365-cli/releases/tag/v1.4.0)
 
 ### New commands
@@ -18,8 +31,8 @@
 
 ### Changes
 
-- refactored to return non-zero error code on error solving [#468](https://github.com/pnp/office365-cli/issues/468)
-- fixed adding item to list referenced by id solving [#473](https://github.com/pnp/office365-cli/issues/473)
+- refactored to return non-zero error code on error [#468](https://github.com/pnp/office365-cli/issues/468)
+- fixed adding item to list referenced by id [#473](https://github.com/pnp/office365-cli/issues/473)
 - added support for upgrading projects built using SharePoint Framework v1.4.0 [#478](https://github.com/pnp/office365-cli/issues/478)
 - added support for upgrading projects built using SharePoint Framework v1.3.4 [#479](https://github.com/pnp/office365-cli/issues/479)
 - added support for upgrading projects built using SharePoint Framework v1.3.2 [#481](https://github.com/pnp/office365-cli/issues/481)
