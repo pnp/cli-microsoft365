@@ -3,12 +3,12 @@ import Command, { CommandOption, CommandValidate, CommandError } from '../../../
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
-const command: Command = require('./app-add');
+const command: Command = require('./navigation-node-add');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import Utils from '../../../../Utils';
 
-describe(commands.APP_ADD, () => {
+describe(commands.NAVIGATION_NODE_ADD, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
@@ -238,7 +238,7 @@ describe(commands.APP_ADD, () => {
 
   it('correctly handles random API error', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/topnavigationbar/navigation`) > -1) {
+      if (opts.url.indexOf(`/_api/web/navigation/topnavigationbar`) > -1) {
         return Promise.reject({ error: 'An error has occurred' });
       }
 
@@ -262,7 +262,7 @@ describe(commands.APP_ADD, () => {
 
   it('correctly handles random API error (string error)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/topnavigationbar/navigation`) > -1) {
+      if (opts.url.indexOf(`/_api/web/navigation/topnavigationbar`) > -1) {
         return Promise.reject('An error has occurred');
       }
 
