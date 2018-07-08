@@ -1,0 +1,201 @@
+import auth from '../../SpoAuth';
+import { ContextInfo } from '../../spo';
+import config from '../../../../config';
+import * as request from 'request-promise-native';
+import commands from '../../commands';
+import GlobalOptions from '../../../../GlobalOptions';
+import {
+  CommandOption,
+  CommandValidate
+} from '../../../../Command';
+import SpoCommand from '../../SpoCommand';
+import Utils from '../../../../Utils';
+import { Auth } from '../../../../Auth';
+
+const vorpal: Vorpal = require('../../../../vorpal-init');
+
+interface CommandArgs {
+  options: Options;
+}
+
+interface Options extends GlobalOptions {
+  isExternal?: boolean;
+  location: string;
+  title: string;
+  url: string;
+  webUrl: string;
+}
+
+class SpoNavigationNodeAddCommand extends SpoCommand {
+  public get name(): string {
+    return `${commands.NAVIGATION_NODE_ADD}`;
+  }
+
+  public get description(): string {
+    return 'Adds a navigation node to the specified site navigation';
+  }
+
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.isExternal = args.options.isExternal;
+    return telemetryProps;
+  }
+
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
+    let siteAccessToken: string = '';
+
+    if (this.debug) {
+      cmd.log(`Retrieving access token for ${resource}...`);
+    }
+
+    auth
+      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
+      .then((accessToken: string): request.RequestPromise => {
+        siteAccessToken = accessToken;
+
+        if (this.debug) {
+          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
+        }
+
+        return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
+      })
+      .then((res: ContextInfo): request.RequestPromise => {
+        if (this.debug) {
+          cmd.log('Response:');
+          cmd.log(res);
+          cmd.log('');
+        }
+
+        if (this.verbose) {
+          cmd.log(`Adding navigation node...`);
+        }
+
+        const requestOptions: any = {
+          url: `${args.options.webUrl}/_api/web/navigation/${args.options.location.toLowerCase()}`,
+          headers: Utils.getRequestHeaders({
+            authorization: `Bearer ${siteAccessToken}`,
+            accept: 'application/json;odata=nometadata',
+            'content-type': 'application/json;odata=nometadata',
+            'X-RequestDigest': res.FormDigestValue
+          }),
+          body: {
+            Title: args.options.title,
+            Url: args.options.url,
+            IsExternal: args.options.isExternal === true
+          },
+          json: true
+        };
+
+        if (this.debug) {
+          cmd.log('Executing web request...');
+          cmd.log(requestOptions);
+          cmd.log('');
+        }
+
+        return request.post(requestOptions);
+      })
+      .then((res: any): void => {
+        if (this.debug) {
+          cmd.log('Response:');
+          cmd.log(res);
+          cmd.log('');
+        }
+
+        cmd.log(res);
+
+        if (this.verbose) {
+          cmd.log(vorpal.chalk.green('DONE'));
+        }
+
+        cb();
+      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, cmd, cb));
+  }
+
+  public options(): CommandOption[] {
+    const options: CommandOption[] = [
+      {
+        option: '-u, --webUrl <webUrl>',
+        description: 'Absolute URL of the site to which navigation should be modified'
+      },
+      {
+        option: '-l, --location <location>',
+        description: 'Navigation type where the node should be added. Available options: QuickLaunch|TopNavigationBar',
+        autocomplete: ['QuickLaunch', 'TopNavigationBar']
+      },
+      {
+        option: '-t, --title <title>',
+        description: 'Navigation node title'
+      },
+      {
+        option: '--url <url>',
+        description: 'Navigation node URL'
+      },
+      {
+        option: '--isExternal',
+        description: 'Set, if the navigation node points to an external URL'
+      }
+    ];
+
+    const parentOptions: CommandOption[] = super.options();
+    return options.concat(parentOptions);
+  }
+
+  public validate(): CommandValidate {
+    return (args: CommandArgs): boolean | string => {
+      if (!args.options.webUrl) {
+        return 'Required option webUrl missing';
+      }
+
+      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+      if (isValidSharePointUrl !== true) {
+        return isValidSharePointUrl;
+      }
+
+      if (!args.options.location) {
+        return 'Required option location missing';
+      }
+      else {
+        if (args.options.location !== 'QuickLaunch' &&
+          args.options.location !== 'TopNavigationBar') {
+          return `${args.options.location} is not a valid value for the location option. Allowed values are QuickLaunch|TopNavigationBar`;
+        }
+      }
+
+      if (!args.options.title) {
+        return 'Required option title missing';
+      }
+
+      if (!args.options.url) {
+        return 'Required option url missing';
+      }
+
+      return true;
+    };
+  }
+
+  public commandHelp(args: CommandArgs, log: (message: string) => void): void {
+    const chalk = vorpal.chalk;
+    log(vorpal.find(commands.NAVIGATION_NODE_ADD).helpInformation());
+    log(
+      `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online site,
+  using the ${chalk.blue(commands.CONNECT)} command.
+                
+  Remarks:
+
+    To add a navigation node to a site, you have to first connect to
+    a SharePoint site using the ${chalk.blue(commands.CONNECT)} command,
+    eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
+
+  Examples:
+  
+    Add a navigation node pointing to a SharePoint page to the top navigation
+      ${chalk.grey(config.delimiter)} ${commands.NAVIGATION_NODE_ADD} --webUrl https://contoso.sharepoint.com/sites/team-a --location TopNavigationBar --title About --url /sites/team-s/sitepages/about.aspx
+
+    Add a navigation node pointing to an external page to the quick launch
+      ${chalk.grey(config.delimiter)} ${commands.NAVIGATION_NODE_ADD} --webUrl https://contoso.sharepoint.com/sites/team-a --location QuickLaunch --title "About us" --url https://contoso.com/about-us --isExternal
+`);
+  }
+}
+
+module.exports = new SpoNavigationNodeAddCommand();

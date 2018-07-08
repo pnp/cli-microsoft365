@@ -78,6 +78,8 @@ pages:
         - listitem get: 'cmd/spo/listitem/listitem-get.md'
         - listitem remove: 'cmd/spo/listitem/listitem-remove.md'
         - listitem set: 'cmd/spo/listitem/listitem-set.md'
+      - navigation:
+        - navigation node add: 'cmd/spo/navigation/navigation-node-add.md'
       - page:
         - page add: 'cmd/spo/page/page-add.md'
         - page control get: 'cmd/spo/page/page-control-get.md'
