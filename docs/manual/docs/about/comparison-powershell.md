@@ -159,7 +159,7 @@ Add-PnPJavaScriptLink|SharePointPnPPowerShellOnline|
 Add-PnPListFoldersToProvisioningTemplate|SharePointPnPPowerShellOnline|
 Add-PnPListItem|SharePointPnPPowerShellOnline|[spo listitem add](../cmd/spo/listitem/listitem-add.md)
 Add-PnPMasterPage|SharePointPnPPowerShellOnline|
-Add-PnPNavigationNode|SharePointPnPPowerShellOnline|
+Add-PnPNavigationNode|SharePointPnPPowerShellOnline|[spo navigation node add](../cmd/spo/navigation/navigation-node-add.md)
 Add-PnPOffice365GroupToSite|SharePointPnPPowerShellOnline|
 Add-PnPPublishingImageRendition|SharePointPnPPowerShellOnline|
 Add-PnPPublishingPage|SharePointPnPPowerShellOnline|
