@@ -250,7 +250,7 @@ Get-PnPList|SharePointPnPPowerShellOnline|[spo list get](../cmd/spo/list/list-ge
 Get-PnPListItem|SharePointPnPPowerShellOnline|[spo listitem get](../cmd/spo/listitem/listitem-get.md)
 Get-PnPListRecordDeclaration|SharePointPnPPowerShellOnline|
 Get-PnPMasterPage|SharePointPnPPowerShellOnline|
-Get-PnPNavigationNode|SharePointPnPPowerShellOnline|
+Get-PnPNavigationNode|SharePointPnPPowerShellOnline|[spo navigation node list](../cmd/spo/navigation/navigation-node-list.md)
 Get-PnPProperty|SharePointPnPPowerShellOnline|
 Get-PnPPropertyBag|SharePointPnPPowerShellOnline|[spo propertybag get](../cmd/spo/propertybag/propertybag-get.md), [spo propertybag list](../cmd/spo/propertybag/propertybag-list.md)
 Get-PnPProvisioningTemplate|SharePointPnPPowerShellOnline|
