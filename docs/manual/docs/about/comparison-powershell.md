@@ -366,7 +366,7 @@ Remove-PnPIndexedProperty|SharePointPnPPowerShellOnline|
 Remove-PnPJavaScriptLink|SharePointPnPPowerShellOnline|
 Remove-PnPList|SharePointPnPPowerShellOnline|[spo list remove](../cmd/spo/list/list-remove.md)
 Remove-PnPListItem|SharePointPnPPowerShellOnline|[spo listitem remove](../cmd/spo/listitem/listitem-remove.md)
-Remove-PnPNavigationNode|SharePointPnPPowerShellOnline|
+Remove-PnPNavigationNode|SharePointPnPPowerShellOnline|[spo navigation node remove](../cmd/spo/navigation/navigation-node-remove.md)
 Remove-PnPPropertyBagValue|SharePointPnPPowerShellOnline|[spo propertybag remove](../cmd/spo/propertybag/propertybag-remove.md)
 Remove-PnPPublishingImageRendition|SharePointPnPPowerShellOnline|
 Remove-PnPRoleDefinition|SharePointPnPPowerShellOnline|

@@ -1,0 +1,43 @@
+# spo navigation node remove
+
+Removes the specified navigation node
+
+## Usage
+
+```sh
+spo navigation node remove [options]
+```
+
+## Options
+
+Option|Description
+------|-----------
+`--help`|output usage information
+`-u, --webUrl <webUrl>`|Absolute URL of the site to which navigation should be modified
+`-l, --location <location>`|Navigation type where the node should be added. Available options: `QuickLaunch`, `TopNavigationBar`
+`-i, --id <id>`|ID of the node to remove
+`--confirm`|Don't prompt for confirming removing the node
+`-o, --output [output]`|Output type. `json|text`. Default `text`
+`--verbose`|Runs command with verbose logging
+`--debug`|Runs command with debug logging
+
+!!! important
+    Before using this command, connect to a SharePoint Online site, using the [spo connect](../connect.md) command.
+
+## Remarks
+
+To remove a navigation node from a site, you have to first connect to a SharePoint Online site using the [spo connect](../connect.md) command, eg. `spo connect https://contoso.sharepoint.com`.
+
+## Examples
+
+Remove a node from the top navigation. Will prompt for confirmation
+
+```sh
+spo navigation node remove --webUrl https://contoso.sharepoint.com/sites/team-a --location TopNavigationBar --id 2003
+```
+
+Remove a node from the quick launch without prompting for confirmation
+
+```sh
+spo navigation node remove --webUrl https://contoso.sharepoint.com/sites/team-a --location QuickLaunch --id 2003 --confirm
+```
