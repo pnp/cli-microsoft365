@@ -62,6 +62,7 @@ export default {
   LISTITEM_SET: `${prefix} listitem set`,
   NAVIGATION_NODE_ADD: `${prefix} navigation node add`,
   NAVIGATION_NODE_LIST: `${prefix} navigation node list`,
+  NAVIGATION_NODE_REMOVE: `${prefix} navigation node remove`,
   PAGE_ADD: `${prefix} page add`,
   PAGE_CONTROL_GET: `${prefix} page control get`,
   PAGE_CONTROL_LIST: `${prefix} page control list`,
