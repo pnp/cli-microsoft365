@@ -27,6 +27,7 @@ export default {
   DISCONNECT: `${prefix} disconnect`,
   EXTERNALUSER_LIST: `${prefix} externaluser list`,
   FIELD_ADD: `${prefix} field add`,
+  FIELD_GET: `${prefix} field get`,
   FILE_CHECKIN: `${prefix} file checkin`,
   FILE_CHECKOUT: `${prefix} file checkout`,
   FILE_COPY: `${prefix} file copy`,

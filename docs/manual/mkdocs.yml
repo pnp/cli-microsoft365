@@ -40,6 +40,7 @@ pages:
         - externaluser list: 'cmd/spo/externaluser/externaluser-list.md'
       - field:
         - field add: 'cmd/spo/field/field-add.md'
+        - field get: 'cmd/spo/field/field-get.md'
       - file:
         - file checkin: 'cmd/spo/file/file-checkin.md'
         - file checkout: 'cmd/spo/file/file-checkout.md'
