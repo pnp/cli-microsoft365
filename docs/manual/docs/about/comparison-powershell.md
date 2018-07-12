@@ -139,7 +139,7 @@ Add-PnPClientSidePage|SharePointPnPPowerShellOnline|[spo page add](../cmd/spo/pa
 Add-PnPClientSidePageSection|SharePointPnPPowerShellOnline|
 Add-PnPClientSideText|SharePointPnPPowerShellOnline|
 Add-PnPClientSideWebPart|SharePointPnPPowerShellOnline|
-Add-PnPContentType|SharePointPnPPowerShellOnline|
+Add-PnPContentType|SharePointPnPPowerShellOnline|[spo contenttype add](../cmd/spo/contenttype/contenttype-add.md)
 Add-PnPContentTypeToDocumentSet|SharePointPnPPowerShellOnline|
 Add-PnPContentTypeToList|SharePointPnPPowerShellOnline|
 Add-PnPCustomAction|SharePointPnPPowerShellOnline|[spo customaction add](../cmd/spo/customaction/customaction-add.md)

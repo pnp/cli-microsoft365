@@ -29,6 +29,8 @@ pages:
         - cdn policy list: 'cmd/spo/cdn/cdn-policy-list.md'
         - cdn policy set: 'cmd/spo/cdn/cdn-policy-set.md'
         - cdn set: 'cmd/spo/cdn/cdn-set.md'
+      - contenttype:
+        - contenttype add: 'cmd/spo/contenttype/contenttype-add.md'
       - customaction:
         - customaction add: 'cmd/spo/customaction/customaction-add.md'
         - customaction clear: 'cmd/spo/customaction/customaction-clear.md'
