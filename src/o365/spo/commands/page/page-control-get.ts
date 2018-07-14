@@ -1,16 +1,15 @@
 import auth from '../../SpoAuth';
 import config from '../../../../config';
-import * as request from 'request-promise-native';
 import commands from '../../commands';
 import {
-  CommandOption, CommandValidate, CommandError
+  CommandOption, CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import GlobalOptions from '../../../../GlobalOptions';
 import { Auth } from '../../../../Auth';
-import { PageItem } from './PageItem';
 import { ClientSidePage, ClientSidePart } from './clientsidepages';
+import { Page } from './Page';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -42,51 +41,10 @@ class SpoPageControlGetCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}`);
-        }
-
-        if (this.verbose) {
-          cmd.log(`Retrieving information about the page...`);
-        }
-
-        let pageName: string = args.options.name;
-        if (args.options.name.indexOf('.aspx') < 0) {
-          pageName += '.aspx';
-        }
-
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${args.options.webUrl.substr(args.options.webUrl.indexOf('/', 8))}/SitePages/${encodeURIComponent(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId`,
-          headers: Utils.getRequestHeaders({
-            authorization: `Bearer ${accessToken}`,
-            'content-type': 'application/json;charset=utf-8',
-            accept: 'application/json;odata=nometadata'
-          }),
-          json: true
-        };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
-        return request.get(requestOptions);
+      .then((accessToken: string): Promise<ClientSidePage> => {
+        return Page.getPage(args.options.name, args.options.webUrl, accessToken, cmd, this.debug, this.verbose);
       })
-      .then((res: PageItem): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
-        if (res.ListItemAllFields.ClientSideApplicationId !== 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec') {
-          cb(new CommandError(`Page ${args.options.name} is not a modern page.`));
-          return;
-        }
-
-        const clientSidePage: ClientSidePage = ClientSidePage.fromHtml(res.ListItemAllFields.CanvasContent1);
+      .then((clientSidePage: ClientSidePage): void => {
         const control: ClientSidePart | null = clientSidePage.findControlById(args.options.id);
 
         if (control) {
