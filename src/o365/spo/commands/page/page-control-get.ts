@@ -1,16 +1,15 @@
 import auth from '../../SpoAuth';
 import config from '../../../../config';
-import * as request from 'request-promise-native';
 import commands from '../../commands';
 import {
-  CommandOption, CommandValidate, CommandError
+  CommandOption, CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import GlobalOptions from '../../../../GlobalOptions';
 import { Auth } from '../../../../Auth';
-import { PageItem } from './PageItem';
 import { ClientSidePage, ClientSidePart } from './clientsidepages';
+import { ModernPage } from './ModernPage';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -42,75 +41,34 @@ class SpoPageControlGetCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}`);
-        }
+      .then((accessToken: string): void => {
+        ModernPage.GetInfo(accessToken, cmd, args.options.name, args.options.webUrl, this.debug, this.verbose)
+          .then((clientSidePage: ClientSidePage): void => {
+            const control: ClientSidePart | null = clientSidePage.findControlById(args.options.id);
 
-        if (this.verbose) {
-          cmd.log(`Retrieving information about the page...`);
-        }
+            if (control) {
+              // remove the column property to be able to serialize the object to JSON
+              delete control.column;
+    
+              if (args.options.output !== 'json') {
+                (control as any).controlType = SpoPageControlGetCommand.getControlTypeDisplayName((control as any).controlType);
+              }
+    
+              cmd.log(control);
+    
+              if (this.verbose) {
+                cmd.log(vorpal.chalk.green('DONE'));
+              }
+            }
+            else {
+              if (this.verbose) {
+                cmd.log(`Control with ID ${args.options.id} not found on page ${args.options.name}`);
+              }
+            }
 
-        let pageName: string = args.options.name;
-        if (args.options.name.indexOf('.aspx') < 0) {
-          pageName += '.aspx';
-        }
-
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${args.options.webUrl.substr(args.options.webUrl.indexOf('/', 8))}/SitePages/${encodeURIComponent(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId`,
-          headers: Utils.getRequestHeaders({
-            authorization: `Bearer ${accessToken}`,
-            'content-type': 'application/json;charset=utf-8',
-            accept: 'application/json;odata=nometadata'
-          }),
-          json: true
-        };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
-        return request.get(requestOptions);
-      })
-      .then((res: PageItem): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
-        if (res.ListItemAllFields.ClientSideApplicationId !== 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec') {
-          cb(new CommandError(`Page ${args.options.name} is not a modern page.`));
-          return;
-        }
-
-        const clientSidePage: ClientSidePage = ClientSidePage.fromHtml(res.ListItemAllFields.CanvasContent1);
-        const control: ClientSidePart | null = clientSidePage.findControlById(args.options.id);
-
-        if (control) {
-          // remove the column property to be able to serialize the object to JSON
-          delete control.column;
-
-          if (args.options.output !== 'json') {
-            (control as any).controlType = SpoPageControlGetCommand.getControlTypeDisplayName((control as any).controlType);
-          }
-
-          cmd.log(control);
-
-          if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
-          }
-        }
-        else {
-          if (this.verbose) {
-            cmd.log(`Control with ID ${args.options.id} not found on page ${args.options.name}`);
-          }
-        }
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+            cb();
+          }).catch((err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }).catch((err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
 
   private static getControlTypeDisplayName(controlType: number): string {

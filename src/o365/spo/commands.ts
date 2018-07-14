@@ -68,6 +68,7 @@ export default {
   PAGE_ADD: `${prefix} page add`,
   PAGE_CONTROL_GET: `${prefix} page control get`,
   PAGE_CONTROL_LIST: `${prefix} page control list`,
+  PAGE_COLUMN_LIST: `${prefix} page column list`,
   PAGE_GET: `${prefix} page get`,
   PAGE_LIST: `${prefix} page list`,
   PAGE_SET: `${prefix} page set`,

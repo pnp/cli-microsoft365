@@ -7,7 +7,7 @@ import {
 import SpoCommand from '../../SpoCommand';
 import GlobalOptions from '../../../../GlobalOptions';
 import { Auth } from '../../../../Auth';
-import { ClientSidePage, ClientSidePart } from './clientsidepages';
+import { ClientSidePage, CanvasColumn } from './clientsidepages';
 import { ModernPage } from './ModernPage';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -17,17 +17,18 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
+  section: number;
   name: string;
   webUrl: string;
 }
 
-class SpoPageControlListCommand extends SpoCommand {
+class SpoPageColumnListCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.PAGE_CONTROL_LIST}`;
+    return `${commands.PAGE_COLUMN_LIST}`;
   }
 
   public get description(): string {
-    return 'Lists controls on the specific modern page';
+    return 'List columns in the specific section of a modern page';
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
@@ -42,49 +43,28 @@ class SpoPageControlListCommand extends SpoCommand {
       .then((accessToken: string): void => {
         ModernPage.GetInfo(accessToken, cmd, args.options.name, args.options.webUrl, this.debug, this.verbose)
           .then((clientSidePage: ClientSidePage): void => {
-            let controls: ClientSidePart[] = [];
-            clientSidePage.sections.forEach(s => {
-              s.columns.forEach(c => {
-                controls = controls.concat(c.controls);
-              });
-            });
-            // remove the column property to be able to serialize the array to JSON
-            controls.forEach(c => delete c.column);
-
-            if (args.options.output === 'json') {
-              // drop the information about original classes from clientsidepages.ts
-              cmd.log(JSON.parse(JSON.stringify(controls)));
-            }
-            else {
-              cmd.log(controls.map(c => {
-                return {
-                  id: c.id,
-                  type: SpoPageControlListCommand.getControlTypeDisplayName((c as any).controlType),
-                  title: (c as any).title
+            const sections = clientSidePage.sections.filter(section => section.order === args.options.section);
+            if (sections.length) {
+              const iterator = (c: CanvasColumn) => {
+                return { 
+                  dataVersion: c.dataVersion, 
+                  factor: c.factor,
+                  jsonData: c.jsonData,
+                  order: c.order,
                 };
-              }));
+              }
+
+              cmd.log(sections[0].columns.map(iterator));
+            } else {
+              cmd.log([]);
             }
 
             if (this.verbose) {
               cmd.log(vorpal.chalk.green('DONE'));
             }
-
             cb();
           }).catch((err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
       }).catch((err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
-  }
-
-  private static getControlTypeDisplayName(controlType: number): string {
-    switch (controlType) {
-      case 0:
-        return 'Empty column';
-      case 3:
-        return 'Client-side web part';
-      case 4:
-        return 'Client-side text';
-      default:
-        return '' + controlType;
-    }
   }
 
   public options(): CommandOption[] {
@@ -96,6 +76,10 @@ class SpoPageControlListCommand extends SpoCommand {
       {
         option: '-u, --webUrl <webUrl>',
         description: 'URL of the site where the page to retrieve is located'
+      },
+      {
+        option: '-s, --section <sectionId>',
+        description: 'ID of the section for which to list columns'
       }
     ];
 
@@ -113,6 +97,14 @@ class SpoPageControlListCommand extends SpoCommand {
         return 'Required parameter webUrl missing';
       }
 
+      if (!args.options.section) {
+        return 'Required parameter section missing';
+      } else {
+        if (isNaN(args.options.section)) {
+          return `${args.options.section} is not a number`;
+        }
+      }
+
       return SpoCommand.isValidSharePointUrl(args.options.webUrl);
     };
   }
@@ -126,7 +118,7 @@ class SpoPageControlListCommand extends SpoCommand {
         
   Remarks:
 
-    To list controls on a modern page, you have to first connect to a SharePoint site
+    To list columns on a modern page, you have to first connect to a SharePoint site
     using the ${chalk.blue(commands.CONNECT)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
 
     If the specified ${chalk.grey('name')} doesn't refer to an existing modern page, you will get
@@ -134,10 +126,10 @@ class SpoPageControlListCommand extends SpoCommand {
 
   Examples:
   
-    List controls on the modern page with name ${chalk.grey('home.aspx')}
-      ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx
+    List columns on the modern page with name ${chalk.grey('home.aspx')}
+      ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx --section 1
 `);
   }
 }
 
-module.exports = new SpoPageControlListCommand();
+module.exports = new SpoPageColumnListCommand();
