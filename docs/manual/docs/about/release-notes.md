@@ -6,6 +6,11 @@
 
 **SharePoint Online:**
 
+- [spo field add](../cmd/spo/field/field-add.md) - adds a new list or site column using the CAML field definition [#518](https://github.com/pnp/office365-cli/issues/518)
+- [spo field get](../cmd/spo/field/field-get.md) - retrieves information about the specified list or site column [#528](https://github.com/pnp/office365-cli/issues/528)
+- [spo navigation node add](../cmd/spo/navigation/navigation-node-add.md) - adds a navigation node to the specified site navigation [#521](https://github.com/pnp/office365-cli/issues/521)
+- [spo navigation node list](../cmd/spo/navigation/navigation-node-list.md) - lists nodes from the specified site navigation [#522](https://github.com/pnp/office365-cli/issues/522)
+- [spo navigation node remove](../cmd/spo/navigation/navigation-node-remove.md) - removes the specified navigation node [#523](https://github.com/pnp/office365-cli/issues/523)
 - [spo web set](../cmd/spo/web/web-set.md) - updates subsite properties [#191](https://github.com/pnp/office365-cli/issues/191)
 
 ### Changes
