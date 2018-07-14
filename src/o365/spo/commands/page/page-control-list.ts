@@ -1,16 +1,14 @@
 import auth from '../../SpoAuth';
 import config from '../../../../config';
-import * as request from 'request-promise-native';
 import commands from '../../commands';
 import {
-  CommandOption, CommandValidate, CommandError
+  CommandOption, CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import Utils from '../../../../Utils';
 import GlobalOptions from '../../../../GlobalOptions';
 import { Auth } from '../../../../Auth';
-import { PageItem } from './PageItem';
 import { ClientSidePage, ClientSidePart } from './clientsidepages';
+import { ModernPage } from './ModernPage';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -41,80 +39,39 @@ class SpoPageControlListCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}`);
-        }
+      .then((accessToken: string): void => {
+        ModernPage.GetInfo(accessToken, cmd, args.options.name, args.options.webUrl, this.debug, this.verbose)
+          .then((clientSidePage: ClientSidePage): void => {
+            let controls: ClientSidePart[] = [];
+            clientSidePage.sections.forEach(s => {
+              s.columns.forEach(c => {
+                controls = controls.concat(c.controls);
+              });
+            });
+            // remove the column property to be able to serialize the array to JSON
+            controls.forEach(c => delete c.column);
 
-        if (this.verbose) {
-          cmd.log(`Retrieving information about the page...`);
-        }
+            if (args.options.output === 'json') {
+              // drop the information about original classes from clientsidepages.ts
+              cmd.log(JSON.parse(JSON.stringify(controls)));
+            }
+            else {
+              cmd.log(controls.map(c => {
+                return {
+                  id: c.id,
+                  type: SpoPageControlListCommand.getControlTypeDisplayName((c as any).controlType),
+                  title: (c as any).title
+                };
+              }));
+            }
 
-        let pageName: string = args.options.name;
-        if (args.options.name.indexOf('.aspx') < 0) {
-          pageName += '.aspx';
-        }
+            if (this.verbose) {
+              cmd.log(vorpal.chalk.green('DONE'));
+            }
 
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${args.options.webUrl.substr(args.options.webUrl.indexOf('/', 8))}/SitePages/${encodeURIComponent(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId`,
-          headers: Utils.getRequestHeaders({
-            authorization: `Bearer ${accessToken}`,
-            'content-type': 'application/json;charset=utf-8',
-            accept: 'application/json;odata=nometadata'
-          }),
-          json: true
-        };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
-        return request.get(requestOptions);
-      })
-      .then((res: PageItem): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
-        if (res.ListItemAllFields.ClientSideApplicationId !== 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec') {
-          cb(new CommandError(`Page ${args.options.name} is not a modern page.`));
-          return;
-        }
-
-        const clientSidePage: ClientSidePage = ClientSidePage.fromHtml(res.ListItemAllFields.CanvasContent1);
-        let controls: ClientSidePart[] = [];
-        clientSidePage.sections.forEach(s => {
-          s.columns.forEach(c => {
-            controls = controls.concat(c.controls);
-          });
-        });
-        // remove the column property to be able to serialize the array to JSON
-        controls.forEach(c => delete c.column);
-
-        if (args.options.output === 'json') {
-          // drop the information about original classes from clientsidepages.ts
-          cmd.log(JSON.parse(JSON.stringify(controls)));
-        }
-        else {
-          cmd.log(controls.map(c => {
-            return {
-              id: c.id,
-              type: SpoPageControlListCommand.getControlTypeDisplayName((c as any).controlType),
-              title: (c as any).title
-            };
-          }));
-        }
-
-        if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+            cb();
+          }).catch((err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }).catch((err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
 
   private static getControlTypeDisplayName(controlType: number): string {
