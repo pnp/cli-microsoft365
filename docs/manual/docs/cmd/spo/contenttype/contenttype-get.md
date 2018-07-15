@@ -1,0 +1,44 @@
+# spo contenttype get
+
+Retrieves information about the specified list or site content type
+
+## Usage
+
+```sh
+spo contenttype get [options]
+```
+
+## Options
+
+Option|Description
+------|-----------
+`--help`|output usage information
+`-u, --webUrl <webUrl>`|Absolute URL of the site where the content type is located
+`-l, --listTitle [listTitle]`|Title of the list where the content type is located (if it is a list content type)
+`-i, --id <id>`|The ID of the content type to retrieve
+`-o, --output [output]`|Output type. `json|text`. Default `text`
+`--verbose`|Runs command with verbose logging
+`--debug`|Runs command with debug logging
+
+!!! important
+    Before using this command, connect to a SharePoint Online tenant admin site, using the [spo connect](../connect.md) command.
+
+## Remarks
+
+To retrieve information about a content type, you have to first connect to a SharePoint site using the [spo connect](../connect.md) command, eg. `spo connect https://contoso.sharepoint.com`.
+
+If no content type with the specified is found in the site or the list, you will get the _Content type with ID 0x010012 not found_ error.
+
+## Examples
+
+Retrieve site content type
+
+```sh
+spo contenttype get --webUrl https://contoso.sharepoint.com/sites/contoso-sales --id 0x0100558D85B7216F6A489A499DB361E1AE2F
+```
+
+Retrieve list content type
+
+```sh
+spo contenttype get --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listTitle Events --id 0x0100558D85B7216F6A489A499DB361E1AE2F
+```
