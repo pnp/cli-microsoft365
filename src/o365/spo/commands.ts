@@ -19,6 +19,7 @@ export default {
   CDN_SET: `${prefix} cdn set`,
   CONNECT: `${prefix} connect`,
   CONTENTTYPE_ADD: `${prefix} contenttype add`,
+  CONTENTTYPE_GET: `${prefix} contenttype get`,
   CUSTOMACTION_ADD: `${prefix} customaction add`,
   CUSTOMACTION_CLEAR: `${prefix} customaction clear`,
   CUSTOMACTION_GET: `${prefix} customaction get`,

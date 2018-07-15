@@ -223,7 +223,7 @@ Get-PnPAzureCertificate|SharePointPnPPowerShellOnline|
 Get-PnPClientSideComponent|SharePointPnPPowerShellOnline|
 Get-PnPClientSidePage|SharePointPnPPowerShellOnline|[spo page get](../cmd/spo/page/page-get.md), [spo page control list](../cmd/spo/page/page-control-list.md), [spo page control get](../cmd/spo/page/page-control-get.md)
 Get-PnPConnection|SharePointPnPPowerShellOnline|
-Get-PnPContentType|SharePointPnPPowerShellOnline|
+Get-PnPContentType|SharePointPnPPowerShellOnline|[spo contenttype get](../cmd/spo/contenttype/contenttype-get.md)
 Get-PnPContentTypePublishingHubUrl|SharePointPnPPowerShellOnline|
 Get-PnPContext|SharePointPnPPowerShellOnline|
 Get-PnPCustomAction|SharePointPnPPowerShellOnline|[spo customaction get](../cmd/spo/customaction/customaction-get.md), [spo customaction list](../cmd/spo/customaction/customaction-list.md)
