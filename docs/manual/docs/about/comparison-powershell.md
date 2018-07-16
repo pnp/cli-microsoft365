@@ -148,7 +148,7 @@ Add-PnPDocumentSet|SharePointPnPPowerShellOnline|
 Add-PnPEventReceiver|SharePointPnPPowerShellOnline|
 Add-PnPField|SharePointPnPPowerShellOnline|
 Add-PnPFieldFromXml|SharePointPnPPowerShellOnline|[spo field add](../cmd/spo/field/field-add.md)
-Add-PnPFieldToContentType|SharePointPnPPowerShellOnline|
+Add-PnPFieldToContentType|SharePointPnPPowerShellOnline|[spo contenttype field set](../cmd/spo/contenttype/contenttype-field-set.md)
 Add-PnPFile|SharePointPnPPowerShellOnline|
 Add-PnPFileToProvisioningTemplate|SharePointPnPPowerShellOnline|
 Add-PnPFolder|SharePointPnPPowerShellOnline|[spo folder add](../cmd/spo/folder/folder-add.md)
