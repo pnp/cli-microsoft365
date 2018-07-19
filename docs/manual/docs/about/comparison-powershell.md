@@ -138,7 +138,7 @@ Add-PnPTenantCdnOrigin|SharePointPnPPowerShellOnline|[spo cdn origin add](../cmd
 Add-PnPClientSidePage|SharePointPnPPowerShellOnline|[spo page add](../cmd/spo/page/page-add.md)
 Add-PnPClientSidePageSection|SharePointPnPPowerShellOnline|
 Add-PnPClientSideText|SharePointPnPPowerShellOnline|
-Add-PnPClientSideWebPart|SharePointPnPPowerShellOnline|
+Add-PnPClientSideWebPart|SharePointPnPPowerShellOnline|[spo page clientsidewebpart add](../cmd/spo/page/page-clientsidewebpart-add.md)
 Add-PnPContentType|SharePointPnPPowerShellOnline|[spo contenttype add](../cmd/spo/contenttype/contenttype-add.md)
 Add-PnPContentTypeToDocumentSet|SharePointPnPPowerShellOnline|
 Add-PnPContentTypeToList|SharePointPnPPowerShellOnline|

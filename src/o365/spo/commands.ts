@@ -74,6 +74,7 @@ export default {
   PAGE_GET: `${prefix} page get`,
   PAGE_LIST: `${prefix} page list`,
   PAGE_SET: `${prefix} page set`,
+  PAGE_CLIENTSIDEWEBPART_ADD: `${prefix} page clientsidewebpart add`,
   PROPERTYBAG_GET: `${prefix} propertybag get`,
   PROPERTYBAG_LIST: `${prefix} propertybag list`,
   PROPERTYBAG_REMOVE: `${prefix} propertybag remove`,

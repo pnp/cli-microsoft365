@@ -90,12 +90,13 @@ pages:
         - navigation node remove: 'cmd/spo/navigation/navigation-node-remove.md'
       - page:
         - page add: 'cmd/spo/page/page-add.md'
-        - page column list: 'cmd/spo/page/page-column-list.md'
-        - page control get: 'cmd/spo/page/page-control-get.md'
-        - page control list: 'cmd/spo/page/page-control-list.md'
         - page get: 'cmd/spo/page/page-get.md'
         - page list: 'cmd/spo/page/page-list.md'
         - page set: 'cmd/spo/page/page-set.md'
+        - page clientsidewebpart add: 'cmd/spo/page/page-clientsidewebpart-add.md'
+        - page column list: 'cmd/spo/page/page-column-list.md'
+        - page control get: 'cmd/spo/page/page-control-get.md'
+        - page control list: 'cmd/spo/page/page-control-list.md'
       - propertybag:
         - propertybag get: 'cmd/spo/propertybag/propertybag-get.md'
         - propertybag list: 'cmd/spo/propertybag/propertybag-list.md'
