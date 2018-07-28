@@ -48,24 +48,8 @@ class SpoPageColumnListCommand extends SpoCommand {
           .filter(section => section.order === args.options.section);
 
         if (sections.length) {
-          if (args.options.output === 'json') {
-            cmd.log(sections[0].columns.map(c => {
-              return {
-                dataVersion: c.dataVersion,
-                factor: c.factor,
-                jsonData: c.jsonData,
-                order: c.order
-              };
-            }));
-          }
-          else {
-            cmd.log(sections[0].columns.map(c => {
-              return {
-                order: c.order,
-                factor: c.factor
-              };
-            }));
-          }
+          const isJSONOutput = args.options.output === 'json';
+          cmd.log(sections[0].columns.map(c => Page.getColumnsInformation(c, isJSONOutput)));
         }
 
         if (this.verbose) {
