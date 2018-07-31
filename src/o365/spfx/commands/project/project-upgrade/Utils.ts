@@ -19,4 +19,10 @@ export class Utils {
       typeof project.yoRcJson['@microsoft/generator-sharepoint'] !== 'undefined' &&
       project.yoRcJson["@microsoft/generator-sharepoint"].framework === 'react';
   }
+
+  public static isKnockoutProject(project: Project): boolean {
+    return typeof project.yoRcJson !== 'undefined' &&
+      typeof project.yoRcJson['@microsoft/generator-sharepoint'] !== 'undefined' &&
+      project.yoRcJson["@microsoft/generator-sharepoint"].framework === 'knockout';
+  }
 }
