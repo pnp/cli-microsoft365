@@ -1,0 +1,8 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "libraryName": "spfx",
+    "framework": "knockout",
+    "version": "1.0.1",
+    "libraryId": "75c8a978-d3a2-44ab-b930-11e3f56397b4"
+  }
+}
