@@ -512,7 +512,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.0.2' } }, (err?: any) => {
       const findings: Finding[] = log[0];
-      assert.equal(findings.length, 2);
+      assert.equal(findings.length, 4);
     });
   });
  
@@ -521,7 +521,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.0.2', debug: true } }, (err?: any) => {
       const findings: Finding[] = log[3];
-      assert.equal(findings.length, 2);
+      assert.equal(findings.length, 4);
     });
   });
 
