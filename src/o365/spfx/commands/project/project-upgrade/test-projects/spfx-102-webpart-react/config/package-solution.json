@@ -1,0 +1,10 @@
+{
+  "solution": {
+    "name": "spfx-client-side-solution",
+    "id": "70dde3d0-6768-41ee-b1f7-fdb768370635",
+    "version": "1.0.0.0"
+  },
+  "paths": {
+    "zippedPackage": "solution/spfx.sppkg"
+  }
+}

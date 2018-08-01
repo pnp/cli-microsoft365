@@ -1,15 +1,15 @@
 import * as assert from 'assert';
 import { Finding } from '../Finding';
 import { Project } from '../model';
-import { FN011008_MAN_safeWithCustomScriptDisabled_propertyChange } from './FN011008_MAN_safeWithCustomScriptDisabled_propertyChange';
+import { FN011008_MAN_requiresCustomScript } from './FN011008_MAN_requiresCustomScript';
 
-describe('FN011005_MAN_safeWithCustomScriptDisabled_propertyChange', () => {
+describe('FN011008_MAN_requiresCustomScript', () => {
   let findings: Finding[];
-  let rule: FN011008_MAN_safeWithCustomScriptDisabled_propertyChange;
+  let rule: FN011008_MAN_requiresCustomScript;
 
   beforeEach(() => {
     findings = [];
-    rule = new FN011008_MAN_safeWithCustomScriptDisabled_propertyChange();
+    rule = new FN011008_MAN_requiresCustomScript();
   });
 
   it('has empty resolution', () => {

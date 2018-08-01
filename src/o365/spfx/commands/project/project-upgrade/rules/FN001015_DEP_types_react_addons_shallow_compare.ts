@@ -1,4 +1,6 @@
 import { DependencyRule } from "./DependencyRule";
+import { Project } from "../model";
+import { Utils } from "../";
 
 export class FN001015_DEP_types_react_addons_shallow_compare extends DependencyRule {
   constructor(packageVersion: string, add: boolean) {
@@ -8,5 +10,9 @@ export class FN001015_DEP_types_react_addons_shallow_compare extends DependencyR
 
   get id(): string {
     return 'FN001015';
+  }
+
+  customCondition(project: Project): boolean {
+    return Utils.isReactProject(project);
   }
 }

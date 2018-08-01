@@ -61,7 +61,6 @@ describe('FN003003_CFG_bundles', () => {
     };
     rule.visit(project, findings);
 
-    console.log(findings);
     const resolution: any = JSON.parse(findings[0].resolution);
     const bundle1: any = resolution.bundles["hello-world-application-customizer"];
 
