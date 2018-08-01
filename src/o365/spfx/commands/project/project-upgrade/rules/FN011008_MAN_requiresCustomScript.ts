@@ -3,7 +3,7 @@ import { Project } from "../model";
 import * as path from 'path';
 import { ManifestRule } from "./ManifestRule";
 
-export class FN011008_MAN_safeWithCustomScriptDisabled_propertyChange extends ManifestRule {
+export class FN011008_MAN_requiresCustomScript extends ManifestRule {
   get id(): string {
     return 'FN011008';
   }
@@ -25,7 +25,7 @@ export class FN011008_MAN_safeWithCustomScriptDisabled_propertyChange extends Ma
     project.manifests.forEach(manifest => {
       if (typeof manifest.safeWithCustomScriptDisabled !== 'undefined') {
         const relativePath: string = path.relative(project.path, manifest.path);
-        this.addFindingWithCustomInfo('Client-side component manifest safeWithCustomScriptDisabled property', `In manifest ${relativePath} rename the safeWithCustomScriptDisabled property to requiresCustomScript and invert its value`, `{
+        this.addFindingWithCustomInfo('Client-side component manifest requiresCustomScript property', `In manifest ${relativePath} rename the safeWithCustomScriptDisabled property to requiresCustomScript and invert its value`, `{
   "requiresCustomScript": ${!manifest.safeWithCustomScriptDisabled}
 `, relativePath, findings);
       }

@@ -11,6 +11,7 @@ export interface Manifest {
   }[];
   requiresCustomScript?: boolean;
   safeWithCustomScriptDisabled?: boolean;
+  version?: string;
 }
 
 export interface CommandSetManifest extends Manifest {

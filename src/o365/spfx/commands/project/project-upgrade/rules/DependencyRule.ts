@@ -34,6 +34,10 @@ export abstract class DependencyRule extends Rule {
     return './package.json';
   };
 
+  customCondition(project: Project): boolean {
+    return false;
+  }
+
   visit(project: Project, findings: Finding[]): void {
     if (!project.packageJson) {
       return;
@@ -57,7 +61,7 @@ export abstract class DependencyRule extends Rule {
         }
       }
       else {
-        if (!this.isOptional) {
+        if (!this.isOptional || this.customCondition(project)) {
           this.addFindingWithCustomInfo(this.packageName, this.description.replace('Upgrade', 'Install'), this.resolution, this.file, findings);
         }
       }
