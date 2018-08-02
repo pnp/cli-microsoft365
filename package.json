@@ -1,6 +1,6 @@
 {
   "name": "@pnp/office365-cli",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Manage Microsoft Office 365 and SharePoint Framework projects on any platform",
   "license": "MIT",
   "main": "./dist/index.js",
@@ -47,6 +47,7 @@
     "Keijzers, Paul <KbWorks@users.noreply.github.com>",
     "Laskewitz, Daniel <daniel@laskewitz.nl>",
     "Mastykarz, Waldek <waldek@mastykarz.nl>",
+    "Plenevaux, Yannick <yannick.plenevaux@gmail.com>",
     "Powney, Mark <powney.mark@outlook.com>",
     "Romano, Rodrigo <rodrigo@rodrigoromano.net>",
     "Schot, Albert-Jan <appie@digiwijs.nl>",
@@ -62,6 +63,7 @@
     "easy-table": "^1.1.1",
     "omelette": "^0.4.11",
     "request-promise-native": "^1.0.5",
+    "semver": "^5.5.0",
     "strip-json-comments": "^2.0.1",
     "update-notifier": "^2.5.0",
     "vorpal": "github:pnp/vorpal"
@@ -72,6 +74,7 @@
     "@types/node": "^8.9.3",
     "@types/request": "^2.47.0",
     "@types/request-promise-native": "^1.0.14",
+    "@types/semver": "^5.5.0",
     "@types/sinon": "^4.3.3",
     "@types/update-notifier": "^2.2.0",
     "coveralls": "^3.0.1",

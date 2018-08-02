@@ -8,7 +8,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import Utils from '../../../../Utils';
 import { Utils as Utils1 } from './project-upgrade/'
-import { Project, Manifest } from './project-upgrade/model';
+import { Project, Manifest, VsCode } from './project-upgrade/model';
 import { Finding } from './project-upgrade/Finding';
 
 describe(commands.PROJECT_UPGRADE, () => {
@@ -539,6 +539,319 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action({ options: { toVersion: '1.1.1' } }, (err?: any) => {
       const findings: Finding[] = log[0];
       assert.equal(findings.length, 4);
+  it('doesn\'t fail if vscode settings are not available', () => {
+    const originalExistsSync = fs.existsSync;
+    sinon.stub(fs, 'existsSync').callsFake((path: string) => {
+      if (path.endsWith('settings.json')) {
+        return false;
+      }
+      else {
+        return originalExistsSync(path);
+      }
+    });
+
+    const getProject = (command as any).getProject;
+    const project: Project = getProject('./');
+    assert.equal(typeof ((project.vsCode) as VsCode).settingsJson, 'undefined');
+  });
+
+  it('e2e: shows correct number of findings for upgrading no framework web part 1.2.0 project to 1.3.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-120-webpart-nolib'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.3.0' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 8);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading react web part 1.2.0 project to 1.3.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-120-webpart-react'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.3.0', debug: true } }, (err?: any) => {
+      const findings: Finding[] = log[3];
+      assert.equal(findings.length, 8);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading application customizer 1.2.0 project to 1.3.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-120-applicationcustomizer'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.3.0' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 9);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading list view command set 1.2.0 project to 1.3.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-120-listviewcommandset'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.3.0' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 9);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading field customizer react 1.2.0 project to 1.3.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-120-fieldcustomizer-react'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.3.0' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 9);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading no framework web part 1.3.0 project to 1.3.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-130-webpart-nolib'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.3.1' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 1);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading react web part 1.3.0 project to 1.3.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-130-webpart-react'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.3.1', debug: true } }, (err?: any) => {
+      const findings: Finding[] = log[3];
+      assert.equal(findings.length, 1);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading application customizer 1.3.0 project to 1.3.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-130-applicationcustomizer'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.3.1' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 1);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading list view command set 1.3.0 project to 1.3.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-130-listviewcommandset'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.3.1' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 1);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading field customizer react 1.3.0 project to 1.3.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-130-fieldcustomizer-react'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.3.1' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 1);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading no framework web part 1.3.1 project to 1.3.2', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-131-webpart-nolib'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.3.2' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 1);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading react web part 1.3.1 project to 1.3.2', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-131-webpart-react'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.3.2', debug: true } }, (err?: any) => {
+      const findings: Finding[] = log[3];
+      assert.equal(findings.length, 1);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading application customizer 1.3.1 project to 1.3.2', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-131-applicationcustomizer'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.3.2' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 1);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading list view command set 1.3.1 project to 1.3.2', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-131-listviewcommandset'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.3.2' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 1);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading field customizer react 1.3.1 project to 1.3.2', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-131-fieldcustomizer-react'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.3.2' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 1);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading no framework web part 1.3.2 project to 1.3.4', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-132-webpart-nolib'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.3.4' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 11);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading react web part 1.3.2 project to 1.3.4', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-132-webpart-react'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.3.4', debug: true } }, (err?: any) => {
+      const findings: Finding[] = log[3];
+      assert.equal(findings.length, 11);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading application customizer 1.3.2 project to 1.3.4', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-132-applicationcustomizer'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.3.4' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 12);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading list view command set 1.3.2 project to 1.3.4', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-132-listviewcommandset'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.3.4' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 12);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading field customizer react 1.3.2 project to 1.3.4', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-132-fieldcustomizer-react'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.3.4' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 11);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading no framework web part 1.3.4 project to 1.4.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-134-webpart-nolib'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.4.0' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 18);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading react web part 1.3.4 project to 1.4.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-134-webpart-react'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.4.0' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 25);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading application customizer 1.3.4 project to 1.4.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-134-applicationcustomizer'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.4.0' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 18);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading list view command set 1.3.4 project to 1.4.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-134-listviewcommandset'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.4.0' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 18);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading field customizer react 1.3.4 project to 1.4.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-134-fieldcustomizer-react'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.4.0' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 24);
+    });
+  });
+  
+  it('e2e: shows correct number of findings for upgrading no framework web part 1.4.0 project to 1.4.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-140-webpart-nolib'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.4.1' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 8);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading react web part 1.4.0 project to 1.4.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-140-webpart-react'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.4.1', debug: true } }, (err?: any) => {
+      const findings: Finding[] = log[3];
+      assert.equal(findings.length, 8);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading application customizer 1.4.0 project to 1.4.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-140-applicationcustomizer'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.4.1' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 8);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading list view command set 1.4.0 project to 1.4.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-140-listviewcommandset'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.4.1' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 8);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading field customizer react 1.4.0 project to 1.4.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-140-fieldcustomizer-react'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.4.1' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 7);
     });
   });
 
@@ -592,6 +905,56 @@ describe(commands.PROJECT_UPGRADE, () => {
     });
   });
 
+  it('e2e: shows correct number of findings for upgrading no framework web part 1.5.0 project to 1.5.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-150-webpart-nolib'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.5.1' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 8);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading react web part 1.5.0 project to 1.5.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-150-webpart-react'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.5.1', debug: true } }, (err?: any) => {
+      const findings: Finding[] = log[3];
+      assert.equal(findings.length, 8);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading application customizer 1.5.0 project to 1.5.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-150-applicationcustomizer'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.5.1' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 8);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading list view command set 1.5.0 project to 1.5.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-150-listviewcommandset'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.5.1' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 8);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading field customizer react 1.5.0 project to 1.5.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-150-fieldcustomizer-react'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.5.1' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 7);
+    });
+  });
+
   it('shows all information with output format json', () => {
     sinon.stub(command as any, 'getProjectVersion').callsFake(_ => '1.4.1');
 
@@ -602,10 +965,10 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('returns markdown report with output format md', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-141-webpart-nolib'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-134-webpart-nolib'));
 
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { output: 'md' } }, (err?: any) => {
+    cmdInstance.action({ options: { output: 'md', toVersion: '1.4.0' } }, (err?: any) => {
       assert(log[0].indexOf('## Findings') > -1);
     });
   });

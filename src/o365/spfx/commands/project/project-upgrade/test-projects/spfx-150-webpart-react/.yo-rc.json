@@ -1,0 +1,12 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "solutionName": "spfx",
+    "environment": "spo",
+    "skipFeatureDeployment": "false",
+    "componentType": "webpart",
+    "framework": "react",
+    "componentName": "HelloWorld",
+    "componentDescription": "HelloWorld",
+    "isCreatingSolution": true
+  }
+}

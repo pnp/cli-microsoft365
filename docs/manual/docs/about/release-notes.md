@@ -1,5 +1,27 @@
 # Release notes
 
+## [v1.5.0](https://github.com/pnp/office365-cli/releases/tag/v1.5.0)
+
+### New commands
+
+**SharePoint Online:**
+
+- [spo contenttype add](../cmd/spo/contenttype/contenttype-add.md) - adds a new list or site content type [#519](https://github.com/pnp/office365-cli/issues/519)
+- [spo contenttype get](../cmd/spo/contenttype/contenttype-get.md) - retrieves information about the specified list or site content type [#532](https://github.com/pnp/office365-cli/issues/532)
+- [spo field add](../cmd/spo/field/field-add.md) - adds a new list or site column using the CAML field definition [#518](https://github.com/pnp/office365-cli/issues/518)
+- [spo field get](../cmd/spo/field/field-get.md) - retrieves information about the specified list or site column [#528](https://github.com/pnp/office365-cli/issues/528)
+- [spo navigation node add](../cmd/spo/navigation/navigation-node-add.md) - adds a navigation node to the specified site navigation [#521](https://github.com/pnp/office365-cli/issues/521)
+- [spo navigation node list](../cmd/spo/navigation/navigation-node-list.md) - lists nodes from the specified site navigation [#522](https://github.com/pnp/office365-cli/issues/522)
+- [spo navigation node remove](../cmd/spo/navigation/navigation-node-remove.md) - removes the specified navigation node [#523](https://github.com/pnp/office365-cli/issues/523)
+- [spo page clientsidewebpart add](../cmd/spo/page/page-clientsidewebpart-add.md) - adds a client-side web part to a modern page [#366](https://github.com/pnp/office365-cli/issues/366)
+- [spo page column list](../cmd/spo/page/page-column-list.md) - lists columns in the specific section of a modern page [#411](https://github.com/pnp/office365-cli/issues/411)
+- [spo web set](../cmd/spo/web/web-set.md) - updates subsite properties [#191](https://github.com/pnp/office365-cli/issues/191)
+
+### Changes
+
+- fixed exit code on error in the 'spo site add' command [#511](https://github.com/pnp/office365-cli/issues/511)
+- Added support for retrieving apps by their name [#516](https://github.com/pnp/office365-cli/issues/516)
+
 ## [v1.4.0](https://github.com/pnp/office365-cli/releases/tag/v1.4.0)
 
 ### New commands
@@ -10,6 +32,7 @@
 - [spo file checkout](../cmd/spo/file/file-checkout.md) - checks out specified file [#285](https://github.com/pnp/office365-cli/issues/285)
 - [spo folder rename](../cmd/spo/folder/folder-rename.md) - renames a folder [#429](https://github.com/pnp/office365-cli/issues/429)
 - [spo listitem get](../cmd/spo/listitem/listitem-get.md) - gets a list item from the specified list [#269](https://github.com/pnp/office365-cli/issues/269)
+- [spo listitem set](../cmd/spo/listitem/listitem-set.md) - updates a list item in the specified list [#271](https://github.com/pnp/office365-cli/issues/271)
 
 **SharePoint Framework:**
 
@@ -17,8 +40,16 @@
 
 ### Changes
 
-- refactored to return non-zero error code on error solving [#468](https://github.com/pnp/office365-cli/issues/468)
-- fixed adding item to list referenced by id solving [#473](https://github.com/pnp/office365-cli/issues/473)
+- refactored to return non-zero error code on error [#468](https://github.com/pnp/office365-cli/issues/468)
+- fixed adding item to list referenced by id [#473](https://github.com/pnp/office365-cli/issues/473)
+- added support for upgrading projects built using SharePoint Framework v1.4.0 [#478](https://github.com/pnp/office365-cli/issues/478)
+- added support for upgrading projects built using SharePoint Framework v1.3.4 [#479](https://github.com/pnp/office365-cli/issues/479)
+- added support for upgrading projects built using SharePoint Framework v1.3.2 [#481](https://github.com/pnp/office365-cli/issues/481)
+- added support for upgrading projects built using SharePoint Framework v1.3.1 [#482](https://github.com/pnp/office365-cli/issues/482)
+- added support for upgrading projects built using SharePoint Framework v1.3.0 [#483](https://github.com/pnp/office365-cli/issues/483)
+- added support for upgrading projects built using SharePoint Framework v1.2.0 [#484](https://github.com/pnp/office365-cli/issues/484)
+- clarified usage of the [spo file get](../cmd/spo/file/file-get.md) command [#497](https://github.com/pnp/office365-cli/pull/497)
+- added support for upgrading projects built using SharePoint Framework v1.5.0 [#505](https://github.com/pnp/office365-cli/issues/505)
 
 ## [v1.3.0](https://github.com/pnp/office365-cli/releases/tag/v1.3.0)
 

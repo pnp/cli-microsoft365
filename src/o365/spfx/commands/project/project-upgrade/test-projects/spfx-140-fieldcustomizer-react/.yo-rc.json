@@ -1,0 +1,8 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "version": "1.4.0",
+    "libraryName": "spfx",
+    "libraryId": "0e6a3930-33c3-4eca-8896-19094825a2e0",
+    "environment": "spo"
+  }
+}

@@ -30,8 +30,15 @@ class SpfxProjectUpgradeCommand extends Command {
     '1.0.2',
     '1.1.0',
     '1.1.1',
+    '1.2.0',
+    '1.3.0',
+    '1.3.1',
+    '1.3.2',
+    '1.3.4',
+    '1.4.0',
     '1.4.1',
-    '1.5.0'
+    '1.5.0',
+    '1.5.1'
   ];
 
   public get name(): string {
@@ -236,6 +243,38 @@ class SpfxProjectUpgradeCommand extends Command {
     });
     project.manifests = manifests;
 
+    const gulpfileJsPath: string = path.join(projectRootPath, 'gulpfile.js');
+    if (fs.existsSync(gulpfileJsPath)) {
+      project.gulpfileJs = {
+        src: fs.readFileSync(gulpfileJsPath, 'utf-8')
+      };
+    }
+
+    project.vsCode = {};
+    const vsCodeSettingsPath: string = path.join(projectRootPath, '.vscode', 'settings.json');
+    if (fs.existsSync(vsCodeSettingsPath)) {
+      try {
+        project.vsCode.settingsJson = JSON.parse(Utils.removeSingleLineComments(fs.readFileSync(vsCodeSettingsPath, 'utf-8')));
+      }
+      catch { }
+    }
+
+    const vsCodeExtensionsPath: string = path.join(projectRootPath, '.vscode', 'extensions.json');
+    if (fs.existsSync(vsCodeExtensionsPath)) {
+      try {
+        project.vsCode.extensionsJson = JSON.parse(Utils.removeSingleLineComments(fs.readFileSync(vsCodeExtensionsPath, 'utf-8')));
+      }
+      catch { }
+    }
+
+    const vsCodeLaunchPath: string = path.join(projectRootPath, '.vscode', 'launch.json');
+    if (fs.existsSync(vsCodeLaunchPath)) {
+      try {
+        project.vsCode.launchJson = JSON.parse(Utils.removeSingleLineComments(fs.readFileSync(vsCodeLaunchPath, 'utf-8')));
+      }
+      catch { }
+    }
+
     return project;
   }
 
@@ -260,6 +299,14 @@ ${f.resolution}
           resolution = `In file [${f.file}](${f.file}) update the code as follows:
 
 \`\`\`json
+${f.resolution}
+\`\`\`
+`;
+          break;
+        case 'js':
+          resolution = `In file [${f.file}](${f.file}) update the code as follows:
+
+\`\`\`js
 ${f.resolution}
 \`\`\`
 `;
@@ -400,7 +447,7 @@ ${f.resolution}
     The ${this.name} command helps you upgrade your SharePoint Framework
     project to the specified version. If no version is specified, the command
     will upgrade to the latest version of the SharePoint Framework it supports
-    (v1.5.0).
+    (v1.5.1).
 
     This command doesn't change your project files. Instead, it gives you
     a report with all steps necessary to upgrade your project to the specified
@@ -411,7 +458,7 @@ ${f.resolution}
     expected.
 
     Using this command you can upgrade SharePoint Framework projects built using
-    SharePoint Framework v1.4.1 to SharePoint Framework v1.5.0.
+    versions: 1.2.0, 1.3.0, 1.3.1, 1.3.2, 1.3.4, 1.4.0, 1.4.1, 1.5.0 and 1.5.1.
 
   Examples:
   

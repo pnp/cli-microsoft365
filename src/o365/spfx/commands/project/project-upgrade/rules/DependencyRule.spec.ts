@@ -13,6 +13,16 @@ class DepRule extends DependencyRule {
   }
 }
 
+class DepRule2 extends DependencyRule {
+  constructor() {
+    super('test-package', '1.0.1');
+  }
+
+  get id(): string {
+    return 'FN000000';
+  }
+}
+
 class DevDepRule extends DependencyRule {
   constructor() {
     super('test-package', '1.0.0', true);
@@ -62,6 +72,91 @@ describe('DependencyRule', () => {
       packageJson: {
         dependencies: {
           'test-package': '1.0.0'
+        },
+        devDependencies: {}
+      }
+    };
+    depRule.visit(project, findings);
+    assert.equal(findings.length, 0);
+  });
+
+  it('doesn\'t return notification if newer dependency already installed (major)', () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      packageJson: {
+        dependencies: {
+          'test-package': '2.0.0'
+        },
+        devDependencies: {}
+      }
+    };
+    depRule.visit(project, findings);
+    assert.equal(findings.length, 0);
+  });
+
+  it('doesn\'t return notification if newer dependency already installed (minor)', () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      packageJson: {
+        dependencies: {
+          'test-package': '1.1.0'
+        },
+        devDependencies: {}
+      }
+    };
+    depRule.visit(project, findings);
+    assert.equal(findings.length, 0);
+  });
+
+  it('doesn\'t return notification if newer dependency already installed (patch)', () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      packageJson: {
+        dependencies: {
+          'test-package': '1.0.1'
+        },
+        devDependencies: {}
+      }
+    };
+    depRule.visit(project, findings);
+    assert.equal(findings.length, 0);
+  });
+
+  it('returns notification even if version range satisfies package requirement', () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      packageJson: {
+        dependencies: {
+          'test-package': '>=0.0.8 <1.1.0'
+        },
+        devDependencies: {}
+      }
+    };
+    depRule.visit(project, findings);
+    assert.equal(findings.length, 1);
+  });
+
+  it('returns notification even if semver version satisfies package requirement', () => {
+    const depRule2 = new DepRule2();
+    const project: Project = {
+      path: '/usr/tmp',
+      packageJson: {
+        dependencies: {
+          'test-package': '~1.0.0'
+        },
+        devDependencies: {}
+      }
+    };
+    depRule2.visit(project, findings);
+    assert.equal(findings.length, 1);
+  });
+
+  it('doesn\'t return notification if the current version is invalid', () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      packageJson: {
+        dependencies: {
+          'test-package': 'github:test/test'
         },
         devDependencies: {}
       }

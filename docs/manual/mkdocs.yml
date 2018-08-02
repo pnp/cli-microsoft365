@@ -29,6 +29,9 @@ pages:
         - cdn policy list: 'cmd/spo/cdn/cdn-policy-list.md'
         - cdn policy set: 'cmd/spo/cdn/cdn-policy-set.md'
         - cdn set: 'cmd/spo/cdn/cdn-set.md'
+      - contenttype:
+        - contenttype add: 'cmd/spo/contenttype/contenttype-add.md'
+        - contenttype get: 'cmd/spo/contenttype/contenttype-get.md'
       - customaction:
         - customaction add: 'cmd/spo/customaction/customaction-add.md'
         - customaction clear: 'cmd/spo/customaction/customaction-clear.md'
@@ -38,6 +41,9 @@ pages:
         - customaction set: 'cmd/spo/customaction/customaction-set.md'
       - externaluser:
         - externaluser list: 'cmd/spo/externaluser/externaluser-list.md'
+      - field:
+        - field add: 'cmd/spo/field/field-add.md'
+        - field get: 'cmd/spo/field/field-get.md'
       - file:
         - file checkin: 'cmd/spo/file/file-checkin.md'
         - file checkout: 'cmd/spo/file/file-checkout.md'
@@ -77,13 +83,20 @@ pages:
         - listitem add: 'cmd/spo/listitem/listitem-add.md'
         - listitem get: 'cmd/spo/listitem/listitem-get.md'
         - listitem remove: 'cmd/spo/listitem/listitem-remove.md'
+        - listitem set: 'cmd/spo/listitem/listitem-set.md'
+      - navigation:
+        - navigation node add: 'cmd/spo/navigation/navigation-node-add.md'
+        - navigation node list: 'cmd/spo/navigation/navigation-node-list.md'
+        - navigation node remove: 'cmd/spo/navigation/navigation-node-remove.md'
       - page:
         - page add: 'cmd/spo/page/page-add.md'
-        - page control get: 'cmd/spo/page/page-control-get.md'
-        - page control list: 'cmd/spo/page/page-control-list.md'
         - page get: 'cmd/spo/page/page-get.md'
         - page list: 'cmd/spo/page/page-list.md'
         - page set: 'cmd/spo/page/page-set.md'
+        - page clientsidewebpart add: 'cmd/spo/page/page-clientsidewebpart-add.md'
+        - page column list: 'cmd/spo/page/page-column-list.md'
+        - page control get: 'cmd/spo/page/page-control-get.md'
+        - page control list: 'cmd/spo/page/page-control-list.md'
       - propertybag:
         - propertybag get: 'cmd/spo/propertybag/propertybag-get.md'
         - propertybag list: 'cmd/spo/propertybag/propertybag-list.md'
@@ -142,6 +155,7 @@ pages:
         - web get: 'cmd/spo/web/web-get.md'
         - web list: 'cmd/spo/web/web-list.md'
         - web remove: 'cmd/spo/web/web-remove.md'
+        - web set: 'cmd/spo/web/web-set.md'
     - SharePoint Framework (spfx):
       - project:
         - project upgrade: 'cmd/spfx/project/project-upgrade.md'

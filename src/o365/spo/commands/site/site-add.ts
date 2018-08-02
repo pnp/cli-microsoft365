@@ -180,7 +180,8 @@ class SiteAddCommand extends SpoCommand {
             cmd.log(res.SiteUrl);
           }
           else {
-            cmd.log(new CommandError('An error has occurred while creating the site'));
+            cb(new CommandError('An error has occurred while creating the site'));
+            return;
           }
         }
         cb();

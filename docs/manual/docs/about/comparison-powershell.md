@@ -138,8 +138,8 @@ Add-PnPTenantCdnOrigin|SharePointPnPPowerShellOnline|[spo cdn origin add](../cmd
 Add-PnPClientSidePage|SharePointPnPPowerShellOnline|[spo page add](../cmd/spo/page/page-add.md)
 Add-PnPClientSidePageSection|SharePointPnPPowerShellOnline|
 Add-PnPClientSideText|SharePointPnPPowerShellOnline|
-Add-PnPClientSideWebPart|SharePointPnPPowerShellOnline|
-Add-PnPContentType|SharePointPnPPowerShellOnline|
+Add-PnPClientSideWebPart|SharePointPnPPowerShellOnline|[spo page clientsidewebpart add](../cmd/spo/page/page-clientsidewebpart-add.md)
+Add-PnPContentType|SharePointPnPPowerShellOnline|[spo contenttype add](../cmd/spo/contenttype/contenttype-add.md)
 Add-PnPContentTypeToDocumentSet|SharePointPnPPowerShellOnline|
 Add-PnPContentTypeToList|SharePointPnPPowerShellOnline|
 Add-PnPCustomAction|SharePointPnPPowerShellOnline|[spo customaction add](../cmd/spo/customaction/customaction-add.md)
@@ -147,7 +147,7 @@ Add-PnPDataRowsToProvisioningTemplate|SharePointPnPPowerShellOnline|
 Add-PnPDocumentSet|SharePointPnPPowerShellOnline|
 Add-PnPEventReceiver|SharePointPnPPowerShellOnline|
 Add-PnPField|SharePointPnPPowerShellOnline|
-Add-PnPFieldFromXml|SharePointPnPPowerShellOnline|
+Add-PnPFieldFromXml|SharePointPnPPowerShellOnline|[spo field add](../cmd/spo/field/field-add.md)
 Add-PnPFieldToContentType|SharePointPnPPowerShellOnline|
 Add-PnPFile|SharePointPnPPowerShellOnline|
 Add-PnPFileToProvisioningTemplate|SharePointPnPPowerShellOnline|
@@ -159,7 +159,7 @@ Add-PnPJavaScriptLink|SharePointPnPPowerShellOnline|
 Add-PnPListFoldersToProvisioningTemplate|SharePointPnPPowerShellOnline|
 Add-PnPListItem|SharePointPnPPowerShellOnline|[spo listitem add](../cmd/spo/listitem/listitem-add.md)
 Add-PnPMasterPage|SharePointPnPPowerShellOnline|
-Add-PnPNavigationNode|SharePointPnPPowerShellOnline|
+Add-PnPNavigationNode|SharePointPnPPowerShellOnline|[spo navigation node add](../cmd/spo/navigation/navigation-node-add.md)
 Add-PnPOffice365GroupToSite|SharePointPnPPowerShellOnline|
 Add-PnPPublishingImageRendition|SharePointPnPPowerShellOnline|
 Add-PnPPublishingPage|SharePointPnPPowerShellOnline|
@@ -223,7 +223,7 @@ Get-PnPAzureCertificate|SharePointPnPPowerShellOnline|
 Get-PnPClientSideComponent|SharePointPnPPowerShellOnline|
 Get-PnPClientSidePage|SharePointPnPPowerShellOnline|[spo page get](../cmd/spo/page/page-get.md), [spo page control list](../cmd/spo/page/page-control-list.md), [spo page control get](../cmd/spo/page/page-control-get.md)
 Get-PnPConnection|SharePointPnPPowerShellOnline|
-Get-PnPContentType|SharePointPnPPowerShellOnline|
+Get-PnPContentType|SharePointPnPPowerShellOnline|[spo contenttype get](../cmd/spo/contenttype/contenttype-get.md)
 Get-PnPContentTypePublishingHubUrl|SharePointPnPPowerShellOnline|
 Get-PnPContext|SharePointPnPPowerShellOnline|
 Get-PnPCustomAction|SharePointPnPPowerShellOnline|[spo customaction get](../cmd/spo/customaction/customaction-get.md), [spo customaction list](../cmd/spo/customaction/customaction-list.md)
@@ -231,7 +231,7 @@ Get-PnPDefaultColumnValues|SharePointPnPPowerShellOnline|
 Get-PnPDocumentSetTemplate|SharePointPnPPowerShellOnline|
 Get-PnPEventReceiver|SharePointPnPPowerShellOnline|
 Get-PnPFeature|SharePointPnPPowerShellOnline|
-Get-PnPField|SharePointPnPPowerShellOnline|
+Get-PnPField|SharePointPnPPowerShellOnline|[spo field get](../cmd/spo/field/field-get.md)
 Get-PnPFile|SharePointPnPPowerShellOnline|[spo file get](../cmd/spo/file/file-get.md), [spo file list](../cmd/spo/file/file-list.md)
 Get-PnPFolder|SharePointPnPPowerShellOnline|[spo folder get](../cmd/spo/folder/folder-get.md), [spo folder list](../cmd/spo/folder/folder-list.md)
 Get-PnPFolderItem|SharePointPnPPowerShellOnline|
@@ -250,7 +250,7 @@ Get-PnPList|SharePointPnPPowerShellOnline|[spo list get](../cmd/spo/list/list-ge
 Get-PnPListItem|SharePointPnPPowerShellOnline|[spo listitem get](../cmd/spo/listitem/listitem-get.md)
 Get-PnPListRecordDeclaration|SharePointPnPPowerShellOnline|
 Get-PnPMasterPage|SharePointPnPPowerShellOnline|
-Get-PnPNavigationNode|SharePointPnPPowerShellOnline|
+Get-PnPNavigationNode|SharePointPnPPowerShellOnline|[spo navigation node list](../cmd/spo/navigation/navigation-node-list.md)
 Get-PnPProperty|SharePointPnPPowerShellOnline|
 Get-PnPPropertyBag|SharePointPnPPowerShellOnline|[spo propertybag get](../cmd/spo/propertybag/propertybag-get.md), [spo propertybag list](../cmd/spo/propertybag/propertybag-list.md)
 Get-PnPProvisioningTemplate|SharePointPnPPowerShellOnline|
@@ -366,7 +366,7 @@ Remove-PnPIndexedProperty|SharePointPnPPowerShellOnline|
 Remove-PnPJavaScriptLink|SharePointPnPPowerShellOnline|
 Remove-PnPList|SharePointPnPPowerShellOnline|[spo list remove](../cmd/spo/list/list-remove.md)
 Remove-PnPListItem|SharePointPnPPowerShellOnline|[spo listitem remove](../cmd/spo/listitem/listitem-remove.md)
-Remove-PnPNavigationNode|SharePointPnPPowerShellOnline|
+Remove-PnPNavigationNode|SharePointPnPPowerShellOnline|[spo navigation node remove](../cmd/spo/navigation/navigation-node-remove.md)
 Remove-PnPPropertyBagValue|SharePointPnPPowerShellOnline|[spo propertybag remove](../cmd/spo/propertybag/propertybag-remove.md)
 Remove-PnPPublishingImageRendition|SharePointPnPPowerShellOnline|
 Remove-PnPRoleDefinition|SharePointPnPPowerShellOnline|
@@ -427,7 +427,7 @@ Set-PnPIndexedProperties|SharePointPnPPowerShellOnline|
 Set-PnPInformationRightsManagement|SharePointPnPPowerShellOnline|
 Set-PnPInPlaceRecordsManagement|SharePointPnPPowerShellOnline|
 Set-PnPList|SharePointPnPPowerShellOnline|[spo list set](../cmd/spo/list/list-set.md)
-Set-PnPListItem|SharePointPnPPowerShellOnline|
+Set-PnPListItem|SharePointPnPPowerShellOnline|[spo listitem set](../cmd/spo/listitem/listitem-set.md)
 Set-PnPListItemAsRecord|SharePointPnPPowerShellOnline|
 Set-PnPListItemPermission|SharePointPnPPowerShellOnline|
 Set-PnPListPermission|SharePointPnPPowerShellOnline|
@@ -454,7 +454,7 @@ Set-PnPTraceLog|SharePointPnPPowerShellOnline|
 Set-PnPUnifiedGroup|SharePointPnPPowerShellOnline|[graph o365group set](../cmd/graph/o365group/o365group-set.md)
 Set-PnPUserProfileProperty|SharePointPnPPowerShellOnline|
 Set-PnPView|SharePointPnPPowerShellOnline|
-Set-PnPWeb|SharePointPnPPowerShellOnline|
+Set-PnPWeb|SharePointPnPPowerShellOnline|[spo web set](../cmd/spo/web/web-set.md)
 Set-PnPWebhookSubscription|SharePointPnPPowerShellOnline|
 Set-PnPWebPartProperty|SharePointPnPPowerShellOnline|
 Set-PnPWebPermission|SharePointPnPPowerShellOnline|
