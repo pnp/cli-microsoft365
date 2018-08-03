@@ -4,11 +4,10 @@ import { Rule } from "./Rule";
 import { Project } from "../model";
 import { Finding } from "../Finding";
 
-export class FN011007_FILE_remove extends Rule {
-  public constructor(private filePath: string) {
+export abstract class FileRemoveRule extends Rule {
+  public constructor(protected filePath: string) {
     super();
   }
-  get id(): string { return 'FN01107'; }
   get title(): string {
     return this.filePath;
   }

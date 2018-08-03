@@ -2,18 +2,27 @@ import * as assert from 'assert';
 import * as path from 'path';
 import { Finding } from '../Finding';
 import { Project } from '../model';
-import { FN011007_FILE_remove } from './FN011007_FILE_remove';
+import { FileRemoveRule } from './FileRemoveRule';
 
-describe('FN011007_FILE_remove', () => {
+class FileRule extends FileRemoveRule {
+  constructor(filePath: string) {
+    super(filePath);
+  }
+
+  get id(): string {
+    return 'FN000000';
+  }
+}
+describe('FileRemoveRule', () => {
   let findings: Finding[];
-  let rule: FN011007_FILE_remove;
+  let rule: FileRule;
 
   beforeEach(() => {
     findings = [];
   });
 
   it('doesn\'t return notification file doesn\'t exist', () => {
-    rule = new FN011007_FILE_remove('dummy.json');
+    rule = new FileRule('dummy.json');
     const project: Project = {
       path: path.join(__dirname, '../test-projects/spfx-102-webpart-react').replace('dist', 'src'),
     };
@@ -22,7 +31,7 @@ describe('FN011007_FILE_remove', () => {
   });
 
   it('returns a notification if file exists', () => {
-    rule = new FN011007_FILE_remove('/typings/tsd.d.ts');
+    rule = new FileRule('/typings/tsd.d.ts');
     const project: Project = {
       path: path.join(__dirname, '../test-projects/spfx-102-webpart-react').replace('dist', 'src'),
     };
