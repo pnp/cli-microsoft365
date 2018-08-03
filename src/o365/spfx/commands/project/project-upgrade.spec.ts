@@ -503,7 +503,6 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.0' } }, (err?: any) => {
       const findings: Finding[] = log[0];
-      console.log(JSON.stringify(findings));
       assert.equal(findings.length, 11);
     });
   });
@@ -513,7 +512,6 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.0', debug: true } }, (err?: any) => {
       const findings: Finding[] = log[3];
-      console.log(JSON.stringify(findings));
       assert.equal(findings.length, 11);
     });
   });
