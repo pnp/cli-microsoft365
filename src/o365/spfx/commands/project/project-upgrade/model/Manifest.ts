@@ -9,4 +9,5 @@ export interface Manifest {
       default?: string;
     }
   }[];
+  safeWithCustomScriptDisabled?: boolean;
 }
