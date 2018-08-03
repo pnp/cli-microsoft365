@@ -6,5 +6,6 @@ export interface TsConfigJson {
     skipLibCheck?: boolean;
     typeRoots?: string[];
     types?: string[];
+    experimentalDecorators?: boolean;
   };
 }
