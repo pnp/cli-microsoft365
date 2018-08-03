@@ -24,7 +24,7 @@ describe('FileRemoveRule', () => {
   it('doesn\'t return notification file doesn\'t exist', () => {
     rule = new FileRule('dummy.json');
     const project: Project = {
-      path: path.join(__dirname, '../test-projects/spfx-102-webpart-react').replace('dist', 'src'),
+      path: path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-102-webpart-react'),
     };
     rule.visit(project, findings);
     assert.equal(findings.length, 0);
@@ -33,7 +33,7 @@ describe('FileRemoveRule', () => {
   it('returns a notification if file exists', () => {
     rule = new FileRule('/typings/tsd.d.ts');
     const project: Project = {
-      path: path.join(__dirname, '../test-projects/spfx-102-webpart-react').replace('dist', 'src'),
+      path: path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-102-webpart-react'),
     };
     rule.visit(project, findings);
     assert.equal(findings.length, 1);
