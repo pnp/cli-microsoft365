@@ -514,6 +514,26 @@ describe(commands.PROJECT_UPGRADE, () => {
     assert.equal(typeof ((project.vsCode) as VsCode).settingsJson, 'undefined');
   });
 
+  it('e2e: shows correct number of findings for upgrading no framework web part 1.0.2 project to 1.1.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-102-webpart-nolib'));
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.1.0' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      console.log(JSON.stringify(findings));
+      assert.equal(findings.length, 11);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading react web part 1.0.1 project to 1.0.2', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-102-webpart-react'));
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.1.0', debug: true } }, (err?: any) => {
+      const findings: Finding[] = log[3];
+      console.log(JSON.stringify(findings));
+      assert.equal(findings.length, 11);
+    });
+  });
+
   it('e2e: shows correct number of findings for upgrading no framework web part 1.1.0 project to 1.1.1', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-110-webpart-nolib'));
 
@@ -1135,7 +1155,5 @@ describe(commands.PROJECT_UPGRADE, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-});
   });
 });
