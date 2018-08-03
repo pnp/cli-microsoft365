@@ -31,6 +31,7 @@ export abstract class FileRemoveRule extends Rule {
       return;
     }
     const targetPath: string = path.join(project.path, this.filePath);
+    console.log(targetPath);
     if (fs.existsSync(targetPath)) {
       this.addFinding(notifications);
     }
