@@ -22,13 +22,13 @@ interface Options extends GlobalOptions {
   webUrl: string;
 }
 
-class SpoPageColumnListCommand extends SpoCommand {
+class SpoPageSectionGetCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.PAGE_COLUMN_LIST}`;
+    return `${commands.PAGE_SECTION_GET}`;
   }
 
   public get description(): string {
-    return 'Lists columns in the specific section of a modern page';
+    return 'List sections in the specific modern page';
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
@@ -47,9 +47,9 @@ class SpoPageColumnListCommand extends SpoCommand {
         const sections: CanvasSection[] = clientSidePage.sections
           .filter(section => section.order === args.options.section);
 
+        const isJSONOutput = args.options.output === 'json';
         if (sections.length) {
-          const isJSONOutput = args.options.output === 'json';
-          cmd.log(sections[0].columns.map(c => Page.getColumnsInformation(c, isJSONOutput)));
+            cmd.log(Page.getSectionInformation(sections[0], isJSONOutput));
         }
 
         if (this.verbose) {
@@ -112,7 +112,7 @@ class SpoPageColumnListCommand extends SpoCommand {
         
   Remarks:
 
-    To list columns of the specific section of a modern page, you have to first
+    To List sections in the specific modern page, you have to first
     connect to a SharePoint site using the ${chalk.blue(commands.CONNECT)} command,
     eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
 
@@ -121,10 +121,10 @@ class SpoPageColumnListCommand extends SpoCommand {
 
   Examples:
   
-    List columns in the first section of a modern page with name ${chalk.grey('home.aspx')}
+    List sections in the specific modern page with name ${chalk.grey('home.aspx')}
       ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx --section 1
 `);
   }
 }
 
-module.exports = new SpoPageColumnListCommand();
+module.exports = new SpoPageSectionGetCommand();

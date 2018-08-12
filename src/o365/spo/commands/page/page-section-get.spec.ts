@@ -3,13 +3,13 @@ import Command, { CommandOption, CommandError, CommandValidate } from '../../../
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
-const command: Command = require('./page-column-list');
+const command: Command = require('./page-section-get');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import Utils from '../../../../Utils';
 import { ClientSidePage } from './clientsidepages';
 
-describe(commands.PAGE_COLUMN_LIST, () => {
+describe(commands.PAGE_SECTION_GET, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
@@ -115,7 +115,7 @@ describe(commands.PAGE_COLUMN_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.PAGE_COLUMN_LIST), true);
+    assert.equal(command.name.startsWith(commands.PAGE_SECTION_GET), true);
   });
 
   it('has a description', () => {
@@ -139,7 +139,7 @@ describe(commands.PAGE_COLUMN_LIST, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, () => {
       try {
-        assert.equal(telemetry.name, commands.PAGE_COLUMN_LIST);
+        assert.equal(telemetry.name, commands.PAGE_SECTION_GET);
         done();
       }
       catch (e) {
@@ -163,7 +163,7 @@ describe(commands.PAGE_COLUMN_LIST, () => {
     });
   });
 
-  it('lists columns on the modern page', (done) => {
+  it('lists sections on the modern page', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve(apiResponse);
@@ -178,16 +178,17 @@ describe(commands.PAGE_COLUMN_LIST, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1 } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
-          {
+        assert(cmdInstanceLogSpy.calledWith({
+          columns: [{
             "order": 1,
             "factor": 6
           },
           {
             "order": 2,
             "factor": 6
-          }
-        ]));
+          }],
+          order: 1
+        }));
         done();
       }
       catch (e) {
@@ -196,7 +197,7 @@ describe(commands.PAGE_COLUMN_LIST, () => {
     });
   });
 
-  it('lists columns on the modern page - no sections available', (done) => {
+  it('lists sections on the modern page - no sections available', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve({
@@ -278,7 +279,7 @@ describe(commands.PAGE_COLUMN_LIST, () => {
     });
   });
 
-  it('lists columns on the modern page (debug)', (done) => {
+  it('lists sections on the modern page (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve(apiResponse);
@@ -293,16 +294,19 @@ describe(commands.PAGE_COLUMN_LIST, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1 } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
-          {
-            "order": 1,
-            "factor": 6
-          },
-          {
-            "order": 2,
-            "factor": 6
-          }
-        ]));
+        assert(cmdInstanceLogSpy.calledWith({
+          "order": 1,
+          "columns": [
+            {
+              "order": 1,
+              "factor": 6
+            },
+            {
+              "order": 2,
+              "factor": 6
+            }
+          ]
+        }));
         done();
       }
       catch (e) {
@@ -311,7 +315,7 @@ describe(commands.PAGE_COLUMN_LIST, () => {
     });
   });
 
-  it('lists columns on the modern page when the specified page name doesn\'t contain extension', (done) => {
+  it('lists sections on the modern page when the specified page name doesn\'t contain extension', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve(apiResponse);
@@ -326,16 +330,19 @@ describe(commands.PAGE_COLUMN_LIST, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home', section: 1 } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
-          {
-            "order": 1,
-            "factor": 6,
-          },
-          {
-            "order": 2,
-            "factor": 6
-          }
-        ]));
+        assert(cmdInstanceLogSpy.calledWith({
+          "order": 1,
+          "columns": [
+            {
+              "order": 1,
+              "factor": 6,
+            },
+            {
+              "order": 2,
+              "factor": 6
+            }
+          ]
+        }));
         done();
       }
       catch (e) {
@@ -344,7 +351,7 @@ describe(commands.PAGE_COLUMN_LIST, () => {
     });
   });
 
-  it('lists all information about columns on the modern page in json output mode', (done) => {
+  it('lists all information about sections on the modern page in json output mode', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve(apiResponse);
@@ -359,18 +366,21 @@ describe(commands.PAGE_COLUMN_LIST, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', output: 'json', section: 1 } }, () => {
       try {
-        assert.equal(JSON.stringify(log[0]), JSON.stringify([{
-          "factor": 6,
+        assert.equal(JSON.stringify(log[0]), JSON.stringify({
           "order": 1,
-          "dataVersion": "1.0",
-          "jsonData": "&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1&#125;&#125;",
-        },
-        {
-          "factor": 6,
-          "order": 2,
-          "dataVersion": "1.0",
-          "jsonData": "&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;2,&quot;zoneIndex&quot;&#58;1&#125;&#125;",
-        }]));
+          "columns": [{
+            "factor": 6,
+            "order": 1,
+            "dataVersion": "1.0",
+            "jsonData": "&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1&#125;&#125;",
+          },
+          {
+            "factor": 6,
+            "order": 2,
+            "dataVersion": "1.0",
+            "jsonData": "&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;2,&quot;zoneIndex&quot;&#58;1&#125;&#125;",
+          }]
+        }));
         done();
       }
       catch (e) {
@@ -557,7 +567,7 @@ describe(commands.PAGE_COLUMN_LIST, () => {
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
     cmd.help({}, () => { });
-    assert(find.calledWith(commands.PAGE_COLUMN_LIST));
+    assert(find.calledWith(commands.PAGE_SECTION_GET));
   });
 
   it('has help with examples', () => {
