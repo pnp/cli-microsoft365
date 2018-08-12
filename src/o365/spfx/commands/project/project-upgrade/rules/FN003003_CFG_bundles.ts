@@ -13,7 +13,7 @@ export class FN003003_CFG_bundles extends Rule {
   }
 
   get description(): string {
-    return `Replace the "entries" property with "bundles" property in ${this.file}`;
+    return `Add "bundles" property (to replace the "entries" property) in ${this.file}`;
   };
 
   get resolution(): string {
@@ -43,54 +43,32 @@ export class FN003003_CFG_bundles extends Rule {
 
       if (entries !== undefined) {
 
-        let bundles: string = '';
+        let resolution: any = { bundles: {} };
 
         // convert the "entries" schema to "bundles" schema
         Object.keys(entries).forEach(key => {
           const valueObj = entries[key];
           let bundleName: string = key;
-          let props: string = '';
+          let props: any = {};
 
           Object.keys(valueObj).forEach(prop => {
 
             switch (prop) {
               case "entry":
-                props += `"entrypoint": "${valueObj[prop]}",
-                `;
+                props.entrypoint = valueObj[prop];
                 bundleName = this.tryGetBundleName(bundleName, valueObj[prop]);
                 break;
               case "outputPath":
                 // skip. Should not be in the file anymore
                 break;
               default:
-                props += `  "${prop}": "${valueObj[prop]}",
-                `;
+                props[prop] = valueObj[prop];
             }
           });
-
-          // remove ending ','
-          props = props.substring(0, props.lastIndexOf(','));
-
-          bundles += `"${bundleName}": {
-              "components": [
-                {
-                  ${props}
-                }
-              ]
-            },
-            `;
+          resolution.bundles[bundleName] = {components:[props]};
         });
 
-        // remove ending ','
-        bundles = bundles.substring(0, bundles.lastIndexOf(','));
-
-        const resolution: string = `{
-          "bundles": {
-            ${bundles}
-          } 
-        }`;
-
-        this.addFindingWithCustomInfo(this.title, this.description, resolution, this.file, findings);
+        this.addFindingWithCustomInfo(this.title, this.description, JSON.stringify(resolution, null, 2), this.file, findings);
       }
       else {
         // this should not happen

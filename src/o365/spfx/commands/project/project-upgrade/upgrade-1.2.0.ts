@@ -21,7 +21,9 @@ import { FN011004_MAN_fieldCustomizer_schema } from "./rules/FN011004_MAN_fieldC
 import { FN001005_DEP_types_react } from "./rules/FN001005_DEP_types_react";
 import { FN003002_CFG_version } from "./rules/FN003002_CFG_version";
 import { FN003003_CFG_bundles } from "./rules/FN003003_CFG_bundles";
-import { FN011005_MAN_listViewCommandSet_items } from "./rules/FN011005_MAN_listViewCommandSet_items";
+import { FN003004_CFG_entries } from "./rules/FN003004_CFG_entries";
+import { FN011006_MAN_listViewCommandSet_items } from "./rules/FN011006_MAN_listViewCommandSet_items";
+import { FN011007_MAN_listViewCommandSet_commands } from "./rules/FN011007_MAN_listViewCommandSet_commands";
 
 module.exports = [
   new FN001001_DEP_microsoft_sp_core_library('1.2.0'),
@@ -35,6 +37,7 @@ module.exports = [
   new FN003001_CFG_schema('https://dev.office.com/json-schemas/spfx-build/config.2.0.schema.json'),
   new FN003002_CFG_version('2.0'),
   new FN003003_CFG_bundles(),
+  new FN003004_CFG_entries(),
   new FN004001_CFG_CA_schema('https://dev.office.com/json-schemas/spfx-build/copy-assets.schema.json'),
   new FN005001_CFG_DAS_schema('https://dev.office.com/json-schemas/spfx-build/deploy-azure-storage.schema.json'),
   new FN006001_CFG_PS_schema('https://dev.office.com/json-schemas/spfx-build/package-solution.schema.json'),
@@ -46,6 +49,7 @@ module.exports = [
   new FN011001_MAN_webpart_schema('https://dev.office.com/json-schemas/spfx/client-side-web-part-manifest.schema.json'),
   new FN011002_MAN_applicationCustomizer_schema('https://dev.office.com/json-schemas/spfx/client-side-extension-manifest.schema.json'),
   new FN011003_MAN_listViewCommandSet_schema('https://dev.office.com/json-schemas/spfx/command-set-extension-manifest.schema.json'),
-  new FN011005_MAN_listViewCommandSet_items(),
+  new FN011006_MAN_listViewCommandSet_items(),
+  new FN011007_MAN_listViewCommandSet_commands(),
   new FN011004_MAN_fieldCustomizer_schema('https://dev.office.com/json-schemas/spfx/client-side-extension-manifest.schema.json')
 ];

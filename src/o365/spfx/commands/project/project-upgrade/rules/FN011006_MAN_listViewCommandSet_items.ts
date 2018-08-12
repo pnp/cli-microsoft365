@@ -3,10 +3,10 @@ import { Project, CommandSetManifest } from "../model";
 import * as path from 'path';
 import { ManifestRule } from "./ManifestRule";
 
-export class FN011005_MAN_listViewCommandSet_items extends ManifestRule {
+export class FN011006_MAN_listViewCommandSet_items extends ManifestRule {
 
   get id(): string {
-    return 'FN011005';
+    return 'FN011006';
   }
 
   get title(): string {
@@ -14,7 +14,7 @@ export class FN011005_MAN_listViewCommandSet_items extends ManifestRule {
   }
 
   get description(): string {
-    return `Replace the "commands" property with "items" property`;
+    return `Add "items" property (to replace the "commands" property)`;
   };
 
   get resolution(): string {
@@ -40,7 +40,7 @@ export class FN011005_MAN_listViewCommandSet_items extends ManifestRule {
 
         const relativePath: string = path.relative(project.path, manifest.path);
 
-        let items: string = '';
+        let resolution: any = { items: {} };
         const commands: any = (commandSetManifest as any)["commands"];
 
         if (commands !== undefined) {
@@ -49,42 +49,22 @@ export class FN011005_MAN_listViewCommandSet_items extends ManifestRule {
           Object.keys(commands).forEach(key => {
             const valueObj = commands[key];
 
-            let props: string = '';
+            resolution.items[key] = { title: { default: valueObj.title }};
+
             Object.keys(valueObj).forEach(prop => {
 
               if (prop !== "title") {
-
-                props += `"${prop}": "${valueObj[prop]}",
-              `;
+                resolution.items[key][prop] = valueObj[prop]
               }
             });
 
-            // remove ending ','
-            props = props.substring(0, props.lastIndexOf(','));
-
             // add type if missing
             if (valueObj.type === undefined) {
-              props += `,
-                "type": "command"`;
+              resolution.items[key].type = "command";
             }
-
-            items += `"${key}": {
-                "title": { "default": "${valueObj.title}" },
-                ${props}
-              },
-              `;
           });
 
-          // remove ending ','
-          items = items.substring(0, items.lastIndexOf(','));
-
-          const resolution: string = `{
-            "items": {
-              ${items}
-            } 
-          }`;
-
-          this.addFindingWithCustomInfo(this.title, `${this.description} in file ${relativePath}`, resolution, relativePath, findings);
+          this.addFindingWithCustomInfo(this.title, `${this.description} in file ${relativePath}`, JSON.stringify(resolution, null, 2), relativePath, findings);
         } else {
           // this should not happen
           // if no items prop, but also no commands prop

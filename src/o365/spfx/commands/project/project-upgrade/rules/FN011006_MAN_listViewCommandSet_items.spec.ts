@@ -1,15 +1,15 @@
 import * as assert from 'assert';
 import { Finding } from '../Finding';
 import { Project, CommandSetManifest, Manifest } from '../model';
-import { FN011005_MAN_listViewCommandSet_items } from './FN011005_MAN_listViewCommandSet_items';
+import { FN011006_MAN_listViewCommandSet_items } from './FN011006_MAN_listViewCommandSet_items';
 
-describe('FN011005_MAN_listViewCommandSet_items', () => {
+describe('FN011006_MAN_listViewCommandSet_items', () => {
   let findings: Finding[];
-  let rule: FN011005_MAN_listViewCommandSet_items;
+  let rule: FN011006_MAN_listViewCommandSet_items;
 
   beforeEach(() => {
     findings = [];
-    rule = new FN011005_MAN_listViewCommandSet_items();
+    rule = new FN011006_MAN_listViewCommandSet_items();
   });
 
   it('has empty resolution', () => {
