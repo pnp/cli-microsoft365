@@ -1,6 +1,6 @@
 {
   "name": "@pnp/office365-cli",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "lockfileVersion": 1,
   "requires": true,
   "dependencies": {
@@ -4397,6 +4397,7 @@
     },
     "vorpal": {
       "version": "github:pnp/vorpal#9e74dcae4bb946fa9a65225d315ed83c03e1ff5b",
+      "from": "github:pnp/vorpal",
       "requires": {
         "babel-polyfill": "6.26.0",
         "chalk": "1.1.3",
