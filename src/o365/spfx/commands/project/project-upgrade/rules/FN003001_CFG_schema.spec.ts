@@ -16,7 +16,9 @@ describe('FN003001_CFG_schema', () => {
     const project: Project = {
       path: '/usr/tmp',
       configJson: {
-        $schema: 'test-schema'
+        $schema: 'test-schema',
+        version: '2.0',
+        bundles: {}
       }
     };
     rule.visit(project, findings);
