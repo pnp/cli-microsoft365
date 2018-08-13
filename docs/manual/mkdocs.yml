@@ -1,5 +1,5 @@
 site_name: Office 365 CLI
-pages:
+nav:
   - Home: 'index.md'
   - User Guide:
     - 'Installing the CLI': 'user-guide/installing-cli.md'
