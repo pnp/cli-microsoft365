@@ -1,10 +1,13 @@
 import * as fs from 'fs';
 import * as path from 'path';
-const stripJsonComments = require('strip-json-comments');
 
 export class Utils {
   public static removeSingleLineComments(s: string): string {
-    return stripJsonComments(s);
+
+    let commentEval: RegExp = new RegExp(/\/\*[\s\S]*?\*\/|([^:]|^)\/\/.*$/gm);
+
+    return s.replace(commentEval, '');
+
   }
 
   public static getAllFiles(dir: string): string | string[] {
