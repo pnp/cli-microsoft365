@@ -504,7 +504,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.0' } }, (err?: any) => {
       const findings: Finding[] = log[0];
-      assert.equal(findings.length, 11); // should be 12 but the fake for remove file and code settings conflict
+      assert.equal(findings.length, 12); // should be 13 but the fake for remove file and code settings conflict
     });
   });
 
@@ -514,7 +514,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.0', debug: true } }, (err?: any) => {
       const findings: Finding[] = log[3];
-      assert.equal(findings.length, 11); // should be 12 but the fake for remove file and code settings conflict
+      assert.equal(findings.length, 12); // should be 13 but the fake for remove file and code settings conflict
     });
   });
 
