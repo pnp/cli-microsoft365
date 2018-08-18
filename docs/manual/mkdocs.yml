@@ -1,5 +1,5 @@
 site_name: Office 365 CLI
-pages:
+nav:
   - Home: 'index.md'
   - User Guide:
     - 'Installing the CLI': 'user-guide/installing-cli.md'
@@ -32,6 +32,7 @@ pages:
       - contenttype:
         - contenttype add: 'cmd/spo/contenttype/contenttype-add.md'
         - contenttype get: 'cmd/spo/contenttype/contenttype-get.md'
+        - contenttype field set: 'cmd/spo/contenttype/contenttype-field-set.md'
       - customaction:
         - customaction add: 'cmd/spo/customaction/customaction-add.md'
         - customaction clear: 'cmd/spo/customaction/customaction-clear.md'
@@ -97,6 +98,7 @@ pages:
         - page column list: 'cmd/spo/page/page-column-list.md'
         - page control get: 'cmd/spo/page/page-control-get.md'
         - page control list: 'cmd/spo/page/page-control-list.md'
+        - page section get: 'cmd/spo/page/page-section-get.md'
       - propertybag:
         - propertybag get: 'cmd/spo/propertybag/propertybag-get.md'
         - propertybag list: 'cmd/spo/propertybag/propertybag-list.md'
