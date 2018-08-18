@@ -1,3 +1,8 @@
 export interface VsCodeSettingsJson {
-  "json.schemas"?: any[];
+  "json.schemas"?: VsCodeSettingsJsonJsonSchema[];
+}
+
+export interface VsCodeSettingsJsonJsonSchema {
+  fileMatch: string[];
+  url: string;
 }

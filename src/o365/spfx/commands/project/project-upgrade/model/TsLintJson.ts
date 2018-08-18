@@ -1,9 +1,8 @@
 export interface TsLintJson {
-  $schema: string;
+  $schema?: string;
   lintConfig?: {
-    rules: {
-    "prefer-const"?: boolean;
-    "class-name"?: boolean;
+    rules?: {
+      [key: string]: boolean;
     }
   };
 }

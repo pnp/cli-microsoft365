@@ -1,7 +1,7 @@
 import * as request from 'request-promise-native';
 import Utils from '../../../../Utils';
 import { PageItem } from './PageItem';
-import { ClientSidePage } from './clientsidepages';
+import { ClientSidePage, CanvasSection, CanvasColumn } from './clientsidepages';
 
 export class Page {
   public static getPage(name: string, webUrl: string, accessToken: string, cmd: CommandInstance, debug: boolean, verbose: boolean): Promise<ClientSidePage> {
@@ -54,5 +54,26 @@ export class Page {
           reject(error);
         });
     });
+  }
+
+  public static getColumnsInformation(column: CanvasColumn, isJSONOutput: boolean) {
+    const output: any = {
+      factor: column.factor,
+      order: column.order
+    };
+
+    if (isJSONOutput) {
+      output.dataVersion = column.dataVersion;
+      output.jsonData = column.jsonData;
+    }
+    
+    return output;
+  }
+
+  public static getSectionInformation(section: CanvasSection, isJSONOutput: boolean): any {
+    return {
+      order: section.order,
+      columns: section.columns.map(column => this.getColumnsInformation(column, isJSONOutput))
+    }
   }
 }
