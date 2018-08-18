@@ -14,6 +14,7 @@ import { FN001017_DEP_types_react_addons_test_utils } from "./rules/FN001017_DEP
 import { FN011006_DEP_microsoft_sp_client_base } from "./rules/FN011006_DEP_microsoft_sp_client_base";
 import { FN011008_CFG_TSC_experimentalDecorators } from "./rules/FN011008_CFG_TSC_experimentalDecorators";
 import { FN011009_MAN_webpart_safeScript } from "./rules/FN011009_MAN_webpart_safeScript";
+import { FN011010_CODE_settingsfile } from "./rules/FN011010_CODE_settingsfile";
 import { FileRemoveRule } from "./rules/FileRemoveRule";
 
 module.exports = [
@@ -30,8 +31,9 @@ module.exports = [
   new FN001015_DEP_types_react_addons_shallow_compare('0.14.17', true),
   new FN001016_DEP_types_react_addons_update('0.14.14', true),
   new FN001017_DEP_types_react_addons_test_utils('0.14.15', true),
-  new FileRemoveRule('/typings/tsd.d.ts', 'FN011010'),
-  new FileRemoveRule('/typings/@ms/odsp.d.ts', 'FN011011'),
+  new FN011010_CODE_settingsfile(),
+  new FileRemoveRule('/typings/tsd.d.ts', 'FN011012'),
+  new FileRemoveRule('/typings/@ms/odsp.d.ts', 'FN011013'),
   new FN011008_CFG_TSC_experimentalDecorators(),
   new FN011009_MAN_webpart_safeScript(),
   new FN010001_YORC_version('1.1.0'),
