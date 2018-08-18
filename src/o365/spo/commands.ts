@@ -65,6 +65,7 @@ export default {
   LISTITEM_REMOVE: `${prefix} listitem remove`,
   LISTITEM_GET: `${prefix} listitem get`,
   LISTITEM_SET: `${prefix} listitem set`,
+  LISTITEM_LIST: `${prefix} listitem list`,
   NAVIGATION_NODE_ADD: `${prefix} navigation node add`,
   NAVIGATION_NODE_LIST: `${prefix} navigation node list`,
   NAVIGATION_NODE_REMOVE: `${prefix} navigation node remove`,
