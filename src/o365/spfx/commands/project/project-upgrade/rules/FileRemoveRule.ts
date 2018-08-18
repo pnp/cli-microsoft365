@@ -4,8 +4,8 @@ import { Rule } from "./Rule";
 import { Project } from "../model";
 import { Finding } from "../Finding";
 
-export abstract class FileRemoveRule extends Rule {
-  public constructor(protected filePath: string) {
+export class FileRemoveRule extends Rule {
+  public constructor(protected filePath: string, protected ruleId: string) {
     super();
   }
   get title(): string {
@@ -14,6 +14,7 @@ export abstract class FileRemoveRule extends Rule {
   get description(): string {
     return `Delete file ${this.filePath}`;
   }
+  get id(): string { return this.ruleId; }
   get resolution(): string {
     return `rm ${this.filePath}`;
   }
