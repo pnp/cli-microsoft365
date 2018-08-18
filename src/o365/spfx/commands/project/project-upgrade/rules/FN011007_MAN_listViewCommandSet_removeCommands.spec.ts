@@ -31,8 +31,9 @@ describe('FN011007_MAN_listViewCommandSet_removeCommands', () => {
       manifests: [{
         $schema: 'schema',
         componentType: 'WebPart',
-        path: '/tmp'
-      }]
+        path: '/tmp',
+        version: '*',
+      }],
     };
     rule.visit(project, findings);
     assert.equal(findings.length, 0);
@@ -45,7 +46,8 @@ describe('FN011007_MAN_listViewCommandSet_removeCommands', () => {
         $schema: 'schema',
         componentType: 'Extension',
         extensionType: 'FieldCustomizer',
-        path: '/tmp'
+        path: '/tmp',
+        version: '*',
       }]
     };
     rule.visit(project, findings);
@@ -58,7 +60,8 @@ describe('FN011007_MAN_listViewCommandSet_removeCommands', () => {
       manifests: [{
         path: '/usr/tmp',
         componentType: 'Extension',
-        extensionType: 'ListViewCommandSet'
+        extensionType: 'ListViewCommandSet',
+        version: '*',
       } as CommandSetManifest]
     };
     rule.visit(project, findings);

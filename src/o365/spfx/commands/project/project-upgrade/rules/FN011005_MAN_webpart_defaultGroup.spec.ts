@@ -29,7 +29,8 @@ describe('FN011005_MAN_webpart_defaultGroup', () => {
         componentType: 'WebPart',
         preconfiguredEntries: [{
           group: { default: 'Custom' }
-        }]
+        }],
+        version: '*',
       }]
     };
     rule.visit(project, findings);
