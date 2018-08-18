@@ -182,6 +182,8 @@ nav:
         - o365group set: 'cmd/graph/o365group/o365group-set.md'
       - siteclassification:
         - siteclassification get: 'cmd/graph/siteclassification/siteclassification-get.md'
+      - teams:
+        - teams list: 'cmd/graph/teams/teams-list.md'
       - user:
         - user get: 'cmd/graph/user/user-get.md'
         - user list: 'cmd/graph/user/user-list.md'
