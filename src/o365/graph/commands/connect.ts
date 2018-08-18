@@ -23,7 +23,7 @@ interface Options extends GlobalOptions {
   password?: string;
 }
 
-class GraphConnectCommand extends Command {
+export class GraphConnectCommand extends Command {
   public get name(): string {
     return `${commands.CONNECT}`;
   }

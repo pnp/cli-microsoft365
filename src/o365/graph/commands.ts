@@ -18,5 +18,6 @@ export default {
   STATUS: `${prefix} status`,
   USER_GET: `${prefix} user get`,
   USER_LIST: `${prefix} user list`,
-  USER_SENDMAIL: `${prefix} user sendmail`
+  USER_SENDMAIL: `${prefix} user sendmail`,
+  TEAMS_LIST: `${prefix} teams list`
 };
