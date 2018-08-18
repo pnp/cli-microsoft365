@@ -29,6 +29,16 @@ describe('FileRemoveRule', () => {
     assert.equal(findings.length, 0);
   });
 
+  it('doesn\'t return notification on badly configured rule', () => {
+    sinon.stub(fs, 'existsSync').callsFake(() => false);
+    rule = new FileRemoveRule('', '');
+    const project: Project = {
+      path: path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-102-webpart-react'),
+    };
+    rule.visit(project, findings);
+    assert.equal(findings.length, 0);
+  });
+
   it('returns a notification if file exists', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     rule = new FileRemoveRule('/typings/tsd.d.ts', 'FN000000');
