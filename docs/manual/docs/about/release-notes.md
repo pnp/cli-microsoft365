@@ -1,5 +1,20 @@
 # Release notes
 
+## [v1.6.0](https://github.com/pnp/office365-cli/releases/tag/v1.6.0)
+
+### New commands
+
+**SharePoint Online:**
+
+- [spo contenttype field set](../cmd/spo/contenttype/contenttype-field-set.md) - adds or updates a site column reference in a site content type [#520](https://github.com/pnp/office365-cli/issues/520)
+- [spo page section get](../cmd/spo/page/page-section-get.md) - gets information about the specified modern page section [#410](https://github.com/pnp/office365-cli/issues/410)
+
+### Changes
+
+- added support for upgrading projects built using SharePoint Framework v1.1.3 [#485](https://github.com/pnp/office365-cli/issues/485)
+- added support for upgrading projects built using SharePoint Framework v1.1.1 [#487](https://github.com/pnp/office365-cli/issues/487)
+- added support for upgrading projects built using SharePoint Framework v1.1.0 [#488](https://github.com/pnp/office365-cli/issues/488)
+
 ## [v1.5.0](https://github.com/pnp/office365-cli/releases/tag/v1.5.0)
 
 ### New commands
