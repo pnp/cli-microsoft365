@@ -10,7 +10,7 @@ describe('FN011008_CFG_TSC_experimentalDecorators', () => {
   beforeEach(() => {
     findings = [];
     rule = new FN011008_CFG_TSC_experimentalDecorators();
-  })
+  });
 
   it('doesn\'t return notification if schema is already up-to-date', () => {
     const project: Project = {
@@ -20,6 +20,15 @@ describe('FN011008_CFG_TSC_experimentalDecorators', () => {
           experimentalDecorators: true,
         },
       }
+    };
+    rule.visit(project, findings);
+    assert.equal(findings.length, 0);
+  });
+
+  it('doesn\'t return notification if object is missing', () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      tsConfigJson: undefined
     };
     rule.visit(project, findings);
     assert.equal(findings.length, 0);
