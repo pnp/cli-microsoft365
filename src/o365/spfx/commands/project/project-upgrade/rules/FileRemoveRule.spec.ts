@@ -4,25 +4,16 @@ import { Finding } from '../Finding';
 import { Project } from '../model';
 import { FileRemoveRule } from './FileRemoveRule';
 
-class FileRule extends FileRemoveRule {
-  constructor(filePath: string) {
-    super(filePath);
-  }
-
-  get id(): string {
-    return 'FN000000';
-  }
-}
 describe('FileRemoveRule', () => {
   let findings: Finding[];
-  let rule: FileRule;
+  let rule: FileRemoveRule;
 
   beforeEach(() => {
     findings = [];
   });
 
   it('doesn\'t return notification file doesn\'t exist', () => {
-    rule = new FileRule('dummy.json');
+    rule = new FileRemoveRule('dummy.json', 'FN000000');
     const project: Project = {
       path: path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-102-webpart-react'),
     };
@@ -31,7 +22,7 @@ describe('FileRemoveRule', () => {
   });
 
   it('returns a notification if file exists', () => {
-    rule = new FileRule('/typings/tsd.d.ts');
+    rule = new FileRemoveRule('/typings/tsd.d.ts', 'FN000000');
     const project: Project = {
       path: path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-102-webpart-react'),
     };
