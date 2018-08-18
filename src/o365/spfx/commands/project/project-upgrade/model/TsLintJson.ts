@@ -4,5 +4,5 @@ export interface TsLintJson {
     rules?: {
       [key: string]: boolean;
     }
-  }
+  };
 }
