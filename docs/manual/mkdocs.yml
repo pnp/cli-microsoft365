@@ -99,6 +99,7 @@ nav:
         - page control get: 'cmd/spo/page/page-control-get.md'
         - page control list: 'cmd/spo/page/page-control-list.md'
         - page section get: 'cmd/spo/page/page-section-get.md'
+        - page section list: 'cmd/spo/page/page-section-list.md'
       - propertybag:
         - propertybag get: 'cmd/spo/propertybag/propertybag-get.md'
         - propertybag list: 'cmd/spo/propertybag/propertybag-list.md'
