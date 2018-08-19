@@ -221,7 +221,7 @@ Get-PnPAvailableClientSideComponents|SharePointPnPPowerShellOnline|
 Get-PnPAzureADManifestKeyCredentials|SharePointPnPPowerShellOnline|
 Get-PnPAzureCertificate|SharePointPnPPowerShellOnline|
 Get-PnPClientSideComponent|SharePointPnPPowerShellOnline|
-Get-PnPClientSidePage|SharePointPnPPowerShellOnline|[spo page get](../cmd/spo/page/page-get.md), [spo page control list](../cmd/spo/page/page-control-list.md), [spo page control get](../cmd/spo/page/page-control-get.md), [spo page section get](../cmd/spo/page/page-section-get.md), [spo page section list](../cmd/spo/page/page-section-list.md)
+Get-PnPClientSidePage|SharePointPnPPowerShellOnline|[spo page get](../cmd/spo/page/page-get.md), [spo page control list](../cmd/spo/page/page-control-list.md), [spo page control get](../cmd/spo/page/page-control-get.md), [spo page section get](../cmd/spo/page/page-section-get.md), [spo page section list](../cmd/spo/page/page-section-list.md), [spo page column get](../cmd/spo/page/page-column-get.md), [spo page column list](../cmd/spo/page/page-column-list.md)
 Get-PnPConnection|SharePointPnPPowerShellOnline|
 Get-PnPContentType|SharePointPnPPowerShellOnline|[spo contenttype get](../cmd/spo/contenttype/contenttype-get.md)
 Get-PnPContentTypePublishingHubUrl|SharePointPnPPowerShellOnline|

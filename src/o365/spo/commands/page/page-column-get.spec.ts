@@ -3,13 +3,13 @@ import Command, { CommandOption, CommandError, CommandValidate } from '../../../
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
-const command: Command = require('./page-column-list');
+const command: Command = require('./page-column-get');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import Utils from '../../../../Utils';
 import { ClientSidePage } from './clientsidepages';
 
-describe(commands.PAGE_COLUMN_LIST, () => {
+describe(commands.PAGE_COLUMN_GET, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
@@ -115,7 +115,7 @@ describe(commands.PAGE_COLUMN_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.PAGE_COLUMN_LIST), true);
+    assert.equal(command.name.startsWith(commands.PAGE_COLUMN_GET), true);
   });
 
   it('has a description', () => {
@@ -139,7 +139,7 @@ describe(commands.PAGE_COLUMN_LIST, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, () => {
       try {
-        assert.equal(telemetry.name, commands.PAGE_COLUMN_LIST);
+        assert.equal(telemetry.name, commands.PAGE_COLUMN_GET);
         done();
       }
       catch (e) {
@@ -163,7 +163,7 @@ describe(commands.PAGE_COLUMN_LIST, () => {
     });
   });
 
-  it('lists columns on the modern page', (done) => {
+  it('Get information about the specific column of a modern page', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve(apiResponse);
@@ -176,20 +176,15 @@ describe(commands.PAGE_COLUMN_LIST, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1 } }, () => {
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1, column: 1 } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(cmdInstanceLogSpy.calledWith(
           {
             "order": 1,
             "factor": 6,
-            "controls": 1
-          },
-          {
-            "order": 2,
-            "factor": 6,
-            "controls": 0
+            "controls": "ccaa96dc-4d16-4940-bf0d-7b179628a8fd (undefined)"
           }
-        ]));
+        ));
         done();
       }
       catch (e) {
@@ -198,7 +193,7 @@ describe(commands.PAGE_COLUMN_LIST, () => {
     });
   });
 
-  it('lists columns on the modern page - no sections available', (done) => {
+  it('Get information about the specific column of a modern page - no sections available', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve({
@@ -269,7 +264,7 @@ describe(commands.PAGE_COLUMN_LIST, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1 } }, () => {
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1, column: 1 } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
         done();
@@ -280,10 +275,68 @@ describe(commands.PAGE_COLUMN_LIST, () => {
     });
   });
 
-  it('lists columns on the modern page (debug)', (done) => {
+  it('Get information about the specific column of a modern page - no columns available', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
-        return Promise.resolve(apiResponse);
+        return Promise.resolve({
+          "ListItemAllFields": {
+            "FileSystemObjectType": 0,
+            "Id": 9,
+            "ServerRedirectedEmbedUri": null,
+            "ServerRedirectedEmbedUrl": "",
+            "ContentTypeId": "0x0101009D1CB255DA76424F860D91F20E6C41180070E97A63FCC58F47B8FE04D0654FD44E",
+            "WikiField": null,
+            "Title": "Nova",
+            "ClientSideApplicationId": "b6917cb1-93a0-4b97-a84d-7cf49975d4ec",
+            "CanvasContent1": "<div><div data-sp-canvascontrol=\"\" data-sp-canvasdataversion=\"1.0\" data-sp-controldata=\"&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionIndex&quot;&#58;2,&quot;sectionFactor&quot;&#58;6,&quot;zoneIndex&quot;&#58;1&#125;&#125;\"></div><div data-sp-canvascontrol=\"\" data-sp-canvasdataversion=\"1.0\" data-sp-controldata=\"&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionIndex&quot;&#58;1,&quot;sectionFactor&quot;&#58;6,&quot;zoneIndex&quot;&#58;2&#125;&#125;\"></div><div data-sp-canvascontrol=\"\" data-sp-canvasdataversion=\"1.0\" data-sp-controldata=\"&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionIndex&quot;&#58;2,&quot;sectionFactor&quot;&#58;6,&quot;zoneIndex&quot;&#58;2&#125;&#125;\"></div></div>",
+            "BannerImageUrl": {
+              "Description": "/_layouts/15/images/sitepagethumbnail.png",
+              "Url": "/_layouts/15/images/sitepagethumbnail.png"
+            },
+            "Description": "asd",
+            "PromotedState": 0,
+            "FirstPublishedDate": null,
+            "LayoutWebpartsContent": "<div><div data-sp-canvascontrol=\"\" data-sp-canvasdataversion=\"1.4\" data-sp-controldata=\"&#123;&quot;id&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;instanceId&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;title&quot;&#58;&quot;Região do Título&quot;,&quot;description&quot;&#58;&quot;Descrição da Região de Título&quot;,&quot;serverProcessedContent&quot;&#58;&#123;&quot;htmlStrings&quot;&#58;&#123;&#125;,&quot;searchablePlainTexts&quot;&#58;&#123;&#125;,&quot;imageSources&quot;&#58;&#123;&#125;,&quot;links&quot;&#58;&#123;&#125;&#125;,&quot;dataVersion&quot;&#58;&quot;1.4&quot;,&quot;properties&quot;&#58;&#123;&quot;title&quot;&#58;&quot;Nova&quot;,&quot;imageSourceType&quot;&#58;4,&quot;layoutType&quot;&#58;&quot;FullWidthImage&quot;,&quot;textAlignment&quot;&#58;&quot;Left&quot;,&quot;showKicker&quot;&#58;false,&quot;showPublishDate&quot;&#58;false,&quot;kicker&quot;&#58;&quot;&quot;&#125;&#125;\"></div></div>",
+            "ComplianceAssetId": null,
+            "OData__AuthorBylineId": null,
+            "_AuthorBylineStringId": null,
+            "OData__OriginalSourceUrl": null,
+            "OData__OriginalSourceSiteId": null,
+            "OData__OriginalSourceWebId": null,
+            "OData__OriginalSourceListId": null,
+            "OData__OriginalSourceItemId": null,
+            "ID": 9,
+            "Created": "2018-07-11T16:24:12",
+            "AuthorId": 9,
+            "Modified": "2018-07-11T16:33:57",
+            "EditorId": 9,
+            "OData__CopySource": null,
+            "CheckoutUserId": 9,
+            "OData__UIVersionString": "1.0",
+            "GUID": "903cdabe-7a28-4e96-a55e-c768185d7d9a"
+          },
+          "CheckInComment": "",
+          "CheckOutType": 0,
+          "ContentTag": "{16035D61-EDB9-4758-A490-3D13FCD9FDAA},10,8",
+          "CustomizedPageStatus": 0,
+          "ETag": "\"{16035D61-EDB9-4758-A490-3D13FCD9FDAA},10\"",
+          "Exists": true,
+          "IrmEnabled": false,
+          "Length": "4708",
+          "Level": 255,
+          "LinkingUri": null,
+          "LinkingUrl": "",
+          "MajorVersion": 1,
+          "MinorVersion": 0,
+          "Name": "Nova.aspx",
+          "ServerRelativeUrl": "/SitePages/Nova.aspx",
+          "TimeCreated": "2018-07-11T19:24:12Z",
+          "TimeLastModified": "2018-07-11T19:33:57Z",
+          "Title": "Nova",
+          "UIVersion": 512,
+          "UIVersionLabel": "1.0",
+          "UniqueId": "16035d61-edb9-4758-a490-3d13fcd9fdaa"
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -293,20 +346,9 @@ describe(commands.PAGE_COLUMN_LIST, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1 } }, () => {
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1, column: 5 } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
-          {
-            "order": 1,
-            "factor": 6,
-            "controls": 1
-          },
-          {
-            "order": 2,
-            "factor": 6,
-            "controls": 0
-          }
-        ]));
+        assert(cmdInstanceLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -315,7 +357,7 @@ describe(commands.PAGE_COLUMN_LIST, () => {
     });
   });
 
-  it('lists columns on the modern page when the specified page name doesn\'t contain extension', (done) => {
+  it('Get information about the specific column of a modern page (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve(apiResponse);
@@ -328,20 +370,14 @@ describe(commands.PAGE_COLUMN_LIST, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home', section: 1 } }, () => {
+    cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1, column: 1 } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(cmdInstanceLogSpy.calledWith(
           {
             "order": 1,
             "factor": 6,
-            "controls": 1
-          },
-          {
-            "order": 2,
-            "factor": 6,
-            "controls": 0
-          }
-        ]));
+            "controls": "ccaa96dc-4d16-4940-bf0d-7b179628a8fd (undefined)"
+          }));
         done();
       }
       catch (e) {
@@ -350,7 +386,7 @@ describe(commands.PAGE_COLUMN_LIST, () => {
     });
   });
 
-  it('lists all information about columns on the modern page in json output mode', (done) => {
+  it('Get information about the specific column of a modern page when the specified page name doesn\'t contain extension', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve(apiResponse);
@@ -363,22 +399,45 @@ describe(commands.PAGE_COLUMN_LIST, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', output: 'json', section: 1 } }, () => {
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home', section: 1, column: 1 } }, () => {
       try {
-        assert.equal(JSON.stringify(log[0]), JSON.stringify([{
+        assert(cmdInstanceLogSpy.calledWith(
+          {
+            "order": 1,
+            "factor": 6,
+            "controls": "ccaa96dc-4d16-4940-bf0d-7b179628a8fd (undefined)"
+          }
+        ));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('Get information about the specific column of a modern page in json output mode', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
+        return Promise.resolve(apiResponse);
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', output: 'json', section: 1, column: 1 } }, () => {
+      try {
+        assert.equal(JSON.stringify(log[0]), JSON.stringify({
           "factor": 6,
           "order": 1,
           "dataVersion": "1.0",
           "jsonData": "&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1&#125;&#125;",
-          "controls": 1
-        },
-        {
-          "factor": 6,
-          "order": 2,
-          "dataVersion": "1.0",
-          "jsonData": "&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;2,&quot;zoneIndex&quot;&#58;1&#125;&#125;",
-          "controls": 0
-        }]));
+          "controls": [{ "controlType": 4, "dataVersion": "1.0", "order": 1, "id": "ccaa96dc-4d16-4940-bf0d-7b179628a8fd", "controlData": { "controlType": 4, "displayMode": 2, "id": "ccaa96dc-4d16-4940-bf0d-7b179628a8fd", "position": { "zoneIndex": 1, "sectionIndex": 1, "controlIndex": 1, "sectionFactor": 6 }, "editorType": "CKEditor" }, "_text": "<p>asd</p></div>" }]
+        }));
         done();
       }
       catch (e) {
@@ -454,7 +513,7 @@ describe(commands.PAGE_COLUMN_LIST, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1 } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1, column: 1 } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Page home.aspx is not a modern page.')));
         done();
@@ -484,7 +543,7 @@ describe(commands.PAGE_COLUMN_LIST, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1 } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1, column: 1 } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('The file /sites/team-a/SitePages/home1.aspx does not exist.')));
         done();
@@ -504,7 +563,7 @@ describe(commands.PAGE_COLUMN_LIST, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1 } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1, column: 1 } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -527,32 +586,42 @@ describe(commands.PAGE_COLUMN_LIST, () => {
   });
 
   it('fails validation if the webUrl option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { name: 'home.aspx', section: 1 } });
+    const actual = (command.validate() as CommandValidate)({ options: { name: 'home.aspx', section: 1, column: 1 } });
     assert.notEqual(actual, true);
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'foo', name: 'home.aspx', section: 1 } });
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'foo', name: 'home.aspx', section: 1, column: 1 } });
     assert.notEqual(actual, true);
   });
 
   it('fails validation if the name option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', section: 1 } });
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', section: 1, column: 1 } });
     assert.notEqual(actual, true);
   });
 
   it('fails validation if the section option is not specifed', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'home.aspx' } });
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'home.aspx', column: 1 } });
     assert.notEqual(actual, true);
   });
 
   it('fails validation if the section option is not a number', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'home.aspx', section: 'abc' } });
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'home.aspx', section: 'abc', column: 1 } });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation if the column option is not specifed', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'home.aspx', section: 1 } });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation if the column option is not a number', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'home.aspx', section: 1, column: 'abc' } });
     assert.notEqual(actual, true);
   });
 
   it('passes validation when the webUrl is a valid SharePoint URL and name is specified and section is specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'home.aspx', section: 1 } });
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'home.aspx', section: 1, column: 1 } });
     assert.equal(actual, true);
   });
 
@@ -565,7 +634,7 @@ describe(commands.PAGE_COLUMN_LIST, () => {
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
     cmd.help({}, () => { });
-    assert(find.calledWith(commands.PAGE_COLUMN_LIST));
+    assert(find.calledWith(commands.PAGE_COLUMN_GET));
   });
 
   it('has help with examples', () => {
