@@ -30,7 +30,8 @@ describe('FN011005_MAN_safeWithCustomScriptDisabled_propertyChange', () => {
       manifests: [{
         path: '/usr/tmp/manifest.json',
         $schema: 'test-schema',
-        componentType: 'WebPart'
+        componentType: 'WebPart',
+        version: '*',
       }]
     };
     rule.visit(project, findings);

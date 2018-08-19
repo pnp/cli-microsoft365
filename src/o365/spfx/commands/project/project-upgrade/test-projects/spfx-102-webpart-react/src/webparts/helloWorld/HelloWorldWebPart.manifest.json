@@ -1,0 +1,20 @@
+{
+  "$schema": "../../../node_modules/@microsoft/sp-module-interfaces/lib/manifestSchemas/jsonSchemas/clientSideComponentManifestSchema.json",
+
+  "id": "0bbe904a-454b-4d0e-b8be-555e63b46651",
+  "alias": "HelloWorldWebPart",
+  "componentType": "WebPart",
+  "version": "0.0.1",
+  "manifestVersion": 2,
+
+  "preconfiguredEntries": [{
+    "groupId": "0bbe904a-454b-4d0e-b8be-555e63b46651",
+    "group": { "default": "Under Development" },
+    "title": { "default": "HelloWorld" },
+    "description": { "default": "HelloWorld description" },
+    "officeFabricIconFontName": "Page",
+    "properties": {
+      "description": "HelloWorld"
+    }
+  }]
+}

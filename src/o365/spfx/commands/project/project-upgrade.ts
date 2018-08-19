@@ -27,6 +27,7 @@ class SpfxProjectUpgradeCommand extends Command {
   private projectRootPath: string | null = null;
   private allFindings: Finding[] = [];
   private supportedVersions: string[] = [
+    '1.0.2',
     '1.1.0',
     '1.1.1',
     '1.1.3',
