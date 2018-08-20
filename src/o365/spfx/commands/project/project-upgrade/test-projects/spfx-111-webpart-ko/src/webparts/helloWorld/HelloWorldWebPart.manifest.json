@@ -1,0 +1,26 @@
+{
+  "$schema": "../../../node_modules/@microsoft/sp-module-interfaces/lib/manifestSchemas/jsonSchemas/clientSideComponentManifestSchema.json",
+
+  "id": "f146d236-0a8c-4d74-8051-8088f9e1e4ea",
+  "alias": "HelloWorldWebPart",
+  "componentType": "WebPart",
+  "version": "*", // The "*" signifies that the version should be taken from the package.json
+  "manifestVersion": 2,
+
+  /**
+   * This property should only be set to true if it is certain that the webpart does not
+   *  allow arbitrary scripts to be called
+   */
+  "safeWithCustomScriptDisabled": false,
+
+  "preconfiguredEntries": [{
+    "groupId": "f146d236-0a8c-4d74-8051-8088f9e1e4ea",
+    "group": { "default": "Under Development" },
+    "title": { "default": "HelloWorld" },
+    "description": { "default": "HelloWorld" },
+    "officeFabricIconFontName": "Page",
+    "properties": {
+      "description": "HelloWorld"
+    }
+  }]
+}

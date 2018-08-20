@@ -360,16 +360,16 @@ describe(commands.PAGE_COLUMN_LIST, () => {
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', output: 'json', section: 1 } }, () => {
       try {
         assert.equal(JSON.stringify(log[0]), JSON.stringify([{
-          "dataVersion": "1.0",
           "factor": 6,
+          "order": 1,
+          "dataVersion": "1.0",
           "jsonData": "&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1&#125;&#125;",
-          "order": 1
         },
         {
-          "dataVersion": "1.0",
           "factor": 6,
+          "order": 2,
+          "dataVersion": "1.0",
           "jsonData": "&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;2,&quot;zoneIndex&quot;&#58;1&#125;&#125;",
-          "order": 2
         }]));
         done();
       }

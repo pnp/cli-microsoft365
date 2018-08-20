@@ -1,0 +1,22 @@
+{
+  "$schema": "../../node_modules/@microsoft/sp-module-interfaces/lib/manifestSchemas/jsonSchemas/clientSideComponentManifestSchema.json",
+
+  "id": "6f377733-7c28-42f0-a220-0ee64472f7ca",
+  "alias": "HelloWorldCommandSet",
+  "componentType": "Extension",
+  "extensionType": "ListViewCommandSet",
+  "version": "*", // The "*" signifies that the version should be taken from the package.json
+  "manifestVersion": 2,
+  "safeWithCustomScriptDisabled": true,
+
+  "commands": {
+    "COMMAND_1": {
+      "title": "Command One",
+      "iconImageUrl": "icons/request.png"
+    },
+    "COMMAND_2": {
+      "title": "Command Two",
+      "iconImageUrl": "icons/cancel.png"
+    }
+  }
+}
