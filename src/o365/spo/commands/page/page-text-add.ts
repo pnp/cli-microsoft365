@@ -26,7 +26,7 @@ interface Options extends GlobalOptions {
 	order?: number;
 }
 
-class SpoPageClientSideWebPartAddCommand extends SpoCommand {
+class SpoPageTextAddCommand extends SpoCommand {
 	public get name(): string {
 		return `${commands.PAGE_TEXT_ADD}`;
 	}
@@ -220,4 +220,4 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
 	}
 }
 
-module.exports = new SpoPageClientSideWebPartAddCommand();
+module.exports = new SpoPageTextAddCommand();
