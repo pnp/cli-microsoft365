@@ -8,7 +8,7 @@ import {
 	ClientSideText
 } from './clientsidepages';
 import Utils from '../../../../Utils';
-import { StandardWebPart, StandardWebPartUtils } from '../../common/StandardWebpartTypes';
+import { StandardWebPart, StandardWebPartUtils } from '../../common/StandardWebPartTypes';
 
 export interface IRequestContext {
 	accessToken: string;
