@@ -6,6 +6,7 @@ import { ClientSidePage, ClientSideWebpart, ClientSideControlData, ClientSideTex
 import ClientSidePageCommandHelper, { ICommandContext } from './ClientSidePageCommandHelper';
 import { StandardWebPartUtils } from '../../common/StandardWebPartTypes';
 
+
 describe('ClientSidePageCommandHelper', () => {
 	let log: string[];
   let commandContext: ICommandContext;
