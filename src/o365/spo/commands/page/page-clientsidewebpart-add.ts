@@ -7,17 +7,11 @@ import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import GlobalOptions from '../../../../GlobalOptions';
 import { Auth } from '../../../../Auth';
-import {
-  ClientSidePage,
-  CanvasSection,
-  ClientSideWebpart,
-  ClientSidePageComponent,
-  CanvasColumn
-} from './clientsidepages';
 import { StandardWebPart, StandardWebPartUtils } from '../../common/StandardWebPartTypes';
 import { ContextInfo } from '../../spo';
 import { isNumber } from 'util';
-import { PageItem } from './PageItem';
+import { ClientSidePage } from './clientsidepages';
+import ClientSidePageCommandHelper, { ICommandContext } from './ClientSidePageCommandHelper';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -37,373 +31,182 @@ interface Options extends GlobalOptions {
 }
 
 class SpoPageClientSideWebPartAddCommand extends SpoCommand {
-  public get name(): string {
-    return `${commands.PAGE_CLIENTSIDEWEBPART_ADD}`;
-  }
+	public get name(): string {
+		return `${commands.PAGE_CLIENTSIDEWEBPART_ADD}`;
+	}
 
-  public get description(): string {
-    return 'Adds a client-side web part to a modern page';
-  }
+	public get description(): string {
+		return 'Adds a client side WebPart to a modern page';
+	}
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.standardWebPart = args.options.standardWebPart;
-    telemetryProps.webPartId = typeof args.options.webPartId !== 'undefined';
-    telemetryProps.webPartProperties = typeof args.options.webPartProperties !== 'undefined';
-    telemetryProps.section = typeof args.options.section !== 'undefined';
-    telemetryProps.column = typeof args.options.column !== 'undefined';
-    telemetryProps.order = typeof args.options.order !== 'undefined';
-    return telemetryProps;
-  }
+	public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+		const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
+		let commandContext: ICommandContext = {
+			requestContext: {
+				accessToken: '',
+				requestDigest: ''
+			},
+			debug: this.debug,
+			verbose: this.verbose,
+			webUrl: args.options.webUrl,
+			pageName: args.options.pageName,
+			log: (msg:any) => cmd.log(msg)
+		};
+		let clientSidePage: ClientSidePage | null = null;
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-    let siteAccessToken: string = '';
-    let requestDigest: string = '';
-    let clientSidePage: ClientSidePage | null = null;
+		if (commandContext.pageName.indexOf('.aspx') < 0) {
+			commandContext.pageName += '.aspx';
+		}
 
-    let pageName: string = args.options.pageName;
-    if (args.options.pageName.indexOf('.aspx') < 0) {
-      pageName += '.aspx';
-    }
+		if (this.debug) {
+			cmd.log(`Retrieving access token for ${resource}...`);
+		}
 
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
-    }
+		auth
+			.getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
+			.then((accessToken: string): request.RequestPromise => {
+				if (this.debug) {
+					cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
+				}
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
+				commandContext.requestContext.accessToken = accessToken;
 
-        siteAccessToken = accessToken;
+				if (this.verbose) {
+					cmd.log(`Retrieving request digest...`);
+				}
 
-        if (this.verbose) {
-          cmd.log(`Retrieving request digest...`);
-        }
+				return this.getRequestDigestForSite(
+					args.options.webUrl,
+					commandContext.requestContext.accessToken,
+					cmd,
+					this.debug
+				);
+			})
+			.then((res: ContextInfo): Promise<ClientSidePage> => {
+				if (this.debug) {
+					cmd.log('Response:');
+					cmd.log(res);
+					cmd.log('');
+				}
 
-        return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
-      })
-      .then((res: ContextInfo): Promise<ClientSidePage> => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
+				// Keep the reference of request digest for subsequent requests
+				commandContext.requestContext.requestDigest = res.FormDigestValue;
 
-        // Keep the reference of request digest for subsequent requests
-        requestDigest = res.FormDigestValue;
+				if (this.verbose) {
+					cmd.log(`Retrieving Client Side Page ${commandContext.pageName}...`);
+				}
+				// Get Client Side Page
+				return ClientSidePageCommandHelper.getClientSidePage(commandContext);
+			})
+			.then((csPage) => {
+				if (this.debug) {
+					cmd.log(`Retrieved Client Side Page:`);
+          // cmd.log(csPage); // Cannot log because of circular structure on JSON stringifying
+					cmd.log('');
+				}
 
-        if (this.verbose) {
-          cmd.log(`Retrieving modern page ${pageName}...`);
-        }
-        // Get Client Side Page
-        return this.getClientSidePage(pageName, cmd, args, siteAccessToken);
-      })
-      .then((page: ClientSidePage): Promise<ClientSideWebpart> => {
-        // Keep the reference of client side page for subsequent requests
-        clientSidePage = page;
+				// Keep the reference of client side page for subsequent requests
+				clientSidePage = csPage;
 
-        if (this.verbose) {
-          cmd.log(
-            `Retrieving definition for web part ${args.options.webPartId ||
-            args.options.standardWebPart}...`
-          );
-        }
-        // Get the WebPart according to arguments
-        return this.getWebPart(cmd, args, siteAccessToken);
-      })
-      .then((webPart: ClientSideWebpart): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log(`Retrieved WebPart definition:`);
-          cmd.log(webPart);
-          cmd.log('');
-        }
+				if (this.verbose) {
+					cmd.log(
+						`Retrieving Client Side definition for WebPart...`
+					);
+				}
 
-        if (this.verbose) {
-          cmd.log(`Setting client-side web part layout and properties...`);
-        }
-        // Set the WebPart properties and layout (section, column and order)
-        this.setWebPartPropertiesAndLayout(clientSidePage as ClientSidePage, webPart, cmd, args);
-        if (this.verbose) {
-          cmd.log(`Saving modern page...`);
-        }
-        // Save the Client Side Page with updated information
-        return this.saveClientSidePage(clientSidePage as ClientSidePage, cmd, args, pageName, siteAccessToken, requestDigest);
-      })
-      .then((res: any): void => {
-        if (this.debug) {
-          cmd.log(`Response`);
-          cmd.log(res);
-          cmd.log('');
-        }
+				if (args.options.standardWebPart) {
+					// Get the standard WebPart according to arguments
+					return ClientSidePageCommandHelper.getStandardWebPartInstance(
+						commandContext,
+						args.options.standardWebPart
+					);
+				} else {
+					// Get the WebPart according to arguments
+					return ClientSidePageCommandHelper.getWebPartInstance(commandContext, args.options.webPartId as string);
+				}
+			})
+			.then((webPart) => {
+				if (this.debug) {
+					cmd.log(`Retrieved WebPart definition:`);
+					cmd.log(webPart);
+					cmd.log('');
+				}
 
-        if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
-        }
-        cb();
-      })
-      .catch((err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
-  }
+				if (this.verbose) {
+					cmd.log(`Setting Client Side WebPart layout and properties...`);
+				}
+				// Add the WebPart to page, set layout and properties
+				ClientSidePageCommandHelper.addWebPartToPage(
+					clientSidePage as ClientSidePage,
+					webPart,
+					commandContext,
+					args.options.section,
+					args.options.column,
+					args.options.order,
+					args.options.webPartProperties
+				);
+			})
+			.then(() => {
+				if (this.verbose) {
+					cmd.log(`Saving Client Side Page...`);
+				}
+				// Save the Client Side Page with updated information
+				return ClientSidePageCommandHelper.saveClientSidePage(commandContext, clientSidePage as ClientSidePage);
+			})
+			.then(() => {
+				if (this.verbose) {
+					cmd.log(
+						`Client Side WebPart ${args.options.webPartId ||
+							args.options.standardWebPart} is added to page ${commandContext.pageName}`
+					);
+				}
+				cb();
+			})
+			.catch((err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+	}
 
-  private getClientSidePage(
-    pageName: string,
-    cmd: CommandInstance,
-    args: CommandArgs,
-    accessToken: string
-  ): Promise<ClientSidePage> {
-    return new Promise<ClientSidePage>((resolve: (page: ClientSidePage) => void, reject: (error: any) => void): void => {
-      if (this.verbose) {
-        cmd.log(`Retrieving information about the page...`);
-      }
+	public options(): CommandOption[] {
+		const options: CommandOption[] = [
+			{
+				option: '-n, --pageName <pageName>',
+				description: 'Name of the page where the control is located'
+			},
+			{
+				option: '-u, --webUrl <webUrl>',
+				description: 'URL of the site where the page to retrieve is located'
+			},
+			{
+				option: '--standardWebPart [standardWebPart]',
+				description: `set to add one of the standard SharePoint web parts.
+                      Available values: ContentRollup | BingMap | ContentEmbed | DocumentEmbed | Image | ImageGallery | LinkPreview | NewsFeed | NewsReel 
+                      | PowerBIReportEmbed | QuickChart | SiteActivity | VideoEmbed | YammerEmbed | Events | GroupCalendar | Hero | List 
+                      | PageTitle | People | QuickLinks | CustomMessageRegion | Divider | MicrosoftForms | Spacer`
+			},
+			{
+				option: '--webPartId [webPartId]',
+				description: 'Set to add a custom web part'
+			},
+			{
+				option: '--webPartProperties [webPartProperties]',
+				description: 'JSON string with web part properties to set on the web part'
+			},
+			{
+				option: '--section [section]',
+				description: 'number of section to which the text should be added (1 or higher)'
+			},
+			{
+				option: '--column [column]',
+				description: 'number of column in which the text should be added (1 or higher)'
+			},
+			{
+				option: '--order [order]',
+				description: 'order of the WebPart in the column'
+			}
+		];
 
-      const webUrl: string = args.options.webUrl;
-      const requestOptions: any = {
-        url: `${webUrl}/_api/web/getfilebyserverrelativeurl('${webUrl.substr(
-          webUrl.indexOf('/', 8)
-        )}/sitepages/${encodeURIComponent(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId`,
-        headers: Utils.getRequestHeaders({
-          authorization: `Bearer ${accessToken}`,
-          accept: 'application/json;odata=nometadata'
-        }),
-        json: true
-      };
-
-      if (this.debug) {
-        cmd.log('Executing web request...');
-        cmd.log(requestOptions);
-        cmd.log('');
-      }
-
-      request
-        .get(requestOptions)
-        .then((res: PageItem): void => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
-          }
-
-          if (res.ListItemAllFields.ClientSideApplicationId !== 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec') {
-            reject(new Error(`Page ${args.options.pageName} is not a modern page.`));
-            return;
-          }
-
-          const clientSidePage: ClientSidePage = ClientSidePage.fromHtml(
-            res.ListItemAllFields.CanvasContent1
-          );
-
-          resolve(clientSidePage);
-        }, (error: any): void => {
-          reject(error);
-        });
-    });
-  }
-
-  private getWebPart(cmd: CommandInstance, args: CommandArgs, accessToken: string): Promise<ClientSideWebpart> {
-    return new Promise<ClientSideWebpart>((resolve: (webPart: ClientSideWebpart) => void, reject: (error: any) => void): void => {
-      const standardWebPart: string | undefined = args.options.standardWebPart;
-
-      const webPartId = standardWebPart
-        ? StandardWebPartUtils.getWebPartId(standardWebPart as StandardWebPart)
-        : args.options.webPartId;
-
-      if (this.debug) {
-        cmd.log(`StandardWebPart: ${standardWebPart}`);
-        cmd.log(`WebPartId: ${webPartId}`);
-      }
-
-      const requestOptions: any = {
-        url: `${args.options.webUrl}/_api/web/getclientsidewebparts()`,
-        headers: Utils.getRequestHeaders({
-          authorization: `Bearer ${accessToken}`,
-          accept: 'application/json;odata=nometadata'
-        }),
-        json: true
-      };
-
-      if (this.debug) {
-        cmd.log('Executing web request...');
-        cmd.log(requestOptions);
-        cmd.log('');
-      }
-
-      request
-        .get(requestOptions)
-        .then((res: { value: ClientSidePageComponent[] }): void => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
-          }
-
-          const webPartDefinition = res.value.filter((c) => c.Id === webPartId);
-          if (webPartDefinition.length === 0) {
-            reject(new Error(`There is no available WebPart with Id ${webPartId}.`));
-            return;
-          }
-
-          if (this.debug) {
-            cmd.log('WebPart definition:');
-            cmd.log(webPartDefinition);
-            cmd.log('');
-          }
-
-          if (this.verbose) {
-            cmd.log(`Creating instance from definition of WebPart ${webPartId}...`);
-          }
-          const webPart = ClientSideWebpart.fromComponentDef(webPartDefinition[0]);
-          resolve(webPart);
-        }, (error: any): void => {
-          reject(error);
-        });
-    });
-  }
-
-  private setWebPartPropertiesAndLayout(
-    clientSidePage: ClientSidePage,
-    webPart: ClientSideWebpart,
-    cmd: CommandInstance,
-    args: CommandArgs
-  ): void {
-    let actualSectionIndex: number | undefined = args.options.section && args.options.section - 1;
-    // If the section arg is not specified, set to first section
-    if (typeof actualSectionIndex === 'undefined') {
-      if (this.debug) {
-        cmd.log(`No section argument specified, The component will be added to default section`);
-      }
-      actualSectionIndex = 0;
-    }
-    // Make sure the section is in the range, other add a new section
-    if (actualSectionIndex >= clientSidePage.sections.length) {
-      throw new Error(`Invalid Section '${args.options.section}'`);
-    }
-
-    // Get the target section
-    const section: CanvasSection = clientSidePage.sections[actualSectionIndex];
-
-    let actualColumnIndex: number | undefined = args.options.column && args.options.column - 1;
-    // If the column arg is not specified, set to first column
-    if (typeof actualColumnIndex === 'undefined') {
-      if (this.debug) {
-        cmd.log(`No column argument specified, The component will be added to default column`);
-      }
-      actualColumnIndex = 0;
-    }
-    // Make sure the column is in the range of the current section
-    if (actualColumnIndex >= section.columns.length) {
-      throw new Error(`Invalid Column '${args.options.column}'`);
-    }
-
-    // Get the target column
-    const column: CanvasColumn = section.columns[actualColumnIndex];
-
-    if (args.options.webPartProperties) {
-      if (this.debug) {
-        cmd.log('WebPart properties: ');
-        cmd.log(args.options.webPartProperties);
-        cmd.log('');
-      }
-
-      try {
-        const properties: any = JSON.parse(args.options.webPartProperties);
-        webPart.setProperties(properties);
-      }
-      catch {
-      }
-    }
-
-    // Add the WebPart to to appropriate location
-    column.addControl(webPart);
-  }
-
-  private saveClientSidePage(
-    clientSidePage: ClientSidePage,
-    cmd: CommandInstance,
-    args: CommandArgs,
-    pageName: string,
-    accessToken: string,
-    requestDigest: string
-  ): request.RequestPromise {
-    const serverRelativeSiteUrl: string = `${args.options.webUrl.substr(
-      args.options.webUrl.indexOf('/', 8)
-    )}/sitepages/${pageName}`;
-
-    const updatedContent: string = clientSidePage.toHtml();
-
-    if (this.debug) {
-      cmd.log('Updated canvas content: ');
-      cmd.log(updatedContent);
-      cmd.log('');
-    }
-
-    const requestOptions: any = {
-      url: `${args.options
-        .webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeSiteUrl}')/ListItemAllFields`,
-      headers: Utils.getRequestHeaders({
-        authorization: `Bearer ${accessToken}`,
-        'X-RequestDigest': requestDigest,
-        'content-type': 'application/json;odata=nometadata',
-        'X-HTTP-Method': 'MERGE',
-        'IF-MATCH': '*',
-        accept: 'application/json;odata=nometadata'
-      }),
-      body: {
-        CanvasContent1: updatedContent
-      },
-      json: true
-    };
-
-    if (this.debug) {
-      cmd.log('Executing web request...');
-      cmd.log(requestOptions);
-      cmd.log('');
-    }
-
-    return request.post(requestOptions);
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the page to add the web part to is located'
-      },
-      {
-        option: '-n, --pageName <pageName>',
-        description: 'Name of the page to which add the web part'
-      },
-      {
-        option: '--standardWebPart [standardWebPart]',
-        description: `Name of the standard web part to add (see the possible values below)`
-      },
-      {
-        option: '--webPartId [webPartId]',
-        description: 'ID of the custom web part to add'
-      },
-      {
-        option: '--webPartProperties [webPartProperties]',
-        description: 'JSON string with web part properties to set on the web part'
-      },
-      {
-        option: '--section [section]',
-        description: 'Number of the section to which the web part should be added (1 or higher)'
-      },
-      {
-        option: '--column [column]',
-        description: 'Number of the column in which the web part should be added (1 or higher)'
-      },
-      {
-        option: '--order [order]',
-        description: 'Order of the web part in the column'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
+		const parentOptions: CommandOption[] = super.options();
+		return options.concat(parentOptions);
+	}
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
@@ -428,7 +231,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
       }
 
       if (args.options.standardWebPart && !StandardWebPartUtils.isValidStandardWebPartType(args.options.standardWebPart)) {
-        return `${args.options.standardWebPart} is not a valid standard web part type`;
+        return `${args.options.standardWebPart} is not a valid standard WebPart type`;
       }
 
       if (args.options.webPartProperties) {
@@ -453,11 +256,11 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
     };
   }
 
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online site
+	public commandHelp(args: {}, log: (help: string) => void): void {
+		const chalk = vorpal.chalk;
+		log(vorpal.find(this.name).helpInformation());
+		log(
+			`  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online site
     using the ${chalk.blue(commands.CONNECT)} command.
         
   Remarks:
