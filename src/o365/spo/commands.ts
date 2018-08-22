@@ -69,6 +69,7 @@ export default {
   NAVIGATION_NODE_LIST: `${prefix} navigation node list`,
   NAVIGATION_NODE_REMOVE: `${prefix} navigation node remove`,
   PAGE_ADD: `${prefix} page add`,
+  PAGE_REMOVE: `${prefix} page remove`,
   PAGE_SECTION_GET: `${prefix} page section get`,
   PAGE_COLUMN_LIST: `${prefix} page column list`,
   PAGE_CONTROL_GET: `${prefix} page control get`,
