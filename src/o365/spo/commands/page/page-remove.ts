@@ -1,0 +1,197 @@
+import auth from '../../SpoAuth';
+import config from '../../../../config';
+import * as request from 'request-promise-native';
+import commands from '../../commands';
+import { CommandOption, CommandValidate } from '../../../../Command';
+import SpoCommand from '../../SpoCommand';
+import Utils from '../../../../Utils';
+import { ContextInfo } from '../../spo';
+import GlobalOptions from '../../../../GlobalOptions';
+import { Auth } from '../../../../Auth';
+
+const vorpal: Vorpal = require('../../../../vorpal-init');
+
+interface CommandArgs {
+  options: Options;
+}
+
+interface Options extends GlobalOptions {
+  name: string;
+  webUrl: string;
+  confirm?: boolean;
+}
+
+class SpoPageRemoveCommand extends SpoCommand {
+  public get name(): string {
+    return `${commands.PAGE_REMOVE}`;
+  }
+
+  public get description(): string {
+    return 'Removes a modern page';
+  }
+
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
+    let siteAccessToken: string = '';
+    let requestDigest: string = '';
+    let pageName: string = args.options.name;
+    const serverRelativeSiteUrl: string = args.options.webUrl.substr(args.options.webUrl.indexOf('/', 8));
+
+    const removePage = () => {
+      auth
+        .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
+        .then((accessToken: string): request.RequestPromise => {
+          if (this.debug) {
+            cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
+          }
+
+          siteAccessToken = accessToken;
+
+          if (this.verbose) {
+            cmd.log(`Retrieving request digest...`);
+          }
+
+          return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
+        })
+        .then((res: ContextInfo): request.RequestPromise => {
+          if (this.debug) {
+            cmd.log('Response:');
+            cmd.log(res);
+            cmd.log('');
+          }
+
+          requestDigest = res.FormDigestValue;
+
+          if (!pageName.endsWith('.aspx')) {
+            pageName += '.aspx';
+          }
+
+          if (this.verbose) {
+            cmd.log(`Removing page ${pageName}...`);
+          }
+
+          const requestOptions: any = {
+            url: `${args.options
+              .webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeSiteUrl}/sitepages/${pageName}')`,
+            headers: Utils.getRequestHeaders({
+              authorization: `Bearer ${siteAccessToken}`,
+              'X-RequestDigest': requestDigest,
+              'X-HTTP-Method': 'DELETE',
+              'content-type': 'application/json;odata=nometadata',
+              accept: 'application/json;odata=nometadata'
+            }),
+            json: true
+          };
+
+          if (this.debug) {
+            cmd.log('Executing web request...');
+            cmd.log(requestOptions);
+            cmd.log('');
+          }
+
+          return request.post(requestOptions);
+        })
+        .then((): void => {
+          if (this.verbose) {
+            cmd.log(vorpal.chalk.green('DONE'));
+          }
+          cb();
+        },
+          (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb)
+        );
+    };
+
+    if (args.options.confirm) {
+      removePage();
+    }
+    else {
+      cmd.prompt(
+        {
+          type: 'confirm',
+          name: 'continue',
+          default: false,
+          message: `Are you sure you want to remove the page '${args.options.name}'?`
+        },
+        (result: { continue: boolean }): void => {
+          if (!result.continue) {
+            cb();
+          }
+          else {
+            removePage();
+          }
+        }
+      );
+    }
+  }
+
+  public options(): CommandOption[] {
+    const options: CommandOption[] = [
+      {
+        option: '-n, --name <name>',
+        description: 'Name of the page to remove'
+      },
+      {
+        option: '-u, --webUrl <webUrl>',
+        description: 'URL of the site from which the page should be removed'
+      },
+      {
+        option: '--confirm',
+        description: `Don't prompt before removing the page`
+      }
+    ];
+
+    const parentOptions: CommandOption[] = super.options();
+    return options.concat(parentOptions);
+  }
+
+  public validate(): CommandValidate {
+    return (args: CommandArgs): boolean | string => {
+      if (!args.options.name) {
+        return 'Required parameter name missing';
+      }
+
+      if (!args.options.webUrl) {
+        return 'Required parameter webUrl missing';
+      }
+
+      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+      if (isValidSharePointUrl !== true) {
+        return isValidSharePointUrl;
+      }
+
+      return true;
+    };
+  }
+
+  public commandHelp(args: {}, log: (help: string) => void): void {
+    const chalk = vorpal.chalk;
+    log(vorpal.find(this.name).helpInformation());
+    log(
+      `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online site
+    using the ${chalk.blue(commands.CONNECT)} command.
+    
+  Remarks:
+
+    To remove a modern page, you have to first connect to a SharePoint site
+    using the ${chalk.blue(commands.CONNECT)} command,
+    eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
+
+    If you try to remove a page with that does not exist, you will get
+    a ${chalk.grey('The file does not exist')} error.
+
+    If you set the ${chalk.grey('--confirm')}  flag, you will not be prompted for confirmation
+    before the page is actually removed.
+
+  Examples:
+
+    Remove a modern page.
+      ${chalk.grey(config.delimiter)} ${this.name} --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team
+
+    Remove a modern page without a confirmation prompt.
+      ${chalk.grey(config.delimiter)} ${this.name} --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --confirm
+    `
+    );
+  }
+}
+
+module.exports = new SpoPageRemoveCommand();

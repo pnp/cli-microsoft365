@@ -71,6 +71,7 @@ export default {
   PAGE_ADD: `${prefix} page add`,
   PAGE_GET: `${prefix} page get`,
   PAGE_LIST: `${prefix} page list`,
+  PAGE_REMOVE: `${prefix} page remove`,
   PAGE_SET: `${prefix} page set`,
   PAGE_CLIENTSIDEWEBPART_ADD: `${prefix} page clientsidewebpart add`,
   PAGE_COLUMN_GET: `${prefix} page column get`,

@@ -93,6 +93,7 @@ nav:
         - page add: 'cmd/spo/page/page-add.md'
         - page get: 'cmd/spo/page/page-get.md'
         - page list: 'cmd/spo/page/page-list.md'
+        - page remove: 'cmd/spo/page/page-remove.md'
         - page set: 'cmd/spo/page/page-set.md'
         - page clientsidewebpart add: 'cmd/spo/page/page-clientsidewebpart-add.md'
         - page column get: 'cmd/spo/page/page-column-get.md'
