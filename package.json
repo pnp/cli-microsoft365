@@ -28,7 +28,8 @@
     "o365",
     "spfx",
     "sharepoint online",
-    "sharepoint"
+    "sharepoint",
+    "microsoft teams"
   ],
   "author": "https://github.com/pnp/office365-cli/graphs/contributors",
   "maintainers": [

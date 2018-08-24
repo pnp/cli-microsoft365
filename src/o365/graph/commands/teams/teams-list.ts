@@ -37,7 +37,7 @@ class TeamsListCommand extends GraphItemsListCommand<Team> {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
 
-    let endpoint: string = `${auth.service.resource}/beta/groups?$filter=resourceProvisioningOptions/Any(x:x eq 'Team')`;
+    let endpoint: string = `${auth.service.resource}/beta/groups?$filter=resourceProvisioningOptions/Any(x:x eq 'Team')&$select=id,displayName,description`;
     if (args.options.joined) {
       endpoint = `${auth.service.resource}/beta/me/joinedTeams`;
     }
@@ -53,22 +53,13 @@ class TeamsListCommand extends GraphItemsListCommand<Team> {
       .then((res?: Team[]): void => {
         if (res) {
           this.items = res;
-
         }
 
         if (args.options.output === 'json') {
           cmd.log(this.items);
         }
         else {
-          cmd.log(this.items.map(g => {
-            const team: any = {
-              id: g.id,
-              displayName: g.displayName,
-              description: g.description,
-              isArchived: g.isArchived
-            };
-            return team;
-          }));
+          cmd.log(this.items);
         }
 
         if (this.verbose) {
@@ -114,12 +105,10 @@ class TeamsListCommand extends GraphItemsListCommand<Team> {
             resolve({
               id: group.id,
               displayName: group.displayName,
-              isArchived: undefined,
-              description: group.description
+              description: group.description,
+              isArchived: undefined
             })
           } else {
-
-
             reject(err);
           }
         });
