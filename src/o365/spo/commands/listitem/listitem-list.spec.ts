@@ -4,12 +4,12 @@ import { CommandValidate, CommandOption, CommandError, CommandTypes } from '../.
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
-const command: Command = require('./listitem-get');
+const command: Command = require('./listitem-list');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import Utils from '../../../../Utils';
 
-describe(commands.LISTITEM_GET, () => {
+describe(commands.LISTITEM_LIST, () => {
 
   let vorpal: Vorpal;
   let log: any[];
@@ -17,35 +17,79 @@ describe(commands.LISTITEM_GET, () => {
   let trackEvent: any;
   let telemetry: any;
 
-  const expectedTitle = `List Item 1`;
-
-  const expectedId = 147;
-  let actualId = 0;
+  const expectedArrayLength = 2;
+  let returnArrayLength = 0;
 
   let postFakes = (opts: any) => {
+
     if (opts.url.indexOf('/common/oauth2/token') > -1) {
       return Promise.resolve('abc');
     }
-    return Promise.reject('Invalid request');
-  }
-
-  let getFakes = (opts: any) => {
-    if (opts.url.indexOf('/items(') > -1) {
-      actualId = opts.url.match(/\/items\((\d+)\)/i)[1];
+    if (opts.url.indexOf('_api/contextinfo') > -1) {
+      return Promise.resolve({
+        FormDigestValue: 'abc'
+      });
+    }
+    if (opts.url.indexOf('/GetItems') > -1) {
+      returnArrayLength = 2;
       return Promise.resolve(
+        [{
+          "Attachments": false,
+          "AuthorId": 3,
+          "ContentTypeId": "0x0100B21BD271A810EE488B570BE49963EA34",
+          "Created": "2018-08-15T13:43:12Z",
+          "EditorId": 3,
+          "GUID": "2b6bd9e0-3c43-4420-891e-20053e3c4664",
+          "ID": 1,
+          "Modified": "2018-08-15T13:43:12Z",
+          "Title": "Example item 1",
+        },
         {
           "Attachments": false,
           "AuthorId": 3,
           "ContentTypeId": "0x0100B21BD271A810EE488B570BE49963EA34",
-          "Created": "2018-03-15T10:43:10Z",
+          "Created": "2018-08-15T13:44:10Z",
           "EditorId": 3,
-          "GUID": "ea093c7b-8ae6-4400-8b75-e2d01154dffc",
-          "ID": actualId,
-          "Modified": "2018-03-15T10:43:10Z",
-          "Title": expectedTitle,
-        }
+          "GUID": "47c5fc61-afb7-4081-aa32-f4386b8a86ea",
+          "ID": 2,
+          "Modified": "2018-08-15T13:44:10Z",
+          "Title": "Example item 2",
+        }]
       );
     }
+    returnArrayLength = 0;
+    return Promise.reject('Invalid request');
+  }
+
+  let getFakes = (opts: any) => {
+    if (opts.url.indexOf('/items') > -1) {
+      returnArrayLength = 2;
+      return Promise.resolve(
+        [{
+          "Attachments": false,
+          "AuthorId": 3,
+          "ContentTypeId": "0x0100B21BD271A810EE488B570BE49963EA34",
+          "Created": "2018-08-15T13:43:12Z",
+          "EditorId": 3,
+          "GUID": "2b6bd9e0-3c43-4420-891e-20053e3c4664",
+          "ID": 1,
+          "Modified": "2018-08-15T13:43:12Z",
+          "Title": "Example item 1",
+        },
+        {
+          "Attachments": false,
+          "AuthorId": 3,
+          "ContentTypeId": "0x0100B21BD271A810EE488B570BE49963EA34",
+          "Created": "2018-08-15T13:44:10Z",
+          "EditorId": 3,
+          "GUID": "47c5fc61-afb7-4081-aa32-f4386b8a86ea",
+          "ID": 2,
+          "Modified": "2018-08-15T13:44:10Z",
+          "Title": "Example item 2",
+        }]
+      );
+    }
+    returnArrayLength = 0;
     return Promise.reject('Invalid request');
   }
   
@@ -87,7 +131,7 @@ describe(commands.LISTITEM_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.LISTITEM_GET), true);
+    assert.equal(command.name.startsWith(commands.LISTITEM_LIST), true);
   });
 
   it('has a description', () => {
@@ -111,7 +155,7 @@ describe(commands.LISTITEM_GET, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, () => {
       try {
-        assert.equal(telemetry.name, commands.LISTITEM_GET);
+        assert.equal(telemetry.name, commands.LISTITEM_LIST);
         done();
       }
       catch (e) {
@@ -124,7 +168,7 @@ describe(commands.LISTITEM_GET, () => {
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', id: expectedId } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com', title: 'Demo List' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Connect to a SharePoint Online site first')));
         done();
@@ -162,52 +206,57 @@ describe(commands.LISTITEM_GET, () => {
     assert.notEqual((command.types() as CommandTypes).string, 'undefined', 'command string types undefined');
   });
 
-  it('fails validation if listTitle and listId option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: expectedId } });
+  it('fails validation if title and id option not specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com' } });
     assert.notEqual(actual, true);
   });
 
-  it('fails validation if listTitle and listId are specified together', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: expectedId } });
+  it('fails validation if title and id are specified together', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', id: '935c13a0-cc53-4103-8b48-c1d0828eaa7f' } });
     assert.notEqual(actual, true);
   });
 
   it('fails validation if the webUrl option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { listTitle: 'Demo List', id: expectedId } });
+    const actual = (command.validate() as CommandValidate)({ options: { title: 'Demo List' } });
     assert.notEqual(actual, true);
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'foo', listTitle: 'Demo List', id: expectedId } });
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'foo', title: 'Demo List' } });
     assert.notEqual(actual, true);
   });
 
   it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', id: expectedId } });
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List' } });
     assert(actual);
   });
 
-  it('fails validation if the listId option is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listId: 'foo', id: expectedId } });
+  it('fails validation if the id option is not a valid GUID', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'foo' } });
     assert.notEqual(actual, true);
   });
 
-  it('passes validation if the listId option is a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: expectedId } });
+  it('passes validation if the id option is a valid GUID', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '935c13a0-cc53-4103-8b48-c1d0828eaa7f' } });
     assert(actual);
   });
 
-  it('fails validation if the id option is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List' } });
+  it('fails validation if query and fields are specified together', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', query: '<Query><ViewFields><FieldRef Name="Title" /><FieldRef Name="Id" /></ViewFields></Query>', fields: 'Title,Id' } });
     assert.notEqual(actual, true);
   });
 
-  it('fails validation if the specified id is not a number', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', id: 'a' } });
+  it('fails validation if query and pageSize are specified together', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', query: '<Query><RowLimit>2</RowLimit></Query>', pageSize: 3 } });
     assert.notEqual(actual, true);
   });
 
-  it('returns listItemInstance object when list item is requested', (done) => {
+  it('fails validation if the specific pageSize is not a number', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', pageSize: 'abc' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('returns array of listItemInstance object when list item is requested', (done) => {
 
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
@@ -216,20 +265,17 @@ describe(commands.LISTITEM_GET, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-
-    command.allowUnknownOptions();
 
     let options: any = { 
       debug: true, 
-      listTitle: 'Demo List', 
+      title: 'Demo List', 
       webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
-      id: expectedId
     }
 
     cmdInstance.action({ options: options }, () => {
 
       try {
-        assert.equal(actualId, expectedId);
+        assert.equal(returnArrayLength, expectedArrayLength);
         done();
       }
       catch (e) {
@@ -243,7 +289,7 @@ describe(commands.LISTITEM_GET, () => {
     
   });
 
-  it('returns listItemInstance object when list item is requested with an output type of json, and a list of fields are specified', (done) => {
+  it('returns array of listItemInstance object when list item is requested with an output type of json, and a list of fields are specified', (done) => {
 
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
@@ -253,21 +299,18 @@ describe(commands.LISTITEM_GET, () => {
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
 
-    command.allowUnknownOptions();
-
     let options: any = { 
       debug: false, 
-      listTitle: 'Demo List', 
+      title: 'Demo List', 
       webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
-      id: expectedId,
       output: "json",
-      fields: "ID,Modified"
+      fields: "Title,ID"
     }
 
     cmdInstance.action({ options: options }, () => {
 
       try {
-        assert.equal(actualId, expectedId);
+        assert.equal(returnArrayLength, expectedArrayLength);
         done();
       }
       catch (e) {
@@ -281,7 +324,7 @@ describe(commands.LISTITEM_GET, () => {
     
   });
 
-  it('returns listItemInstance object when list item is requested with an output type of text, and no list of fields', (done) => {
+  it('returns array of listItemInstance object when list item is requested with no output type specified, and a list of fields are specified', (done) => {
 
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
@@ -291,20 +334,51 @@ describe(commands.LISTITEM_GET, () => {
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
 
-    command.allowUnknownOptions();
+    let options: any = { 
+      debug: false, 
+      title: 'Demo List', 
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
+      fields: "Title,ID"
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert.equal(returnArrayLength, expectedArrayLength);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+    
+  });
+
+  it('returns array of listItemInstance objects when a list of items is requested with an output type of text, and no fields', (done) => {
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'post').callsFake(postFakes);
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
 
     let options: any = { 
       debug: false, 
-      listTitle: 'Demo List', 
+      title: 'Demo List', 
       webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
-      id: expectedId,
       output: "text"
     }
 
     cmdInstance.action({ options: options }, () => {
 
       try {
-        assert.equal(actualId, expectedId);
+        assert.equal(returnArrayLength, expectedArrayLength);
         done();
       }
       catch (e) {
@@ -318,7 +392,7 @@ describe(commands.LISTITEM_GET, () => {
     
   });
 
-  it('returns listItemInstance object when list item is requested with an output type of text, and a list of fields specified', (done) => {
+  it('returns an array of listItemInstance objects when list of items is requested with no output type specified, and a list of fields specified', (done) => {
 
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
@@ -328,20 +402,51 @@ describe(commands.LISTITEM_GET, () => {
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
 
-    command.allowUnknownOptions();
-
     let options: any = { 
-      debug: false, 
-      listTitle: 'Demo List', 
+      debug: true, 
+      title: 'Demo List', 
       webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
-      id: expectedId,
-      output: "json"
+      fields: "Title,ID"
     }
 
     cmdInstance.action({ options: options }, () => {
 
       try {
-        assert.equal(actualId, expectedId);
+        assert.equal(returnArrayLength, expectedArrayLength);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+    
+  });
+
+  it('returns an array of listItemInstance objects when a list of items is requested with a query specified', (done) => {
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'post').callsFake(postFakes);
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    let options: any = { 
+      debug: true, 
+      title: 'Demo List', 
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
+      query: "<View><Query><ViewFields><FieldRef Name='Title' /><FieldRef Name='Id' /></ViewFields><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo List Item 1</Value></Eq></Where></Query></View>"
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert.equal(returnArrayLength, expectedArrayLength);
         done();
       }
       catch (e) {
@@ -364,7 +469,7 @@ describe(commands.LISTITEM_GET, () => {
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
     cmd.help({}, () => { });
-    assert(find.calledWith(commands.LISTITEM_GET));
+    assert(find.calledWith(commands.LISTITEM_LIST));
   });
 
   it('has help with examples', () => {

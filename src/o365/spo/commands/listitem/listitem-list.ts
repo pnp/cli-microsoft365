@@ -30,10 +30,7 @@ interface Options extends GlobalOptions {
   fields?: string;
 }
 
-class SpoListItemGetCommand extends SpoCommand {
-  public allowUnknownOptions(): boolean | undefined {
-    return true;
-  }
+class SpoListItemListCommand extends SpoCommand {
 
   public get name(): string {
     return commands.LISTITEM_LIST;
@@ -97,43 +94,42 @@ class SpoListItemGetCommand extends SpoCommand {
         }
         
         formDigestValue = args.options.query ? res['FormDigestValue'] : '';
+        const rowLimit: string = args.options.pageSize ? `$top=${args.options.pageSize}` : ``
+        const filter: string = args.options.filter ? `$filter=${encodeURIComponent(args.options.filter)}` : ``
         const fieldSelect: string = args.options.fields ?
-          `?$select=${encodeURIComponent(args.options.fields)}` :
+          `?$select=${encodeURIComponent(args.options.fields)}&${rowLimit}&${filter}` :
           (
             (!args.options.output || args.options.output === 'text') ?
-              `?$select=Id,Title` :
-              ``
+              `?$select=Id,Title&${rowLimit}&${filter}` :
+              `?${rowLimit}&${filter}`
           )
 
         const requestBody: any = args.options.query ?
             {
               "query": { 
-                "__metadata": { 
-                  "type": "SP.CamlQuery"
-                }, 
                 "ViewXml": args.options.query 
               } 
             }
           : ``;
         
         const requestOptions: any = {
-          url: `${listRestUrl}/${args.options.query ? `GetItems` : `items/${fieldSelect}`}`,
+          url: `${listRestUrl}/${args.options.query ? `GetItems` : `items${fieldSelect}`}`,
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata',
-            'X-RequestDigest': args.options.query ? formDigestValue : ''
+            'X-RequestDigest': formDigestValue
           }),
           json: true,
           body: requestBody
         };
-
+        
         if (this.debug) {
           cmd.log('Executing web request...');
           cmd.log(requestOptions);
           cmd.log('');
         }
 
-        return args.options.query ? request.get(requestOptions) : request.post(requestOptions);
+        return args.options.query ? request.post(requestOptions) : request.get(requestOptions);
       })
       .then((response: any): void => {
         (!args.options.output || args.options.output === 'text') && delete response["ID"];
@@ -199,16 +195,28 @@ class SpoListItemGetCommand extends SpoCommand {
       }
 
       if (!args.options.id && !args.options.title) {
-        return `Specify listId or listTitle`;
+        return `Specify list id or title`;
       }
 
       if (args.options.id && args.options.title) {
-        return `Specify listId or listTitle but not both`;
+        return `Specify list id or title but not both`;
+      }
+
+      if (args.options.query && args.options.fields) {
+        return `Specify query or fields but not both`;
+      }
+
+      if (args.options.query && args.options.pageSize) {
+        return `Specify query or pageSize but not both`;
+      }
+
+      if (args.options.pageSize && isNaN(Number(args.options.pageSize))) {
+        return `pageSize must be numeric`;
       }
 
       if (args.options.id &&
         !Utils.isValidGuid(args.options.id)) {
-        return `${args.options.id} in option listId is not a valid GUID`;
+        return `${args.options.id} in option id is not a valid GUID`;
       }
 
       return true;
@@ -237,4 +245,4 @@ class SpoListItemGetCommand extends SpoCommand {
 
 }
 
-module.exports = new SpoListItemGetCommand();
+module.exports = new SpoListItemListCommand();
