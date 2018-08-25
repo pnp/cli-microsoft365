@@ -24,8 +24,8 @@ interface Options extends GlobalOptions {
   webUrl: string;
   id?: string;
   title?: string;
-  pageSize?: string;
   query?: string;
+  pageSize?: string;
   filter?: string;
   fields?: string;
 }
@@ -37,7 +37,7 @@ class SpoListItemListCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Get list items from the specified list';
+    return 'Get a list of items from the specified list';
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -158,11 +158,15 @@ class SpoListItemListCommand extends SpoCommand {
       },
       {
         option: '-q, --query [query]',
-        description: 'The CAML query to use to retrieve items. Will ignore pageSize if specified'
+        description: 'CAML query to use to retrieve items. Will ignore pageSize if specified'
       },
       {
         option: '-f, --fields [fields]',
         description: 'Comma-separated list of fields to retrieve. Will retrieve all fields if not specified and json output is requested'
+      },
+      {
+        option: '-l, --filter [odataFilter]',
+        description: 'ODATA filter to use to query the list of items with. Specify query or filter but not both'
       },
     ];
 
@@ -179,7 +183,8 @@ class SpoListItemListCommand extends SpoCommand {
         'query',
         'pageSize',
         'fields',
-      ]
+        'filter',
+      ],
     };
   }
 
@@ -232,13 +237,28 @@ class SpoListItemListCommand extends SpoCommand {
   
   Remarks:
   
-    To get an items from a list, you have to first connect to SharePoint using
+    To get a list of items from a list, you have to first connect to SharePoint using
     the ${chalk.blue(commands.CONNECT)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
         
   Examples:
   
-    Get the items in list with title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_GET} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x
+    Get a list of items from list with title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
+      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_LIST} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x
+
+    Get a list of items from list with title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} using the CAML query ${chalk.grey('<Query><View><Where><Eq><FieldRef Name=\'Title\' /><Value Type=\'Text\'>Demo list item</Value></Eq></Where></View></Query>')}
+      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_LIST} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --query "<Query><View><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo list item</Value></Eq></Where></View></Query>"
+    
+    Get a list of items from list with a GUID of ${chalk.grey('935c13a0-cc53-4103-8b48-c1d0828eaa7f')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
+      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_LIST} --id 935c13a0-cc53-4103-8b48-c1d0828eaa7f --webUrl https://contoso.sharepoint.com/sites/project-x
+
+    Get a list of items from list with title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}, specifying fields ${chalk.grey('ID,Title,Modified')}
+      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_LIST} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --fields "ID,Title,Modified"
+
+    Get a list of items from list with title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}, with an ODATA filter ${chalk.grey('Title eq \'Demo list item\'')}
+      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_LIST} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --filter "Title eq 'Demo list item'"
+
+    Get a list of items from list with title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}, with a page size of ${chalk.grey('10')}
+      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_LIST} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --pageSize 10
 
    `);
   }

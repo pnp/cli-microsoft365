@@ -256,7 +256,7 @@ describe(commands.LISTITEM_LIST, () => {
     assert.notEqual(actual, true);
   });
 
-  it('returns array of listItemInstance object when list item is requested', (done) => {
+  it('returns array of listItemInstance objects when a list of items is requested, and debug mode enabled', (done) => {
 
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
@@ -289,7 +289,7 @@ describe(commands.LISTITEM_LIST, () => {
     
   });
 
-  it('returns array of listItemInstance object when list item is requested with an output type of json, and a list of fields are specified', (done) => {
+  it('returns array of listItemInstance objects when a list of items is requested with an output type of json, and a list of fields and a filter specified', (done) => {
 
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
@@ -304,6 +304,8 @@ describe(commands.LISTITEM_LIST, () => {
       title: 'Demo List', 
       webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
       output: "json",
+      pageSize: 2,
+      filter: "Title eq 'Demo list item",
       fields: "Title,ID"
     }
 
@@ -324,7 +326,7 @@ describe(commands.LISTITEM_LIST, () => {
     
   });
 
-  it('returns array of listItemInstance object when list item is requested with no output type specified, and a list of fields are specified', (done) => {
+  it('returns array of listItemInstance objects when a list of items is requested with no output type specified, and a list of fields specified', (done) => {
 
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
@@ -358,7 +360,7 @@ describe(commands.LISTITEM_LIST, () => {
     
   });
 
-  it('returns array of listItemInstance objects when a list of items is requested with an output type of text, and no fields', (done) => {
+  it('returns array of listItemInstance objects when a list of items is requested with an output type of text, and no fields specified', (done) => {
 
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
@@ -392,7 +394,7 @@ describe(commands.LISTITEM_LIST, () => {
     
   });
 
-  it('returns an array of listItemInstance objects when list of items is requested with no output type specified, and a list of fields specified', (done) => {
+  it('returns array of listItemInstance objects when a list of items is requested with no output type specified, and a list of fields specified', (done) => {
 
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
@@ -406,7 +408,7 @@ describe(commands.LISTITEM_LIST, () => {
       debug: true, 
       title: 'Demo List', 
       webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
-      fields: "Title,ID"
+      fields: "Title,ID",
     }
 
     cmdInstance.action({ options: options }, () => {
@@ -426,7 +428,7 @@ describe(commands.LISTITEM_LIST, () => {
     
   });
 
-  it('returns an array of listItemInstance objects when a list of items is requested with a query specified', (done) => {
+  it('returns array of listItemInstance objects when a list of items is requested with a query specified, and output set to json, and debug mode is enabled', (done) => {
 
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
@@ -438,6 +440,41 @@ describe(commands.LISTITEM_LIST, () => {
 
     let options: any = { 
       debug: true, 
+      title: 'Demo List', 
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
+      query: "<View><Query><ViewFields><FieldRef Name='Title' /><FieldRef Name='Id' /></ViewFields><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo List Item 1</Value></Eq></Where></Query></View>",
+      output: "json"
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert.equal(returnArrayLength, expectedArrayLength);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+    
+  });
+
+  it('returns array of listItemInstance objects when a list of items is requested with a query specified, and debug mode is disabled', (done) => {
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'post').callsFake(postFakes);
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    let options: any = { 
+      debug: false, 
       title: 'Demo List', 
       webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
       query: "<View><Query><ViewFields><FieldRef Name='Title' /><FieldRef Name='Id' /></ViewFields><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo List Item 1</Value></Eq></Where></Query></View>"
