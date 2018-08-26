@@ -1,4 +1,4 @@
-# spo page column list
+# spo page column get
 
 Get information about a specific column of a modern page
 

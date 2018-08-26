@@ -115,7 +115,7 @@ describe(commands.PAGE_COLUMN_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.PAGE_COLUMN_LIST), true);
+    assert.equal(command.name.startsWith(commands.PAGE_COLUMN_GET), true);
   });
 
   it('has a description', () => {
@@ -139,7 +139,7 @@ describe(commands.PAGE_COLUMN_GET, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, () => {
       try {
-        assert.equal(telemetry.name, commands.PAGE_COLUMN_LIST);
+        assert.equal(telemetry.name, commands.PAGE_COLUMN_GET);
         done();
       }
       catch (e) {
@@ -630,7 +630,7 @@ describe(commands.PAGE_COLUMN_GET, () => {
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
     cmd.help({}, () => { });
-    assert(find.calledWith(commands.PAGE_COLUMN_LIST));
+    assert(find.calledWith(commands.PAGE_COLUMN_GET));
   });
 
   it('has help with examples', () => {
