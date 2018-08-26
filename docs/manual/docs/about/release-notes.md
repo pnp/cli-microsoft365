@@ -8,12 +8,21 @@
 
 - [spo contenttype field set](../cmd/spo/contenttype/contenttype-field-set.md) - adds or updates a site column reference in a site content type [#520](https://github.com/pnp/office365-cli/issues/520)
 - [spo page section get](../cmd/spo/page/page-section-get.md) - gets information about the specified modern page section [#410](https://github.com/pnp/office365-cli/issues/410)
+- [spo page section list](../cmd/spo/page/page-section-list.md) - lists sections in the specific modern page [#409](https://github.com/pnp/office365-cli/issues/409)
+
+**Microsoft Graph:**
+
+- [graph teams list](../cmd/graph/teams/teams-list.md) - lists Microsoft Teams in the current tenant [#558](https://github.com/pnp/office365-cli/pull/558)
 
 ### Changes
 
 - added support for upgrading projects built using SharePoint Framework v1.1.3 [#485](https://github.com/pnp/office365-cli/issues/485)
 - added support for upgrading projects built using SharePoint Framework v1.1.1 [#487](https://github.com/pnp/office365-cli/issues/487)
 - added support for upgrading projects built using SharePoint Framework v1.1.0 [#488](https://github.com/pnp/office365-cli/issues/488)
+- added support for upgrading projects built using SharePoint Framework v1.0.2 [#537](https://github.com/pnp/office365-cli/issues/537)
+- added support for upgrading projects built using SharePoint Framework v1.0.1 [#536](https://github.com/pnp/office365-cli/issues/536)
+- added support for upgrading projects built using SharePoint Framework v1.0.0 [#535](https://github.com/pnp/office365-cli/issues/535)
+- fixed created content type have different ID than specified [#550](https://github.com/pnp/office365-cli/issues/550)
 
 ## [v1.5.0](https://github.com/pnp/office365-cli/releases/tag/v1.5.0)
 
