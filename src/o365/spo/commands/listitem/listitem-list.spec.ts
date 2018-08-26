@@ -32,7 +32,7 @@ describe(commands.LISTITEM_LIST, () => {
     }
     if (opts.url.indexOf('/GetItems') > -1) {
       returnArrayLength = 2;
-      return Promise.resolve(
+      return Promise.resolve({value: 
         [{
           "Attachments": false,
           "AuthorId": 3,
@@ -51,11 +51,12 @@ describe(commands.LISTITEM_LIST, () => {
           "Created": "2018-08-15T13:44:10Z",
           "EditorId": 3,
           "GUID": "47c5fc61-afb7-4081-aa32-f4386b8a86ea",
+          "Id": 2,
           "ID": 2,
           "Modified": "2018-08-15T13:44:10Z",
           "Title": "Example item 2",
         }]
-      );
+      });
     }
     returnArrayLength = 0;
     return Promise.reject('Invalid request');
@@ -64,7 +65,7 @@ describe(commands.LISTITEM_LIST, () => {
   let getFakes = (opts: any) => {
     if (opts.url.indexOf('/items') > -1) {
       returnArrayLength = 2;
-      return Promise.resolve(
+      return Promise.resolve({ value: 
         [{
           "Attachments": false,
           "AuthorId": 3,
@@ -84,10 +85,11 @@ describe(commands.LISTITEM_LIST, () => {
           "EditorId": 3,
           "GUID": "47c5fc61-afb7-4081-aa32-f4386b8a86ea",
           "ID": 2,
+          "Id": 2,
           "Modified": "2018-08-15T13:44:10Z",
           "Title": "Example item 2",
         }]
-      );
+      });
     }
     returnArrayLength = 0;
     return Promise.reject('Invalid request');

@@ -39,10 +39,10 @@ Get a list of items from list with title _Demo List_ in site _https://contoso.sh
 spo listitem list --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x
 ```
 
-Get a list of items from list with title _Demo List_ in site _https://contoso.sharepoint.com/sites/project-x_ using the CAML query _<Query><View><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo list item</Value></Eq></Where></View></Query>_
+Get a list of items from list with title _Demo List_ in site _https://contoso.sharepoint.com/sites/project-x_ using the CAML query _<View><Query><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo list item</Value></Eq></Where></Query></View>_
 
 ```sh
-spo listitem list --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --query "<Query><View><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo list item</Value></Eq></Where></View></Query>"
+spo listitem list --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --query "<View><Query><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo list item</Value></Eq></Where></Query></View>"
 ```
 
 Get a list of items from list with a GUID of _935c13a0-cc53-4103-8b48-c1d0828eaa7f_ in site _https://contoso.sharepoint.com/sites/project-x_

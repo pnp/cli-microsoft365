@@ -5,7 +5,7 @@ export interface ListItemInstance {
   Created: Date;
   EditorId: number;
   GUID: string;
-  ID: number;
+  Id: number;
   Modified: Date;
   Title: string;
 } 

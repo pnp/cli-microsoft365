@@ -11,7 +11,7 @@ import {
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import { Auth } from '../../../../Auth';
-import { ListItemInstance } from './ListItemInstance';
+import { ListItemInstanceCollection } from './ListItemInstanceCollection';
 import { ContextInfo } from '../../spo';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -55,6 +55,9 @@ class SpoListItemListCommand extends SpoCommand {
     let siteAccessToken: string = '';
     let formDigestValue: string = '';
 
+    const fieldsArray: string[] = args.options.fields ? args.options.fields.split(",") 
+      : (!args.options.output || args.options.output === "text") ? ["Title", "Id"] : []
+
     const listRestUrl: string = (args.options.id ?
       `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(listIdArgument)}')`
       : `${args.options.webUrl}/_api/web/lists/getByTitle('${encodeURIComponent(listTitleArgument)}')`);
@@ -96,14 +99,9 @@ class SpoListItemListCommand extends SpoCommand {
         formDigestValue = args.options.query ? res['FormDigestValue'] : '';
         const rowLimit: string = args.options.pageSize ? `$top=${args.options.pageSize}` : ``
         const filter: string = args.options.filter ? `$filter=${encodeURIComponent(args.options.filter)}` : ``
-        const fieldSelect: string = args.options.fields ?
-          `?$select=${encodeURIComponent(args.options.fields)}&${rowLimit}&${filter}` :
-          (
-            (!args.options.output || args.options.output === 'text') ?
-              `?$select=Id,Title&${rowLimit}&${filter}` :
-              `?${rowLimit}&${filter}`
-          )
-
+        const fieldSelect: string = fieldsArray.length > 0 ?
+          `?$select=${encodeURIComponent(fieldsArray.join(","))}&${rowLimit}&${filter}` :
+          `?${rowLimit}&${filter}`
         const requestBody: any = args.options.query ?
             {
               "query": { 
@@ -131,9 +129,17 @@ class SpoListItemListCommand extends SpoCommand {
 
         return args.options.query ? request.post(requestOptions) : request.get(requestOptions);
       })
-      .then((response: any): void => {
-        (!args.options.output || args.options.output === 'text') && delete response["ID"];
-        cmd.log(<ListItemInstance>response);
+      .then((listItemInstances: ListItemInstanceCollection): void => {
+        if (args.options.output === 'json') {
+          cmd.log(listItemInstances.value);
+        }
+        else {
+          
+          cmd.log(listItemInstances.value.map(l => {
+            if ((<any>l)["ID"] && l["Id"]) delete (<any>l)["ID"];
+            return l;
+          }));
+        }
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
@@ -245,8 +251,8 @@ class SpoListItemListCommand extends SpoCommand {
     Get a list of items from list with title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
       ${chalk.grey(config.delimiter)} ${commands.LISTITEM_LIST} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x
 
-    Get a list of items from list with title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} using the CAML query ${chalk.grey('<Query><View><Where><Eq><FieldRef Name=\'Title\' /><Value Type=\'Text\'>Demo list item</Value></Eq></Where></View></Query>')}
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_LIST} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --query "<Query><View><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo list item</Value></Eq></Where></View></Query>"
+    Get a list of items from list with title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} using the CAML query ${chalk.grey('<View><Query><Where><Eq><FieldRef Name=\'Title\' /><Value Type=\'Text\'>Demo list item</Value></Eq></Where></Query></View>')}
+      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_LIST} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --query "<View><Query><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo list item</Value></Eq></Where></Query></View>"
     
     Get a list of items from list with a GUID of ${chalk.grey('935c13a0-cc53-4103-8b48-c1d0828eaa7f')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
       ${chalk.grey(config.delimiter)} ${commands.LISTITEM_LIST} --id 935c13a0-cc53-4103-8b48-c1d0828eaa7f --webUrl https://contoso.sharepoint.com/sites/project-x
