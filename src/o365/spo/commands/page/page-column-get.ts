@@ -52,7 +52,9 @@ class SpoPageColumnGetCommand extends SpoCommand {
           const isJSONOutput = args.options.output === 'json';
           const columns = sections[0].columns.filter(col => col.order === args.options.column);
           if (columns.length) {
-            cmd.log(Page.getColumnsInformation(columns[0], isJSONOutput));
+            const column = Page.getColumnsInformation(columns[0], isJSONOutput);
+            column.controls = columns[0].controls.map(control => Page.getControlsInformation(control, isJSONOutput));
+            cmd.log(column);
           }
         }
 
