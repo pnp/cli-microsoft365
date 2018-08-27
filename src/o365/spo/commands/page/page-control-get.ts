@@ -48,14 +48,9 @@ class SpoPageControlGetCommand extends SpoCommand {
         const control: ClientSidePart | null = clientSidePage.findControlById(args.options.id);
 
         if (control) {
-          // remove the column property to be able to serialize the object to JSON
-          delete control.column;
+          const isJSONOutput = args.options.output === 'json';
 
-          if (args.options.output !== 'json') {
-            (control as any).controlType = SpoPageControlGetCommand.getControlTypeDisplayName((control as any).controlType);
-          }
-
-          cmd.log(control);
+          cmd.log(Page.getControlsInformation(control, isJSONOutput));
 
           if (this.verbose) {
             cmd.log(vorpal.chalk.green('DONE'));
@@ -69,19 +64,6 @@ class SpoPageControlGetCommand extends SpoCommand {
 
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
-  }
-
-  private static getControlTypeDisplayName(controlType: number): string {
-    switch (controlType) {
-      case 0:
-        return 'Empty column';
-      case 3:
-        return 'Client-side web part';
-      case 4:
-        return 'Client-side text';
-      default:
-        return '' + controlType;
-    }
   }
 
   public options(): CommandOption[] {
