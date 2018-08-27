@@ -181,11 +181,13 @@ describe(commands.PAGE_COLUMN_LIST, () => {
         assert(cmdInstanceLogSpy.calledWith([
           {
             "order": 1,
-            "factor": 6
+            "factor": 6,
+            "controls": 1
           },
           {
             "order": 2,
-            "factor": 6
+            "factor": 6,
+            "controls": 0
           }
         ]));
         done();
@@ -296,11 +298,13 @@ describe(commands.PAGE_COLUMN_LIST, () => {
         assert(cmdInstanceLogSpy.calledWith([
           {
             "order": 1,
-            "factor": 6
+            "factor": 6,
+            "controls": 1
           },
           {
             "order": 2,
-            "factor": 6
+            "factor": 6,
+            "controls": 0
           }
         ]));
         done();
@@ -330,10 +334,12 @@ describe(commands.PAGE_COLUMN_LIST, () => {
           {
             "order": 1,
             "factor": 6,
+            "controls": 1
           },
           {
             "order": 2,
-            "factor": 6
+            "factor": 6,
+            "controls": 0
           }
         ]));
         done();
@@ -364,12 +370,14 @@ describe(commands.PAGE_COLUMN_LIST, () => {
           "order": 1,
           "dataVersion": "1.0",
           "jsonData": "&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1&#125;&#125;",
+          "controls": 1
         },
         {
           "factor": 6,
           "order": 2,
           "dataVersion": "1.0",
           "jsonData": "&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;2,&quot;zoneIndex&quot;&#58;1&#125;&#125;",
+          "controls": 0
         }]));
         done();
       }
