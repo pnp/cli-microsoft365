@@ -275,7 +275,7 @@ Get-PnPStoredCredential|SharePointPnPPowerShellOnline|
 Get-PnPSubWebs|SharePointPnPPowerShellOnline|
 Get-PnPTaxonomyItem|SharePointPnPPowerShellOnline|
 Get-PnPTaxonomySession|SharePointPnPPowerShellOnline|
-Get-PnPTenant|SharePointPnPPowerShellOnline|
+Get-PnPTenant|SharePointPnPPowerShellOnline|[spo tenant settings list](../cmd/spo/tenant/tenant-settings-list.md)
 Get-PnPTenantAppCatalogUrl|SharePointPnPPowerShellOnline|[spo tenant appcatalogurl get](../cmd/spo/tenant/tenant-appcatalogurl-get.md)
 Get-PnPTenantCdnEnabled|SharePointPnPPowerShellOnline|[spo cdn get](../cmd/spo/cdn/cdn-get.md)
 Get-PnPTenantCdnOrigin|SharePointPnPPowerShellOnline|[spo cdn origin list](../cmd/spo/cdn/cdn-origin-list.md)
