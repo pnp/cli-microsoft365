@@ -262,12 +262,14 @@ theme:
   name: 'material'
   palette:
     primary: 'red'
-  logo: 'images/office.png'
+  logo: 'images/pnp-office365-cli-white.svg'
   feature:
     tabs: true
 google_analytics:
   - 'UA-110480857-1'
   - 'auto'
+extra_css:
+  - 'css/styles.css'
 markdown_extensions:
   - admonition
   - codehilite:
