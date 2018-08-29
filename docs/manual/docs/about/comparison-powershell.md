@@ -83,7 +83,7 @@ Remove-SPOMigrationJob|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOMultiGeoCompanyAllowedDataLocation|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOPublicCdnOrigin|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOSdnProvider|Microsoft.Online.SharePoint.PowerShell|
-Remove-SPOSite|Microsoft.Online.SharePoint.PowerShell|
+Remove-SPOSite|Microsoft.Online.SharePoint.PowerShell|[spo site classic remove](../cmd/spo/site/site-classic-remove.md)
 Remove-SPOSiteCollectionAppCatalog|Microsoft.Online.SharePoint.PowerShell|[spo site appcatalog remove](../cmd/spo/site/site-appcatalog-remove.md)
 Remove-SPOSiteCollectionAppCatalogById|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOSiteDesign|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign remove](../cmd/spo/sitedesign/sitedesign-remove.md)
