@@ -20,7 +20,8 @@
     "build": "tsc -p .",
     "watch": "tsc -w -p .",
     "clean": "rimraf ./dist",
-    "test": "nyc -r=lcov -r=text mocha \"dist/**/*.spec.js\""
+    "test": "nyc -r=lcov -r=text mocha \"dist/**/*.spec.js\"",
+    "test-stuff": "nyc -r=lcov -r=text mocha \"dist/**/site-classic-remove.spec.js\""
   },
   "keywords": [
     "office 365",
