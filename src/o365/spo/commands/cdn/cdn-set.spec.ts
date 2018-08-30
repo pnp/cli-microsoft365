@@ -253,6 +253,120 @@ describe(commands.CDN_SET, () => {
     });
   });
 
+  it('enables both CDN\'s when Both type specified and enabled set to true', (done) => {
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: true, enabled: 'true', type: 'Both' } }, () => {
+      let setRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.headers['X-RequestDigest'] &&
+          r.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="12" ObjectPathId="11" /><Method Name="SetTenantCdnEnabled" Id="13" ObjectPathId="11"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="SetTenantCdnEnabled" Id="14" ObjectPathId="11"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="CreateTenantCdnDefaultOrigins" Id="15" ObjectPathId="11"><Parameters><Parameter Type="Enum">0</Parameter></Parameters></Method><Method Name="CreateTenantCdnDefaultOrigins" Id="16" ObjectPathId="11"><Parameters><Parameter Type="Enum">0</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="11" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+          setRequestIssued = true;
+        }
+      });
+
+      try {
+        assert(setRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('disables both CDN when Both type specified and enabled set to false', (done) => {
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, enabled: 'false', type: 'Both' } }, () => {
+      let setRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.headers['X-RequestDigest'] &&
+          r.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="12" ObjectPathId="11" /><Method Name="SetTenantCdnEnabled" Id="13" ObjectPathId="11"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Name="SetTenantCdnEnabled" Id="14" ObjectPathId="11"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Name="CreateTenantCdnDefaultOrigins" Id="15" ObjectPathId="11"><Parameters><Parameter Type="Enum">0</Parameter></Parameters></Method><Method Name="CreateTenantCdnDefaultOrigins" Id="16" ObjectPathId="11"><Parameters><Parameter Type="Enum">0</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="11" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+          setRequestIssued = true;
+        }
+      });
+
+      try {
+        assert(setRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('disables both CDN when Both type specified and enabled set to false (debug)', (done) => {
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: true, enabled: 'false', type: 'Both' } }, () => {
+      let setRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.headers['X-RequestDigest'] &&
+          r.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="12" ObjectPathId="11" /><Method Name="SetTenantCdnEnabled" Id="13" ObjectPathId="11"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Name="SetTenantCdnEnabled" Id="14" ObjectPathId="11"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Name="CreateTenantCdnDefaultOrigins" Id="15" ObjectPathId="11"><Parameters><Parameter Type="Enum">0</Parameter></Parameters></Method><Method Name="CreateTenantCdnDefaultOrigins" Id="16" ObjectPathId="11"><Parameters><Parameter Type="Enum">0</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="11" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+          setRequestIssued = true;
+        }
+      });
+
+      try {
+        assert(setRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('enables both CDN\'s when Both type specified and enabled set to true, without Default Origins', (done) => {
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: true, enabled: 'true', type: 'Both', noDefaultOrigins: true } }, () => {
+      let setRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.headers['X-RequestDigest'] &&
+          r.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="12" ObjectPathId="11" /><Method Name="SetTenantCdnEnabled" Id="13" ObjectPathId="11"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="SetTenantCdnEnabled" Id="14" ObjectPathId="11"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="CreateTenantCdnDefaultOrigins" Id="15" ObjectPathId="11"><Parameters><Parameter Type="Enum">1</Parameter></Parameters></Method><Method Name="CreateTenantCdnDefaultOrigins" Id="16" ObjectPathId="11"><Parameters><Parameter Type="Enum">1</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="11" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+          setRequestIssued = true;
+        }
+      });
+
+      try {
+        assert(setRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  // ToDo: Implement test for --noDefaultOrigines flag
+
   it('correctly handles an error when setting tenant CDN settings', (done) => {
     Utils.restore(request.post);
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -343,10 +457,15 @@ describe(commands.CDN_SET, () => {
     assert.equal(actual, true);
   });
 
+  it('accepts Both SharePoint Online CDN type', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { type: 'Both', enabled: 'true' } });
+    assert.equal(actual, true);
+  });
+
   it('rejects invalid SharePoint Online CDN type', () => {
     const type = 'foo';
     const actual = (command.validate() as CommandValidate)({ options: { type: type, enabled: 'true' } });
-    assert.equal(actual, `${type} is not a valid CDN type. Allowed values are Public|Private`);
+    assert.equal(actual, `${type} is not a valid CDN type. Allowed values are Public|Private|Both`);
   });
 
   it('doesn\'t fail validation if the optional type option not specified', () => {
