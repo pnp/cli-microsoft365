@@ -10,7 +10,15 @@ describe('FN007001_CFG_S_schema', () => {
   beforeEach(() => {
     findings = [];
     rule = new FN007001_CFG_S_schema('test-schema');
-  })
+  });
+
+  it('doesn\'t return notification if no serve.json found', () => {
+    const project: Project = {
+      path: '/usr/tmp'
+    };
+    rule.visit(project, findings);
+    assert.equal(findings.length, 0);
+  });
 
   it('doesn\'t return notification if schema is already up-to-date', () => {
     const project: Project = {

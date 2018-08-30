@@ -40,7 +40,7 @@ export class FN012003_TSC_skipLibCheck extends Rule {
   };
 
   visit(project: Project, findings: Finding[]): void {
-    if (!project.tsConfigJson) {
+    if (!project.tsConfigJson || !project.tsConfigJson.compilerOptions) {
       return;
     }
 

@@ -10,7 +10,15 @@ describe('FN004001_CFG_CA_schema', () => {
   beforeEach(() => {
     findings = [];
     rule = new FN004001_CFG_CA_schema('test-schema');
-  })
+  });
+
+  it('doesn\'t return notification if no copy-assets.json found', () => {
+    const project: Project = {
+      path: '/usr/tmp'
+    };
+    rule.visit(project, findings);
+    assert.equal(findings.length, 0);
+  });
 
   it('doesn\'t return notification if schema is already up-to-date', () => {
     const project: Project = {

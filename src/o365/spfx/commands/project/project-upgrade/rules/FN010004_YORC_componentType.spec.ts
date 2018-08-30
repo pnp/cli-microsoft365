@@ -10,7 +10,15 @@ describe('FN010004_YORC_componentType', () => {
   beforeEach(() => {
     findings = [];
     rule = new FN010004_YORC_componentType('webpart');
-  })
+  });
+
+  it('doesn\'t return notification if no .yo-rc.json found', () => {
+    const project: Project = {
+      path: '/usr/tmp'
+    };
+    rule.visit(project, findings);
+    assert.equal(findings.length, 0);
+  });
 
   it('doesn\'t return notification if componentType is already up-to-date', () => {
     const project: Project = {

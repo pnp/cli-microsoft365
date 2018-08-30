@@ -40,7 +40,7 @@ export class FN012001_TSC_module extends Rule {
   };
 
   visit(project: Project, findings: Finding[]): void {
-    if (!project.tsConfigJson) {
+    if (!project.tsConfigJson || !project.tsConfigJson.compilerOptions) {
       return;
     }
 

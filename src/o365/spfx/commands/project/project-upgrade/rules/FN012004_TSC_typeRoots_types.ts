@@ -42,7 +42,7 @@ export class FN012004_TSC_typeRoots_types extends Rule {
   };
 
   visit(project: Project, findings: Finding[]): void {
-    if (!project.tsConfigJson) {
+    if (!project.tsConfigJson || !project.tsConfigJson.compilerOptions) {
       return;
     }
 

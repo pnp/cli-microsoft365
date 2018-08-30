@@ -9,7 +9,7 @@ import * as fs from 'fs';
 import { Finding, Utils } from './project-upgrade/';
 import { Rule } from './project-upgrade/rules/Rule';
 import { EOL } from 'os';
-import { Project, Manifest } from './project-upgrade/model';
+import { Project, Manifest, TsFile } from './project-upgrade/model';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -41,7 +41,8 @@ class SpfxProjectUpgradeCommand extends Command {
     '1.4.0',
     '1.4.1',
     '1.5.0',
-    '1.5.1'
+    '1.5.1',
+    '1.6.0'
   ];
 
   public get name(): string {
@@ -278,7 +279,17 @@ class SpfxProjectUpgradeCommand extends Command {
       catch { }
     }
 
+    const srcFiles: string[] = SpfxProjectUpgradeCommand.readdirR(path.join(projectRootPath, 'src')) as string[];
+    const tsFiles: string[] = srcFiles.filter(f => f.endsWith('.ts') || f.endsWith('.tsx'));
+    project.tsFiles = tsFiles.map(f => new TsFile(f));
+
     return project;
+  }
+
+  private static readdirR(dir: string): string | string[] {
+    return fs.statSync(dir).isDirectory()
+      ? Array.prototype.concat(...fs.readdirSync(dir).map(f => SpfxProjectUpgradeCommand.readdirR(path.join(dir, f))))
+      : dir;
   }
 
   private getMdReport(findings: Finding[]): string {
@@ -299,17 +310,11 @@ ${f.resolution}
 `;
           break;
         case 'json':
-          resolution = `In file [${f.file}](${f.file}) update the code as follows:
-
-\`\`\`json
-${f.resolution}
-\`\`\`
-`;
-          break;
         case 'js':
+        case 'ts':
           resolution = `In file [${f.file}](${f.file}) update the code as follows:
 
-\`\`\`js
+\`\`\`${f.resolutionType}
 ${f.resolution}
 \`\`\`
 `;
@@ -337,7 +342,7 @@ ${f.resolution}
         EOL,
         resolution,
         EOL,
-        `File: [${f.file}](${f.file})`, EOL,
+        `File: [${f.file}${(f.position ? `:${f.position.line}:${f.position.character}` : '')}](${f.file})`, EOL,
         EOL
       );
     });
@@ -450,7 +455,7 @@ ${f.resolution}
     The ${this.name} command helps you upgrade your SharePoint Framework
     project to the specified version. If no version is specified, the command
     will upgrade to the latest version of the SharePoint Framework it supports
-    (v1.5.1).
+    (v1.6.0).
 
     This command doesn't change your project files. Instead, it gives you
     a report with all steps necessary to upgrade your project to the specified
@@ -462,7 +467,7 @@ ${f.resolution}
 
     Using this command you can upgrade SharePoint Framework projects built using
     versions: 1.0.0, 1.0.1, 1.0.2, 1.1.0, 1.1.1, 1.1.3, 1.2.0, 1.3.0, 1.3.1,
-    1.3.2, 1.3.4, 1.4.0, 1.4.1, 1.5.0 and 1.5.1.
+    1.3.2, 1.3.4, 1.4.0, 1.4.1, 1.5.0, 1.5.1 and 1.6.0.
 
   Examples:
   

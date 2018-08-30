@@ -42,7 +42,7 @@ export class FN012006_TSC_types_es6_collections extends Rule {
   };
 
   visit(project: Project, findings: Finding[]): void {
-    if (!project.tsConfigJson) {
+    if (!project.tsConfigJson || !project.tsConfigJson.compilerOptions) {
       return;
     }
 

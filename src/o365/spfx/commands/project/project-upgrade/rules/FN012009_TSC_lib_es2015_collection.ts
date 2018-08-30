@@ -42,7 +42,7 @@ export class FN012009_TSC_lib_es2015_collection extends Rule {
   };
 
   visit(project: Project, findings: Finding[]): void {
-    if (!project.tsConfigJson) {
+    if (!project.tsConfigJson || !project.tsConfigJson.compilerOptions) {
       return;
     }
 
