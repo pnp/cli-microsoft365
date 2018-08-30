@@ -217,7 +217,7 @@ class SpoCdnSetCommand extends SpoCommand {
       ${chalk.grey(config.delimiter)} ${commands.CDN_SET} -t Both -e true 
 
     Enable the Office 365 Private and Public CDN on the current tenant without the default Origins 
-      ${chalk.grey(config.delimiter)} ${commands.CDN_SET} -t Both -e true -noDefaultOrigins
+      ${chalk.grey(config.delimiter)} ${commands.CDN_SET} -t Both -e true --noDefaultOrigins
 
   More information:
 
