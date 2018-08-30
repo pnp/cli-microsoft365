@@ -10,7 +10,15 @@ describe('FN010001_YORC_version', () => {
   beforeEach(() => {
     findings = [];
     rule = new FN010001_YORC_version('1.5.0');
-  })
+  });
+
+  it('doesn\'t return notification if no .yo-rc.json found', () => {
+    const project: Project = {
+      path: '/usr/tmp'
+    };
+    rule.visit(project, findings);
+    assert.equal(findings.length, 0);
+  });
 
   it('doesn\'t return notification if version is already up-to-date', () => {
     const project: Project = {

@@ -10,7 +10,15 @@ describe('FN006001_CFG_PS_schema', () => {
   beforeEach(() => {
     findings = [];
     rule = new FN006001_CFG_PS_schema('test-schema');
-  })
+  });
+
+  it('doesn\'t return notification if no package-solution.json found', () => {
+    const project: Project = {
+      path: '/usr/tmp'
+    };
+    rule.visit(project, findings);
+    assert.equal(findings.length, 0);
+  });
 
   it('doesn\'t return notification if schema is already up-to-date', () => {
     const project: Project = {

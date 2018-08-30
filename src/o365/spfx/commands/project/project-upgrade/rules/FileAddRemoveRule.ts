@@ -5,7 +5,7 @@ import { Project } from "../model";
 import { Finding } from "../Finding";
 
 export abstract class FileAddRemoveRule extends Rule {
-  constructor(private filePath: string, private add: boolean) {
+  constructor(private filePath: string, private add: boolean, private contents?: string) {
     super();
   }
 
@@ -18,7 +18,14 @@ export abstract class FileAddRemoveRule extends Rule {
   }
 
   get resolution(): string {
-    return `${this.add ? 'touch' : 'rm'} ${this.filePath}`;
+    if (this.add) {
+      return `cat > ${this.filePath} << EOF
+${this.contents}
+EOF`;
+    }
+    else {
+      return `rm ${this.filePath}`;
+    }
   }
 
   get resolutionType(): string {

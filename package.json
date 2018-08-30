@@ -67,6 +67,7 @@
     "omelette": "^0.4.11",
     "request-promise-native": "^1.0.5",
     "semver": "^5.5.1",
+    "typescript": "^3.0.3",
     "update-notifier": "^2.5.0",
     "vorpal": "github:pnp/vorpal"
   },
@@ -83,8 +84,7 @@
     "mocha": "^5.2.0",
     "nyc": "^12.0.2",
     "rimraf": "^2.6.2",
-    "sinon": "^6.1.5",
-    "typescript": "^3.0.1"
+    "sinon": "^6.1.5"
   },
   "nyc": {
     "exclude": [
