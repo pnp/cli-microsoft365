@@ -71,6 +71,25 @@ class SpoTenantSettingsListCommand extends SpoCommand {
         delete result['_ObjectIdentity_'];
         delete result['_ObjectType_'];
 
+        // map integers to their enums
+        const sharingLinkType = ['None','Direct','Internal','AnonymousAccess'];
+        const sharingCapabilities = ['Disabled','ExternalUserSharingOnly','ExternalUserAndGuestSharing','ExistingExternalUserSharingOnly'];
+        const sharingDomainRestrictionModes = ['None','AllowList','BlockList'];
+        const sharingState = ['Unspecified','On','Off'];
+        const anonymousLinkType = ['None','View','Edit'];
+        const sharingPermissionType = ['None', 'View', 'Edit'];
+        const sPOConditionalAccessPolicyType = ['AllowFullAccess', 'AllowLimitedAccess', 'BlockAccess'];
+
+        result['SharingCapability'] = sharingCapabilities[result['SharingCapability']];
+        result['SharingDomainRestrictionMode'] = sharingDomainRestrictionModes[result['SharingDomainRestrictionMode']];
+        result['ODBMembersCanShare'] = sharingState[result['ODBMembersCanShare']];
+        result['ODBAccessRequests'] = sharingState[result['ODBAccessRequests']];
+        result['DefaultSharingLinkType'] = sharingLinkType[result['DefaultSharingLinkType']];
+        result['FileAnonymousLinkType'] = anonymousLinkType[result['FileAnonymousLinkType']];
+        result['FolderAnonymousLinkType'] = anonymousLinkType[result['FolderAnonymousLinkType']];
+        result['DefaultLinkPermission'] = sharingPermissionType[result['DefaultLinkPermission']];
+        result['ConditionalAccessPolicy'] = sPOConditionalAccessPolicyType[result['ConditionalAccessPolicy']];
+
         cmd.log(result);
         
         cb();

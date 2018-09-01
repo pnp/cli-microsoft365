@@ -251,6 +251,16 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
         assert.equal(cmdInstanceLogSpy.lastCall.args[0].UserVoiceForFeedbackEnabled, false);
         assert.equal(cmdInstanceLogSpy.lastCall.args[0]["_ObjectType_"], undefined);
         assert.equal(cmdInstanceLogSpy.lastCall.args[0]["_ObjectIdentity_"], undefined);
+
+        assert.equal(cmdInstanceLogSpy.lastCall.args[0]["SharingCapability"], 'ExternalUserSharingOnly');
+        assert.equal(cmdInstanceLogSpy.lastCall.args[0]["SharingDomainRestrictionMode"], 'AllowList');
+        assert.equal(cmdInstanceLogSpy.lastCall.args[0]["ODBMembersCanShare"], 'Unspecified');
+        assert.equal(cmdInstanceLogSpy.lastCall.args[0]["ODBAccessRequests"], 'Unspecified');
+        assert.equal(cmdInstanceLogSpy.lastCall.args[0]["DefaultSharingLinkType"], 'Direct');
+        assert.equal(cmdInstanceLogSpy.lastCall.args[0]["FileAnonymousLinkType"], 'Edit');
+        assert.equal(cmdInstanceLogSpy.lastCall.args[0]["FolderAnonymousLinkType"], 'Edit');
+        assert.equal(cmdInstanceLogSpy.lastCall.args[0]["DefaultLinkPermission"], 'View');
+        assert.equal(cmdInstanceLogSpy.lastCall.args[0]["ConditionalAccessPolicy"], 'AllowFullAccess');
         done();
       }
       catch (e) {
