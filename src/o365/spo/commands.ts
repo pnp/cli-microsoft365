@@ -72,6 +72,7 @@ export default {
   PAGE_SECTION_GET: `${prefix} page section get`,
   PAGE_SECTION_LIST: `${prefix} page section list`,
   PAGE_COLUMN_LIST: `${prefix} page column list`,
+  PAGE_COLUMN_GET: `${prefix} page column get`,
   PAGE_CONTROL_GET: `${prefix} page control get`,
   PAGE_CONTROL_LIST: `${prefix} page control list`,
   PAGE_GET: `${prefix} page get`,

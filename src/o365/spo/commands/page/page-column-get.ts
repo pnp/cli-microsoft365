@@ -5,10 +5,9 @@ import {
   CommandOption, CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import Utils from '../../../../Utils';
 import GlobalOptions from '../../../../GlobalOptions';
 import { Auth } from '../../../../Auth';
-import { ClientSidePage, ClientSidePart } from './clientsidepages';
+import { ClientSidePage, CanvasSection } from './clientsidepages';
 import { Page } from './Page';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -18,18 +17,19 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  id: string;
   name: string;
+  section: number;
+  column: number;
   webUrl: string;
 }
 
-class SpoPageControlGetCommand extends SpoCommand {
+class SpoPageColumnGetCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.PAGE_CONTROL_GET}`;
+    return `${commands.PAGE_COLUMN_GET}`;
   }
 
   public get description(): string {
-    return 'Gets information about the specific control on a modern page';
+    return 'Get information about a specific column of a modern page';
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
@@ -45,21 +45,21 @@ class SpoPageControlGetCommand extends SpoCommand {
         return Page.getPage(args.options.name, args.options.webUrl, accessToken, cmd, this.debug, this.verbose);
       })
       .then((clientSidePage: ClientSidePage): void => {
-        const control: ClientSidePart | null = clientSidePage.findControlById(args.options.id);
+        const sections: CanvasSection[] = clientSidePage.sections
+          .filter(section => section.order === args.options.section);
 
-        if (control) {
+        if (sections.length) {
           const isJSONOutput = args.options.output === 'json';
-
-          cmd.log(Page.getControlsInformation(control, isJSONOutput));
-
-          if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
+          const columns = sections[0].columns.filter(col => col.order === args.options.column);
+          if (columns.length) {
+            const column = Page.getColumnsInformation(columns[0], isJSONOutput);
+            column.controls = columns[0].controls.map(control => Page.getControlsInformation(control, isJSONOutput));
+            cmd.log(column);
           }
         }
-        else {
-          if (this.verbose) {
-            cmd.log(`Control with ID ${args.options.id} not found on page ${args.options.name}`);
-          }
+
+        if (this.verbose) {
+          cmd.log(vorpal.chalk.green('DONE'));
         }
 
         cb();
@@ -69,16 +69,20 @@ class SpoPageControlGetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'ID of the control to retrieve information for'
+        option: '-u, --webUrl <webUrl>',
+        description: 'URL of the site where the page to retrieve is located'
       },
       {
         option: '-n, --name <name>',
-        description: 'Name of the page where the control is located'
+        description: 'Name of the page to list columns of'
       },
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the page to retrieve is located'
+        option: '-s, --section <sectionId>',
+        description: 'ID of the section for which to list columns'
+      },
+      {
+        option: '-c, --column <column>',
+        description: 'ID of the column for which to retrieve more information'
       }
     ];
 
@@ -88,20 +92,30 @@ class SpoPageControlGetCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.id) {
-        return 'Required parameter id missing';
-      }
-
-      if (!Utils.isValidGuid(args.options.id)) {
-        return `${args.options.id} is not a valid GUID`;
-      }
-
       if (!args.options.name) {
         return 'Required parameter name missing';
       }
 
       if (!args.options.webUrl) {
         return 'Required parameter webUrl missing';
+      }
+
+      if (!args.options.section) {
+        return 'Required parameter section missing';
+      }
+      else {
+        if (isNaN(args.options.section)) {
+          return `${args.options.section} is not a number`;
+        }
+      }
+
+      if (!args.options.column) {
+        return 'Required parameter column missing';
+      }
+      else {
+        if (isNaN(args.options.column)) {
+          return `${args.options.column} is not a number`;
+        }
       }
 
       return SpoCommand.isValidSharePointUrl(args.options.webUrl);
@@ -117,21 +131,19 @@ class SpoPageControlGetCommand extends SpoCommand {
         
   Remarks:
 
-    To get information about a control on a modern page, you have to first
+    To get information about the specific column of a modern page, you have to first
     connect to a SharePoint site using the ${chalk.blue(commands.CONNECT)} command,
     eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
 
-    If the specified ${chalk.grey('name')} doesn't refer to an existing modern page, you will get
-    a ${chalk.grey('File doesn\'t exists')} error.
+    If the specified ${chalk.grey('name')} doesn't refer to an existing modern
+    page, you will get a ${chalk.grey('File doesn\'t exists')} error.
 
   Examples:
   
-    Get information about the control with ID
-    ${chalk.grey('3ede60d3-dc2c-438b-b5bf-cc40bb2351e1')} placed on a modern page
-    with name ${chalk.grey('home.aspx')}
-      ${chalk.grey(config.delimiter)} ${this.name} --id 3ede60d3-dc2c-438b-b5bf-cc40bb2351e1 --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx
+    Get information about the specific column of a modern page with name ${chalk.grey('home.aspx')}
+      ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx --section 1 --column 1
 `);
   }
 }
 
-module.exports = new SpoPageControlGetCommand();
+module.exports = new SpoPageColumnGetCommand();
