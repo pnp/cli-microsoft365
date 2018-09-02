@@ -172,6 +172,7 @@ nav:
         - groupsetting add: 'cmd/graph/groupsetting/groupsetting-add.md'
         - groupsetting get: 'cmd/graph/groupsetting/groupsetting-get.md'
         - groupsetting list: 'cmd/graph/groupsetting/groupsetting-list.md'
+        - groupsetting remove: 'cmd/graph/groupsetting/groupsetting-remove.md'
       - groupsettingtemplate:
         - groupsettingtemplate get: 'cmd/graph/groupsettingtemplate/groupsettingtemplate-get.md'
         - groupsettingtemplate list: 'cmd/graph/groupsettingtemplate/groupsettingtemplate-list.md'
