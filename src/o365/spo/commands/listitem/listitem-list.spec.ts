@@ -253,8 +253,23 @@ describe(commands.LISTITEM_LIST, () => {
     assert.notEqual(actual, true);
   });
 
+  it('fails validation if query and pageNumber are specified together', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', query: '<Query><RowLimit>2</RowLimit></Query>', pageNumber: 3 } });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation if pageNumber is specified and pageSize is not', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', pageNumber: 3 } });
+    assert.notEqual(actual, true);
+  });
+
   it('fails validation if the specific pageSize is not a number', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', pageSize: 'abc' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation if the specific pageNumber is not a number', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', pageSize: 3, pageNumber: 'abc' } });
     assert.notEqual(actual, true);
   });
 
@@ -308,6 +323,43 @@ describe(commands.LISTITEM_LIST, () => {
       output: "json",
       pageSize: 2,
       filter: "Title eq 'Demo list item",
+      fields: "Title,ID"
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert.equal(returnArrayLength, expectedArrayLength);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+    
+  });
+
+  it('returns array of listItemInstance objects when a list of items is requested with an output type of json, and a pageNumber is specified', (done) => {
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'post').callsFake(postFakes);
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    let options: any = { 
+      debug: false, 
+      title: 'Demo List', 
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
+      output: "json",
+      pageSize: 2,
+      pageNumber: 2,
       fields: "Title,ID"
     }
 

@@ -20,6 +20,7 @@ Option|Description
 `-f, --fields [fields]`|Comma-separated list of fields to retrieve. Will retrieve all fields if not specified and json output is requested. Specify `query` or `fields` but not both  
 `-l, --filter [odataFilter]`|ODATA filter to use to query the list of items with. Specify `query` or `filter` but not both
 `-p, --pageSize [pageSize]`|Number of list items to return. Specify `query` or `pageSize` but not both
+`-n, --pageNumber [pageNumber]`|Page number to return if `pageSize` is specified (first page is indexed as value of 0)
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
@@ -63,9 +64,9 @@ Get a list of items from list with title _Demo List_ in site _https://contoso.sh
 spo listitem list --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --filter "Title eq 'Demo list item'"
 ```
 
-Get a list of items from list with title _Demo List_ in site _https://contoso.sharepoint.com/sites/project-x_, with a page size of _10_
+Get a list of items from list with title _Demo List_ in site _https://contoso.sharepoint.com/sites/project-x_, with a page size of _10_, and a page number of _2_.  Note: pageNumber is specified as a 0 based index; a value of 2 returns the third page of items
 
 ```sh
-spo listitem list --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --pageSize 10
+spo listitem list --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --pageSize 10 --pageNumber 2
 ```
 

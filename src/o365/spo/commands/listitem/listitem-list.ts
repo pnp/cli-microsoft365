@@ -26,6 +26,7 @@ interface Options extends GlobalOptions {
   title?: string;
   query?: string;
   pageSize?: string;
+  pageNumber?: string;
   filter?: string;
   fields?: string;
 }
@@ -98,10 +99,11 @@ class SpoListItemListCommand extends SpoCommand {
         
         formDigestValue = args.options.query ? res['FormDigestValue'] : '';
         const rowLimit: string = args.options.pageSize ? `$top=${args.options.pageSize}` : ``
+        const skipToken: string = args.options.pageNumber ? `$skiptoken=Paged=TRUE%26p_ID=${Number(args.options.pageNumber) * Number(args.options.pageSize)}` : ``
         const filter: string = args.options.filter ? `$filter=${encodeURIComponent(args.options.filter)}` : ``
         const fieldSelect: string = fieldsArray.length > 0 ?
-          `?$select=${encodeURIComponent(fieldsArray.join(","))}&${rowLimit}&${filter}` :
-          `?${rowLimit}&${filter}`
+          `?$select=${encodeURIComponent(fieldsArray.join(","))}&${rowLimit}&${skipToken}&${filter}` :
+          `?${rowLimit}&${skipToken}&${filter}`
         const requestBody: any = args.options.query ?
             {
               "query": { 
@@ -163,8 +165,12 @@ class SpoListItemListCommand extends SpoCommand {
         description: 'The number of items to retrieve per page request'
       },
       {
+        option: '-n, --pageNumber [pageNumber]',
+        description: 'Page number to return if pageSize is specified (first page is indexed as value of 0)'
+      },
+      {
         option: '-q, --query [query]',
-        description: 'CAML query to use to retrieve items. Will ignore pageSize if specified'
+        description: 'CAML query to use to retrieve items. Will ignore pageSize and pageNumber if specified'
       },
       {
         option: '-f, --fields [fields]',
@@ -188,6 +194,7 @@ class SpoListItemListCommand extends SpoCommand {
         'title',
         'query',
         'pageSize',
+        'pageNumber',
         'fields',
         'filter',
       ],
@@ -221,8 +228,20 @@ class SpoListItemListCommand extends SpoCommand {
         return `Specify query or pageSize but not both`;
       }
 
+      if (args.options.query && args.options.pageNumber) {
+        return `Specify query or pageNumber but not both`;
+      }
+
       if (args.options.pageSize && isNaN(Number(args.options.pageSize))) {
         return `pageSize must be numeric`;
+      }
+
+      if (args.options.pageNumber && !args.options.pageSize) {
+        return `pageSize must be specified if pageNumber is specified`;
+      }
+
+      if (args.options.pageNumber && isNaN(Number(args.options.pageNumber))) {
+        return `pageNumber must be numeric`;
       }
 
       if (args.options.id &&
@@ -251,7 +270,8 @@ class SpoListItemListCommand extends SpoCommand {
     Get a list of items from list with title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
       ${chalk.grey(config.delimiter)} ${commands.LISTITEM_LIST} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x
 
-    Get a list of items from list with title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} using the CAML query ${chalk.grey('<View><Query><Where><Eq><FieldRef Name=\'Title\' /><Value Type=\'Text\'>Demo list item</Value></Eq></Where></Query></View>')}
+    Get a list of items from list with title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} using the CAML 
+    query ${chalk.grey('<View><Query><Where><Eq><FieldRef Name=\'Title\' /><Value Type=\'Text\'>Demo list item</Value></Eq></Where></Query></View>')}
       ${chalk.grey(config.delimiter)} ${commands.LISTITEM_LIST} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --query "<View><Query><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo list item</Value></Eq></Where></Query></View>"
     
     Get a list of items from list with a GUID of ${chalk.grey('935c13a0-cc53-4103-8b48-c1d0828eaa7f')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
@@ -263,8 +283,9 @@ class SpoListItemListCommand extends SpoCommand {
     Get a list of items from list with title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}, with an ODATA filter ${chalk.grey('Title eq \'Demo list item\'')}
       ${chalk.grey(config.delimiter)} ${commands.LISTITEM_LIST} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --filter "Title eq 'Demo list item'"
 
-    Get a list of items from list with title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}, with a page size of ${chalk.grey('10')}
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_LIST} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --pageSize 10
+    Get a list of items from list with title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}, with a page size of ${chalk.grey('10')} and a page number of ${chalk.grey('2')}. 
+    Note: pageNumber is specified as a 0 based index; a value of 2 returns the third page of items
+      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_LIST} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --pageSize 10 --pageNumber 2
 
    `);
   }
