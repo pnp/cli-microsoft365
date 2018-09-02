@@ -131,11 +131,11 @@ class SpoPageRemoveCommand extends SpoCommand {
 		const options: CommandOption[] = [
 			{
 				option: '-n, --name <name>',
-				description: 'Name of the page to create'
+				description: 'Name of the page to remove'
 			},
 			{
 				option: '-u, --webUrl <webUrl>',
-				description: 'URL of the site where the page should be created'
+				description: 'URL of the site from which the page should be removed'
 			},
 			{
 				option: '--confirm',
@@ -183,7 +183,7 @@ class SpoPageRemoveCommand extends SpoCommand {
     If you try to remove a page with that does not exist, you
     will get a ${chalk.grey('The file does not exist')} error.
 
-    If you set the --confirm flag, you will not be prompted for confirmation before the page is actually removed.
+    If you set the ${chalk.grey('--confirm')}  flag, you will not be prompted for confirmation before the page is actually removed.
 
   Examples:
 
