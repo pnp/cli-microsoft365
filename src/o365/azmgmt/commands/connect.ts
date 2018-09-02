@@ -64,7 +64,7 @@ class AzmgmtConnectCommand extends Command {
       }
 
       auth
-        .ensureAccessToken(auth.service.resource, cmd, args.options.debug)
+        .ensureAccessToken(auth.service.resource, cmd, this.debug)
         .then((accessToken: string): Promise<void> => {
           if (this.verbose) {
             cmd.log(chalk.green('DONE'));
