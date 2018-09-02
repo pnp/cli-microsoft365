@@ -1,5 +1,4 @@
 import Command, { CommandAction, CommandError } from '../../Command';
-import appInsights from '../../appInsights';
 import auth from './AadAuth';
 
 export default abstract class AadCommand extends Command {
@@ -10,14 +9,7 @@ export default abstract class AadCommand extends Command {
       auth
         .restoreAuth()
         .then((): void => {
-          cmd._debug = args.options.debug || false;
-          cmd._verbose = cmd._debug || args.options.verbose || false;
-
-          appInsights.trackEvent({
-            name: cmd.getCommandName(),
-            properties: cmd.getTelemetryProperties(args)
-          });
-          appInsights.flush();
+          cmd.initAction(args);
 
           if (!auth.service.connected) {
             cb(new CommandError('Connect to Azure Active Directory Graph first'));

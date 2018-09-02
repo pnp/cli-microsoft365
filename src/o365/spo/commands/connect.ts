@@ -72,7 +72,7 @@ class SpoConnectCommand extends Command {
 
       if (auth.site.isTenantAdminSite()) {
         auth
-          .ensureAccessToken(resource, cmd, args.options.debug)
+          .ensureAccessToken(resource, cmd, this.debug)
           .then((accessToken: string): request.RequestPromise => {
             auth.service.resource = resource;
             auth.site.url = args.url;
@@ -164,7 +164,7 @@ class SpoConnectCommand extends Command {
       }
       else {
         auth
-          .ensureAccessToken(resource, cmd, args.options.debug)
+          .ensureAccessToken(resource, cmd, this.debug)
           .then((accessToken: string): Promise<void> => {
             auth.service.resource = resource;
             if (this.verbose) {

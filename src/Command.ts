@@ -70,15 +70,7 @@ export default abstract class Command {
   public action(): CommandAction {
     const cmd: Command = this;
     return function (this: CommandInstance, args: CommandArgs, cb: () => void) {
-      cmd._debug = args.options.debug || false;
-      cmd._verbose = cmd._debug || args.options.verbose || false;
-
-      appInsights.trackEvent({
-        name: cmd.getCommandName(),
-        properties: cmd.getTelemetryProperties(args)
-      });
-      appInsights.flush();
-
+      cmd.initAction(args);
       cmd.commandAction(this, args, cb);
     }
   }
@@ -278,5 +270,16 @@ export default abstract class Command {
 
   protected handleRejectedPromise(rawResponse: any, cmd: CommandInstance, callback: (err?: any) => void): void {
     this.handleError(rawResponse, cmd, callback);
+  }
+
+  protected initAction(args: CommandArgs): void {
+    this._debug = args.options.debug || process.env.OFFICE365CLI_DEBUG === '1';
+    this._verbose = this._debug || args.options.verbose || process.env.OFFICE365CLI_VERBOSE === '1';
+
+    appInsights.trackEvent({
+      name: this.getCommandName(),
+      properties: this.getTelemetryProperties(args)
+    });
+    appInsights.flush();
   }
 }
