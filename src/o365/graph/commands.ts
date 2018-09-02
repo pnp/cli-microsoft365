@@ -7,6 +7,7 @@ export default {
   GROUPSETTING_GET: `${prefix} groupsetting get`,
   GROUPSETTING_LIST: `${prefix} groupsetting list`,
   GROUPSETTING_REMOVE: `${prefix} groupsetting remove`,
+  GROUPSETTING_SET: `${prefix} groupsetting set`,
   GROUPSETTINGTEMPLATE_GET: `${prefix} groupsettingtemplate get`,
   GROUPSETTINGTEMPLATE_LIST: `${prefix} groupsettingtemplate list`,
   O365GROUP_ADD: `${prefix} o365group add`,
