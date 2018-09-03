@@ -19,6 +19,10 @@ class SpoTenantSettingsListCommand extends SpoCommand {
     return 'Lists the global tenant settings';
   }
 
+  protected requiresTenantAdmin(): boolean {
+    return true;
+  }
+
   public commandAction(cmd: CommandInstance, args: any, cb: (err?: any) => void): void {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
