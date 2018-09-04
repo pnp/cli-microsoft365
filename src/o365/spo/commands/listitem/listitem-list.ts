@@ -55,7 +55,7 @@ class SpoListItemListCommand extends SpoCommand {
     
     let siteAccessToken: string = '';
     let formDigestValue: string = '';
-
+    
     const fieldsArray: string[] = args.options.fields ? args.options.fields.split(",") 
       : (!args.options.output || args.options.output === "text") ? ["Title", "Id"] : []
 
@@ -90,7 +90,7 @@ class SpoListItemListCommand extends SpoCommand {
           return Promise.resolve();
         }
       })
-      .then((res: ContextInfo): request.RequestPromise<any> => {
+      .then((res: ContextInfo): request.RequestPromise<any> | Promise<any> => {
         if (this.debug) {
           cmd.log('Response:')
           cmd.log(res);
@@ -98,8 +98,49 @@ class SpoListItemListCommand extends SpoCommand {
         }
         
         formDigestValue = args.options.query ? res['FormDigestValue'] : '';
+
+        if (args.options.pageNumber && Number(args.options.pageNumber) > 0) {
+
+          const rowLimit: string = `$top=${Number(args.options.pageSize) * Number(args.options.pageNumber)}`;
+          const filter: string = args.options.filter ? `$filter=${encodeURIComponent(args.options.filter)}` : ``;
+          const fieldSelect: string = `?$select=Id&${rowLimit}&${filter}`;
+
+          const requestOptions: any = {
+            url: `${listRestUrl}/items${fieldSelect}`,
+            headers: Utils.getRequestHeaders({
+              authorization: `Bearer ${siteAccessToken}`,
+              'accept': 'application/json;odata=nometadata',
+              'X-RequestDigest': formDigestValue
+            }),
+            json: true,
+            body: ''
+          };
+
+          if (this.debug) {
+            cmd.log('Executing web request for skip token id lookup...');
+            cmd.log(requestOptions);
+            cmd.log('');
+          }
+  
+          return request.get(requestOptions);
+  
+        } else {
+
+          return Promise.resolve();
+
+        }
+
+      })
+      .then((res: any): request.RequestPromise<any> => {
+        if (this.debug) {
+          cmd.log('Response:')
+          cmd.log(res);
+          cmd.log('');
+        }
+
+        const skipTokenId = (res && res.value && res.value.length && res.value[res.value.length - 1]) ? res.value[res.value.length - 1].Id : 0
+        const skipToken: string = (args.options.pageNumber && Number(args.options.pageNumber) > 0 && skipTokenId > 0) ? `$skiptoken=Paged=TRUE%26p_ID=${res.value[res.value.length - 1].Id}` : ``;
         const rowLimit: string = args.options.pageSize ? `$top=${args.options.pageSize}` : ``
-        const skipToken: string = args.options.pageNumber ? `$skiptoken=Paged=TRUE%26p_ID=${Number(args.options.pageNumber) * Number(args.options.pageSize)}` : ``
         const filter: string = args.options.filter ? `$filter=${encodeURIComponent(args.options.filter)}` : ``
         const fieldSelect: string = fieldsArray.length > 0 ?
           `?$select=${encodeURIComponent(fieldsArray.join(","))}&${rowLimit}&${skipToken}&${filter}` :

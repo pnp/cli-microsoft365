@@ -24,11 +24,13 @@ describe(commands.LISTITEM_LIST, () => {
 
     if (opts.url.indexOf('/common/oauth2/token') > -1) {
       return Promise.resolve('abc');
+      returnArrayLength = 0;
     }
     if (opts.url.indexOf('_api/contextinfo') > -1) {
       return Promise.resolve({
         FormDigestValue: 'abc'
       });
+      returnArrayLength = 0;
     }
     if (opts.url.indexOf('/GetItems') > -1) {
       returnArrayLength = 2;
@@ -317,11 +319,49 @@ describe(commands.LISTITEM_LIST, () => {
     cmdInstance.action = command.action();
 
     let options: any = { 
-      debug: false, 
+      debug: true, 
       title: 'Demo List', 
       webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
       output: "json",
       pageSize: 2,
+      filter: "Title eq 'Demo list item",
+      fields: "Title,ID"
+    }
+
+    cmdInstance.action({ options: options }, () => {
+
+      try {
+        assert.equal(returnArrayLength, expectedArrayLength);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+    
+  });
+
+  it('returns array of listItemInstance objects when a list of items is requested with an output type of json, and a list of fields and a filter specified', (done) => {
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'post').callsFake(postFakes);
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    let options: any = { 
+      debug: true, 
+      title: 'Demo List', 
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
+      output: "json",
+      pageSize: 2,
+      pageNumber: 2,
       filter: "Title eq 'Demo list item",
       fields: "Title,ID"
     }
