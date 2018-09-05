@@ -1,5 +1,29 @@
 # Release notes
 
+## [v1.7.0](https://github.com/pnp/office365-cli/releases/tag/v1.7.0)
+
+### New commands
+
+**SharePoint Online:**
+
+- [spo listitem list](../cmd/spo/listitem/listitem-list.md) - gets a list of items from the specified list [#268](https://github.com/pnp/office365-cli/issues/268)
+- [spo page column get](../cmd/spo/page/page-column-get.md) - get information about a specific column of a modern page [#412](https://github.com/pnp/office365-cli/issues/412)
+- [spo page remove](../cmd/spo/page/page-remove.md) - removes a modern page [#363](https://github.com/pnp/office365-cli/issues/363)
+- [spo site classic remove](../cmd/spo/site/site-classic-remove.md) - removes the specified site [#125](https://github.com/pnp/office365-cli/issues/125)
+- [spo tenant settings list](../cmd/spo/tenant/tenant-settings-list.md) - lists the global tenant settings [#548](https://github.com/pnp/office365-cli/issues/548)
+
+**Microsoft Graph:**
+
+- [graph groupsetting remove](../cmd/graph/groupsetting/groupsetting-remove.md) - removes the particular group setting [#452](https://github.com/pnp/office365-cli/pull/452)
+- [graph groupsetting set](../cmd/graph/groupsetting/groupsetting-set.md) - removes the particular group setting [#451](https://github.com/pnp/office365-cli/pull/451)
+
+### Changes
+
+- added support for upgrading projects built using SharePoint Framework v1.5.1 [#569](https://github.com/pnp/office365-cli/issues/569)
+- added support for setting debug and verbose mode using an environment variable [#54](https://github.com/pnp/office365-cli/issues/54)
+- extended the 'spo cdn set' command, solving. Added support for managing both CDNs. Added support for enabling CDNs without provisioning default origins [#230](https://github.com/pnp/office365-cli/issues/230)
+
+
 ## [v1.6.0](https://github.com/pnp/office365-cli/releases/tag/v1.6.0)
 
 ### New commands
