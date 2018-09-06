@@ -297,17 +297,25 @@ class SpfxProjectUpgradeCommand extends Command {
     const findingsToReport: string[] = [];
     const modificationPerFile: any = [];
     const modificationTypePerFile: any = [];
+    const packagesDevExact: string[] = [];
+    const packagesDevInexact: string[] = [];
+    const packagesDepExact: string[] = [];
+    const packagesDepInexact: string[] = [];
+    const packagesDepUn: string[] = [];
+    const packagesDevUn: string[] = [];
 
     findings.forEach(f => {
       let resolution: string = '';
       switch (f.resolutionType) {
         case 'cmd':
+        if (f.resolution.indexOf('npm') !== -1) {
           resolution = `Execute the following command:
 
 \`\`\`sh
 ${f.resolution}
 \`\`\`
 `;
+        }
           break;
         case 'json':
         case 'js':
@@ -322,7 +330,31 @@ ${f.resolution}
       }
 
       if (f.resolutionType === 'cmd') {
-        commandsToExecute.push(f.resolution);
+        if (f.resolution.indexOf('npm') !== -1) {
+          const npmReduceRegex: RegExp = /npm\s+(i|un)\s+([\w\d\@\/\.-]+)\s+(-D|-S)?\s?(-E)?/gm;
+          const npmReduceMatch: RegExpExecArray | null = npmReduceRegex.exec(f.resolution);
+          if (npmReduceMatch) {
+            if (npmReduceMatch[3] === '-S') {
+              if (npmReduceMatch[4] === '-E') {
+                packagesDepExact.push(npmReduceMatch[2]);
+              } else if (npmReduceMatch[1] === 'i') {
+                packagesDepInexact.push(npmReduceMatch[2]);
+              } else {
+                packagesDepUn.push(npmReduceMatch[2]);
+              }
+            } else if (npmReduceMatch[3] === '-D') {
+              if (npmReduceMatch[4] === '-E') {
+                packagesDevExact.push(npmReduceMatch[2]);
+              } else if (npmReduceMatch[1] === 'i') {
+                packagesDevInexact.push(npmReduceMatch[2]);
+              } else {
+                packagesDevUn.push(npmReduceMatch[2]);
+              }
+            }
+          }
+        } else {
+          commandsToExecute.push(f.resolution);
+        }
       }
       else {
         if (!modificationPerFile[f.file]) {
@@ -346,6 +378,25 @@ ${f.resolution}
         EOL
       );
     });
+
+    if (packagesDepExact.length > 0) {
+      commandsToExecute.push(`npm i ${packagesDepExact.join(' ')} -S -E`);
+    }
+    if (packagesDevExact.length > 0) {
+      commandsToExecute.push(`npm i ${packagesDevExact.join(' ')} -D -E`);
+    }
+    if (packagesDepInexact.length > 0) {
+      commandsToExecute.push(`npm i ${packagesDepInexact.join(' ')} -S`);
+    }
+    if (packagesDevInexact.length > 0) {
+      commandsToExecute.push(`npm i ${packagesDevInexact.join(' ')} -D`);
+    }
+    if (packagesDepUn.length > 0) {
+      commandsToExecute.push(`npm un ${packagesDepUn.join(' ')} -S`);
+    }
+    if (packagesDevUn.length > 0) {
+      commandsToExecute.push(`npm un ${packagesDevUn.join(' ')} -D`);
+    }
 
     const s: string[] = [
       `# Upgrade project ${path.posix.basename(this.projectRootPath as string)} to v${this.toVersion}`, EOL,
