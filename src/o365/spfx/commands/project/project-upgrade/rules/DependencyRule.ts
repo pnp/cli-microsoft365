@@ -19,7 +19,7 @@ export abstract class DependencyRule extends Rule {
   get resolution(): string {
     return this.add ?
       `npm i ${this.packageName}@${this.packageVersion} -E${(this.isDevDep ? ' -D' : '')}` :
-      `npm uninstall ${this.packageName}`;
+      `npm un ${this.packageName}`;
   };
 
   get resolutionType(): string {
