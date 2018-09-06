@@ -69,8 +69,7 @@ class AzmgmtFlowRunListCommand extends AzmgmtCommand {
         if (res.value && res.value.length > 0) {
           if (args.options.output === 'json') {
             cmd.log(res.value);
-          }
-          else {
+          } else {
             cmd.log(res.value.map(e => {
               return {
                 name: e.name,
@@ -78,6 +77,10 @@ class AzmgmtFlowRunListCommand extends AzmgmtCommand {
                 status: e.properties.status
               };
             }));
+          }
+        } else {
+          if (this.verbose) {
+            cmd.log('No runs found');
           }
         }
 
