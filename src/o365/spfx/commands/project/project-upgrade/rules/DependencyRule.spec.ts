@@ -33,6 +33,16 @@ class DevDepRule extends DependencyRule {
   }
 }
 
+class DevDepRule2 extends DependencyRule {
+  constructor() {
+    super('test-package', '1.0.0', true, false, false);
+  }
+
+  get id(): string {
+    return 'FN000000';
+  }
+}
+
 describe('DependencyRule', () => {
   let depRule: DepRule;
   let devDepRule: DevDepRule;
@@ -163,5 +173,10 @@ describe('DependencyRule', () => {
     };
     depRule.visit(project, findings);
     assert.equal(findings.length, 0);
+  });
+
+  it('returns uninstall resolution for uninstall a dev dependency', () => {
+    const rule: DependencyRule = new DevDepRule2();
+    assert.equal(rule.resolution, 'npm un test-package -D');
   });
 });

@@ -23,14 +23,14 @@ describe(commands.LISTITEM_LIST, () => {
   let postFakes = (opts: any) => {
 
     if (opts.url.indexOf('/common/oauth2/token') > -1) {
-      return Promise.resolve('abc');
       returnArrayLength = 0;
+      return Promise.resolve('abc');
     }
     if (opts.url.indexOf('_api/contextinfo') > -1) {
+      returnArrayLength = 0;
       return Promise.resolve({
         FormDigestValue: 'abc'
       });
-      returnArrayLength = 0;
     }
     if (opts.url.indexOf('/GetItems') > -1) {
       returnArrayLength = 2;

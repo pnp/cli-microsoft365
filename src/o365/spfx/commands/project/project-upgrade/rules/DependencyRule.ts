@@ -18,8 +18,8 @@ export abstract class DependencyRule extends Rule {
 
   get resolution(): string {
     return this.add ?
-      `npm i ${this.packageName}@${this.packageVersion} --save-exact${(this.isDevDep ? ' -D' : '')}` :
-      `npm uninstall ${this.packageName}`;
+      `npm i ${this.packageName}@${this.packageVersion} ${(this.isDevDep ? '-DE' : '-SE')}` :
+      `npm un ${this.packageName} ${(this.isDevDep ? '-D' : '-S')}`;
   };
 
   get resolutionType(): string {

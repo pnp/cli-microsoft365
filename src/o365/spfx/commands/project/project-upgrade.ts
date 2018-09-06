@@ -315,6 +315,10 @@ class SpfxProjectUpgradeCommand extends Command {
     const findingsToReport: string[] = [];
     const modificationPerFile: any = [];
     const modificationTypePerFile: any = [];
+    const packagesDevExact: string[] = [];
+    const packagesDepExact: string[] = [];
+    const packagesDepUn: string[] = [];
+    const packagesDevUn: string[] = [];
 
     findings.forEach(f => {
       let resolution: string = '';
@@ -340,9 +344,13 @@ ${f.resolution}
       }
 
       if (f.resolutionType === 'cmd') {
-        commandsToExecute.push(f.resolution);
-      }
-      else {
+        if (f.resolution.indexOf('npm') !== -1) {
+          this.mapNpmCommand(f.resolution, packagesDevExact,
+            packagesDepExact, packagesDepUn, packagesDevUn);
+        } else {
+          commandsToExecute.push(f.resolution);
+        }
+      } else {
         if (!modificationPerFile[f.file]) {
           modificationPerFile[f.file] = [];
         }
@@ -365,6 +373,9 @@ ${f.resolution}
       );
     });
 
+    const mainNpmCommands: string[] = this.reduceNpmCommand(
+      packagesDepExact, packagesDevExact, packagesDepUn, packagesDevUn);
+
     const s: string[] = [
       `# Upgrade project ${path.posix.basename(this.projectRootPath as string)} to v${this.toVersion}`, EOL,
       EOL,
@@ -380,7 +391,7 @@ ${f.resolution}
       '### Execute script', EOL,
       EOL,
       '```sh', EOL,
-      commandsToExecute.join(EOL), EOL,
+      commandsToExecute.filter((command) => command.indexOf('npm') === -1).concat(mainNpmCommands).join(EOL), EOL,
       '```', EOL,
       EOL,
       '### Modify files', EOL,
@@ -396,6 +407,58 @@ ${f.resolution}
     ];
 
     return s.join('').trim();
+  }
+
+  private mapNpmCommand(command: string, packagesDevExact: string[],
+    packagesDepExact: string[], packagesDepUn: string[], packagesDevUn: string[]): void {
+    const npmReduceRegex: RegExp = /npm\s+(i|un)\s+([\w\d\@\/\.-]+)\s+(-DE|-SE|-S|-D)?/gm;
+    const npmReduceMatch: RegExpExecArray | null = npmReduceRegex.exec(command);
+    const packageNameGroupId: number = 2;
+    const installCommandGroupId: number = 1;
+    const dependencyCategoryGroupId: number = 3;
+    if (!npmReduceMatch) {
+      return;
+    }
+
+    if (npmReduceMatch[installCommandGroupId] === 'i') {
+      if (npmReduceMatch[dependencyCategoryGroupId] === '-SE') {
+        packagesDepExact.push(npmReduceMatch[packageNameGroupId]);
+      }
+      else if (npmReduceMatch[dependencyCategoryGroupId] === '-DE') {
+        packagesDevExact.push(npmReduceMatch[packageNameGroupId]);
+      }
+    }
+    else {
+      if (npmReduceMatch[dependencyCategoryGroupId] === '-S') {
+        packagesDepUn.push(npmReduceMatch[packageNameGroupId]);
+      }
+      else if (npmReduceMatch[dependencyCategoryGroupId] === '-D') {
+        packagesDevUn.push(npmReduceMatch[packageNameGroupId]);
+      }
+    }
+  }
+
+  private reduceNpmCommand(packagesDepExact: string[], packagesDevExact: string[],
+    packagesDepUn: string[], packagesDevUn: string[]): string[] {
+    const commandsToExecute: string[] = [];
+
+    if (packagesDepExact.length > 0) {
+      commandsToExecute.push(`npm i ${packagesDepExact.join(' ')} -SE`);
+    }
+
+    if (packagesDevExact.length > 0) {
+      commandsToExecute.push(`npm i ${packagesDevExact.join(' ')} -DE`);
+    }
+
+    if (packagesDepUn.length > 0) {
+      commandsToExecute.push(`npm un ${packagesDepUn.join(' ')} -S`);
+    }
+
+    if (packagesDevUn.length > 0) {
+      commandsToExecute.push(`npm un ${packagesDevUn.join(' ')} -D`);
+    }
+
+    return commandsToExecute;
   }
 
   private getProjectRoot(folderPath: string): string | null {

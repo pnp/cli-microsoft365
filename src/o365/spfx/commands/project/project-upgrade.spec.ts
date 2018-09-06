@@ -17,6 +17,10 @@ describe(commands.PROJECT_UPGRADE, () => {
   let cmdInstance: any;
   let trackEvent: any;
   let telemetry: any;
+  let packagesDevExact: string[];
+  let packagesDepExact: string[];
+  let packagesDepUn: string[];
+  let packagesDevUn: string[];
 
   before(() => {
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
@@ -34,6 +38,10 @@ describe(commands.PROJECT_UPGRADE, () => {
     };
     telemetry = null;
     (command as any).allFindings = [];
+    packagesDevExact = [];
+    packagesDepExact = [];
+    packagesDepUn = [];
+    packagesDevUn = [];
   });
 
   afterEach(() => {
@@ -506,6 +514,103 @@ describe(commands.PROJECT_UPGRADE, () => {
     const getProject = (command as any).getProject;
     const project: Project = getProject('./');
     assert.equal(typeof ((project.vsCode) as VsCode).settingsJson, 'undefined');
+  });
+
+  it(`doesn't return any dependencies from npm`, () => {
+    (command as any).mapNpmCommand('npm', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
+    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
+    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
+  });
+
+  it(`returns 1 exact dependency to be installed for npm i -SE`, () => {
+    (command as any).mapNpmCommand('npm i package -SE', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
+    assert.equal(packagesDepExact.length, 1, 'Incorrect number of dev deps to install');
+    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
+  });
+
+  it(`returns 1 exact dev dependency to be installed for npm i -DE`, () => {
+    (command as any).mapNpmCommand('npm i package -DE', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    assert.equal(packagesDevExact.length, 1, 'Incorrect number of deps to install');
+    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
+    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
+  });
+
+  it(`doesn't return any dependencies for npm i -S`, () => {
+    (command as any).mapNpmCommand('npm i package -S', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
+    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
+    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
+  });
+
+  it(`doesn't return any dependencies for npm i -D`, () => {
+    (command as any).mapNpmCommand('npm i package -D', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
+    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
+    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
+  });
+
+  it(`doesn't return any dependencies for npm un -SE`, () => {
+    (command as any).mapNpmCommand('npm un package -SE', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
+    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
+    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
+  });
+
+  it(`doesn't return any dependencies for npm un -DE`, () => {
+    (command as any).mapNpmCommand('npm un package -DE', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
+    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
+    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
+  });
+
+  it(`returns 1 dependency to uninstall for npm un -S`, () => {
+    (command as any).mapNpmCommand('npm un package -S', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
+    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
+    assert.equal(packagesDepUn.length, 1, 'Incorrect number of deps to uninstall');
+    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
+  });
+
+  it(`returns 1 dev dependency to uninstall for npm un -D`, () => {
+    (command as any).mapNpmCommand('npm un package -D', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
+    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
+    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.equal(packagesDevUn.length, 1, 'Incorrect number of dev deps to uninstall');
+  });
+
+  it(`returns no commands to run when no dependencies found`, () => {
+    const commands: string[] = (command as any).reduceNpmCommand([], [], [], []);
+    assert.equal(JSON.stringify(commands), JSON.stringify([]));
+  });
+
+  it(`returns command to install dependency for 1 dep`, () => {
+    const commands: string[] = (command as any).reduceNpmCommand(['package'], [], [], []);
+    assert.equal(JSON.stringify(commands), JSON.stringify(['npm i package -SE']));
+  });
+
+  it(`returns command to install dev dependency for 1 dev dep`, () => {
+    const commands: string[] = (command as any).reduceNpmCommand([], ['package'], [], []);
+    assert.equal(JSON.stringify(commands), JSON.stringify(['npm i package -DE']));
+  });
+
+  it(`returns command to uninstall dependency for 1 dep`, () => {
+    const commands: string[] = (command as any).reduceNpmCommand([], [], ['package'], []);
+    assert.equal(JSON.stringify(commands), JSON.stringify(['npm un package -S']));
+  });
+
+  it(`returns command to uninstall dev dependency for 1 dev dep`, () => {
+    const commands: string[] = (command as any).reduceNpmCommand([], [], [], ['package']);
+    assert.equal(JSON.stringify(commands), JSON.stringify(['npm un package -D']));
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.0.0 project to 1.0.1', () => {
