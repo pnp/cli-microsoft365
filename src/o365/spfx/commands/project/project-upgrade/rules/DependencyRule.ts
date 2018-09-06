@@ -18,7 +18,7 @@ export abstract class DependencyRule extends Rule {
 
   get resolution(): string {
     return this.add ?
-      `npm i ${this.packageName}@${this.packageVersion} --save-exact${(this.isDevDep ? ' -D' : '')}` :
+      `npm i ${this.packageName}@${this.packageVersion} -E${(this.isDevDep ? ' -D' : '')}` :
       `npm uninstall ${this.packageName}`;
   };
 
