@@ -94,7 +94,7 @@ class SpoListItemListCommand extends SpoCommand {
           return Promise.resolve();
         }
       })
-      .then((res: ContextInfo): request.RequestPromise<any> | Promise<any> => {
+      .then((res: ContextInfo): request.RequestPromise | Promise<any> => {
         if (this.debug) {
           cmd.log('Response:')
           cmd.log(res);
@@ -130,7 +130,7 @@ class SpoListItemListCommand extends SpoCommand {
           return Promise.resolve();
         }
       })
-      .then((res: any): request.RequestPromise<any> => {
+      .then((res: any): request.RequestPromise => {
         if (this.debug) {
           cmd.log('Response:')
           cmd.log(res);
