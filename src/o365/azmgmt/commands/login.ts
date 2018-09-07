@@ -1,4 +1,4 @@
-import auth from '../GraphAuth';
+import auth from '../AzmgmtAuth';
 import config from '../../../config';
 import commands from '../commands';
 import GlobalOptions from '../../../GlobalOptions';
@@ -23,38 +23,44 @@ interface Options extends GlobalOptions {
   password?: string;
 }
 
-class GraphConnectCommand extends Command {
+class AzmgmtLoginCommand extends Command {
   public get name(): string {
-    return `${commands.CONNECT}`;
+    return `${commands.LOGIN}`;
   }
 
   public get description(): string {
-    return 'Connects to the Microsoft Graph';
+    return 'Log in to the Azure Management Service';
+  }
+
+  public alias(): string[] | undefined {
+    return [commands.CONNECT];
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     const chalk: any = vorpal.chalk;
 
+    this.showDeprecationWarning(cmd, commands.CONNECT, commands.LOGIN);
+
     appInsights.trackEvent({
-      name: this.name
+      name: this.getUsedCommandName(cmd)
     });
 
     // disconnect before re-connecting
     if (this.debug) {
-      cmd.log(`Disconnecting from Microsoft Graph...`);
+      cmd.log(`Logging out from Azure Management Service...`);
     }
 
-    const disconnect: () => void = (): void => {
-      auth.service.disconnect();
-      auth.service.resource = 'https://graph.microsoft.com';
+    const logout: () => void = (): void => {
+      auth.service.logout();
+      auth.service.resource = 'https://management.azure.com/';
       if (this.verbose) {
         cmd.log(chalk.green('DONE'));
       }
     }
 
-    const connect: () => void = (): void => {
+    const login: () => void = (): void => {
       if (this.verbose) {
-        cmd.log(`Authenticating with Microsoft Graph...`);
+        cmd.log(`Authenticating with Azure Management Service...`);
       }
 
       if (args.options.authType === 'password') {
@@ -93,15 +99,15 @@ class GraphConnectCommand extends Command {
     auth
       .clearConnectionInfo()
       .then((): void => {
-        disconnect();
-        connect();
+        logout();
+        login();
       }, (error: any): void => {
         if (this.debug) {
           cmd.log(new CommandError(error));
         }
 
-        disconnect();
-        connect();
+        logout();
+        login();
       });
   }
 
@@ -150,43 +156,48 @@ class GraphConnectCommand extends Command {
 
   public commandHelp(args: CommandArgs, log: (help: string) => void): void {
     const chalk = vorpal.chalk;
-    log(vorpal.find(commands.CONNECT).helpInformation());
+    log(vorpal.find(commands.LOGIN).helpInformation());
     log(
       `  Remarks:
-    
-    Using the ${chalk.blue(commands.CONNECT)} command you can connect to the Microsoft Graph.
 
-    By default, the ${chalk.blue(commands.CONNECT)} command uses device code OAuth flow
-    to connect to the Microsoft Graph. Alternatively, you can
+    ${chalk.yellow('Attention:')} This command is based on an API that is currently
+    in preview and is subject to change once the API reached general
+    availability.
+    
+    Using the ${chalk.blue(commands.LOGIN)} command you can log in to
+    the Azure Management Service to manage your Azure objects.
+
+    By default, the ${chalk.blue(commands.LOGIN)} command uses device code OAuth flow
+    to log in to the Azure Management Service. Alternatively, you can
     authenticate using a user name and password, which is convenient for CI/CD
     scenarios, but which comes with its own limitations. See the Office 365 CLI
     manual for more information.
     
-    When connecting to the Microsoft Graph, the ${chalk.blue(commands.CONNECT)} command stores
-    in memory the access token and the refresh token. Both tokens are cleared
-    from memory after exiting the CLI or by calling the ${chalk.blue(commands.DISCONNECT)}
-    command.
+    When logging in to the Azure Management Service, the ${chalk.blue(commands.LOGIN)}
+    command stores in memory the access token and the refresh token. Both tokens
+    are cleared from memory after exiting the CLI or by calling the
+    ${chalk.blue(commands.LOGOUT)} command.
 
-    When connecting to the Microsoft Graph using the user name and
+    When logging in to the Azure Management Service using the user name and
     password, next to the access and refresh token, the Office 365 CLI will
     store the user credentials so that it can automatically reauthenticate if
     necessary. Similarly to the tokens, the credentials are removed by
-    reconnecting using the device code or by calling the ${chalk.blue(commands.DISCONNECT)}
+    reauthenticating using the device code or by calling the ${chalk.blue(commands.LOGOUT)}
     command.
 
   Examples:
   
-    Connect to the Microsoft Graph using the device code
-      ${chalk.grey(config.delimiter)} ${commands.CONNECT}
+    Log in to the Azure Management Service using the device code
+      ${chalk.grey(config.delimiter)} ${commands.LOGIN}
 
-    Connect to the Microsoft Graph using the device code in debug mode including
-    detailed debug information in the console output
-      ${chalk.grey(config.delimiter)} ${commands.CONNECT} --debug
+    Log in to the Azure Management Service using the device code in debug mode
+    including detailed debug information in the console output
+      ${chalk.grey(config.delimiter)} ${commands.LOGIN} --debug
 
-    Connect to the Microsoft Graph using a user name and password
-      ${chalk.grey(config.delimiter)} ${commands.CONNECT} --authType password --userName user@contoso.com --password pass@word1
+    Log in to the Azure Management Service using a user name and password
+      ${chalk.grey(config.delimiter)} ${commands.LOGIN} --authType password --userName user@contoso.com --password pass@word1
 `);
   }
 }
 
-module.exports = new GraphConnectCommand();
+module.exports = new AzmgmtLoginCommand();

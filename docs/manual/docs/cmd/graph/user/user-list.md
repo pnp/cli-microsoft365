@@ -19,11 +19,11 @@ Option|Description
 `--debug`|Runs command with debug logging
 
 !!! important
-    Before using this command, connect to the Microsoft Graph, using the [graph connect](../connect.md) command.
+    Before using this command, log in to the Microsoft Graph, using the [graph login](../login.md) command.
 
 ## Remarks
 
-To list users matching specific criteria, you have to first connect to the Microsoft Graph using the [graph connect](../connect.md) command, eg. `graph connect`.
+To list users matching specific criteria, you have to first log in to the Microsoft Graph using the [graph login](../login.md) command, eg. `graph login`.
 
 Using the `--properties` option, you can specify a comma-separated list of user properties to retrieve from the Microsoft Graph. If you don't specify any properties, the command will retrieve user's display name and account name.
 

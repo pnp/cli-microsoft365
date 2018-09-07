@@ -127,13 +127,13 @@ class GraphGroupSettingRemoveCommand extends GraphCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, connect to the Microsoft Graph,
-    using the ${chalk.blue(commands.CONNECT)} command.
+      `  ${chalk.yellow('Important:')} before using this command, log in to the Microsoft Graph,
+    using the ${chalk.blue(commands.LOGIN)} command.
 
   Remarks:
   
-    To remove a group setting, you have to first connect to the Microsoft Graph
-    using the ${chalk.blue(commands.CONNECT)} command.
+    To remove a group setting, you have to first log in to the Microsoft Graph
+    using the ${chalk.blue(commands.LOGIN)} command.
 
     If the specified ${chalk.grey('id')} doesn't refer to an existing group setting, you will
     get a ${chalk.grey('Resource does not exist')} error.

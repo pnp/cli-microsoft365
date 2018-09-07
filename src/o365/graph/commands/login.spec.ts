@@ -2,14 +2,14 @@ import commands from '../commands';
 import Command, { CommandCancel, CommandError, CommandOption, CommandValidate } from '../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
-import auth from '../AadAuth';
-const command: Command = require('./connect');
+import auth from '../GraphAuth';
+const command: Command = require('./login');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import Utils from '../../../Utils';
 import { Service, AuthType } from '../../../Auth';
 
-describe(commands.CONNECT, () => {
+describe(commands.LOGIN, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
@@ -31,13 +31,16 @@ describe(commands.CONNECT, () => {
     vorpal = require('../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: 'graph login'
+      },
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.service = new Service('https://graph.windows.net');
-    sinon.stub(auth.service, 'disconnect').callsFake(() => { });
+    auth.service = new Service('https://graph.microsoft.com');
+    sinon.stub(auth.service, 'logout').callsFake(() => { });
     telemetry = null;
   });
 
@@ -60,7 +63,7 @@ describe(commands.CONNECT, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.CONNECT), true);
+    assert.equal(command.name.startsWith(commands.LOGIN), true);
   });
 
   it('has a description', () => {
@@ -93,8 +96,8 @@ describe(commands.CONNECT, () => {
     });
   });
 
-  it('connects to AAD Graph', (done) => {
-    auth.service = new Service('https://graph.windows.net');
+  it('logs in to MS Graph', (done) => {
+    auth.service = new Service('https://graph.microsoft.com');
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false } }, () => {
       try {
@@ -107,8 +110,8 @@ describe(commands.CONNECT, () => {
     });
   });
 
-  it('connects to AAD Graph (debug)', (done) => {
-    auth.service = new Service('https://graph.windows.net');
+  it('logs in to MS Graph (debug)', (done) => {
+    auth.service = new Service('https://graph.microsoft.com');
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
       try {
@@ -121,8 +124,8 @@ describe(commands.CONNECT, () => {
     });
   });
 
-  it('connects to AAD Graph using username and password when authType password set', (done) => {
-    auth.service = new Service('https://graph.windows.net');
+  it('logs in to MS Graph using username and password when authType password set', (done) => {
+    auth.service = new Service('https://graph.microsoft.com');
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, authType: 'password', userName: 'user', password: 'password' } }, () => {
       try {
@@ -210,6 +213,11 @@ describe(commands.CONNECT, () => {
     assert.equal(actual, true);
   });
 
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notEqual(typeof alias, 'undefined');
+  });
+
   it('has help referring to the right command', () => {
     const cmd: any = {
       log: (msg: string) => {},
@@ -219,7 +227,7 @@ describe(commands.CONNECT, () => {
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
     cmd.help({}, () => {});
-    assert(find.calledWith(commands.CONNECT));
+    assert(find.calledWith(commands.LOGIN));
   });
 
   it('has help with examples', () => {
@@ -244,14 +252,14 @@ describe(commands.CONNECT, () => {
     assert(containsExamples);
   });
 
-  it('correctly handles lack of valid access token when connecting to AAD Graph', (done) => {
+  it('correctly handles lack of valid access token when logging in to MS Graph', (done) => {
     Utils.restore(auth.ensureAccessToken);
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject('Error getting access token'); });
-    auth.service = new Service('https://graph.windows.net');
+    auth.service = new Service('https://graph.microsoft.com');
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false } }, () => {
+    cmdInstance.action({ options: { debug: false } }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
         done();
       }
       catch (e) {
@@ -260,14 +268,14 @@ describe(commands.CONNECT, () => {
     });
   });
 
-  it('correctly handles lack of valid access token when connecting to AAD Graph (debug)', (done) => {
+  it('correctly handles lack of valid access token when logging in to MS Graph (debug)', (done) => {
     Utils.restore(auth.ensureAccessToken);
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject('Error getting access token'); });
-    auth.service = new Service('https://graph.windows.net');
+    auth.service = new Service('https://graph.microsoft.com');
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, () => {
+    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(new CommandError('Error getting access token')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
         done();
       }
       catch (e) {
@@ -282,7 +290,7 @@ describe(commands.CONNECT, () => {
   it('ignores the error raised by cancelling device code auth flow', (done) => {
     Utils.restore(auth.ensureAccessToken);
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject('Polling_Request_Cancelled'); });
-    auth.service = new Service('https://graph.windows.net');
+    auth.service = new Service('https://graph.microsoft.com');
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, () => {
       try {

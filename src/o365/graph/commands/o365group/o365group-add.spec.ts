@@ -93,13 +93,13 @@ describe(commands.O365GROUP_ADD, () => {
     });
   });
 
-  it('aborts when not connected to the Microsoft Graph', (done) => {
+  it('aborts when not logged in to the Microsoft Graph', (done) => {
     auth.service = new Service('https://graph.microsoft.com');
     auth.service.connected = false;
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Connect to the Microsoft Graph first')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to the Microsoft Graph first')));
         done();
       }
       catch (e) {

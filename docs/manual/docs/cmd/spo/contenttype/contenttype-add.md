@@ -24,11 +24,11 @@ Option|Description
 `--debug`|Runs command with debug logging
 
 !!! important
-    Before using this command, connect to a SharePoint Online tenant admin site, using the [spo connect](../connect.md) command.
+    Before using this command, log in to a SharePoint Online tenant admin site, using the [spo login](../login.md) command.
 
 ## Remarks
 
-To create a content type, you have to first connect to a SharePoint site using the [spo connect](../connect.md) command, eg. `spo connect https://contoso.sharepoint.com`.
+To create a content type, you have to first log in to a SharePoint site using the [spo login](../login.md) command, eg. `spo login https://contoso.sharepoint.com`.
 
 If the specified content type already exists, you will get a _A duplicate content type "Your Content Type" was found._ error.
 

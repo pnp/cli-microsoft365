@@ -87,13 +87,13 @@ describe(commands.FLOW_GET, () => {
     });
   });
 
-  it('aborts when not connected to the Azure Management Service', (done) => {
+  it('aborts when not logged in to the Azure Management Service', (done) => {
     auth.service = new Service('https://management.azure.com/');
     auth.service.connected = false;
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Connect to the Azure Management Service first')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to the Azure Management Service first')));
         done();
       }
       catch (e) {

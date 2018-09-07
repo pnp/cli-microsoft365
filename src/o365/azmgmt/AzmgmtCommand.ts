@@ -12,7 +12,7 @@ export default abstract class AzmgmtCommand extends Command {
           cmd.initAction(args);
 
           if (!auth.service.connected) {
-            cb(new CommandError('Connect to the Azure Management Service first'));
+            cb(new CommandError('Log in to the Azure Management Service first'));
             return;
           }
 

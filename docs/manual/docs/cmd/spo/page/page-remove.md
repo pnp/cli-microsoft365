@@ -20,11 +20,11 @@ Option|Description
 `--debug`|Runs command with debug logging
 
 !!! important
-    Before using this command, connect to a SharePoint Online site, using the [spo connect](../connect.md) command.
+    Before using this command, log in to a SharePoint Online site, using the [spo login](../login.md) command.
 
 ## Remarks
 
-To remove new modern page, you have to first connect to a SharePoint site using the [spo connect](../connect.md) command, eg. `spo connect https://contoso.sharepoint.com`.
+To remove new modern page, you have to first log in to a SharePoint site using the [spo login](../login.md) command, eg. `spo login https://contoso.sharepoint.com`.
 
 If you try to remove a page with that does not exist, you
 will get a `The file does not exist` error.

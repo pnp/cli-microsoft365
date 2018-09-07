@@ -191,9 +191,9 @@
 
 **Azure Management Service:**
 
-- [azmgmt connect](../cmd/azmgmt/connect.md) - connects to the Azure Management Service [#378](https://github.com/pnp/office365-cli/issues/378)
-- [azmgmt disconnect](../cmd/azmgmt/disconnect.md) - disconnects from the Azure Management Service [#378](https://github.com/pnp/office365-cli/issues/378)
-- [azmgmt status](../cmd/azmgmt/status.md) - shows Azure Management Service connection status [#378](https://github.com/pnp/office365-cli/issues/378)
+- [azmgmt login](../cmd/azmgmt/login.md) - log in to the Azure Management Service [#378](https://github.com/pnp/office365-cli/issues/378)
+- [azmgmt logout](../cmd/azmgmt/logout.md) - log out from the Azure Management Service [#378](https://github.com/pnp/office365-cli/issues/378)
+- [azmgmt status](../cmd/azmgmt/status.md) - shows Azure Management Service login status [#378](https://github.com/pnp/office365-cli/issues/378)
 - [azmgmt flow environment get](../cmd/azmgmt/flow/flow-environment-get.md) - gets information about the specified Microsoft Flow environment [#380](https://github.com/pnp/office365-cli/issues/380)
 - [azmgmt flow environment list](../cmd/azmgmt/flow/flow-environment-list.md) - lists Microsoft Flow environments in the current tenant [#379](https://github.com/pnp/office365-cli/issues/379)
 - [azmgmt flow get](../cmd/azmgmt/flow/flow-get.md) - gets information about the specified Microsoft Flow [#382](https://github.com/pnp/office365-cli/issues/382)
@@ -237,9 +237,9 @@
 
 **Microsoft Graph:**
 
-- [graph connect](../cmd/graph/connect.md) - connects to the Microsoft Graph [#10](https://github.com/pnp/office365-cli/issues/10)
-- [graph disconnect](../cmd/graph/disconnect.md) - disconnects from the Microsoft Graph [#10](https://github.com/pnp/office365-cli/issues/10)
-- [graph status](../cmd/graph/status.md) - shows Microsoft Graph connection status [#10](https://github.com/pnp/office365-cli/issues/10)
+- [graph login](../cmd/graph/login.md) - log in to the Microsoft Graph [#10](https://github.com/pnp/office365-cli/issues/10)
+- [graph logout](../cmd/graph/logout.md) - log out from the Microsoft Graph [#10](https://github.com/pnp/office365-cli/issues/10)
+- [graph status](../cmd/graph/status.md) - shows Microsoft Graph login status [#10](https://github.com/pnp/office365-cli/issues/10)
 - [graph o365group add](../cmd/graph/o365group/o365group-add.md) - creates Office 365 Group [#308](https://github.com/pnp/office365-cli/issues/308)
 - [graph o365group get](../cmd/graph/o365group/o365group-get.md) - gets information about the specified Office 365 Group [#306](https://github.com/pnp/office365-cli/issues/306)
 - [graph o365group list](../cmd/graph/o365group/o365group-list.md) - lists Office 365 Groups in the current tenant [#305](https://github.com/pnp/office365-cli/issues/305)
@@ -325,9 +325,9 @@
 
 **Azure Active Directory Graph:**
 
-- [aad connect](../cmd/aad/connect.md) - connects to the Azure Active Directory Graph [#160](https://github.com/pnp/office365-cli/issues/160)
-- [aad disconnect](../cmd/aad/disconnect.md) - disconnects from Azure Active Directory Graph [#161](https://github.com/pnp/office365-cli/issues/161)
-- [aad status](../cmd/aad/status.md) - shows Azure Active Directory Graph connection status [#162](https://github.com/pnp/office365-cli/issues/162)
+- [aad login](../cmd/aad/login.md) - log in to the Azure Active Directory Graph [#160](https://github.com/pnp/office365-cli/issues/160)
+- [aad logout](../cmd/aad/logout.md) - log out from Azure Active Directory Graph [#161](https://github.com/pnp/office365-cli/issues/161)
+- [aad status](../cmd/aad/status.md) - shows Azure Active Directory Graph login status [#162](https://github.com/pnp/office365-cli/issues/162)
 - [aad sp get](../cmd/aad/sp/sp-get.md) - gets information about the specific service principal [#158](https://github.com/pnp/office365-cli/issues/158)
 - [aad oauth2grant list](../cmd/aad/oauth2grant/oauth2grant-list.md) - lists OAuth2 permission grants for the specified service principal [#159](https://github.com/pnp/office365-cli/issues/159)
 - [aad oauth2grant add](../cmd/aad/oauth2grant/oauth2grant-add.md) - grant the specified service principal OAuth2 permissions to the specified resource [#164](https://github.com/pnp/office365-cli/issues/164)
@@ -400,9 +400,9 @@ Initial release.
 - [spo cdn policy list](../cmd/spo/cdn/cdn-policy-list.md) - list Office 365 CDN policies
 - [spo cdn policy set](../cmd/spo/cdn/cdn-policy-set.md) - set Office 365 CDN policy
 - [spo cdn set](../cmd/spo/cdn/cdn-set.md) - enable/disable Office 365 CDN
-- [spo connect](../cmd/spo/connect.md) - connect to a SharePoint Online site
-- [spo disconnect](../cmd/spo/disconnect.md) - disconnect from SharePoint
-- [spo status](../cmd/spo/status.md) - show SharePoint Online connection status
+- [spo login](../cmd/spo/login.md) - log in to a SharePoint Online site
+- [spo logout](../cmd/spo/logout.md) - log out from SharePoint
+- [spo status](../cmd/spo/status.md) - show SharePoint Online login status
 - [spo storageentity get](../cmd/spo/storageentity/storageentity-get.md) - get value of a tenant property
 - [spo storageentity list](../cmd/spo/storageentity/storageentity-list.md) - list all tenant properties
 - [spo storageentity remove](../cmd/spo/storageentity/storageentity-remove.md) - remove a tenant property

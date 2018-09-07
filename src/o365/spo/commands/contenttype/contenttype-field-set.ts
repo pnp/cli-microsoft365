@@ -612,14 +612,14 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.CONTENTTYPE_FIELD_SET).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint site,
-    using the ${chalk.blue(commands.CONNECT)} command.
+      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint site,
+    using the ${chalk.blue(commands.LOGIN)} command.
                 
   Remarks:
 
-    To add a field reference to a content type, you have to first connect
-    to a SharePoint site using the ${chalk.blue(commands.CONNECT)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
+    To add a field reference to a content type, you have to first log in
+    to a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
+    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
 
     If the field reference already exists, the command will update its ${chalk.grey(`required`)}
     and ${chalk.grey(`hidden`)} properties as specified in the command.

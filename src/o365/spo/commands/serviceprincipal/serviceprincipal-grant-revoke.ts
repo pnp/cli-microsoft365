@@ -121,13 +121,13 @@ class SpoServicePrincipalGrantRevokeCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.SERVICEPRINCIPAL_GRANT_REVOKE).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online tenant admin site using the
-      ${chalk.blue(commands.CONNECT)} command.
+      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online tenant admin site using the
+      ${chalk.blue(commands.LOGIN)} command.
         
   Remarks:
 
-    To revoke permissions granted to the service principal, you have to first connect to a SharePoint tenant admin
-    site using the ${chalk.blue(commands.CONNECT)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso-admin.sharepoint.com`)}.
+    To revoke permissions granted to the service principal, you have to first log in to a SharePoint tenant admin
+    site using the ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso-admin.sharepoint.com`)}.
 
     The permission grant you want to revoke is denoted using its ${chalk.grey('ObjectId')}. You can retrieve
     it using the ${chalk.grey(`${commands.SERVICEPRINCIPAL_GRANT_LIST}`)} command.

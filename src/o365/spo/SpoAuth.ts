@@ -16,8 +16,8 @@ export class Site extends Service {
   url!: string;
   accessTokens: Hash = {};
 
-  public disconnect(): void {
-    super.disconnect();
+  public logout(): void {
+    super.logout();
     this.tenantId = '';
     this.url = '';
   }

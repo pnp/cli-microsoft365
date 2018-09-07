@@ -1,6 +1,6 @@
 # graph status
 
-Shows Microsoft Graph connection status
+Shows Microsoft Graph login status
 
 ## Usage
 
@@ -19,11 +19,11 @@ Option|Description
 
 ## Remarks
 
-If you are connected to the Microsoft Graph, the `graph status` command will show you information about the currently stored refresh and access token and the expiration date and time of the access token when run in debug mode.
+If you are logged in to the Microsoft Graph, the `graph status` command will show you information about the currently stored refresh and access token and the expiration date and time of the access token when run in debug mode.
 
 ## Examples
 
-Show the information about the current connection to the Microsoft Graph
+Show the information about the current login to the Microsoft Graph
 
 ```sh
 graph status

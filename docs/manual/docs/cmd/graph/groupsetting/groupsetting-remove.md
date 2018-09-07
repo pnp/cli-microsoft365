@@ -20,11 +20,11 @@ Option|Description
 `--debug`|Runs command with debug logging
 
 !!! important
-    Before using this command, connect to the Microsoft Graph, using the [graph connect](../connect.md) command.
+    Before using this command, log in to the Microsoft Graph, using the [graph login](../login.md) command.
 
 ## Remarks
 
-To remove a group setting, you have to first connect to the Microsoft Graph using the [graph connect](../connect.md) command, eg. `graph connect`.
+To remove a group setting, you have to first log in to the Microsoft Graph using the [graph login](../login.md) command, eg. `graph login`.
 
 If the specified _id_ doesn't refer to an existing group setting, you will get a `Resource does not exist` error.
 

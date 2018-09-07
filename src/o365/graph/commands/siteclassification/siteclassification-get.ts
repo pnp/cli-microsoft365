@@ -113,8 +113,8 @@ class GraphO365SiteClassificationGetCommand extends GraphCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, connect to the Microsoft Graph
-    using the ${chalk.blue(commands.CONNECT)} command.
+      `  ${chalk.yellow('Important:')} before using this command, log in to the Microsoft Graph
+    using the ${chalk.blue(commands.LOGIN)} command.
         
   Remarks:
 
@@ -123,8 +123,8 @@ class GraphO365SiteClassificationGetCommand extends GraphCommand {
     availability.
 
     To get information about a Office 365 Tenant site classification, you have
-    to first connect to the Microsoft Graph using the ${chalk.blue(commands.CONNECT)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT}`)}.
+    to first log in to the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
+    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
 
   Examples:
   

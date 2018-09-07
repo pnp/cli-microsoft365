@@ -14,12 +14,12 @@ Add-SPOTenantCentralAssetRepositoryLibrary|Microsoft.Online.SharePoint.PowerShel
 Add-SPOTheme|Microsoft.Online.SharePoint.PowerShell|[spo theme set](../cmd/spo/theme/theme-set.md)
 Add-SPOUser|Microsoft.Online.SharePoint.PowerShell|
 Approve-SPOTenantServicePrincipalPermissionRequest|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal permissionrequest approve](../cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-approve.md)
-Connect-SPOService|Microsoft.Online.SharePoint.PowerShell|[spo connect](../cmd/spo/connect.md)
+Connect-SPOService|Microsoft.Online.SharePoint.PowerShell|[spo login](../cmd/spo/login.md)
 ConvertTo-SPOMigrationEncryptedPackage|Microsoft.Online.SharePoint.PowerShell|
 ConvertTo-SPOMigrationTargetedPackage|Microsoft.Online.SharePoint.PowerShell|
 Deny-SPOTenantServicePrincipalPermissionRequest|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal permissionrequest deny](../cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-deny.md)
 Disable-SPOTenantServicePrincipal|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal set](../cmd/spo/serviceprincipal/serviceprincipal-set.md)
-Disconnect-SPOService|Microsoft.Online.SharePoint.PowerShell|[spo disconnect](../cmd/spo/disconnect.md)
+Disconnect-SPOService|Microsoft.Online.SharePoint.PowerShell|[spo logout](../cmd/spo/logout.md)
 Enable-SPOTenantServicePrincipal|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal set](../cmd/spo/serviceprincipal/serviceprincipal-set.md)
 Export-SPOUserInfo|Microsoft.Online.SharePoint.PowerShell|
 Export-SPOUserProfile|Microsoft.Online.SharePoint.PowerShell|
@@ -198,7 +198,7 @@ Clear-PnPRecycleBinItem|SharePointPnPPowerShellOnline|
 Clear-PnPTenantRecycleBinItem|SharePointPnPPowerShellOnline|
 Connect-PnPHubSite|SharePointPnPPowerShellOnline|[spo hubsite connect](../cmd/spo/hubsite/hubsite-connect.md)
 Connect-PnPMicrosoftGraph|SharePointPnPPowerShellOnline|
-Connect-PnPOnline|SharePointPnPPowerShellOnline|[spo connect](../cmd/spo/connect.md)
+Connect-PnPOnline|SharePointPnPPowerShellOnline|[spo login](../cmd/spo/login.md)
 Convert-PnPFolderToProvisioningTemplate|SharePointPnPPowerShellOnline|
 Convert-PnPProvisioningTemplate|SharePointPnPPowerShellOnline|
 Copy-PnPFile|SharePointPnPPowerShellOnline|[spo file copy](../cmd/spo/file/file-copy.md), [spo folder copy](../cmd/spo/folder/folder-copy.md)
@@ -210,7 +210,7 @@ Disable-PnPResponsiveUI|SharePointPnPPowerShellOnline|
 Disable-PnPSiteClassification|SharePointPnPPowerShellOnline|
 Disable-PnPTenantServicePrincipal|SharePointPnPPowerShellOnline|[spo serviceprincipal set](../cmd/spo/serviceprincipal/serviceprincipal-set.md)
 Disconnect-PnPHubSite|SharePointPnPPowerShellOnline|[spo hubsite disconnect](../cmd/spo/hubsite/hubsite-disconnect.md)
-Disconnect-PnPOnline|SharePointPnPPowerShellOnline|[spo disconnect](../cmd/spo/disconnect.md)
+Disconnect-PnPOnline|SharePointPnPPowerShellOnline|[spo logout](../cmd/spo/logout.md)
 Enable-PnPFeature|SharePointPnPPowerShellOnline|
 Enable-PnPInPlaceRecordsManagementForSite|SharePointPnPPowerShellOnline|
 Enable-PnPResponsiveUI|SharePointPnPPowerShellOnline|

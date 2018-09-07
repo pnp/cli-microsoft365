@@ -19,11 +19,11 @@ Option|Description
 `--debug`|Runs command with debug logging
 
 !!! important
-    Before using this command, connect to Azure Active Directory Graph, using the [aad connect](../connect.md) command.
+    Before using this command, log in to Azure Active Directory Graph, using the [aad login](../login.md) command.
 
 ## Remarks
 
-To remove service principal's OAuth2 permissions, you have to first connect to Azure Active Directory Graph using the [aad connect](../connect.md) command, eg. `aad connect`.
+To remove service principal's OAuth2 permissions, you have to first log in to Azure Active Directory Graph using the [aad login](../login.md) command, eg. `aad login`.
 
 Before you can remove service principal's OAuth2 permissions, you need to get the `objectId` of the permissions grant to remove. You can retrieve it using the [aad oauth2grant list](./oauth2grant-list.md) command.
 

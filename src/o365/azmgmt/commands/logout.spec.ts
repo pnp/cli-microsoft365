@@ -3,12 +3,12 @@ import Command from '../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
 import auth from '../AzmgmtAuth';
-const command: Command = require('./disconnect');
+const command: Command = require('./logout');
 import * as assert from 'assert';
 import Utils from '../../../Utils';
 import { Service } from '../../../Auth';
 
-describe(commands.DISCONNECT, () => {
+describe(commands.LOGOUT, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
@@ -27,12 +27,15 @@ describe(commands.DISCONNECT, () => {
     vorpal = require('../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: 'azmgmt logout'
+      },
       log: (msg: string) => {
         log.push(msg);
       }
     };
     auth.service = new Service('https://management.azure.com/');
-    sinon.stub(auth.service, 'disconnect').callsFake(() => { });
+    sinon.stub(auth.service, 'logout').callsFake(() => { });
     telemetry = null;
   });
 
@@ -45,7 +48,7 @@ describe(commands.DISCONNECT, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.DISCONNECT), true);
+    assert.equal(command.name.startsWith(commands.LOGOUT), true);
   });
 
   it('has a description', () => {
@@ -69,7 +72,7 @@ describe(commands.DISCONNECT, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, () => {
       try {
-        assert.equal(telemetry.name, commands.DISCONNECT);
+        assert.equal(telemetry.name, commands.LOGOUT);
         done();
       }
       catch (e) {
@@ -78,7 +81,7 @@ describe(commands.DISCONNECT, () => {
     });
   });
 
-  it('disconnects from Azure Management Service when connected', (done) => {
+  it('logs out from Azure Management Service when logged in', (done) => {
     auth.service = new Service('https://management.azure.com/');
     auth.service.connected = true;
     cmdInstance.action = command.action();
@@ -93,7 +96,7 @@ describe(commands.DISCONNECT, () => {
     });
   });
 
-  it('disconnects from Azure Management Service when not connected', (done) => {
+  it('logs out from Azure Management Service when not logged in', (done) => {
     auth.service = new Service('https://management.azure.com/');
     auth.service.connected = false;
     cmdInstance.action = command.action();
@@ -108,7 +111,7 @@ describe(commands.DISCONNECT, () => {
     });
   });
 
-  it('clears persisted connection info when disconnecting', (done) => {
+  it('clears persisted connection info when logging out', (done) => {
     auth.service = new Service('https://management.azure.com/');
     auth.service.connected = true;
     cmdInstance.action = command.action();
@@ -123,6 +126,11 @@ describe(commands.DISCONNECT, () => {
     });
   });
 
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notEqual(typeof alias, 'undefined');
+  });
+
   it('has help referring to the right command', () => {
     const cmd: any = {
       log: (msg: string) => {},
@@ -132,7 +140,7 @@ describe(commands.DISCONNECT, () => {
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
     cmd.help({}, () => {});
-    assert(find.calledWith(commands.DISCONNECT));
+    assert(find.calledWith(commands.LOGOUT));
   });
 
   it('has help with examples', () => {
@@ -161,12 +169,12 @@ describe(commands.DISCONNECT, () => {
     Utils.restore(auth.clearConnectionInfo);
     sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
     auth.service = new Service('https://management.azure.com/');
-    const disconnectSpy = sinon.spy(auth.service, 'disconnect');
+    const logoutSpy = sinon.spy(auth.service, 'logout');
     auth.service.connected = true;
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false } }, () => {
       try {
-        assert(disconnectSpy.called);
+        assert(logoutSpy.called);
         done();
       }
       catch (e) {
@@ -181,12 +189,12 @@ describe(commands.DISCONNECT, () => {
   it('correctly handles error while clearing persisted connection info (debug)', (done) => {
     sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
     auth.service = new Service('https://management.azure.com/');
-    const disconnectSpy = sinon.spy(auth.service, 'disconnect');
+    const logoutSpy = sinon.spy(auth.service, 'logout');
     auth.service.connected = true;
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
       try {
-        assert(disconnectSpy.called);
+        assert(logoutSpy.called);
         done();
       }
       catch (e) {

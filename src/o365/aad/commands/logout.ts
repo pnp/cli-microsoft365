@@ -1,4 +1,4 @@
-import auth from '../GraphAuth';
+import auth from '../AadAuth';
 import commands from '../commands';
 import config from '../../../config';
 import Command, {
@@ -8,26 +8,33 @@ import appInsights from '../../../appInsights';
 
 const vorpal: Vorpal = require('../../../vorpal-init');
 
-class GraphDisconnectCommand extends Command {
+class AadLogoutCommand extends Command {
   public get name(): string {
-    return commands.DISCONNECT;
+    return commands.LOGOUT;
   }
 
   public get description(): string {
-    return 'Disconnects from the Microsoft Graph';
+    return 'Log out from Azure Active Directory Graph';
+  }
+
+  public alias(): string[] | undefined {
+    return [commands.DISCONNECT];
   }
 
   public commandAction(cmd: CommandInstance, args: {}, cb: () => void): void {
     const chalk = vorpal.chalk;
+
+    this.showDeprecationWarning(cmd, commands.DISCONNECT, commands.LOGOUT);
+
     appInsights.trackEvent({
-      name: commands.DISCONNECT
+      name: this.getUsedCommandName(cmd)
     });
     if (this.verbose) {
-      cmd.log('Disconnecting from Microsoft Graph...');
+      cmd.log('Logging out from AAD Graph...');
     }
 
-    const disconnect: () => void = (): void => {
-      auth.service.disconnect();
+    const logout: () => void = (): void => {
+      auth.service.logout();
       if (this.verbose) {
         cmd.log(chalk.green('DONE'));
       }
@@ -37,35 +44,35 @@ class GraphDisconnectCommand extends Command {
     auth
       .clearConnectionInfo()
       .then((): void => {
-        disconnect();
+        logout();
       }, (error: any): void => {
         if (this.debug) {
           cmd.log(new CommandError(error));
         }
 
-        disconnect();
+        logout();
       });
   }
 
   public commandHelp(args: any, log: (help: string) => void): void {
     const chalk = vorpal.chalk;
-    log(vorpal.find(commands.DISCONNECT).helpInformation());
+    log(vorpal.find(commands.LOGOUT).helpInformation());
     log(
       `  Remarks:
 
-    The ${chalk.blue(commands.DISCONNECT)} command disconnects from the Microsoft Graph
+    The ${chalk.blue(commands.LOGOUT)} command logs out from Azure Active Directory Graph
     and removes any access and refresh tokens from memory.
 
   Examples:
   
-    Disconnect from Microsoft Graph
-      ${chalk.grey(config.delimiter)} ${commands.DISCONNECT}
+    Log out from Azure Active Directory Graph
+      ${chalk.grey(config.delimiter)} ${commands.LOGOUT}
 
-    Disconnect from Microsoft Graph in debug mode including detailed debug
-    information in the console output
-      ${chalk.grey(config.delimiter)} ${commands.DISCONNECT} --debug
+    Log out from Azure Active Directory Graph in debug mode including detailed
+    debug information in the console output
+      ${chalk.grey(config.delimiter)} ${commands.LOGOUT} --debug
 `);
   }
 }
 
-module.exports = new GraphDisconnectCommand();
+module.exports = new AadLogoutCommand();

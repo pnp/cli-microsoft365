@@ -10,6 +10,8 @@ export default {
   GROUPSETTING_SET: `${prefix} groupsetting set`,
   GROUPSETTINGTEMPLATE_GET: `${prefix} groupsettingtemplate get`,
   GROUPSETTINGTEMPLATE_LIST: `${prefix} groupsettingtemplate list`,
+  LOGIN: `${prefix} login`,
+  LOGOUT: `${prefix} logout`,
   O365GROUP_ADD: `${prefix} o365group add`,
   O365GROUP_GET: `${prefix} o365group get`,
   O365GROUP_LIST: `${prefix} o365group list`,

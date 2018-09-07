@@ -41,6 +41,9 @@ describe('GraphCommand', () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
     const command = new MockCommand();
     const cmdInstance = {
+      commandWrapper: {
+        command: 'graph command'
+      },
       log: (msg: any) => {},
       prompt: () => {},
       action: command.action()
@@ -60,6 +63,9 @@ describe('GraphCommand', () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
     const command = new MockCommand();
     const cmdInstance = {
+      commandWrapper: {
+        command: 'graph command'
+      },
       log: (msg: any) => {},
       prompt: () => {},
       action: command.action()
@@ -76,10 +82,13 @@ describe('GraphCommand', () => {
     });
   });
 
-  it('doesn\'t execute command when not connected', (done) => {
+  it('doesn\'t execute command when not logged in', (done) => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     const command = new MockCommand();
     const cmdInstance = {
+      commandWrapper: {
+        command: 'graph command'
+      },
       log: (msg: any) => {},
       prompt: () => {},
       action: command.action()
@@ -98,10 +107,13 @@ describe('GraphCommand', () => {
     });
   });
 
-  it('executes command when connected', (done) => {
+  it('executes command when logged in', (done) => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     const command = new MockCommand();
     const cmdInstance = {
+      commandWrapper: {
+        command: 'graph command'
+      },
       log: (msg: any) => {},
       prompt: () => {},
       action: command.action()

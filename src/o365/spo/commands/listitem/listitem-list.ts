@@ -296,14 +296,14 @@ class SpoListItemListCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online site,
-    using the ${chalk.blue(commands.CONNECT)} command.
+      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
+    using the ${chalk.blue(commands.LOGIN)} command.
   
   Remarks:
   
-    To get a list of items from a list, you have to first connect to SharePoint
-    using the ${chalk.blue(commands.CONNECT)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
+    To get a list of items from a list, you have to first log in to SharePoint
+    using the ${chalk.blue(commands.LOGIN)} command,
+    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
 
     ${chalk.grey('pageNumber')} is specified as a 0-based index. A value of ${chalk.grey('2')} returns the third
     page of items.

@@ -30,13 +30,13 @@ o365$ _
 
 Running the `office365` command will start the immersive CLI with its own command prompt.
 
-Start managing the settings of your Office 365 tenant by connecting to it, using the `spo connect <url>` site, for example:
+Start managing the settings of your Office 365 tenant by logging in to it, using the `spo login <url>` site, for example:
 
 ```sh
-o365$ spo connect https://contoso-admin.sharepoint.com
+o365$ spo login https://contoso-admin.sharepoint.com
 ```
 
-> Depending on which settings you want to manage you might need to connect either to your tenant admin site (URL with `-admin` in it), or to a regular SharePoint site. For more information refer to the help of the command you want to use.
+> Depending on which settings you want to manage you might need to log in either to your tenant admin site (URL with `-admin` in it), or to a regular SharePoint site. For more information refer to the help of the command you want to use.
 
 To list all available commands, type in the Office 365 CLI prompt `help`:
 

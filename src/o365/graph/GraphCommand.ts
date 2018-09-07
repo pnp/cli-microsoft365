@@ -12,7 +12,7 @@ export default abstract class GraphCommand extends Command {
           cmd.initAction(args);
 
           if (!auth.service.connected) {
-            cb(new CommandError('Connect to the Microsoft Graph first'));
+            cb(new CommandError('Log in to the Microsoft Graph first'));
             return;
           }
 

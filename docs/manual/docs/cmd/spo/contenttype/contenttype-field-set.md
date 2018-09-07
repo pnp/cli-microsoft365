@@ -23,11 +23,11 @@ Option|Description
 `--debug`|Runs command with debug logging
 
 !!! important
-    Before using this command, connect to a SharePoint Online tenant admin site, using the [spo connect](../connect.md) command.
+    Before using this command, log in to a SharePoint Online tenant admin site, using the [spo login](../login.md) command.
 
 ## Remarks
 
-To add a field reference to a content type, you have to first connect to a SharePoint site using the [spo connect](../connect.md) command, eg. `spo connect https://contoso.sharepoint.com`.
+To add a field reference to a content type, you have to first log in to a SharePoint site using the [spo login](../login.md) command, eg. `spo login https://contoso.sharepoint.com`.
 
 If the field reference already exists, the command will update its _required_ and _hidden_ properties as specified in the command.
 

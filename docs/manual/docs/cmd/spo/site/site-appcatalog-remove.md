@@ -19,11 +19,11 @@ Option|Description
 `--debug`|Runs command with debug logging
 
 !!! important
-    Before using this command, connect to a SharePoint Online site, using the [spo connect](../connect.md) command.
+    Before using this command, log in to a SharePoint Online site, using the [spo login](../login.md) command.
 
 ## Remarks
 
-To remove an app catalog from a site collection, you have to first connect to a SharePoint site using the [spo connect](../connect.md) command, eg. `spo connect https://contoso.sharepoint.com`.
+To remove an app catalog from a site collection, you have to first log in to a SharePoint site using the [spo login](../login.md) command, eg. `spo login https://contoso.sharepoint.com`.
 
 While the command uses the term *"remove"*, like the PowerShell equivalent cmdlet, it does not remove the special library **Apps for SharePoint** from the site collection. It simply disables the site collection app catalog in that site. Packages deployed to the app catalog are not available within the site collection.
 

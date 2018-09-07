@@ -26,11 +26,11 @@ Option|Description
 `--debug`|Runs command with debug logging
 
 !!! important
-    Before using this command, connect to a SharePoint Online site, using the [spo connect](../connect.md) command.
+    Before using this command, log in to a SharePoint Online site, using the [spo login](../login.md) command.
 
 ## Remarks
 
-To add a client-side web part to a modern page, you have to first connect to a SharePoint site using the [spo connect](../connect.md) command, eg. `spo connect https://contoso.sharepoint.com`.
+To add a client-side web part to a modern page, you have to first log in to a SharePoint site using the [spo login](../login.md) command, eg. `spo login https://contoso.sharepoint.com`.
 
 If the specified `pageName` doesn't refer to an existing modern page, you will get a _File doesn't exists_ error.
 

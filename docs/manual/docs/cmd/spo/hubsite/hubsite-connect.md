@@ -23,11 +23,11 @@ Option|Description
 `--debug`|Runs command with debug logging
 
 !!! important
-    Before using this command, connect to a SharePoint Online site, using the [spo connect](../connect.md) command.
+    Before using this command, log in to a SharePoint Online site, using the [spo login](../login.md) command.
 
 ## Remarks
 
-To connect a site collection to a hub site, you have to first connect to a SharePoint site using the [spo connect](../connect.md) command, eg. `spo connect https://contoso.sharepoint.com`.
+To connect a site collection to a hub site, you have to first log in to a SharePoint site using the [spo login](../login.md) command, eg. `spo login https://contoso.sharepoint.com`.
 
 If the specified site collection is already connected to a hub site, it will be disconnected and connected to the newly specified hub site.
 

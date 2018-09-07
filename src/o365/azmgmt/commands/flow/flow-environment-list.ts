@@ -79,8 +79,8 @@ class AzmgmtFlowEnvironmentListCommand extends AzmgmtCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.FLOW_ENVIRONMENT_LIST).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, connect to the Azure Management Service,
-    using the ${chalk.blue(commands.CONNECT)} command.
+      `  ${chalk.yellow('Important:')} before using this command, log in to the Azure Management Service,
+    using the ${chalk.blue(commands.LOGIN)} command.
 
   Remarks:
 
@@ -89,7 +89,7 @@ class AzmgmtFlowEnvironmentListCommand extends AzmgmtCommand {
     availability.
   
     To get information about Microsoft Flow environments, you have to first
-    connect to the Azure Management Service using the ${chalk.blue(commands.CONNECT)} command.
+    log in to the Azure Management Service using the ${chalk.blue(commands.LOGIN)} command.
    
   Examples:
   

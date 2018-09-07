@@ -3,14 +3,14 @@ import Command, { CommandValidate, CommandCancel, CommandError, CommandOption } 
 import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
 import auth, { Site } from '../SpoAuth';
-const command: Command = require('./connect');
+const command: Command = require('./login');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import config from '../../../config';
 import Utils from '../../../Utils';
 import { AuthType } from '../../../Auth';
 
-describe(commands.CONNECT, () => {
+describe(commands.LOGIN, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
@@ -58,13 +58,16 @@ describe(commands.CONNECT, () => {
     vorpal = require('../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: 'spo login'
+      },
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
     auth.site = new Site();
-    sinon.stub(auth.site, 'disconnect').callsFake(() => { });
+    sinon.stub(auth.site, 'logout').callsFake(() => { });
     telemetry = null;
   });
 
@@ -87,7 +90,7 @@ describe(commands.CONNECT, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.CONNECT), true);
+    assert.equal(command.name.startsWith(commands.LOGIN), true);
   });
 
   it('has a description', () => {
@@ -111,7 +114,7 @@ describe(commands.CONNECT, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {}, url: 'https://contoso-admin.sharepoint.com' }, () => {
       try {
-        assert.equal(telemetry.name, command.name);
+        assert.equal(telemetry.name, commands.LOGIN);
         done();
       }
       catch (e) {
@@ -120,7 +123,7 @@ describe(commands.CONNECT, () => {
     });
   });
 
-  it('connects to a tenant admin site', (done) => {
+  it('logs in to a tenant admin site', (done) => {
     auth.site = new Site();
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false }, url: 'https://contoso-admin.sharepoint.com' }, () => {
@@ -134,7 +137,7 @@ describe(commands.CONNECT, () => {
     });
   });
 
-  it('connects to a tenant admin site (debug)', (done) => {
+  it('logs in to a tenant admin site (debug)', (done) => {
     auth.site = new Site();
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true }, url: 'https://contoso-admin.sharepoint.com' }, () => {
@@ -148,7 +151,7 @@ describe(commands.CONNECT, () => {
     });
   });
 
-  it('connects to a regular SharePoint site', (done) => {
+  it('logs in to a regular SharePoint site', (done) => {
     auth.site = new Site();
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false }, url: 'https://contoso.sharepoint.com' }, () => {
@@ -162,7 +165,7 @@ describe(commands.CONNECT, () => {
     });
   });
 
-  it('connects to a regular SharePoint site (debug)', (done) => {
+  it('logs in to a regular SharePoint site (debug)', (done) => {
     auth.site = new Site();
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true }, url: 'https://contoso.sharepoint.com' }, () => {
@@ -187,7 +190,7 @@ describe(commands.CONNECT, () => {
     assert.equal(actual, `${url} is not a valid SharePoint Online site URL`);
   });
 
-  it('connects to AAD Graph using username and password when authType password set', (done) => {
+  it('logs in to AAD Graph using username and password when authType password set', (done) => {
     auth.site = new Site();
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, authType: 'password', userName: 'user', password: 'password' }, url: 'https://contoso.sharepoint.com' }, () => {
@@ -276,6 +279,11 @@ describe(commands.CONNECT, () => {
     assert.equal(actual, true);
   });
 
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notEqual(typeof alias, 'undefined');
+  });
+
   it('has help referring to the right command', () => {
     const cmd: any = {
       log: (msg: string) => {},
@@ -285,7 +293,7 @@ describe(commands.CONNECT, () => {
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
     cmd.help({}, () => {});
-    assert(find.calledWith(commands.CONNECT));
+    assert(find.calledWith(commands.LOGIN));
   });
 
   it('has help with examples', () => {
@@ -310,7 +318,7 @@ describe(commands.CONNECT, () => {
     assert(containsExamples);
   });
 
-  it('correctly handles lack of valid access token when connecting to a tenant-admin site', (done) => {
+  it('correctly handles lack of valid access token when logging in to a tenant-admin site', (done) => {
     Utils.restore(auth.ensureAccessToken);
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject('Error getting access token'); });
     auth.site = new Site();
@@ -326,7 +334,7 @@ describe(commands.CONNECT, () => {
     });
   });
 
-  it('correctly handles lack of valid access token when connecting to a tenant-admin site (debug)', (done) => {
+  it('correctly handles lack of valid access token when logging in to a tenant-admin site (debug)', (done) => {
     Utils.restore(auth.ensureAccessToken);
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject('Error getting access token'); });
     auth.site = new Site();
@@ -345,7 +353,7 @@ describe(commands.CONNECT, () => {
     });
   });
 
-  it('correctly handles lack of valid access token when connecting to a regular site', (done) => {
+  it('correctly handles lack of valid access token when logging in to a regular site', (done) => {
     Utils.restore(auth.ensureAccessToken);
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject('Error getting access token'); });
     auth.site = new Site();
@@ -361,7 +369,7 @@ describe(commands.CONNECT, () => {
     });
   });
 
-  it('correctly handles lack of valid access token when connecting to a regular site (debug)', (done) => {
+  it('correctly handles lack of valid access token when logging in to a regular site (debug)', (done) => {
     Utils.restore(auth.ensureAccessToken);
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject('Error getting access token'); });
     auth.site = new Site();
@@ -380,7 +388,7 @@ describe(commands.CONNECT, () => {
     });
   });
 
-  it('ignores the error raised by cancelling device code auth flow to connect to a tenant admin site', (done) => {
+  it('ignores the error raised by cancelling device code auth flow to log in to a tenant admin site', (done) => {
     Utils.restore(auth.ensureAccessToken);
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject('Polling_Request_Cancelled'); });
     auth.site = new Site();
@@ -399,7 +407,7 @@ describe(commands.CONNECT, () => {
     });
   });
 
-  it('ignores the error raised by cancelling device code auth flow to connect to a regular SharePoint site', (done) => {
+  it('ignores the error raised by cancelling device code auth flow to log in to a regular SharePoint site', (done) => {
     Utils.restore(auth.ensureAccessToken);
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject('Polling_Request_Cancelled'); });
     auth.site = new Site();

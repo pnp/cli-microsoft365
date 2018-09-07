@@ -15,7 +15,7 @@ class AzmgmtStatusCommand extends Command {
   }
 
   public get description(): string {
-    return 'Shows Azure Management Service connection status';
+    return 'Shows Azure Management Service login status';
   }
 
   public commandAction(cmd: CommandInstance, args: {}, cb: (err?: any) => void): void {
@@ -42,10 +42,10 @@ class AzmgmtStatusCommand extends Command {
         }
         else {
           if (this.verbose) {
-            cmd.log('Not connected to the Azure Management Service');
+            cmd.log('Logged out from the Azure Management Service');
           }
           else {
-            cmd.log('Not connected');
+            cmd.log('Logged out');
           }
         }
         cb();
@@ -64,14 +64,14 @@ class AzmgmtStatusCommand extends Command {
     in preview and is subject to change once the API reached general
     availability.
 
-    If you are connected to the Azure Management Service, the ${chalk.blue(commands.STATUS)} command
+    If you are logged in to the Azure Management Service, the ${chalk.blue(commands.STATUS)} command
     will show you information about the currently stored refresh and access
     token and the expiration date and time of the access token when run in debug
     mode.
 
   Examples:
   
-    Show the information about the current connection to the Azure Management
+    Show the information about the current login to the Azure Management
     Service
       ${chalk.grey(config.delimiter)} ${commands.STATUS}
 `);

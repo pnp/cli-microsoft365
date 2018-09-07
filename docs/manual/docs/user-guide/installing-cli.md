@@ -87,7 +87,7 @@ This will download and install the latest public version of the Office 365 CLI. 
 ## Uninstall the CLI
 
 !!! attention
-    Before uninstalling the CLI, disconnect from the different Office 365 services to which you connected using the `[service] disconnect` command, for example `spo disconnect` to disconnect from SharePoint Online. Office 365 CLI persists connection information on your computer and if you don't disconnect before uninstalling the CLI, this information will be left on your computer and you will have to remove it manually. For more information see the article on [persisting connection information](../concepts/persisting-connection.md)
+    Before uninstalling the CLI, log out from the different Office 365 services to which you logged in using the `[service] logout` command, for example `spo logout` to log out from SharePoint Online. Office 365 CLI persists connection information on your computer and if you don't log out before uninstalling the CLI, this information will be left on your computer and you will have to remove it manually. For more information see the article on [persisting connection information](../concepts/persisting-connection.md)
 
 To uninstall the Office 365 CLI, execute in the command line:
 

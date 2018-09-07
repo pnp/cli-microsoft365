@@ -1354,7 +1354,6 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { output: 'md', toVersion: '1.6.0' } }, (err?: any) => {
-      console.log(log[0]);
       assert(log[0].indexOf('## Findings') > -1);
     });
   });
