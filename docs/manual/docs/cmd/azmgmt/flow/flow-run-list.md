@@ -14,7 +14,7 @@ Option|Description
 ------|-----------
 `--help`|output usage information
 `-n, --name <name>`|The name of the Microsoft Flow to get information about
-`-e, --environment <environment>`|The name of the environment for which to retrieve available Flows
+`-e, --environment <environment>`|The name of the environment to which the flow belongs
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
@@ -29,11 +29,9 @@ Option|Description
 
 To get information about the specified Microsoft Flow, you have to first connect to the Azure Management Service using the [azmgmt connect](../connect.md) command.
 
-By default, the command will try to retrieve Microsoft Flows you own. If you want to retrieve Flow owned by another user, use the `asAdmin` flag.
-
 If the environment with the name you specified doesn't exist, you will get the `Access to the environment 'xyz' is denied.` error.
 
-If the Microsoft Flow with the name you specified doesn't exist, you will get the `The caller with object id 'abc' does not have permission for connection 'xyz' under Api 'shared_logicflows'.` error. If you try to retrieve a non-existing flow as admin, you will get the `Could not find flow 'xyz'.` error.
+If the Microsoft Flow with the name you specified doesn't exist, you will get the `The caller with object id 'abc' does not have permission for connection 'xyz' under Api 'shared_logicflows'.` error.
 
 ## Examples
 

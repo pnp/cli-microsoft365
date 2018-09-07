@@ -141,8 +141,6 @@ class AzmgmtFlowRunListCommand extends AzmgmtCommand {
     If the Microsoft Flow with the name you specified doesn't exist, you will
     get the ${chalk.grey(`The caller with object id \'abc\' does not have permission${os.EOL}` +
     '    for connection \'xyz\' under Api \'shared_logicflows\'.')} error.
-    If you try to retrieve a non-existing flow as admin, you will get the
-    ${chalk.grey('Could not find flow \'xyz\'.')} error.
    
   Examples:
   
