@@ -97,7 +97,7 @@ class AzmgmtFlowRunListCommand extends AzmgmtCommand {
       },
       {
         option: '-e, --environment <environment>',
-        description: 'The name of the environment for which to retrieve available Flows'
+        description: 'The name of the environment to which the flow belongs'
       }
     ];
 
