@@ -171,13 +171,13 @@ class SpoServicePrincipalSetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.SERVICEPRINCIPAL_SET).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online tenant admin site,
-  using the ${chalk.blue(commands.CONNECT)} command.
+      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online tenant admin site,
+  using the ${chalk.blue(commands.LOGIN)} command.
         
   Remarks:
 
-    To enable or disable the service principal, you have to first connect to a tenant admin site using the
-    ${chalk.blue(commands.CONNECT)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso-admin.sharepoint.com`)}.
+    To enable or disable the service principal, you have to first log in to a tenant admin site using the
+    ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso-admin.sharepoint.com`)}.
 
     Using the ${chalk.blue('-e, --enabled')} option you can specify whether the service principal should be
     enabled or disabled. Use ${chalk.grey('true')} to enable the service principal and ${chalk.grey('false')} to

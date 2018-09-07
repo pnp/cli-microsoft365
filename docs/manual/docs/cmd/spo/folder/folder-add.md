@@ -21,11 +21,11 @@ Option|Description
 `--debug`|Runs command with debug logging
 
 !!! important
-    Before using this command, connect to a SharePoint Online site, using the [spo connect](../connect.md) command.
+    Before using this command, log in to a SharePoint Online site, using the [spo login](../login.md) command.
 
 ## Remarks
 
-To create a folder, you have to first connect to SharePoint using the [spo connect](../connect.md) command, eg. `spo connect https://contoso.sharepoint.com`.
+To create a folder, you have to first log in to SharePoint using the [spo login](../login.md) command, eg. `spo login https://contoso.sharepoint.com`.
 
 ## Examples
 

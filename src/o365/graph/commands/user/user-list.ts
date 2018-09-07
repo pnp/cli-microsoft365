@@ -94,14 +94,14 @@ class GraphUserListCommand extends GraphItemsListCommand<any> {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, connect to the Microsoft Graph
-    using the ${chalk.blue(commands.CONNECT)} command.
+      `  ${chalk.yellow('Important:')} before using this command, log in to the Microsoft Graph
+    using the ${chalk.blue(commands.LOGIN)} command.
         
   Remarks:
 
-    To list users matching specific criteria, you have to first connect to
-    the Microsoft Graph using the ${chalk.blue(commands.CONNECT)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT}`)}.
+    To list users matching specific criteria, you have to first log in to
+    the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
+    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
 
     Using the ${chalk.blue('--properties')} option, you can specify
     a comma-separated list of user properties to retrieve from the Microsoft

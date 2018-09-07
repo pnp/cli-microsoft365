@@ -18,11 +18,11 @@ Option|Description
 `--debug`|Runs command with debug logging
 
 !!! important
-    Before using this command, connect to the Microsoft Graph, using the [graph connect](../connect.md) command.
+    Before using this command, log in to the Microsoft Graph, using the [graph login](../login.md) command.
 
 ## Remarks
 
-To list group setting templates, you have to first connect to the Microsoft Graph using the [graph connect](../connect.md) command, eg. `graph connect`.
+To list group setting templates, you have to first log in to the Microsoft Graph using the [graph login](../login.md) command, eg. `graph login`.
 
 ## Examples
 

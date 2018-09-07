@@ -2,13 +2,13 @@ import commands from '../commands';
 import Command from '../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
-import auth from '../GraphAuth';
-const command: Command = require('./disconnect');
+import auth from '../AadAuth';
+const command: Command = require('./logout');
 import * as assert from 'assert';
 import Utils from '../../../Utils';
 import { Service } from '../../../Auth';
 
-describe(commands.DISCONNECT, () => {
+describe(commands.LOGOUT, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
@@ -27,12 +27,15 @@ describe(commands.DISCONNECT, () => {
     vorpal = require('../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: 'aad logout'
+      },
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    auth.service = new Service('https://graph.microsoft.com');
-    sinon.stub(auth.service, 'disconnect').callsFake(() => { });
+    auth.service = new Service('https://graph.windows.net');
+    sinon.stub(auth.service, 'logout').callsFake(() => { });
     telemetry = null;
   });
 
@@ -45,7 +48,7 @@ describe(commands.DISCONNECT, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.DISCONNECT), true);
+    assert.equal(command.name.startsWith(commands.LOGOUT), true);
   });
 
   it('has a description', () => {
@@ -69,7 +72,7 @@ describe(commands.DISCONNECT, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, () => {
       try {
-        assert.equal(telemetry.name, commands.DISCONNECT);
+        assert.equal(telemetry.name, commands.LOGOUT);
         done();
       }
       catch (e) {
@@ -78,8 +81,8 @@ describe(commands.DISCONNECT, () => {
     });
   });
 
-  it('disconnects from MS Graph when connected', (done) => {
-    auth.service = new Service('https://graph.microsoft.com');
+  it('logs out from AAD Graph when logged out', (done) => {
+    auth.service = new Service('https://graph.windows.net');
     auth.service.connected = true;
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
@@ -93,8 +96,8 @@ describe(commands.DISCONNECT, () => {
     });
   });
 
-  it('disconnects from MS Graph when not connected', (done) => {
-    auth.service = new Service('https://graph.microsoft.com');
+  it('logs out from AAD Graph when not logged in', (done) => {
+    auth.service = new Service('https://graph.windows.net');
     auth.service.connected = false;
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
@@ -108,8 +111,8 @@ describe(commands.DISCONNECT, () => {
     });
   });
 
-  it('clears persisted connection info when disconnecting', (done) => {
-    auth.service = new Service('https://graph.microsoft.com');
+  it('clears persisted connection info when logging out', (done) => {
+    auth.service = new Service('https://graph.windows.net');
     auth.service.connected = true;
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
@@ -123,6 +126,11 @@ describe(commands.DISCONNECT, () => {
     });
   });
 
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notEqual(typeof alias, 'undefined');
+  });
+
   it('has help referring to the right command', () => {
     const cmd: any = {
       log: (msg: string) => {},
@@ -132,7 +140,7 @@ describe(commands.DISCONNECT, () => {
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
     cmd.help({}, () => {});
-    assert(find.calledWith(commands.DISCONNECT));
+    assert(find.calledWith(commands.LOGOUT));
   });
 
   it('has help with examples', () => {
@@ -160,13 +168,13 @@ describe(commands.DISCONNECT, () => {
   it('correctly handles error while clearing persisted connection info', (done) => {
     Utils.restore(auth.clearConnectionInfo);
     sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
-    auth.service = new Service('https://graph.microsoft.com');
-    const disconnectSpy = sinon.spy(auth.service, 'disconnect');
+    auth.service = new Service('https://graph.windows.net');
+    const logoutSpy = sinon.spy(auth.service, 'logout');
     auth.service.connected = true;
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false } }, () => {
       try {
-        assert(disconnectSpy.called);
+        assert(logoutSpy.called);
         done();
       }
       catch (e) {
@@ -180,13 +188,13 @@ describe(commands.DISCONNECT, () => {
 
   it('correctly handles error while clearing persisted connection info (debug)', (done) => {
     sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
-    auth.service = new Service('https://graph.microsoft.com');
-    const disconnectSpy = sinon.spy(auth.service, 'disconnect');
+    auth.service = new Service('https://graph.windows.net');
+    const logoutSpy = sinon.spy(auth.service, 'logout');
     auth.service.connected = true;
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
       try {
-        assert(disconnectSpy.called);
+        assert(logoutSpy.called);
         done();
       }
       catch (e) {

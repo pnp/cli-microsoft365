@@ -97,8 +97,8 @@ class AzmgmtFlowEnvironmentGetCommand extends AzmgmtCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.FLOW_ENVIRONMENT_GET).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, connect to the Azure Management Service,
-    using the ${chalk.blue(commands.CONNECT)} command.
+      `  ${chalk.yellow('Important:')} before using this command, log in to the Azure Management Service,
+    using the ${chalk.blue(commands.LOGIN)} command.
 
   Remarks:
 
@@ -107,8 +107,8 @@ class AzmgmtFlowEnvironmentGetCommand extends AzmgmtCommand {
     availability.
   
     To get information about the specified Microsoft Flow environment, you have
-    to first connect to the Azure Management Service using the
-    ${chalk.blue(commands.CONNECT)} command.
+    to first log in to the Azure Management Service using the
+    ${chalk.blue(commands.LOGIN)} command.
 
     If the environment with the name you specified doesn't exist, you will get
     the ${chalk.grey('Access to the environment \'xyz\' is denied.')} error.

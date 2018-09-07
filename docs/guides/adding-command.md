@@ -6,9 +6,9 @@ Following article describes how to add a new command to the Office 365 CLI.
 
 Each command consists of three files:
 
-- command implementation, located under **./src/o365/[service]/commands**, eg. *./src/o365/spo/commands/connect.ts*
-- command unit tests, located under **./src/o365/[service]/commands**, eg. *./src/o365/spo/commands/connect.spec.ts*
-- command documentation page, located under **./docs/manual/docs/cmd/[service]**, eg. *./docs/manual/docs/cmd/spo/connect.md*
+- command implementation, located under **./src/o365/[service]/commands**, eg. *./src/o365/spo/commands/login.ts*
+- command unit tests, located under **./src/o365/[service]/commands**, eg. *./src/o365/spo/commands/login.spec.ts*
+- command documentation page, located under **./docs/manual/docs/cmd/[service]**, eg. *./docs/manual/docs/cmd/spo/login.md*
 
 Additionally, each command is listed in:
 
@@ -80,7 +80,7 @@ class MyCommand extends Command {
 module.exports = new MyCommand();
 ```
 
-Depending on your command and the service for which you're building the command, there might be a base class that you can use to simplify the implementation. For example for SPO, you can inherit from the [SpoCommand](../../src/o365/spo/SpoCommand.ts) base class. This class automatically checks if the user connected to SharePoint Online before running the command, simplifying your implementation.
+Depending on your command and the service for which you're building the command, there might be a base class that you can use to simplify the implementation. For example for SPO, you can inherit from the [SpoCommand](../../src/o365/spo/SpoCommand.ts) base class. This class automatically checks if the user logged in to SharePoint Online before running the command, simplifying your implementation.
 
 ### Tracking command usage
 

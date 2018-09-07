@@ -87,13 +87,13 @@ describe(commands.OAUTH2GRANT_SET, () => {
     });
   });
 
-  it('aborts when not connected to AAD Graph', (done) => {
+  it('aborts when not logged in to AAD Graph', (done) => {
     auth.service = new Service('https://graph.windows.net');
     auth.service.connected = false;
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Connect to Azure Active Directory Graph first')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to Azure Active Directory Graph first')));
         done();
       }
       catch (e) {

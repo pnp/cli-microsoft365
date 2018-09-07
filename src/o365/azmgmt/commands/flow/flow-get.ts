@@ -124,8 +124,8 @@ class AzmgmtFlowGetCommand extends AzmgmtCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.FLOW_GET).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, connect to the Azure Management Service,
-    using the ${chalk.blue(commands.CONNECT)} command.
+      `  ${chalk.yellow('Important:')} before using this command, log in to the Azure Management Service,
+    using the ${chalk.blue(commands.LOGIN)} command.
 
   Remarks:
 
@@ -134,7 +134,7 @@ class AzmgmtFlowGetCommand extends AzmgmtCommand {
     availability.
   
     To get information about the specified Microsoft Flow, you have to first
-    connect to the Azure Management Service using the ${chalk.blue(commands.CONNECT)} command.
+    log in to the Azure Management Service using the ${chalk.blue(commands.LOGIN)} command.
 
     By default, the command will try to retrieve Microsoft Flows you own.
     If you want to retrieve Flow owned by another user, use the ${chalk.blue('asAdmin')}

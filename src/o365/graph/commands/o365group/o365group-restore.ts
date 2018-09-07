@@ -103,8 +103,8 @@ class GraphO365GroupRestoreCommand extends GraphCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, connect to the Microsoft Graph,
-    using the ${chalk.blue(commands.CONNECT)} command.
+      `  ${chalk.yellow('Important:')} before using this command, log in to the Microsoft Graph,
+    using the ${chalk.blue(commands.LOGIN)} command.
 
   Remarks:
 
@@ -112,8 +112,8 @@ class GraphO365GroupRestoreCommand extends GraphCommand {
     in preview and is subject to change once the API reached general
     availability.
   
-    To restore a deleted Office 365 Group, you have to first connect to
-    the Microsoft Graph using the ${chalk.blue(commands.CONNECT)} command.
+    To restore a deleted Office 365 Group, you have to first log in to
+    the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command.
 
     If the specified ${chalk.grey('id')} doesn't refer to a deleted group, you will get
     a ${chalk.grey('File not found')} error.

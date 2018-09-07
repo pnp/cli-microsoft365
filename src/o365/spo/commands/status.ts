@@ -15,7 +15,7 @@ class SpoStatusCommand extends Command {
   }
 
   public get description(): string {
-    return 'Shows SharePoint Online site connection status';
+    return 'Shows SharePoint Online site login status';
   }
 
   public commandAction(cmd: CommandInstance, args: {}, cb: (err?: any) => void): void {
@@ -43,10 +43,10 @@ class SpoStatusCommand extends Command {
         }
         else {
           if (this.verbose) {
-            cmd.log('Not connected to SharePoint Online');
+            cmd.log('Logged out from SharePoint Online');
           }
           else {
-            cmd.log('Not connected');
+            cmd.log('Logged out');
           }
         }
         cb();
@@ -61,14 +61,14 @@ class SpoStatusCommand extends Command {
     log(
       `  Remarks:
 
-    If you are connected to a SharePoint Online, the ${chalk.blue(commands.STATUS)} command
-    will show you information about the site to which you are connected, the
+    If you are logged in to SharePoint Online, the ${chalk.blue(commands.STATUS)} command
+    will show you information about the site to which you are logged in, the
     currently stored refresh and access token and the expiration date and time
     of the access token.
 
   Examples:
   
-    Show the information about the current connection to SharePoint Online
+    Show the information about the current login to SharePoint Online
       ${chalk.grey(config.delimiter)} ${commands.STATUS}
 `);
   }

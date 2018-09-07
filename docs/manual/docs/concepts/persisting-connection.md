@@ -1,6 +1,6 @@
 # Persisting connection information
 
-After connecting to an Office 365 service, like SharePoint Online, the Office 365 CLI will persist the information about the connection until you explicitly disconnect from the specific service.
+After logging in to an Office 365 service, like SharePoint Online, the Office 365 CLI will persist the information about the connection until you explicitly log out from the specific service.
 
 ## Why is persisting connection information important
 
@@ -14,7 +14,7 @@ First of all it's more convenient to use the Office 365 CLI. If you're using it 
 
 Additionally, it makes it possible for you to write scripts that automate management of your tenant. When the Office 365 CLI is run in immersive (interactive) mode, the connection information is persisted in memory and is available to all commands run in the CLI command prompt. Unfortunately, one limitation of the immersive mode is that you can only run one command at a time and can't pass the output of one command into another.
 
-When running in the non-immersive (non-interactive) mode, each command is executed in an isolated context and has no access to the memory of any command executed before. So unless you would store the connection information in a variable and explicitly pass it to each command, the CLI would be unable to connect to your tenant. As you can imagine, working with the CLI in this way would be tedious and inconvenient.
+When running in the non-immersive (non-interactive) mode, each command is executed in an isolated context and has no access to the memory of any command executed before. So unless you would store the connection information in a variable and explicitly pass it to each command, the CLI would be unable to log in to your tenant. As you can imagine, working with the CLI in this way would be tedious and inconvenient.
 
 By persisting the connection information the Office 365 CLI can be used to build scripts, for example:
 
@@ -37,7 +37,7 @@ First, you use the Office 365 CLI to get the list of all apps from the tenant ap
 
 ## Persisting connection information in Office 365 CLI
 
-When you connect in the Office 365 CLI to an Office 365 service, such as SharePoint Online, the CLI will persist the information about the connection for future reuse. For each established connection, the Office 365 CLI persists the following information:
+When you log in to an Office 365 service, such as SharePoint Online, in the Office 365 CLI, the CLI will persist the information about the connection for future reuse. For each established connection, the Office 365 CLI persists the following information:
 
 - service name, eg. `SPO`
 - Azure AD resource name, eg `https://contoso.sharepoint.com`
@@ -45,7 +45,7 @@ When you connect in the Office 365 CLI to an Office 365 service, such as SharePo
 - access token
 - access token expiration timestamp
 
-Depending on the Office 365 service to which you connect, the Office 365 CLI might persist some additional information. For example, when connecting to SharePoint Online tenant admin site using the `spo connect` command, the CLI will store the tenant ID. If you were initially connected to the tenant admin site, but also performed operations on other site collections (like retrieving the list of apps installed in the specific site), the CLI will store access token for regular SharePoint sites as well.
+Depending on the Office 365 service to which you log in, the Office 365 CLI might persist some additional information. For example, when logging in to SharePoint Online tenant admin site using the `spo login` command, the CLI will store the tenant ID. If you were initially connected to the tenant admin site, but also performed operations on other site collections (like retrieving the list of apps installed in the specific site), the CLI will store access token for regular SharePoint sites as well.
 
 Where the connection information is persisted, depends on the operating system that you are using.
 
@@ -59,12 +59,12 @@ On Windows, the Office 365 CLI persists its connection information in the Window
 
 ### Linux
 
-On Linux, the Office 365 CLI stores its connection information in a JSON file located at `~/.o365cli-tokens.json`. The contents of this file are not encrypted. The primary use case for supporting Linux operating system is to use the Office 365 CLI in Docker containers, where the tokens file is persisted in the container as long as the container is running. When the container is closed and removed, the file is removed as well. When you would start the container again, you would have to connect to Office 365 first, before you could use the Office 365 CLI.
+On Linux, the Office 365 CLI stores its connection information in a JSON file located at `~/.o365cli-tokens.json`. The contents of this file are not encrypted. The primary use case for supporting Linux operating system is to use the Office 365 CLI in Docker containers, where the tokens file is persisted in the container as long as the container is running. When the container is closed and removed, the file is removed as well. When you would start the container again, you would have to log in to Office 365 first, before you could use the Office 365 CLI.
 
 ## Removing persisted connection information
 
-Office 365 CLI persists its connection information until you either explicitly disconnect from the particular service or manually remove the stored credentials.
+Office 365 CLI persists its connection information until you either explicitly log out from the particular service or manually remove the stored credentials.
 
-To check if you are connected to a particular Office 365 service in the Office 365 CLI, run the corresponding status command, for example `o365 spo status`. If you are connected, the command will return the URL of the site to which you are connected. If you are not connected, the command will return `false`.
+To check if you are logged in to a particular Office 365 service in the Office 365 CLI, run the corresponding status command, for example `o365 spo status`. If you are logged in, the command will return the URL of the site to which you are logged in. If you are not connected, the command will return `false`.
 
-To disconnect from the specific Office 365 service, run the corresponding Office 365 CLI, for example, to disconnect from SharePoint Online and remove all persisted connection information, run `o365 spo disconnect`.
+To log out from the specific Office 365 service, run the corresponding Office 365 CLI, for example, to log out from SharePoint Online and remove all persisted connection information, run `o365 spo logout`.

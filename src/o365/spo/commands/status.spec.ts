@@ -78,19 +78,19 @@ describe(commands.STATUS, () => {
     });
   });
 
-  it('shows disconnected status when not connected', (done) => {
+  it('shows not logged in status when not logged in', (done) => {
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, () => {
-      let reportsDisconnected: boolean = false;
+      let reportsNotLoggedIn: boolean = false;
       log.forEach(l => {
-        if (l && l.indexOf('Not connected') === 0) {
-          reportsDisconnected = true;
+        if (l && l.indexOf('Logged out') === 0) {
+          reportsNotLoggedIn = true;
         }
       });
       try {
-        assert(reportsDisconnected);
+        assert(reportsNotLoggedIn);
         done();
       }
       catch (e) {
@@ -99,19 +99,19 @@ describe(commands.STATUS, () => {
     });
   });
 
-  it('shows disconnected status when not connected (verbose)', (done) => {
+  it('shows not logged in status when not logged in (verbose)', (done) => {
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { verbose: true } }, () => {
-      let reportsDisconnected: boolean = false;
+      let reportsNotLoggedIn: boolean = false;
       log.forEach(l => {
-        if (l && l.indexOf('Not connected to SharePoint Online') === 0) {
-          reportsDisconnected = true;
+        if (l && l.indexOf('Logged out from SharePoint Online') === 0) {
+          reportsNotLoggedIn = true;
         }
       });
       try {
-        assert(reportsDisconnected);
+        assert(reportsNotLoggedIn);
         done();
       }
       catch (e) {
@@ -120,7 +120,7 @@ describe(commands.STATUS, () => {
     });
   });
 
-  it('shows correct site URL when connected', (done) => {
+  it('shows correct site URL when logged in', (done) => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';

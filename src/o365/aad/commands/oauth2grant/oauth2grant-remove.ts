@@ -98,13 +98,13 @@ class Oauth2GrantRemoveCommand extends AadCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.OAUTH2GRANT_REMOVE).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, connect to Azure Active Directory Graph,
-      using the ${chalk.blue(commands.CONNECT)} command.
+      `  ${chalk.yellow('Important:')} before using this command, log in to Azure Active Directory Graph,
+      using the ${chalk.blue(commands.LOGIN)} command.
 
   Remarks:
   
-    To remove service principal's OAuth2 permissions, you have to first connect to Azure Active Directory
-    Graph using the ${chalk.blue(commands.CONNECT)} command.
+    To remove service principal's OAuth2 permissions, you have to first log in to Azure Active Directory
+    Graph using the ${chalk.blue(commands.LOGIN)} command.
 
     Before you can remove service principal's OAuth2 permissions, you need to get the ${chalk.grey('objectId')}
     of the permissions grant to remove. You can retrieve it using the ${chalk.blue(commands.OAUTH2GRANT_LIST)} command.

@@ -1,4 +1,4 @@
-import auth from '../AadAuth';
+import auth from '../SpoAuth';
 import commands from '../commands';
 import config from '../../../config';
 import Command, {
@@ -8,26 +8,34 @@ import appInsights from '../../../appInsights';
 
 const vorpal: Vorpal = require('../../../vorpal-init');
 
-class AadDisconnectCommand extends Command {
+class SpoLogoutCommand extends Command {
   public get name(): string {
-    return commands.DISCONNECT;
+    return commands.LOGOUT;
   }
 
   public get description(): string {
-    return 'Disconnects from Azure Active Directory Graph';
+    return 'Log out from SharePoint Online';
+  }
+
+  public alias(): string[] | undefined {
+    return [commands.DISCONNECT];
   }
 
   public commandAction(cmd: CommandInstance, args: {}, cb: () => void): void {
     const chalk = vorpal.chalk;
+    
+    this.showDeprecationWarning(cmd, commands.DISCONNECT, commands.LOGOUT);
+
     appInsights.trackEvent({
-      name: commands.DISCONNECT
+      name: this.getUsedCommandName(cmd)
     });
+
     if (this.verbose) {
-      cmd.log('Disconnecting from AAD Graph...');
+      cmd.log('Logging out from SharePoint Online...');
     }
 
-    const disconnect: () => void = (): void => {
-      auth.service.disconnect();
+    const logOut: () => void = (): void => {
+      auth.site.logout();
       if (this.verbose) {
         cmd.log(chalk.green('DONE'));
       }
@@ -35,37 +43,37 @@ class AadDisconnectCommand extends Command {
     }
 
     auth
-      .clearConnectionInfo()
+      .clearSiteConnectionInfo()
       .then((): void => {
-        disconnect();
+        logOut();
       }, (error: any): void => {
         if (this.debug) {
           cmd.log(new CommandError(error));
         }
 
-        disconnect();
+        logOut();
       });
   }
 
   public commandHelp(args: any, log: (help: string) => void): void {
     const chalk = vorpal.chalk;
-    log(vorpal.find(commands.DISCONNECT).helpInformation());
+    log(vorpal.find(commands.LOGOUT).helpInformation());
     log(
       `  Remarks:
 
-    The ${chalk.blue(commands.DISCONNECT)} command disconnects from Azure Active Directory Graph
+    The ${chalk.blue(commands.LOGOUT)} command logs out from SharePoint Online 
     and removes any access and refresh tokens from memory.
 
   Examples:
   
-    Disconnect from Azure Active Directory Graph
-      ${chalk.grey(config.delimiter)} ${commands.DISCONNECT}
+    Log out from SharePoint Online
+      ${chalk.grey(config.delimiter)} ${commands.LOGOUT}
 
-    Disconnect from Azure Active Directory Graph in debug mode including detailed debug
+    Log out from SharePoint Online in debug mode including detailed debug
     information in the console output
-      ${chalk.grey(config.delimiter)} ${commands.DISCONNECT} --debug
+      ${chalk.grey(config.delimiter)} ${commands.LOGOUT} --debug
 `);
   }
 }
 
-module.exports = new AadDisconnectCommand();
+module.exports = new SpoLogoutCommand();

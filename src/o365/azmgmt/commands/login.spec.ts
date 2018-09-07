@@ -3,13 +3,13 @@ import Command, { CommandCancel, CommandError, CommandOption, CommandValidate } 
 import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
 import auth from '../AzmgmtAuth';
-const command: Command = require('./connect');
+const command: Command = require('./login');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import Utils from '../../../Utils';
 import { Service, AuthType } from '../../../Auth';
 
-describe(commands.CONNECT, () => {
+describe(commands.LOGIN, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
@@ -31,13 +31,16 @@ describe(commands.CONNECT, () => {
     vorpal = require('../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: 'azmgmt login'
+      },
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
     auth.service = new Service('https://management.azure.com/');
-    sinon.stub(auth.service, 'disconnect').callsFake(() => { });
+    sinon.stub(auth.service, 'logout').callsFake(() => { });
     telemetry = null;
   });
 
@@ -60,7 +63,7 @@ describe(commands.CONNECT, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.CONNECT), true);
+    assert.equal(command.name.startsWith(commands.LOGIN), true);
   });
 
   it('has a description', () => {
@@ -93,7 +96,7 @@ describe(commands.CONNECT, () => {
     });
   });
 
-  it('connects to Azure Management Service', (done) => {
+  it('logs in to Azure Management Service', (done) => {
     auth.service = new Service('https://management.azure.com/');
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false } }, () => {
@@ -107,7 +110,7 @@ describe(commands.CONNECT, () => {
     });
   });
 
-  it('connects to Azure Management Service (debug)', (done) => {
+  it('logs in to Azure Management Service (debug)', (done) => {
     auth.service = new Service('https://management.azure.com/');
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
@@ -121,7 +124,7 @@ describe(commands.CONNECT, () => {
     });
   });
 
-  it('connects to Azure Management Service using username and password when authType password set', (done) => {
+  it('logs in to Azure Management Service using username and password when authType password set', (done) => {
     auth.service = new Service('https://management.azure.com/');
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, authType: 'password', userName: 'user', password: 'password' } }, () => {
@@ -210,6 +213,11 @@ describe(commands.CONNECT, () => {
     assert.equal(actual, true);
   });
 
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notEqual(typeof alias, 'undefined');
+  });
+
   it('has help referring to the right command', () => {
     const cmd: any = {
       log: (msg: string) => {},
@@ -219,7 +227,7 @@ describe(commands.CONNECT, () => {
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
     cmd.help({}, () => {});
-    assert(find.calledWith(commands.CONNECT));
+    assert(find.calledWith(commands.LOGIN));
   });
 
   it('has help with examples', () => {
@@ -244,7 +252,7 @@ describe(commands.CONNECT, () => {
     assert(containsExamples);
   });
 
-  it('correctly handles lack of valid access token when connecting to Azure Management Service', (done) => {
+  it('correctly handles lack of valid access token when logging in to Azure Management Service', (done) => {
     Utils.restore(auth.ensureAccessToken);
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject('Error getting access token'); });
     auth.service = new Service('https://management.azure.com/');
@@ -260,7 +268,7 @@ describe(commands.CONNECT, () => {
     });
   });
 
-  it('correctly handles lack of valid access token when connecting to Azure Management Service (debug)', (done) => {
+  it('correctly handles lack of valid access token when logging in to Azure Management Service (debug)', (done) => {
     Utils.restore(auth.ensureAccessToken);
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject('Error getting access token'); });
     auth.service = new Service('https://management.azure.com/');

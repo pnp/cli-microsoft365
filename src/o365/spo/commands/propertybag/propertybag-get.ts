@@ -141,14 +141,14 @@ class SpoPropertyBagGetCommand extends SpoPropertyBagBaseCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.PROPERTYBAG_GET).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online site,
-    using the ${chalk.blue(commands.CONNECT)} command.
+      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
+    using the ${chalk.blue(commands.LOGIN)} command.
                       
   Remarks:
 
-    To retrieve property bag value, you have to first connect to a SharePoint
-    Online site using the ${chalk.blue(commands.CONNECT)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
+    To retrieve property bag value, you have to first log in to a SharePoint
+    Online site using the ${chalk.blue(commands.LOGIN)} command,
+    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
 
   Examples:
 

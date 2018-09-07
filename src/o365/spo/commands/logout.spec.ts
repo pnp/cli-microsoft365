@@ -3,11 +3,11 @@ import Command from '../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
 import auth, { Site } from '../SpoAuth';
-const command: Command = require('./disconnect');
+const command: Command = require('./logout');
 import * as assert from 'assert';
 import Utils from '../../../Utils';
 
-describe(commands.DISCONNECT, () => {
+describe(commands.LOGOUT, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
@@ -26,12 +26,15 @@ describe(commands.DISCONNECT, () => {
     vorpal = require('../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: 'spo logout'
+      },
       log: (msg: string) => {
         log.push(msg);
       }
     };
     auth.site = new Site();
-    sinon.stub(auth.site, 'disconnect').callsFake(() => { });
+    sinon.stub(auth.site, 'logout').callsFake(() => { });
     telemetry = null;
   });
 
@@ -44,7 +47,7 @@ describe(commands.DISCONNECT, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.DISCONNECT), true);
+    assert.equal(command.name.startsWith(commands.LOGOUT), true);
   });
 
   it('has a description', () => {
@@ -68,7 +71,7 @@ describe(commands.DISCONNECT, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, () => {
       try {
-        assert.equal(telemetry.name, commands.DISCONNECT);
+        assert.equal(telemetry.name, commands.LOGOUT);
         done();
       }
       catch (e) {
@@ -77,7 +80,7 @@ describe(commands.DISCONNECT, () => {
     });
   });
 
-  it('disconnects from SharePoint when connected', (done) => {
+  it('logs out from SharePoint when logged in', (done) => {
     auth.site = new Site();
     auth.site.connected = true;
     cmdInstance.action = command.action();
@@ -92,7 +95,7 @@ describe(commands.DISCONNECT, () => {
     });
   });
 
-  it('disconnects from SharePoint when not connected', (done) => {
+  it('logs out from SharePoint when not logged in', (done) => {
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = command.action();
@@ -107,7 +110,7 @@ describe(commands.DISCONNECT, () => {
     });
   });
 
-  it('clears persisted connection info when disconnecting', (done) => {
+  it('clears persisted connection info when logging out', (done) => {
     auth.site = new Site();
     auth.site.connected = true;
     cmdInstance.action = command.action();
@@ -122,6 +125,11 @@ describe(commands.DISCONNECT, () => {
     });
   });
 
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notEqual(typeof alias, 'undefined');
+  });
+
   it('has help referring to the right command', () => {
     const cmd: any = {
       log: (msg: string) => {},
@@ -131,7 +139,7 @@ describe(commands.DISCONNECT, () => {
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
     cmd.help({}, () => {});
-    assert(find.calledWith(commands.DISCONNECT));
+    assert(find.calledWith(commands.LOGOUT));
   });
 
   it('has help with examples', () => {
@@ -160,12 +168,12 @@ describe(commands.DISCONNECT, () => {
     Utils.restore(auth.clearSiteConnectionInfo);
     sinon.stub(auth, 'clearSiteConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
     auth.site = new Site();
-    const disconnectSpy = sinon.spy(auth.site, 'disconnect');
+    const logoutSpy = sinon.spy(auth.site, 'logout');
     auth.site.connected = true;
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false } }, () => {
       try {
-        assert(disconnectSpy.called);
+        assert(logoutSpy.called);
         done();
       }
       catch (e) {
@@ -180,12 +188,12 @@ describe(commands.DISCONNECT, () => {
   it('correctly handles error while clearing persisted connection info (debug)', (done) => {
     sinon.stub(auth, 'clearSiteConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
     auth.site = new Site();
-    const disconnectSpy = sinon.spy(auth.site, 'disconnect');
+    const logoutSpy = sinon.spy(auth.site, 'logout');
     auth.site.connected = true;
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
       try {
-        assert(disconnectSpy.called);
+        assert(logoutSpy.called);
         done();
       }
       catch (e) {

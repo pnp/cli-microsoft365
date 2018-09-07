@@ -12,7 +12,7 @@ export default abstract class AadCommand extends Command {
           cmd.initAction(args);
 
           if (!auth.service.connected) {
-            cb(new CommandError('Connect to Azure Active Directory Graph first'));
+            cb(new CommandError('Log in to Azure Active Directory Graph first'));
             return;
           }
 

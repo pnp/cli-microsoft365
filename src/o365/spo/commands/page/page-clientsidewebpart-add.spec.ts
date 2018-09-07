@@ -87,7 +87,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     });
   });
 
-  it('aborts when not connected to a SharePoint site', (done) => {
+  it('aborts when not logged in to a SharePoint site', (done) => {
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = command.action();
@@ -95,7 +95,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       try {
         assert.equal(
           JSON.stringify(err),
-          JSON.stringify(new CommandError('Connect to a SharePoint Online site first'))
+          JSON.stringify(new CommandError('Log in to a SharePoint Online site first'))
         );
         done();
       } catch (e) {

@@ -28,37 +28,43 @@ interface Options extends GlobalOptions {
   password?: string;
 }
 
-class SpoConnectCommand extends Command {
+class SpoLoginCommand extends Command {
   public get name(): string {
-    return `${commands.CONNECT} <url>`;
+    return `${commands.LOGIN} <url>`;
   }
 
   public get description(): string {
-    return 'Connects to a SharePoint Online site';
+    return 'Log in to SharePoint Online';
+  }
+
+  public alias(): string[] | undefined {
+    return [commands.CONNECT];
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     const chalk: any = vorpal.chalk;
 
+    this.showDeprecationWarning(cmd, commands.CONNECT, commands.LOGIN);
+
     appInsights.trackEvent({
-      name: this.name
+      name: this.getUsedCommandName(cmd)
     });
 
     // disconnect before re-connecting
     if (this.debug) {
-      cmd.log(`Disconnecting from SPO...`);
+      cmd.log(`Logging out from SPO...`);
     }
 
-    const disconnect: () => void = (): void => {
-      auth.site.disconnect();
+    const logout: () => void = (): void => {
+      auth.site.logout();
       if (this.verbose) {
         cmd.log(chalk.green('DONE'));
       }
     }
 
-    const connect: () => void = (): void => {
+    const login: () => void = (): void => {
       if (this.verbose) {
-        cmd.log(`Authenticating with SharePoint Online at ${args.url}...`);
+        cmd.log(`Logging in to SharePoint Online at ${args.url}...`);
       }
 
       const resource = Auth.getResourceFromUrl(args.url);
@@ -144,7 +150,7 @@ class SpoConnectCommand extends Command {
           .then((): void => {
             if (this.verbose) {
               cmd.log(chalk.green('DONE'));
-              cmd.log(`Successfully connected to ${args.url}`);
+              cmd.log(`Successfully logged in to ${args.url}`);
             }
             cb();
           }, (rej: string): void => {
@@ -195,15 +201,15 @@ class SpoConnectCommand extends Command {
     auth
       .clearSiteConnectionInfo()
       .then((): void => {
-        disconnect();
-        connect();
+        logout();
+        login();
       }, (error: any): void => {
         if (this.debug) {
           cmd.log(new CommandError(error));
         }
 
-        disconnect();
-        connect();
+        logout();
+        login();
       });
   }
 
@@ -252,53 +258,53 @@ class SpoConnectCommand extends Command {
 
   public commandHelp(args: CommandArgs, log: (help: string) => void): void {
     const chalk = vorpal.chalk;
-    log(vorpal.find(commands.CONNECT).helpInformation());
+    log(vorpal.find(commands.LOGIN).helpInformation());
     log(
       `  Arguments:
     
-    url  absolute URL of the SharePoint Online site to connect to
+    url  absolute URL of the SharePoint Online site to log in to
         
   Remarks:
 
-    Using the ${chalk.blue(commands.CONNECT)} command, you can connect to any SharePoint Online
+    Using the ${chalk.blue(commands.LOGIN)} command, you can log in to any SharePoint Online
     site. Depending on the command you want to use, you might be required to
-    connect to a SharePoint Online tenant admin site (suffixed with ${chalk.grey('-admin')},
+    log in to a SharePoint Online tenant admin site (suffixed with ${chalk.grey('-admin')},
     eg. ${chalk.grey('https://contoso-admin.sharepoint.com')}) or a regular site.
 
-    By default, the ${chalk.blue(commands.CONNECT)} command uses device code OAuth flow
-    to connect to SharePoint Online. Alternatively, you can
+    By default, the ${chalk.blue(commands.LOGIN)} command uses device code OAuth flow
+    to log in to SharePoint Online. Alternatively, you can
     authenticate using a user name and password, which is convenient for CI/CD
     scenarios, but which comes with its own limitations. See the Office 365 CLI
     manual for more information.
     
-    When connecting to a SharePoint site, the ${chalk.blue(commands.CONNECT)} command
+    When logging in to a SharePoint site, the ${chalk.blue(commands.LOGIN)} command
     stores in memory the access token and the refresh token for the specified
     site. Both tokens are cleared from memory after exiting the CLI or by
-    calling the ${chalk.blue(commands.DISCONNECT)} command.
+    calling the ${chalk.blue(commands.LOGOUT)} command.
 
-    When connecting to SharePoint Online using the user name and
+    When logging in to SharePoint Online using the user name and
     password, next to the access and refresh token, the Office 365 CLI will
     store the user credentials so that it can automatically reauthenticate if
     necessary. Similarly to the tokens, the credentials are removed by
-    reconnecting using the device code or by calling the ${chalk.blue(commands.DISCONNECT)}
+    reauthenticating using the device code or by calling the ${chalk.blue(commands.LOGOUT)}
     command.
 
   Examples:
   
-    Connect to a SharePoint Online tenant admin site using the device code
-      ${chalk.grey(config.delimiter)} ${commands.CONNECT} https://contoso-admin.sharepoint.com
+    Log in to a SharePoint Online tenant admin site using the device code
+      ${chalk.grey(config.delimiter)} ${commands.LOGIN} https://contoso-admin.sharepoint.com
 
-    Connect to a SharePoint Online tenant admin site using the device code in
+    Log in to a SharePoint Online tenant admin site using the device code in
     debug mode including detailed debug information in the console output
-      ${chalk.grey(config.delimiter)} ${commands.CONNECT} --debug https://contoso-admin.sharepoint.com
+      ${chalk.grey(config.delimiter)} ${commands.LOGIN} --debug https://contoso-admin.sharepoint.com
       
-    Connect to a regular SharePoint Online site using the device code
-      ${chalk.grey(config.delimiter)} ${commands.CONNECT} https://contoso.sharepoint.com/sites/team
+    Log in to a regular SharePoint Online site using the device code
+      ${chalk.grey(config.delimiter)} ${commands.LOGIN} https://contoso.sharepoint.com/sites/team
 
-    Connect to a SharePoint Online tenant admin site using a user name and password
-      ${chalk.grey(config.delimiter)} ${commands.CONNECT} https://contoso-admin.sharepoint.com --authType password --userName user@contoso.com --password pass@word1
+    Log in to a SharePoint Online tenant admin site using a user name and password
+      ${chalk.grey(config.delimiter)} ${commands.LOGIN} https://contoso-admin.sharepoint.com --authType password --userName user@contoso.com --password pass@word1
 `);
   }
 }
 
-module.exports = new SpoConnectCommand();
+module.exports = new SpoLoginCommand();

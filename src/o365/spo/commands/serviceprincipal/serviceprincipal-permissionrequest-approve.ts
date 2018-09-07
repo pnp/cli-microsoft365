@@ -130,13 +130,13 @@ class SpoServicePrincipalPermissionRequestApproveCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online tenant admin site using the
-      ${chalk.blue(commands.CONNECT)} command.
+      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online tenant admin site using the
+      ${chalk.blue(commands.LOGIN)} command.
         
   Remarks:
 
-    To approve a permission request, you have to first connect to a SharePoint tenant admin
-    site using the ${chalk.blue(commands.CONNECT)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso-admin.sharepoint.com`)}.
+    To approve a permission request, you have to first log in to a SharePoint tenant admin
+    site using the ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso-admin.sharepoint.com`)}.
 
     The permission request you want to approve is denoted using its ${chalk.grey('ID')}. You can retrieve
     it using the ${chalk.grey(`${commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST}`)} command.

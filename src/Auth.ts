@@ -20,7 +20,7 @@ export class Service {
     this.resource = resource;
   }
 
-  public disconnect(): void {
+  public logout(): void {
     this.connected = false;
     this.resource = '';
     this.accessToken = '';

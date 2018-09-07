@@ -125,8 +125,8 @@ class AzmgmtFlowListCommand extends AzmgmtCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.FLOW_LIST).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, connect to the Azure Management Service,
-    using the ${chalk.blue(commands.CONNECT)} command.
+      `  ${chalk.yellow('Important:')} before using this command, log in to the Azure Management Service,
+    using the ${chalk.blue(commands.LOGIN)} command.
 
   Remarks:
 
@@ -134,8 +134,8 @@ class AzmgmtFlowListCommand extends AzmgmtCommand {
     in preview and is subject to change once the API reached general
     availability.
   
-    To list Microsoft Flows in the given environment, you have to first connect
-    to the Azure Management Service using the ${chalk.blue(commands.CONNECT)} command.
+    To list Microsoft Flows in the given environment, you have to first log in
+    to the Azure Management Service using the ${chalk.blue(commands.LOGIN)} command.
 
     If the environment with the name you specified doesn't exist, you will get
     the ${chalk.grey('Access to the environment \'xyz\' is denied.')} error.

@@ -23,36 +23,42 @@ interface Options extends GlobalOptions {
   password?: string;
 }
 
-class AadConnectCommand extends Command {
+class AadLoginCommand extends Command {
   public get name(): string {
-    return `${commands.CONNECT}`;
+    return `${commands.LOGIN}`;
   }
 
   public get description(): string {
-    return 'Connects to the Azure Active Directory Graph';
+    return 'Log in to the Azure Active Directory Graph';
+  }
+
+  public alias(): string[] | undefined {
+    return [commands.CONNECT];
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const chalk: any = vorpal.chalk;
 
+    this.showDeprecationWarning(cmd, commands.CONNECT, commands.LOGIN);
+
     appInsights.trackEvent({
-      name: this.name
+      name: this.getUsedCommandName(cmd)
     });
 
     // disconnect before re-connecting
     if (this.debug) {
-      cmd.log(`Disconnecting from AAD Graph...`);
+      cmd.log(`Logging out from AAD Graph...`);
     }
 
-    const disconnect: () => void = (): void => {
-      auth.service.disconnect();
+    const logout: () => void = (): void => {
+      auth.service.logout();
       auth.service.resource = 'https://graph.windows.net';
       if (this.verbose) {
         cmd.log(chalk.green('DONE'));
       }
     }
 
-    const connect: () => void = (): void => {
+    const login: () => void = (): void => {
       if (this.verbose) {
         cmd.log(`Authenticating with AAD Graph...`);
       }
@@ -92,15 +98,15 @@ class AadConnectCommand extends Command {
     auth
       .clearConnectionInfo()
       .then((): void => {
-        disconnect();
-        connect();
+        logout();
+        login();
       }, (error: any): void => {
         if (this.debug) {
           cmd.log(new CommandError(error));
         }
 
-        disconnect();
-        connect();
+        logout();
+        login();
       });
   }
 
@@ -149,43 +155,43 @@ class AadConnectCommand extends Command {
 
   public commandHelp(args: CommandArgs, log: (help: string) => void): void {
     const chalk = vorpal.chalk;
-    log(vorpal.find(commands.CONNECT).helpInformation());
+    log(vorpal.find(commands.LOGIN).helpInformation());
     log(
       `  Remarks:
     
-    Using the ${chalk.blue(commands.CONNECT)} command you can connect to the Azure Active
+    Using the ${chalk.blue(commands.LOGIN)} command you can log in to the Azure Active
     Directory Graph to manage your AAD objects.
 
-    By default, the ${chalk.blue(commands.CONNECT)} command uses device code OAuth flow
-    to connect to the AAD Graph. Alternatively, you can
+    By default, the ${chalk.blue(commands.LOGIN)} command uses device code OAuth flow
+    to log in to the AAD Graph. Alternatively, you can
     authenticate using a user name and password, which is convenient for CI/CD
     scenarios, but which comes with its own limitations. See the Office 365 CLI
     manual for more information.
     
-    When connecting to the AAD Graph, the ${chalk.blue(commands.CONNECT)} command stores in memory
+    When logging in to the AAD Graph, the ${chalk.blue(commands.LOGIN)} command stores in memory
     the access token and the refresh token. Both tokens are cleared from memory
-    after exiting the CLI or by calling the ${chalk.blue(commands.DISCONNECT)} command.
+    after exiting the CLI or by calling the ${chalk.blue(commands.LOGOUT)} command.
 
-    When connecting to the AAD Graph using the user name and
+    When logging in to the AAD Graph using the user name and
     password, next to the access and refresh token, the Office 365 CLI will
     store the user credentials so that it can automatically reauthenticate if
     necessary. Similarly to the tokens, the credentials are removed by
-    reconnecting using the device code or by calling the ${chalk.blue(commands.DISCONNECT)}
+    reauthenticating using the device code or by calling the ${chalk.blue(commands.LOGOUT)}
     command.
 
   Examples:
   
-    Connect to the AAD Graph using the device code
-      ${chalk.grey(config.delimiter)} ${commands.CONNECT}
+    Log in to the AAD Graph using the device code
+      ${chalk.grey(config.delimiter)} ${commands.LOGIN}
 
-    Connect to the AAD Graph using the device code in debug mode including
+    Log in to the AAD Graph using the device code in debug mode including
     detailed debug information in the console output
-      ${chalk.grey(config.delimiter)} ${commands.CONNECT} --debug
+      ${chalk.grey(config.delimiter)} ${commands.LOGIN} --debug
 
-    Connect to the AAD Graph using a user name and password
-      ${chalk.grey(config.delimiter)} ${commands.CONNECT} --authType password --userName user@contoso.com --password pass@word1
+    Log in to the AAD Graph using a user name and password
+      ${chalk.grey(config.delimiter)} ${commands.LOGIN} --authType password --userName user@contoso.com --password pass@word1
 `);
   }
 }
 
-module.exports = new AadConnectCommand();
+module.exports = new AadLoginCommand();

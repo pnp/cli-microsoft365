@@ -4,12 +4,12 @@ nav:
   - User Guide:
     - 'Installing the CLI': 'user-guide/installing-cli.md'
     - 'Using the CLI': 'user-guide/using-cli.md'
-    - 'Connecting to Office 365': 'user-guide/connecting-office-365.md'
+    - 'Logging in to Office 365': 'user-guide/connecting-office-365.md'
     - 'CLI output mode': 'user-guide/cli-output-mode.md'
   - Commands:
     - SharePoint Online (spo):
-      - connect: 'cmd/spo/connect.md'
-      - disconnect: 'cmd/spo/disconnect.md'
+      - login: 'cmd/spo/login.md'
+      - logout: 'cmd/spo/logout.md'
       - status: 'cmd/spo/status.md'
       - app:
         - app add: 'cmd/spo/app/app-add.md'
@@ -168,8 +168,8 @@ nav:
       - project:
         - project upgrade: 'cmd/spfx/project/project-upgrade.md'
     - Microsoft Graph (graph):
-      - connect: 'cmd/graph/connect.md'
-      - disconnect: 'cmd/graph/disconnect.md'
+      - login: 'cmd/graph/login.md'
+      - logout: 'cmd/graph/logout.md'
       - status: 'cmd/graph/status.md'
       - groupsetting:
         - groupsetting add: 'cmd/graph/groupsetting/groupsetting-add.md'
@@ -196,8 +196,8 @@ nav:
         - user list: 'cmd/graph/user/user-list.md'
         - user sendmail: 'cmd/graph/user/user-sendmail.md'
     - Azure Management Service (azmgmt):
-      - connect: 'cmd/azmgmt/connect.md'
-      - disconnect: 'cmd/azmgmt/disconnect.md'
+      - login: 'cmd/azmgmt/login.md'
+      - logout: 'cmd/azmgmt/logout.md'
       - status: 'cmd/azmgmt/status.md'
       - flow:
         - flow environment get: 'cmd/azmgmt/flow/flow-environment-get.md'
@@ -207,8 +207,8 @@ nav:
         - flow run get: 'cmd/azmgmt/flow/flow-run-get.md'
         - flow run list: 'cmd/azmgmt/flow/flow-run-list.md'
     - Azure Active Directory Graph (aad):
-      - connect: 'cmd/aad/connect.md'
-      - disconnect: 'cmd/aad/disconnect.md'
+      - login: 'cmd/aad/login.md'
+      - logout: 'cmd/aad/logout.md'
       - status: 'cmd/aad/status.md'
       - oauth2grant:
         - oauth2grant add: 'cmd/aad/oauth2grant/oauth2grant-add.md'

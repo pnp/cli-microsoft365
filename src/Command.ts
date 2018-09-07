@@ -67,6 +67,32 @@ export default abstract class Command {
   public abstract commandAction(cmd: CommandInstance, args: any, cb: () => void): void;
   public abstract commandHelp(args: any, log: (message: string) => void): void;
 
+  protected showDeprecationWarning(cmd: CommandInstance, deprecated: string, recommended: string): void {
+    if (cmd.commandWrapper.command.indexOf(deprecated) === 0) {
+      cmd.log(vorpal.chalk.yellow(`Command '${deprecated}' is deprecated. Please use '${recommended}' instead`));
+    }
+  }
+
+  protected getUsedCommandName(cmd: CommandInstance): string {
+    const commandName: string = this.getCommandName();
+    if (cmd.commandWrapper.command.indexOf(commandName) === 0) {
+      return commandName;
+    }
+
+    // since the command was called by something else than its name
+    // it must have aliases
+    const aliases: string[] = this.alias() as string[];
+
+    for (let i: number = 0; i < aliases.length; i++) {
+      if (cmd.commandWrapper.command.indexOf(aliases[i]) === 0) {
+        return aliases[i];
+      }
+    }
+
+    // shouldn't happen because the command is called either by its name or alias
+    return '';
+  }
+
   public action(): CommandAction {
     const cmd: Command = this;
     return function (this: CommandInstance, args: CommandArgs, cb: () => void) {

@@ -8,26 +8,34 @@ import appInsights from '../../../appInsights';
 
 const vorpal: Vorpal = require('../../../vorpal-init');
 
-class AzmgmtDisconnectCommand extends Command {
+class AzmgmtLogoutCommand extends Command {
   public get name(): string {
-    return commands.DISCONNECT;
+    return commands.LOGOUT;
   }
 
   public get description(): string {
-    return 'Disconnects from the Azure Management Service';
+    return 'Log out from the Azure Management Service';
+  }
+
+  public alias(): string[] | undefined {
+    return [commands.DISCONNECT];
   }
 
   public commandAction(cmd: CommandInstance, args: {}, cb: () => void): void {
     const chalk = vorpal.chalk;
+
+    this.showDeprecationWarning(cmd, commands.DISCONNECT, commands.LOGOUT);
+
     appInsights.trackEvent({
-      name: commands.DISCONNECT
+      name: this.getUsedCommandName(cmd)
     });
+
     if (this.verbose) {
-      cmd.log('Disconnecting from Azure Management Service...');
+      cmd.log('Logging out from Azure Management Service...');
     }
 
-    const disconnect: () => void = (): void => {
-      auth.service.disconnect();
+    const logout: () => void = (): void => {
+      auth.service.logout();
       if (this.verbose) {
         cmd.log(chalk.green('DONE'));
       }
@@ -37,19 +45,19 @@ class AzmgmtDisconnectCommand extends Command {
     auth
       .clearConnectionInfo()
       .then((): void => {
-        disconnect();
+        logout();
       }, (error: any): void => {
         if (this.debug) {
           cmd.log(new CommandError(error));
         }
 
-        disconnect();
+        logout();
       });
   }
 
   public commandHelp(args: any, log: (help: string) => void): void {
     const chalk = vorpal.chalk;
-    log(vorpal.find(commands.DISCONNECT).helpInformation());
+    log(vorpal.find(commands.LOGOUT).helpInformation());
     log(
       `  Remarks:
 
@@ -57,19 +65,19 @@ class AzmgmtDisconnectCommand extends Command {
     in preview and is subject to change once the API reached general
     availability.
 
-    The ${chalk.blue(commands.DISCONNECT)} command disconnects from the Azure
+    The ${chalk.blue(commands.LOGOUT)} command logs out from the Azure
     Management Service and removes any access and refresh tokens from memory.
 
   Examples:
   
-    Disconnect from Azure Management Service
-      ${chalk.grey(config.delimiter)} ${commands.DISCONNECT}
+    Log out from Azure Management Service
+      ${chalk.grey(config.delimiter)} ${commands.LOGOUT}
 
-    Disconnect from Azure Management Service in debug mode including detailed
+    Log out from Azure Management Service in debug mode including detailed
     debug information in the console output
-      ${chalk.grey(config.delimiter)} ${commands.DISCONNECT} --debug
+      ${chalk.grey(config.delimiter)} ${commands.LOGOUT} --debug
 `);
   }
 }
 
-module.exports = new AzmgmtDisconnectCommand();
+module.exports = new AzmgmtLogoutCommand();
