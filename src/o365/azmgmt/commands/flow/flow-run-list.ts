@@ -9,6 +9,7 @@ import {
 import * as request from 'request-promise-native';
 import Utils from '../../../../Utils';
 import AzmgmtCommand from '../../AzmgmtCommand';
+import * as os from 'os';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -133,6 +134,15 @@ class AzmgmtFlowRunListCommand extends AzmgmtCommand {
   
     To get information about the runs of the specified Microsoft Flow, you have to first
     connect to the Azure Management Service using the ${chalk.blue(commands.CONNECT)} command.
+    
+    If the environment with the name you specified doesn't exist, you will get
+    the ${chalk.grey('Access to the environment \'xyz\' is denied.')} error.
+
+    If the Microsoft Flow with the name you specified doesn't exist, you will
+    get the ${chalk.grey(`The caller with object id \'abc\' does not have permission${os.EOL}` +
+    '    for connection \'xyz\' under Api \'shared_logicflows\'.')} error.
+    If you try to retrieve a non-existing flow as admin, you will get the
+    ${chalk.grey('Could not find flow \'xyz\'.')} error.
    
   Examples:
   
