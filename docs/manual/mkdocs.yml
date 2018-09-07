@@ -204,6 +204,7 @@ nav:
         - flow environment list: 'cmd/azmgmt/flow/flow-environment-list.md'
         - flow get: 'cmd/azmgmt/flow/flow-get.md'
         - flow list: 'cmd/azmgmt/flow/flow-list.md'
+        - flow run list: 'cmd/azmgmt/flow/flow-run-list.md'
     - Azure Active Directory Graph (aad):
       - connect: 'cmd/aad/connect.md'
       - disconnect: 'cmd/aad/disconnect.md'
