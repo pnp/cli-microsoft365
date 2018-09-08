@@ -17,6 +17,11 @@
 - [graph groupsetting remove](../cmd/graph/groupsetting/groupsetting-remove.md) - removes the particular group setting [#452](https://github.com/pnp/office365-cli/pull/452)
 - [graph groupsetting set](../cmd/graph/groupsetting/groupsetting-set.md) - removes the particular group setting [#451](https://github.com/pnp/office365-cli/pull/451)
 
+**Azure Management Service:**
+
+- [azmgmt flow run get](../cmd/azmgmt/flow/flow-run-get.md) - gets information about a specific run of the specified Microsoft Flow [#400](https://github.com/pnp/office365-cli/issues/400)
+- [azmgmt flow run list](../cmd/azmgmt/flow/flow-run-list.md) - lists runs of the specified Microsoft Flow [#399](https://github.com/pnp/office365-cli/issues/399)
+
 ### Changes
 
 - added support for upgrading projects built using SharePoint Framework v1.5.1 [#569](https://github.com/pnp/office365-cli/issues/569)
