@@ -10,6 +10,7 @@ Add-SPOSiteCollectionAppCatalog|Microsoft.Online.SharePoint.PowerShell|[spo site
 Add-SPOSiteDesign|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign add](../cmd/spo/sitedesign/sitedesign-add.md)
 Add-SPOSiteScript|Microsoft.Online.SharePoint.PowerShell|[spo sitescript add](../cmd/spo/sitescript/sitescript-add.md)
 Add-SPOTenantCdnOrigin|Microsoft.Online.SharePoint.PowerShell|[spo cdn origin add](../cmd/spo/cdn/cdn-origin-add.md)
+Add-SPOTenantCentralAssetRepositoryLibrary|Microsoft.Online.SharePoint.PowerShell|
 Add-SPOTheme|Microsoft.Online.SharePoint.PowerShell|[spo theme set](../cmd/spo/theme/theme-set.md)
 Add-SPOUser|Microsoft.Online.SharePoint.PowerShell|
 Approve-SPOTenantServicePrincipalPermissionRequest|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal permissionrequest approve](../cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-approve.md)
@@ -20,6 +21,8 @@ Deny-SPOTenantServicePrincipalPermissionRequest|Microsoft.Online.SharePoint.Powe
 Disable-SPOTenantServicePrincipal|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal set](../cmd/spo/serviceprincipal/serviceprincipal-set.md)
 Disconnect-SPOService|Microsoft.Online.SharePoint.PowerShell|[spo disconnect](../cmd/spo/disconnect.md)
 Enable-SPOTenantServicePrincipal|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal set](../cmd/spo/serviceprincipal/serviceprincipal-set.md)
+Export-SPOUserInfo|Microsoft.Online.SharePoint.PowerShell|
+Export-SPOUserProfile|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOAppErrors|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOAppInfo|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOBrowserIdleSignOut|Microsoft.Online.SharePoint.PowerShell|
@@ -46,11 +49,13 @@ Get-SPOSiteDesign|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign get](..
 Get-SPOSiteDesignRights|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign rights list](../cmd/spo/sitedesign/sitedesign-rights-list.md)
 Get-SPOSiteGroup|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOSiteScript|Microsoft.Online.SharePoint.PowerShell|[spo sitescript get](../cmd/spo/sitescript/sitescript-get.md), [spo sitescript list](../cmd/spo/sitescript/sitescript-list.md)
+Get-SPOSiteScriptFromList|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOStorageEntity|Microsoft.Online.SharePoint.PowerShell|[spo storageentity get](../cmd/spo/storageentity/storageentity-get.md), [spo storageentity list](../cmd/spo/storageentity/storageentity-list.md)
 Get-SPOTenant|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOTenantCdnEnabled|Microsoft.Online.SharePoint.PowerShell|[spo cdn get](../cmd/spo/cdn/cdn-get.md)
 Get-SPOTenantCdnOrigins|Microsoft.Online.SharePoint.PowerShell|[spo cdn origin list](../cmd/spo/cdn/cdn-origin-list.md)
 Get-SPOTenantCdnPolicies|Microsoft.Online.SharePoint.PowerShell|[spo cdn policy list](../cmd/spo/cdn/cdn-policy-list.md)
+Get-SPOTenantCentralAssetRepository|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOTenantContentTypeReplicationParameters|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOTenantLogEntry|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOTenantLogLastAvailableTimeInUtc|Microsoft.Online.SharePoint.PowerShell|
@@ -59,6 +64,7 @@ Get-SPOTenantServicePrincipalPermissionRequests|Microsoft.Online.SharePoint.Powe
 Get-SPOTenantSyncClientRestriction|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOTenantTaxonomyReplicationParameters|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOTheme|Microsoft.Online.SharePoint.PowerShell|[spo theme list](../cmd/spo/theme/theme-list.md)
+Get-SPOUnifiedGroup|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOUser|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOUserAndContentMoveState|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOUserOneDriveLocation|Microsoft.Online.SharePoint.PowerShell|
@@ -91,9 +97,12 @@ Remove-SPOSiteGroup|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOSiteScript|Microsoft.Online.SharePoint.PowerShell|[spo sitescript remove](../cmd/spo/sitescript/sitescript-remove.md)
 Remove-SPOStorageEntity|Microsoft.Online.SharePoint.PowerShell|[spo storageentity remove](../cmd/spo/storageentity/storageentity-remove.md)
 Remove-SPOTenantCdnOrigin|Microsoft.Online.SharePoint.PowerShell|[spo cdn origin remove](../cmd/spo/cdn/cdn-origin-remove.md)
+Remove-SPOTenantCentralAssetRepositoryLibrary|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOTenantSyncClientRestriction|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOTheme|Microsoft.Online.SharePoint.PowerShell|[spo theme remove](../cmd/spo/theme/theme-remove.md)
 Remove-SPOUser|Microsoft.Online.SharePoint.PowerShell|
+Remove-SPOUserInfo|Microsoft.Online.SharePoint.PowerShell|
+Remove-SPOUserProfile|Microsoft.Online.SharePoint.PowerShell|
 Repair-SPOSite|Microsoft.Online.SharePoint.PowerShell|
 Request-SPOPersonalSite|Microsoft.Online.SharePoint.PowerShell|
 Request-SPOUpgradeEvaluationSite|Microsoft.Online.SharePoint.PowerShell|
@@ -122,6 +131,7 @@ Set-SPOTenantCdnPolicy|Microsoft.Online.SharePoint.PowerShell|[spo cdn policy se
 Set-SPOTenantContentTypeReplicationParameters|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOTenantSyncClientRestriction|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOTenantTaxonomyReplicationParameters|Microsoft.Online.SharePoint.PowerShell|
+Set-SPOUnifiedGroup|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOUser|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOWebTheme|Microsoft.Online.SharePoint.PowerShell|
 Start-SPOSiteContentMove|Microsoft.Online.SharePoint.PowerShell|
@@ -246,6 +256,7 @@ Get-PnPIndexedPropertyKeys|SharePointPnPPowerShellOnline|
 Get-PnPInformationRightsManagement|SharePointPnPPowerShellOnline|
 Get-PnPInPlaceRecordsManagement|SharePointPnPPowerShellOnline|
 Get-PnPJavaScriptLink|SharePointPnPPowerShellOnline|
+Get-PnPLabel|SharePointPnPPowerShellOnline|
 Get-PnPList|SharePointPnPPowerShellOnline|[spo list get](../cmd/spo/list/list-get.md), [spo list list](../cmd/spo/list/list-list.md)
 Get-PnPListItem|SharePointPnPPowerShellOnline|[spo listitem get](../cmd/spo/listitem/listitem-get.md), [spo listitem list](../cmd/spo/listitem/listitem-list.md)
 Get-PnPListRecordDeclaration|SharePointPnPPowerShellOnline|
@@ -260,6 +271,7 @@ Get-PnPRecycleBinItem|SharePointPnPPowerShellOnline|
 Get-PnPRequestAccessEmails|SharePointPnPPowerShellOnline|
 Get-PnPRoleDefinition|SharePointPnPPowerShellOnline|
 Get-PnPSearchConfiguration|SharePointPnPPowerShellOnline|
+Get-PnPSearchCrawlLog|SharePointPnPPowerShellOnline|
 Get-PnPSite|SharePointPnPPowerShellOnline|[spo site get](../cmd/spo/site/site-get.md), [spo site list](../cmd/spo/site/site-list.md)
 Get-PnPSiteClassification|SharePointPnPPowerShellOnline|[graph siteclassification get](../cmd/graph/siteclassification/siteclassification-get.md)
 Get-PnPSiteClosure|SharePointPnPPowerShellOnline|
@@ -308,8 +320,9 @@ Get-PnPWikiPageContent|SharePointPnPPowerShellOnline|
 Get-PnPWorkflowDefinition|SharePointPnPPowerShellOnline|
 Get-PnPWorkflowInstance|SharePointPnPPowerShellOnline|
 Get-PnPWorkflowSubscription|SharePointPnPPowerShellOnline|
-Grant-PnPSiteDesignRights|SharePointPnPPowerShellOnline|[spo sitedesign rights grant](../cmd/spo/sitedesign/sitedesign-rights-grant.md)
 Grant-PnPHubSiteRights|SharePointPnPPowerShellOnline|[spo hubsite rights grant](../cmd/spo/hubsite/hubsite-rights-grant.md)
+Grant-PnPSiteDesignRights|SharePointPnPPowerShellOnline|[spo sitedesign rights grant](../cmd/spo/sitedesign/sitedesign-rights-grant.md)
+Grant-PnPTenantServicePrincipalPermission|SharePointPnPPowerShellOnline|[aad oauth2grant add](../cmd/aad/oauth2grant/oauth2grant-add.md)
 Import-PnPAppPackage|SharePointPnPPowerShellOnline|
 Import-PnPTaxonomy|SharePointPnPPowerShellOnline|
 Import-PnPTermGroupFromXml|SharePointPnPPowerShellOnline|
@@ -426,6 +439,7 @@ Set-PnPHubSite|SharePointPnPPowerShellOnline|[spo hubsite set](../cmd/spo/hubsit
 Set-PnPIndexedProperties|SharePointPnPPowerShellOnline|
 Set-PnPInformationRightsManagement|SharePointPnPPowerShellOnline|
 Set-PnPInPlaceRecordsManagement|SharePointPnPPowerShellOnline|
+Set-PnPLabel|SharePointPnPPowerShellOnline|
 Set-PnPList|SharePointPnPPowerShellOnline|[spo list set](../cmd/spo/list/list-set.md)
 Set-PnPListItem|SharePointPnPPowerShellOnline|[spo listitem set](../cmd/spo/listitem/listitem-set.md)
 Set-PnPListItemAsRecord|SharePointPnPPowerShellOnline|
