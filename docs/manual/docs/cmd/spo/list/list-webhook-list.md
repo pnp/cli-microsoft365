@@ -13,7 +13,7 @@ spo list webhook list [options]
 Option|Description
 ------|-----------
 `--help`|output usage information
-`-u, --webUrl <webUrl>`|URL of the site where the list to retrieve is located
+`-u, --webUrl <webUrl>`|URL of the site where the list to retrieve webhooks for is located
 `-i, --id [id]`|ID of the list to retrieve all webhooks for. Specify either `id` or `title` but not both
 `-t, --title [title]`|Title of the list to retrieve all webhooks for. Specify either `id` or `title` but not both
 `-o, --output [output]`|Output type. `json|text`. Default `text`
@@ -25,7 +25,7 @@ Option|Description
 
 ## Remarks
 
-To get information about a list, you have to first connect to a SharePoint Online site using the [spo connect](../connect.md) command, eg. `spo connect https://contoso.sharepoint.com`.
+To list all webhooks for a list, you have to first connect to a SharePoint Online site using the [spo connect](../connect.md) command, eg. `spo connect https://contoso.sharepoint.com`.
 
 ## Examples
 
