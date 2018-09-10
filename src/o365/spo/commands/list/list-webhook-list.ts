@@ -98,13 +98,7 @@ class ListGetCommand extends SpoCommand {
 
         return request.get(requestOptions);
       })
-      // .then((listInstance: ListInstance): void => {
-      //   if (this.debug) {
-      //     cmd.log('Response:');
-      //     cmd.log(listInstance);
-      //     cmd.log('');
-      //   }
-      .then((res: { value: [{ id: string, notificationUrl: string }] }): void => {
+      .then((res: { value: [{ id: string, clientState: string, expirationDateTime: Date, resource: string }] }): void => {
         if (this.debug) {
           cmd.log('Response:');
           cmd.log(res);
@@ -119,7 +113,9 @@ class ListGetCommand extends SpoCommand {
             cmd.log(res.value.map(e => {
               return {
                 id: e.id,
-                notificationUrl: e.notificationUrl
+                clientState: e.clientState || '',
+                expirationDateTime: e.expirationDateTime,
+                resource: e.resource
               };
             }));
           }
@@ -138,7 +134,7 @@ class ListGetCommand extends SpoCommand {
     const options: CommandOption[] = [
       {
         option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the list to retrieve is located'
+        description: 'URL of the site where the list to retrieve webhooks for is located'
       },
       {
         option: '-i, --id [id]',
