@@ -306,14 +306,12 @@ class SpfxProjectUpgradeCommand extends Command {
       let resolution: string = '';
       switch (f.resolutionType) {
         case 'cmd':
-        if (f.resolution.indexOf('npm') !== -1) {
           resolution = `Execute the following command:
 
 \`\`\`sh
 ${f.resolution}
 \`\`\`
 `;
-        }
           break;
         case 'json':
         case 'js':
@@ -357,7 +355,7 @@ ${f.resolution}
       );
     });
 
-    this.reduceNpmCommand(commandsToExecute, packagesDevExact,
+    const mainNpmCommands: string[] = this.reduceNpmCommand(packagesDevExact,
       packagesDepExact, packagesDepUn, packagesDevUn);
 
     const s: string[] = [
@@ -375,7 +373,7 @@ ${f.resolution}
       '### Execute script', EOL,
       EOL,
       '```sh', EOL,
-      commandsToExecute.join(EOL), EOL,
+      commandsToExecute.filter((command) => command.indexOf('npm') === -1).concat(mainNpmCommands).join(EOL), EOL,
       '```', EOL,
       EOL,
       '### Modify files', EOL,
@@ -415,8 +413,9 @@ ${f.resolution}
       }
     }
   }
-  private reduceNpmCommand(commandsToExecute: string[], packagesDevExact: string[],
-    packagesDepExact: string[], packagesDepUn: string[], packagesDevUn: string[]): void {
+  private reduceNpmCommand(packagesDevExact: string[], packagesDepExact: string[],
+    packagesDepUn: string[], packagesDevUn: string[]): string[] {
+    const commandsToExecute: string[] = [];
     if (packagesDepExact.length > 0) {
       commandsToExecute.push(`npm i ${packagesDepExact.join(' ')} -SE`);
     }
@@ -429,6 +428,7 @@ ${f.resolution}
     if (packagesDevUn.length > 0) {
       commandsToExecute.push(`npm un ${packagesDevUn.join(' ')} -D`);
     }
+    return commandsToExecute;
   }
 
   private getProjectRoot(folderPath: string): string | null {
