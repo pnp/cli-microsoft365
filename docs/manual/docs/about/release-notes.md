@@ -27,7 +27,9 @@
 - added support for upgrading projects built using SharePoint Framework v1.5.1 [#569](https://github.com/pnp/office365-cli/issues/569)
 - added support for setting debug and verbose mode using an environment variable [#54](https://github.com/pnp/office365-cli/issues/54)
 - extended the 'spo cdn set' command, solving. Added support for managing both CDNs. Added support for enabling CDNs without provisioning default origins [#230](https://github.com/pnp/office365-cli/issues/230)
-
+- fixed bug in reporting SPFx project upgrade findings solving [#582](https://github.com/pnp/office365-cli/issues/582)
+- fixed upgrade SPFx 1.6.0 FN012012 always returns a finding [#580](https://github.com/pnp/office365-cli/issues/580)
+- Combined npm commands in SPFx project upgrade summary solving [#508](https://github.com/pnp/office365-cli/issues/508)
 
 ## [v1.6.0](https://github.com/pnp/office365-cli/releases/tag/v1.6.0)
 
