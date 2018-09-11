@@ -62,7 +62,10 @@ export abstract class DependencyRule extends Rule {
       }
       else {
         if (!this.isOptional || this.customCondition(project)) {
-          this.addFindingWithCustomInfo(this.packageName, this.description.replace('Upgrade', 'Install'), this.resolution, this.file, findings);
+          this.addFindingWithCustomInfo(this.packageName, this.description.replace('Upgrade', 'Install'), [{
+            file: this.file,
+            resolution: this.resolution
+          }], findings);
         }
       }
     }

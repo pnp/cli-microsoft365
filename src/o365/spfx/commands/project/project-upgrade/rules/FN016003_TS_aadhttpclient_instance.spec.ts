@@ -71,6 +71,6 @@ describe('FN016003_TS_aadhttpclient_instance', () => {
       ]
     };
     rule.visit(project, findings);
-    assert(findings[0].resolution.indexOf('/* your resource */') > -1);
+    assert(findings[0].occurrences[0].resolution.indexOf('/* your resource */') > -1);
   });
 });

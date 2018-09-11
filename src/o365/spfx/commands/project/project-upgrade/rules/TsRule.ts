@@ -1,5 +1,5 @@
 import { Rule } from "./Rule";
-import { Finding } from "../";
+import { Occurrence } from "../";
 import * as ts from 'typescript';
 import * as path from 'path';
 
@@ -16,21 +16,16 @@ export abstract class TsRule extends Rule {
     return '';
   };
 
-  protected addTsFinding(findingNumber: number, resolution: string, filePath: string, projectPath: string, node: ts.Node, findings: Finding[]): void {
+  protected addOccurrence(resolution: string, filePath: string, projectPath: string, node: ts.Node, occurrences: Occurrence[]): void {
     const lineChar: ts.LineAndCharacter = node.getSourceFile().getLineAndCharacterOfPosition(node.getStart());
 
-    findings.push({
-      id: `${this.id}_${findingNumber}`,
-      title: this.title,
-      description: this.description,
-      resolution: resolution,
-      resolutionType: this.resolutionType,
+    occurrences.push({
       file: path.relative(projectPath, filePath),
-      severity: this.severity,
       position: {
         line: lineChar.line + 1,
         character: lineChar.character + 1
-      }
+      },
+      resolution: resolution
     });
   }
 

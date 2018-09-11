@@ -12,14 +12,6 @@ describe('FN003005_CFG_localizedResource_pathLib', () => {
     rule = new FN003005_CFG_localizedResource_pathLib();
   });
 
-  it('has empty title', () => {
-    assert.equal(rule.title, '');
-  });
-
-  it('has empty description', () => {
-    assert.equal(rule.description, '');
-  });
-
   it('has empty resolution', () => {
     assert.equal(rule.resolution, '');
   });

@@ -50,7 +50,11 @@ export class FN006003_CFG_PS_skipFeatureDeployment extends Rule {
     "skipFeatureDeployment": ${(this.valueType === 'string' ? `"${project.packageSolutionJson.solution.skipFeatureDeployment}"` : `${project.packageSolutionJson.solution.skipFeatureDeployment}`)}
   }
 }`;
-      this.addFindingWithCustomInfo(this.title, this.description, resolution, this.file, findings);
+
+      this.addFindingWithCustomInfo(this.title, this.description, [{
+        file: this.file,
+        resolution: resolution
+      }], findings);
     }
   }
 }

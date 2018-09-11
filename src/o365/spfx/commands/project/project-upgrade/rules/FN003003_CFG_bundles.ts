@@ -52,7 +52,10 @@ export class FN003003_CFG_bundles extends Rule {
       };
     });
 
-    this.addFindingWithCustomInfo(this.title, this.description, JSON.stringify(resolution, null, 2), this.file, findings);
+    this.addFindingWithOccurrences([{
+      file: this.file,
+      resolution: JSON.stringify(resolution, null, 2)
+    }], findings);
   }
 
   /**

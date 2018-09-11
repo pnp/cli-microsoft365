@@ -1,6 +1,5 @@
-import { Finding } from "../";
+import { Finding, Occurrence } from "../";
 import { Project } from "../model";
-import * as path from 'path';
 import { ManifestRule } from "./ManifestRule";
 
 export class FN011003_MAN_listViewCommandSet_schema extends ManifestRule {
@@ -11,6 +10,14 @@ export class FN011003_MAN_listViewCommandSet_schema extends ManifestRule {
   get id(): string {
     return 'FN011003';
   }
+
+  get title(): string {
+    return 'List view command set manifest schema';
+  }
+
+  get description(): string {
+    return 'Update schema in manifest';
+  };
 
   get resolution(): string {
     return `{
@@ -28,13 +35,17 @@ export class FN011003_MAN_listViewCommandSet_schema extends ManifestRule {
       return;
     }
 
+    const occurrences: Occurrence[] = [];
     project.manifests.forEach(manifest => {
       if (manifest.componentType === 'Extension' &&
         manifest.extensionType === 'ListViewCommandSet' &&
         manifest.$schema !== this.schema) {
-        const relativePath: string = path.relative(project.path, manifest.path);
-        this.addFindingWithCustomInfo('List view command set manifest schema', `Update schema in manifest ${relativePath}`, this.resolution, relativePath, findings);
+        this.addOccurrence(this.resolution, manifest.path, project.path, occurrences);
       }
     });
+
+    if (occurrences.length > 0) {
+      this.addFindingWithOccurrences(occurrences, findings);
+    }
   }
 }

@@ -10,6 +10,7 @@ import { Finding, Utils } from './project-upgrade/';
 import { Rule } from './project-upgrade/rules/Rule';
 import { EOL } from 'os';
 import { Project, Manifest, TsFile } from './project-upgrade/model';
+import { FindingToReport } from './project-upgrade/FindingToReport';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -128,17 +129,34 @@ class SpfxProjectUpgradeCommand extends Command {
       return i === firstFindingPos;
     });
 
+    // flatten
+    const findingsToReport: FindingToReport[] = [].concat.apply([], findings.map(f => {
+      return f.occurrences.map(o => {
+        return {
+          description: f.description,
+          id: f.id,
+          file: o.file,
+          position: o.position,
+          resolution: o.resolution,
+          resolutionType: f.resolutionType,
+          severity: f.severity,
+          title: f.title
+        };
+      });
+    }));
+
     switch (args.options.output) {
       case 'json':
-        cmd.log(findings);
+        cmd.log(findingsToReport);
         break;
       case 'md':
-        cmd.log(this.getMdReport(findings));
+        cmd.log(this.getMdReport(findingsToReport));
         break;
       default:
-        cmd.log(findings.map(f => {
+        cmd.log(findingsToReport.map(f => {
           return {
             id: f.id,
+            file: f.file,
             resolution: f.resolution
           };
         }));
@@ -292,7 +310,7 @@ class SpfxProjectUpgradeCommand extends Command {
       : dir;
   }
 
-  private getMdReport(findings: Finding[]): string {
+  private getMdReport(findings: FindingToReport[]): string {
     const commandsToExecute: string[] = [];
     const findingsToReport: string[] = [];
     const modificationPerFile: any = [];

@@ -1,4 +1,4 @@
-import { Finding } from "../";
+import { Finding, Occurrence } from "../";
 import { Project } from "../model";
 import { TsRule } from "./TsRule";
 import * as ts from 'typescript';
@@ -38,7 +38,7 @@ export class FN016003_TS_aadhttpclient_instance extends TsRule {
       return;
     }
 
-    let findingNumber: number = 0;
+    const occurrences: Occurrence[] = [];
     project.tsFiles.forEach(file => {
       const nodes: ts.Node[] | undefined = file.nodes;
       if (!nodes) {
@@ -64,9 +64,13 @@ export class FN016003_TS_aadhttpclient_instance extends TsRule {
   .then((client: AadHttpClient): void => {
     // use AadHttpClient here
   });`;
-          this.addTsFinding(++findingNumber, resolution, file.path, project.path, varDec, findings);
+          this.addOccurrence(resolution, file.path, project.path, varDec, occurrences);
         }
       });
     });
+
+    if (occurrences.length > 0) {
+      this.addFindingWithOccurrences(occurrences, findings);
+    }
   }
 }

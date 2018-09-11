@@ -1,12 +1,19 @@
-import { Finding } from "../";
+import { Finding, Occurrence } from "../";
 import { Project } from "../model";
-import * as path from 'path';
 import { ManifestRule } from "./ManifestRule";
 
 export class FN011010_MAN_webpart_version extends ManifestRule {
   get id(): string {
     return 'FN011010';
   }
+
+  get title(): string {
+    return 'Web part manifest version';
+  }
+
+  get description(): string {
+    return 'Update version in manifest to use automated component versioning';
+  };
 
   get resolution(): string {
     return `{
@@ -24,12 +31,16 @@ export class FN011010_MAN_webpart_version extends ManifestRule {
       return;
     }
 
+    const occurrences: Occurrence[] = [];
     project.manifests.forEach(manifest => {
       if (manifest.componentType === 'WebPart' &&
         manifest.version !== '*') {
-        const relativePath: string = path.relative(project.path, manifest.path);
-        this.addFindingWithCustomInfo('Web part manifest version', `Update version in manifest ${relativePath} to use automated component versioning`, this.resolution, relativePath, findings);
+        this.addOccurrence(this.resolution, manifest.path, project.path, occurrences);
       }
     });
+
+    if (occurrences.length > 0) {
+      this.addFindingWithOccurrences(occurrences, findings);
+    }
   }
 }

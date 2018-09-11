@@ -1,4 +1,4 @@
-import { Finding } from "../";
+import { Finding, Occurrence } from "../";
 import { Project } from "../model";
 import { TsRule } from "./TsRule";
 import * as ts from 'typescript';
@@ -37,7 +37,7 @@ export class FN016001_TS_msgraphclient_packageName extends TsRule {
       return;
     }
 
-    let findingNumber: number = 0;
+    const occurrences: Occurrence[] = [];
     project.tsFiles.forEach(file => {
       const nodes: ts.Node[] | undefined = file.nodes;
       if (!nodes) {
@@ -58,9 +58,13 @@ export class FN016001_TS_msgraphclient_packageName extends TsRule {
         if (moduleSpecifier !== `"${this.packageName}"` &&
           moduleSpecifier !== `'${this.packageName}'`) {
           const resolution: string = msGraphImportDeclaration.getText(msGraphImportDeclaration.getSourceFile()).replace(moduleSpecifier, `"${this.packageName}"`);
-          this.addTsFinding(++findingNumber, resolution, file.path, project.path, msGraphImportDeclaration, findings);
+          this.addOccurrence(resolution, file.path, project.path, msGraphImportDeclaration, occurrences);
         }
       });
     });
+
+    if (occurrences.length > 0) {
+      this.addFindingWithOccurrences(occurrences, findings);
+    }
   }
 }

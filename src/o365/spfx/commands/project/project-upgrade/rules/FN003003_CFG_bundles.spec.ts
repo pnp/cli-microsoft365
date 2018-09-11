@@ -61,7 +61,7 @@ describe('FN003003_CFG_bundles', () => {
     };
     rule.visit(project, findings);
 
-    const resolution: any = JSON.parse(findings[0].resolution);
+    const resolution: any = JSON.parse(findings[0].occurrences[0].resolution);
     const bundle1: any = resolution.bundles["hello-world-application-customizer"];
 
     assert.notEqual(bundle1, undefined, 'Bundle undefined');
