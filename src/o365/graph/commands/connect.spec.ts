@@ -8,6 +8,8 @@ import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import Utils from '../../../Utils';
 import { Service, AuthType } from '../../../Auth';
+import * as fs from 'fs';
+
 
 describe(commands.CONNECT, () => {
   let vorpal: Vorpal;
@@ -137,6 +139,56 @@ describe(commands.CONNECT, () => {
     });
   });
 
+  it('connects to MS Graph using certificate when authType certificate set', (done) => {
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    sinon.stub(fs, 'readFileSync').callsFake(() => "certificate");
+
+    auth.service = new Service('https://graph.microsoft.com');
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, authType: 'certificate', certificateFile: 'certificateFile', applicationId: 'applicationId', thumbprint: 'thumbprint' } }, () => {
+      try {
+        assert.equal(auth.service.authType, AuthType.Certificate, 'Incorrect authType set');
+        assert.equal(auth.service.certificate, 'certificate', 'Incorrect certificateFile set');
+        assert.equal(auth.service.applicationId, 'applicationId', 'Incorrect applicationId set');
+        assert.equal(auth.service.thumbprint, 'thumbprint', 'Incorrect thumbprint set');
+        Utils.restore([
+          fs.existsSync,
+          fs.readFileSync
+        ]);
+        done();
+      }
+      catch (e) {
+        Utils.restore([
+          fs.existsSync
+        ]);
+        done(e);
+      }
+    });
+  });
+
+  it('fails to connect to MS Graph using certificate when authType certificate set and missing certificate file', (done) => {
+    sinon.stub(fs, 'existsSync').callsFake(() => false);
+
+    auth.service = new Service('https://graph.microsoft.com');
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, authType: 'certificate', certificateFile: 'certificateFile', applicationId: 'applicationId', thumbprint: 'thumbprint' } }, (err?: any) => {
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('File does not exist: certificateFile')));
+       
+        Utils.restore([
+          fs.existsSync
+        ]);
+        done();
+      }
+      catch (e) {
+        Utils.restore([
+          fs.existsSync
+        ]);
+        done(e);
+      }
+    });
+  });
+
   it('can be cancelled', () => {
     assert(command.cancel());
   });
@@ -180,6 +232,39 @@ describe(commands.CONNECT, () => {
     assert(containsOption);
   });
 
+  it('supports specifying certificateFile', () => {
+    const options = (command.options() as CommandOption[]);
+    let containsOption = false;
+    options.forEach(o => {
+      if (o.option.indexOf('--certificateFile') > -1) {
+        containsOption = true;
+      }
+    });
+    assert(containsOption);
+  });
+
+  it('supports specifying applicationId', () => {
+    const options = (command.options() as CommandOption[]);
+    let containsOption = false;
+    options.forEach(o => {
+      if (o.option.indexOf('--applicationId') > -1) {
+        containsOption = true;
+      }
+    });
+    assert(containsOption);
+  });
+
+  it('supports specifying thumbprint', () => {
+    const options = (command.options() as CommandOption[]);
+    let containsOption = false;
+    options.forEach(o => {
+      if (o.option.indexOf('--thumbprint') > -1) {
+        containsOption = true;
+      }
+    });
+    assert(containsOption);
+  });
+
   it('fails validation if authType is set to password and userName and password not specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { authType: 'password' } });
     assert.notEqual(actual, true);
@@ -209,6 +294,47 @@ describe(commands.CONNECT, () => {
     const actual = (command.validate() as CommandValidate)({ options: { } });
     assert.equal(actual, true);
   });
+
+  it('fails validation if authType is set to certificate and certificateFile, thumbprint and applicationId not specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { authType: 'certificate' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation if authType is set to certificate and thumbprint and applicationId not specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { authType: 'certificate', certificateFile: 'certificateFile' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation if authType is set to certificate and certificateFile and applicationId not specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { authType: 'certificate', thumbprint: 'thumbprint' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation if authType is set to certificate and certificateFile and thumbprint not specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { authType: 'certificate', applicationId: 'applicationId' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation if authType is set to certificate and certificateFile and thumbprint only specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { authType: 'certificate', certificateFile: 'certificateFile', thumbprint: 'thumbprint' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation if authType is set to certificate and applicationId and thumbprint only specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { authType: 'certificate', applicationId: 'applicationId', thumbprint: 'thumbprint' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation if authType is set to certificate and certificateFile and applicationId only specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { authType: 'certificate', certificateFile: 'certificateFile', applicationId: 'applicationId' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('passes validation if authType is set to certificate and certificateFile, thumbprint and applicationId is specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { authType: 'certificate', applicationId: 'applicationId', certificateFile: 'certificateFile', thumbprint: 'thumbprint' } });
+    assert.equal(actual, true);
+  });
+
 
   it('has help referring to the right command', () => {
     const cmd: any = {

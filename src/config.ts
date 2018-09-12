@@ -8,5 +8,6 @@ export default {
   aadAadAppId: process.env.OFFICE365CLI_AADAADAPPID || process.env.OFFICE365CLI_AADAPPID || cliAadAppId,
   aadAzmgmtAppId: process.env.OFFICE365CLI_AADAZMGMTAPPID || process.env.OFFICE365CLI_AADAPPID || cliAadAppId,
   aadGraphAppId: process.env.OFFICE365CLI_AADGRAPHAPPID || process.env.OFFICE365CLI_AADAPPID || cliAadAppId,
-  aadSpoAppId: process.env.OFFICE365CLI_AADSPOAPPID || process.env.OFFICE365CLI_AADAPPID || cliAadAppId
+  aadSpoAppId: process.env.OFFICE365CLI_AADSPOAPPID || process.env.OFFICE365CLI_AADAPPID || cliAadAppId,
+  tenant: process.env.OFFICE365CLI_TENANT || 'common'
 };

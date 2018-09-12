@@ -5,6 +5,7 @@ import { WindowsTokenStorage } from './auth/WindowsTokenStorage';
 import { FileTokenStorage } from './auth/FileTokenStorage';
 import { AuthenticationContext, TokenResponse, ErrorResponse, UserCodeInfo, Logging, LoggingLevel } from 'adal-node';
 import { CommandError } from './Command';
+import config from './config';
 
 export class Service {
   connected: boolean = false;
@@ -15,6 +16,9 @@ export class Service {
   authType: AuthType = AuthType.DeviceCode;
   userName?: string;
   password?: string;
+  applicationId?: string;
+  certificate?: string
+  thumbprint?: string;
 
   constructor(resource: string = '') {
     this.resource = resource;
@@ -29,6 +33,9 @@ export class Service {
     this.authType = AuthType.DeviceCode;
     this.userName = undefined;
     this.password = undefined;
+    this.applicationId = undefined;
+    this.certificate = undefined;
+    this.thumbprint = undefined;
   }
 }
 
@@ -38,7 +45,8 @@ export interface Logger {
 
 export enum AuthType {
   DeviceCode,
-  Password
+  Password,
+  Certificate
 }
 
 export abstract class Auth {
@@ -48,7 +56,7 @@ export abstract class Auth {
   protected abstract serviceId(): string;
 
   constructor(public service: Service, private appId?: string) {
-    this.authCtx = new AuthenticationContext('https://login.microsoftonline.com/common');
+    this.authCtx = new AuthenticationContext(`https://login.microsoftonline.com/${config.tenant}`);
   }
 
   public restoreAuth(): Promise<void> {
@@ -103,6 +111,9 @@ export abstract class Auth {
             break;
           case AuthType.Password:
             getTokenPromise = this.ensureAccessTokenWithPassword.bind(this);
+            break;
+          case AuthType.Certificate:
+            getTokenPromise = this.ensureAccessTokenWithCertificate.bind(this);
             break;
         }
       }
@@ -211,6 +222,33 @@ export abstract class Auth {
         this.service.userName as string,
         this.service.password as string,
         this.appId as string,
+        (error: Error, response: TokenResponse | ErrorResponse): void => {
+          if (debug) {
+            stdout.log('Response:');
+            stdout.log(response);
+            stdout.log('');
+          }
+
+          if (error) {
+            reject((response && (response as any).error_description) || error.message);
+            return;
+          }
+
+          resolve(<TokenResponse>response);
+        });
+    });
+  }
+
+  private ensureAccessTokenWithCertificate(resource: string, stdout: Logger, debug: boolean): Promise<TokenResponse> {
+    return new Promise<TokenResponse>((resolve: (tokenResponse: TokenResponse) => void, reject: (error: any) => void): void => {
+      if (debug) {
+        stdout.log(`Retrieving new access token using certificate (thumbprint ${this.service.thumbprint})...`);
+      }
+      this.authCtx.acquireTokenWithClientCertificate(
+        resource,
+        this.service.applicationId as string,
+        this.service.certificate as string,
+        this.service.thumbprint as string,
         (error: Error, response: TokenResponse | ErrorResponse): void => {
           if (debug) {
             stdout.log('Response:');
