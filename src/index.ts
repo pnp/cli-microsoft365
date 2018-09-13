@@ -36,7 +36,10 @@ fs.realpath(__dirname, (err: NodeJS.ErrnoException, resolvedPath: string): void 
       try {
         const cmd: any = require(file);
         if (cmd instanceof Command) {
-          cmd.init(vorpal);
+          if ((<any>cmd)["previewFeaturesUsed"] == undefined || process.argv.indexOf('--allowPreview') > -1) {
+            cmd.init(vorpal);
+          }
+
         }
       }
       catch { }
@@ -59,6 +62,12 @@ fs.realpath(__dirname, (err: NodeJS.ErrnoException, resolvedPath: string): void 
   if (process.argv.indexOf('--reconsent') > -1) {
     console.log(`To reconsent the PnP Office 365 Management Shell Azure AD application navigate in your web browser to https://login.microsoftonline.com/common/oauth2/authorize?client_id=${config.cliAadAppId}&response_type=code&prompt=admin_consent`);
     process.exit();
+  }
+  if (process.argv.indexOf('--allowPreview') > -1) {
+    console.log(`Note: Functionality depending on non-production code is enabled`);
+    process.argv = process.argv.filter((a: string, index: number, array: string[]) => {
+      return a !== '--allowPreview';
+    });
   }
 
   // disable linux-normalizing args to support JSON and XML values

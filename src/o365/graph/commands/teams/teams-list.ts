@@ -9,6 +9,7 @@ import { Team } from './Team';
 import { GraphItemsListCommand } from '../GraphItemsListCommand';
 import * as request from 'request-promise-native';
 import Utils from '../../../../Utils';
+import { Preview } from '../../../../PreviewFeaturesDecorator';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -20,6 +21,7 @@ interface Options extends GlobalOptions {
   joined?: boolean;
 }
 
+@Preview
 class TeamsListCommand extends GraphItemsListCommand<Team> {
   public get name(): string {
     return `${commands.TEAMS_LIST}`;
