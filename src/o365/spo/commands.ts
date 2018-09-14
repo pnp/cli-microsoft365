@@ -61,6 +61,7 @@ export default {
   LIST_LIST: `${prefix} list list`,
   LIST_REMOVE: `${prefix} list remove`,
   LIST_SET: `${prefix} list set`,
+  LIST_WEBHOOK_LIST: `${prefix} list webhook list`,
   LISTITEM_ADD: `${prefix} listitem add`,
   LISTITEM_GET: `${prefix} listitem get`,
   LISTITEM_LIST: `${prefix} listitem list`,
