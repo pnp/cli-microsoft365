@@ -152,6 +152,8 @@ nav:
       - tenant:
         - tenant appcatalogurl get: 'cmd/spo/tenant/tenant-appcatalogurl-get.md'
         - tenant settings list: 'cmd/spo/tenant/tenant-settings-list.md'
+      - term:
+        - term group list: 'cmd/spo/term/term-group-list.md'
       - theme:
         - theme apply: 'cmd/spo/theme/theme-apply.md'
         - theme get: 'cmd/spo/theme/theme-get.md'
