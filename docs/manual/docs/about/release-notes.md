@@ -6,11 +6,13 @@
 
 **SharePoint Online:**
 
+- [spo list webhook list](../cmd/spo/list/list-webhook-list.md) - lists all webhooks for the specified list [#579](https://github.com/pnp/office365-cli/issues/579)
 - [spo listitem list](../cmd/spo/listitem/listitem-list.md) - gets a list of items from the specified list [#268](https://github.com/pnp/office365-cli/issues/268)
 - [spo page column get](../cmd/spo/page/page-column-get.md) - get information about a specific column of a modern page [#412](https://github.com/pnp/office365-cli/issues/412)
 - [spo page remove](../cmd/spo/page/page-remove.md) - removes a modern page [#363](https://github.com/pnp/office365-cli/issues/363)
 - [spo site classic remove](../cmd/spo/site/site-classic-remove.md) - removes the specified site [#125](https://github.com/pnp/office365-cli/issues/125)
 - [spo tenant settings list](../cmd/spo/tenant/tenant-settings-list.md) - lists the global tenant settings [#548](https://github.com/pnp/office365-cli/issues/548)
+- [spo term group list](../cmd/spo/term/term-group-list.md) - lists taxonomy term groups [#596](https://github.com/pnp/office365-cli/issues/596)
 
 **Microsoft Graph:**
 
@@ -29,7 +31,8 @@
 - extended the 'spo cdn set' command, solving. Added support for managing both CDNs. Added support for enabling CDNs without provisioning default origins [#230](https://github.com/pnp/office365-cli/issues/230)
 - fixed bug in reporting SPFx project upgrade findings solving [#582](https://github.com/pnp/office365-cli/issues/582)
 - fixed upgrade SPFx 1.6.0 FN012012 always returns a finding [#580](https://github.com/pnp/office365-cli/issues/580)
-- Combined npm commands in SPFx project upgrade summary solving [#508](https://github.com/pnp/office365-cli/issues/508)
+- combined npm commands in SPFx project upgrade summary solving [#508](https://github.com/pnp/office365-cli/issues/508)
+- renamed 'connect' commands to 'login' [#574](https://github.com/pnp/office365-cli/issues/574)
 
 ## [v1.6.0](https://github.com/pnp/office365-cli/releases/tag/v1.6.0)
 
