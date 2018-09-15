@@ -125,7 +125,7 @@ Set-SPOSiteGroup|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOSiteOffice365Group|Microsoft.Online.SharePoint.PowerShell|[spo site o365group set](../cmd/spo/site/site-o365group-set.md)
 Set-SPOSiteScript|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOStorageEntity|Microsoft.Online.SharePoint.PowerShell|[spo storageentity set](../cmd/spo/storageentity/storageentity-set.md)
-Set-SPOTenant|Microsoft.Online.SharePoint.PowerShell|
+Set-SPOTenant|Microsoft.Online.SharePoint.PowerShell|[spo tenant settings set](../cmd/spo/tenant/tenant-settings-set.md)
 Set-SPOTenantCdnEnabled|Microsoft.Online.SharePoint.PowerShell|[spo cdn set](../cmd/spo/cdn/cdn-set.md)
 Set-SPOTenantCdnPolicy|Microsoft.Online.SharePoint.PowerShell|[spo cdn policy set](../cmd/spo/cdn/cdn-policy-set.md)
 Set-SPOTenantContentTypeReplicationParameters|Microsoft.Online.SharePoint.PowerShell|
@@ -459,7 +459,7 @@ Set-PnPSitePolicy|SharePointPnPPowerShellOnline|
 Set-PnPSiteScript|SharePointPnPPowerShellOnline|[spo sitescript set](../cmd/spo/sitescript/sitescript-set.md)
 Set-PnPStorageEntity|SharePointPnPPowerShellOnline|[spo storageentity set](../cmd/spo/storageentity/storageentity-set.md)
 Set-PnPTaxonomyFieldValue|SharePointPnPPowerShellOnline|
-Set-PnPTenant|SharePointPnPPowerShellOnline|
+Set-PnPTenant|SharePointPnPPowerShellOnline|[spo tenant settings set](../cmd/spo/tenant/tenant-settings-set.md)
 Set-PnPTenantCdnEnabled|SharePointPnPPowerShellOnline|[spo cdn set](../cmd/spo/cdn/cdn-set.md)
 Set-PnPTenantCdnPolicy|SharePointPnPPowerShellOnline|[spo cdn policy set](../cmd/spo/cdn/cdn-policy-set.md)
 Set-PnPTenantSite|SharePointPnPPowerShellOnline|[spo site classic set](../cmd/spo/site/site-classic-set.md)
