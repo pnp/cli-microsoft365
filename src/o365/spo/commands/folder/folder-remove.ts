@@ -159,13 +159,13 @@ class SpoFolderRemoveCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online site,
-    using the ${chalk.blue(commands.CONNECT)} command.
+      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
+    using the ${chalk.blue(commands.LOGIN)} command.
   
   Remarks:
   
-    To delete a folder, you have to first connect to SharePoint using the
-    ${chalk.blue(commands.CONNECT)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
+    To delete a folder, you have to first log in to SharePoint using the
+    ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
 
     The ${chalk.blue(this.name)} command will remove folder only if it is empty.
     If the folder contains any files, deleting the folder will fail.

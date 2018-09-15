@@ -95,13 +95,13 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
     });
   });
 
-  it('aborts when not connected to a SharePoint site', (done) => {
+  it('aborts when not logged in to a SharePoint site', (done) => {
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Connect to a SharePoint Online site first')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
         done();
       }
       catch (e) {
@@ -110,14 +110,14 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
     });
   });
 
-  it('aborts when not connected to a SharePoint tenant admin site', (done) => {
+  it('aborts when not logged in to a SharePoint tenant admin site', (done) => {
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`${auth.site.url} is not a tenant admin site. Connect to your tenant admin site and try again`)));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`${auth.site.url} is not a tenant admin site. Log in to your tenant admin site and try again`)));
         done();
       }
       catch (e) {

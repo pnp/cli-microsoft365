@@ -131,8 +131,8 @@ class SpoHubSiteDataGetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online site using
-    the ${chalk.blue(commands.CONNECT)} command.
+      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site using
+    the ${chalk.blue(commands.LOGIN)} command.
         
   Remarks:
 
@@ -140,9 +140,9 @@ class SpoHubSiteDataGetCommand extends SpoCommand {
     in preview and is subject to change once the API reached general
     availability.
 
-    To get hub site data for a site, you have to first connect to
-    a SharePoint site using the ${chalk.blue(commands.CONNECT)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
+    To get hub site data for a site, you have to first log in to
+    a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
+    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
 
     By default, the hub site data is returned from the server's cache.
     To refresh the data with the latest updates, use the ${chalk.blue('-f, --forceRefresh')}

@@ -81,13 +81,13 @@ describe(commands.STATUS, () => {
     });
   });
 
-  it('shows disconnected status when not connected', (done) => {
+  it('shows logged out status when not logged in', (done) => {
     auth.service = new Service('https://graph.microsoft.com');
     auth.service.connected = false;
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith('Not connected'));
+        assert(cmdInstanceLogSpy.calledWith('Logged out'));
         done();
       }
       catch (e) {
@@ -96,13 +96,13 @@ describe(commands.STATUS, () => {
     });
   });
 
-  it('shows disconnected status when not connected (verbose)', (done) => {
+  it('shows logged out status when not logged in (verbose)', (done) => {
     auth.service = new Service('https://graph.microsoft.com');
     auth.service.connected = false;
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { verbose: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith('Not connected to Microsoft Graph'));
+        assert(cmdInstanceLogSpy.calledWith('Logged out from Microsoft Graph'));
         done();
       }
       catch (e) {
@@ -111,7 +111,7 @@ describe(commands.STATUS, () => {
     });
   });
 
-  it('shows connected status when connected', (done) => {
+  it('shows logged in status when logged in', (done) => {
     auth.service = new Service('https://graph.microsoft.com');
     auth.service.accessToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Ing0NTh4eU9wbHNNMkg3TlhrMlN4MTd4MXVwYyIsImtpZCI6Ing0NTh4eU9wbHNNMkg3TlhrN1N4MTd4MXVwYyJ9.eyJhdWQiOiJodHRwczovL2dyYXBoLndpbmRvd3MubmV0IiwiaXNzIjoiaHR0cHM6Ly9zdHMud2luZG93cy5uZXQvY2FlZTMyZTYtNDA1ZC00MjRhLTljZjEtMjA3MWQwNDdmMjk4LyIsImlhdCI6MTUxNTAwNDc4NCwibmJmIjoxNTE1MDA0Nzg0LCJleHAiOjE1MTUwMDg2ODQsImFjciI6IjEiLCJhaW8iOiJBQVdIMi84R0FBQUFPN3c0TDBXaHZLZ1kvTXAxTGJMWFdhd2NpOEpXUUpITmpKUGNiT2RBM1BvPSIsImFtciI6WyJwd2QiXSwiYXBwaWQiOiIwNGIwNzc5NS04ZGRiLTQ2MWEtYmJlZS0wMmY5ZTFiZjdiNDYiLCJhcHBpZGFjciI6IjAiLCJmYW1pbHlfbmFtZSI6IkRvZSIsImdpdmVuX25hbWUiOiJKb2huIiwiaXBhZGRyIjoiOC44LjguOCIsIm5hbWUiOiJKb2huIERvZSIsIm9pZCI6ImYzZTU5NDkxLWZjMWEtNDdjYy1hMWYwLTk1ZWQ0NTk4MzcxNyIsInB1aWQiOiIxMDk0N0ZGRUE2OEJDQ0NFIiwic2NwIjoiNjJlOTAzOTQtNjlmNS00MjM3LTkxOTAtMDEyMTc3MTQ1ZTEwIiwic3ViIjoiemZicmtUV1VQdEdWUUg1aGZRckpvVGp3TTBrUDRsY3NnLTJqeUFJb0JuOCIsInRlbmFudF9yZWdpb25fc2NvcGUiOiJOQSIsInRpZCI6ImNhZWUzM2U2LTQwNWQtNDU0YS05Y2YxLTMwNzFkMjQxYTI5OCIsInVuaXF1ZV9uYW1lIjoiYWRtaW5AY29udG9zby5vbm1pY3Jvc29mdC5jb20iLCJ1cG4iOiJhZG1pbkBjb250b3NvLm9ubWljcm9zb2Z0LmNvbSIsInV0aSI6ImFUZVdpelVmUTBheFBLMVRUVXhsQUEiLCJ2ZXIiOiIxLjAifQ==.abc';
     auth.service.connected = true;

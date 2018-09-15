@@ -18,14 +18,14 @@ Option|Description
 `--debug`|Runs command with debug logging
 
 !!! important
-    Before using this command, connect to the Azure Management Service, using the [azmgmt connect](../connect.md) command.
+    Before using this command, log in to the Azure Management Service, using the [azmgmt login](../login.md) command.
 
 ## Remarks
 
 !!! attention
     This command is based on an API that is currently in preview and is subject to change once the API reached general availability.
 
-To get information about Microsoft Flow environments, you have to first connect to the Azure Management Service using the [azmgmt connect](../connect.md) command.
+To get information about Microsoft Flow environments, you have to first log in to the Azure Management Service using the [azmgmt login](../login.md) command.
 
 ## Examples
 

@@ -172,8 +172,8 @@ class SpoHubSiteRightsRevokeCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.HUBSITE_RIGHTS_REVOKE).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online tenant admin site,
-  using the ${chalk.blue(commands.CONNECT)} command.
+      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online tenant admin site,
+  using the ${chalk.blue(commands.LOGIN)} command.
                 
   Remarks:
 
@@ -181,10 +181,10 @@ class SpoHubSiteRightsRevokeCommand extends SpoCommand {
     in preview and is subject to change once the API reached general
     availability.
 
-    To revoke rights to join sites to a hub site, you have to first connect to
-    a tenant admin site using the ${chalk.blue(commands.CONNECT)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso-admin.sharepoint.com`)}.
-    If you are connected to a different site and will try to revoke rights,
+    To revoke rights to join sites to a hub site, you have to first log in to
+    a tenant admin site using the ${chalk.blue(commands.LOGIN)} command,
+    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso-admin.sharepoint.com`)}.
+    If you are logged in to a different site and will try to revoke rights,
     you will get an error.
 
   Examples:

@@ -1,12 +1,19 @@
-import { Finding } from "../";
+import { Finding, Occurrence } from "../";
 import { Project, CommandSetManifest } from "../model";
-import * as path from 'path';
 import { ManifestRule } from "./ManifestRule";
 
 export class FN011006_MAN_listViewCommandSet_items extends ManifestRule {
   get id(): string {
     return 'FN011006';
   }
+
+  get title(): string {
+    return 'List view command set items property';
+  }
+
+  get description(): string {
+    return 'In the manifest add the items property';
+  };
 
   get resolution(): string {
     return '';
@@ -22,6 +29,7 @@ export class FN011006_MAN_listViewCommandSet_items extends ManifestRule {
       return;
     }
 
+    const occurrences: Occurrence[] = [];
     project.manifests.forEach(manifest => {
       const commandSetManifest: CommandSetManifest = manifest as CommandSetManifest;
 
@@ -39,8 +47,11 @@ export class FN011006_MAN_listViewCommandSet_items extends ManifestRule {
           resolution.items[k].type = 'command';
       });
 
-      const relativePath: string = path.relative(project.path, manifest.path);
-      this.addFindingWithCustomInfo('List view command set items property', `In the manifest ${relativePath} add the items property`, JSON.stringify(resolution, null, 2), relativePath, findings);
+      this.addOccurrence(JSON.stringify(resolution, null, 2), manifest.path, project.path, occurrences);
     });
+
+    if (occurrences.length > 0) {
+      this.addFindingWithOccurrences(occurrences, findings);
+    }
   }
 }

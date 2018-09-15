@@ -1,6 +1,5 @@
-import { Finding } from "../";
+import { Finding, Occurrence } from "../";
 import { Project } from "../model";
-import * as path from 'path';
 import { ManifestRule } from "./ManifestRule";
 
 export class FN011005_MAN_webpart_defaultGroup extends ManifestRule {
@@ -11,6 +10,14 @@ export class FN011005_MAN_webpart_defaultGroup extends ManifestRule {
   get id(): string {
     return 'FN011005';
   }
+
+  get title(): string {
+    return 'Web part manifest default group';
+  }
+
+  get description(): string {
+    return 'In the manifest update the default group value';
+  };
 
   get resolution(): string {
     return `{
@@ -30,16 +37,20 @@ export class FN011005_MAN_webpart_defaultGroup extends ManifestRule {
       return;
     }
 
+    const occurrences: Occurrence[] = [];
     project.manifests.forEach(manifest => {
       if (manifest.componentType === 'WebPart' &&
         manifest.preconfiguredEntries) {
         manifest.preconfiguredEntries.forEach(e => {
           if (e.group && e.group.default === this.oldDefaultGroup) {
-            const relativePath: string = path.relative(project.path, manifest.path);
-            this.addFindingWithCustomInfo('Web part manifest default group', `In the manifest ${relativePath} update the default group value`, this.resolution, relativePath, findings);
+            this.addOccurrence(this.resolution, manifest.path, project.path, occurrences);
           }
         });
       }
     });
+
+    if (occurrences.length > 0) {
+      this.addFindingWithOccurrences(occurrences, findings);
+    }
   }
 }

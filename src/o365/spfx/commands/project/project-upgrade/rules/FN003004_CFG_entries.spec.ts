@@ -46,7 +46,7 @@ describe('FN003004_CFG_entries', () => {
     };
     rule.visit(project, findings);
 
-    const resolution: any = JSON.parse(findings[0].resolution);
+    const resolution: any = JSON.parse(findings[0].occurrences[0].resolution);
     const entries: any = resolution.entries;
 
     assert.notEqual(entries, undefined);

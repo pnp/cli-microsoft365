@@ -8,6 +8,7 @@ export * from './PackageSolutionJson';
 export * from './Project';
 export * from './ServeJson';
 export * from './TsConfigJson'
+export * from './TsFile';
 export * from './TsLintJson';
 export * from './VsCode';
 export * from './VsCodeExtensionsJson';

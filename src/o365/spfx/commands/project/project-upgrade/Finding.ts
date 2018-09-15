@@ -1,8 +1,9 @@
+import { Occurrence } from "./";
+
 export interface Finding {
   description: string;
-  file: string;
   id: string;
-  resolution: string;
+  occurrences: Occurrence[];
   resolutionType: string;
   severity: string;
   title: string;

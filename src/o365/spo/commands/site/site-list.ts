@@ -158,14 +158,14 @@ class SiteListCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online tenant admin site,
-      using the ${chalk.blue(commands.CONNECT)} command.
+      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online tenant admin site,
+      using the ${chalk.blue(commands.LOGIN)} command.
    
   Remarks:
 
-    To list modern sites, you have to first connect to a tenant admin site using the
-    ${chalk.blue(commands.CONNECT)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso-admin.sharepoint.com`)}.
-    If you are connected to a different site and will try to list the available sites,
+    To list modern sites, you have to first log in to a tenant admin site using the
+    ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso-admin.sharepoint.com`)}.
+    If you are logged in to a different site and will try to list the available sites,
     you will get an error.
 
     Using the ${chalk.blue('-f, --filter')} option you can specify which sites you want to retrieve.
@@ -178,13 +178,13 @@ class SiteListCommand extends SpoCommand {
   
   Examples:
   
-    List all modern team sites in the currently connected tenant
+    List all modern team sites in the tenant you're logged in to
       ${chalk.grey(config.delimiter)} ${commands.SITE_LIST}
 
-    List all modern team sites in the currently connected tenant
+    List all modern team sites in the tenant you're logged in to
       ${chalk.grey(config.delimiter)} ${commands.SITE_LIST} --type TeamSite
 
-    List all modern communication sites in the currently connected tenant
+    List all modern communication sites in the tenant you're logged in to
       ${chalk.grey(config.delimiter)} ${commands.SITE_LIST} --type CommunicationSite
 
     List all modern team sites that contain 'project' in the URL

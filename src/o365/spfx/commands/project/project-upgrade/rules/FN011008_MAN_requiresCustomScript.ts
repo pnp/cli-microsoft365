@@ -1,12 +1,19 @@
-import { Finding } from '../Finding';
+import { Finding, Occurrence } from '../';
 import { Project } from "../model";
-import * as path from 'path';
 import { ManifestRule } from "./ManifestRule";
 
 export class FN011008_MAN_requiresCustomScript extends ManifestRule {
   get id(): string {
     return 'FN011008';
   }
+
+  get title(): string {
+    return 'Client-side component manifest requiresCustomScript property';
+  }
+
+  get description(): string {
+    return 'In the manifest rename the safeWithCustomScriptDisabled property to requiresCustomScript and invert its value';
+  };
 
   get resolution(): string {
     return '';
@@ -22,13 +29,17 @@ export class FN011008_MAN_requiresCustomScript extends ManifestRule {
       return;
     }
 
+    const occurrences: Occurrence[] = [];
     project.manifests.forEach(manifest => {
       if (typeof manifest.safeWithCustomScriptDisabled !== 'undefined') {
-        const relativePath: string = path.relative(project.path, manifest.path);
-        this.addFindingWithCustomInfo('Client-side component manifest requiresCustomScript property', `In manifest ${relativePath} rename the safeWithCustomScriptDisabled property to requiresCustomScript and invert its value`, `{
+        this.addOccurrence(`{
   "requiresCustomScript": ${!manifest.safeWithCustomScriptDisabled}
-`, relativePath, findings);
+`, manifest.path, project.path, occurrences);
       }
     });
+
+    if (occurrences.length > 0) {
+      this.addFindingWithOccurrences(occurrences, findings);
+    }
   }
 }

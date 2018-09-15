@@ -88,7 +88,7 @@ describe('FN011006_MAN_listViewCommandSet_items', () => {
     };
     rule.visit(project, findings);
 
-    const resolution: any = JSON.parse(findings[0].resolution);
+    const resolution: any = JSON.parse(findings[0].occurrences[0].resolution);
     const command1: any = resolution.items.COMMAND_1;
     
     assert.notEqual(command1, undefined);

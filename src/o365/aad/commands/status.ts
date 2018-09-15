@@ -15,7 +15,7 @@ class AadStatusCommand extends Command {
   }
 
   public get description(): string {
-    return 'Shows Azure Active Directory Graph connection status';
+    return 'Shows Azure Active Directory Graph login status';
   }
 
   public commandAction(cmd: CommandInstance, args: {}, cb: (err?: any) => void): void {
@@ -42,10 +42,10 @@ class AadStatusCommand extends Command {
         }
         else {
           if (this.verbose) {
-            cmd.log('Not connected to AAD Graph');
+            cmd.log('Logged out from AAD Graph');
           }
           else {
-            cmd.log('Not connected');
+            cmd.log('Logged out');
           }
         }
         cb();
@@ -60,15 +60,15 @@ class AadStatusCommand extends Command {
     log(
       `  Remarks:
 
-    If you are connected to Azure Active Directory Graph, the ${chalk.blue(commands.STATUS)} command
+    If you are logged in to Azure Active Directory Graph, the ${chalk.blue(commands.STATUS)} command
     will show you information about the currently stored refresh and access
     token and the expiration date and time of the access token when run in debug
-    mode. If you are connected using a user name and password, it will also show
+    mode. If you are logged in using a user name and password, it will also show
     you the name of the user used to authenticate.
 
   Examples:
   
-    Show the information about the current connection to Azure Active Directory Graph
+    Show the information about the current login to Azure Active Directory Graph
       ${chalk.grey(config.delimiter)} ${commands.STATUS}
 `);
   }

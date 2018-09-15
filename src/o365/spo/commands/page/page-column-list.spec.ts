@@ -148,13 +148,13 @@ describe(commands.PAGE_COLUMN_LIST, () => {
     });
   });
 
-  it('aborts when not connected to a SharePoint site', (done) => {
+  it('aborts when not logged in to a SharePoint site', (done) => {
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Connect to a SharePoint Online site first')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
         done();
       }
       catch (e) {
@@ -181,11 +181,13 @@ describe(commands.PAGE_COLUMN_LIST, () => {
         assert(cmdInstanceLogSpy.calledWith([
           {
             "order": 1,
-            "factor": 6
+            "factor": 6,
+            "controls": 1
           },
           {
             "order": 2,
-            "factor": 6
+            "factor": 6,
+            "controls": 0
           }
         ]));
         done();
@@ -296,11 +298,13 @@ describe(commands.PAGE_COLUMN_LIST, () => {
         assert(cmdInstanceLogSpy.calledWith([
           {
             "order": 1,
-            "factor": 6
+            "factor": 6,
+            "controls": 1
           },
           {
             "order": 2,
-            "factor": 6
+            "factor": 6,
+            "controls": 0
           }
         ]));
         done();
@@ -330,10 +334,12 @@ describe(commands.PAGE_COLUMN_LIST, () => {
           {
             "order": 1,
             "factor": 6,
+            "controls": 1
           },
           {
             "order": 2,
-            "factor": 6
+            "factor": 6,
+            "controls": 0
           }
         ]));
         done();
@@ -364,12 +370,14 @@ describe(commands.PAGE_COLUMN_LIST, () => {
           "order": 1,
           "dataVersion": "1.0",
           "jsonData": "&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1&#125;&#125;",
+          "controls": 1
         },
         {
           "factor": 6,
           "order": 2,
           "dataVersion": "1.0",
           "jsonData": "&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;2,&quot;zoneIndex&quot;&#58;1&#125;&#125;",
+          "controls": 0
         }]));
         done();
       }
@@ -446,7 +454,7 @@ describe(commands.PAGE_COLUMN_LIST, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', sectipn: 1 } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1 } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Page home.aspx is not a modern page.')));
         done();

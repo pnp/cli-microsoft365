@@ -151,14 +151,14 @@ class SiteClassicListCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online tenant admin site,
-      using the ${chalk.blue(commands.CONNECT)} command.
+      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online tenant admin site,
+      using the ${chalk.blue(commands.LOGIN)} command.
    
   Remarks:
 
-    To list classic sites, you have to first connect to a tenant admin site using the
-    ${chalk.blue(commands.CONNECT)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso-admin.sharepoint.com`)}.
-    If you are connected to a different site and will try to list the available sites,
+    To list classic sites, you have to first log in to a tenant admin site using the
+    ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso-admin.sharepoint.com`)}.
+    If you are logged in to a different site and will try to list the available sites,
     you will get an error.
 
     Using the ${chalk.blue('-t, --webTemplate')} option you can specify which sites you want to retrieve.
@@ -174,13 +174,13 @@ class SiteClassicListCommand extends SpoCommand {
   
   Examples:
   
-    List all sites in the currently connected tenant
+    List all sites in the tenant you're logged in to
       ${chalk.grey(config.delimiter)} ${commands.SITE_CLASSIC_LIST}
 
-      List all sites (including OneDrive sites) in the currently connected tenant
+      List all sites (including OneDrive sites) in the tenant you're logged in to
       ${chalk.grey(config.delimiter)} ${commands.SITE_CLASSIC_LIST} --includeOneDriveSites    
 
-    List all classic team sites in the currently connected tenant
+    List all classic team sites in the tenant you're logged in to
       ${chalk.grey(config.delimiter)} ${commands.SITE_CLASSIC_LIST} --webTemplate STS#0
 
     List all classic project sites that contain 'project' in the URL

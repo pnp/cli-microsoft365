@@ -86,8 +86,8 @@ class SpoTenantAppCatalogUrlGetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online
-    tenant admin site, using the ${chalk.blue(commands.CONNECT)} command.
+      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online
+    tenant admin site, using the ${chalk.blue(commands.LOGIN)} command.
 
   Examples:
   

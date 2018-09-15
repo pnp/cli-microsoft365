@@ -132,14 +132,14 @@ class SpoContentTypeGetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online site using
-    the ${chalk.blue(commands.CONNECT)} command.
+      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site using
+    the ${chalk.blue(commands.LOGIN)} command.
         
   Remarks:
 
-    To retrieve information about a content type, you have to first connect to
-    a SharePoint site using the ${chalk.blue(commands.CONNECT)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
+    To retrieve information about a content type, you have to first log in to
+    a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
+    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
 
     If no content type with the specified is found in the site or the list, you
     will get the ${chalk.grey('Content type with ID 0x010012 not found')} error.

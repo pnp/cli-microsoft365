@@ -8,6 +8,7 @@ import Command, {
   CommandError
 } from './Command';
 import Utils from './Utils';
+import appInsights from './appInsights';
 const vorpal: Vorpal = require('./vorpal-init');
 
 class MockCommand1 extends Command {
@@ -39,7 +40,14 @@ class MockCommand1 extends Command {
     return true;
   }
 
-  public commandAction(): void {
+  public commandAction(cmd: CommandInstance, args: any, cb: (err?: any) => void): void {
+    this.showDeprecationWarning(cmd, 'mc1', this.name);
+
+    appInsights.trackEvent({
+      name: this.getUsedCommandName(cmd)
+    });
+
+    cb();
   }
 
   public commandHelp(args: any, log: (message: string) => void): void {
@@ -108,6 +116,13 @@ describe('Command', () => {
   let cancelSpy: sinon.SinonSpy;
   let helpSpy: sinon.SinonSpy;
   let typesSpy: sinon.SinonSpy;
+  let telemetry: any;
+
+  before(() => {
+    sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
+      telemetry = t;
+    });
+  });
 
   beforeEach(() => {
     actionSpy = sinon.spy(vcmd, 'action');
@@ -117,6 +132,7 @@ describe('Command', () => {
     cancelSpy = sinon.spy(vcmd, 'cancel');
     helpSpy = sinon.spy(vcmd, 'help');
     typesSpy = sinon.spy(vcmd, 'types');
+    telemetry = null;
   });
 
   afterEach(() => {
@@ -131,6 +147,10 @@ describe('Command', () => {
       vcmd.allowUnknownOptions
     ]);
   });
+
+  after(() => {
+    Utils.restore(appInsights.trackEvent);
+  })
 
   it('initiates command 1 with vorpal', () => {
     const cmd = new MockCommand1();
@@ -287,6 +307,9 @@ describe('Command', () => {
 
   it('displays error message when it\'s serialized in the error property', () => {
     const cmd = {
+      commandWrapper: {
+        command: 'command'
+      },
       log: (msg?: string) => { },
       prompt: () => { }
     };
@@ -304,6 +327,9 @@ describe('Command', () => {
 
   it('displays the raw error message when the serialized value from the error property is not an error object', () => {
     const cmd = {
+      commandWrapper: {
+        command: 'command'
+      },
       log: (msg?: string) => { },
       prompt: () => { }
     };
@@ -325,6 +351,9 @@ describe('Command', () => {
 
   it('displays the raw error message when the serialized value from the error property is not a JSON object', () => {
     const cmd = {
+      commandWrapper: {
+        command: 'command'
+      },
       log: (msg?: string) => { },
       prompt: () => { }
     };
@@ -338,6 +367,9 @@ describe('Command', () => {
 
   it('displays error message coming from ADALJS', () => {
     const cmd = {
+      commandWrapper: {
+        command: 'command'
+      },
       log: (msg?: string) => { },
       prompt: () => { }
     };
@@ -346,6 +378,81 @@ describe('Command', () => {
       error: { error_description: 'abc' }
     }, cmd, (err?: any) => {
       assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
+    });
+  });
+
+  it('shows deprecation warning when command executed using the deprecated name', () => {
+    const cmd = {
+      commandWrapper: {
+        command: 'mc1'
+      },
+      log: (msg?: string) => { },
+      prompt: () => { }
+    };
+    const cmdLogSpy: sinon.SinonSpy = sinon.spy(cmd, 'log');
+    const mock = new MockCommand1();
+    mock.commandAction(cmd, {}, (err?: any): void => {
+      assert(cmdLogSpy.calledWith(vorpal.chalk.yellow(`Command 'mc1' is deprecated. Please use 'Mock command' instead`)))
+    });
+  });
+
+  it('logs command name in the telemetry when command name used', (done) => {
+    const cmd = {
+      commandWrapper: {
+        command: 'Mock command'
+      },
+      log: (msg?: string) => { },
+      prompt: () => { }
+    };
+    const mock = new MockCommand1();
+    mock.commandAction(cmd, {}, (err?: any): void => {
+      try {
+        assert.equal(telemetry.name, 'Mock command');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('logs command alias in the telemetry when command alias used', (done) => {
+    const cmd = {
+      commandWrapper: {
+        command: 'mc1'
+      },
+      log: (msg?: string) => { },
+      prompt: () => { }
+    };
+    const mock = new MockCommand1();
+    mock.commandAction(cmd, {}, (err?: any): void => {
+      try {
+        assert.equal(telemetry.name, 'mc1');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('logs empty command name in telemetry when command called using something else than name or alias', (done) => {
+    const cmd = {
+      commandWrapper: {
+        command: 'foo'
+      },
+      log: (msg?: string) => { },
+      prompt: () => { }
+    };
+    const mock = new MockCommand1();
+    mock.commandAction(cmd, {}, (err?: any): void => {
+      try {
+        assert.equal(telemetry.name, '');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
   });
 });

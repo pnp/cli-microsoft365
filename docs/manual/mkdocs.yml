@@ -4,12 +4,12 @@ nav:
   - User Guide:
     - 'Installing the CLI': 'user-guide/installing-cli.md'
     - 'Using the CLI': 'user-guide/using-cli.md'
-    - 'Connecting to Office 365': 'user-guide/connecting-office-365.md'
+    - 'Logging in to Office 365': 'user-guide/connecting-office-365.md'
     - 'CLI output mode': 'user-guide/cli-output-mode.md'
   - Commands:
     - SharePoint Online (spo):
-      - connect: 'cmd/spo/connect.md'
-      - disconnect: 'cmd/spo/disconnect.md'
+      - login: 'cmd/spo/login.md'
+      - logout: 'cmd/spo/logout.md'
       - status: 'cmd/spo/status.md'
       - app:
         - app add: 'cmd/spo/app/app-add.md'
@@ -80,9 +80,11 @@ nav:
         - list list: 'cmd/spo/list/list-list.md'
         - list remove: 'cmd/spo/list/list-remove.md'
         - list set: 'cmd/spo/list/list-set.md'
+        - list webhook list: 'cmd/spo/list/list-webhook-list.md'
       - listitem:
         - listitem add: 'cmd/spo/listitem/listitem-add.md'
         - listitem get: 'cmd/spo/listitem/listitem-get.md'
+        - listitem list: 'cmd/spo/listitem/listitem-list.md'
         - listitem remove: 'cmd/spo/listitem/listitem-remove.md'
         - listitem set: 'cmd/spo/listitem/listitem-set.md'
       - navigation:
@@ -93,8 +95,10 @@ nav:
         - page add: 'cmd/spo/page/page-add.md'
         - page get: 'cmd/spo/page/page-get.md'
         - page list: 'cmd/spo/page/page-list.md'
+        - page remove: 'cmd/spo/page/page-remove.md'
         - page set: 'cmd/spo/page/page-set.md'
         - page clientsidewebpart add: 'cmd/spo/page/page-clientsidewebpart-add.md'
+        - page column get: 'cmd/spo/page/page-column-get.md'
         - page column list: 'cmd/spo/page/page-column-list.md'
         - page control get: 'cmd/spo/page/page-control-get.md'
         - page control list: 'cmd/spo/page/page-control-list.md'
@@ -121,6 +125,7 @@ nav:
         - site appcatalog remove: 'cmd/spo/site/site-appcatalog-remove.md'
         - site classic add: 'cmd/spo/site/site-classic-add.md'
         - site classic list: 'cmd/spo/site/site-classic-list.md'
+        - site classic remove: 'cmd/spo/site/site-classic-remove.md'
         - site classic set: 'cmd/spo/site/site-classic-set.md'
         - site o365group set: 'cmd/spo/site/site-o365group-set.md'
       - sitedesign:
@@ -146,6 +151,9 @@ nav:
         - storageentity set: 'cmd/spo/storageentity/storageentity-set.md'
       - tenant:
         - tenant appcatalogurl get: 'cmd/spo/tenant/tenant-appcatalogurl-get.md'
+        - tenant settings list: 'cmd/spo/tenant/tenant-settings-list.md'
+      - term:
+        - term group list: 'cmd/spo/term/term-group-list.md'
       - theme:
         - theme apply: 'cmd/spo/theme/theme-apply.md'
         - theme get: 'cmd/spo/theme/theme-get.md'
@@ -163,13 +171,15 @@ nav:
       - project:
         - project upgrade: 'cmd/spfx/project/project-upgrade.md'
     - Microsoft Graph (graph):
-      - connect: 'cmd/graph/connect.md'
-      - disconnect: 'cmd/graph/disconnect.md'
+      - login: 'cmd/graph/login.md'
+      - logout: 'cmd/graph/logout.md'
       - status: 'cmd/graph/status.md'
       - groupsetting:
         - groupsetting add: 'cmd/graph/groupsetting/groupsetting-add.md'
         - groupsetting get: 'cmd/graph/groupsetting/groupsetting-get.md'
         - groupsetting list: 'cmd/graph/groupsetting/groupsetting-list.md'
+        - groupsetting remove: 'cmd/graph/groupsetting/groupsetting-remove.md'
+        - groupsetting set: 'cmd/graph/groupsetting/groupsetting-set.md'
       - groupsettingtemplate:
         - groupsettingtemplate get: 'cmd/graph/groupsettingtemplate/groupsettingtemplate-get.md'
         - groupsettingtemplate list: 'cmd/graph/groupsettingtemplate/groupsettingtemplate-list.md'
@@ -189,17 +199,19 @@ nav:
         - user list: 'cmd/graph/user/user-list.md'
         - user sendmail: 'cmd/graph/user/user-sendmail.md'
     - Azure Management Service (azmgmt):
-      - connect: 'cmd/azmgmt/connect.md'
-      - disconnect: 'cmd/azmgmt/disconnect.md'
+      - login: 'cmd/azmgmt/login.md'
+      - logout: 'cmd/azmgmt/logout.md'
       - status: 'cmd/azmgmt/status.md'
       - flow:
         - flow environment get: 'cmd/azmgmt/flow/flow-environment-get.md'
         - flow environment list: 'cmd/azmgmt/flow/flow-environment-list.md'
         - flow get: 'cmd/azmgmt/flow/flow-get.md'
         - flow list: 'cmd/azmgmt/flow/flow-list.md'
+        - flow run get: 'cmd/azmgmt/flow/flow-run-get.md'
+        - flow run list: 'cmd/azmgmt/flow/flow-run-list.md'
     - Azure Active Directory Graph (aad):
-      - connect: 'cmd/aad/connect.md'
-      - disconnect: 'cmd/aad/disconnect.md'
+      - login: 'cmd/aad/login.md'
+      - logout: 'cmd/aad/logout.md'
       - status: 'cmd/aad/status.md'
       - oauth2grant:
         - oauth2grant add: 'cmd/aad/oauth2grant/oauth2grant-add.md'

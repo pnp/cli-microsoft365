@@ -48,14 +48,9 @@ class SpoPageControlGetCommand extends SpoCommand {
         const control: ClientSidePart | null = clientSidePage.findControlById(args.options.id);
 
         if (control) {
-          // remove the column property to be able to serialize the object to JSON
-          delete control.column;
+          const isJSONOutput = args.options.output === 'json';
 
-          if (args.options.output !== 'json') {
-            (control as any).controlType = SpoPageControlGetCommand.getControlTypeDisplayName((control as any).controlType);
-          }
-
-          cmd.log(control);
+          cmd.log(Page.getControlsInformation(control, isJSONOutput));
 
           if (this.verbose) {
             cmd.log(vorpal.chalk.green('DONE'));
@@ -69,19 +64,6 @@ class SpoPageControlGetCommand extends SpoCommand {
 
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
-  }
-
-  private static getControlTypeDisplayName(controlType: number): string {
-    switch (controlType) {
-      case 0:
-        return 'Empty column';
-      case 3:
-        return 'Client-side web part';
-      case 4:
-        return 'Client-side text';
-      default:
-        return '' + controlType;
-    }
   }
 
   public options(): CommandOption[] {
@@ -130,14 +112,14 @@ class SpoPageControlGetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online site
-    using the ${chalk.blue(commands.CONNECT)} command.
+      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site
+    using the ${chalk.blue(commands.LOGIN)} command.
         
   Remarks:
 
     To get information about a control on a modern page, you have to first
-    connect to a SharePoint site using the ${chalk.blue(commands.CONNECT)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
+    log in to a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
+    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
 
     If the specified ${chalk.grey('name')} doesn't refer to an existing modern page, you will get
     a ${chalk.grey('File doesn\'t exists')} error.

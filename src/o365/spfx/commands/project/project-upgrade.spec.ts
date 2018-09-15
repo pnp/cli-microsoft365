@@ -17,6 +17,10 @@ describe(commands.PROJECT_UPGRADE, () => {
   let cmdInstance: any;
   let trackEvent: any;
   let telemetry: any;
+  let packagesDevExact: string[];
+  let packagesDepExact: string[];
+  let packagesDepUn: string[];
+  let packagesDevUn: string[];
 
   before(() => {
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
@@ -34,6 +38,10 @@ describe(commands.PROJECT_UPGRADE, () => {
     };
     telemetry = null;
     (command as any).allFindings = [];
+    packagesDevExact = [];
+    packagesDepExact = [];
+    packagesDepUn = [];
+    packagesDevUn = [];
   });
 
   afterEach(() => {
@@ -507,6 +515,104 @@ describe(commands.PROJECT_UPGRADE, () => {
     const project: Project = getProject('./');
     assert.equal(typeof ((project.vsCode) as VsCode).settingsJson, 'undefined');
   });
+
+  it(`doesn't return any dependencies from npm`, () => {
+    (command as any).mapNpmCommand('npm', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
+    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
+    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
+  });
+
+  it(`returns 1 exact dependency to be installed for npm i -SE`, () => {
+    (command as any).mapNpmCommand('npm i package -SE', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
+    assert.equal(packagesDepExact.length, 1, 'Incorrect number of dev deps to install');
+    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
+  });
+
+  it(`returns 1 exact dev dependency to be installed for npm i -DE`, () => {
+    (command as any).mapNpmCommand('npm i package -DE', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    assert.equal(packagesDevExact.length, 1, 'Incorrect number of deps to install');
+    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
+    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
+  });
+
+  it(`doesn't return any dependencies for npm i -S`, () => {
+    (command as any).mapNpmCommand('npm i package -S', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
+    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
+    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
+  });
+
+  it(`doesn't return any dependencies for npm i -D`, () => {
+    (command as any).mapNpmCommand('npm i package -D', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
+    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
+    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
+  });
+
+  it(`doesn't return any dependencies for npm un -SE`, () => {
+    (command as any).mapNpmCommand('npm un package -SE', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
+    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
+    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
+  });
+
+  it(`doesn't return any dependencies for npm un -DE`, () => {
+    (command as any).mapNpmCommand('npm un package -DE', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
+    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
+    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
+  });
+
+  it(`returns 1 dependency to uninstall for npm un -S`, () => {
+    (command as any).mapNpmCommand('npm un package -S', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
+    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
+    assert.equal(packagesDepUn.length, 1, 'Incorrect number of deps to uninstall');
+    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
+  });
+
+  it(`returns 1 dev dependency to uninstall for npm un -D`, () => {
+    (command as any).mapNpmCommand('npm un package -D', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
+    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
+    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.equal(packagesDevUn.length, 1, 'Incorrect number of dev deps to uninstall');
+  });
+
+  it(`returns no commands to run when no dependencies found`, () => {
+    const commands: string[] = (command as any).reduceNpmCommand([], [], [], []);
+    assert.equal(JSON.stringify(commands), JSON.stringify([]));
+  });
+
+  it(`returns command to install dependency for 1 dep`, () => {
+    const commands: string[] = (command as any).reduceNpmCommand(['package'], [], [], []);
+    assert.equal(JSON.stringify(commands), JSON.stringify(['npm i package -SE']));
+  });
+
+  it(`returns command to install dev dependency for 1 dev dep`, () => {
+    const commands: string[] = (command as any).reduceNpmCommand([], ['package'], [], []);
+    assert.equal(JSON.stringify(commands), JSON.stringify(['npm i package -DE']));
+  });
+
+  it(`returns command to uninstall dependency for 1 dep`, () => {
+    const commands: string[] = (command as any).reduceNpmCommand([], [], ['package'], []);
+    assert.equal(JSON.stringify(commands), JSON.stringify(['npm un package -S']));
+  });
+
+  it(`returns command to uninstall dev dependency for 1 dev dep`, () => {
+    const commands: string[] = (command as any).reduceNpmCommand([], [], [], ['package']);
+    assert.equal(JSON.stringify(commands), JSON.stringify(['npm un package -D']));
+  });
+
   it('e2e: shows correct number of findings for upgrading no framework web part 1.0.0 project to 1.0.1', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-100-webpart-nolib'));
 
@@ -1154,8 +1260,88 @@ describe(commands.PROJECT_UPGRADE, () => {
     });
   });
 
+  it('e2e: shows correct number of findings for upgrading no framework web part 1.5.1 project to 1.6.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-151-webpart-nolib'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.6.0' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 15);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading no framework web part 1.5.1 project using MSGraphClient to 1.6.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-151-webpart-nolib-graph'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.6.0' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 17);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading no framework web part 1.5.1 project using AadHttpClient to 1.6.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-151-webpart-nolib-aad'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.6.0' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 16);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading react web part 1.5.1 project to 1.6.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-151-webpart-react'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.6.0' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 15);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading react web part 1.5.1 project using MSGraphClient to 1.6.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-151-webpart-react-graph'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.6.0' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 20);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading application customizer 1.5.1 project to 1.6.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-151-applicationcustomizer'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.6.0' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 15);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading list view command set 1.5.1 project to 1.6.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-151-listviewcommandset'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.6.0' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 15);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading field customizer react 1.5.1 project to 1.6.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-151-fieldcustomizer-react'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.6.0' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 14);
+    });
+  });
+
   it('shows all information with output format json', () => {
-    sinon.stub(command as any, 'getProjectVersion').callsFake(_ => '1.4.1');
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-151-fieldcustomizer-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { output: 'json' } }, (err?: any) => {
@@ -1164,10 +1350,10 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('returns markdown report with output format md', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-134-webpart-nolib'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-151-webpart-react-graph'));
 
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { output: 'md', toVersion: '1.4.0' } }, (err?: any) => {
+    cmdInstance.action({ options: { output: 'md', toVersion: '1.6.0' } }, (err?: any) => {
       assert(log[0].indexOf('## Findings') > -1);
     });
   });

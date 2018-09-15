@@ -159,8 +159,8 @@ class SpoHubSiteRightsGrantCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online tenant admin
-    site using the ${chalk.blue(commands.CONNECT)} command.
+      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online tenant admin
+    site using the ${chalk.blue(commands.LOGIN)} command.
         
   Remarks:
 
@@ -168,10 +168,10 @@ class SpoHubSiteRightsGrantCommand extends SpoCommand {
     in preview and is subject to change once the API reached general
     availability.
 
-    To grant permissions to join the hub site, you have to first connect
-    to a tenant admin site using the ${chalk.blue(commands.CONNECT)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso-admin.sharepoint.com`)}.
-    If you are connected to a different site and will try to grant permissions
+    To grant permissions to join the hub site, you have to first log in
+    to a tenant admin site using the ${chalk.blue(commands.LOGIN)} command,
+    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso-admin.sharepoint.com`)}.
+    If you are logged in to a different site and will try to grant permissions
     to join the hub site, you will get an error.
 
   Examples:

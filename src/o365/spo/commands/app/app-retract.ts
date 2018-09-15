@@ -204,13 +204,13 @@ class AppDeployCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.APP_RETRACT).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint site,
-        using the ${chalk.blue(commands.CONNECT)} command.
+      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint site,
+        using the ${chalk.blue(commands.LOGIN)} command.
 
   Remarks:
   
-    To retract an app from the tenant app catalog, you have to first connect to a SharePoint site
-    using the ${chalk.blue(commands.CONNECT)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
+    To retract an app from the tenant app catalog, you have to first log in to a SharePoint site
+    using the ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
 
     If you don't specify the URL of the tenant app catalog site using the ${chalk.grey('appCatalogUrl')} option,
     the CLI will try to determine its URL automatically. This will be done using SharePoint Search.

@@ -39,7 +39,10 @@ export class FN003004_CFG_entries extends Rule {
     const entries: Entry[] | undefined = project.configJson.entries;
 
     if (entries !== undefined) {
-      this.addFindingWithCustomInfo(this.title, this.description, JSON.stringify({ entries: entries }, null, 2), this.file, findings);
+      this.addFindingWithOccurrences([{
+        file: this.file,
+        resolution: JSON.stringify({ entries: entries }, null, 2)
+      }], findings);
     }
   }
 }

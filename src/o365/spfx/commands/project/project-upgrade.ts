@@ -9,7 +9,8 @@ import * as fs from 'fs';
 import { Finding, Utils } from './project-upgrade/';
 import { Rule } from './project-upgrade/rules/Rule';
 import { EOL } from 'os';
-import { Project, Manifest } from './project-upgrade/model';
+import { Project, Manifest, TsFile } from './project-upgrade/model';
+import { FindingToReport } from './project-upgrade/FindingToReport';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -41,7 +42,8 @@ class SpfxProjectUpgradeCommand extends Command {
     '1.4.0',
     '1.4.1',
     '1.5.0',
-    '1.5.1'
+    '1.5.1',
+    '1.6.0'
   ];
 
   public get name(): string {
@@ -127,17 +129,34 @@ class SpfxProjectUpgradeCommand extends Command {
       return i === firstFindingPos;
     });
 
+    // flatten
+    const findingsToReport: FindingToReport[] = [].concat.apply([], findings.map(f => {
+      return f.occurrences.map(o => {
+        return {
+          description: f.description,
+          id: f.id,
+          file: o.file,
+          position: o.position,
+          resolution: o.resolution,
+          resolutionType: f.resolutionType,
+          severity: f.severity,
+          title: f.title
+        };
+      });
+    }));
+
     switch (args.options.output) {
       case 'json':
-        cmd.log(findings);
+        cmd.log(findingsToReport);
         break;
       case 'md':
-        cmd.log(this.getMdReport(findings));
+        cmd.log(this.getMdReport(findingsToReport));
         break;
       default:
-        cmd.log(findings.map(f => {
+        cmd.log(findingsToReport.map(f => {
           return {
             id: f.id,
+            file: f.file,
             resolution: f.resolution
           };
         }));
@@ -278,14 +297,28 @@ class SpfxProjectUpgradeCommand extends Command {
       catch { }
     }
 
+    const srcFiles: string[] = SpfxProjectUpgradeCommand.readdirR(path.join(projectRootPath, 'src')) as string[];
+    const tsFiles: string[] = srcFiles.filter(f => f.endsWith('.ts') || f.endsWith('.tsx'));
+    project.tsFiles = tsFiles.map(f => new TsFile(f));
+
     return project;
   }
 
-  private getMdReport(findings: Finding[]): string {
+  private static readdirR(dir: string): string | string[] {
+    return fs.statSync(dir).isDirectory()
+      ? Array.prototype.concat(...fs.readdirSync(dir).map(f => SpfxProjectUpgradeCommand.readdirR(path.join(dir, f))))
+      : dir;
+  }
+
+  private getMdReport(findings: FindingToReport[]): string {
     const commandsToExecute: string[] = [];
     const findingsToReport: string[] = [];
     const modificationPerFile: any = [];
     const modificationTypePerFile: any = [];
+    const packagesDevExact: string[] = [];
+    const packagesDepExact: string[] = [];
+    const packagesDepUn: string[] = [];
+    const packagesDevUn: string[] = [];
 
     findings.forEach(f => {
       let resolution: string = '';
@@ -299,17 +332,11 @@ ${f.resolution}
 `;
           break;
         case 'json':
-          resolution = `In file [${f.file}](${f.file}) update the code as follows:
-
-\`\`\`json
-${f.resolution}
-\`\`\`
-`;
-          break;
         case 'js':
+        case 'ts':
           resolution = `In file [${f.file}](${f.file}) update the code as follows:
 
-\`\`\`js
+\`\`\`${f.resolutionType}
 ${f.resolution}
 \`\`\`
 `;
@@ -317,9 +344,13 @@ ${f.resolution}
       }
 
       if (f.resolutionType === 'cmd') {
-        commandsToExecute.push(f.resolution);
-      }
-      else {
+        if (f.resolution.indexOf('npm') !== -1) {
+          this.mapNpmCommand(f.resolution, packagesDevExact,
+            packagesDepExact, packagesDepUn, packagesDevUn);
+        } else {
+          commandsToExecute.push(f.resolution);
+        }
+      } else {
         if (!modificationPerFile[f.file]) {
           modificationPerFile[f.file] = [];
         }
@@ -337,10 +368,13 @@ ${f.resolution}
         EOL,
         resolution,
         EOL,
-        `File: [${f.file}](${f.file})`, EOL,
+        `File: [${f.file}${(f.position ? `:${f.position.line}:${f.position.character}` : '')}](${f.file})`, EOL,
         EOL
       );
     });
+
+    const mainNpmCommands: string[] = this.reduceNpmCommand(
+      packagesDepExact, packagesDevExact, packagesDepUn, packagesDevUn);
 
     const s: string[] = [
       `# Upgrade project ${path.posix.basename(this.projectRootPath as string)} to v${this.toVersion}`, EOL,
@@ -357,7 +391,7 @@ ${f.resolution}
       '### Execute script', EOL,
       EOL,
       '```sh', EOL,
-      commandsToExecute.join(EOL), EOL,
+      commandsToExecute.filter((command) => command.indexOf('npm') === -1).concat(mainNpmCommands).join(EOL), EOL,
       '```', EOL,
       EOL,
       '### Modify files', EOL,
@@ -373,6 +407,58 @@ ${f.resolution}
     ];
 
     return s.join('').trim();
+  }
+
+  private mapNpmCommand(command: string, packagesDevExact: string[],
+    packagesDepExact: string[], packagesDepUn: string[], packagesDevUn: string[]): void {
+    const npmReduceRegex: RegExp = /npm\s+(i|un)\s+([\w\d\@\/\.-]+)\s+(-DE|-SE|-S|-D)?/gm;
+    const npmReduceMatch: RegExpExecArray | null = npmReduceRegex.exec(command);
+    const packageNameGroupId: number = 2;
+    const installCommandGroupId: number = 1;
+    const dependencyCategoryGroupId: number = 3;
+    if (!npmReduceMatch) {
+      return;
+    }
+
+    if (npmReduceMatch[installCommandGroupId] === 'i') {
+      if (npmReduceMatch[dependencyCategoryGroupId] === '-SE') {
+        packagesDepExact.push(npmReduceMatch[packageNameGroupId]);
+      }
+      else if (npmReduceMatch[dependencyCategoryGroupId] === '-DE') {
+        packagesDevExact.push(npmReduceMatch[packageNameGroupId]);
+      }
+    }
+    else {
+      if (npmReduceMatch[dependencyCategoryGroupId] === '-S') {
+        packagesDepUn.push(npmReduceMatch[packageNameGroupId]);
+      }
+      else if (npmReduceMatch[dependencyCategoryGroupId] === '-D') {
+        packagesDevUn.push(npmReduceMatch[packageNameGroupId]);
+      }
+    }
+  }
+
+  private reduceNpmCommand(packagesDepExact: string[], packagesDevExact: string[],
+    packagesDepUn: string[], packagesDevUn: string[]): string[] {
+    const commandsToExecute: string[] = [];
+
+    if (packagesDepExact.length > 0) {
+      commandsToExecute.push(`npm i ${packagesDepExact.join(' ')} -SE`);
+    }
+
+    if (packagesDevExact.length > 0) {
+      commandsToExecute.push(`npm i ${packagesDevExact.join(' ')} -DE`);
+    }
+
+    if (packagesDepUn.length > 0) {
+      commandsToExecute.push(`npm un ${packagesDepUn.join(' ')} -S`);
+    }
+
+    if (packagesDevUn.length > 0) {
+      commandsToExecute.push(`npm un ${packagesDevUn.join(' ')} -D`);
+    }
+
+    return commandsToExecute;
   }
 
   private getProjectRoot(folderPath: string): string | null {
@@ -450,7 +536,7 @@ ${f.resolution}
     The ${this.name} command helps you upgrade your SharePoint Framework
     project to the specified version. If no version is specified, the command
     will upgrade to the latest version of the SharePoint Framework it supports
-    (v1.5.1).
+    (v1.6.0).
 
     This command doesn't change your project files. Instead, it gives you
     a report with all steps necessary to upgrade your project to the specified
@@ -462,7 +548,7 @@ ${f.resolution}
 
     Using this command you can upgrade SharePoint Framework projects built using
     versions: 1.0.0, 1.0.1, 1.0.2, 1.1.0, 1.1.1, 1.1.3, 1.2.0, 1.3.0, 1.3.1,
-    1.3.2, 1.3.4, 1.4.0, 1.4.1, 1.5.0 and 1.5.1.
+    1.3.2, 1.3.4, 1.4.0, 1.4.1, 1.5.0, 1.5.1 and 1.6.0.
 
   Examples:
   

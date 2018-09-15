@@ -1,18 +1,18 @@
 # Authorization and access tokens
 
-Commands provided with the Office 365 CLI manipulate different settings of Office 365. Before you can execute any of the commands in the CLI, you have to connect to the Office 365 service corresponding to your command, such as SharePoint or Microsoft Graph.
+Commands provided with the Office 365 CLI manipulate different settings of Office 365. Before you can execute any of the commands in the CLI, you have to log in to the Office 365 service corresponding to your command, such as SharePoint or Microsoft Graph.
 
 ## TL;DR
 
 Use `Auth.ensureAccessToken` when:
 
-- the URL of the service to which you are connected and the URL of the API you're communicating with are the same, eg. you're connected to AAD Graph at `https://graph.windows.net` and you're calling `https://graph.windows.net/myorganization/servicePrincipals` or you're connected to SharePoint tenant admin site at `https://contoso-admin.sharepoint.com` and you're calling the tenant admin API at `https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery`
+- the URL of the service to which you are logged in and the URL of the API you're communicating with are the same, eg. you're connected to AAD Graph at `https://graph.windows.net` and you're calling `https://graph.windows.net/myorganization/servicePrincipals` or you're connected to SharePoint tenant admin site at `https://contoso-admin.sharepoint.com` and you're calling the tenant admin API at `https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery`
 - you want to renew the refresh token persisted in the Office 365 CLI
 
 Use `Auth.getAccessToken` when:
 
-- the URL of the service to which you are connected and the URL of the API you're calling are different, eg. you're connected to a SharePoint Online tenant admin site at `https://contoso-admin.sharepoint.com`, but you're calling `https://contoso.sharepoint.com/sites/team/_api/web/tenantappcatalog/AvailableApps/GetById('cd807889-9107-416e-88e4-7575789ab35c')/install` to install an app on a regular SharePoint site
-- you're obtaining access token for a service different than the one to which you are connected and don't want to break the existing connection
+- the URL of the service to which you are logged in and the URL of the API you're calling are different, eg. you're connected to a SharePoint Online tenant admin site at `https://contoso-admin.sharepoint.com`, but you're calling `https://contoso.sharepoint.com/sites/team/_api/web/tenantappcatalog/AvailableApps/GetById('cd807889-9107-416e-88e4-7575789ab35c')/install` to install an app on a regular SharePoint site
+- you're obtaining access token for a service different than the one to which you are logged in and don't want to break the existing connection
 
 ## Authorization in the Office 365 CLI
 
@@ -52,7 +52,7 @@ Office 365 CLI requires the following permissions to Office 365 services:
 
 ### Access and refresh tokens in the Office 365 CLI
 
-After completing the OAuth flow, the CLI receives from Azure Active Directory a refresh- and an access token. Each web request to Office 365 APIs contains the access token which authorizes the Office 365 CLI to execute the particular operation. When the access token expires, the CLI uses the refresh token to obtain a new access token. When the refresh token expires, the user has to reconnect to Office 365 to obtain a new refresh token.
+After completing the OAuth flow, the CLI receives from Azure Active Directory a refresh- and an access token. Each web request to Office 365 APIs contains the access token which authorizes the Office 365 CLI to execute the particular operation. When the access token expires, the CLI uses the refresh token to obtain a new access token. When the refresh token expires, the user has to reauthenticate to Office 365 to obtain a new refresh token.
 
 ## Services and commands
 
@@ -60,7 +60,7 @@ Each command in the Office 365 CLI belongs to a service, for example the [spo si
 
 ## Communicating with Office 365
 
-Before a command can connect to Office 365, it requires a valid access token. Office 365 CLI offers you two methods to obtain a valid access token: [Auth.ensureAccessToken](https://github.com/pnp/office365-cli/blob/8b4ede874923fbe5fd84ebe79dc20206da18a529/src/Auth.ts#L62-L214) and [Auth.getAccessToken](https://github.com/pnp/office365-cli/blob/8b4ede874923fbe5fd84ebe79dc20206da18a529/src/Auth.ts#L216-L255). While the methods seem similar, they work differently and are meant for different purposes.
+Before a command can log in to Office 365, it requires a valid access token. Office 365 CLI offers you two methods to obtain a valid access token: [Auth.ensureAccessToken](https://github.com/pnp/office365-cli/blob/8b4ede874923fbe5fd84ebe79dc20206da18a529/src/Auth.ts#L62-L214) and [Auth.getAccessToken](https://github.com/pnp/office365-cli/blob/8b4ede874923fbe5fd84ebe79dc20206da18a529/src/Auth.ts#L216-L255). While the methods seem similar, they work differently and are meant for different purposes.
 
 ### Refresh access token for the current resource
 
@@ -68,7 +68,7 @@ If you're building a command that operates on the same URL, as the service to wh
 
 For example: you're building a command that retrieves the list of service principals from the Azure Active Directory ([aad sp get](../cmd/aad/sp/sp-get.md)). The command uses the Azure Active Directory Graph API (`https://graph.windows.net`) for this. Since the resource URL of the AAD Graph service (`https://graph.windows.net`) and the URL of the API that the command has to call (`https://graph.windows.net/myorganization/servicePrincipals`) are both located on the same domain `https://graph.windows.net`, you should call the `Auth.ensureAccessToken` method to obtain a valid access token for the AAD Graph service, before calling the API.
 
-As another example, let's take a method that communicates with the SharePoint Online tenant admin API to set a tenant property ([spo storageentity set](../cmd/spo/storageentity/storageentity-set.md)). While using the [spo connect](../cmd/spo/connect.md) command, users can connect to any SharePoint site, the _spo storageentity set_ command requires the user to be connected to the SharePoint tenant admin site. As a result, both the URL of the service, to which the user is connected (`https://contoso-admin.sharepoint.com`) and the URL of the API used by the service (`https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery`) are located on the same domain `https://contoso-admin.sharepoint.com`, which is why you should call the `Auth.ensureAccessToken` method to obtain a valid access for the SharePoint Online tenant admin site, before calling the API.
+As another example, let's take a method that communicates with the SharePoint Online tenant admin API to set a tenant property ([spo storageentity set](../cmd/spo/storageentity/storageentity-set.md)). While using the [spo login](../cmd/spo/login.md) command, users can log in to any SharePoint site, the _spo storageentity set_ command requires the user to be connected to the SharePoint tenant admin site. As a result, both the URL of the service, to which the user is connected (`https://contoso-admin.sharepoint.com`) and the URL of the API used by the service (`https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery`) are located on the same domain `https://contoso-admin.sharepoint.com`, which is why you should call the `Auth.ensureAccessToken` method to obtain a valid access for the SharePoint Online tenant admin site, before calling the API.
 
 ### Obtain a valid access token for a different resource
 
@@ -78,9 +78,9 @@ If you're building a command that allows users to specify a URL on which the ope
 
 ## Why two different methods to get tokens
 
-In the Office 365 CLI, connecting to Office 365 services is interactive and requires user input. If commands relied on context information from the site, to which users are connected, it would be impossible to build scripts using the Office 365 CLI commands.
+In the Office 365 CLI, logging in to Office 365 services is interactive and requires user input. If commands relied on context information from the site, to which users are logged in, it would be impossible to build scripts using the Office 365 CLI commands.
 
-Some SharePoint commands require to be executed in the context of the tenant admin site. Some commands additionally require specifying tenant information. For performance reasons, this information is retrieved only initially, when connecting to SharePoint, if the specified site to connect to is a tenant admin site. Because tenant information doesn't change, there is no point in retrieving it on every call to SharePoint. If users would first connect to a regular SharePoint site, and would then switch to the tenant admin site, the tenant information would be missing and the commands requiring it would fail.
+Some SharePoint commands require to be executed in the context of the tenant admin site. Some commands additionally require specifying tenant information. For performance reasons, this information is retrieved only initially, when logging in to SharePoint, if the specified site to log in to is a tenant admin site. Because tenant information doesn't change, there is no point in retrieving it on every call to SharePoint. If users would first log in to a regular SharePoint site, and would then switch to the tenant admin site, the tenant information would be missing and the commands requiring it would fail.
 
 ## Rules of thumb
 

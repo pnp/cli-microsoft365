@@ -15,7 +15,7 @@ class GraphStatusCommand extends Command {
   }
 
   public get description(): string {
-    return 'Shows Microsoft Graph connection status';
+    return 'Shows Microsoft Graph login status';
   }
 
   public commandAction(cmd: CommandInstance, args: {}, cb: (err?: any) => void): void {
@@ -42,10 +42,10 @@ class GraphStatusCommand extends Command {
         }
         else {
           if (this.verbose) {
-            cmd.log('Not connected to Microsoft Graph');
+            cmd.log('Logged out from Microsoft Graph');
           }
           else {
-            cmd.log('Not connected');
+            cmd.log('Logged out');
           }
         }
         cb();
@@ -60,14 +60,14 @@ class GraphStatusCommand extends Command {
     log(
       `  Remarks:
 
-    If you are connected to the Microsoft Graph, the ${chalk.blue(commands.STATUS)} command
+    If you are logged in to the Microsoft Graph, the ${chalk.blue(commands.STATUS)} command
     will show you information about the currently stored refresh and access
     token and the expiration date and time of the access token when run in debug
     mode.
 
   Examples:
   
-    Show the information about the current connection to the Microsoft Graph
+    Show the information about the current login to the Microsoft Graph
       ${chalk.grey(config.delimiter)} ${commands.STATUS}
 `);
   }

@@ -125,14 +125,14 @@ class AppInstallCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.APP_INSTALL).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online site,
-      using the ${chalk.blue(commands.CONNECT)} command.
+      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
+      using the ${chalk.blue(commands.LOGIN)} command.
 
   Remarks:
   
-    To install an app from the tenant app catalog in a site, you have to first connect
-    to a SharePoint site using the ${chalk.blue(commands.CONNECT)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso.sharepoint.com`)}.
+    To install an app from the tenant app catalog in a site, you have to first log in
+    to a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
+    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
 
     If the app with the specified ID doesn't exist in the tenant app catalog, the command will fail
     with an error. Before you can install app in a site, you have to add it to the tenant app catalog

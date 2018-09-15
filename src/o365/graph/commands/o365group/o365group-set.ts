@@ -367,13 +367,13 @@ class GraphO365GroupSetCommand extends GraphCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, connect to the Microsoft Graph,
-    using the ${chalk.blue(commands.CONNECT)} command.
+      `  ${chalk.yellow('Important:')} before using this command, log in to the Microsoft Graph,
+    using the ${chalk.blue(commands.LOGIN)} command.
 
   Remarks:
   
-    To update an Office 365 Group, you have to first connect to the Microsoft
-    Graph using the ${chalk.blue(commands.CONNECT)} command.
+    To update an Office 365 Group, you have to first log in to the Microsoft
+    Graph using the ${chalk.blue(commands.LOGIN)} command.
 
     When updating group's owners and members, the command will add newly
     specified users to the previously set owners and members. The previously

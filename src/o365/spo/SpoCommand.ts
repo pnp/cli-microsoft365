@@ -1,5 +1,4 @@
 import Command, { CommandAction, CommandError } from '../../Command';
-import appInsights from '../../appInsights';
 import auth from './SpoAuth';
 import { SearchResponse } from './spo';
 import * as request from 'request-promise-native';
@@ -17,24 +16,16 @@ export default abstract class SpoCommand extends Command {
       auth
         .restoreAuth()
         .then((): void => {
-          cmd._debug = args.options.debug || false;
-          cmd._verbose = cmd._debug || args.options.verbose || false;
-
-          appInsights.trackEvent({
-            name: cmd.getCommandName(),
-            properties: cmd.getTelemetryProperties(args)
-          });
-          appInsights.flush();
+          cmd.initAction(args);
 
           if (!auth.site.connected) {
-            // this.log(new CommandError('Connect to a SharePoint Online site first'));
-            cb(new CommandError('Connect to a SharePoint Online site first'));
+            cb(new CommandError('Log in to a SharePoint Online site first'));
             return;
           }
 
           if (cmd.requiresTenantAdmin()) {
             if (!auth.site.isTenantAdminSite()) {
-              cb(new CommandError(`${auth.site.url} is not a tenant admin site. Connect to your tenant admin site and try again`));
+              cb(new CommandError(`${auth.site.url} is not a tenant admin site. Log in to your tenant admin site and try again`));
               return;
             }
           }

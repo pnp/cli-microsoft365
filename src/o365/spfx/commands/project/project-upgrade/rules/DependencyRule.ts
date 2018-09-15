@@ -18,8 +18,8 @@ export abstract class DependencyRule extends Rule {
 
   get resolution(): string {
     return this.add ?
-      `npm i ${this.packageName}@${this.packageVersion} --save-exact${(this.isDevDep ? ' -D' : '')}` :
-      `npm uninstall ${this.packageName}`;
+      `npm i ${this.packageName}@${this.packageVersion} ${(this.isDevDep ? '-DE' : '-SE')}` :
+      `npm un ${this.packageName} ${(this.isDevDep ? '-D' : '-S')}`;
   };
 
   get resolutionType(): string {
@@ -62,7 +62,10 @@ export abstract class DependencyRule extends Rule {
       }
       else {
         if (!this.isOptional || this.customCondition(project)) {
-          this.addFindingWithCustomInfo(this.packageName, this.description.replace('Upgrade', 'Install'), this.resolution, this.file, findings);
+          this.addFindingWithCustomInfo(this.packageName, this.description.replace('Upgrade', 'Install'), [{
+            file: this.file,
+            resolution: this.resolution
+          }], findings);
         }
       }
     }

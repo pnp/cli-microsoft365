@@ -8,6 +8,14 @@ class MockManifestRule extends ManifestRule {
     return 'FN000000';
   }
 
+  get title(): string {
+    return 'Mock rule';
+  }
+
+  get description(): string {
+    return 'Mock manifest rule';
+  }
+
   get resolution(): string {
     return '';
   }
@@ -26,14 +34,6 @@ describe('ManifestRule', () => {
   beforeEach(() => {
     rule = new MockManifestRule();
   })
-
-  it('rule has empty title', () => {
-    assert.equal('', rule.title);
-  });
-
-  it('rule has empty description', () => {
-    assert.equal('', rule.description);
-  });
 
   it('rule has empty file', () => {
     assert.equal('', rule.file);

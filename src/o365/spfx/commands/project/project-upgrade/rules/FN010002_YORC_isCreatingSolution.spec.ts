@@ -10,7 +10,15 @@ describe('FN010002_YORC_isCreatingSolution', () => {
   beforeEach(() => {
     findings = [];
     rule = new FN010002_YORC_isCreatingSolution(true);
-  })
+  });
+
+  it('doesn\'t return notification if no .yo-rc.json found', () => {
+    const project: Project = {
+      path: '/usr/tmp'
+    };
+    rule.visit(project, findings);
+    assert.equal(findings.length, 0);
+  });
 
   it('doesn\'t return notification if isCreatingSolution is already up-to-date', () => {
     const project: Project = {

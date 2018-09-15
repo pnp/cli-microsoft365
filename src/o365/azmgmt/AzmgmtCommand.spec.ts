@@ -26,6 +26,9 @@ describe('AzmgmtCommand', () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
     const command = new MockCommand();
     const cmdInstance = {
+      commandWrapper: {
+        command: 'azmgmt command'
+      },
       log: (msg: any) => {},
       prompt: () => {},
       action: command.action()
@@ -48,6 +51,9 @@ describe('AzmgmtCommand', () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
     const command = new MockCommand();
     const cmdInstance = {
+      commandWrapper: {
+        command: 'azmgmt command'
+      },
       log: (msg: any) => {},
       prompt: () => {},
       action: command.action()

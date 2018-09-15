@@ -181,8 +181,8 @@ class SpoHubSiteSetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.HUBSITE_SET).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online tenant
-    admin site, using the ${chalk.blue(commands.CONNECT)} command.
+      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online tenant
+    admin site, using the ${chalk.blue(commands.LOGIN)} command.
         
   Remarks:
 
@@ -190,9 +190,9 @@ class SpoHubSiteSetCommand extends SpoCommand {
     in preview and is subject to change once the API reached general
     availability.
 
-    To update hub site's properties, you have to first connect to a tenant admin
-    site using the ${chalk.blue(commands.CONNECT)} command, eg.
-    ${chalk.grey(`${config.delimiter} ${commands.CONNECT} https://contoso-admin.sharepoint.com`)}.
+    To update hub site's properties, you have to first log in to a tenant admin
+    site using the ${chalk.blue(commands.LOGIN)} command, eg.
+    ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso-admin.sharepoint.com`)}.
 
     If the specified ${chalk.grey('id')} doesn't refer to an existing hub site, you will get
     an ${chalk.grey('Unknown Error')} error.

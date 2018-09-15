@@ -115,13 +115,13 @@ class Oauth2GrantListCommand extends AadCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.OAUTH2GRANT_LIST).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, connect to Azure Active Directory Graph,
-      using the ${chalk.blue(commands.CONNECT)} command.
+      `  ${chalk.yellow('Important:')} before using this command, log in to Azure Active Directory Graph,
+      using the ${chalk.blue(commands.LOGIN)} command.
 
   Remarks:
   
-    To get information about service principal OAuth2 permission grants, you have to first connect
-    to Azure Active Directory Graph using the ${chalk.blue(commands.CONNECT)} command.
+    To get information about service principal OAuth2 permission grants, you have to first log in
+    to Azure Active Directory Graph using the ${chalk.blue(commands.LOGIN)} command.
 
     In order to list existing OAuth2 permissions granted to a service principal, you need its ${chalk.grey('objectId')}.
     You can retrieve it using the ${chalk.blue(commands.SP_GET)} command.
