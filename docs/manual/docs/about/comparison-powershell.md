@@ -146,7 +146,7 @@ Upgrade-SPOSite|Microsoft.Online.SharePoint.PowerShell|
 Add-PnPApp|SharePointPnPPowerShellOnline|[spo app add](../cmd/spo/app/app-add.md)
 Add-PnPTenantCdnOrigin|SharePointPnPPowerShellOnline|[spo cdn origin add](../cmd/spo/cdn/cdn-origin-add.md)
 Add-PnPClientSidePage|SharePointPnPPowerShellOnline|[spo page add](../cmd/spo/page/page-add.md)
-Add-PnPClientSidePageSection|SharePointPnPPowerShellOnline|
+Add-PnPClientSidePageSection|SharePointPnPPowerShellOnline|[spo page section add](../cmd/spo/page/page-section-add.md)
 Add-PnPClientSideText|SharePointPnPPowerShellOnline|
 Add-PnPClientSideWebPart|SharePointPnPPowerShellOnline|[spo page clientsidewebpart add](../cmd/spo/page/page-clientsidewebpart-add.md)
 Add-PnPContentType|SharePointPnPPowerShellOnline|[spo contenttype add](../cmd/spo/contenttype/contenttype-add.md)

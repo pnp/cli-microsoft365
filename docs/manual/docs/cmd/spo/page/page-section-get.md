@@ -1,4 +1,4 @@
-# spo page column list
+# spo page section get
 
 Get information about the specified modern page section
 
