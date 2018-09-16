@@ -108,7 +108,12 @@ class Oauth2GrantRemoveCommand extends AadCommand {
 
     Before you can remove service principal's OAuth2 permissions, you need to get the ${chalk.grey('objectId')}
     of the permissions grant to remove. You can retrieve it using the ${chalk.blue(commands.OAUTH2GRANT_LIST)} command.
-   
+
+    If the ${chalk.grey('objectId')} listed when using the ${chalk.blue(commands.OAUTH2GRANT_LIST)} command has a 
+    minus sign ('-') prefix, you may receive an error indicating --grantId is missing.  To resolve this issue simply 
+    escape the leading '-'.  
+      e.g. ${chalk.blue(commands.OAUTH2GRANT_REMOVE)} --grantId \\-Zc1JRY8REeLxmXz5KtixAYU3Q6noCBPlhwGiX7pxmU     
+
   Examples:
   
     Remove the OAuth2 permission grant with ID ${chalk.grey('YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek')}
