@@ -8,6 +8,33 @@ export interface TypedHash<T> {
   [key: string]: T;
 }
 
+export enum CanvasSectionTemplate {
+  /// <summary>
+  /// One column
+  /// </summary>
+  OneColumn,
+  /// <summary>
+  /// One column, full browser width. This one only works for communication sites in combination with image or hero webparts
+  /// </summary>
+  OneColumnFullWidth,
+  /// <summary>
+  /// Two columns of the same size
+  /// </summary>
+  TwoColumn,
+  /// <summary>
+  /// Three columns of the same size
+  /// </summary>
+  ThreeColumn,
+  /// <summary>
+  /// Two columns, left one is 2/3, right one 1/3
+  /// </summary>
+  TwoColumnLeft,
+  /// <summary>
+  /// Two columns, left one is 1/3, right one 2/3
+  /// </summary>
+  TwoColumnRight
+}
+
 /**
  * Provides functionality to extend the given object by doing a shallow copy
  *
@@ -261,7 +288,7 @@ export class ClientSidePage {
 
     return JSON.parse(escapedString
       .replace(/&quot;/g, `"`)
-      .replace(/&#58;/g, ":")
+      .replace(/&#58;/g, ":") 
       .replace(/&#123;/g, "{")
       .replace(/&#125;/g, "}"));
   }
@@ -269,10 +296,47 @@ export class ClientSidePage {
   /**
    * Add a section to this page
    */
-  public addSection(): CanvasSection {
+  public addSection(sectionTemplate? : CanvasSectionTemplate, order? : number): CanvasSection {
+    var section: CanvasSection;
+    var sectionOrder = order ? order : 1;
+    if(sectionTemplate && order) {
+      section = new CanvasSection(this, sectionOrder);
+      switch(CanvasSectionTemplate[sectionTemplate].toString()) {
+        case CanvasSectionTemplate.OneColumnFullWidth.toString():
+          section.addColumn(0);
+          break;  
+        case CanvasSectionTemplate.TwoColumn.toString():
+          section.addColumn(6);
+          section.addColumn(6);
+          break;
+        case CanvasSectionTemplate.ThreeColumn.toString():
+          section.addColumn(4);
+          section.addColumn(4);
+          section.addColumn(4);
+          break;
+        case CanvasSectionTemplate.TwoColumnLeft.toString():
+          section.addColumn(8);
+          section.addColumn(4);
+          break;
+        case CanvasSectionTemplate.TwoColumnRight.toString():
+          section.addColumn(4);
+          section.addColumn(8);
+          break;
+        case CanvasSectionTemplate.OneColumn.toString():
+        default:
+          section.addColumn(12);
+          break;
+      }
 
-    const section = new CanvasSection(this, getNextOrder(this.sections));
-    this.sections.push(section);
+      // Insert the sections at the specified order.
+      this.sections.splice(sectionOrder-1, 0, section)
+
+    }
+    else {
+      section = new CanvasSection(this, getNextOrder(this.sections));
+      this.sections.push(section);
+    }
+
     return section;
   }
 
@@ -285,7 +349,7 @@ export class ClientSidePage {
     reindex(this.sections);
 
     const html: string[] = [];
-
+ 
     html.push("<div>");
 
     for (let i = 0; i < this.sections.length; i++) {
