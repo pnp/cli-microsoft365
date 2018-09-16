@@ -287,7 +287,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: 
       { 
-        pageName: 'home.aspx', 
+        pageName: 'home', 
         webUrl: 'https://contoso.sharepoint.com/sites/newsletter' ,
         sectionTemplate : 'OneColumn',
         order: 2

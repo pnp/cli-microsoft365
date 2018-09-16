@@ -40,6 +40,10 @@ class SpoPageSectionAddCommand extends SpoCommand {
     const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
     let siteAccessToken: string = '';
     let requestDigest: string = '';
+    let pageFullName: string = args.options.pageName.toLowerCase();
+    if (pageFullName.indexOf('.aspx') < 0) {
+      pageFullName += '.aspx';
+    }
 
     if (this.debug) {
       cmd.log(`Retrieving access token for ${resource}...`);
@@ -73,14 +77,14 @@ class SpoPageSectionAddCommand extends SpoCommand {
         cmd.log(`Retrieving modern page ${args.options.pageName}...`);
       }
       // Get Client Side Page
-      return Page.getPage(args.options.pageName, args.options.webUrl, siteAccessToken, cmd, this.debug, this.verbose);
+      return Page.getPage(pageFullName, args.options.webUrl, siteAccessToken, cmd, this.debug, this.verbose);
     })
     .then((clientSidePage: ClientSidePage): request.RequestPromise => {
 
         clientSidePage.addSection(args.options.sectionTemplate, args.options.order);
 
         // Save the Client Side Page with updated section
-        return this.saveClientSidePage(clientSidePage as ClientSidePage, cmd, args, args.options.pageName, siteAccessToken, requestDigest);
+        return this.saveClientSidePage(clientSidePage as ClientSidePage, cmd, args, pageFullName, siteAccessToken, requestDigest);
     })
     .then((res: any): void => {
         if (this.debug) {
@@ -106,7 +110,7 @@ class SpoPageSectionAddCommand extends SpoCommand {
     pageName: string,
     accessToken: string,
     requestDigest: string
-  ): request.RequestPromise {
+  ): request.RequestPromise<any> {
     const serverRelativeSiteUrl: string = `${args.options.webUrl.substr(
       args.options.webUrl.indexOf('/', 8)
     )}/sitepages/${pageName}`;
@@ -216,7 +220,7 @@ class SpoPageSectionAddCommand extends SpoCommand {
   
     Get information about adding section to the modern page
     named ${chalk.grey('home.aspx')}
-      ${chalk.grey(config.delimiter)} ${this.name} --pageName home.aspx --webUrl https://contoso.sharepoint.com/sites/team-a  --sectionTemplate OneColumn --order 1
+      ${chalk.grey(config.delimiter)} ${this.name} --pageName home.aspx --webUrl https://contoso.sharepoint.com/sites/newsletter  --sectionTemplate OneColumn --order 1
 `);
   }
 }
