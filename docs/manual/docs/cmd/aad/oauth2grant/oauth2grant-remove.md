@@ -27,6 +27,12 @@ To remove service principal's OAuth2 permissions, you have to first log in to Az
 
 Before you can remove service principal's OAuth2 permissions, you need to get the `objectId` of the permissions grant to remove. You can retrieve it using the [aad oauth2grant list](./oauth2grant-list.md) command.
 
+If the `objectId` listed when using the [aad oauth2grant list](./oauth2grant-list.md) command has a minus sign ('-') prefix, you may receive an error indicating `--grantId` is missing.  To resolve this issue simply escape the leading '-'.  
+
+```sh
+aad oauth2grant remove --grantId \\-Zc1JRY8REeLxmXz5KtixAYU3Q6noCBPlhwGiX7pxmU
+```
+
 ## Examples
 
 Remove the OAuth2 permission grant with ID _YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek_

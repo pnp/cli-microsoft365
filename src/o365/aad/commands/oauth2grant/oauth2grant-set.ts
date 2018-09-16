@@ -116,12 +116,18 @@ class Oauth2GrantSetCommand extends AadCommand {
 
   Remarks:
   
-    To update service principal's OAuth2 permissions, you have to first log in to Azure Active Directory
-    Graph using the ${chalk.blue(commands.LOGIN)} command.
+    To update service principal's OAuth2 permissions, you have to first log in
+    to Azure Active Directory Graph using the ${chalk.blue(commands.LOGIN)} command.
 
-    Before you can update service principal's OAuth2 permissions, you need to get the ${chalk.grey('objectId')}
-    of the permissions grant to update. You can retrieve it using the ${chalk.blue(commands.OAUTH2GRANT_LIST)} command.
-   
+    Before you can update service principal's OAuth2 permissions, you need to
+    get the ${chalk.grey('objectId')} of the permissions grant to update. You can retrieve it
+    using the ${chalk.blue(commands.OAUTH2GRANT_LIST)} command.
+
+    If the ${chalk.grey('objectId')} listed when using the ${chalk.blue(commands.OAUTH2GRANT_LIST)} command has a 
+    minus sign ('-') prefix, you may receive an error indicating --grantId is
+    missing. To resolve this issue simply escape the leading '-',
+    eg. ${chalk.blue(commands.OAUTH2GRANT_SET)} --grantId \\-Zc1JRY8REeLxmXz5KtixAYU3Q6noCBPlhwGiX7pxmU --scope 'Calendars.Read'     
+       
   Examples:
   
     Update the existing OAuth2 permission grant with ID ${chalk.grey('YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek')}
