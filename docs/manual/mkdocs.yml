@@ -206,6 +206,7 @@ nav:
       - flow:
         - flow environment get: 'cmd/azmgmt/flow/flow-environment-get.md'
         - flow environment list: 'cmd/azmgmt/flow/flow-environment-list.md'
+        - flow export: 'cmd/azmgmt/flow/flow-export.md'
         - flow get: 'cmd/azmgmt/flow/flow-get.md'
         - flow list: 'cmd/azmgmt/flow/flow-list.md'
         - flow run get: 'cmd/azmgmt/flow/flow-run-get.md'
