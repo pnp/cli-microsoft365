@@ -1,5 +1,6 @@
 import commands from '../../commands';
-import Command, {CommandValidate,CommandOption,CommandError} from '../../../../Command';
+//import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
+import Command, {CommandOption,CommandError} from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
@@ -7,161 +8,29 @@ const command: Command = require('./search');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import Utils from '../../../../Utils';
-import { ResultTableRow } from './datatypes/ResultTableRow';
-import { SearchResult } from './datatypes/SearchResult';
 
 describe(commands.SEARCH, () => {
   let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
+  //let cmdInstanceLogSpy: sinon.SinonSpy;
   let trackEvent: any;
   let telemetry: any;
-  let returnArrayLength = 0;
-  let stubAuth: any = () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/common/oauth2/token') > -1) {
-        return Promise.resolve('abc');
-      }
+  // let stubAuth: any = () => {
+  //   sinon.stub(request, 'post').callsFake((opts) => {
+  //     if (opts.url.indexOf('/common/oauth2/token') > -1) {
+  //       return Promise.resolve('abc');
+  //     }
 
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
+  //     if (opts.url.indexOf('/_api/contextinfo') > -1) {
+  //       return Promise.resolve({
+  //         FormDigestValue: 'abc'
+  //       });
+  //     }
 
-      return Promise.reject('Invalid request');
-    });
-  }
-  let getFakeRows = ():ResultTableRow[] => {
-    return [
-      {
-        "Cells":[
-          {"Key":"Rank","Value":"1","ValueType":"Edm.Double"},
-          {"Key":"DocId","Value":"1","ValueType":"Edm.Int64"},
-          {"Key":"Path","Value":"MyPath-item1","ValueType":"Edm.String"},
-          {"Key":"Author","Value":"myAuthor-item1","ValueType":"Edm.String"},
-          {"Key":"FileType","Value":"docx","ValueType":"Edm.String"},
-          {"Key":"OriginalPath","Value":"myOriginalPath-item1","ValueType":"Edm.String"},
-          {"Key":"PartitionId","Value":"00000000-0000-0000-0000-000000000000","ValueType":"Edm.Guid"},
-          {"Key":"UrlZone","Value":"0","ValueType":"Edm.Int32"},
-          {"Key":"Culture","Value":"en-US","ValueType":"Edm.String"},
-          {"Key":"ResultTypeId","Value":"0","ValueType":"Edm.Int32"},
-          {"Key":"IsDocument","Value":"true","ValueType":"Edm.Boolean"},
-          {"Key":"RenderTemplateId","Value":"~sitecollection/_catalogs/masterpage/Display Templates/Search/Item_Default.js","ValueType":"Edm.String"}
-        ]
-      },
-      {
-        "Cells":[
-          {"Key":"Rank","Value":"2","ValueType":"Edm.Double"},
-          {"Key":"DocId","Value":"2","ValueType":"Edm.Int64"},
-          {"Key":"Path","Value":"MyPath-item2","ValueType":"Edm.String"},
-          {"Key":"Author","Value":"myAuthor-item2","ValueType":"Edm.String"},
-          {"Key":"FileType","Value":"docx","ValueType":"Edm.String"},
-          {"Key":"OriginalPath","Value":"myOriginalPath-item2","ValueType":"Edm.String"},
-          {"Key":"PartitionId","Value":"00000000-0000-0000-0000-000000000000","ValueType":"Edm.Guid"},
-          {"Key":"UrlZone","Value":"0","ValueType":"Edm.Int32"},
-          {"Key":"Culture","Value":"en-US","ValueType":"Edm.String"},
-          {"Key":"ResultTypeId","Value":"0","ValueType":"Edm.Int32"},
-          {"Key":"IsDocument","Value":"true","ValueType":"Edm.Boolean"},
-          {"Key":"RenderTemplateId","Value":"~sitecollection/_catalogs/masterpage/Display Templates/Search/Item_Default.js","ValueType":"Edm.String"}
-        ]
-      },
-      {
-        "Cells":[
-          {"Key":"Rank","Value":"3","ValueType":"Edm.Double"},
-          {"Key":"DocId","Value":"3","ValueType":"Edm.Int64"},
-          {"Key":"Path","Value":"MyPath-item3","ValueType":"Edm.String"},
-          {"Key":"Author","Value":"myAuthor-item3","ValueType":"Edm.String"},
-          {"Key":"FileType","Value":"aspx","ValueType":"Edm.String"},
-          {"Key":"OriginalPath","Value":"myOriginalPath-item3","ValueType":"Edm.String"},
-          {"Key":"PartitionId","Value":"00000000-0000-0000-0000-000000000000","ValueType":"Edm.Guid"},
-          {"Key":"UrlZone","Value":"0","ValueType":"Edm.Int32"},
-          {"Key":"Culture","Value":"en-US","ValueType":"Edm.String"},
-          {"Key":"ResultTypeId","Value":"0","ValueType":"Edm.Int32"},
-          {"Key":"IsDocument","Value":"false","ValueType":"Edm.Boolean"},
-          {"Key":"RenderTemplateId","Value":"~sitecollection/_catalogs/masterpage/Display Templates/Search/Item_Default.js","ValueType":"Edm.String"}
-        ]
-      }
-    ];
-  };
-  let fakeRows:ResultTableRow[] = getFakeRows();
-  let getQueryResult = (rows:ResultTableRow[],totalRows?:number):SearchResult => {
-    returnArrayLength = rows.length;
-
-    return {
-      "ElapsedTime": 83,
-      "PrimaryQueryResult": {
-        "CustomResults": [],
-        "QueryId": "00000000-0000-0000-0000-000000000000",
-        "QueryRuleId": "00000000-0000-0000-0000-000000000000",
-        "RefinementResults": null,
-        "RelevantResults": {
-          "GroupTemplateId": null,
-          "ItemTemplateId": null,
-          "Properties": [
-            {
-              "Key": "GenerationId",
-              "Value": "9223372036854775806",
-              "ValueType": "Edm.Int64"
-            }
-          ],
-          "ResultTitle": null,
-          "ResultTitleUrl": null,
-          "RowCount": returnArrayLength,
-          "Table": {
-            "Rows": fakeRows
-          },
-          "TotalRows": totalRows ? totalRows : returnArrayLength,
-          "TotalRowsIncludingDuplicates": totalRows ? totalRows : returnArrayLength
-        },
-        "SpecialTermResults": null
-      },
-      "Properties": [
-        {
-          "Key": "RowLimit",
-          "Value": "10",
-          "ValueType": "Edm.Int32"
-        }
-      ],
-      "SecondaryQueryResults": [],
-      "SpellingSuggestion": "",
-      "TriggeredRules": []
-    };
-  }
-  let getFakes = (opts:any) => {
-    if (opts.url.toUpperCase().indexOf('QUERYTEXT=\'ISDOCUMENT:1\'') > -1) {
-      let rows = fakeRows.filter(row => { 
-        return row.Cells.filter(cell => { 
-          return (cell.Key.toUpperCase() === "ISDOCUMENT" && cell.Value.toUpperCase() === "TRUE");
-        }).length > 0; 
-      });
-
-      if(opts.url.toUpperCase().indexOf('ROWLIMIT=1') > -1) {
-        if(opts.url.toUpperCase().indexOf('STARTROW=0') > -1) {
-          return Promise.resolve(getQueryResult([rows[0]],2));
-        }
-        else if(opts.url.toUpperCase().indexOf('STARTROW=1') > -1) {
-          const queryResult:any = getQueryResult([rows[1]],2);
-          returnArrayLength = 2;
-          return Promise.resolve(queryResult);
-        }
-        else {
-          return Promise.resolve(getQueryResult([]));
-        }
-      }
-
-      return Promise.resolve(getQueryResult(rows));
-    }
-    if (opts.url.toUpperCase().indexOf('QUERYTEXT=\'*\'') > -1) {
-      let rows = fakeRows;
-      if(opts.url.toUpperCase().indexOf('ROWLIMIT=1') > -1) {
-        return Promise.resolve(getQueryResult([rows[0]]));;
-      }
-      return Promise.resolve(getQueryResult(rows));
-    }
-    returnArrayLength = 0;
-    return Promise.reject('Invalid request');
-  }
+  //     return Promise.reject('Invalid request');
+  //   });
+  // }
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -180,6 +49,7 @@ describe(commands.SEARCH, () => {
         log.push(msg);
       }
     };
+    //cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
     auth.site = new Site();
     telemetry = null;
   });
@@ -249,10 +119,52 @@ describe(commands.SEARCH, () => {
     });
   });
 
-  it('executes search request', (done) => {
+  /*it('retrieves site information', (done) => {
     stubAuth();
 
-    sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('/_api/web') > -1) {
+        return Promise.resolve(
+          {
+            "value": [{
+              "AllowRssFeeds": false,
+            "AlternateCssUrl": null,
+            "AppInstanceId": "00000000-0000-0000-0000-000000000000",
+            "Configuration": 0,
+            "Created": null,
+            "CurrentChangeToken": null,
+            "CustomMasterUrl": null,
+            "Description": null,
+            "DesignPackageId": null,
+            "DocumentLibraryCalloutOfficeWebAppPreviewersDisabled": false,
+            "EnableMinimalDownload": false,
+            "HorizontalQuickLaunch": false,
+            "Id": "d8d179c7-f459-4f90-b592-14b08e84accb",
+            "IsMultilingual": false,
+            "Language": 1033,
+            "LastItemModifiedDate": null,
+            "LastItemUserModifiedDate": null,
+            "MasterUrl": null,
+            "NoCrawl": false,
+            "OverwriteTranslationsOnChange": false,
+            "ResourcePath": null,
+            "QuickLaunchEnabled": false,
+            "RecycleBinEnabled": false,
+            "ServerRelativeUrl": null,
+            "SiteLogoUrl": null,
+            "SyndicationEnabled": false,
+            "Title": "Subsite",
+            "TreeViewEnabled": false,
+            "UIVersion": 15,
+            "UIVersionConfigurationEnabled": false,
+            "Url": "https://contoso.sharepoint.com/subsite",
+            "WebTemplate": "STS",
+             }]
+          }
+        );
+      }
+      return Promise.reject('Invalid request');
+    });
 
     auth.site = new Site();
     auth.site.connected = true;
@@ -263,11 +175,46 @@ describe(commands.SEARCH, () => {
       options: {
         output: 'json',
         debug: true,
-        query: '*'
+        webUrl: 'https://contoso.sharepoint.com'
       }
     }, () => {
       try {
-        assert.equal(returnArrayLength, 3);
+        assert(cmdInstanceLogSpy.calledWith({
+          value: [{
+            AllowRssFeeds: false,
+            AlternateCssUrl: null,
+            AppInstanceId: "00000000-0000-0000-0000-000000000000",
+            Configuration: 0,
+            Created: null,
+            CurrentChangeToken: null,
+            CustomMasterUrl: null,
+            Description: null,
+            DesignPackageId: null,
+            DocumentLibraryCalloutOfficeWebAppPreviewersDisabled: false,
+            EnableMinimalDownload: false,
+            HorizontalQuickLaunch: false,
+            Id: "d8d179c7-f459-4f90-b592-14b08e84accb",
+            IsMultilingual: false,
+            Language: 1033,
+            LastItemModifiedDate: null,
+            LastItemUserModifiedDate: null,
+            MasterUrl: null,
+            NoCrawl: false,
+            OverwriteTranslationsOnChange: false,
+            ResourcePath: null,
+            QuickLaunchEnabled: false,
+            RecycleBinEnabled: false,
+            ServerRelativeUrl: null,
+            SiteLogoUrl: null,
+            SyndicationEnabled: false,
+            Title: "Subsite",
+            TreeViewEnabled: false,
+            UIVersion: 15,
+            UIVersionConfigurationEnabled: false,
+            Url: "https://contoso.sharepoint.com/subsite",
+            WebTemplate: "STS",
+            }]
+        }));
         done();
       }
       catch (e) {
@@ -280,10 +227,52 @@ describe(commands.SEARCH, () => {
     });
   });
 
-  it('executes search request with output option text', (done) => {
+  it('retrieves all site information with output option text', (done) => {
     stubAuth();
 
-    sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('/_api/web') > -1) {
+        return Promise.resolve(
+          {
+            "value": [{
+              "AllowRssFeeds": false,
+            "AlternateCssUrl": null,
+            "AppInstanceId": "00000000-0000-0000-0000-000000000000",
+            "Configuration": 0,
+            "Created": null,
+            "CurrentChangeToken": null,
+            "CustomMasterUrl": null,
+            "Description": null,
+            "DesignPackageId": null,
+            "DocumentLibraryCalloutOfficeWebAppPreviewersDisabled": false,
+            "EnableMinimalDownload": false,
+            "HorizontalQuickLaunch": false,
+            "Id": "d8d179c7-f459-4f90-b592-14b08e84accb",
+            "IsMultilingual": false,
+            "Language": 1033,
+            "LastItemModifiedDate": null,
+            "LastItemUserModifiedDate": null,
+            "MasterUrl": null,
+            "NoCrawl": false,
+            "OverwriteTranslationsOnChange": false,
+            "ResourcePath": null,
+            "QuickLaunchEnabled": false,
+            "RecycleBinEnabled": false,
+            "ServerRelativeUrl": null,
+            "SiteLogoUrl": null,
+            "SyndicationEnabled": false,
+            "Title": "Subsite",
+            "TreeViewEnabled": false,
+            "UIVersion": 15,
+            "UIVersionConfigurationEnabled": false,
+            "Url": "https://contoso.sharepoint.com/subsite",
+            "WebTemplate": "STS",
+             }]
+          }
+        );
+      }
+      return Promise.reject('Invalid request');
+    });
 
     auth.site = new Site();
     auth.site.connected = true;
@@ -294,11 +283,46 @@ describe(commands.SEARCH, () => {
       options: {
         output: 'text',
         debug: false,
-        query: 'IsDocument:1'
+        webUrl: 'https://contoso.sharepoint.com'
       }
     }, () => {
       try {
-        assert.equal(returnArrayLength, 2);
+        assert(cmdInstanceLogSpy.calledWith({
+          value: [{
+            AllowRssFeeds: false,
+            AlternateCssUrl: null,
+            AppInstanceId: "00000000-0000-0000-0000-000000000000",
+            Configuration: 0,
+            Created: null,
+            CurrentChangeToken: null,
+            CustomMasterUrl: null,
+            Description: null,
+            DesignPackageId: null,
+            DocumentLibraryCalloutOfficeWebAppPreviewersDisabled: false,
+            EnableMinimalDownload: false,
+            HorizontalQuickLaunch: false,
+            Id: "d8d179c7-f459-4f90-b592-14b08e84accb",
+            IsMultilingual: false,
+            Language: 1033,
+            LastItemModifiedDate: null,
+            LastItemUserModifiedDate: null,
+            MasterUrl: null,
+            NoCrawl: false,
+            OverwriteTranslationsOnChange: false,
+            ResourcePath: null,
+            QuickLaunchEnabled: false,
+            RecycleBinEnabled: false,
+            ServerRelativeUrl: null,
+            SiteLogoUrl: null,
+            SyndicationEnabled: false,
+            Title: "Subsite",
+            TreeViewEnabled: false,
+            UIVersion: 15,
+            UIVersionConfigurationEnabled: false,
+            Url: "https://contoso.sharepoint.com/subsite",
+            WebTemplate: "STS",
+            }]
+        }));
         done();
       }
       catch (e) {
@@ -309,139 +333,9 @@ describe(commands.SEARCH, () => {
         Utils.restore(request.post);
       }
     });
-  });
+  });*/
 
-  it('executes search request with output option text and \'allResults\'', (done) => {
-    stubAuth();
-
-    sinon.stub(request, 'get').callsFake(getFakes);
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        output: 'text',
-        debug: false,
-        query: 'IsDocument:1',
-        allResults:true,
-        rowLimit:1
-      }
-    }, () => {
-      try {
-        assert.equal(returnArrayLength, 2);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        Utils.restore(request.get);
-        Utils.restore(request.post);
-      }
-    });
-  });
-
-  it('executes search request with output option json and \'allResults\'', (done) => {
-    stubAuth();
-
-    sinon.stub(request, 'get').callsFake(getFakes);
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        output: 'json',
-        debug: false,
-        query: 'IsDocument:1',
-        allResults:true,
-        rowLimit:1
-      }
-    }, () => {
-      try {
-        assert.equal(returnArrayLength, 2);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        Utils.restore(request.get);
-        Utils.restore(request.post);
-      }
-    });
-  });
-
-  it('executes search request with selectProperties', (done) => {
-    stubAuth();
-
-    sinon.stub(request, 'get').callsFake(getFakes);
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        output: 'text',
-        debug: false,
-        query: 'IsDocument:1',
-        selectProperties: 'Path'
-      }
-    }, () => {
-      try {
-        assert.equal(returnArrayLength, 2);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        Utils.restore(request.get);
-        Utils.restore(request.post);
-      }
-    });
-  });
-
-  it('executes search request with rowLimits defined', (done) => {
-    stubAuth();
-
-    sinon.stub(request, 'get').callsFake(getFakes);
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        output: 'text',
-        debug: true,
-        query: '*',
-        rowLimit: 1
-      }
-    }, () => {
-      try {
-        assert.equal(returnArrayLength, 1);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        Utils.restore(request.get);
-        Utils.restore(request.post);
-      }
-    });
-  });
-
-  it('command correctly handles reject request', (done) => {
+  it('command correctly handles web get reject request', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf('/_api/contextinfo') > -1) {
         return Promise.resolve({
@@ -488,6 +382,49 @@ describe(commands.SEARCH, () => {
     });
   });
 
+  /*it('uses correct API url when output json option is passed', (done) => {
+    stubAuth();
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      cmdInstance.log('Test Url:');
+      cmdInstance.log(opts.url);
+      if (opts.url.indexOf('select123=') > -1) {
+        return Promise.resolve('Correct Url1')
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    cmdInstance.action({
+      options: {
+        output: 'json',
+        debug: false,
+        webUrl: 'https://contoso.sharepoint.com',
+      }
+    }, () => {
+
+      try {
+        assert('Correct Url');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore([
+          request.post,
+          request.get
+        ]);
+      }
+    });
+
+  });*/
+
   it('supports debug mode', () => {
     const options = (command.options() as CommandOption[]);
     let containsDebugOption = false;
@@ -499,25 +436,30 @@ describe(commands.SEARCH, () => {
     assert(containsDebugOption);
   });
 
-  it('supports specifying query', () => {
+  /*it('supports specifying URL', () => {
     const options = (command.options() as CommandOption[]);
     let containsTypeOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('<query>') > -1) {
+      if (o.option.indexOf('<webUrl>') > -1) {
         containsTypeOption = true;
       }
     });
     assert(containsTypeOption);
   });
 
-  it('fails validation if the query option is not specified', () => {
+  it('fails validation if the url option not specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: {} });
     assert.notEqual(actual, true);
   });
 
-  it('passes validation if all options are provided', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { query:'*' } });
-    assert.equal(actual, true);
+  it('fails validation if the url option is not a valid SharePoint site URL', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'foo' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('passes validation if the url option is a valid SharePoint site URL', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com' } });
+    assert(actual);
   });
 
   it('has help referring to the right command', () => {
@@ -552,7 +494,7 @@ describe(commands.SEARCH, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
+  });*/
 
   it('correctly handles lack of valid access token', (done) => {
     Utils.restore(auth.getAccessToken);
