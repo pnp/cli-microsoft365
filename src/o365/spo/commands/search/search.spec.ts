@@ -1,6 +1,5 @@
 import commands from '../../commands';
-//import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
-import Command, {CommandOption,CommandError} from '../../../../Command';
+import Command, {CommandValidate,CommandOption,CommandError} from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
@@ -436,23 +435,23 @@ describe(commands.SEARCH, () => {
     assert(containsDebugOption);
   });
 
-  /*it('supports specifying URL', () => {
+  it('supports specifying query', () => {
     const options = (command.options() as CommandOption[]);
     let containsTypeOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('<webUrl>') > -1) {
+      if (o.option.indexOf('<query>') > -1) {
         containsTypeOption = true;
       }
     });
     assert(containsTypeOption);
   });
 
-  it('fails validation if the url option not specified', () => {
+  it('fails validation if the query option is not specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: {} });
     assert.notEqual(actual, true);
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', () => {
+  /*it('fails validation if the url option is not a valid SharePoint site URL', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'foo' } });
     assert.notEqual(actual, true);
   });
