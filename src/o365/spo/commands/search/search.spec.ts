@@ -459,7 +459,7 @@ describe(commands.SEARCH, () => {
   it('passes validation if the url option is a valid SharePoint site URL', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com' } });
     assert(actual);
-  });
+  });*/
 
   it('has help referring to the right command', () => {
     const cmd: any = {
@@ -493,7 +493,7 @@ describe(commands.SEARCH, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });*/
+  });
 
   it('correctly handles lack of valid access token', (done) => {
     Utils.restore(auth.getAccessToken);
