@@ -117,14 +117,14 @@ class SearchCommand extends SpoCommand {
   
   Remarks:
   
-    To get information about a list, you have to first log in to SharePoint using the
+    To execute a search query you have to first log in to SharePoint using the
     ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
         
   Examples:
   
     Execute search query '${chalk.grey('ContentTypeId:0x0120D520')}'
     Return all document sets available through the SharePoint search engine
-      ${chalk.grey(config.delimiter)} ${commands.SEARCH} --webUrl https://contoso.sharepoint.com/sites/project-x --query 'ContentTypeId:0x0120D520'
+      ${chalk.grey(config.delimiter)} ${commands.SEARCH} --query 'ContentTypeId:0x0120D520'
       `);
   }
 }
