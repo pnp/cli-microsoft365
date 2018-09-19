@@ -18,7 +18,6 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  webUrl: string;
   query: string;
 }
 
@@ -39,10 +38,10 @@ class SearchCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
+    const webUrl = auth.site.url;
+    const resource: string = Auth.getResourceFromUrl(webUrl);
 
     if (this.debug) {
-      cmd.log("Calling Search API on = " + auth.site.url);
       cmd.log(`Retrieving access token for ${resource}...`);
     }
 
@@ -54,11 +53,11 @@ class SearchCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          cmd.log(`Executing search query '${args.options.query}' in site at ${args.options.webUrl}...`);
+          cmd.log(`Executing search query '${args.options.query}' on site at ${webUrl}...`);
         }
 
         const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/search/query?querytext='${args.options.query}'`,
+          url: `${webUrl}/_api/search/query?querytext='${args.options.query}'`,
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${accessToken}`,
             'accept': 'application/json;odata=nometadata'
@@ -82,7 +81,7 @@ class SearchCommand extends SpoCommand {
           cmd.log(searchResults);
           cmd.log('');
         }
-        cmd.log(searchResults);
+        //cmd.log(searchResults);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
@@ -90,11 +89,7 @@ class SearchCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the search query is executed'
-      },
-      {
-        option: '-q, --query <KQLQuery>',
+        option: '-q, --query <query>',
         description: 'Query to be executed in KQL format'
       }
     ];
@@ -105,15 +100,6 @@ class SearchCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.webUrl) {
-        return 'Required parameter webUrl missing';
-      }
-
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
-
       if (!args.options.query) {
         return 'Required parameter query missing';
       }
