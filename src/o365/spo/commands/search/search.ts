@@ -81,7 +81,7 @@ class SearchCommand extends SpoCommand {
           cmd.log(searchResults);
           cmd.log('');
         }
-        //cmd.log(searchResults);
+        cmd.log(searchResults);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
