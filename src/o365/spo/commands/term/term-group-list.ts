@@ -86,9 +86,9 @@ class SpoTermGroupListCommand extends SpoCommand {
         if (result._Child_Items_ && result._Child_Items_.length > 0) {
           if (args.options.output === 'json') {
             cmd.log(result._Child_Items_.map(t => {
-              t.CreatedDate = t.CreatedDate.replace('/Date(', '').replace(')/', '');
+              t.CreatedDate = new Date(Number(t.CreatedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
               t.Id = t.Id.replace('/Guid(', '').replace(')/', '');
-              t.LastModifiedDate = t.LastModifiedDate.replace('/Date(', '').replace(')/', '');
+              t.LastModifiedDate = new Date(Number(t.LastModifiedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
               return t;
             }));
           }
