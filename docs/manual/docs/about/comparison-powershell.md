@@ -299,7 +299,7 @@ Get-PnPTenantServicePrincipal|SharePointPnPPowerShellOnline|
 Get-PnPTenantSite|SharePointPnPPowerShellOnline|[spo site get](../cmd/spo/site/site-get.md), [spo site classic list](../cmd/spo/site/site-classic-list.md)
 Get-PnPTenantTheme|SharePointPnPPowerShellOnline|[spo theme get](../cmd/spo/theme/theme-get.md), [spo theme list](../cmd/spo/theme/theme-list.md)
 Get-PnPTerm|SharePointPnPPowerShellOnline|
-Get-PnPTermGroup|SharePointPnPPowerShellOnline|[spo term group list](../cmd/spo/term/term-group-list.md)
+Get-PnPTermGroup|SharePointPnPPowerShellOnline|[spo term group get](../cmd/spo/term/term-group-get.md), [spo term group list](../cmd/spo/term/term-group-list.md)
 Get-PnPTermSet|SharePointPnPPowerShellOnline|
 Get-PnPTheme|SharePointPnPPowerShellOnline|
 Get-PnPTimeZoneId|SharePointPnPPowerShellOnline|
