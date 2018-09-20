@@ -2,11 +2,11 @@ import { SearchResultProperty } from "./SearchResultProperty";
 import { ResultTable } from "./ResultTable";
 
 export interface RelevantResults {
-  GroupTemplateId:string | null;
-  ItemTemplateId:string | null;
+  RelevantResults:string;
+  ItemTemplateId:string;
   Properties:SearchResultProperty[];
-  ResultTitle:string | null;
-  ResultTitleUrl:string | null;
+  ResultTitle:string;
+  ResultTitleUrl:string;
   RowCount:number;
   Table:ResultTable;
   TotalRows:number;
