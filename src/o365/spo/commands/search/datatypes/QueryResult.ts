@@ -7,7 +7,7 @@ export interface QueryResult {
   CustomResults:ResultTable[];
   QueryId:string;
   QueryRuleId:string;
-  RefinementResults:RefinementResult[] | null;
+  RefinementResults:RefinementResult[];
   RelevantResults:RelevantResults;
-  SpecialTermResults:SpecialTermResult[] | null;
+  SpecialTermResults:SpecialTermResult[];
 }
