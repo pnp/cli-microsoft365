@@ -10,6 +10,7 @@ import {
 import SpoCommand from '../../SpoCommand';
 import { Auth } from '../../../../Auth';
 import Utils from '../../../../Utils';
+import { SearchResult } from './datatypes/SearchResult';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -32,8 +33,7 @@ class SearchCommand extends SpoCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    // telemetryProps.id = (!(!args.options.id)).toString();
-    // telemetryProps.title = (!(!args.options.title)).toString();
+    telemetryProps.query = (!(!args.options.query)).toString();
     return telemetryProps;
   }
 
@@ -74,14 +74,14 @@ class SearchCommand extends SpoCommand {
 
         return request.get(requestOptions);
       })
-      //TODO:Stijn -> Replace the type so we don't use ANY!
-      .then((searchResults: any): void => {
+      .then((searchResult: SearchResult): void => {
         if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(searchResults);
+          cmd.log(`${searchResult.PrimaryQueryResult.RelevantResults.TotalRowsIncludingDuplicates} Results found (including duplicates) :`);
+          cmd.log('');
+          cmd.log(searchResult);
           cmd.log('');
         }
-        cmd.log(searchResults);
+        cmd.log(searchResult);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }

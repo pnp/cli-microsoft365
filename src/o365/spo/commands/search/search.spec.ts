@@ -125,8 +125,43 @@ describe(commands.SEARCH, () => {
       if (opts.url.indexOf('/_api/search') > -1) {
         return Promise.resolve(
           {
-            //TODO:Stijn -> Use real value
-            "value": 'x'
+            "ElapsedTime": 83,
+            "PrimaryQueryResult": {
+              "CustomResults": [],
+              "QueryId": "00000000-0000-0000-0000-000000000000",
+              "QueryRuleId": "00000000-0000-0000-0000-000000000000",
+              "RefinementResults": null,
+              "RelevantResults": {
+                "GroupTemplateId": null,
+                "ItemTemplateId": null,
+                "Properties": [
+                  {
+                    "Key": "GenerationId",
+                    "Value": "9223372036854775806",
+                    "ValueType": "Edm.Int64"
+                  }
+                ],
+                "ResultTitle": null,
+                "ResultTitleUrl": null,
+                "RowCount": 0,
+                "Table": {
+                  "Rows": []
+                },
+                "TotalRows": 0,
+                "TotalRowsIncludingDuplicates": 0
+              },
+              "SpecialTermResults": null
+            },
+            "Properties": [
+              {
+                "Key": "RowLimit",
+                "Value": "10",
+                "ValueType": "Edm.Int32"
+              }
+            ],
+            "SecondaryQueryResults": [],
+            "SpellingSuggestion": "",
+            "TriggeredRules": []
           }
         );
       }
@@ -147,7 +182,43 @@ describe(commands.SEARCH, () => {
     }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({
-          value: 'x'
+          ElapsedTime: 83,
+          PrimaryQueryResult: {
+            CustomResults: [],
+            QueryId: "00000000-0000-0000-0000-000000000000",
+            QueryRuleId: "00000000-0000-0000-0000-000000000000",
+            RefinementResults: null,
+            RelevantResults: {
+              GroupTemplateId: null,
+              ItemTemplateId: null,
+              Properties: [
+                {
+                  Key: "GenerationId",
+                  Value: "9223372036854775806",
+                  ValueType: "Edm.Int64"
+                }
+              ],
+              ResultTitle: null,
+              ResultTitleUrl: null,
+              RowCount: 0,
+              Table: {
+                Rows: []
+              },
+              TotalRows: 0,
+              TotalRowsIncludingDuplicates: 0
+            },
+            SpecialTermResults: null
+          },
+          Properties: [
+            {
+              Key: "RowLimit",
+              Value: "10",
+              ValueType: "Edm.Int32"
+            }
+          ],
+          SecondaryQueryResults: [],
+          SpellingSuggestion: "",
+          TriggeredRules: []
         }));
         done();
       }
@@ -168,8 +239,43 @@ describe(commands.SEARCH, () => {
       if (opts.url.indexOf('/_api/search') > -1) {
         return Promise.resolve(
           {
-            //TODO:Stijn -> Use real value
-            "value": 'x'
+            "ElapsedTime": 83,
+            "PrimaryQueryResult": {
+              "CustomResults": [],
+              "QueryId": "00000000-0000-0000-0000-000000000000",
+              "QueryRuleId": "00000000-0000-0000-0000-000000000000",
+              "RefinementResults": null,
+              "RelevantResults": {
+                "GroupTemplateId": null,
+                "ItemTemplateId": null,
+                "Properties": [
+                  {
+                    "Key": "GenerationId",
+                    "Value": "9223372036854775806",
+                    "ValueType": "Edm.Int64"
+                  }
+                ],
+                "ResultTitle": null,
+                "ResultTitleUrl": null,
+                "RowCount": 0,
+                "Table": {
+                  "Rows": []
+                },
+                "TotalRows": 0,
+                "TotalRowsIncludingDuplicates": 0
+              },
+              "SpecialTermResults": null
+            },
+            "Properties": [
+              {
+                "Key": "RowLimit",
+                "Value": "10",
+                "ValueType": "Edm.Int32"
+              }
+            ],
+            "SecondaryQueryResults": [],
+            "SpellingSuggestion": "",
+            "TriggeredRules": []
           }
         );
       }
@@ -190,7 +296,43 @@ describe(commands.SEARCH, () => {
     }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({
-          value: 'x'
+          ElapsedTime: 83,
+          PrimaryQueryResult: {
+            CustomResults: [],
+            QueryId: "00000000-0000-0000-0000-000000000000",
+            QueryRuleId: "00000000-0000-0000-0000-000000000000",
+            RefinementResults: null,
+            RelevantResults: {
+              GroupTemplateId: null,
+              ItemTemplateId: null,
+              Properties: [
+                {
+                  Key: "GenerationId",
+                  Value: "9223372036854775806",
+                  ValueType: "Edm.Int64"
+                }
+              ],
+              ResultTitle: null,
+              ResultTitleUrl: null,
+              RowCount: 0,
+              Table: {
+                Rows: []
+              },
+              TotalRows: 0,
+              TotalRowsIncludingDuplicates: 0
+            },
+            SpecialTermResults: null
+          },
+          Properties: [
+            {
+              Key: "RowLimit",
+              Value: "10",
+              ValueType: "Edm.Int32"
+            }
+          ],
+          SecondaryQueryResults: [],
+          SpellingSuggestion: "",
+          TriggeredRules: []
         }));
         done();
       }
