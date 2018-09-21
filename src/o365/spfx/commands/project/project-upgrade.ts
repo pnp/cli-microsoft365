@@ -11,6 +11,7 @@ import { Rule } from './project-upgrade/rules/Rule';
 import { EOL } from 'os';
 import { Project, Manifest, TsFile } from './project-upgrade/model';
 import { FindingToReport } from './project-upgrade/FindingToReport';
+import { FN017001_MISC_npm_dedupe } from './project-upgrade/rules/FN017001_MISC_npm_dedupe';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -122,6 +123,8 @@ class SpfxProjectUpgradeCommand extends Command {
         return;
       }
     });
+    const npmDedupeRule: Rule = new FN017001_MISC_npm_dedupe();
+    npmDedupeRule.visit(project, this.allFindings);
 
     // dedupe
     const findings: Finding[] = this.allFindings.filter((f: Finding, i: number, allFindings: Finding[]) => {
@@ -344,13 +347,16 @@ ${f.resolution}
       }
 
       if (f.resolutionType === 'cmd') {
-        if (f.resolution.indexOf('npm') !== -1) {
+        if (f.resolution.indexOf('npm i') !== -1 ||
+          f.resolution.indexOf('npm un') !== -1) {
           this.mapNpmCommand(f.resolution, packagesDevExact,
             packagesDepExact, packagesDepUn, packagesDevUn);
-        } else {
+        }
+        else {
           commandsToExecute.push(f.resolution);
         }
-      } else {
+      }
+      else {
         if (!modificationPerFile[f.file]) {
           modificationPerFile[f.file] = [];
         }
@@ -391,7 +397,7 @@ ${f.resolution}
       '### Execute script', EOL,
       EOL,
       '```sh', EOL,
-      commandsToExecute.filter((command) => command.indexOf('npm') === -1).concat(mainNpmCommands).join(EOL), EOL,
+      (mainNpmCommands.concat(commandsToExecute.filter((command) => command.indexOf('npm i') === -1 && command.indexOf('npm un') === -1))).join(EOL), EOL,
       '```', EOL,
       EOL,
       '### Modify files', EOL,
