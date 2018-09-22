@@ -10,8 +10,10 @@
 - [spo listitem list](../cmd/spo/listitem/listitem-list.md) - gets a list of items from the specified list [#268](https://github.com/pnp/office365-cli/issues/268)
 - [spo page column get](../cmd/spo/page/page-column-get.md) - get information about a specific column of a modern page [#412](https://github.com/pnp/office365-cli/issues/412)
 - [spo page remove](../cmd/spo/page/page-remove.md) - removes a modern page [#363](https://github.com/pnp/office365-cli/issues/363)
+- [spo page section add](../cmd/spo/page/page-section-add.md) - adds section to modern page [#364](https://github.com/pnp/office365-cli/issues/364)
 - [spo site classic remove](../cmd/spo/site/site-classic-remove.md) - removes the specified site [#125](https://github.com/pnp/office365-cli/issues/125)
 - [spo tenant settings list](../cmd/spo/tenant/tenant-settings-list.md) - lists the global tenant settings [#548](https://github.com/pnp/office365-cli/issues/548)
+- [spo term group get](../cmd/spo/term/term-group-get.md) - gets information about the specified taxonomy term group [#597](https://github.com/pnp/office365-cli/issues/597)
 - [spo term group list](../cmd/spo/term/term-group-list.md) - lists taxonomy term groups [#596](https://github.com/pnp/office365-cli/issues/596)
 
 **Microsoft Graph:**
@@ -21,6 +23,7 @@
 
 **Azure Management Service:**
 
+- [azmgmt flow export](../cmd/azmgmt/flow/flow-export.md) - exports the specified Microsoft Flow as a file [#383](https://github.com/pnp/office365-cli/issues/383)
 - [azmgmt flow run get](../cmd/azmgmt/flow/flow-run-get.md) - gets information about a specific run of the specified Microsoft Flow [#400](https://github.com/pnp/office365-cli/issues/400)
 - [azmgmt flow run list](../cmd/azmgmt/flow/flow-run-list.md) - lists runs of the specified Microsoft Flow [#399](https://github.com/pnp/office365-cli/issues/399)
 
@@ -33,6 +36,8 @@
 - fixed upgrade SPFx 1.6.0 FN012012 always returns a finding [#580](https://github.com/pnp/office365-cli/issues/580)
 - combined npm commands in SPFx project upgrade summary solving [#508](https://github.com/pnp/office365-cli/issues/508)
 - renamed 'connect' commands to 'login' [#574](https://github.com/pnp/office365-cli/issues/574)
+- updated docs on escaping objectId in aad oauth2grant set and remove [#606](https://github.com/pnp/office365-cli/issues/606)
+- added 'npm dedupe' SPFx project upgrade rule [#612](https://github.com/pnp/office365-cli/issues/612)
 
 ## [v1.6.0](https://github.com/pnp/office365-cli/releases/tag/v1.6.0)
 
