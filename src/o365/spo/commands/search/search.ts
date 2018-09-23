@@ -20,6 +20,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   query: string;
+  selectProperties:string;
 }
 
 class SearchCommand extends SpoCommand {
@@ -57,7 +58,7 @@ class SearchCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          url: `${webUrl}/_api/search/query?querytext='${args.options.query}'`,
+          url: this.getRequestUrl(webUrl,cmd,args),
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${accessToken}`,
             'accept': 'application/json;odata=nometadata'
@@ -70,7 +71,6 @@ class SearchCommand extends SpoCommand {
           cmd.log(requestOptions);
           cmd.log('');
         }
-        
 
         return request.get(requestOptions);
       })
@@ -81,9 +81,59 @@ class SearchCommand extends SpoCommand {
           cmd.log(searchResult);
           cmd.log('');
         }
-        cmd.log(searchResult);
+
+        if (args.options.output === 'json') {
+          cmd.log(searchResult);
+        }
+        else {
+          cmd.log(this.getTextOutput(args,searchResult));
+        }
+
+
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+  }
+
+  private getTextOutput(args: CommandArgs,searchResult: SearchResult) {
+    var selectProperties = this.getSelectPropertiesArray(args);
+    var outputData = searchResult.PrimaryQueryResult.RelevantResults.Table.Rows.map(row => {
+      var rowOutput:any = {};
+
+      row.Cells.map(cell => { 
+        if(selectProperties.filter(prop => { return cell.Key.toUpperCase() === prop.toUpperCase() }).length > 0) {
+          rowOutput[cell.Key] = cell.Value;
+        }
+      })
+
+      return rowOutput;
+    });
+    return outputData;
+  }
+
+  private getRequestUrl(webUrl:string, cmd:CommandInstance, args: CommandArgs): string {
+    //Get arg data
+    const selectPropertiesArray: string[] = this.getSelectPropertiesArray(args);
+
+    //Transform arg data to requeststrings
+    const propertySelect: string = selectPropertiesArray.length > 0 ?
+        `&selectproperties='${encodeURIComponent(selectPropertiesArray.join(","))}'` :
+        ``;
+
+    //Construct single requestUrl
+    const requestUrl = `${webUrl}/_api/search/query?querytext='${args.options.query}'${propertySelect}`
+
+    if(this.debug) {
+      cmd.log(`RequestURL: ${requestUrl}`);
+    }
+    return requestUrl;
+  }
+
+  private getSelectPropertiesArray(args: CommandArgs) {
+    return args.options.selectProperties 
+      ? args.options.selectProperties.split(",")
+      : (!args.options.output || args.options.output === "text") 
+        ? ["Rank","DocId","OriginalPath"/*,"PartitionId","UrlZone","Culture","ResultTypeId","RenderTemplateId"*/]
+        : [];
   }
 
   public options(): CommandOption[] {
@@ -91,6 +141,10 @@ class SearchCommand extends SpoCommand {
       {
         option: '-q, --query <query>',
         description: 'Query to be executed in KQL format'
+      },
+      {
+        option: '-p, --selectProperties <selectProperties>',
+        description: 'Comma separated list of properties to retrieve. Will retrieve all properties if not specified and json output is requested.'
       }
     ];
 
@@ -122,9 +176,11 @@ class SearchCommand extends SpoCommand {
         
   Examples:
   
-    Execute search query '${chalk.grey('ContentTypeId:0x0120D520')}'
-    Return all document sets available through the SharePoint search engine
+    Execute search query to retrieve all Document Sets (ContentTypeId = '${chalk.grey('0x0120D520')}')
       ${chalk.grey(config.delimiter)} ${commands.SEARCH} --query 'ContentTypeId:0x0120D520'
+
+    Retrieve all documents. For each document, retrieve the Path, Author and FileType.
+      ${chalk.grey(config.delimiter)} ${commands.SEARCH} --query 'IsDocument:1' --selectProperties 'Path,Author,FileType'
       `);
   }
 }
