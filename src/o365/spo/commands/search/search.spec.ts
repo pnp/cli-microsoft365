@@ -12,9 +12,11 @@ describe(commands.SEARCH, () => {
   let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
   let trackEvent: any;
   let telemetry: any;
+  const expectedArrayLengthDocuments = 2;
+  const expectedArrayLengthAll = 3;
+  let returnArrayLength = 0;
   let stubAuth: any = () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf('/common/oauth2/token') > -1) {
@@ -29,6 +31,177 @@ describe(commands.SEARCH, () => {
 
       return Promise.reject('Invalid request');
     });
+  }
+  let getFakes = (opts:any) => {
+    console.log(opts);
+    if (opts.url.indexOf('querytext=\'IsDocument:1\'') > -1) {
+      returnArrayLength = 2;
+      return Promise.resolve({
+        "ElapsedTime": 83,
+        "PrimaryQueryResult": {
+          "CustomResults": [],
+          "QueryId": "00000000-0000-0000-0000-000000000000",
+          "QueryRuleId": "00000000-0000-0000-0000-000000000000",
+          "RefinementResults": null,
+          "RelevantResults": {
+            "GroupTemplateId": null,
+            "ItemTemplateId": null,
+            "Properties": [
+              {
+                "Key": "GenerationId",
+                "Value": "9223372036854775806",
+                "ValueType": "Edm.Int64"
+              }
+            ],
+            "ResultTitle": null,
+            "ResultTitleUrl": null,
+            "RowCount": 0,
+            "Table": {
+              "Rows": [
+                {
+                  "Cells":[
+                    {"Key":"Rank","Value":"1","ValueType":"Edm.Double"},
+                    {"Key":"DocId","Value":"1","ValueType":"Edm.Int64"},
+                    {"Key":"Path","Value":"MyPath-item1","ValueType":"Edm.String"},
+                    {"Key":"Author","Value":"myAuthor-item1","ValueType":"Edm.String"},
+                    {"Key":"FileType","Value":"aspx","ValueType":"Edm.String"},
+                    {"Key":"OriginalPath","Value":"myOriginalPath-item1","ValueType":"Edm.String"},
+                    {"Key":"PartitionId","Value":"00000000-0000-0000-0000-000000000000","ValueType":"Edm.Guid"},
+                    {"Key":"UrlZone","Value":"0","ValueType":"Edm.Int32"},
+                    {"Key":"Culture","Value":"en-US","ValueType":"Edm.String"},
+                    {"Key":"ResultTypeId","Value":"0","ValueType":"Edm.Int32"},
+                    {"Key":"IsDocument","Value":"true","ValueType":"Edm.Boolean"},
+                    {"Key":"RenderTemplateId","Value":"~sitecollection/_catalogs/masterpage/Display Templates/Search/Item_Default.js","ValueType":"Edm.String"}
+                  ]
+                },
+                {
+                  "Cells":[
+                    {"Key":"Rank","Value":"2","ValueType":"Edm.Double"},
+                    {"Key":"DocId","Value":"2","ValueType":"Edm.Int64"},
+                    {"Key":"Path","Value":"MyPath-item2","ValueType":"Edm.String"},
+                    {"Key":"Author","Value":"myAuthor-item2","ValueType":"Edm.String"},
+                    {"Key":"FileType","Value":"aspx","ValueType":"Edm.String"},
+                    {"Key":"OriginalPath","Value":"myOriginalPath-item2","ValueType":"Edm.String"},
+                    {"Key":"PartitionId","Value":"00000000-0000-0000-0000-000000000000","ValueType":"Edm.Guid"},
+                    {"Key":"UrlZone","Value":"0","ValueType":"Edm.Int32"},
+                    {"Key":"Culture","Value":"en-US","ValueType":"Edm.String"},
+                    {"Key":"ResultTypeId","Value":"0","ValueType":"Edm.Int32"},
+                    {"Key":"IsDocument","Value":"true","ValueType":"Edm.Boolean"},
+                    {"Key":"RenderTemplateId","Value":"~sitecollection/_catalogs/masterpage/Display Templates/Search/Item_Default.js","ValueType":"Edm.String"}
+                  ]
+                }
+              ]
+            },
+            "TotalRows": 0,
+            "TotalRowsIncludingDuplicates": 0
+          },
+          "SpecialTermResults": null
+        },
+        "Properties": [
+          {
+            "Key": "RowLimit",
+            "Value": "10",
+            "ValueType": "Edm.Int32"
+          }
+        ],
+        "SecondaryQueryResults": [],
+        "SpellingSuggestion": "",
+        "TriggeredRules": []
+      });
+    }
+    if (opts.url.indexOf('querytext=\'*\'') > -1) {
+      returnArrayLength = 3;
+      return Promise.resolve({
+        "ElapsedTime": 83,
+        "PrimaryQueryResult": {
+          "CustomResults": [],
+          "QueryId": "00000000-0000-0000-0000-000000000000",
+          "QueryRuleId": "00000000-0000-0000-0000-000000000000",
+          "RefinementResults": null,
+          "RelevantResults": {
+            "GroupTemplateId": null,
+            "ItemTemplateId": null,
+            "Properties": [
+              {
+                "Key": "GenerationId",
+                "Value": "9223372036854775806",
+                "ValueType": "Edm.Int64"
+              }
+            ],
+            "ResultTitle": null,
+            "ResultTitleUrl": null,
+            "RowCount": 0,
+            "Table": {
+              "Rows": [
+                {
+                  "Cells":[
+                    {"Key":"Rank","Value":"1","ValueType":"Edm.Double"},
+                    {"Key":"DocId","Value":"1","ValueType":"Edm.Int64"},
+                    {"Key":"Path","Value":"MyPath-item1","ValueType":"Edm.String"},
+                    {"Key":"Author","Value":"myAuthor-item1","ValueType":"Edm.String"},
+                    {"Key":"FileType","Value":"docx","ValueType":"Edm.String"},
+                    {"Key":"OriginalPath","Value":"myOriginalPath-item1","ValueType":"Edm.String"},
+                    {"Key":"PartitionId","Value":"00000000-0000-0000-0000-000000000000","ValueType":"Edm.Guid"},
+                    {"Key":"UrlZone","Value":"0","ValueType":"Edm.Int32"},
+                    {"Key":"Culture","Value":"en-US","ValueType":"Edm.String"},
+                    {"Key":"ResultTypeId","Value":"0","ValueType":"Edm.Int32"},
+                    {"Key":"IsDocument","Value":"true","ValueType":"Edm.Boolean"},
+                    {"Key":"RenderTemplateId","Value":"~sitecollection/_catalogs/masterpage/Display Templates/Search/Item_Default.js","ValueType":"Edm.String"}
+                  ]
+                },
+                {
+                  "Cells":[
+                    {"Key":"Rank","Value":"2","ValueType":"Edm.Double"},
+                    {"Key":"DocId","Value":"2","ValueType":"Edm.Int64"},
+                    {"Key":"Path","Value":"MyPath-item2","ValueType":"Edm.String"},
+                    {"Key":"Author","Value":"myAuthor-item2","ValueType":"Edm.String"},
+                    {"Key":"FileType","Value":"docx","ValueType":"Edm.String"},
+                    {"Key":"OriginalPath","Value":"myOriginalPath-item2","ValueType":"Edm.String"},
+                    {"Key":"PartitionId","Value":"00000000-0000-0000-0000-000000000000","ValueType":"Edm.Guid"},
+                    {"Key":"UrlZone","Value":"0","ValueType":"Edm.Int32"},
+                    {"Key":"Culture","Value":"en-US","ValueType":"Edm.String"},
+                    {"Key":"ResultTypeId","Value":"0","ValueType":"Edm.Int32"},
+                    {"Key":"IsDocument","Value":"true","ValueType":"Edm.Boolean"},
+                    {"Key":"RenderTemplateId","Value":"~sitecollection/_catalogs/masterpage/Display Templates/Search/Item_Default.js","ValueType":"Edm.String"}
+                  ]
+                },
+                {
+                  "Cells":[
+                    {"Key":"Rank","Value":"3","ValueType":"Edm.Double"},
+                    {"Key":"DocId","Value":"3","ValueType":"Edm.Int64"},
+                    {"Key":"Path","Value":"MyPath-item3","ValueType":"Edm.String"},
+                    {"Key":"Author","Value":"myAuthor-item3","ValueType":"Edm.String"},
+                    {"Key":"FileType","Value":"aspx","ValueType":"Edm.String"},
+                    {"Key":"OriginalPath","Value":"myOriginalPath-item3","ValueType":"Edm.String"},
+                    {"Key":"PartitionId","Value":"00000000-0000-0000-0000-000000000000","ValueType":"Edm.Guid"},
+                    {"Key":"UrlZone","Value":"0","ValueType":"Edm.Int32"},
+                    {"Key":"Culture","Value":"en-US","ValueType":"Edm.String"},
+                    {"Key":"ResultTypeId","Value":"0","ValueType":"Edm.Int32"},
+                    {"Key":"IsDocument","Value":"false","ValueType":"Edm.Boolean"},
+                    {"Key":"RenderTemplateId","Value":"~sitecollection/_catalogs/masterpage/Display Templates/Search/Item_Default.js","ValueType":"Edm.String"}
+                  ]
+                }
+              ]
+            },
+            "TotalRows": 0,
+            "TotalRowsIncludingDuplicates": 0
+          },
+          "SpecialTermResults": null
+        },
+        "Properties": [
+          {
+            "Key": "RowLimit",
+            "Value": "10",
+            "ValueType": "Edm.Int32"
+          }
+        ],
+        "SecondaryQueryResults": [],
+        "SpellingSuggestion": "",
+        "TriggeredRules": []
+      });
+    }
+    returnArrayLength = 0;
+    return Promise.reject('Invalid request');
   }
 
   before(() => {
@@ -48,7 +221,6 @@ describe(commands.SEARCH, () => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
     auth.site = new Site();
     telemetry = null;
   });
@@ -121,52 +293,7 @@ describe(commands.SEARCH, () => {
   it('executes search request', (done) => {
     stubAuth();
 
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/search') > -1) {
-        return Promise.resolve(
-          {
-            "ElapsedTime": 83,
-            "PrimaryQueryResult": {
-              "CustomResults": [],
-              "QueryId": "00000000-0000-0000-0000-000000000000",
-              "QueryRuleId": "00000000-0000-0000-0000-000000000000",
-              "RefinementResults": null,
-              "RelevantResults": {
-                "GroupTemplateId": null,
-                "ItemTemplateId": null,
-                "Properties": [
-                  {
-                    "Key": "GenerationId",
-                    "Value": "9223372036854775806",
-                    "ValueType": "Edm.Int64"
-                  }
-                ],
-                "ResultTitle": null,
-                "ResultTitleUrl": null,
-                "RowCount": 0,
-                "Table": {
-                  "Rows": []
-                },
-                "TotalRows": 0,
-                "TotalRowsIncludingDuplicates": 0
-              },
-              "SpecialTermResults": null
-            },
-            "Properties": [
-              {
-                "Key": "RowLimit",
-                "Value": "10",
-                "ValueType": "Edm.Int32"
-              }
-            ],
-            "SecondaryQueryResults": [],
-            "SpellingSuggestion": "",
-            "TriggeredRules": []
-          }
-        );
-      }
-      return Promise.reject('Invalid request');
-    });
+    sinon.stub(request, 'get').callsFake(getFakes);
 
     auth.site = new Site();
     auth.site.connected = true;
@@ -181,45 +308,7 @@ describe(commands.SEARCH, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
-          ElapsedTime: 83,
-          PrimaryQueryResult: {
-            CustomResults: [],
-            QueryId: "00000000-0000-0000-0000-000000000000",
-            QueryRuleId: "00000000-0000-0000-0000-000000000000",
-            RefinementResults: null,
-            RelevantResults: {
-              GroupTemplateId: null,
-              ItemTemplateId: null,
-              Properties: [
-                {
-                  Key: "GenerationId",
-                  Value: "9223372036854775806",
-                  ValueType: "Edm.Int64"
-                }
-              ],
-              ResultTitle: null,
-              ResultTitleUrl: null,
-              RowCount: 0,
-              Table: {
-                Rows: []
-              },
-              TotalRows: 0,
-              TotalRowsIncludingDuplicates: 0
-            },
-            SpecialTermResults: null
-          },
-          Properties: [
-            {
-              Key: "RowLimit",
-              Value: "10",
-              ValueType: "Edm.Int32"
-            }
-          ],
-          SecondaryQueryResults: [],
-          SpellingSuggestion: "",
-          TriggeredRules: []
-        }));
+        assert.equal(returnArrayLength, expectedArrayLengthAll);
         done();
       }
       catch (e) {
@@ -235,52 +324,7 @@ describe(commands.SEARCH, () => {
   it('executes search request with output option text', (done) => {
     stubAuth();
 
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/search') > -1) {
-        return Promise.resolve(
-          {
-            "ElapsedTime": 83,
-            "PrimaryQueryResult": {
-              "CustomResults": [],
-              "QueryId": "00000000-0000-0000-0000-000000000000",
-              "QueryRuleId": "00000000-0000-0000-0000-000000000000",
-              "RefinementResults": null,
-              "RelevantResults": {
-                "GroupTemplateId": null,
-                "ItemTemplateId": null,
-                "Properties": [
-                  {
-                    "Key": "GenerationId",
-                    "Value": "9223372036854775806",
-                    "ValueType": "Edm.Int64"
-                  }
-                ],
-                "ResultTitle": null,
-                "ResultTitleUrl": null,
-                "RowCount": 0,
-                "Table": {
-                  "Rows": []
-                },
-                "TotalRows": 0,
-                "TotalRowsIncludingDuplicates": 0
-              },
-              "SpecialTermResults": null
-            },
-            "Properties": [
-              {
-                "Key": "RowLimit",
-                "Value": "10",
-                "ValueType": "Edm.Int32"
-              }
-            ],
-            "SecondaryQueryResults": [],
-            "SpellingSuggestion": "",
-            "TriggeredRules": []
-          }
-        );
-      }
-      return Promise.reject('Invalid request');
-    });
+    sinon.stub(request, 'get').callsFake(getFakes);
 
     auth.site = new Site();
     auth.site.connected = true;
@@ -291,49 +335,43 @@ describe(commands.SEARCH, () => {
       options: {
         output: 'text',
         debug: false,
-        query: '*'
+        query: 'IsDocument:1'
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
-          ElapsedTime: 83,
-          PrimaryQueryResult: {
-            CustomResults: [],
-            QueryId: "00000000-0000-0000-0000-000000000000",
-            QueryRuleId: "00000000-0000-0000-0000-000000000000",
-            RefinementResults: null,
-            RelevantResults: {
-              GroupTemplateId: null,
-              ItemTemplateId: null,
-              Properties: [
-                {
-                  Key: "GenerationId",
-                  Value: "9223372036854775806",
-                  ValueType: "Edm.Int64"
-                }
-              ],
-              ResultTitle: null,
-              ResultTitleUrl: null,
-              RowCount: 0,
-              Table: {
-                Rows: []
-              },
-              TotalRows: 0,
-              TotalRowsIncludingDuplicates: 0
-            },
-            SpecialTermResults: null
-          },
-          Properties: [
-            {
-              Key: "RowLimit",
-              Value: "10",
-              ValueType: "Edm.Int32"
-            }
-          ],
-          SecondaryQueryResults: [],
-          SpellingSuggestion: "",
-          TriggeredRules: []
-        }));
+        assert.equal(returnArrayLength, expectedArrayLengthDocuments);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('executes search request with selectProperties', (done) => {
+    stubAuth();
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        output: 'text',
+        debug: false,
+        query: 'IsDocument:1',
+        selectProperties: 'Path'
+      }
+    }, () => {
+      try {
+        assert.equal(returnArrayLength, expectedArrayLengthDocuments);
         done();
       }
       catch (e) {
