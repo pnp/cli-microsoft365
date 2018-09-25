@@ -37,5 +37,5 @@ spo search --query 'ContentTypeId:0x0120D520'
 Retrieve all documents. For each document, retrieve the Path, Author and FileType.
 
 ```sh
-spo search --query 'IsDocument:1' --selectProperties 'Path,Author,FileType'
+spo search --query 'IsDocument:1' --selectProperties 'Path,Author,FileType' --allResults
 ```

@@ -11,6 +11,7 @@ import SpoCommand from '../../SpoCommand';
 import { Auth } from '../../../../Auth';
 import Utils from '../../../../Utils';
 import { SearchResult } from './datatypes/SearchResult';
+import { ResultTableRow } from './datatypes/ResultTableRow';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -21,6 +22,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   query: string;
   selectProperties:string;
+  allResults?:boolean;
 }
 
 class SearchCommand extends SpoCommand {
@@ -34,7 +36,9 @@ class SearchCommand extends SpoCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.query = (!(!args.options.query)).toString();
+    telemetryProps.query = args.options.query;
+    telemetryProps.selectproperties = args.options.selectProperties;
+    telemetryProps.allResults = args.options.allResults;
     return telemetryProps;
   }
 
@@ -48,7 +52,7 @@ class SearchCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): string => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}.`);
         }
@@ -57,8 +61,44 @@ class SearchCommand extends SpoCommand {
           cmd.log(`Executing search query '${args.options.query}' on site at ${webUrl}...`);
         }
 
+        return accessToken;
+      })
+      .then((accessToken:string):Promise<any[]> => {
+        return this.executeSearchQuery(cmd,args,accessToken,webUrl,[],0);
+      })
+      .then((results:any[]) => { 
+        this.printResults(cmd,args,results);
+      })
+      .then(() => {
+        cb();
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+  }
+
+  private printResults(cmd:CommandInstance,args:CommandArgs,results:SearchResult[]) {
+    if(results.length === 1) {
+      if(args.options.output === 'json') {
+        cmd.log(results[0]);
+      } else {
+        cmd.log(this.getTextOutput(args,results[0].PrimaryQueryResult.RelevantResults.Table.Rows));
+      }
+    } else {
+      if(args.options.output === 'json') {
+        cmd.log(results);
+      } else {
+        let allRows:ResultTableRow[] = [];
+        for(let i = 0;i < results.length;i++) {
+          allRows.push(...results[i].PrimaryQueryResult.RelevantResults.Table.Rows);
+        }
+        cmd.log(this.getTextOutput(args,allRows));
+      }
+    }
+  }
+
+  private executeSearchQuery(cmd:CommandInstance,args:CommandArgs,accessToken:string,webUrl:string,resultSet:SearchResult[],startRow:number):Promise<SearchResult[]> {
+    return (():request.RequestPromise => { 
+        const requestUrl:string = this.getRequestUrl(webUrl,cmd,args,startRow);
         const requestOptions: any = {
-          url: this.getRequestUrl(webUrl,cmd,args),
+          url: requestUrl,
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${accessToken}`,
             'accept': 'application/json;odata=nometadata'
@@ -73,8 +113,8 @@ class SearchCommand extends SpoCommand {
         }
 
         return request.get(requestOptions);
-      })
-      .then((searchResult: SearchResult): void => {
+      })()
+      .then((searchResult: SearchResult): SearchResult => {
         if (this.debug) {
           cmd.log(`${searchResult.PrimaryQueryResult.RelevantResults.TotalRowsIncludingDuplicates} Results found (including duplicates) :`);
           cmd.log('');
@@ -82,21 +122,25 @@ class SearchCommand extends SpoCommand {
           cmd.log('');
         }
 
-        if (args.options.output === 'json') {
-          cmd.log(searchResult);
-        }
-        else {
-          cmd.log(this.getTextOutput(args,searchResult));
-        }
+        resultSet.push(searchResult);
 
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+        return searchResult;
+      })
+      .then((searchResult:SearchResult):Promise<SearchResult[]> => {
+        if(args.options.allResults) {
+          if(startRow + searchResult.PrimaryQueryResult.RelevantResults.RowCount < searchResult.PrimaryQueryResult.RelevantResults.TotalRows) {
+            const nextStartRow = startRow + searchResult.PrimaryQueryResult.RelevantResults.RowCount;
+            return this.executeSearchQuery(cmd,args,accessToken,webUrl,resultSet,nextStartRow);
+          }
+        } 
+        return new Promise<SearchResult[]>((resolve) => { resolve(resultSet); });
+      })
+      .then(() => { return resultSet });
   }
 
-  private getTextOutput(args: CommandArgs,searchResult: SearchResult) {
+  private getTextOutput(args: CommandArgs,searchResultRows: ResultTableRow[]) {
     var selectProperties = this.getSelectPropertiesArray(args);
-    var outputData = searchResult.PrimaryQueryResult.RelevantResults.Table.Rows.map(row => {
+    var outputData = searchResultRows.map(row => {
       var rowOutput:any = {};
 
       row.Cells.map(cell => { 
@@ -110,17 +154,19 @@ class SearchCommand extends SpoCommand {
     return outputData;
   }
 
-  private getRequestUrl(webUrl:string, cmd:CommandInstance, args: CommandArgs): string {
+  private getRequestUrl(webUrl:string, cmd:CommandInstance, args: CommandArgs,startRow:number): string {
     //Get arg data
     const selectPropertiesArray: string[] = this.getSelectPropertiesArray(args);
 
     //Transform arg data to requeststrings
-    const propertySelect: string = selectPropertiesArray.length > 0 ?
+    const propertySelectRequestString: string = selectPropertiesArray.length > 0 ?
         `&selectproperties='${encodeURIComponent(selectPropertiesArray.join(","))}'` :
         ``;
+    const startRowRequestString = `&startrow='${startRow ? startRow : 0}'`;
+    const rowLimitRequestString = `&rowlimit=1`
 
     //Construct single requestUrl
-    const requestUrl = `${webUrl}/_api/search/query?querytext='${args.options.query}'${propertySelect}`
+    const requestUrl = `${webUrl}/_api/search/query?querytext='${args.options.query}'${propertySelectRequestString}${startRowRequestString}${rowLimitRequestString}`
 
     if(this.debug) {
       cmd.log(`RequestURL: ${requestUrl}`);
@@ -145,6 +191,10 @@ class SearchCommand extends SpoCommand {
       {
         option: '-p, --selectProperties <selectProperties>',
         description: 'Comma separated list of properties to retrieve. Will retrieve all properties if not specified and json output is requested.'
+      },
+      {
+        option: '--allResults',
+        description: 'Get all results of the search query, not only the amount specified by the rowlimit (default: 10)'
       }
     ];
 
@@ -156,6 +206,9 @@ class SearchCommand extends SpoCommand {
     return (args: CommandArgs): boolean | string => {
       if (!args.options.query) {
         return 'Required parameter query missing';
+      }
+      if(typeof(args.options.allResults) === 'undefined') {
+        args.options.allResults = false;
       }
 
       return true;
@@ -180,7 +233,7 @@ class SearchCommand extends SpoCommand {
       ${chalk.grey(config.delimiter)} ${commands.SEARCH} --query 'ContentTypeId:0x0120D520'
 
     Retrieve all documents. For each document, retrieve the Path, Author and FileType.
-      ${chalk.grey(config.delimiter)} ${commands.SEARCH} --query 'IsDocument:1' --selectProperties 'Path,Author,FileType'
+      ${chalk.grey(config.delimiter)} ${commands.SEARCH} --query 'IsDocument:1' --selectProperties 'Path,Author,FileType' --allResults
       `);
   }
 }
