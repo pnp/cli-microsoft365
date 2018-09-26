@@ -300,7 +300,7 @@ Get-PnPTenantSite|SharePointPnPPowerShellOnline|[spo site get](../cmd/spo/site/s
 Get-PnPTenantTheme|SharePointPnPPowerShellOnline|[spo theme get](../cmd/spo/theme/theme-get.md), [spo theme list](../cmd/spo/theme/theme-list.md)
 Get-PnPTerm|SharePointPnPPowerShellOnline|
 Get-PnPTermGroup|SharePointPnPPowerShellOnline|[spo term group get](../cmd/spo/term/term-group-get.md), [spo term group list](../cmd/spo/term/term-group-list.md)
-Get-PnPTermSet|SharePointPnPPowerShellOnline|
+Get-PnPTermSet|SharePointPnPPowerShellOnline|[spo term set list](../cmd/spo/term/term-set-list.md)
 Get-PnPTheme|SharePointPnPPowerShellOnline|
 Get-PnPTimeZoneId|SharePointPnPPowerShellOnline|
 Get-PnPUnifiedGroup|SharePointPnPPowerShellOnline|[graph o365group get](../cmd/graph/o365group/o365group-get.md), [graph o365group list](../cmd/graph/o365group/o365group-list.md)
