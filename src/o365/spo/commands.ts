@@ -137,6 +137,7 @@ export default {
   TERM_GROUP_ADD: `${prefix} term group add`,
   TERM_GROUP_GET: `${prefix} term group get`,
   TERM_GROUP_LIST: `${prefix} term group list`,
+  TERM_SET_LIST: `${prefix} term set list`,
   THEME_APPLY: `${prefix} theme apply`,
   THEME_GET: `${prefix} theme get`,
   THEME_LIST: `${prefix} theme list`,
