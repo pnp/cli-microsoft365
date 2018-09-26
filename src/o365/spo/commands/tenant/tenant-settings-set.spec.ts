@@ -258,7 +258,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     cmdInstance.action({
       options: {
         verbose: true,
-        notificationsInSharePointEnabled: true
+        NotificationsInSharePointEnabled: true
       }
     }, () => {
       try {
@@ -280,7 +280,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
-        notificationsInSharePointEnabled: true
+        NotificationsInSharePointEnabled: true
       }
     }, () => {
       try {
@@ -302,7 +302,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
-        excludedFileExtensionsForSyncClient: 'xml,xslt,xsd'
+        ExcludedFileExtensionsForSyncClient: 'xml,xslt,xsd'
       }
     }, () => {
       try {
@@ -324,7 +324,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
-        allowedDomainListForSyncClient: '6648899e-a042-6000-ee90-5bfa05d08b79,6648899e-a042-6000-ee90-5bfa05d08b77'
+        AllowedDomainListForSyncClient: '6648899e-a042-6000-ee90-5bfa05d08b79,6648899e-a042-6000-ee90-5bfa05d08b77'
       }
     }, () => {
       try {
@@ -346,7 +346,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
-        disabledWebPartIds: '6648899e-a042-6000-ee90-5bfa05d08b79,6648899e-a042-6000-ee90-5bfa05d08b77'
+        DisabledWebPartIds: '6648899e-a042-6000-ee90-5bfa05d08b79,6648899e-a042-6000-ee90-5bfa05d08b77'
       }
     }, () => {
       try {
@@ -368,11 +368,11 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
-        disabledWebPartIds: '6648899e-a042-6000-ee90-5bfa05d08b79,6648899e-a042-6000-ee90-5bfa05d08b77',
-        excludedFileExtensionsForSyncClient: 'xsl,doc,ttf',
-        officeClientADALDisabled: true,
-        oneDriveStorageQuota: 256,
-        orgNewsSiteUrl: 'https://contoso-admin.sharepoint.com'
+        DisabledWebPartIds: '6648899e-a042-6000-ee90-5bfa05d08b79,6648899e-a042-6000-ee90-5bfa05d08b77',
+        ExcludedFileExtensionsForSyncClient: 'xsl,doc,ttf',
+        OfficeClientADALDisabled: true,
+        OneDriveStorageQuota: 256,
+        OrgNewsSiteUrl: 'https://contoso-admin.sharepoint.com'
       }
     }, () => {
       try {
@@ -493,17 +493,17 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       options: {
         debug: true,
         verbose: true,
-        sharingCapability: 'ExternalUserSharingOnly',
-        sharingDomainRestrictionMode: 'AllowList',
-        defaultSharingLinkType: 'Direct',
-        oDBMembersCanShare: 'On',
-        oDBAccessRequests: 'Off',
-        fileAnonymousLinkType: 'View',
-        folderAnonymousLinkType: 'Edit',
-        defaultLinkPermission: 'View',
-        conditionalAccessPolicy: 'AllowLimitedAccess',
-        limitedAccessFileType: 'WebPreviewableFiles',
-        specialCharactersStateInFileFolderNames: 'Allowed'
+        SharingCapability: 'ExternalUserSharingOnly',
+        SharingDomainRestrictionMode: 'AllowList',
+        DefaultSharingLinkType: 'Direct',
+        ODBMembersCanShare: 'On',
+        ODBAccessRequests: 'Off',
+        FileAnonymousLinkType: 'View',
+        FolderAnonymousLinkType: 'Edit',
+        DefaultLinkPermission: 'View',
+        ConditionalAccessPolicy: 'AllowLimitedAccess',
+        LimitedAccessFileType: 'WebPreviewableFiles',
+        SpecialCharactersStateInFileFolderNames: 'Allowed'
       }
     }, () => {
       try {
@@ -518,26 +518,26 @@ describe(commands.TENANT_SETTINGS_SET, () => {
 
   it('validation fails if wrong enum value', () => {
     const options: any = {
-      sharingCapability: 'abc'
+      SharingCapability: 'abc'
     }
     const actual = (command.validate() as CommandValidate)({ options: options });
-    assert.equal(actual, 'sharingCapability option has invalid value of abc. Allowed values are ["Disabled","ExternalUserSharingOnly","ExternalUserAndGuestSharing","ExistingExternalUserSharingOnly"]');
+    assert.equal(actual, 'SharingCapability option has invalid value of abc. Allowed values are ["Disabled","ExternalUserSharingOnly","ExternalUserAndGuestSharing","ExistingExternalUserSharingOnly"]');
   });
 
   it('validation passes if right enum value', () => {
     const options: any = {
       debug: true,
-      sharingCapability: 'ExternalUserSharingOnly',
-      sharingDomainRestrictionMode: 'AllowList',
-      defaultSharingLinkType: 'Direct',
-      oDBMembersCanShare: 'On',
-      oDBAccessRequests: 'Off',
-      fileAnonymousLinkType: 'View',
-      folderAnonymousLinkType: 'Edit',
-      defaultLinkPermission: 'View',
-      conditionalAccessPolicy: 'AllowLimitedAccess',
-      limitedAccessFileType: 'WebPreviewableFiles',
-      specialCharactersStateInFileFolderNames: 'Allowed',
+      SharingCapability: 'ExternalUserSharingOnly',
+      SharingDomainRestrictionMode: 'AllowList',
+      DefaultSharingLinkType: 'Direct',
+      ODBMembersCanShare: 'On',
+      ODBAccessRequests: 'Off',
+      FileAnonymousLinkType: 'View',
+      FolderAnonymousLinkType: 'Edit',
+      DefaultLinkPermission: 'View',
+      ConditionalAccessPolicy: 'AllowLimitedAccess',
+      LimitedAccessFileType: 'WebPreviewableFiles',
+      SpecialCharactersStateInFileFolderNames: 'Allowed',
     }
     const actual = (command.validate() as CommandValidate)({ options: options });
     assert.equal(actual, true);
@@ -545,10 +545,10 @@ describe(commands.TENANT_SETTINGS_SET, () => {
 
   it('validation fails if wrong enum value', () => {
     const options: any = {
-      sharingCapability: 'abc'
+      SharingCapability: 'abc'
     }
     const actual = (command.validate() as CommandValidate)({ options: options });
-    assert.equal(actual, 'sharingCapability option has invalid value of abc. Allowed values are ["Disabled","ExternalUserSharingOnly","ExternalUserAndGuestSharing","ExistingExternalUserSharingOnly"]');
+    assert.equal(actual, 'SharingCapability option has invalid value of abc. Allowed values are ["Disabled","ExternalUserSharingOnly","ExternalUserAndGuestSharing","ExistingExternalUserSharingOnly"]');
   });
 
   it('validation fails if wrong enum key', () => {
@@ -559,7 +559,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
 
   it('validation passes if right prop value', () => {
     const options: any = {
-      orgNewsSiteUrl:'abc'
+      OrgNewsSiteUrl:'abc'
     }
     const actual = (command.validate() as CommandValidate)({ options: options });
     assert.equal(actual, true);
@@ -567,10 +567,10 @@ describe(commands.TENANT_SETTINGS_SET, () => {
 
   it('validation false if boolean option has non boolean value', () => {
     const options: any = {
-      showAllUsersClaim:'abc'
+      ShowAllUsersClaim:'abc'
     }
     const actual = (command.validate() as CommandValidate)({ options: options });
-    assert.equal(actual, 'showAllUsersClaim option has invalid value of abc. Allowed values are ["true","false"]');
+    assert.equal(actual, 'ShowAllUsersClaim option has invalid value of abc. Allowed values are ["true","false"]');
   });
 
   it('validation fails if no options specified', () => {
@@ -584,7 +584,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
 
   it('validation passes autocomplete check if has the right value specified', () => {
     const options: any = {
-      showAllUsersClaim: true
+      ShowAllUsersClaim: true
     }
     const actual = (command.validate() as CommandValidate)({ options: options });
     assert.equal(actual, true);
