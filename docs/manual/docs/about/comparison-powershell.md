@@ -311,7 +311,7 @@ Get-PnPUser|SharePointPnPPowerShellOnline|
 Get-PnPUserProfileProperty|SharePointPnPPowerShellOnline|
 Get-PnPView|SharePointPnPPowerShellOnline|
 Get-PnPWeb|SharePointPnPPowerShellOnline|[spo web get](../cmd/spo/web/web-get.md), [spo web list](../cmd/spo/web/web-list.md)
-Get-PnPWebhookSubscriptions|SharePointPnPPowerShellOnline|[spo list webhook list](../cmd/spo/list/list-webhook-list.md)
+Get-PnPWebhookSubscriptions|SharePointPnPPowerShellOnline|[spo list webhook get](../cmd/spo/list/list-webhook-get.md), [spo list webhook list](../cmd/spo/list/list-webhook-list.md)
 Get-PnPWebPart|SharePointPnPPowerShellOnline|
 Get-PnPWebPartProperty|SharePointPnPPowerShellOnline|
 Get-PnPWebPartXml|SharePointPnPPowerShellOnline|
