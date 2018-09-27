@@ -83,6 +83,8 @@ class SpoTenantSettingsListCommand extends SpoCommand {
         const anonymousLinkType = ['None', 'View', 'Edit'];
         const sharingPermissionType = ['None', 'View', 'Edit'];
         const sPOConditionalAccessPolicyType = ['AllowFullAccess', 'AllowLimitedAccess', 'BlockAccess'];
+        const specialCharactersState = ['NoPreference', 'Allowed', 'Disallowed'];
+        const sPOLimitedAccessFileType = ['OfficeOnlineFilesOnly', 'WebPreviewableFiles', 'OtherFiles'];
 
         result['SharingCapability'] = sharingCapabilities[result['SharingCapability']];
         result['SharingDomainRestrictionMode'] = sharingDomainRestrictionModes[result['SharingDomainRestrictionMode']];
@@ -93,6 +95,8 @@ class SpoTenantSettingsListCommand extends SpoCommand {
         result['FolderAnonymousLinkType'] = anonymousLinkType[result['FolderAnonymousLinkType']];
         result['DefaultLinkPermission'] = sharingPermissionType[result['DefaultLinkPermission']];
         result['ConditionalAccessPolicy'] = sPOConditionalAccessPolicyType[result['ConditionalAccessPolicy']];
+        result['SpecialCharactersStateInFileFolderNames'] = specialCharactersState[result['SpecialCharactersStateInFileFolderNames']];
+        result['LimitedAccessFileType'] = sPOLimitedAccessFileType[result['LimitedAccessFileType']];
 
         cmd.log(result);
 
