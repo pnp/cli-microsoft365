@@ -24,7 +24,7 @@ interface Options extends GlobalOptions {
   id: string;
 }
 
-class SpoListWebhookListCommand extends SpoCommand {
+class SpoListWebhookGetCommand extends SpoCommand {
   public get name(): string {
     return commands.LIST_WEBHOOK_GET;
   }
@@ -201,4 +201,4 @@ class SpoListWebhookListCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoListWebhookListCommand();
+module.exports = new SpoListWebhookGetCommand();
