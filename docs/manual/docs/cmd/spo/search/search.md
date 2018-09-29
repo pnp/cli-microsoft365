@@ -39,3 +39,9 @@ Retrieve all documents. For each document, retrieve the Path, Author and FileTyp
 ```sh
 spo search --query 'IsDocument:1' --selectProperties 'Path,Author,FileType' --allResults
 ```
+
+Return the top 50 items of which the title starts with 'Marketing'.
+
+```sh
+spo search --query 'Title:Marketing*' --rowLimit=50
+```
