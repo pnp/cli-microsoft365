@@ -86,7 +86,7 @@ describe(commands.SEARCH, () => {
   };
   let fakeRows:ResultTableRow[] = getFakeRows();
   let getQueryResult = (rows:ResultTableRow[],totalRows?:number):SearchResult => {
-    returnArrayLength = rows.length;
+    returnArrayLength = totalRows ? totalRows : rows.length;
 
     return {
       "ElapsedTime": 83,
@@ -107,12 +107,12 @@ describe(commands.SEARCH, () => {
           ],
           "ResultTitle": null,
           "ResultTitleUrl": null,
-          "RowCount": returnArrayLength,
+          "RowCount": rows.length,
           "Table": {
             "Rows": fakeRows
           },
-          "TotalRows": totalRows ? totalRows : returnArrayLength,
-          "TotalRowsIncludingDuplicates": totalRows ? totalRows : returnArrayLength
+          "TotalRows": returnArrayLength,
+          "TotalRowsIncludingDuplicates": returnArrayLength
         },
         "SpecialTermResults": null
       },
@@ -141,9 +141,7 @@ describe(commands.SEARCH, () => {
           return Promise.resolve(getQueryResult([rows[0]],2));
         }
         else if(opts.url.toUpperCase().indexOf('STARTROW=1') > -1) {
-          const queryResult:any = getQueryResult([rows[1]],2);
-          returnArrayLength = 2;
-          return Promise.resolve(queryResult);
+          return Promise.resolve(getQueryResult([rows[1]],2));
         }
         else {
           return Promise.resolve(getQueryResult([]));
