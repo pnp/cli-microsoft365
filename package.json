@@ -72,6 +72,7 @@
     "strip-json-comments": "^2.0.1",
     "typescript": "^3.0.3",
     "update-notifier": "^2.5.0",
+    "uuid": "^3.3.2",
     "vorpal": "github:pnp/vorpal"
   },
   "devDependencies": {
