@@ -24,7 +24,7 @@ Option|Description
 
 ## Remarks
 
-To get information about a taxonomy term group, you have to first log in to a tenant admin site using the [spo login](../login.md) command, eg. `spo connect https://contoso-admin.sharepoint.com`.
+To get information about a taxonomy term group, you have to first log in to a tenant admin site using the [spo login](../login.md) command, eg. `spo login https://contoso-admin.sharepoint.com`.
 
 ## Examples
 
