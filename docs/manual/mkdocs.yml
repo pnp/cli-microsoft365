@@ -158,6 +158,7 @@ nav:
         - term group add: 'cmd/spo/term/term-group-add.md'
         - term group get: 'cmd/spo/term/term-group-get.md'
         - term group list: 'cmd/spo/term/term-group-list.md'
+        - term set add: 'cmd/spo/term/term-set-add.md'
         - term set get: 'cmd/spo/term/term-set-get.md'
         - term set list: 'cmd/spo/term/term-set-list.md'
       - theme:
