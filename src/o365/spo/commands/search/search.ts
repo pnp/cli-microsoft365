@@ -26,6 +26,7 @@ interface Options extends GlobalOptions {
   allResults?:boolean;
   sourceId:string;
   trimDuplicates?:boolean;
+  enableStemming?:boolean;
 }
 
 class SearchCommand extends SpoCommand {
@@ -45,6 +46,7 @@ class SearchCommand extends SpoCommand {
     telemetryProps.rowLimit = args.options.rowLimit;
     telemetryProps.sourceId = args.options.sourceId;
     telemetryProps.trimDuplicates = args.options.trimDuplicates;
+    telemetryProps.enableStemming = args.options.enableStemming;
     return telemetryProps;
   }
 
@@ -137,6 +139,7 @@ class SearchCommand extends SpoCommand {
     const rowLimitRequestString = args.options.rowLimit ? `&rowlimit=${args.options.rowLimit}` : ``;
     const sourceIdRequestString = args.options.sourceId ? `&sourceid='${args.options.sourceId}'` : ``;
     const trimDuplicatesRequestString = `&trimduplicates=${args.options.trimDuplicates ? args.options.trimDuplicates : "false"}`;
+    const enableStemmingRequestString = `&enablestemming=${typeof(args.options.enableStemming) === 'undefined' ? "true" : args.options.enableStemming}`;
 
     //Construct single requestUrl
     const requestUrl = `${webUrl}/_api/search/query?querytext='${args.options.query}'`.concat(
@@ -144,7 +147,8 @@ class SearchCommand extends SpoCommand {
       startRowRequestString,
       rowLimitRequestString,
       sourceIdRequestString,
-      trimDuplicatesRequestString
+      trimDuplicatesRequestString,
+      enableStemmingRequestString
     );
 
     if(this.debug) {
@@ -186,6 +190,10 @@ class SearchCommand extends SpoCommand {
       {
         option: '--trimDuplicates',
         description: 'Specifies whether near duplicate items should be removed from the search results.'
+      },
+      {
+        option: '--enableStemming',
+        description: 'Specifies whether stemming is enabled.'
       }
     ];
 
