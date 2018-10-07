@@ -45,3 +45,9 @@ Return the top 50 items of which the title starts with 'Marketing'.
 ```sh
 spo search --query 'Title:Marketing*' --rowLimit=50
 ```
+
+Return only items from a specific resultsource (using the source id).
+
+```sh
+spo search --query '*' --sourceId '6e71030e-5e16-4406-9bff-9c1829843083'
+```
