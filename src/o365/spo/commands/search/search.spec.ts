@@ -156,8 +156,10 @@ describe(commands.SEARCH, () => {
         return Promise.resolve(getQueryResult([rows[0]]));;
       }
       if(opts.url.toUpperCase().indexOf('SOURCEID=\'6E71030E-5E16-4406-9BFF-9C1829843083\'') > -1) {
-        console.log("sourceId = OK");
         return Promise.resolve(getQueryResult([rows[3]]));
+      }
+      if(opts.url.toUpperCase().indexOf('TRIMDUPLICATES=TRUE') > -1) {
+        return Promise.resolve(getQueryResult([rows[2],rows[3]]));
       }
       return Promise.resolve(getQueryResult(rows));
     }
@@ -330,6 +332,38 @@ describe(commands.SEARCH, () => {
         query: 'IsDocument:1',
         allResults:true,
         rowLimit:1
+      }
+    }, () => {
+      try {
+        assert.equal(returnArrayLength, 2);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('executes search request with trimDuplicates', (done) => {
+    stubAuth();
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        output: 'text',
+        debug: false,
+        query: '*',
+        trimDuplicates:true
       }
     }, () => {
       try {
