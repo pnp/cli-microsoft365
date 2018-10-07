@@ -28,10 +28,10 @@ To execute a search query, you have to first log in to a SharePoint Online site 
 
 ## Examples
 
-Execute search query to retrieve all Document Sets (ContentTypeId = '0x0120D520')
+Execute search query to retrieve all Document Sets (ContentTypeId = '0x0120D520') for the english locale
 
 ```sh
-spo search --query 'ContentTypeId:0x0120D520'
+spo search --query 'ContentTypeId:0x0120D520' --culture 1033
 ```
 
 Retrieve all documents. For each document, retrieve the Path, Author and FileType.

@@ -81,6 +81,22 @@ describe(commands.SEARCH, () => {
           {"Key":"IsDocument","Value":"false","ValueType":"Edm.Boolean"},
           {"Key":"RenderTemplateId","Value":"~sitecollection/_catalogs/masterpage/Display Templates/Search/Item_Default.js","ValueType":"Edm.String"}
         ]
+      },
+      {
+        "Cells":[
+          {"Key":"Rank","Value":"4","ValueType":"Edm.Double"},
+          {"Key":"DocId","Value":"4","ValueType":"Edm.Int64"},
+          {"Key":"Path","Value":"MyPath-item4","ValueType":"Edm.String"},
+          {"Key":"Author","Value":"myAuthor-item4","ValueType":"Edm.String"},
+          {"Key":"FileType","Value":"aspx","ValueType":"Edm.String"},
+          {"Key":"OriginalPath","Value":"myOriginalPath-item4","ValueType":"Edm.String"},
+          {"Key":"PartitionId","Value":"00000000-0000-0000-0000-000000000000","ValueType":"Edm.Guid"},
+          {"Key":"UrlZone","Value":"0","ValueType":"Edm.Int32"},
+          {"Key":"Culture","Value":"nl-NL","ValueType":"Edm.String"},
+          {"Key":"ResultTypeId","Value":"0","ValueType":"Edm.Int32"},
+          {"Key":"IsDocument","Value":"false","ValueType":"Edm.Boolean"},
+          {"Key":"RenderTemplateId","Value":"~sitecollection/_catalogs/masterpage/Display Templates/Search/Item_Default.js","ValueType":"Edm.String"}
+        ]
       }
     ];
   };
@@ -158,12 +174,20 @@ describe(commands.SEARCH, () => {
       if(opts.url.toUpperCase().indexOf('SOURCEID=\'6E71030E-5E16-4406-9BFF-9C1829843083\'') > -1) {
         return Promise.resolve(getQueryResult([rows[3]]));
       }
-      console.log(opts.url);
       if(
           opts.url.toUpperCase().indexOf('TRIMDUPLICATES=TRUE') > -1 ||
           opts.url.toUpperCase().indexOf('ENABLESTEMMING=FALSE') > -1
         ) {
         return Promise.resolve(getQueryResult([rows[2],rows[3]]));
+      }
+      if(opts.url.toUpperCase().indexOf('CULTURE=1043') > -1) {
+        rows = fakeRows.filter(row => { 
+          return row.Cells.filter(cell => { 
+            return (cell.Key.toUpperCase() === "CULTURE" && cell.Value.toUpperCase() === "NL-NL");
+          }).length > 0; 
+        });
+
+        return Promise.resolve(getQueryResult(rows));
       }
       return Promise.resolve(getQueryResult(rows));
     }
@@ -275,7 +299,7 @@ describe(commands.SEARCH, () => {
       }
     }, () => {
       try {
-        assert.equal(returnArrayLength, 3);
+        assert.equal(returnArrayLength,4);
         done();
       }
       catch (e) {
@@ -435,7 +459,39 @@ describe(commands.SEARCH, () => {
       }
     }, () => {
       try {
-        assert.equal(returnArrayLength, 3);
+        assert.equal(returnArrayLength,4);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('executes search request with culture', (done) => {
+    stubAuth();
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        output: 'text',
+        debug: false,
+        query: '*',
+        culture:1043
+      }
+    }, () => {
+      try {
+        assert.equal(returnArrayLength,1);
         done();
       }
       catch (e) {
