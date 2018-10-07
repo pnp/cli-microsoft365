@@ -29,7 +29,13 @@
     "spfx",
     "sharepoint online",
     "sharepoint",
-    "microsoft teams"
+    "microsoft teams",
+    "microsoft graph",
+    "microsoft flow",
+    "azure active directory",
+    "azure ad",
+    "azure",
+    "microsoft"
   ],
   "author": "https://github.com/pnp/office365-cli/graphs/contributors",
   "maintainers": [
