@@ -1,5 +1,22 @@
 # Release notes
 
+## [v1.8.0](https://github.com/pnp/office365-cli/releases/tag/v1.8.0)
+
+### New commands
+
+**SharePoint Online:**
+
+- [spo tenant settings set](../cmd/spo/tenant/tenant-settings-set.md) - sets tenant global settings [#549](https://github.com/pnp/office365-cli/issues/549)
+- [spo term group add](../cmd/spo/term/term-group-add.md) - adds taxonomy term group [#598](https://github.com/pnp/office365-cli/issues/598)
+- [spo term set get](../cmd/spo/term/term-set-get.md) - gets information about the specified taxonomy term set [#601](https://github.com/pnp/office365-cli/issues/601)
+- [spo term set list](../cmd/spo/term/term-set-list.md) - lists taxonomy term sets from the given term group [#600](https://github.com/pnp/office365-cli/issues/600)
+
+### Changes
+
+- improved SPFx project upgrade text report [#591](https://github.com/pnp/office365-cli/issues/591)
+- updated the 'spo tenant settings list' command [#623](https://github.com/pnp/office365-cli/issues/623)
+- changed commands to be lazy-loaded [#624](https://github.com/pnp/office365-cli/issues/624)
+
 ## [v1.7.0](https://github.com/pnp/office365-cli/releases/tag/v1.7.0)
 
 ### New commands
