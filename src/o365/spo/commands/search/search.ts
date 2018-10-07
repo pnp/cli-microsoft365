@@ -24,6 +24,7 @@ interface Options extends GlobalOptions {
   rowLimit:number;
   selectProperties:string;
   allResults?:boolean;
+  sourceId:string;
 }
 
 class SearchCommand extends SpoCommand {
@@ -41,6 +42,7 @@ class SearchCommand extends SpoCommand {
     telemetryProps.selectproperties = args.options.selectProperties;
     telemetryProps.allResults = args.options.allResults;
     telemetryProps.rowLimit = args.options.rowLimit;
+    telemetryProps.sourceId = args.options.sourceId;
     return telemetryProps;
   }
 
@@ -131,9 +133,15 @@ class SearchCommand extends SpoCommand {
         ``;
     const startRowRequestString = `&startrow=${startRow ? startRow : 0}`;
     const rowLimitRequestString = args.options.rowLimit ? `&rowlimit=${args.options.rowLimit}` : ``;
+    const sourceIdRequestString = args.options.sourceId ? `&sourceid='${args.options.sourceId}'` : ``;
 
     //Construct single requestUrl
-    const requestUrl = `${webUrl}/_api/search/query?querytext='${args.options.query}'${propertySelectRequestString}${startRowRequestString}${rowLimitRequestString}`
+    const requestUrl = `${webUrl}/_api/search/query?querytext='${args.options.query}'`.concat(
+      propertySelectRequestString,
+      startRowRequestString,
+      rowLimitRequestString,
+      sourceIdRequestString
+    );
 
     if(this.debug) {
       cmd.log(`RequestURL: ${requestUrl}`);
@@ -166,6 +174,10 @@ class SearchCommand extends SpoCommand {
       {
         option: '--rowLimit <rowLimit>',
         description: 'Sets the number of rows to be returned. When the \'allResults\' parameter is enabled, it will determines the size of the batches being retrieved'
+      },
+      {
+        option: '--sourceId <sourceId>',
+        description: 'Specifies the identifier (ID or name) of the result source to be used to run the query.'
       }
     ];
 
@@ -177,6 +189,9 @@ class SearchCommand extends SpoCommand {
     return (args: CommandArgs): boolean | string => {
       if (!args.options.query) {
         return 'Required parameter query missing';
+      }
+      if (args.options.sourceId && !Utils.isValidGuid(args.options.sourceId)) {
+        return `${args.options.sourceId} is not a valid GUID`;
       }
 
       return true;
@@ -201,6 +216,20 @@ class SearchCommand extends SpoCommand {
         cmd.log(this.getTextOutput(args,allRows));
       }
     }
+
+    if(!args.options.output || args.options.output == 'text') {
+      cmd.log("# Rows: "+results[results.length-1].PrimaryQueryResult.RelevantResults.TotalRows);
+      cmd.log("# Rows (Including duplicates): "+results[results.length-1].PrimaryQueryResult.RelevantResults.TotalRowsIncludingDuplicates);
+      cmd.log("Elapsed Time: "+this.getElapsedTime(results));
+    }
+  }
+
+  private getElapsedTime(results:SearchResult[]) {
+    var totalTime:number = 0;
+    results.forEach(result => {
+      totalTime += result.ElapsedTime;
+    });
+    return totalTime;
   }
 
   private getTextOutput(args: CommandArgs,searchResultRows: ResultTableRow[]) {
@@ -241,6 +270,9 @@ class SearchCommand extends SpoCommand {
     
     Return the top 50 items of which the title starts with 'Marketing'.
       ${chalk.grey(config.delimiter)} ${commands.SEARCH} --query 'Title:Marketing*' --rowLimit=50
+
+    Return only items from a specific resultsource (using the source id).
+      ${chalk.grey(config.delimiter)} ${commands.SEARCH} --query '*' --sourceId 6e71030e-5e16-4406-9bff-9c1829843083
       `);
   }
 }
