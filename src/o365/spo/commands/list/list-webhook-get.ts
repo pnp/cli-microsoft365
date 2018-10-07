@@ -103,17 +103,15 @@ class SpoListWebhookGetCommand extends SpoCommand {
           cmd.log('');
         }
 
-        if (res) {
-          cmd.log(res);
-        }
-        else {
+        cmd.log(res);
+
+        cb();
+      }, (err: any): void => {
           if (this.verbose) {
             cmd.log('Specified webhook not found');
           }
-        }
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+        this.handleRejectedODataJsonPromise(err, cmd, cb)
+      });
   }
 
   public options(): CommandOption[] {
@@ -150,14 +148,18 @@ class SpoListWebhookGetCommand extends SpoCommand {
         return 'Required parameter id missing';
       }
 
+      if (!Utils.isValidGuid(args.options.id)) {
+        return `${args.options.id} is not a valid GUID`;
+      }
+
       const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
       if (isValidSharePointUrl !== true) {
         return isValidSharePointUrl;
       }
 
-      if (args.options.id) {
-        if (!Utils.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
+      if (args.options.listId) {
+        if (!Utils.isValidGuid(args.options.listId)) {
+          return `${args.options.listId} is not a valid GUID`;
         }
       }
 
@@ -182,9 +184,12 @@ class SpoListWebhookGetCommand extends SpoCommand {
   
   Remarks:
   
-  To get information about a webhook, you have to first log in to SharePoint
+    To get information about a webhook, you have to first log in to SharePoint
     using the ${chalk.blue(commands.LOGIN)} command,
     eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
+
+    If the specified ${chalk.grey('id')} doesn't refer to an existing webhook,
+    you will get a ${chalk.grey('404 - "404 FILE NOT FOUND"')} error.
         
   Examples:
   
