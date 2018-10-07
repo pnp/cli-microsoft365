@@ -27,6 +27,7 @@ interface Options extends GlobalOptions {
   sourceId:string;
   trimDuplicates?:boolean;
   enableStemming?:boolean;
+  culture?:number;
 }
 
 class SearchCommand extends SpoCommand {
@@ -47,6 +48,7 @@ class SearchCommand extends SpoCommand {
     telemetryProps.sourceId = args.options.sourceId;
     telemetryProps.trimDuplicates = args.options.trimDuplicates;
     telemetryProps.enableStemming = args.options.enableStemming;
+    telemetryProps.culture = args.options.culture;
     return telemetryProps;
   }
 
@@ -139,6 +141,7 @@ class SearchCommand extends SpoCommand {
     const sourceIdRequestString = args.options.sourceId ? `&sourceid='${args.options.sourceId}'` : ``;
     const trimDuplicatesRequestString = `&trimduplicates=${args.options.trimDuplicates ? args.options.trimDuplicates : "false"}`;
     const enableStemmingRequestString = `&enablestemming=${typeof(args.options.enableStemming) === 'undefined' ? "true" : args.options.enableStemming}`;
+    const cultureRequestString = args.options.culture ? `&culture=${args.options.culture}` : ``;
 
     //Construct single requestUrl
     const requestUrl = `${webUrl}/_api/search/query?querytext='${args.options.query}'`.concat(
@@ -147,7 +150,8 @@ class SearchCommand extends SpoCommand {
       rowLimitRequestString,
       sourceIdRequestString,
       trimDuplicatesRequestString,
-      enableStemmingRequestString
+      enableStemmingRequestString,
+      cultureRequestString
     );
 
     if(this.debug) {
@@ -193,6 +197,10 @@ class SearchCommand extends SpoCommand {
       {
         option: '--enableStemming',
         description: 'Specifies whether stemming is enabled.'
+      },
+      {
+        option: '--culture <culture>',
+        description: 'The locale for the query.'
       }
     ];
 
@@ -277,8 +285,8 @@ class SearchCommand extends SpoCommand {
         
   Examples:
   
-    Execute search query to retrieve all Document Sets (ContentTypeId = '${chalk.grey('0x0120D520')}')
-      ${chalk.grey(config.delimiter)} ${commands.SEARCH} --query 'ContentTypeId:0x0120D520'
+    Execute search query to retrieve all Document Sets (ContentTypeId = '${chalk.grey('0x0120D520')}') for the english locale
+      ${chalk.grey(config.delimiter)} ${commands.SEARCH} --query 'ContentTypeId:0x0120D520' --culture 1033
 
     Retrieve all documents. For each document, retrieve the Path, Author and FileType.
       ${chalk.grey(config.delimiter)} ${commands.SEARCH} --query 'IsDocument:1' --selectProperties 'Path,Author,FileType' --allResults
