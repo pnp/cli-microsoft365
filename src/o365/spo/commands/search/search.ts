@@ -25,6 +25,7 @@ interface Options extends GlobalOptions {
   selectProperties:string;
   allResults?:boolean;
   sourceId:string;
+  trimDuplicates?:boolean;
 }
 
 class SearchCommand extends SpoCommand {
@@ -43,6 +44,7 @@ class SearchCommand extends SpoCommand {
     telemetryProps.allResults = args.options.allResults;
     telemetryProps.rowLimit = args.options.rowLimit;
     telemetryProps.sourceId = args.options.sourceId;
+    telemetryProps.trimDuplicates = args.options.trimDuplicates;
     return telemetryProps;
   }
 
@@ -133,13 +135,15 @@ class SearchCommand extends SpoCommand {
     const startRowRequestString = `&startrow=${startRow ? startRow : 0}`;
     const rowLimitRequestString = args.options.rowLimit ? `&rowlimit=${args.options.rowLimit}` : ``;
     const sourceIdRequestString = args.options.sourceId ? `&sourceid='${args.options.sourceId}'` : ``;
+    const trimDuplicatesRequestString = `&trimduplicates=${args.options.trimDuplicates ? args.options.trimDuplicates : "false"}`;
 
     //Construct single requestUrl
     const requestUrl = `${webUrl}/_api/search/query?querytext='${args.options.query}'`.concat(
       propertySelectRequestString,
       startRowRequestString,
       rowLimitRequestString,
-      sourceIdRequestString
+      sourceIdRequestString,
+      trimDuplicatesRequestString
     );
 
     if(this.debug) {
@@ -177,6 +181,10 @@ class SearchCommand extends SpoCommand {
       {
         option: '--sourceId <sourceId>',
         description: 'Specifies the identifier (ID or name) of the result source to be used to run the query.'
+      },
+      {
+        option: '--trimDuplicates',
+        description: 'Specifies whether near duplicate items should be removed from the search results.'
       }
     ];
 
@@ -267,8 +275,8 @@ class SearchCommand extends SpoCommand {
     Retrieve all documents. For each document, retrieve the Path, Author and FileType.
       ${chalk.grey(config.delimiter)} ${commands.SEARCH} --query 'IsDocument:1' --selectProperties 'Path,Author,FileType' --allResults
     
-    Return the top 50 items of which the title starts with 'Marketing'.
-      ${chalk.grey(config.delimiter)} ${commands.SEARCH} --query 'Title:Marketing*' --rowLimit=50
+    Return the top 50 items of which the title starts with 'Marketing' while trimming duplicates.
+      ${chalk.grey(config.delimiter)} ${commands.SEARCH} --query 'Title:Marketing*' --rowLimit=50 --trimDuplicates
 
     Return only items from a specific resultsource (using the source id).
       ${chalk.grey(config.delimiter)} ${commands.SEARCH} --query '*' --sourceId 6e71030e-5e16-4406-9bff-9c1829843083
