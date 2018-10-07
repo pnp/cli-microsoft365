@@ -155,6 +155,10 @@ describe(commands.SEARCH, () => {
       if(opts.url.toUpperCase().indexOf('ROWLIMIT=1') > -1) {
         return Promise.resolve(getQueryResult([rows[0]]));;
       }
+      if(opts.url.toUpperCase().indexOf('SOURCEID=\'6E71030E-5E16-4406-9BFF-9C1829843083\'') > -1) {
+        console.log("sourceId = OK");
+        return Promise.resolve(getQueryResult([rows[3]]));
+      }
       return Promise.resolve(getQueryResult(rows));
     }
     returnArrayLength = 0;
@@ -407,6 +411,38 @@ describe(commands.SEARCH, () => {
     });
   });
 
+  it('executes search request with sourceId', (done) => {
+    stubAuth();
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        output: 'text',
+        debug: false,
+        query: '*',
+        sourceId: '6e71030e-5e16-4406-9bff-9c1829843083'
+      }
+    }, () => {
+      try {
+        assert.equal(returnArrayLength, 1);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+  });
+
   it('executes search request with rowLimits defined', (done) => {
     stubAuth();
 
@@ -437,6 +473,24 @@ describe(commands.SEARCH, () => {
         Utils.restore(request.post);
       }
     });
+  });
+
+  it('fails validation if the sourceId is not a valid GUID', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { 
+        sourceId: '123',
+        query:'*'
+      } 
+    });
+    assert.notEqual(actual, true);
+  });
+
+  it('passes validation if the sourceId is a valid GUID', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { 
+        sourceId: '1caf7dcd-7e83-4c3a-94f7-932a1299c844',
+        query:'*'
+      } 
+    });
+    assert.equal(actual, true);
   });
 
   it('command correctly handles reject request', (done) => {
