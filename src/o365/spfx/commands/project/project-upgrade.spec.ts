@@ -88,7 +88,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, (err?: any) => {
-      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Couldn't find project root folder`)));
+      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Couldn't find project root folder`, 1)));
     });
   });
 
@@ -104,14 +104,14 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, (err?: any) => {
-      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Couldn't find project root folder`)));
+      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Couldn't find project root folder`, 1)));
     });
   });
 
   it('shows error if the specified spfx version is not supported by the CLI', () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '0.0.1' } }, (err?: any) => {
-      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Office 365 CLI doesn't support upgrading SharePoint Framework projects to version 0.0.1. Supported versions are ${(command as any).supportedVersions.join(', ')}`)));
+      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Office 365 CLI doesn't support upgrading SharePoint Framework projects to version 0.0.1. Supported versions are ${(command as any).supportedVersions.join(', ')}`, 2)));
     });
   });
 
@@ -242,7 +242,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, (err?: any) => {
-      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Unable to determine the version of the current SharePoint Framework project`)));
+      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Unable to determine the version of the current SharePoint Framework project`, 3)));
     });
   });
 
@@ -251,7 +251,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, (err?: any) => {
-      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Office 365 CLI doesn't support upgrading projects build on SharePoint Framework v0.0.1`)));
+      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Office 365 CLI doesn't support upgrading projects build on SharePoint Framework v0.0.1`, 4)));
     });
   });
 
@@ -260,7 +260,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.5.0' } }, (err?: any) => {
-      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Project doesn't need to be upgraded`)));
+      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Project doesn't need to be upgraded`, 6)));
     });
   });
 
@@ -269,7 +269,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.4.1' } }, (err?: any) => {
-      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`You cannot downgrade a project`)));
+      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`You cannot downgrade a project`, 5)));
     });
   });
 

@@ -48,6 +48,13 @@ class SpfxProjectUpgradeCommand extends Command {
     '1.6.0'
   ];
 
+  public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
+  public static ERROR_UNSUPPORTED_TO_VERSION: number = 2;
+  public static ERROR_NO_VERSION: number = 3;
+  public static ERROR_UNSUPPORTED_FROM_VERSION: number = 4;
+  public static ERROR_NO_DOWNGRADE: number = 5;
+  public static ERROR_PROJECT_UP_TO_DATE: number = 6;
+
   public get name(): string {
     return commands.PROJECT_UPGRADE;
   }
@@ -65,37 +72,37 @@ class SpfxProjectUpgradeCommand extends Command {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     this.projectRootPath = this.getProjectRoot(process.cwd());
     if (this.projectRootPath === null) {
-      cb(new CommandError(`Couldn't find project root folder`));
+      cb(new CommandError(`Couldn't find project root folder`, SpfxProjectUpgradeCommand.ERROR_NO_PROJECT_ROOT_FOLDER));
       return;
     }
 
     this.toVersion = args.options.toVersion ? args.options.toVersion : this.supportedVersions[this.supportedVersions.length - 1];
 
     if (this.supportedVersions.indexOf(this.toVersion) < 0) {
-      cb(new CommandError(`Office 365 CLI doesn't support upgrading SharePoint Framework projects to version ${this.toVersion}. Supported versions are ${this.supportedVersions.join(', ')}`));
+      cb(new CommandError(`Office 365 CLI doesn't support upgrading SharePoint Framework projects to version ${this.toVersion}. Supported versions are ${this.supportedVersions.join(', ')}`, SpfxProjectUpgradeCommand.ERROR_UNSUPPORTED_TO_VERSION));
       return;
     }
 
     this.projectVersion = this.getProjectVersion();
     if (!this.projectVersion) {
-      cb(new CommandError(`Unable to determine the version of the current SharePoint Framework project`));
+      cb(new CommandError(`Unable to determine the version of the current SharePoint Framework project`, SpfxProjectUpgradeCommand.ERROR_NO_VERSION));
       return;
     }
 
     const pos: number = this.supportedVersions.indexOf(this.projectVersion);
     if (pos < 0) {
-      cb(new CommandError(`Office 365 CLI doesn't support upgrading projects build on SharePoint Framework v${this.projectVersion}`));
+      cb(new CommandError(`Office 365 CLI doesn't support upgrading projects build on SharePoint Framework v${this.projectVersion}`, SpfxProjectUpgradeCommand.ERROR_UNSUPPORTED_FROM_VERSION));
       return;
     }
 
     const posTo: number = this.supportedVersions.indexOf(this.toVersion);
     if (pos > posTo) {
-      cb(new CommandError('You cannot downgrade a project'));
+      cb(new CommandError('You cannot downgrade a project', SpfxProjectUpgradeCommand.ERROR_NO_DOWNGRADE));
       return;
     }
 
     if (pos === posTo) {
-      cb(new CommandError('Project doesn\'t need to be upgraded'));
+      cb(new CommandError('Project doesn\'t need to be upgraded', SpfxProjectUpgradeCommand.ERROR_PROJECT_UP_TO_DATE));
       return;
     }
 
