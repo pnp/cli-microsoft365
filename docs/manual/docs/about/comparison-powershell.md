@@ -214,7 +214,7 @@ Disconnect-PnPOnline|SharePointPnPPowerShellOnline|[spo logout](../cmd/spo/logou
 Enable-PnPFeature|SharePointPnPPowerShellOnline|
 Enable-PnPInPlaceRecordsManagementForSite|SharePointPnPPowerShellOnline|
 Enable-PnPResponsiveUI|SharePointPnPPowerShellOnline|
-Enable-PnPSiteClassification|SharePointPnPPowerShellOnline|
+Enable-PnPSiteClassification|SharePointPnPPowerShellOnline|[graph siteclassification enable](../cmd/graph/siteclassification/siteclassification-enable.md)
 Enable-PnPTenantServicePrincipal|SharePointPnPPowerShellOnline|[spo serviceprincipal set](../cmd/spo/serviceprincipal/serviceprincipal-set.md)
 Ensure-PnPFolder|SharePointPnPPowerShellOnline|
 Execute-PnPQuery|SharePointPnPPowerShellOnline|

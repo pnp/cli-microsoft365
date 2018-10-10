@@ -200,6 +200,7 @@ nav:
         - o365group restore: 'cmd/graph/o365group/o365group-restore.md'
         - o365group set: 'cmd/graph/o365group/o365group-set.md'
       - siteclassification:
+        - siteclassification enable: 'cmd/graph/siteclassification/siteclassification-enable.md'
         - siteclassification get: 'cmd/graph/siteclassification/siteclassification-get.md'
       - teams:
         - teams list: 'cmd/graph/teams/teams-list.md'
