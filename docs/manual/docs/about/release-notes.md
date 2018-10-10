@@ -16,6 +16,7 @@
 - improved SPFx project upgrade text report [#591](https://github.com/pnp/office365-cli/issues/591)
 - updated the 'spo tenant settings list' command [#623](https://github.com/pnp/office365-cli/issues/623)
 - changed commands to be lazy-loaded [#624](https://github.com/pnp/office365-cli/issues/624)
+- added error codes to the 'spfx project upgrade' command [#630](https://github.com/pnp/office365-cli/issues/630)
 
 ## [v1.7.0](https://github.com/pnp/office365-cli/releases/tag/v1.7.0)
 
