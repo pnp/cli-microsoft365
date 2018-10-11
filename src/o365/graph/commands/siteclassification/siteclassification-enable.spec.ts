@@ -94,8 +94,8 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Connect to the Microsoft Graph first')));
-        done();
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to the Microsoft Graph first')));
+        done(); 
       }
       catch (e) {
         done(e);
