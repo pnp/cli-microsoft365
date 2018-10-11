@@ -156,6 +156,7 @@ nav:
         - tenant settings list: 'cmd/spo/tenant/tenant-settings-list.md'
         - tenant settings set: 'cmd/spo/tenant/tenant-settings-set.md'
       - term:
+        - term get: 'cmd/spo/term/term-get.md'
         - term list: 'cmd/spo/term/term-list.md'
         - term group add: 'cmd/spo/term/term-group-add.md'
         - term group get: 'cmd/spo/term/term-group-get.md'
