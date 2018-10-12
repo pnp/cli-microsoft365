@@ -6,3 +6,8 @@ export interface DirectorySetting {
   templateId: string;
   values: DirectorySettingValue[];
 }
+
+export class UpdateDirectorySetting {
+  templateId: string = '';
+  values: DirectorySettingValue[] = [];
+}
