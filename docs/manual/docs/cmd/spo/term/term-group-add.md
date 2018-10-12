@@ -25,7 +25,7 @@ Option|Description
 
 ## Remarks
 
-To add a taxonomy term group, you have to first log in to a tenant admin site using the [spo login](../login.md) command, eg. `spo connect https://contoso-admin.sharepoint.com`.
+To add a taxonomy term group, you have to first log in to a tenant admin site using the [spo login](../login.md) command, eg. `spo login https://contoso-admin.sharepoint.com`.
 
 ## Examples
 
