@@ -220,7 +220,7 @@ class GraphO365SiteClassificationEnableCommand extends GraphCommand {
 
   Examples:
   
-    Enables SiteClassification without 
+    Enables SiteClassification 
       ${chalk.grey(config.delimiter)} ${this.name} -c "High, Medium, Low" -d "Medium" 
 
     Enables SiteClassification with a Usage Guidelines Url 
