@@ -205,6 +205,7 @@ nav:
         - siteclassification get: 'cmd/graph/siteclassification/siteclassification-get.md'
       - teams:
         - teams list: 'cmd/graph/teams/teams-list.md'
+        - teams channel add: 'cmd/graph/teams/teams-channel-add.md'
       - user:
         - user get: 'cmd/graph/user/user-get.md'
         - user list: 'cmd/graph/user/user-list.md'

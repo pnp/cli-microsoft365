@@ -22,6 +22,7 @@ export default {
   SITECLASSIFICATION_GET: `${prefix} siteclassification get`,
   STATUS: `${prefix} status`,
   TEAMS_LIST: `${prefix} teams list`,
+  TEAMS_CHANNEL_ADD: `${prefix} teams channel add`,
   USER_GET: `${prefix} user get`,
   USER_LIST: `${prefix} user list`,
   USER_SENDMAIL: `${prefix} user sendmail`,
