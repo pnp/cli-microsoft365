@@ -196,6 +196,11 @@ describe(commands.SEARCH, () => {
 
         return Promise.resolve(getQueryResult(rows));
       }
+      if(urlContains(opts,'queryTemplate=\'{searchterms} fileType:docx\'')) {
+        rows = filterRows(fakeRows,'FILETYPE','DOCX');
+
+        return Promise.resolve(getQueryResult(rows));
+      }
       return Promise.resolve(getQueryResult(rows));
     }
     returnArrayLength = 0;
@@ -592,6 +597,38 @@ describe(commands.SEARCH, () => {
         debug: false,
         query: '*',
         refinementFilters: 'fileExtension:equals("docx")'
+      }
+    }, () => {
+      try {
+        assert.equal(returnArrayLength, 2);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('executes search request with queryTemplate', (done) => {
+    stubAuth();
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        output: 'text',
+        debug: false,
+        query: '*',
+        queryTemplate: '{searchterms} fileType:docx'
       }
     }, () => {
       try {
