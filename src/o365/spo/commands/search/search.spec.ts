@@ -32,6 +32,16 @@ describe(commands.SEARCH, () => {
       return Promise.reject('Invalid request');
     });
   }
+  let urlContains = (opts:any,substring:string):boolean => {
+    return opts.url.toUpperCase().indexOf(substring.toUpperCase()) > -1;
+  }
+  let filterRows = (rows:ResultTableRow[],key:string,value:string)=> {
+    return rows.filter(row => { 
+        return row.Cells.filter(cell => { 
+          return (cell.Key.toUpperCase() === key.toUpperCase() && cell.Value.toUpperCase() === value.toUpperCase());
+        }).length > 0; 
+      });
+  }
   let getFakeRows = ():ResultTableRow[] => {
     return [
       {
@@ -145,18 +155,14 @@ describe(commands.SEARCH, () => {
     };
   }
   let getFakes = (opts:any) => {
-    if (opts.url.toUpperCase().indexOf('QUERYTEXT=\'ISDOCUMENT:1\'') > -1) {
-      let rows = fakeRows.filter(row => { 
-        return row.Cells.filter(cell => { 
-          return (cell.Key.toUpperCase() === "ISDOCUMENT" && cell.Value.toUpperCase() === "TRUE");
-        }).length > 0; 
-      });
+    if (urlContains(opts,'QUERYTEXT=\'ISDOCUMENT:1\'')) {
+      let rows = filterRows(fakeRows,'ISDOCUMENT','TRUE');
 
-      if(opts.url.toUpperCase().indexOf('ROWLIMIT=1') > -1) {
-        if(opts.url.toUpperCase().indexOf('STARTROW=0') > -1) {
+      if(urlContains(opts,'ROWLIMIT=1')) {
+        if(urlContains(opts,'STARTROW=0')) {
           return Promise.resolve(getQueryResult([rows[0]],2));
         }
-        else if(opts.url.toUpperCase().indexOf('STARTROW=1') > -1) {
+        else if(urlContains(opts,'STARTROW=1')) {
           return Promise.resolve(getQueryResult([rows[1]],2));
         }
         else {
@@ -166,35 +172,27 @@ describe(commands.SEARCH, () => {
 
       return Promise.resolve(getQueryResult(rows));
     }
-    if (opts.url.toUpperCase().indexOf('QUERYTEXT=\'*\'') > -1) {
+    if (urlContains(opts,'QUERYTEXT=\'*\'')) {
       let rows = fakeRows;
-      if(opts.url.toUpperCase().indexOf('ROWLIMIT=1') > -1) {
+      if(urlContains(opts,'ROWLIMIT=1')) {
         return Promise.resolve(getQueryResult([rows[0]]));;
       }
-      if(opts.url.toUpperCase().indexOf('SOURCEID=\'6E71030E-5E16-4406-9BFF-9C1829843083\'') > -1) {
+      if(urlContains(opts,'SOURCEID=\'6E71030E-5E16-4406-9BFF-9C1829843083\'')) {
         return Promise.resolve(getQueryResult([rows[3]]));
       }
       if(
-          opts.url.toUpperCase().indexOf('TRIMDUPLICATES=TRUE') > -1 ||
-          opts.url.toUpperCase().indexOf('ENABLESTEMMING=FALSE') > -1
+          urlContains(opts,'TRIMDUPLICATES=TRUE') ||
+          urlContains(opts,'ENABLESTEMMING=FALSE')
         ) {
         return Promise.resolve(getQueryResult([rows[2],rows[3]]));
       }
-      if(opts.url.toUpperCase().indexOf('CULTURE=1043') > -1) {
-        rows = fakeRows.filter(row => { 
-          return row.Cells.filter(cell => { 
-            return (cell.Key.toUpperCase() === "CULTURE" && cell.Value.toUpperCase() === "NL-NL");
-          }).length > 0; 
-        });
+      if(urlContains(opts,'CULTURE=1043')) {
+        rows = filterRows(fakeRows,'CULTURE','NL-NL');
 
         return Promise.resolve(getQueryResult(rows));
       }
-      if(opts.url.toUpperCase().indexOf('&refinementfilters=\'fileExtension:equals("docx")\''.toUpperCase()) > -1) {
-        rows = fakeRows.filter(row => { 
-          return row.Cells.filter(cell => { 
-            return (cell.Key.toUpperCase() === "FILETYPE" && cell.Value.toUpperCase() === "DOCX");
-          }).length > 0; 
-        });
+      if(urlContains(opts,'refinementfilters=\'fileExtension:equals("docx")\'')) {
+        rows = filterRows(fakeRows,'FILETYPE','DOCX');
 
         return Promise.resolve(getQueryResult(rows));
       }
