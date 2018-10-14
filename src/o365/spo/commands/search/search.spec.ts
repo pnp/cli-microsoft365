@@ -189,6 +189,15 @@ describe(commands.SEARCH, () => {
 
         return Promise.resolve(getQueryResult(rows));
       }
+      if(opts.url.toUpperCase().indexOf('&refinementfilters=\'fileExtension:equals("docx")\''.toUpperCase()) > -1) {
+        rows = fakeRows.filter(row => { 
+          return row.Cells.filter(cell => { 
+            return (cell.Key.toUpperCase() === "FILETYPE" && cell.Value.toUpperCase() === "DOCX");
+          }).length > 0; 
+        });
+
+        return Promise.resolve(getQueryResult(rows));
+      }
       return Promise.resolve(getQueryResult(rows));
     }
     returnArrayLength = 0;
@@ -553,6 +562,38 @@ describe(commands.SEARCH, () => {
         debug: false,
         query: 'IsDocument:1',
         selectProperties: 'Path'
+      }
+    }, () => {
+      try {
+        assert.equal(returnArrayLength, 2);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('executes search request with refinementFilters', (done) => {
+    stubAuth();
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        output: 'text',
+        debug: false,
+        query: '*',
+        refinementFilters: 'fileExtension:equals("docx")'
       }
     }, () => {
       try {
