@@ -28,6 +28,7 @@ interface Options extends GlobalOptions {
   trimDuplicates?:boolean;
   enableStemming?:boolean;
   culture?:number;
+  refinementFilters:string;
 }
 
 class SearchCommand extends SpoCommand {
@@ -49,6 +50,7 @@ class SearchCommand extends SpoCommand {
     telemetryProps.trimDuplicates = args.options.trimDuplicates;
     telemetryProps.enableStemming = args.options.enableStemming;
     telemetryProps.culture = args.options.culture;
+    telemetryProps.refinementFilters = args.options.refinementFilters;
     return telemetryProps;
   }
 
@@ -143,6 +145,7 @@ class SearchCommand extends SpoCommand {
     const trimDuplicatesRequestString = `&trimduplicates=${args.options.trimDuplicates ? args.options.trimDuplicates : "false"}`;
     const enableStemmingRequestString = `&enablestemming=${typeof(args.options.enableStemming) === 'undefined' ? "true" : args.options.enableStemming}`;
     const cultureRequestString = args.options.culture ? `&culture=${args.options.culture}` : ``;
+    const refinementFiltersRequestString = args.options.refinementFilters ? `&refinementfilters='${args.options.refinementFilters}'` : ``;
 
     //Construct single requestUrl
     const requestUrl = `${webUrl}/_api/search/query?querytext='${args.options.query}'`.concat(
@@ -152,7 +155,8 @@ class SearchCommand extends SpoCommand {
       sourceIdRequestString,
       trimDuplicatesRequestString,
       enableStemmingRequestString,
-      cultureRequestString
+      cultureRequestString,
+      refinementFiltersRequestString
     );
 
     if(this.debug) {
@@ -202,6 +206,10 @@ class SearchCommand extends SpoCommand {
       {
         option: '--culture <culture>',
         description: 'The locale for the query.'
+      },
+      {
+        option: '--refinementFilters <refinementFilters>',
+        description: 'The set of refinement filters used when issuing a refinement query. For GET requests, the RefinementFilters parameter is specified as an FQL filter. For POST requests, the RefinementFilters parameter is specified as an array of FQL filters.'
       }
     ];
 
