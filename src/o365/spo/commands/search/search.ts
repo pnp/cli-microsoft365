@@ -29,6 +29,7 @@ interface Options extends GlobalOptions {
   enableStemming?:boolean;
   culture?:number;
   refinementFilters:string;
+  queryTemplate:string;
 }
 
 class SearchCommand extends SpoCommand {
@@ -51,6 +52,7 @@ class SearchCommand extends SpoCommand {
     telemetryProps.enableStemming = args.options.enableStemming;
     telemetryProps.culture = args.options.culture;
     telemetryProps.refinementFilters = args.options.refinementFilters;
+    telemetryProps.queryTemplate = args.options.queryTemplate;
     return telemetryProps;
   }
 
@@ -145,6 +147,7 @@ class SearchCommand extends SpoCommand {
     const enableStemmingRequestString = `&enablestemming=${typeof(args.options.enableStemming) === 'undefined' ? "true" : args.options.enableStemming}`;
     const cultureRequestString = args.options.culture ? `&culture=${args.options.culture}` : ``;
     const refinementFiltersRequestString = args.options.refinementFilters ? `&refinementfilters='${args.options.refinementFilters}'` : ``;
+    const queryTemplateRequestString = args.options.queryTemplate ? `&querytemplate='${args.options.queryTemplate}'` : ``;
 
     //Construct single requestUrl
     const requestUrl = `${webUrl}/_api/search/query?querytext='${args.options.query}'`.concat(
@@ -155,7 +158,8 @@ class SearchCommand extends SpoCommand {
       trimDuplicatesRequestString,
       enableStemmingRequestString,
       cultureRequestString,
-      refinementFiltersRequestString
+      refinementFiltersRequestString,
+      queryTemplateRequestString
     );
 
     if(this.debug) {
@@ -209,6 +213,10 @@ class SearchCommand extends SpoCommand {
       {
         option: '--refinementFilters <refinementFilters>',
         description: 'The set of refinement filters used when issuing a refinement query. For GET requests, the RefinementFilters parameter is specified as an FQL filter. For POST requests, the RefinementFilters parameter is specified as an array of FQL filters.'
+      },
+      {
+        option: '--queryTemplate <queryTemplate>',
+        description: 'A string that contains the text that replaces the query text, as part of a query transformation.'
       }
     ];
 
