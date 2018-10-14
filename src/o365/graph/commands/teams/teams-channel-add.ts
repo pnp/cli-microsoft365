@@ -94,7 +94,7 @@ class TeamsChannelAddCommand extends GraphCommand {
         description: 'The name of the channel.'
       },
       {
-        option: '-d, --description <description>',
+        option: '-d, --description [description]',
         description: 'The description of the channel.'
       }
     ];
