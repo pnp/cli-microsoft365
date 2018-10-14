@@ -10,6 +10,23 @@ import Utils from '../../../../Utils';
 import { ResultTableRow } from './datatypes/ResultTableRow';
 import { SearchResult } from './datatypes/SearchResult';
 
+enum TestID
+{
+  None,
+  QueryAll_NoParameterTest,
+  QueryAll_WithQueryTemplateTest,
+  QueryDocuments_WithStartRow0Test,
+  QueryDocuments_WithStartRow1Test,
+  QueryDocuments_NoStartRowTest,
+  QueryDocuments_NoParameterTest,
+  QueryAll_WithRowLimitTest,
+  QueryAll_WithSourceIdTest,
+  QueryAll_WithTrimDuplicatesTest,
+  QueryAll_WithEnableStemmingTest,
+  QueryAll_WithCultureTest,
+  QueryAll_WithRefinementFiltersTest
+}
+
 describe(commands.SEARCH, () => {
   let vorpal: Vorpal;
   let log: any[];
@@ -17,6 +34,7 @@ describe(commands.SEARCH, () => {
   let trackEvent: any;
   let telemetry: any;
   let returnArrayLength = 0;
+  let executedTest: TestID = TestID.None;
   let stubAuth: any = () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf('/common/oauth2/token') > -1) {
@@ -160,47 +178,60 @@ describe(commands.SEARCH, () => {
 
       if(urlContains(opts,'ROWLIMIT=1')) {
         if(urlContains(opts,'STARTROW=0')) {
+          executedTest = TestID.QueryDocuments_WithStartRow0Test;
           return Promise.resolve(getQueryResult([rows[0]],2));
         }
         else if(urlContains(opts,'STARTROW=1')) {
+          executedTest = TestID.QueryDocuments_WithStartRow1Test;
           return Promise.resolve(getQueryResult([rows[1]],2));
         }
         else {
+          executedTest = TestID.QueryDocuments_NoStartRowTest;
           return Promise.resolve(getQueryResult([]));
         }
       }
 
+      executedTest = TestID.QueryDocuments_NoParameterTest;
       return Promise.resolve(getQueryResult(rows));
     }
     if (urlContains(opts,'QUERYTEXT=\'*\'')) {
       let rows = fakeRows;
       if(urlContains(opts,'ROWLIMIT=1')) {
+        executedTest = TestID.QueryAll_WithRowLimitTest;
         return Promise.resolve(getQueryResult([rows[0]]));;
       }
       if(urlContains(opts,'SOURCEID=\'6E71030E-5E16-4406-9BFF-9C1829843083\'')) {
+        executedTest = TestID.QueryAll_WithSourceIdTest;
         return Promise.resolve(getQueryResult([rows[3]]));
       }
-      if(
-          urlContains(opts,'TRIMDUPLICATES=TRUE') ||
-          urlContains(opts,'ENABLESTEMMING=FALSE')
-        ) {
+      if(urlContains(opts,'TRIMDUPLICATES=TRUE')) {
+        executedTest = TestID.QueryAll_WithTrimDuplicatesTest;
+        return Promise.resolve(getQueryResult([rows[2],rows[3]]));
+      }
+      if(urlContains(opts,'ENABLESTEMMING=FALSE')) {
+        executedTest = TestID.QueryAll_WithEnableStemmingTest;
         return Promise.resolve(getQueryResult([rows[2],rows[3]]));
       }
       if(urlContains(opts,'CULTURE=1043')) {
         rows = filterRows(fakeRows,'CULTURE','NL-NL');
 
+        executedTest = TestID.QueryAll_WithCultureTest;
         return Promise.resolve(getQueryResult(rows));
       }
       if(urlContains(opts,'refinementfilters=\'fileExtension:equals("docx")\'')) {
         rows = filterRows(fakeRows,'FILETYPE','DOCX');
 
+        executedTest = TestID.QueryAll_WithRefinementFiltersTest;
         return Promise.resolve(getQueryResult(rows));
       }
       if(urlContains(opts,'queryTemplate=\'{searchterms} fileType:docx\'')) {
         rows = filterRows(fakeRows,'FILETYPE','DOCX');
 
+        executedTest = TestID.QueryAll_WithQueryTemplateTest;
         return Promise.resolve(getQueryResult(rows));
       }
+
+      executedTest = TestID.QueryAll_NoParameterTest;
       return Promise.resolve(getQueryResult(rows));
     }
     returnArrayLength = 0;
@@ -312,6 +343,7 @@ describe(commands.SEARCH, () => {
     }, () => {
       try {
         assert.equal(returnArrayLength,4);
+        assert.equal(executedTest,TestID.QueryAll_NoParameterTest);
         done();
       }
       catch (e) {
@@ -343,6 +375,7 @@ describe(commands.SEARCH, () => {
     }, () => {
       try {
         assert.equal(returnArrayLength, 2);
+        assert.equal(executedTest,TestID.QueryDocuments_NoParameterTest);
         done();
       }
       catch (e) {
@@ -376,6 +409,7 @@ describe(commands.SEARCH, () => {
     }, () => {
       try {
         assert.equal(returnArrayLength, 2);
+        assert.equal(executedTest,TestID.QueryDocuments_WithStartRow1Test);
         done();
       }
       catch (e) {
@@ -408,6 +442,7 @@ describe(commands.SEARCH, () => {
     }, () => {
       try {
         assert.equal(returnArrayLength, 2);
+        assert.equal(executedTest,TestID.QueryAll_WithTrimDuplicatesTest);
         done();
       }
       catch (e) {
@@ -440,6 +475,7 @@ describe(commands.SEARCH, () => {
     }, () => {
       try {
         assert.equal(returnArrayLength, 2);
+        assert.equal(executedTest,TestID.QueryAll_WithEnableStemmingTest);
         done();
       }
       catch (e) {
@@ -472,6 +508,7 @@ describe(commands.SEARCH, () => {
     }, () => {
       try {
         assert.equal(returnArrayLength,4);
+        assert.equal(executedTest,TestID.QueryAll_NoParameterTest);
         done();
       }
       catch (e) {
@@ -504,6 +541,7 @@ describe(commands.SEARCH, () => {
     }, () => {
       try {
         assert.equal(returnArrayLength,1);
+        assert.equal(executedTest,TestID.QueryAll_WithCultureTest);
         done();
       }
       catch (e) {
@@ -537,6 +575,7 @@ describe(commands.SEARCH, () => {
     }, () => {
       try {
         assert.equal(returnArrayLength, 2);
+        assert.equal(executedTest,TestID.QueryDocuments_WithStartRow1Test);
         done();
       }
       catch (e) {
@@ -569,6 +608,7 @@ describe(commands.SEARCH, () => {
     }, () => {
       try {
         assert.equal(returnArrayLength, 2);
+        assert.equal(executedTest,TestID.QueryDocuments_NoParameterTest);
         done();
       }
       catch (e) {
@@ -601,6 +641,7 @@ describe(commands.SEARCH, () => {
     }, () => {
       try {
         assert.equal(returnArrayLength, 2);
+        assert.equal(executedTest,TestID.QueryAll_WithRefinementFiltersTest);
         done();
       }
       catch (e) {
@@ -633,6 +674,7 @@ describe(commands.SEARCH, () => {
     }, () => {
       try {
         assert.equal(returnArrayLength, 2);
+        assert.equal(executedTest,TestID.QueryAll_WithQueryTemplateTest);
         done();
       }
       catch (e) {
@@ -665,6 +707,7 @@ describe(commands.SEARCH, () => {
     }, () => {
       try {
         assert.equal(returnArrayLength, 1);
+        assert.equal(executedTest,TestID.QueryAll_WithSourceIdTest);
         done();
       }
       catch (e) {
@@ -697,6 +740,7 @@ describe(commands.SEARCH, () => {
     }, () => {
       try {
         assert.equal(returnArrayLength, 1);
+        assert.equal(executedTest,TestID.QueryAll_WithRowLimitTest);
         done();
       }
       catch (e) {
