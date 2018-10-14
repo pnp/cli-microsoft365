@@ -21,6 +21,7 @@ export default {
   SITECLASSIFICATION_ENABLE: `${prefix} siteclassification enable`,
   SITECLASSIFICATION_GET: `${prefix} siteclassification get`,
   STATUS: `${prefix} status`,
+  TEAMS_CHANNEL_ADD: `${prefix} teams channel add`,
   TEAMS_LIST: `${prefix} teams list`,
   USER_GET: `${prefix} user get`,
   USER_LIST: `${prefix} user list`,
