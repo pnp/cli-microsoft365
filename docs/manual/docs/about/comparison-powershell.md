@@ -351,7 +351,7 @@ New-PnPProvisioningTemplate|SharePointPnPPowerShellOnline|
 New-PnPProvisioningTemplateFromFolder|SharePointPnPPowerShellOnline|
 New-PnPSite|SharePointPnPPowerShellOnline|[spo site add](../cmd/spo/site/site-add.md)
 New-PnPTenantSite|SharePointPnPPowerShellOnline|[spo site classic add](../cmd/spo/site/site-classic-add.md)
-New-PnPTerm|SharePointPnPPowerShellOnline|
+New-PnPTerm|SharePointPnPPowerShellOnline|[spo term add](../cmd/spo/term/term-add.md)
 New-PnPTermGroup|SharePointPnPPowerShellOnline|[spo term group add](../cmd/spo/term/term-group-add.md)
 New-PnPTermSet|SharePointPnPPowerShellOnline|[spo term set add](../cmd/spo/term/term-set-add.md)
 New-PnPUnifiedGroup|SharePointPnPPowerShellOnline|[graph o365group add](../cmd/graph/o365group/o365group-add.md)

@@ -135,6 +135,7 @@ export default {
   TENANT_APPCATALOGURL_GET: `${prefix} tenant appcatalogurl get`,
   TENANT_SETTINGS_LIST: `${prefix} tenant settings list`,
   TENANT_SETTINGS_SET: `${prefix} tenant settings set`,
+  TERM_ADD: `${prefix} term add`,
   TERM_GET: `${prefix} term get`,
   TERM_LIST: `${prefix} term list`,
   TERM_GROUP_ADD: `${prefix} term group add`,
