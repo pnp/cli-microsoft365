@@ -79,7 +79,7 @@
     "typescript": "^3.0.3",
     "update-notifier": "^2.5.0",
     "uuid": "^3.3.2",
-    "vorpal": "github:pnp/vorpal"
+    "vorpal": "https://github.com/pnp/vorpal/raw/master/vorpal-1.11.4.tgz"
   },
   "devDependencies": {
     "@types/easy-table": "0.0.31",
