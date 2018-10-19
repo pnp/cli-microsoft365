@@ -182,7 +182,7 @@ export default class Utils {
   /**
    * Returns server relative path.
    * @param webUrl web full or web relative url e.g. https://contoso.sharepoint.com/sites/team1
-   * @param siteRelativePath site relative path e.g. /Shared Documents
+   * @param folderRelativePath folder relative path e.g. /Shared Documents
    * @example
    * // returns "/sites/team1"
    * Utils.getServerRelativePath("https://contoso.sharepoint.com/sites/team1");
@@ -193,13 +193,20 @@ export default class Utils {
    * // returns "/sites/team1/Shared Documents"
    * Utils.getServerRelativePath("/sites/team1/", "/Shared Documents");
    */
-  public static getServerRelativePath(webUrl: string, siteRelativePath: string = ""): string {
+  public static getServerRelativePath(webUrl: string, folderRelativePath: string = ""): string {
     const tenantUrl: string = `${url.parse(webUrl).protocol}//${url.parse(webUrl).hostname}`;
     let webRelativePath: string = webUrl.replace(tenantUrl, '');
+
+    // will be used to remove relative path from the folderRelativePath
+    // in case the web relative url is included
+    let relativePathToRemove: string = webRelativePath;
 
     // add '/' at 0
     if (webRelativePath.charAt(0) !== '/') {
       webRelativePath = `/${webRelativePath}`;
+    }
+    else {
+      relativePathToRemove = webRelativePath.substring(1);
     }
 
     // remove last '/' of webRelativePath
@@ -208,25 +215,28 @@ export default class Utils {
       webRelativePath = webRelativePath.substring(0, webRelativePath.length - 1);
     }
 
-    if (siteRelativePath !== '') {
+    // remove the web relative path if it is contained in the folder relative path
+    folderRelativePath = folderRelativePath.replace(relativePathToRemove, '');
+
+    if (folderRelativePath !== '') {
       // add '/' at 0 for siteRelativePath 
-      if (siteRelativePath.charAt(0) !== '/') {
-        siteRelativePath = `/${siteRelativePath}`;
+      if (folderRelativePath.charAt(0) !== '/') {
+        folderRelativePath = `/${folderRelativePath}`;
       }
 
       // remove last '/' of siteRelativePath
-      if (siteRelativePath.lastIndexOf('/') === siteRelativePath.length - 1) {
-        siteRelativePath = siteRelativePath.substring(0, siteRelativePath.length - 1);
+      if (folderRelativePath.lastIndexOf('/') === folderRelativePath.length - 1) {
+        folderRelativePath = folderRelativePath.substring(0, folderRelativePath.length - 1);
       }
 
-      if (webRelativePath === '/' && siteRelativePath !== '') {
-        webRelativePath = siteRelativePath;
+      if (webRelativePath === '/' && folderRelativePath !== '') {
+        webRelativePath = folderRelativePath;
       }
       else {
-        webRelativePath = `${webRelativePath}${siteRelativePath}`;
+        webRelativePath = `${webRelativePath}${folderRelativePath}`;
       }
     }
 
-    return webRelativePath;
+    return webRelativePath.replace('//', '/');
   }
 }

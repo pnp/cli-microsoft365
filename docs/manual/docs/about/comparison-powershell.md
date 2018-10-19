@@ -160,7 +160,7 @@ Add-PnPEventReceiver|SharePointPnPPowerShellOnline|
 Add-PnPField|SharePointPnPPowerShellOnline|
 Add-PnPFieldFromXml|SharePointPnPPowerShellOnline|[spo field add](../cmd/spo/field/field-add.md)
 Add-PnPFieldToContentType|SharePointPnPPowerShellOnline|[spo contenttype field set](../cmd/spo/contenttype/contenttype-field-set.md)
-Add-PnPFile|SharePointPnPPowerShellOnline|
+Add-PnPFile|SharePointPnPPowerShellOnline|[spo file add](../cmd/spo/file/file-add.md)
 Add-PnPFileToProvisioningTemplate|SharePointPnPPowerShellOnline|
 Add-PnPFolder|SharePointPnPPowerShellOnline|[spo folder add](../cmd/spo/folder/folder-add.md)
 Add-PnPHtmlPublishingPageLayout|SharePointPnPPowerShellOnline|
