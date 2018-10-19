@@ -46,6 +46,7 @@ nav:
         - field add: 'cmd/spo/field/field-add.md'
         - field get: 'cmd/spo/field/field-get.md'
       - file:
+        - file add: 'cmd/spo/file/file-add.md'
         - file checkin: 'cmd/spo/file/file-checkin.md'
         - file checkout: 'cmd/spo/file/file-checkout.md'
         - file copy: 'cmd/spo/file/file-copy.md'
