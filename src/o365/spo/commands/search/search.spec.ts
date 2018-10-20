@@ -25,7 +25,8 @@ enum TestID
   QueryAll_WithEnableStemmingTest,
   QueryAll_WithCultureTest,
   QueryAll_WithRefinementFiltersTest,
-  QueryAll_SortListTest
+  QueryAll_SortListTest,
+  QueryAll_WithRankingModelIdTest
 }
 
 describe(commands.SEARCH, () => {
@@ -231,9 +232,12 @@ describe(commands.SEARCH, () => {
         executedTest = TestID.QueryAll_WithQueryTemplateTest;
         return Promise.resolve(getQueryResult(rows));
       }
-      console.log(opts.url);
       if(urlContains(opts,'sortList=\'Rank%3Aascending\'')) {
         executedTest = TestID.QueryAll_SortListTest;
+        return Promise.resolve(getQueryResult(fakeRows));
+      }
+      if(urlContains(opts,'rankingModelId=\'d4ac6500-d1d0-48aa-86d4-8fe9a57a74af\'')) {
+        executedTest = TestID.QueryAll_WithRankingModelIdTest;
         return Promise.resolve(getQueryResult(fakeRows));
       }
 
@@ -759,6 +763,39 @@ describe(commands.SEARCH, () => {
     });
   });
 
+  it('executes search request with rankingModelId', (done) => {
+    stubAuth();
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        output: 'text',
+        debug: false,
+        query: '*',
+        rankingModelId: 'd4ac6500-d1d0-48aa-86d4-8fe9a57a74af'
+      }
+    }, () => {
+      try {
+        assert.equal(returnArrayLength, 4);
+        assert.equal(executedTest,TestID.QueryAll_WithRankingModelIdTest);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+  });
+
   it('executes search request with rowLimits defined', (done) => {
     stubAuth();
 
@@ -804,6 +841,24 @@ describe(commands.SEARCH, () => {
   it('passes validation if the sourceId is a valid GUID', () => {
     const actual = (command.validate() as CommandValidate)({ options: { 
         sourceId: '1caf7dcd-7e83-4c3a-94f7-932a1299c844',
+        query:'*'
+      } 
+    });
+    assert.equal(actual, true);
+  });
+
+  it('fails validation if the rankingModelId is not a valid GUID', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { 
+        rankingModelId: '123',
+        query:'*'
+      } 
+    });
+    assert.notEqual(actual, true);
+  });
+
+  it('passes validation if the rankingModelId is a valid GUID', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { 
+        rankingModelId: 'd4ac6500-d1d0-48aa-86d4-8fe9a57a74af',
         query:'*'
       } 
     });
