@@ -30,6 +30,7 @@ interface Options extends GlobalOptions {
   culture?:number;
   refinementFilters:string;
   queryTemplate:string;
+  sortList:string;
 }
 
 class SearchCommand extends SpoCommand {
@@ -53,6 +54,7 @@ class SearchCommand extends SpoCommand {
     telemetryProps.culture = args.options.culture;
     telemetryProps.refinementFilters = args.options.refinementFilters;
     telemetryProps.queryTemplate = args.options.queryTemplate;
+    telemetryProps.sortList = args.options.sortList;
     return telemetryProps;
   }
 
@@ -148,6 +150,7 @@ class SearchCommand extends SpoCommand {
     const cultureRequestString = args.options.culture ? `&culture=${args.options.culture}` : ``;
     const refinementFiltersRequestString = args.options.refinementFilters ? `&refinementfilters='${args.options.refinementFilters}'` : ``;
     const queryTemplateRequestString = args.options.queryTemplate ? `&querytemplate='${args.options.queryTemplate}'` : ``;
+    const sortListRequestString = args.options.sortList ? `&sortList='${encodeURIComponent(args.options.sortList)}'` : ``;
 
     //Construct single requestUrl
     const requestUrl = `${webUrl}/_api/search/query?querytext='${args.options.query}'`.concat(
@@ -159,7 +162,8 @@ class SearchCommand extends SpoCommand {
       enableStemmingRequestString,
       cultureRequestString,
       refinementFiltersRequestString,
-      queryTemplateRequestString
+      queryTemplateRequestString,
+      sortListRequestString
     );
 
     if(this.debug) {
@@ -217,6 +221,10 @@ class SearchCommand extends SpoCommand {
       {
         option: '--queryTemplate <queryTemplate>',
         description: 'A string that contains the text that replaces the query text, as part of a query transformation.'
+      },
+      {
+        option:'--sortList <sortList>',
+        description: 'The list of properties by which the search results are ordered.'
       }
     ];
 
@@ -231,6 +239,9 @@ class SearchCommand extends SpoCommand {
       }
       if (args.options.sourceId && !Utils.isValidGuid(args.options.sourceId)) {
         return `${args.options.sourceId} is not a valid GUID`;
+      }
+      if(args.options.sortList && !Utils.isRegExMatch(args.options.sortList,"^([a-z0-9_]+:(ascending|descending))(,([a-z0-9_]+:(ascending|descending)))*$")) {
+        return `sortlist parameter value '${args.options.sortList}' does not match the required pattern (=comma separated list of '<property>:(ascending|descending)'-pattern)`;
       }
 
       return true;
