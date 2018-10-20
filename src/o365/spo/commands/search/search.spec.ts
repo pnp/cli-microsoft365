@@ -24,7 +24,8 @@ enum TestID
   QueryAll_WithTrimDuplicatesTest,
   QueryAll_WithEnableStemmingTest,
   QueryAll_WithCultureTest,
-  QueryAll_WithRefinementFiltersTest
+  QueryAll_WithRefinementFiltersTest,
+  QueryAll_SortListTest
 }
 
 describe(commands.SEARCH, () => {
@@ -229,6 +230,11 @@ describe(commands.SEARCH, () => {
 
         executedTest = TestID.QueryAll_WithQueryTemplateTest;
         return Promise.resolve(getQueryResult(rows));
+      }
+      console.log(opts.url);
+      if(urlContains(opts,'sortList=\'Rank%3Aascending\'')) {
+        executedTest = TestID.QueryAll_SortListTest;
+        return Promise.resolve(getQueryResult(fakeRows));
       }
 
       executedTest = TestID.QueryAll_NoParameterTest;
@@ -443,6 +449,39 @@ describe(commands.SEARCH, () => {
       try {
         assert.equal(returnArrayLength, 2);
         assert.equal(executedTest,TestID.QueryAll_WithTrimDuplicatesTest);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('executes search request with sortList', (done) => {
+    stubAuth();
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        output: 'text',
+        debug: false,
+        query: '*',
+        sortList:'Rank:ascending'
+      }
+    }, () => {
+      try {
+        assert.equal(returnArrayLength, 4);
+        assert.equal(executedTest,TestID.QueryAll_SortListTest);
         done();
       }
       catch (e) {
@@ -847,6 +886,16 @@ describe(commands.SEARCH, () => {
 
   it('passes validation if all options are provided', () => {
     const actual = (command.validate() as CommandValidate)({ options: { query:'*' } });
+    assert.equal(actual, true);
+  });
+
+  it('fails validation if sortList is in an invalid format', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { query:'*',sortList:'property1:wrongvalue' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('passes validation if sortList is in a valid format', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { query:'*',sortList:'property1:ascending,property2:descending' } });
     assert.equal(actual, true);
   });
 
