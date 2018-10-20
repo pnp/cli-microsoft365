@@ -31,6 +31,7 @@ interface Options extends GlobalOptions {
   refinementFilters:string;
   queryTemplate:string;
   sortList:string;
+  rankingModelId:string;
 }
 
 class SearchCommand extends SpoCommand {
@@ -55,6 +56,7 @@ class SearchCommand extends SpoCommand {
     telemetryProps.refinementFilters = args.options.refinementFilters;
     telemetryProps.queryTemplate = args.options.queryTemplate;
     telemetryProps.sortList = args.options.sortList;
+    telemetryProps.rankingModelId = args.options.rankingModelId;
     return telemetryProps;
   }
 
@@ -152,6 +154,7 @@ class SearchCommand extends SpoCommand {
     const refinementFiltersRequestString = args.options.refinementFilters ? `&refinementfilters='${args.options.refinementFilters}'` : ``;
     const queryTemplateRequestString = args.options.queryTemplate ? `&querytemplate='${args.options.queryTemplate}'` : ``;
     const sortListRequestString = args.options.sortList ? `&sortList='${encodeURIComponent(args.options.sortList)}'` : ``;
+    const rankingModelIdRequstString = args.options.rankingModelId ? `&rankingmodelid='${args.options.rankingModelId}'` : ``;
 
     //Construct single requestUrl
     const requestUrl = `${webUrl}/_api/search/query?querytext='${args.options.query}'`.concat(
@@ -164,7 +167,8 @@ class SearchCommand extends SpoCommand {
       cultureRequestString,
       refinementFiltersRequestString,
       queryTemplateRequestString,
-      sortListRequestString
+      sortListRequestString,
+      rankingModelIdRequstString
     );
 
     if(this.debug) {
@@ -226,6 +230,10 @@ class SearchCommand extends SpoCommand {
       {
         option:'--sortList <sortList>',
         description: 'The list of properties by which the search results are ordered.'
+      },
+      {
+        option:'--rankingModelId <rankingModelId>',
+        description: 'The ID of the ranking model to use for the query.'
       }
     ];
 
@@ -240,6 +248,9 @@ class SearchCommand extends SpoCommand {
       }
       if (args.options.sourceId && !Utils.isValidGuid(args.options.sourceId)) {
         return `${args.options.sourceId} is not a valid GUID`;
+      }
+      if (args.options.rankingModelId && !Utils.isValidGuid(args.options.rankingModelId)) {
+        return `${args.options.rankingModelId} is not a valid GUID`;
       }
       if(args.options.sortList && !Utils.isRegExMatch(args.options.sortList,"^([a-z0-9_]+:(ascending|descending))(,([a-z0-9_]+:(ascending|descending)))*$")) {
         return `sortlist parameter value '${args.options.sortList}' does not match the required pattern (=comma separated list of '<property>:(ascending|descending)'-pattern)`;
