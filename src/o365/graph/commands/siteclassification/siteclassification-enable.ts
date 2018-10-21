@@ -224,7 +224,7 @@ class GraphSiteClassificationEnableCommand extends GraphCommand {
       ${chalk.grey(config.delimiter)} ${this.name} --classifications "High, Medium, Low" --defaultClassification "Medium" --usageGuidelinesUrl "http://aka.ms/pnp"
 
     Enable site classification with usage guidelines URLs for guests and members
-      ${chalk.grey(config.delimiter)} ${this.name} --classifications "High, Medium, Low" -d "Medium" --usageGuidelinesUrl "http://aka.ms/pnp" --guestUsageGuidelinesUrl "http://aka.ms/pnp" 
+      ${chalk.grey(config.delimiter)} ${this.name} --classifications "High, Medium, Low" --defaultClassification "Medium" --usageGuidelinesUrl "http://aka.ms/pnp" --guestUsageGuidelinesUrl "http://aka.ms/pnp" 
 
   More information:
 
