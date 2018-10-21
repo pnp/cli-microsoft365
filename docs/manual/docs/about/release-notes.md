@@ -18,6 +18,7 @@
 **Microsoft Graph:**
 
 - [graph siteclassification enable](../cmd/graph/siteclassification/siteclassification-enable.md) - enables site classification configuration [#301](https://github.com/pnp/office365-cli/issues/301)
+- [graph teams channel add](../cmd/graph/teams/teams-channel-add.md) - adds a channel to the specified Microsoft Teams team [#587](https://github.com/pnp/office365-cli/issues/587)
 
 ### Changes
 
@@ -25,6 +26,7 @@
 - updated the 'spo tenant settings list' command [#623](https://github.com/pnp/office365-cli/issues/623)
 - changed commands to be lazy-loaded [#624](https://github.com/pnp/office365-cli/issues/624)
 - added error codes to the 'spfx project upgrade' command [#630](https://github.com/pnp/office365-cli/issues/630)
+- changed vorpal dependency to https [#637](https://github.com/pnp/office365-cli/issues/637)
 
 ## [v1.7.0](https://github.com/pnp/office365-cli/releases/tag/v1.7.0)
 
