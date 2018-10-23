@@ -83,7 +83,7 @@ class GraphO365SiteClassificationGetCommand extends GraphCommand {
           siteClassificationsSettings.Classifications = classificationList[0].value.split(',');
         }
 
-        // Get the UsageGuidancelinesUrl
+        // Get the UsageGuidelinesUrl
         const guidanceUrl: DirectorySettingValue[] = unifiedGroupSetting[0].values.filter((directorySetting: DirectorySettingValue): boolean => {
           return directorySetting.name === 'UsageGuidelinesUrl';
         });
@@ -91,6 +91,16 @@ class GraphO365SiteClassificationGetCommand extends GraphCommand {
         siteClassificationsSettings.UsageGuidelinesUrl = "";
         if (guidanceUrl != null && guidanceUrl.length > 0) {
           siteClassificationsSettings.UsageGuidelinesUrl = guidanceUrl[0].value;
+        }
+
+        // Get the GuestUsageGuidelinesUrl
+        const guestGuidanceUrl: DirectorySettingValue[] = unifiedGroupSetting[0].values.filter((directorySetting: DirectorySettingValue): boolean => {
+          return directorySetting.name === 'GuestUsageGuidelinesUrl';
+        });
+
+        siteClassificationsSettings.GuestUsageGuidelinesUrl = "";
+        if (guestGuidanceUrl != null && guestGuidanceUrl.length > 0) {
+          siteClassificationsSettings.GuestUsageGuidelinesUrl = guestGuidanceUrl[0].value;
         }
 
         // Get the DefaultClassification
