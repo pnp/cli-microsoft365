@@ -713,6 +713,8 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
   });
 
   it('handles disabling site classification when prompt confirmed', (done) => {
+    let deleteRequestIssued = false;
+
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.headers.authorization &&
         opts.headers.authorization.indexOf('Bearer ') === 0 &&
@@ -755,7 +757,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
                 },
                 {
                   "name": "GuestUsageGuidelinesUrl",
-                  "value": ""
+                  "value": "https://test"
                 },
                 {
                   "name": "GroupCreationAllowedGroupId",
@@ -786,7 +788,23 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    const postSpy = sinon.spy(request, 'delete');
+    sinon.stub(request, 'delete').callsFake((opts) => {
+      if (opts.headers.authorization &&
+        opts.headers.authorization.indexOf('Bearer ') === 0 &&
+        opts.url === `https://graph.microsoft.com/beta/settings/d20c475c-6f96-449a-aee8-08146be187d3`) {
+
+        deleteRequestIssued = true;
+
+        return Promise.resolve({
+          value: [
+          ]
+
+        });
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
     auth.service = new Service('https://graph.microsoft.com');
     auth.service.connected = true;
 
@@ -796,7 +814,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
     };
     cmdInstance.action({ options: { debug: false } }, () => {
       try {
-        assert(postSpy.called);
+        assert(deleteRequestIssued);
         done();
       }
       catch (e) {
