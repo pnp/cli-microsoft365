@@ -207,7 +207,7 @@ Deny-PnPTenantServicePrincipalPermissionRequest|SharePointPnPPowerShellOnline|[s
 Disable-PnPFeature|SharePointPnPPowerShellOnline|
 Disable-PnPInPlaceRecordsManagementForSite|SharePointPnPPowerShellOnline|
 Disable-PnPResponsiveUI|SharePointPnPPowerShellOnline|
-Disable-PnPSiteClassification|SharePointPnPPowerShellOnline|
+Disable-PnPSiteClassification|SharePointPnPPowerShellOnline|[graph siteclassification disable](../cmd/graph/siteclassification/siteclassification-disable.md)
 Disable-PnPTenantServicePrincipal|SharePointPnPPowerShellOnline|[spo serviceprincipal set](../cmd/spo/serviceprincipal/serviceprincipal-set.md)
 Disconnect-PnPHubSite|SharePointPnPPowerShellOnline|[spo hubsite disconnect](../cmd/spo/hubsite/hubsite-disconnect.md)
 Disconnect-PnPOnline|SharePointPnPPowerShellOnline|[spo logout](../cmd/spo/logout.md)
