@@ -93,6 +93,16 @@ class GraphO365SiteClassificationGetCommand extends GraphCommand {
           siteClassificationsSettings.UsageGuidelinesUrl = guidanceUrl[0].value;
         }
 
+        // Get the UsageGuidancelinesUrl
+        const guestGuidanceUrl: DirectorySettingValue[] = unifiedGroupSetting[0].values.filter((directorySetting: DirectorySettingValue): boolean => {
+          return directorySetting.name === 'GuestUsageGuidelinesUrl';
+        });
+
+        siteClassificationsSettings.GuestUsageGuidelinesUrl = "";
+        if (guestGuidanceUrl != null && guestGuidanceUrl.length > 0) {
+          siteClassificationsSettings.GuestUsageGuidelinesUrl = guestGuidanceUrl[0].value;
+        }
+
         // Get the DefaultClassification
         const defaultClassification: DirectorySettingValue[] = unifiedGroupSetting[0].values.filter((directorySetting: DirectorySettingValue): boolean => {
           return directorySetting.name === 'DefaultClassification';
