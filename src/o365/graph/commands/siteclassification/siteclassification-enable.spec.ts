@@ -370,7 +370,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
     auth.service = new Service('https://graph.microsoft.com');
     auth.service.connected = true;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, test: "hxxxxxoi", classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" } }, (err: any) => {
+    cmdInstance.action({ options: { debug: true, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" } }, (err: any) => {
       try {
         assert(enableRequestIssued);
         done();
