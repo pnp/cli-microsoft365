@@ -471,7 +471,7 @@ describe(commands.SITECLASSIFICATION_GET, () => {
                   "value": "true"
                 },
                 {
-                  "name": "GuestUsageGuidelinesUrl",
+                  "name": "GuestUsageGuidelinesUrl_not_exist",
                   "value": ""
                 },
                 {
