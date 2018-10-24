@@ -45,7 +45,8 @@ class SpfxProjectUpgradeCommand extends Command {
     '1.4.1',
     '1.5.0',
     '1.5.1',
-    '1.6.0'
+    '1.6.0',
+    '1.7.0'
   ];
 
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
@@ -235,6 +236,14 @@ class SpfxProjectUpgradeCommand extends Command {
     if (fs.existsSync(tsLintJsonPath)) {
       try {
         project.tsLintJson = JSON.parse(Utils.removeSingleLineComments(fs.readFileSync(tsLintJsonPath, 'utf-8')));
+      }
+      catch { }
+    }
+
+    const tsLintJsonRootPath: string = path.join(projectRootPath, 'tslint.json');
+    if (fs.existsSync(tsLintJsonRootPath)) {
+      try {
+        project.tsLintJsonRoot = JSON.parse(Utils.removeSingleLineComments(fs.readFileSync(tsLintJsonRootPath, 'utf-8')));
       }
       catch { }
     }
