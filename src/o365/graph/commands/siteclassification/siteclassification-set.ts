@@ -68,11 +68,12 @@ class GraphSiteClassificationUpdateCommand extends GraphCommand {
 
         if (!unifiedGroupSetting ||
           unifiedGroupSetting.length === 0) {
-          cb(new CommandError("Missing DirectorySettingTemplate for \"Group.Unified\""));
+          cb(new CommandError("There is no previous defined site classification which can updated."));
           return Promise.reject();
         }
 
         const updatedDirSettings: UpdateDirectorySetting = new UpdateDirectorySetting();
+        // TODO: Adjust DirectorySettings.ts to make the following line obsolete
         updatedDirSettings.templateId = unifiedGroupSetting[0].id;
 
         unifiedGroupSetting[0].values.forEach((directorySetting: DirectorySettingValue) => {
@@ -120,7 +121,7 @@ class GraphSiteClassificationUpdateCommand extends GraphCommand {
             default:
               updatedDirSettings.values.push({
                 "name": directorySetting.name,
-                "value": directorySetting.value as string
+                "value": directorySetting.defaultValue as string
               });
               break;
           }
@@ -144,7 +145,7 @@ class GraphSiteClassificationUpdateCommand extends GraphCommand {
         }
 
         if (this.verbose) {
-          cmd.log('The updated classification settings will be :');
+          cmd.log('The updated classification settings will be:');
           cmd.log(updatedDirSettings);
           cmd.log('');
         }
