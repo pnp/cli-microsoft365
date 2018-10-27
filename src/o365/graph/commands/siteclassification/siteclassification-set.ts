@@ -223,8 +223,8 @@ class GraphSiteClassificationUpdateCommand extends GraphCommand {
     eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
 
   Examples:
-  
-    Update site classification 
+
+    Update information about the Office 365 Tenant site classification
       ${chalk.grey(config.delimiter)} ${this.name} --classifications "High, Medium, Low" --defaultClassification "Medium" 
 
     Update site classification with a usage guidelines URL 

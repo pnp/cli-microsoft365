@@ -1,6 +1,6 @@
 # graph siteclassification set
 
-Update site classification
+Updates site classification configuration
 
 ## Usage
 
