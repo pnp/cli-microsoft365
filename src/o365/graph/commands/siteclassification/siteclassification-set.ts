@@ -73,8 +73,6 @@ class GraphSiteClassificationUpdateCommand extends GraphCommand {
         }
 
         const updatedDirSettings: UpdateDirectorySetting = new UpdateDirectorySetting();
-        // TODO: Adjust DirectorySettings.ts to make the following line obsolete
-        updatedDirSettings.templateId = unifiedGroupSetting[0].id;
 
         unifiedGroupSetting[0].values.forEach((directorySetting: DirectorySettingValue) => {
           switch (directorySetting.name) {
