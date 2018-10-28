@@ -4,7 +4,7 @@ import commands from '../../commands';
 import * as request from 'request-promise-native';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
-  CommandOption, CommandValidate, CommandError
+  CommandOption, CommandValidate
 } from '../../../../Command';
 import Utils from '../../../../Utils';
 import GraphCommand from '../../GraphCommand';
@@ -35,6 +35,8 @@ class GraphSiteClassificationUpdateCommand extends GraphCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.classifications = typeof args.options.classifications !== 'undefined';
+    telemetryProps.defaultClassification = typeof args.options.defaultClassification !== 'undefined';
     telemetryProps.usageGuidelinesUrl = typeof args.options.usageGuidelinesUrl !== 'undefined';
     telemetryProps.guestUsageGuidelinesUrl = typeof args.options.guestUsageGuidelinesUrl !== 'undefined';
     return telemetryProps;
@@ -68,8 +70,7 @@ class GraphSiteClassificationUpdateCommand extends GraphCommand {
 
         if (!unifiedGroupSetting ||
           unifiedGroupSetting.length === 0) {
-          cb(new CommandError("There is no previous defined site classification which can updated."));
-          return Promise.reject();
+          return Promise.reject("There is no previous defined site classification which can updated.");
         }
 
         const updatedDirSettings: UpdateDirectorySetting = new UpdateDirectorySetting();
