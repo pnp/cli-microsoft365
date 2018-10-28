@@ -259,11 +259,14 @@ class GraphSiteClassificationUpdateCommand extends GraphCommand {
     Update information about the Office 365 Tenant site classification
       ${chalk.grey(config.delimiter)} ${this.name} --classifications "High, Medium, Low" --defaultClassification "Medium" 
 
+    Update only the default classification
+      ${chalk.grey(config.delimiter)} ${this.name} --defaultClassification "Low"
+
     Update site classification with a usage guidelines URL 
-      ${chalk.grey(config.delimiter)} ${this.name} --classifications "High, Medium, Low" --defaultClassification "Medium" --usageGuidelinesUrl "http://aka.ms/pnp"
+      ${chalk.grey(config.delimiter)} ${this.name} --usageGuidelinesUrl "http://aka.ms/pnp"
 
     Update site classification with usage guidelines URLs for guests and members
-      ${chalk.grey(config.delimiter)} ${this.name} --classifications "High, Medium, Low" --defaultClassification "Medium" --usageGuidelinesUrl "http://aka.ms/pnp" --guestUsageGuidelinesUrl "http://aka.ms/pnp" 
+      ${chalk.grey(config.delimiter)} ${this.name} --usageGuidelinesUrl "http://aka.ms/pnp" --guestUsageGuidelinesUrl "http://aka.ms/pnp" 
 
   More information:
 

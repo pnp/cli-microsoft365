@@ -39,16 +39,22 @@ Update information about the Office 365 Tenant site classification
 graph siteclassification set --classifications "High, Medium, Low" --defaultClassification "Medium"
 ```
 
+Update only the default classification
+
+```sh
+graph siteclassification set --defaultClassification "Low"
+```
+
 Update site classification with a usage guidelines URL
 
 ```sh
-graph siteclassification set --classifications "High, Medium, Low" --defaultClassification "Medium" --usageGuidelinesUrl "http://aka.ms/pnp"
+graph siteclassification set --usageGuidelinesUrl "http://aka.ms/pnp"
 ```
 
 Update site classification with usage guidelines URLs for guests and members
 
 ```sh
-graph siteclassification set --classifications "High, Medium, Low" --defaultClassification "Medium" --usageGuidelinesUrl "http://aka.ms/pnp" --guestUsageGuidelinesUrl "http://aka.ms/pnp"
+graph siteclassification set --usageGuidelinesUrl "http://aka.ms/pnp" --guestUsageGuidelinesUrl "http://aka.ms/pnp"
 ```
 
 ## More information
