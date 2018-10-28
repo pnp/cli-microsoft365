@@ -114,7 +114,7 @@ class GraphSiteClassificationUpdateCommand extends GraphCommand {
               else {
                 updatedDirSettings.values.push({
                   "name": directorySetting.name,
-                  "value": directorySetting.defaultValue as string
+                  "value": directorySetting.value as string
                 });
               }
               break;
@@ -128,23 +128,15 @@ class GraphSiteClassificationUpdateCommand extends GraphCommand {
               else {
                 updatedDirSettings.values.push({
                   "name": directorySetting.name,
-                  "value": directorySetting.defaultValue as string
+                  "value": directorySetting.value as string
                 });
               }
               break;
             default:
-              if (directorySetting.value) {
                 updatedDirSettings.values.push({
                   "name": directorySetting.name,
                   "value": directorySetting.value as string
                 });
-              }
-              else {
-                updatedDirSettings.values.push({
-                  "name": directorySetting.name,
-                  "value": directorySetting.defaultValue as string
-                });
-              }
               break;
           }
         });
