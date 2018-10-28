@@ -13,8 +13,8 @@ graph siteclassification set [options]
 Option|Description
 ------|-----------
 `--help`|output usage information
-`-c, --classifications <classifications>`|Comma-separated list of classifications
-`-d, --defaultClassification <defaultClassification>`|Classification to use by default
+`-c, --classifications [classifications]`|Comma-separated list of classifications
+`-d, --defaultClassification [defaultClassification]`|Classification to use by default
 `-u, --usageGuidelinesUrl [usageGuidelinesUrl]`|URL with usage guidelines for members
 `-g, --guestUsageGuidelinesUrl [guestUsageGuidelinesUrl]`|URL with usage guidelines for guests
 `-o, --output [output]`|Output type. `json|text`. Default `text`

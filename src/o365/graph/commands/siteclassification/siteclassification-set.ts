@@ -18,8 +18,8 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  classifications: string;
-  defaultClassification: string;
+  classifications?: string;
+  defaultClassification?: string;
   usageGuidelinesUrl?: string;
   guestUsageGuidelinesUrl?: string;
 }
@@ -77,16 +77,44 @@ class GraphSiteClassificationUpdateCommand extends GraphCommand {
         unifiedGroupSetting[0].values.forEach((directorySetting: DirectorySettingValue) => {
           switch (directorySetting.name) {
             case "ClassificationList":
-              updatedDirSettings.values.push({
-                "name": directorySetting.name,
-                "value": args.options.classifications as string
-              });
+              if (args.options.classifications) {
+                updatedDirSettings.values.push({
+                  "name": directorySetting.name,
+                  "value": args.options.classifications as string
+                });
+              }
+              else if (directorySetting.value) {
+                updatedDirSettings.values.push({
+                  "name": directorySetting.name,
+                  "value": directorySetting.value as string
+                });
+              }
+              else {
+                updatedDirSettings.values.push({
+                  "name": directorySetting.name,
+                  "value": directorySetting.defaultValue as string
+                });
+              }
               break;
             case "DefaultClassification":
-              updatedDirSettings.values.push({
-                "name": directorySetting.name,
-                "value": args.options.defaultClassification as string
-              });
+              if (args.options.defaultClassification) {
+                updatedDirSettings.values.push({
+                  "name": directorySetting.name,
+                  "value": args.options.defaultClassification as string
+                });
+              }
+              else if (directorySetting.value) {
+                updatedDirSettings.values.push({
+                  "name": directorySetting.name,
+                  "value": directorySetting.value as string
+                });
+              }
+              else {
+                updatedDirSettings.values.push({
+                  "name": directorySetting.name,
+                  "value": directorySetting.defaultValue as string
+                });
+              }
               break;
             case "UsageGuidelinesUrl":
               if (args.options.usageGuidelinesUrl) {
@@ -99,7 +127,7 @@ class GraphSiteClassificationUpdateCommand extends GraphCommand {
                 updatedDirSettings.values.push({
                   "name": directorySetting.name,
                   "value": directorySetting.defaultValue as string
-                })
+                });
               }
               break;
             case "GuestUsageGuidelinesUrl":
@@ -113,14 +141,22 @@ class GraphSiteClassificationUpdateCommand extends GraphCommand {
                 updatedDirSettings.values.push({
                   "name": directorySetting.name,
                   "value": directorySetting.defaultValue as string
-                })
+                });
               }
               break;
             default:
-              updatedDirSettings.values.push({
-                "name": directorySetting.name,
-                "value": directorySetting.defaultValue as string
-              });
+              if (directorySetting.value) {
+                updatedDirSettings.values.push({
+                  "name": directorySetting.name,
+                  "value": directorySetting.value as string
+                });
+              }
+              else {
+                updatedDirSettings.values.push({
+                  "name": directorySetting.name,
+                  "value": directorySetting.defaultValue as string
+                });
+              }
               break;
           }
         });
@@ -168,11 +204,11 @@ class GraphSiteClassificationUpdateCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-c, --classifications <classifications>',
+        option: '-c, --classifications [classifications]',
         description: 'Comma-separated list of classifications to update in the tenant'
       },
       {
-        option: '-d, --defaultClassification <defaultClassification>',
+        option: '-d, --defaultClassification [defaultClassification]',
         description: 'Classification to use by default'
       },
       {
@@ -191,14 +227,12 @@ class GraphSiteClassificationUpdateCommand extends GraphCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.classifications) {
-        return 'Required option classifications missing';
+      if (!args.options.classifications &&
+        !args.options.defaultClassification &&
+        !args.options.usageGuidelinesUrl &&
+        !args.options.guestUsageGuidelinesUrl) {
+        return 'Specify at least one property to update';
       }
-
-      if (!args.options.defaultClassification) {
-        return 'Required option defaultClassification missing';
-      }
-
       return true;
     };
   }
