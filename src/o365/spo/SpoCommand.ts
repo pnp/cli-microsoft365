@@ -125,7 +125,7 @@ export default abstract class SpoCommand extends Command {
     });
   }
 
-  protected ensureFormDigestA(cmd: CommandInstance, context: FormDigestInfo): Promise<FormDigestInfo> {
+  protected ensureFormDigest(cmd: CommandInstance, context: FormDigestInfo): Promise<FormDigestInfo> {
     return new Promise<FormDigestInfo>((reject: (error: any) => void): void => {
       if (this.isUnexpiredFormDigest(context)) {
 

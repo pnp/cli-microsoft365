@@ -26,10 +26,9 @@ describe(commands.SITE_CLASSIC_ADD, () => {
   });
 
   beforeEach(() => {
-    //sinon.stub(command as any, 'getRequestDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800 }); });
     let futureDate = new Date();
     futureDate.setSeconds(futureDate.getSeconds() + 1800);
-    sinon.stub(command as any, 'ensureFormDigestA').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: futureDate.toISOString() }); });
+    sinon.stub(command as any, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: futureDate.toISOString() }); });
 
     vorpal = require('../../../../vorpal-init');
     log = [];
@@ -44,13 +43,12 @@ describe(commands.SITE_CLASSIC_ADD, () => {
   });
 
   afterEach(() => {
-    //(command as any).formDigest = undefined;
     (command as any).currentContext = undefined;
     Utils.restore([
       vorpal.find,
       request.post,
       global.setTimeout,
-      (command as any).ensureFormDigestA
+      (command as any).ensureFormDigest
     ]);
   });
 
@@ -872,11 +870,11 @@ describe(commands.SITE_CLASSIC_ADD, () => {
   });
 
   it('creates classic site with minimal options. doesn\'t wait for completion. remove deleted site, site doesn\'t exist. refreshes expired token', (done) => {
-    Utils.restore((command as any).ensureFormDigestA);
+    Utils.restore((command as any).ensureFormDigest);
 
     let pastDate = new Date();
     pastDate.setSeconds(pastDate.getSeconds() - 1800);
-    sinon.stub(command as any, 'ensureFormDigestA').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: pastDate.toISOString() }); });
+    sinon.stub(command as any, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: pastDate.toISOString() }); });
 
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
@@ -947,11 +945,11 @@ describe(commands.SITE_CLASSIC_ADD, () => {
   });
 
   it('creates classic site with minimal options. doesn\'t wait for completion. remove deleted site, site doesn\'t exist. refreshes expired token (debug)', (done) => {
-    Utils.restore((command as any).ensureFormDigestA);
+    Utils.restore((command as any).ensureFormDigest);
     //sinon.stub(command as any, 'getRequestDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: -1 }); });
     let pastDate = new Date();
     pastDate.setSeconds(pastDate.getSeconds() - 1800);
-    sinon.stub(command as any, 'ensureFormDigestA').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: pastDate.toISOString() }); });
+    sinon.stub(command as any, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: pastDate.toISOString() }); });
 
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {

@@ -75,7 +75,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
 
         this.accessToken = accessToken;
 
-        return this.ensureFormDigestA(cmd, this.currentContext);
+        return this.ensureFormDigest(cmd, this.currentContext);
       })
       .then((res: FormDigestInfo): Promise<boolean> => {
         this.currentContext = res;
@@ -105,7 +105,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
         }
       })
       .then((): Promise<FormDigestInfo> => {
-        return this.ensureFormDigestA(cmd, this.currentContext);
+        return this.ensureFormDigest(cmd, this.currentContext);
       })
       .then((res: FormDigestInfo): request.RequestPromise => {
         this.currentContext = res;
@@ -185,7 +185,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
   private siteExistsInTheRecycleBin(url: string, accessToken: string, cmd: CommandInstance): Promise<boolean> {
     return new Promise<boolean>((resolve: (exists: boolean) => void, reject: (error: any) => void): void => {
       this
-        .ensureFormDigestA(cmd, this.currentContext)
+        .ensureFormDigest(cmd, this.currentContext)
         .then((res: FormDigestInfo): request.RequestPromise => {
           this.currentContext = res;
 
@@ -299,7 +299,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
   private deleteSiteFromTheRecycleBin(url: string, wait: boolean, accessToken: string, cmd: CommandInstance): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       this
-        .ensureFormDigestA(cmd, this.currentContext)
+        .ensureFormDigest(cmd, this.currentContext)
         .then((res: FormDigestInfo): request.RequestPromise => {
           this.currentContext = res;
 
@@ -354,7 +354,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
 
   private waitUntilFinished(operationId: string, resolve: () => void, reject: (error: any) => void, accessToken: string, cmd: CommandInstance): void {
     this
-      .ensureFormDigestA(cmd, this.currentContext)
+      .ensureFormDigest(cmd, this.currentContext)
       .then((res: FormDigestInfo): request.RequestPromise => {
         this.currentContext = res;
 

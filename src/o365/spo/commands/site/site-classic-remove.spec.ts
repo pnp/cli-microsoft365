@@ -27,7 +27,9 @@ describe(commands.SITE_CLASSIC_REMOVE, () => {
   });
 
   beforeEach(() => {
-    sinon.stub(command as any, 'getRequestDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800 }); });
+    let futureDate = new Date();
+    futureDate.setSeconds(futureDate.getSeconds() + 1800);
+    sinon.stub(command as any, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: futureDate.toISOString() }); }); 
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
@@ -42,12 +44,12 @@ describe(commands.SITE_CLASSIC_REMOVE, () => {
   });
 
   afterEach(() => {
-    (command as any).formDigest = undefined;
+    (command as any).currentContext = undefined;
     Utils.restore([
       vorpal.find,
       request.post,
       global.setTimeout,
-      (command as any).getRequestDigest
+      (command as any).ensureFormDigest
     ]);
   });
 
@@ -321,26 +323,6 @@ describe(commands.SITE_CLASSIC_REMOVE, () => {
     cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('removes site. doesn\'t wait for completion, refreshes expired token fails (debug)', (done) => {
-    Utils.restore((command as any).getRequestDigest);
-    sinon.stub(command as any, 'getRequestDigest').callsFake(() => { return Promise.reject('An error has occurred'); });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
