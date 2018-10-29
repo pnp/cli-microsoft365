@@ -1,6 +1,6 @@
 import Command, { CommandAction, CommandError } from '../../Command';
 import auth from './SpoAuth';
-import { SearchResponse } from './spo';
+import { SearchResponse, FormDigestInfo } from './spo';
 import * as request from 'request-promise-native';
 import Utils from '../../Utils';
 
@@ -123,5 +123,48 @@ export default abstract class SpoCommand extends Command {
           reject(error);
         });
     });
+  }
+
+  protected ensureFormDigestA(cmd: CommandInstance, context: FormDigestInfo): Promise<FormDigestInfo> {
+    return new Promise<FormDigestInfo>((reject: (error: any) => void): void => {
+      if (this.isUnexpiredFormDigest(context)) {
+
+        if (this.debug) {
+          cmd.log('Existing form digest still valid');
+        }
+
+        Promise.resolve(context);
+      }
+
+      this
+        .getRequestDigest(cmd, this.debug)
+        .then((res: FormDigestInfo): void => {
+          if (this.debug) {
+            cmd.log('Response:');
+            cmd.log(res);
+            cmd.log('');
+          }
+
+          context.FormDigestValue = res.FormDigestValue;
+          context.FormDigestTimeoutSeconds = res.FormDigestTimeoutSeconds
+          context.FormDigestExpiresAt = new Date();
+          context.FormDigestExpiresAt.setSeconds(context.FormDigestExpiresAt.getSeconds() + res.FormDigestTimeoutSeconds - 5);
+          
+          Promise.resolve(context);
+        }, (error: any): void => {
+          reject(error);
+        });
+    });
+  }
+
+  private isUnexpiredFormDigest(contextinfo: FormDigestInfo): boolean {
+    const now: Date = new Date();
+    if (contextinfo.FormDigestValue &&
+      now < (contextinfo.FormDigestExpiresAt as Date)) {
+
+      return true;
+    }
+
+    return false;
   }
 }

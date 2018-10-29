@@ -4,6 +4,10 @@ export interface ContextInfo {
   WebFullUrl: string;
 }
 
+export interface FormDigestInfo extends ContextInfo {
+  FormDigestExpiresAt: Date;
+}
+
 export interface ClientSvcResponse extends Array<any | ClientSvcResponseContents> {
 }
 
