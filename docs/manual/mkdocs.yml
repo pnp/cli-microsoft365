@@ -209,6 +209,7 @@ nav:
       - teams:
         - teams list: 'cmd/graph/teams/teams-list.md'
         - teams channel add: 'cmd/graph/teams/teams-channel-add.md'
+        - teams channel message get: 'cmd/graph/teams/teams-channel-message-get.md'
       - user:
         - user get: 'cmd/graph/user/user-get.md'
         - user list: 'cmd/graph/user/user-list.md'
