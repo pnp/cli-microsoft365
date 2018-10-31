@@ -27,7 +27,7 @@ class GraphTeamsChannelMessageGetCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Retreives a message from a channel in a Microsoft Teams team';
+    return 'Retrieves a message from a channel in a Microsoft Teams team';
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -134,11 +134,11 @@ class GraphTeamsChannelMessageGetCommand extends GraphCommand {
     the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
     eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
 
-    You can only retreive a message from a Microsoft Teams team if you are a member of that team.
+    You can only retrieve a message from a Microsoft Teams team if you are a member of that team.
 
   Examples:
   
-    Retrieve the specified message from a channel of the specified Microsoft Teams team
+    Retrieve the specified message from a channel of the Microsoft Teams team
       ${chalk.grey(config.delimiter)} ${this.name} --groupId 5f5d7b71-1161-44d8-bcc1-3da710eb4171 --channelId 19:88f7e66a8dfe42be92db19505ae912a8@thread.skype --messageId 1540747442203
 `   );
   }
