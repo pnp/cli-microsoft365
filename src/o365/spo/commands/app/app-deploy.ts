@@ -8,9 +8,8 @@ import {
   CommandOption,
   CommandValidate
 } from '../../../../Command';
-import { ContextInfo } from '../../spo';
-import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
+import { SpoAppBaseCommand } from './SpoAppBaseCommand';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -19,19 +18,21 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
+  appCatalogUrl?: string;
   id?: string;
   name?: string;
-  appCatalogUrl?: string;
+  scope?: string;
+  siteUrl?: string;
   skipFeatureDeployment?: boolean;
 }
 
-class AppDeployCommand extends SpoCommand {
+class SpoAppDeployCommand extends SpoAppBaseCommand {
   public get name(): string {
     return commands.APP_DEPLOY;
   }
 
   public get description(): string {
-    return 'Deploys the specified app in the tenant app catalog';
+    return 'Deploys the specified app in the specified app catalog';
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -40,73 +41,26 @@ class AppDeployCommand extends SpoCommand {
     telemetryProps.name = typeof args.options.name !== 'undefined';
     telemetryProps.appCatalogUrl = (!(!args.options.appCatalogUrl)).toString();
     telemetryProps.skipFeatureDeployment = args.options.skipFeatureDeployment || false;
+    telemetryProps.scope = (!(!args.options.scope)).toString();
+    telemetryProps.siteUrl = (!(!args.options.siteUrl)).toString();
     return telemetryProps;
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    let appCatalogUrl: string = '';
-    let accessToken: string = '';
     let appId: string = '';
+    const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
+    let siteAccessToken: string = '';
+    let appCatalogSiteUrl: string = '';
 
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<string> => {
-        return new Promise<string>((resolve: (appCatalogUrl: string) => void, reject: (error: any) => void): void => {
-          if (args.options.appCatalogUrl) {
-            resolve(args.options.appCatalogUrl);
-          }
-          else {
-            this
-              .getTenantAppCatalogUrl(cmd, this.debug)
-              .then((appCatalogUrl: string): void => {
-                resolve(appCatalogUrl);
-              }, (error: any): void => {
-                if (this.debug) {
-                  cmd.log('Error');
-                  cmd.log(error);
-                  cmd.log('');
-                }
+    this.getAppCatalogSiteUrl(cmd, auth.site.url, auth.service.accessToken, args)
+      .then((siteUrl: string): Promise<string> => {
+        appCatalogSiteUrl = siteUrl;
 
-                cmd.log('CLI could not automatically determine the URL of the tenant app catalog');
-                cmd.log('What is the absolute URL of your tenant app catalog site');
-                cmd.prompt({
-                  type: 'input',
-                  name: 'appCatalogUrl',
-                  message: '? ',
-                }, (result: { appCatalogUrl?: string }): void => {
-                  if (!result.appCatalogUrl) {
-                    reject(`Couldn't determine tenant app catalog URL`);
-                  }
-                  else {
-                    let isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(result.appCatalogUrl);
-                    if (isValidSharePointUrl === true) {
-                      resolve(result.appCatalogUrl);
-                    }
-                    else {
-                      reject(isValidSharePointUrl);
-                    }
-                  }
-                });
-              });
-          }
-        });
+        const resource: string = Auth.getResourceFromUrl(appCatalogSiteUrl);
+        return auth.getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug);
       })
-      .then((appCatalog: string): Promise<string> => {
-        if (this.debug) {
-          cmd.log(`Retrieved tenant app catalog URL ${appCatalog}`);
-        }
-
-        appCatalogUrl = appCatalog;
-
-        if (this.verbose) {
-          cmd.log(`Retrieving access token for the app catalog at ${appCatalogUrl}...`);
-        }
-
-        const appCatalogResource: string = Auth.getResourceFromUrl(appCatalogUrl);
-        return auth.getAccessToken(appCatalogResource, auth.service.refreshToken as string, cmd, this.debug);
-      })
-      .then((token: string): Promise<{ UniqueId: string }> | request.RequestPromise => {
-        accessToken = token;
+      .then((accessToken: string): Promise<{ UniqueId: string }> | request.RequestPromise => {
+        siteAccessToken = accessToken;
 
         if (this.verbose) {
           cmd.log('Retrieved access token');
@@ -125,9 +79,9 @@ class AppDeployCommand extends SpoCommand {
           }
 
           const requestOptions: any = {
-            url: `${appCatalogUrl}/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('${args.options.name}')?$select=UniqueId`,
+            url: `${appCatalogSiteUrl}/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('${args.options.name}')?$select=UniqueId`,
             headers: Utils.getRequestHeaders({
-              authorization: `Bearer ${accessToken}`,
+              authorization: `Bearer ${siteAccessToken}`,
               accept: 'application/json;odata=nometadata'
             }),
             json: true
@@ -142,7 +96,7 @@ class AppDeployCommand extends SpoCommand {
           return request.get(requestOptions);
         }
       })
-      .then((res: { UniqueId: string }): request.RequestPromise | Promise<void> => {
+      .then((res: { UniqueId: string }): request.RequestPromise => {
         if (this.debug) {
           cmd.log('Response:');
           cmd.log(res);
@@ -151,26 +105,16 @@ class AppDeployCommand extends SpoCommand {
 
         appId = res.UniqueId;
 
-        return this.getRequestDigestForSite(appCatalogUrl, accessToken, cmd, this.debug);
-      })
-      .then((res: ContextInfo): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
         if (this.verbose) {
           cmd.log(`Deploying app...`);
         }
 
         const requestOptions: any = {
-          url: `${appCatalogUrl}/_api/web/tenantappcatalog/AvailableApps/GetById('${appId}')/deploy`,
+          url: `${appCatalogSiteUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${appId}')/deploy`,
           headers: Utils.getRequestHeaders({
-            authorization: `Bearer ${accessToken}`,
+            authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata',
-            'content-type': 'application/json;odata=nometadata;charset=utf-8',
-            'X-RequestDigest': res.FormDigestValue
+            'content-type': 'application/json;odata=nometadata;charset=utf-8'
           }),
           body: { 'skipFeatureDeployment': args.options.skipFeatureDeployment || false },
           json: true
@@ -211,11 +155,20 @@ class AppDeployCommand extends SpoCommand {
       },
       {
         option: '-u, --appCatalogUrl [appCatalogUrl]',
-        description: '(optional) URL of the tenant app catalog site. If not specified, the CLI will try to resolve it automatically'
+        description: 'URL of the tenant app catalog site. If not specified, the CLI will try to resolve it automatically'
       },
       {
         option: '--skipFeatureDeployment',
         description: 'If the app supports tenant-wide deployment, deploy it to the whole tenant'
+      },
+      {
+        option: '-s, --scope [scope]',
+        description: 'Scope of the app catalog: tenant|sitecollection. Default tenant',
+        autocomplete: ['tenant', 'sitecollection']
+      },
+      {
+        option: '--siteUrl [siteUrl]',
+        description: 'The URL of the site collection with app catalog where the solution package will be deployed. Must be specified when the scope is \'sitecollection\''
       }
     ];
 
@@ -225,6 +178,25 @@ class AppDeployCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
+      // verify either 'tenant' or 'sitecollection' specified if scope provided
+      if (args.options.scope) {
+        const testScope: string = args.options.scope.toLowerCase();
+        if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
+          return `Scope must be either 'tenant' or 'sitecollection'`
+        }
+
+        if (testScope === 'sitecollection' && !args.options.siteUrl) {
+          
+          if(args.options.appCatalogUrl){
+            return `You must specify siteUrl when the scope is sitecollection instead of appCatalogUrl`;
+          }  
+          return `You must specify siteUrl when the scope is sitecollection`;
+
+        } else if(testScope === 'tenant' && args.options.siteUrl) {
+          return `The siteUrl option can only be used when the scope option is set to sitecollection`;
+        }
+      }
+
       if (!args.options.id && !args.options.name) {
         return 'Specify either the id or the name';
       }
@@ -238,7 +210,15 @@ class AppDeployCommand extends SpoCommand {
       }
 
       if (args.options.appCatalogUrl) {
-        return SpoCommand.isValidSharePointUrl(args.options.appCatalogUrl);
+        return SpoAppBaseCommand.isValidSharePointUrl(args.options.appCatalogUrl);
+      }
+
+      if (!args.options.scope && args.options.siteUrl) {
+        return `The siteUrl option can only be used when the scope option is set to sitecollection`;
+      }
+
+      if(args.options.siteUrl) {
+          return SpoAppBaseCommand.isValidSharePointUrl(args.options.siteUrl);
       }
 
       return true;
@@ -250,7 +230,7 @@ class AppDeployCommand extends SpoCommand {
     log(vorpal.find(commands.APP_DEPLOY).helpInformation());
     log(
       `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint site,
-        using the ${chalk.blue(commands.LOGIN)} command.
+    using the ${chalk.blue(commands.LOGIN)} command.
 
   Remarks:
   
@@ -272,6 +252,10 @@ class AppDeployCommand extends SpoCommand {
     of the tenant app catalog automatically.
       ${chalk.grey(config.delimiter)} ${commands.APP_DEPLOY} --id 058140e3-0e37-44fc-a1d3-79c487d371a3
 
+    Deploy the specified app in the site collection app catalog 
+    of site ${chalk.grey('https://contoso.sharepoint.com/sites/site1')}.
+      ${chalk.grey(config.delimiter)} ${commands.APP_DEPLOY} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --scope sitecollection --siteUrl https://contoso.sharepoint.com/sites/site1
+
     Deploy the app with the specified name in the tenant app catalog.
     Try to resolve the URL of the tenant app catalog automatically.
       ${chalk.grey(config.delimiter)} ${commands.APP_DEPLOY} --name solution.sppkg
@@ -291,4 +275,4 @@ class AppDeployCommand extends SpoCommand {
   }
 }
 
-module.exports = new AppDeployCommand();
+module.exports = new SpoAppDeployCommand();

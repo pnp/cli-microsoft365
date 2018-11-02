@@ -2,36 +2,64 @@ import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import * as request from 'request-promise-native';
-import SpoCommand from '../../SpoCommand';
+import {
+  CommandOption,
+  CommandValidate
+} from '../../../../Command';
 import { AppMetadata } from './AppMetadata';
 import Utils from '../../../../Utils';
 import GlobalOptions from '../../../../GlobalOptions';
+import { Auth } from '../../../../Auth';
+import { SpoAppBaseCommand } from './SpoAppBaseCommand';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
 interface CommandArgs {
-  options: GlobalOptions;
+  options: Options;
 }
 
-class AppListCommand extends SpoCommand {
+interface Options extends GlobalOptions {
+  scope?: string;
+  siteUrl?: string;
+}
+
+class SpoAppListCommand extends SpoAppBaseCommand {
   public get name(): string {
     return commands.APP_LIST;
   }
 
   public get description(): string {
-    return 'Lists apps from the tenant app catalog';
+    return 'Lists apps from the specified app catalog';
   }
 
   protected requiresTenantAdmin(): boolean {
     return false;
   }
 
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.siteUrl = (!(!args.options.siteUrl)).toString();
+    telemetryProps.scope = (!(!args.options.scope)).toString();
+    return telemetryProps;
+  }
+
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
+    const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
+    let siteAccessToken: string = '';
+    let appCatalogSiteUrl: string = '';
+
+    this.getAppCatalogSiteUrl(cmd, auth.site.url, auth.service.accessToken, args)
+      .then((siteUrl: string): Promise<string> => {
+        appCatalogSiteUrl = siteUrl;
+
+        const resource: string = Auth.getResourceFromUrl(appCatalogSiteUrl);
+        return auth.getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug);
+      })
       .then((accessToken: string): request.RequestPromise => {
+        siteAccessToken = accessToken;
+
         if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Loading apps from tenant app catalog...`);
+          cmd.log(`Retrieved access token ${accessToken}...`);
         }
 
         if (this.verbose) {
@@ -39,11 +67,12 @@ class AppListCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          url: `${auth.site.url}/_api/web/tenantappcatalog/AvailableApps`,
+          url: `${appCatalogSiteUrl}/_api/web/${scope}appcatalog/AvailableApps`,
           headers: Utils.getRequestHeaders({
-            authorization: `Bearer ${accessToken}`,
+            authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata'
-          })
+          }),
+          json: true
         };
 
         if (this.debug) {
@@ -54,14 +83,12 @@ class AppListCommand extends SpoCommand {
 
         return request.get(requestOptions);
       })
-      .then((res: string): void => {
+      .then((apps: { value: AppMetadata[] }): void => {
         if (this.debug) {
           cmd.log('Response:');
-          cmd.log(res);
+          cmd.log(apps);
           cmd.log('');
         }
-
-        const apps: { value: AppMetadata[] } = JSON.parse(res);
 
         if (apps.value && apps.value.length > 0) {
           if (args.options.output === 'json') {
@@ -84,7 +111,50 @@ class AppListCommand extends SpoCommand {
           }
         }
         cb();
-      }, (rawRes: any): void => this.handleRejectedODataPromise(rawRes, cmd, cb));
+      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, cmd, cb));
+  }
+
+  public options(): CommandOption[] {
+    const options: CommandOption[] = [
+      {
+        option: '-s, --scope [scope]',
+        description: 'Scope of the app catalog: tenant|sitecollection. Default tenant',
+        autocomplete: ['tenant', 'sitecollection']
+      },
+      {
+        option: '-u, --siteUrl [siteUrl]',
+        description: 'The URL of the site collection with app catalog for which to list available solution packages. Must be specified when the scope is \'sitecollection\''
+      }
+    ];
+
+    const parentOptions: CommandOption[] = super.options();
+    return options.concat(parentOptions);
+  }
+
+  public validate(): CommandValidate {
+    return (args: CommandArgs): boolean | string => {
+      // verify either 'tenant' or 'sitecollection' specified if scope provided
+      if (args.options.scope) {
+        const testScope: string = args.options.scope.toLowerCase();
+
+        if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
+          return `Scope must be either 'tenant' or 'sitecollection'`;
+        }
+
+        if (testScope === 'sitecollection' && !args.options.siteUrl) {
+          return `You must specify siteUrl when the scope is sitecollection`;
+        }
+
+        if (args.options.siteUrl) {
+          return SpoAppBaseCommand.isValidSharePointUrl(args.options.siteUrl);
+        }
+      }
+      else if (args.options.siteUrl) {
+        return `siteUrl must be used with scope 'sitecollection'`;
+      }
+
+      return true;
+    };
   }
 
   public commandHelp(args: {}, log: (help: string) => void): void {
@@ -105,7 +175,11 @@ class AppListCommand extends SpoCommand {
   Examples:
   
     Return the list of available apps from the tenant app catalog. Show the installed version in the site if applicable.
-      ${chalk.grey(config.delimiter)} ${commands.APP_LIST}
+      ${chalk.grey(config.delimiter)} ${commands.APP_LIST} --scope tenant
+
+    Return the list of available apps from a site collection app catalog
+    of site ${chalk.grey('https://contoso.sharepoint.com/sites/site1')}.
+      ${chalk.grey(config.delimiter)} ${commands.APP_LIST} --scope sitecollection --siteUrl https://contoso.sharepoint.com/sites/site1
 
   More information:
   
@@ -115,4 +189,4 @@ class AppListCommand extends SpoCommand {
   }
 }
 
-module.exports = new AppListCommand();
+module.exports = new SpoAppListCommand();

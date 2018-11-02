@@ -1,6 +1,6 @@
 # spo app deploy
 
-Deploys the specified app in the tenant app catalog
+Deploys the specified app in the specified app catalog
 
 ## Usage
 
@@ -15,8 +15,10 @@ Option|Description
 `--help`|output usage information
 `-i, --id [id]`|ID of the app to deploy. Specify the `id` or the `name` but not both.
 `-n, --name [name]`|Name of the app to deploy. Specify the `id` or the `name` but not both.
-`-u, --appCatalogUrl [appCatalogUrl]`|(optional) URL of the tenant app catalog site. If not specified, the CLI will try to resolve it automatically
+`-u, --appCatalogUrl [appCatalogUrl]`|URL of the tenant app catalog site. If not specified, the CLI will try to resolve it automatically
 `--skipFeatureDeployment`|If the app supports tenant-wide deployment, deploy it to the whole tenant
+`-s, --scope [scope]`|Scope of the app catalog: `tenant|sitecollection`. Default `tenant`
+`--siteUrl [siteUrl]`|The URL of the site collection with app catalog where the solution package will be deployed. Must be specified when the scope is `sitecollection`.
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
@@ -38,6 +40,12 @@ Deploy the specified app in the tenant app catalog. Try to resolve the URL of th
 
 ```sh
 spo app deploy --id 058140e3-0e37-44fc-a1d3-79c487d371a3
+```
+
+Deploy the specified app in the site collection app catalog of site _https://contoso.sharepoint.com/sites/site1_
+
+```sh
+spo app deploy --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --scope sitecollection --siteUrl https://contoso.sharepoint.com/sites/site1
 ```
 
 Deploy the app with the specified name in the tenant app catalog. Try to resolve the URL of the tenant app catalog automatically.
