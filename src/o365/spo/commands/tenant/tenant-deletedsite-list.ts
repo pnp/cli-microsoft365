@@ -71,21 +71,26 @@ class SpoTenantDeletedsiteListCommand extends SpoCommand {
           return;
         }
 
-        let result: any[] = json[6]['_Child_Items_'];
+        let result;
+        if (json[6] && json[6]['_Child_Items_']) {
+          result = json[6]['_Child_Items_'] as any[];
+        }
 
         if (result && result.length > 0) {
           result.forEach(c => {
             delete c['_ObjectIdentity_'];
             delete c['_ObjectType_'];
+            c.SiteId = c.SiteId.replace('/Guid(', '').replace(')/', '');
             const dateChunks: number[] = (c.DeletionTime as string)
-                .replace('/Date(', '')
-                .replace(')/', '')
-                .split(',')
-                .map(c => {
-                  return parseInt(c);
-                });
+              .replace('/Date(', '')
+              .replace(')/', '')
+              .split(',')
+              .map(c => {
+                return parseInt(c);
+              });
             c.DeletionTime = new Date(dateChunks[0], dateChunks[1], dateChunks[2], dateChunks[3], dateChunks[4], dateChunks[5], dateChunks[6]).toISOString();
           });
+
           if (args.options.output === 'json') {
             cmd.log(result);
           }
@@ -96,9 +101,12 @@ class SpoTenantDeletedsiteListCommand extends SpoCommand {
                 StorageMaximumLevel: e.StorageMaximumLevel,
                 UserCodeMaximumLevel: e.UserCodeMaximumLevel,
                 DeletionTime: e.DeletionTime,
-                DaysRemaining: e.DaysRemaining,
+                DaysRemaining: e.DaysRemaining
               };
             }));
+            if (this.verbose) {
+              cmd.log(vorpal.chalk.green('DONE'));
+            }
           }
         }
         else {
