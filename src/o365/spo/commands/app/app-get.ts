@@ -22,6 +22,7 @@ interface Options extends GlobalOptions {
   id?: string;
   name?: string;
   appCatalogUrl?: string;
+  scope?: string;
 }
 
 class AppGetCommand extends SpoCommand {
@@ -38,6 +39,7 @@ class AppGetCommand extends SpoCommand {
     telemetryProps.id = typeof args.options.id !== 'undefined';
     telemetryProps.name = typeof args.options.name !== 'undefined';
     telemetryProps.appCatalogUrl = typeof args.options.appCatalogUrl !== 'undefined';
+    telemetryProps.scope = (!(!args.options.scope)).toString();
     return telemetryProps;
   }
 
@@ -46,6 +48,8 @@ class AppGetCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
+
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
       .then((accessToken: string): request.RequestPromise | Promise<string> => {
@@ -54,23 +58,31 @@ class AppGetCommand extends SpoCommand {
         }
 
         if (args.options.id) {
-          return Promise.resolve(args.options.id);
-        }
-        else {
-          let appCatalogUrl: string = '';
 
-          return (args.options.appCatalogUrl ?
-            Promise.resolve(args.options.appCatalogUrl) :
-            this.getTenantAppCatalogUrl(cmd, this.debug))
+          return Promise.resolve(args.options.id);
+
+        } else if (args.options.appCatalogUrl) {
+
+          return this.getAppUniqueId(args.options.appCatalogUrl, args.options.name, cmd);
+
+        } else if (args.options.scope === 'sitecollection'){
+
+          return this.getAppUniqueId(auth.site.url, args.options.name, cmd);
+
+        } else {
+
+          return this.getTenantAppCatalogUrl(cmd, this.debug)
             .then((appCatalogUrl: string): Promise<string> => {
+            
               return Promise.resolve(appCatalogUrl);
+
             }, (error: any): Promise<string> => {
               if (this.debug) {
                 cmd.log('Error');
                 cmd.log(error);
                 cmd.log('');
               }
-
+  
               return new Promise<string>((resolve: (appCatalogUrl: string) => void, reject: (error: any) => void): void => {
                 cmd.log('CLI could not automatically determine the URL of the tenant app catalog');
                 cmd.log('What is the absolute URL of your tenant app catalog site');
@@ -94,50 +106,8 @@ class AppGetCommand extends SpoCommand {
                 });
               });
             })
-            .then((appCatalog: string): Promise<string> => {
-              if (this.debug) {
-                cmd.log(`Retrieved tenant app catalog URL ${appCatalog}`);
-              }
-
-              appCatalogUrl = appCatalog;
-
-              if (this.verbose) {
-                cmd.log(`Retrieving access token for the app catalog at ${appCatalogUrl}...`);
-              }
-
-              const appCatalogResource: string = Auth.getResourceFromUrl(appCatalogUrl);
-              return auth.getAccessToken(appCatalogResource, auth.service.refreshToken as string, cmd, this.debug);
-            })
-            .then((token: string): request.RequestPromise => {
-              if (this.verbose) {
-                cmd.log(`Looking up app id for app named ${args.options.name}...`);
-              }
-
-              const requestOptions: any = {
-                url: `${appCatalogUrl}/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('${args.options.name}')?$select=UniqueId`,
-                headers: Utils.getRequestHeaders({
-                  authorization: `Bearer ${token}`,
-                  accept: 'application/json;odata=nometadata'
-                }),
-                json: true
-              };
-
-              if (this.debug) {
-                cmd.log('Executing web request...');
-                cmd.log(requestOptions);
-                cmd.log('');
-              }
-
-              return request.get(requestOptions);
-            })
-            .then((res: { UniqueId: string }): Promise<string> => {
-              if (this.debug) {
-                cmd.log('Response:');
-                cmd.log(res);
-                cmd.log('');
-              }
-
-              return Promise.resolve(res.UniqueId);
+            .then((appCatalogUrl: string) =>{
+                return this.getAppUniqueId(appCatalogUrl, args.options.name, cmd);
             });
         }
       })
@@ -147,7 +117,7 @@ class AppGetCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          url: `${auth.site.url}/_api/web/tenantappcatalog/AvailableApps/GetById('${encodeURIComponent(appId)}')`,
+          url: `${auth.site.url}/_api/web/${scope}appcatalog/AvailableApps/GetById('${encodeURIComponent(appId)}')`,
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${auth.service.accessToken}`,
             accept: 'application/json;odata=nometadata'
@@ -189,6 +159,11 @@ class AppGetCommand extends SpoCommand {
       {
         option: '-u, --appCatalogUrl [appCatalogUrl]',
         description: 'URL of the tenant app catalog site. If not specified, the CLI will try to resolve it automatically'
+      },
+      {
+        option: '-s, --scope [scope]',
+        description: 'Specify the target app catalog: \'tenant\' or \'sitecollection\' (default = tenant)',
+        autocomplete: ['tenant', 'sitecollection']
       }
     ];
 
@@ -198,6 +173,13 @@ class AppGetCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
+      // verify either 'tenant' or 'sitecollection' specified if scope provided
+      if (args.options.scope) {
+        const testScope: string = args.options.scope.toLowerCase();
+        if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
+          return `Scope must be either 'tenant' or 'sitecollection' if specified`
+        }
+      }
       if (!args.options.id && !args.options.name) {
         return 'Specify either the id or the name';
       }
@@ -245,11 +227,68 @@ class AppGetCommand extends SpoCommand {
     available in the tenant app catalog using the specified app catalog URL
       ${chalk.grey(config.delimiter)} ${commands.APP_GET} --name solution.sppkg --appCatalogUrl https://contoso.sharepoint.com/sites/apps
 
+    Return details about the app with ID ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
+    available in the site collection app catalog
+    of the site you are currently logged in.
+      ${chalk.grey(config.delimiter)} ${commands.APP_GET} --id b2307a39-e878-458b-bc90-03bc578531d6 --scope sitecollection
+
   More information:
   
     Application Lifecycle Management (ALM) APIs
       https://docs.microsoft.com/en-us/sharepoint/dev/apis/alm-api-for-spfx-add-ins
 `);
+  }
+
+  private getAppUniqueId(appCatalogUrl: string, appName: any, cmd: any): Promise<string> {
+
+    return new Promise<string>((resolve: any, reject: any) => {
+      
+      if (this.debug) {
+        cmd.log(`Retrieved tenant app catalog URL ${appCatalogUrl}`);
+      }
+
+      if (this.verbose) {
+        cmd.log(`Retrieving access token for the app catalog at ${appCatalogUrl}...`);
+      }
+
+      const appCatalogResource: string = Auth.getResourceFromUrl(appCatalogUrl);
+
+      return auth.getAccessToken(appCatalogResource, auth.service.refreshToken as string, cmd, this.debug)
+        .then((token: string): request.RequestPromise => {
+          if (this.verbose) {
+            cmd.log(`Looking up app id for app named ${appName}...`);
+          }
+
+          const requestOptions: any = {
+            url: `${appCatalogUrl}/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('${appName}')?$select=UniqueId`,
+            headers: Utils.getRequestHeaders({
+              authorization: `Bearer ${token}`,
+              accept: 'application/json;odata=nometadata'
+            }),
+            json: true
+          };
+
+          if (this.debug) {
+            cmd.log('Executing web request...');
+            cmd.log(requestOptions);
+            cmd.log('');
+          }
+
+          return request.get(requestOptions);
+        })
+        .then((res: { UniqueId: string }): Promise<string> => {
+          if (this.debug) {
+            cmd.log('Response:');
+            cmd.log(res);
+            cmd.log('');
+          }
+
+          return resolve(res.UniqueId);
+        })
+        .catch((err: any) => {
+          return reject(err);
+        });
+    });
   }
 }
 

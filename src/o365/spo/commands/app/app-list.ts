@@ -2,6 +2,10 @@ import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import * as request from 'request-promise-native';
+import {
+  CommandOption,
+  CommandValidate
+} from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import { AppMetadata } from './AppMetadata';
 import Utils from '../../../../Utils';
@@ -10,7 +14,12 @@ import GlobalOptions from '../../../../GlobalOptions';
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
 interface CommandArgs {
-  options: GlobalOptions;
+  options: Options;
+}
+
+interface Options extends GlobalOptions {
+  siteUrl?: string;
+  scope?: string;
 }
 
 class AppListCommand extends SpoCommand {
@@ -26,7 +35,15 @@ class AppListCommand extends SpoCommand {
     return false;
   }
 
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.siteUrl = (!(!args.options.siteUrl)).toString();
+    telemetryProps.scope = (!(!args.options.scope)).toString();
+    return telemetryProps;
+  }
+
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
       .then((accessToken: string): request.RequestPromise => {
@@ -38,8 +55,13 @@ class AppListCommand extends SpoCommand {
           cmd.log(`Retrieving apps...`);
         }
 
+        let siteUrl = auth.site.url;
+        if(args.options.siteUrl) {
+          siteUrl = args.options.siteUrl;
+        }
+
         const requestOptions: any = {
-          url: `${auth.site.url}/_api/web/tenantappcatalog/AvailableApps`,
+          url: `${siteUrl}/_api/web/${scope}appcatalog/AvailableApps`,
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${accessToken}`,
             accept: 'application/json;odata=nometadata'
@@ -87,6 +109,47 @@ class AppListCommand extends SpoCommand {
       }, (rawRes: any): void => this.handleRejectedODataPromise(rawRes, cmd, cb));
   }
 
+  public options(): CommandOption[] {
+    const options: CommandOption[] = [
+      {
+        option: '-s, --scope [scope]',
+        description: 'Specify the target app catalog: \'tenant\' or \'sitecollection\' (default = tenant)',
+        autocomplete: ['tenant', 'sitecollection']
+      },
+      {
+        option: '-u, --siteUrl [siteUrl]',
+        description: 'Absolute URL of the site to list the apps'
+      }
+    ];
+
+    const parentOptions: CommandOption[] = super.options();
+    return options.concat(parentOptions);
+  }
+
+  public validate(): CommandValidate {
+    return (args: CommandArgs): boolean | string => {
+      // verify either 'tenant' or 'sitecollection' specified if scope provided
+      if (args.options.scope) {
+        const testScope: string = args.options.scope.toLowerCase();
+        if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
+          return `Scope must be either 'tenant' or 'sitecollection' if specified`
+        }
+
+        if (testScope === 'tenant' && args.options.siteUrl){
+          return `siteUrl must be used with scope 'sitecollection'`;
+        }
+
+        if (args.options.siteUrl) {
+          return SpoCommand.isValidSharePointUrl(args.options.siteUrl);
+        }
+      } else if (args.options.siteUrl) {
+          return `siteUrl must be used with scope 'sitecollection'`;
+      }
+
+      return true;
+    };
+  }
+
   public commandHelp(args: {}, log: (help: string) => void): void {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.APP_LIST).helpInformation());
@@ -105,7 +168,14 @@ class AppListCommand extends SpoCommand {
   Examples:
   
     Return the list of available apps from the tenant app catalog. Show the installed version in the site if applicable.
-      ${chalk.grey(config.delimiter)} ${commands.APP_LIST}
+      ${chalk.grey(config.delimiter)} ${commands.APP_LIST} --scope tenant
+
+    Return the list of available apps from a site collection app catalog. Show the installed version in the site if applicable.
+      ${chalk.grey(config.delimiter)} ${commands.APP_LIST} --scope sitecollection --siteUrl https://contoso.sharepoint.com/sites/foo
+
+    Return the list of available apps from a site collection app catalog of the site you are currently logged in. 
+    Show the installed version in the site if applicable.
+      ${chalk.grey(config.delimiter)} ${commands.APP_LIST} --scope sitecollection
 
   More information:
   

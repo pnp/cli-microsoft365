@@ -15,6 +15,7 @@ Option|Description
 `--help`|output usage information
 `-i, --id [id]`|ID of the app to deploy. Specify the `id` or the `name` but not both.
 `-n, --name [name]`|Name of the app to deploy. Specify the `id` or the `name` but not both.
+`-s, --scope [scope]`|Target app catalog. `tenant|sitecollection`. Default `tenant`.
 `-u, --appCatalogUrl [appCatalogUrl]`|(optional) URL of the tenant app catalog site. If not specified, the CLI will try to resolve it automatically
 `--skipFeatureDeployment`|If the app supports tenant-wide deployment, deploy it to the whole tenant
 `-o, --output [output]`|Output type. `json|text`. Default `text`
@@ -38,6 +39,12 @@ Deploy the specified app in the tenant app catalog. Try to resolve the URL of th
 
 ```sh
 spo app deploy --id 058140e3-0e37-44fc-a1d3-79c487d371a3
+```
+
+Deploy the specified app in the site collection app catalog.
+
+```sh
+spo app deploy --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --scope sitecollection
 ```
 
 Deploy the app with the specified name in the tenant app catalog. Try to resolve the URL of the tenant app catalog automatically.

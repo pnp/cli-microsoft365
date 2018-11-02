@@ -12,10 +12,12 @@ spo app list [options]
 
 Option|Description
 ------|-----------
-`--help`|output usage information
-`-o, --output [output]`|Output type. `json|text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-s, --scope [scope]`|Target app catalog. `tenant|sitecollection`. Default `tenant`.
+`-u, --siteUrl [siteUrl]`|Absolute URL of the site to list the apps in. Required if scope is set to `sitecollection`.
+`--help`|Output usage information.
+`-o, --output [output]`|Output type. `json|text`. Default `text`.
+`--verbose`|Runs command with verbose logging.
+`--debug`|Runs command with debug logging.
 
 !!! important
     Before using this command, log in to a SharePoint Online site, using the [spo login](../login.md) command.
@@ -32,6 +34,18 @@ List all apps available in the tenant app catalog
 
 ```sh
 spo app list
+```
+
+List all apps available in a site collection app catalog
+
+```sh
+spo app list --scope sitecollection --siteUrl https://contoso.sharepoint.com/sites/foo
+```
+
+Return the list of available apps from a site collection app catalog of the site you are currently logged in. Show the installed version in the site if applicable.
+
+```sh     
+spo app list --scope sitecollection
 ```
 
 ## More information

@@ -1,5 +1,4 @@
 import auth from '../../SpoAuth';
-import { ContextInfo } from '../../spo';
 import config from '../../../../config';
 import * as request from 'request-promise-native';
 import commands from '../../commands';
@@ -21,7 +20,8 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   filePath: string;
-  overwrite?: boolean;
+  overwrite?: boolean; 
+  scope?: string;
 }
 
 class SpoAppAddCommand extends SpoCommand {
@@ -36,10 +36,12 @@ class SpoAppAddCommand extends SpoCommand {
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.overwrite = args.options.overwrite || false;
+    telemetryProps.scope = (!(!args.options.scope)).toString();
     return telemetryProps;
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
     const overwrite: boolean = args.options.overwrite || false;
 
     if (this.debug) {
@@ -48,14 +50,7 @@ class SpoAppAddCommand extends SpoCommand {
 
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
-
-        return this.getRequestDigest(cmd, this.debug);
-      })
-      .then((res: ContextInfo): request.RequestPromise => {
+      .then((res: any): request.RequestPromise => {
         if (this.debug) {
           cmd.log('Response:');
           cmd.log(res);
@@ -69,11 +64,10 @@ class SpoAppAddCommand extends SpoCommand {
 
         const fileName: string = path.basename(fullPath);
         const requestOptions: any = {
-          url: `${auth.site.url}/_api/web/tenantappcatalog/Add(overwrite=${(overwrite.toString().toLowerCase())}, url='${fileName}')`,
+          url: `${auth.site.url}/_api/web/${scope}appcatalog/Add(overwrite=${(overwrite.toString().toLowerCase())}, url='${fileName}')`,
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${auth.service.accessToken}`,
             accept: 'application/json;odata=nometadata',
-            'X-RequestDigest': res.FormDigestValue,
             binaryStringRequestBody: 'true'
           }),
           body: fs.readFileSync(fullPath)
@@ -117,7 +111,12 @@ class SpoAppAddCommand extends SpoCommand {
         description: 'Absolute or relative path to the solution package file to add to the app catalog'
       },
       {
-        option: '--overwrite',
+        option: '-s, --scope [scope]',
+        description: 'Specify the target app catalog: \'tenant\' or \'sitecollection\' (default = tenant)',
+        autocomplete: ['tenant', 'sitecollection']
+      },
+      {
+        option: '--overwrite [overwrite]',
         description: 'Set to overwrite the existing package file'
       }
     ];
@@ -128,6 +127,14 @@ class SpoAppAddCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
+      // verify either 'tenant' or 'site' specified if scope provided
+      if (args.options.scope) {
+        const testScope: string = args.options.scope.toLowerCase();
+        if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
+          return `Scope must be either 'tenant' or 'sitecollection' if specified`
+        }
+      }
+
       if (!args.options.filePath) {
         return 'Missing required option filePath';
       }
@@ -155,23 +162,27 @@ class SpoAppAddCommand extends SpoCommand {
                 
   Remarks:
 
-    To add an app to the tenant app catalog, you have to first log in to a SharePoint site using the
+    To add an app to the tenant or site collection app catalog, you have to first log in to a SharePoint site using the
     ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
 
     When specifying the path to the app package file you can use both relative and absolute paths.
     Note, that ~ in the path, will not be resolved and will most likely result in an error.
 
-    If you try to upload a package that already exists in the tenant app catalog without specifying
+    If you try to upload a package that already exists in the app catalog without specifying
     the ${chalk.blue('--overwrite')} option, the command will fail with an error stating that the
     specified package already exists.
 
   Examples:
   
     Add the ${chalk.grey('spfx.sppkg')} package to the tenant app catalog
-      ${chalk.grey(config.delimiter)} ${commands.APP_ADD} -p /Users/pnp/spfx/sharepoint/solution/spfx.sppkg
+      ${chalk.grey(config.delimiter)} ${commands.APP_ADD} --filePath /Users/pnp/spfx/sharepoint/solution/spfx.sppkg
 
     Overwrite the ${chalk.grey('spfx.sppkg')} package in the tenant app catalog with the newer version
-      ${chalk.grey(config.delimiter)} ${commands.APP_ADD} -p sharepoint/solution/spfx.sppkg --overwrite
+      ${chalk.grey(config.delimiter)} ${commands.APP_ADD} --filePath sharepoint/solution/spfx.sppkg --overwrite
+
+    Add the ${chalk.grey('spfx.sppkg')} package to the site collection app catalog 
+    of the site you are currently logged in
+      ${chalk.grey(config.delimiter)} ${commands.APP_ADD} --filePath c:/spfx.sppkg --scope sitecollection
 
   More information:
 
