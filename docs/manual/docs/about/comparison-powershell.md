@@ -401,7 +401,7 @@ Remove-PnPUser|SharePointPnPPowerShellOnline|
 Remove-PnPUserFromGroup|SharePointPnPPowerShellOnline|
 Remove-PnPView|SharePointPnPPowerShellOnline|
 Remove-PnPWeb|SharePointPnPPowerShellOnline|[spo web remove](../cmd/spo/web/web-remove.md)
-Remove-PnPWebhookSubscription|SharePointPnPPowerShellOnline|
+Remove-PnPWebhookSubscription|SharePointPnPPowerShellOnline|[spo list webhook remove](../cmd/spo/list/list-webhook-remove.md)
 Remove-PnPWebPart|SharePointPnPPowerShellOnline|
 Remove-PnPWikiPage|SharePointPnPPowerShellOnline|
 Remove-PnPWorkflowDefinition|SharePointPnPPowerShellOnline|
