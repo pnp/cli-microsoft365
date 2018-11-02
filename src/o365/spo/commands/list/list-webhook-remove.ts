@@ -91,7 +91,7 @@ class SpoListWebhookRemoveCommand extends SpoCommand {
             cmd.log('');
           }
 
-          return request.get(requestOptions);
+          return request.delete(requestOptions);
         })
         .then((res: any): void => {
           if (this.debug) {
@@ -118,7 +118,7 @@ class SpoListWebhookRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the webhook ${args.options.id} from list ${args.options.listId || args.options.listTitle} located in site ${args.options.webUrl}?`,
+        message: `Are you sure you want to remove the webhook ${args.options.id} from list ${args.options.listId || args.options.listTitle}?`,
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();
