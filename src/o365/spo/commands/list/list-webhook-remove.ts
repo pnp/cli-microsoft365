@@ -31,7 +31,7 @@ class SpoListWebhookRemoveCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Remove the specific webhook';
+    return 'Removes the specified webhook from the list';
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -46,6 +46,7 @@ class SpoListWebhookRemoveCommand extends SpoCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
     let siteAccessToken: string = '';
+    const list: string = args.options.listId ? encodeURIComponent(args.options.listId as string) : encodeURIComponent(args.options.listTitle as string);
 
     const removeWebhook: () => void = (): void => {
       if (this.debug) {
@@ -62,8 +63,7 @@ class SpoListWebhookRemoveCommand extends SpoCommand {
           }
 
           if (this.verbose) {
-            const list: string = args.options.listId ? encodeURIComponent(args.options.listId as string) : encodeURIComponent(args.options.listTitle as string);
-            cmd.log(`Webhook ${args.options.id} belonging to list ${list} in site at ${args.options.webUrl} is about to be removed...`);
+            cmd.log(`Webhook ${args.options.id} is about to be removed from list ${list} located at site ${args.options.webUrl}...`);
           }
 
           let requestUrl: string = '';
@@ -94,13 +94,7 @@ class SpoListWebhookRemoveCommand extends SpoCommand {
           return request.delete(requestOptions);
         })
         .then((res: any): void => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
-          }
-
-          cmd.log(res);
+          // REST delete call doesn't return anything
 
           cb();
         }, (err: any): void => {
@@ -118,7 +112,7 @@ class SpoListWebhookRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the webhook ${args.options.id} from list ${args.options.listId || args.options.listTitle}?`,
+        message: `Are you sure you want to remove webhook ${args.options.id} from list ${list} located at site ${args.options.webUrl}?`,
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();
@@ -134,23 +128,23 @@ class SpoListWebhookRemoveCommand extends SpoCommand {
     const options: CommandOption[] = [
       {
         option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the list to retrieve webhooks for is located'
+        description: 'URL of the site where the list to remove the webhook from is located'
       },
       {
         option: '-l, --listId [listId]',
-        description: 'ID of the list from which to retrieve the webhook. Specify either listId or listTitle but not both'
+        description: 'ID of the list from which the webhook should be removed. Specify either listId or listTitle but not both'
       },
       {
         option: '-t, --listTitle [listTitle]',
-        description: 'Title of the list from which to retrieve the webhook. Specify either listId or listTitle but not both'
+        description: 'Title of the list from which the webhook should be removed. Specify either listId or listTitle but not both'
       },
       {
         option: '-i, --id <id>',
-        description: 'ID of the webhook to retrieve'
+        description: 'ID of the webhook to remove'
       },
       {
         option: '--confirm',
-        description: 'Don\'t prompt for confirming removing the file'
+        description: 'Don\'t prompt for confirming removing the webhook'
       }
     ];
 
@@ -204,7 +198,7 @@ class SpoListWebhookRemoveCommand extends SpoCommand {
   
   Remarks:
   
-    To get information about a webhook, you have to first log in to SharePoint
+    To remove a webhook from a list, you have to first log in to SharePoint
     using the ${chalk.blue(commands.LOGIN)} command,
     eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
 
@@ -213,15 +207,20 @@ class SpoListWebhookRemoveCommand extends SpoCommand {
         
   Examples:
   
-    Return information about a webhook with ID ${chalk.grey('cc27a922-8224-4296-90a5-ebbc54da2e85')} which
-    belongs to a list with ID ${chalk.grey('0cd891ef-afce-4e55-b836-fce03286cccf')}
-    located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LIST_WEBHOOK_REMOVE} --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --id cc27a922-8224-4296-90a5-ebbc54da2e85
+    Remove webhook with ID ${chalk.grey('cc27a922-8224-4296-90a5-ebbc54da2e81')} from a
+    list with ID ${chalk.grey('0cd891ef-afce-4e55-b836-fce03286cccf')}
+    located in site ${chalk.grey('https://contoso.sharepoint.com/sites/ninja')}
+      ${chalk.grey(config.delimiter)} ${commands.LIST_WEBHOOK_REMOVE} --webUrl https://contoso.sharepoint.com/sites/ninja --listId 0cd891ef-afce-4e55-b836-fce03286cccf --id cc27a922-8224-4296-90a5-ebbc54da2e81
 
-    Return information about a webhook with ID ${chalk.grey('cc27a922-8224-4296-90a5-ebbc54da2e85')} which
-    belongs to a list with title ${chalk.grey('Documents')} located in site
-    ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LIST_WEBHOOK_REMOVE} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e85
+    Remove webhook with ID ${chalk.grey('cc27a922-8224-4296-90a5-ebbc54da2e81')} from a
+    list with title ${chalk.grey('Documents')} located in site
+    ${chalk.grey('https://contoso.sharepoint.com/sites/ninja')}
+      ${chalk.grey(config.delimiter)} ${commands.LIST_WEBHOOK_REMOVE} --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e81
+
+    Remove webhook with ID ${chalk.grey('cc27a922-8224-4296-90a5-ebbc54da2e81')} from a
+    list with title ${chalk.grey('Documents')} located in site
+    ${chalk.grey('https://contoso.sharepoint.com/sites/ninja')} without being asked for confirmation
+      ${chalk.grey(config.delimiter)} ${commands.LIST_WEBHOOK_REMOVE} --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e81 --confirm
       `);
   }
 }

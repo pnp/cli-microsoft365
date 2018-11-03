@@ -82,6 +82,7 @@ nav:
         - list set: 'cmd/spo/list/list-set.md'
         - list webhook get: 'cmd/spo/list/list-webhook-get.md'
         - list webhook list: 'cmd/spo/list/list-webhook-list.md'
+        - list webhook remove: 'cmd/spo/list/list-webhook-remove.md'
       - listitem:
         - listitem add: 'cmd/spo/listitem/listitem-add.md'
         - listitem get: 'cmd/spo/listitem/listitem-get.md'
