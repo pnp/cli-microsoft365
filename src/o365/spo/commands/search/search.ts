@@ -35,6 +35,7 @@ interface Options extends GlobalOptions {
   startRow?:number;
   properties:string;
   sourceName:string;
+  refiners:string;
 }
 
 class SearchCommand extends SpoCommand {
@@ -63,6 +64,7 @@ class SearchCommand extends SpoCommand {
     telemetryProps.startRow = args.options.startRow;
     telemetryProps.properties = args.options.properties;
     telemetryProps.sourceName = args.options.sourceName;
+    telemetryProps.refiners = args.options.refiners;
     return telemetryProps;
   }
 
@@ -163,6 +165,7 @@ class SearchCommand extends SpoCommand {
     const sortListRequestString = args.options.sortList ? `&sortList='${encodeURIComponent(args.options.sortList)}'` : ``;
     const rankingModelIdRequestString = args.options.rankingModelId ? `&rankingmodelid='${args.options.rankingModelId}'` : ``;
     const propertiesRequestString = this.getPropertiesRequestString(args);
+    const refinersRequestString = args.options.refiners ? `&refiners='${args.options.refiners}'` : ``;
 
     //Construct single requestUrl
     const requestUrl = `${webUrl}/_api/search/query?querytext='${args.options.query}'`.concat(
@@ -177,7 +180,8 @@ class SearchCommand extends SpoCommand {
       queryTemplateRequestString,
       sortListRequestString,
       rankingModelIdRequestString,
-      propertiesRequestString
+      propertiesRequestString,
+      refinersRequestString
     );
 
     if(this.debug) {
@@ -264,6 +268,10 @@ class SearchCommand extends SpoCommand {
       {
         option: '--sourceName <sourceName>',
         description: 'Specified the name of the result source to be used to run the query.'
+      },
+      {
+        option: '--refiners <refiners>',
+        description: 'The set of refiners to return in a search result.'
       }
     ];
 
