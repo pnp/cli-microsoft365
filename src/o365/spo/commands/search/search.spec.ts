@@ -34,7 +34,11 @@ enum TestID
   QueryAll_WithRefinersTest,
   QueryAll_WithWebTest,
   QueryAll_WithHiddenConstraintsTest,
-  QueryAll_WithClientTypeTest
+  QueryAll_WithClientTypeTest,
+  QueryAll_WithEnablePhoneticTest,
+  QueryAll_WithProcessBestBetsTest,
+  QueryAll_WithEnableQueryRulesTest,
+  QueryAll_WithProcessPersonalFavoritesTest
 }
 
 describe(commands.SEARCH, () => {
@@ -280,6 +284,23 @@ describe(commands.SEARCH, () => {
       }
       if(urlContains(opts,'clientType=\'custom\'')) {
         executedTest = TestID.QueryAll_WithClientTypeTest;
+        return Promise.resolve(getQueryResult(fakeRows));
+      }
+      
+      if(urlContains(opts,'enablephonetic=true')) {
+        executedTest = TestID.QueryAll_WithEnablePhoneticTest;
+        return Promise.resolve(getQueryResult(fakeRows));
+      }
+      if(urlContains(opts,'processBestBets=true')) {
+        executedTest = TestID.QueryAll_WithProcessBestBetsTest;
+        return Promise.resolve(getQueryResult(fakeRows));
+      }
+      if(urlContains(opts,'enableQueryRules=false')) {
+        executedTest = TestID.QueryAll_WithEnableQueryRulesTest;
+        return Promise.resolve(getQueryResult(fakeRows));
+      }
+      if(urlContains(opts,'processPersonalFavorites=true')) {
+        executedTest = TestID.QueryAll_WithProcessPersonalFavoritesTest;
         return Promise.resolve(getQueryResult(fakeRows));
       }
 
@@ -1158,6 +1179,138 @@ describe(commands.SEARCH, () => {
       try {
         assert.equal(returnArrayLength, 4);
         assert.equal(executedTest,TestID.QueryAll_WithClientTypeTest);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('executes search request with enablePhonetic defined', (done) => {
+    stubAuth();
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        output: 'text',
+        debug: true,
+        query: '*',
+        enablePhonetic: true
+      }
+    }, () => {
+      try {
+        assert.equal(returnArrayLength, 4);
+        assert.equal(executedTest,TestID.QueryAll_WithEnablePhoneticTest);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('executes search request with processBestBets defined', (done) => {
+    stubAuth();
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        output: 'text',
+        debug: true,
+        query: '*',
+        processBestBets: true
+      }
+    }, () => {
+      try {
+        assert.equal(returnArrayLength, 4);
+        assert.equal(executedTest,TestID.QueryAll_WithProcessBestBetsTest);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('executes search request with enableQueryRules defined', (done) => {
+    stubAuth();
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        output: 'text',
+        debug: true,
+        query: '*',
+        enableQueryRules: false
+      }
+    }, () => {
+      try {
+        assert.equal(returnArrayLength, 4);
+        assert.equal(executedTest,TestID.QueryAll_WithEnableQueryRulesTest);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('executes search request with processPersonalFavorites defined', (done) => {
+    stubAuth();
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        output: 'text',
+        debug: true,
+        query: '*',
+        processPersonalFavorites: true
+      }
+    }, () => {
+      try {
+        assert.equal(returnArrayLength, 4);
+        assert.equal(executedTest,TestID.QueryAll_WithProcessPersonalFavoritesTest);
         done();
       }
       catch (e) {
