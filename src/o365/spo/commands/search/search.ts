@@ -36,6 +36,7 @@ interface Options extends GlobalOptions {
   properties:string;
   sourceName:string;
   refiners:string;
+  web:string;
 }
 
 class SearchCommand extends SpoCommand {
@@ -65,11 +66,12 @@ class SearchCommand extends SpoCommand {
     telemetryProps.properties = args.options.properties;
     telemetryProps.sourceName = args.options.sourceName;
     telemetryProps.refiners = args.options.refiners;
+    telemetryProps.web = args.options.web;
     return telemetryProps;
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const webUrl = auth.site.url;
+    const webUrl = args.options.web ? args.options.web : auth.site.url;
     const resource: string = Auth.getResourceFromUrl(webUrl);
 
     if (this.debug) {
@@ -272,6 +274,10 @@ class SearchCommand extends SpoCommand {
       {
         option: '--refiners <refiners>',
         description: 'The set of refiners to return in a search result.'
+      },
+      {
+        option: '--web <web>',
+        description: 'The web against which we want to execute the query. If the parameter is not defined, the query is executed against the web that\'s used when logging in to the SPO environment.'
       }
     ];
 
