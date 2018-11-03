@@ -38,6 +38,7 @@ interface Options extends GlobalOptions {
   refiners:string;
   web:string;
   hiddenConstraints:string;
+  clientType:string;
 }
 
 class SearchCommand extends SpoCommand {
@@ -69,6 +70,7 @@ class SearchCommand extends SpoCommand {
     telemetryProps.refiners = args.options.refiners;
     telemetryProps.web = args.options.web;
     telemetryProps.hiddenConstraints = args.options.hiddenConstraints;
+    telemetryProps.clientType = args.options.clientType;
     return telemetryProps;
   }
 
@@ -170,7 +172,8 @@ class SearchCommand extends SpoCommand {
     const rankingModelIdRequestString = args.options.rankingModelId ? `&rankingmodelid='${args.options.rankingModelId}'` : ``;
     const propertiesRequestString = this.getPropertiesRequestString(args);
     const refinersRequestString = args.options.refiners ? `&refiners='${args.options.refiners}'` : ``;
-    const hiddenConstraintsString = args.options.hiddenConstraints ? `&hiddenconstraints='${args.options.hiddenConstraints}'` : ``;
+    const hiddenConstraintsRequestString = args.options.hiddenConstraints ? `&hiddenconstraints='${args.options.hiddenConstraints}'` : ``;
+    const clientTypeRequestString = args.options.clientType ? `&clienttype='${args.options.clientType}'` : ``;
 
     //Construct single requestUrl
     const requestUrl = `${webUrl}/_api/search/query?querytext='${args.options.query}'`.concat(
@@ -187,7 +190,8 @@ class SearchCommand extends SpoCommand {
       rankingModelIdRequestString,
       propertiesRequestString,
       refinersRequestString,
-      hiddenConstraintsString
+      hiddenConstraintsRequestString,
+      clientTypeRequestString
     );
 
     if(this.debug) {
@@ -286,6 +290,10 @@ class SearchCommand extends SpoCommand {
       {
         option: '--hiddenConstraints <hiddenConstraints>',
         description: 'The additional query terms to append to the query.'
+      },
+      {
+        option: '--clientType <clientType>',
+        description: 'The type of the client that issued the query.'
       }
     ];
 
