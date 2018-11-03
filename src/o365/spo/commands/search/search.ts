@@ -33,6 +33,7 @@ interface Options extends GlobalOptions {
   sortList:string;
   rankingModelId:string;
   startRow?:number;
+  properties:string;
 }
 
 class SearchCommand extends SpoCommand {
@@ -59,6 +60,7 @@ class SearchCommand extends SpoCommand {
     telemetryProps.sortList = args.options.sortList;
     telemetryProps.rankingModelId = args.options.rankingModelId;
     telemetryProps.startRow = args.options.startRow;
+    telemetryProps.properties = args.options.properties;
     return telemetryProps;
   }
 
@@ -157,7 +159,8 @@ class SearchCommand extends SpoCommand {
     const refinementFiltersRequestString = args.options.refinementFilters ? `&refinementfilters='${args.options.refinementFilters}'` : ``;
     const queryTemplateRequestString = args.options.queryTemplate ? `&querytemplate='${args.options.queryTemplate}'` : ``;
     const sortListRequestString = args.options.sortList ? `&sortList='${encodeURIComponent(args.options.sortList)}'` : ``;
-    const rankingModelIdRequstString = args.options.rankingModelId ? `&rankingmodelid='${args.options.rankingModelId}'` : ``;
+    const rankingModelIdRequestString = args.options.rankingModelId ? `&rankingmodelid='${args.options.rankingModelId}'` : ``;
+    const propertiesRequestString = args.options.properties ? `&properties='${args.options.properties}'` : ``;
 
     //Construct single requestUrl
     const requestUrl = `${webUrl}/_api/search/query?querytext='${args.options.query}'`.concat(
@@ -171,7 +174,8 @@ class SearchCommand extends SpoCommand {
       refinementFiltersRequestString,
       queryTemplateRequestString,
       sortListRequestString,
-      rankingModelIdRequstString
+      rankingModelIdRequestString,
+      propertiesRequestString
     );
 
     if(this.debug) {
@@ -241,6 +245,10 @@ class SearchCommand extends SpoCommand {
       {
         option: '--startRow <startRow>',
         description: 'The first row that is included in the search results that are returned. You use this parameter when you want to implement paging for search results.'
+      },
+      {
+        option: '--properties <properties>',
+        description: 'Additional properties for the query. GET requests support only string values. POST requests support values of any type.'
       }
     ];
 
