@@ -11,7 +11,7 @@
 
 Using the Office 365 CLI, you can manage your Microsoft Office 365 tenant and SharePoint Framework projects on any platform. No matter if you are on Windows, macOS or Linux, using Bash, Cmder or PowerShell, using the Office 365 CLI you can configure Office 365, manage SharePoint Framework projects and build automation scripts.
 
-[![asciicast](https://asciinema.org/a/TJORGWjhqrbOSOQHe7fh3c11S.png)](https://asciinema.org/a/TJORGWjhqrbOSOQHe7fh3c11S)
+[![asciicast](https://asciinema.org/a/203789.png)](https://asciinema.org/a/203789)
 
 ## Installation
 

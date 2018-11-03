@@ -22,7 +22,7 @@ Option|Description
 
 ## Remarks
 
-To list taxonomy term groups, you have to first log in to a tenant admin site using the [spo login](../login.md) command, eg. `spo connect https://contoso-admin.sharepoint.com`.
+To list taxonomy term groups, you have to first log in to a tenant admin site using the [spo login](../login.md) command, eg. `spo login https://contoso-admin.sharepoint.com`.
 
 ## Examples
 

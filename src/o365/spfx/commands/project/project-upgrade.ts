@@ -6,12 +6,13 @@ import Command, {
 import GlobalOptions from '../../../../GlobalOptions';
 import * as path from 'path';
 import * as fs from 'fs';
-import { Finding, Utils } from './project-upgrade/';
+import { Finding, Utils, Hash, Dictionary } from './project-upgrade/';
 import { Rule } from './project-upgrade/rules/Rule';
 import { EOL } from 'os';
 import { Project, Manifest, TsFile } from './project-upgrade/model';
 import { FindingToReport } from './project-upgrade/FindingToReport';
 import { FN017001_MISC_npm_dedupe } from './project-upgrade/rules/FN017001_MISC_npm_dedupe';
+import { ReportData, ReportDataModification } from './ReportData';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -47,6 +48,13 @@ class SpfxProjectUpgradeCommand extends Command {
     '1.6.0'
   ];
 
+  public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
+  public static ERROR_UNSUPPORTED_TO_VERSION: number = 2;
+  public static ERROR_NO_VERSION: number = 3;
+  public static ERROR_UNSUPPORTED_FROM_VERSION: number = 4;
+  public static ERROR_NO_DOWNGRADE: number = 5;
+  public static ERROR_PROJECT_UP_TO_DATE: number = 6;
+
   public get name(): string {
     return commands.PROJECT_UPGRADE;
   }
@@ -64,37 +72,37 @@ class SpfxProjectUpgradeCommand extends Command {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     this.projectRootPath = this.getProjectRoot(process.cwd());
     if (this.projectRootPath === null) {
-      cb(new CommandError(`Couldn't find project root folder`));
+      cb(new CommandError(`Couldn't find project root folder`, SpfxProjectUpgradeCommand.ERROR_NO_PROJECT_ROOT_FOLDER));
       return;
     }
 
     this.toVersion = args.options.toVersion ? args.options.toVersion : this.supportedVersions[this.supportedVersions.length - 1];
 
     if (this.supportedVersions.indexOf(this.toVersion) < 0) {
-      cb(new CommandError(`Office 365 CLI doesn't support upgrading SharePoint Framework projects to version ${this.toVersion}. Supported versions are ${this.supportedVersions.join(', ')}`));
+      cb(new CommandError(`Office 365 CLI doesn't support upgrading SharePoint Framework projects to version ${this.toVersion}. Supported versions are ${this.supportedVersions.join(', ')}`, SpfxProjectUpgradeCommand.ERROR_UNSUPPORTED_TO_VERSION));
       return;
     }
 
     this.projectVersion = this.getProjectVersion();
     if (!this.projectVersion) {
-      cb(new CommandError(`Unable to determine the version of the current SharePoint Framework project`));
+      cb(new CommandError(`Unable to determine the version of the current SharePoint Framework project`, SpfxProjectUpgradeCommand.ERROR_NO_VERSION));
       return;
     }
 
     const pos: number = this.supportedVersions.indexOf(this.projectVersion);
     if (pos < 0) {
-      cb(new CommandError(`Office 365 CLI doesn't support upgrading projects build on SharePoint Framework v${this.projectVersion}`));
+      cb(new CommandError(`Office 365 CLI doesn't support upgrading projects build on SharePoint Framework v${this.projectVersion}`, SpfxProjectUpgradeCommand.ERROR_UNSUPPORTED_FROM_VERSION));
       return;
     }
 
     const posTo: number = this.supportedVersions.indexOf(this.toVersion);
     if (pos > posTo) {
-      cb(new CommandError('You cannot downgrade a project'));
+      cb(new CommandError('You cannot downgrade a project', SpfxProjectUpgradeCommand.ERROR_NO_DOWNGRADE));
       return;
     }
 
     if (pos === posTo) {
-      cb(new CommandError('Project doesn\'t need to be upgraded'));
+      cb(new CommandError('Project doesn\'t need to be upgraded', SpfxProjectUpgradeCommand.ERROR_PROJECT_UP_TO_DATE));
       return;
     }
 
@@ -156,13 +164,7 @@ class SpfxProjectUpgradeCommand extends Command {
         cmd.log(this.getMdReport(findingsToReport));
         break;
       default:
-        cmd.log(findingsToReport.map(f => {
-          return {
-            id: f.id,
-            file: f.file,
-            resolution: f.resolution
-          };
-        }));
+        cmd.log(this.getTextReport(findingsToReport));
     }
 
     cb();
@@ -313,15 +315,29 @@ class SpfxProjectUpgradeCommand extends Command {
       : dir;
   }
 
+  private getTextReport(findings: FindingToReport[]): string {
+    const reportData: ReportData = this.getReportData(findings);
+    const s: string[] = [
+      'Execute in command line', EOL,
+      '-----------------------', EOL,
+      (reportData.mainNpmCommands.concat(reportData.commandsToExecute.filter((command) => command.indexOf('npm i') === -1 && command.indexOf('npm un') === -1))).join(EOL), EOL,
+      EOL,
+      Object.keys(reportData.modificationPerFile).map(file => {
+        return [
+          file, EOL,
+          '-'.repeat(file.length), EOL,
+          reportData.modificationPerFile[file].map((m: ReportDataModification) => `${m.description}:${EOL}${m.modification}${EOL}`).join(EOL), EOL,
+        ].join('');
+      }).join(EOL),
+      EOL,
+    ];
+
+    return s.join('').trim();
+  }
+
   private getMdReport(findings: FindingToReport[]): string {
-    const commandsToExecute: string[] = [];
     const findingsToReport: string[] = [];
-    const modificationPerFile: any = [];
-    const modificationTypePerFile: any = [];
-    const packagesDevExact: string[] = [];
-    const packagesDepExact: string[] = [];
-    const packagesDepUn: string[] = [];
-    const packagesDevUn: string[] = [];
+    const reportData: ReportData = this.getReportData(findings);
 
     findings.forEach(f => {
       let resolution: string = '';
@@ -346,6 +362,61 @@ ${f.resolution}
           break;
       }
 
+      findingsToReport.push(
+        `### ${f.id} ${f.title} | ${f.severity}`, EOL,
+        EOL,
+        f.description, EOL,
+        EOL,
+        resolution,
+        EOL,
+        `File: [${f.file}${(f.position ? `:${f.position.line}:${f.position.character}` : '')}](${f.file})`, EOL,
+        EOL
+      );
+    });
+
+    const s: string[] = [
+      `# Upgrade project ${path.posix.basename(this.projectRootPath as string)} to v${this.toVersion}`, EOL,
+      EOL,
+      `Date: ${(new Date().toLocaleDateString())}`, EOL,
+      EOL,
+      '## Findings', EOL,
+      EOL,
+      `Following is the list of steps required to upgrade your project to SharePoint Framework version ${this.toVersion}. [Summary](#Summary) of the modifications is included at the end of the report.`, EOL,
+      EOL,
+      findingsToReport.join(''),
+      '## Summary', EOL,
+      EOL,
+      '### Execute script', EOL,
+      EOL,
+      '```sh', EOL,
+      (reportData.mainNpmCommands.concat(reportData.commandsToExecute.filter((command) => command.indexOf('npm i') === -1 && command.indexOf('npm un') === -1))).join(EOL), EOL,
+      '```', EOL,
+      EOL,
+      '### Modify files', EOL,
+      EOL,
+      Object.keys(reportData.modificationPerFile).map(file => {
+        return [
+          `#### [${file}](${file})`, EOL,
+          EOL,
+          reportData.modificationPerFile[file].map((m: ReportDataModification) => `${m.description}:${EOL}${EOL}\`\`\`${reportData.modificationTypePerFile[file]}${EOL}${m.modification}${EOL}\`\`\``).join(EOL + EOL), EOL,
+        ].join('');
+      }).join(EOL),
+      EOL,
+    ];
+
+    return s.join('').trim();
+  }
+
+  private getReportData(findings: FindingToReport[]): ReportData {
+    const commandsToExecute: string[] = [];
+    const modificationPerFile: Dictionary<ReportDataModification[]> = {};
+    const modificationTypePerFile: Hash = {};
+    const packagesDevExact: string[] = [];
+    const packagesDepExact: string[] = [];
+    const packagesDepUn: string[] = [];
+    const packagesDevUn: string[] = [];
+
+    findings.forEach(f => {
       if (f.resolutionType === 'cmd') {
         if (f.resolution.indexOf('npm i') !== -1 ||
           f.resolution.indexOf('npm un') !== -1) {
@@ -364,55 +435,22 @@ ${f.resolution}
           modificationTypePerFile[f.file] = f.resolutionType;
         }
 
-        modificationPerFile[f.file].push(f.resolution);
+        modificationPerFile[f.file].push({
+          description: f.description,
+          modification: f.resolution
+        });
       }
-
-      findingsToReport.push(
-        `### ${f.id} ${f.title} | ${f.severity}`, EOL,
-        EOL,
-        f.description, EOL,
-        EOL,
-        resolution,
-        EOL,
-        `File: [${f.file}${(f.position ? `:${f.position.line}:${f.position.character}` : '')}](${f.file})`, EOL,
-        EOL
-      );
     });
 
     const mainNpmCommands: string[] = this.reduceNpmCommand(
       packagesDepExact, packagesDevExact, packagesDepUn, packagesDevUn);
 
-    const s: string[] = [
-      `# Upgrade project ${path.posix.basename(this.projectRootPath as string)} to v${this.toVersion}`, EOL,
-      EOL,
-      `Date: ${(new Date().toLocaleDateString())}`, EOL,
-      EOL,
-      '## Findings', EOL,
-      EOL,
-      `Following is the list of steps required to upgrade your project to SharePoint Framework version ${this.toVersion}.`, EOL,
-      EOL,
-      findingsToReport.join(''),
-      '## Summary', EOL,
-      EOL,
-      '### Execute script', EOL,
-      EOL,
-      '```sh', EOL,
-      (mainNpmCommands.concat(commandsToExecute.filter((command) => command.indexOf('npm i') === -1 && command.indexOf('npm un') === -1))).join(EOL), EOL,
-      '```', EOL,
-      EOL,
-      '### Modify files', EOL,
-      EOL,
-      Object.keys(modificationPerFile).map(file => {
-        return [
-          `#### [${file}](${file})`, EOL,
-          EOL,
-          modificationPerFile[file].map((m: string) => `\`\`\`${modificationTypePerFile[file]}${EOL}${m}${EOL}\`\`\``).join(EOL + EOL), EOL,
-        ].join('');
-      }).join(EOL),
-      EOL,
-    ];
-
-    return s.join('').trim();
+    return {
+      commandsToExecute: commandsToExecute,
+      mainNpmCommands: mainNpmCommands,
+      modificationPerFile: modificationPerFile,
+      modificationTypePerFile: modificationTypePerFile
+    }
   }
 
   private mapNpmCommand(command: string, packagesDevExact: string[],

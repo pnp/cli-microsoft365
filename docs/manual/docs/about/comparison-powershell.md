@@ -125,7 +125,7 @@ Set-SPOSiteGroup|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOSiteOffice365Group|Microsoft.Online.SharePoint.PowerShell|[spo site o365group set](../cmd/spo/site/site-o365group-set.md)
 Set-SPOSiteScript|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOStorageEntity|Microsoft.Online.SharePoint.PowerShell|[spo storageentity set](../cmd/spo/storageentity/storageentity-set.md)
-Set-SPOTenant|Microsoft.Online.SharePoint.PowerShell|
+Set-SPOTenant|Microsoft.Online.SharePoint.PowerShell|[spo tenant settings set](../cmd/spo/tenant/tenant-settings-set.md)
 Set-SPOTenantCdnEnabled|Microsoft.Online.SharePoint.PowerShell|[spo cdn set](../cmd/spo/cdn/cdn-set.md)
 Set-SPOTenantCdnPolicy|Microsoft.Online.SharePoint.PowerShell|[spo cdn policy set](../cmd/spo/cdn/cdn-policy-set.md)
 Set-SPOTenantContentTypeReplicationParameters|Microsoft.Online.SharePoint.PowerShell|
@@ -207,14 +207,14 @@ Deny-PnPTenantServicePrincipalPermissionRequest|SharePointPnPPowerShellOnline|[s
 Disable-PnPFeature|SharePointPnPPowerShellOnline|
 Disable-PnPInPlaceRecordsManagementForSite|SharePointPnPPowerShellOnline|
 Disable-PnPResponsiveUI|SharePointPnPPowerShellOnline|
-Disable-PnPSiteClassification|SharePointPnPPowerShellOnline|
+Disable-PnPSiteClassification|SharePointPnPPowerShellOnline|[graph siteclassification disable](../cmd/graph/siteclassification/siteclassification-disable.md)
 Disable-PnPTenantServicePrincipal|SharePointPnPPowerShellOnline|[spo serviceprincipal set](../cmd/spo/serviceprincipal/serviceprincipal-set.md)
 Disconnect-PnPHubSite|SharePointPnPPowerShellOnline|[spo hubsite disconnect](../cmd/spo/hubsite/hubsite-disconnect.md)
 Disconnect-PnPOnline|SharePointPnPPowerShellOnline|[spo logout](../cmd/spo/logout.md)
 Enable-PnPFeature|SharePointPnPPowerShellOnline|
 Enable-PnPInPlaceRecordsManagementForSite|SharePointPnPPowerShellOnline|
 Enable-PnPResponsiveUI|SharePointPnPPowerShellOnline|
-Enable-PnPSiteClassification|SharePointPnPPowerShellOnline|
+Enable-PnPSiteClassification|SharePointPnPPowerShellOnline|[graph siteclassification enable](../cmd/graph/siteclassification/siteclassification-enable.md)
 Enable-PnPTenantServicePrincipal|SharePointPnPPowerShellOnline|[spo serviceprincipal set](../cmd/spo/serviceprincipal/serviceprincipal-set.md)
 Ensure-PnPFolder|SharePointPnPPowerShellOnline|
 Execute-PnPQuery|SharePointPnPPowerShellOnline|
@@ -298,9 +298,9 @@ Get-PnPTenantServicePermissionRequests|SharePointPnPPowerShellOnline|[spo servic
 Get-PnPTenantServicePrincipal|SharePointPnPPowerShellOnline|
 Get-PnPTenantSite|SharePointPnPPowerShellOnline|[spo site get](../cmd/spo/site/site-get.md), [spo site classic list](../cmd/spo/site/site-classic-list.md)
 Get-PnPTenantTheme|SharePointPnPPowerShellOnline|[spo theme get](../cmd/spo/theme/theme-get.md), [spo theme list](../cmd/spo/theme/theme-list.md)
-Get-PnPTerm|SharePointPnPPowerShellOnline|
+Get-PnPTerm|SharePointPnPPowerShellOnline|[spo term get](../cmd/spo/term/term-get.md), [spo term list](../cmd/spo/term/term-list.md)
 Get-PnPTermGroup|SharePointPnPPowerShellOnline|[spo term group get](../cmd/spo/term/term-group-get.md), [spo term group list](../cmd/spo/term/term-group-list.md)
-Get-PnPTermSet|SharePointPnPPowerShellOnline|
+Get-PnPTermSet|SharePointPnPPowerShellOnline|[spo term set get](../cmd/spo/term/term-set-get.md), [spo term set list](../cmd/spo/term/term-set-list.md)
 Get-PnPTheme|SharePointPnPPowerShellOnline|
 Get-PnPTimeZoneId|SharePointPnPPowerShellOnline|
 Get-PnPUnifiedGroup|SharePointPnPPowerShellOnline|[graph o365group get](../cmd/graph/o365group/o365group-get.md), [graph o365group list](../cmd/graph/o365group/o365group-list.md)
@@ -311,7 +311,7 @@ Get-PnPUser|SharePointPnPPowerShellOnline|
 Get-PnPUserProfileProperty|SharePointPnPPowerShellOnline|
 Get-PnPView|SharePointPnPPowerShellOnline|
 Get-PnPWeb|SharePointPnPPowerShellOnline|[spo web get](../cmd/spo/web/web-get.md), [spo web list](../cmd/spo/web/web-list.md)
-Get-PnPWebhookSubscriptions|SharePointPnPPowerShellOnline|[spo list webhook list](../cmd/spo/list/list-webhook-list.md)
+Get-PnPWebhookSubscriptions|SharePointPnPPowerShellOnline|[spo list webhook get](../cmd/spo/list/list-webhook-get.md), [spo list webhook list](../cmd/spo/list/list-webhook-list.md)
 Get-PnPWebPart|SharePointPnPPowerShellOnline|
 Get-PnPWebPartProperty|SharePointPnPPowerShellOnline|
 Get-PnPWebPartXml|SharePointPnPPowerShellOnline|
@@ -351,9 +351,9 @@ New-PnPProvisioningTemplate|SharePointPnPPowerShellOnline|
 New-PnPProvisioningTemplateFromFolder|SharePointPnPPowerShellOnline|
 New-PnPSite|SharePointPnPPowerShellOnline|[spo site add](../cmd/spo/site/site-add.md)
 New-PnPTenantSite|SharePointPnPPowerShellOnline|[spo site classic add](../cmd/spo/site/site-classic-add.md)
-New-PnPTerm|SharePointPnPPowerShellOnline|
-New-PnPTermGroup|SharePointPnPPowerShellOnline|
-New-PnPTermSet|SharePointPnPPowerShellOnline|
+New-PnPTerm|SharePointPnPPowerShellOnline|[spo term add](../cmd/spo/term/term-add.md)
+New-PnPTermGroup|SharePointPnPPowerShellOnline|[spo term group add](../cmd/spo/term/term-group-add.md)
+New-PnPTermSet|SharePointPnPPowerShellOnline|[spo term set add](../cmd/spo/term/term-set-add.md)
 New-PnPUnifiedGroup|SharePointPnPPowerShellOnline|[graph o365group add](../cmd/graph/o365group/o365group-add.md)
 New-PnPUPABulkImportJob|SharePointPnPPowerShellOnline|
 New-PnPUser|SharePointPnPPowerShellOnline|
@@ -459,7 +459,7 @@ Set-PnPSitePolicy|SharePointPnPPowerShellOnline|
 Set-PnPSiteScript|SharePointPnPPowerShellOnline|[spo sitescript set](../cmd/spo/sitescript/sitescript-set.md)
 Set-PnPStorageEntity|SharePointPnPPowerShellOnline|[spo storageentity set](../cmd/spo/storageentity/storageentity-set.md)
 Set-PnPTaxonomyFieldValue|SharePointPnPPowerShellOnline|
-Set-PnPTenant|SharePointPnPPowerShellOnline|
+Set-PnPTenant|SharePointPnPPowerShellOnline|[spo tenant settings set](../cmd/spo/tenant/tenant-settings-set.md)
 Set-PnPTenantCdnEnabled|SharePointPnPPowerShellOnline|[spo cdn set](../cmd/spo/cdn/cdn-set.md)
 Set-PnPTenantCdnPolicy|SharePointPnPPowerShellOnline|[spo cdn policy set](../cmd/spo/cdn/cdn-policy-set.md)
 Set-PnPTenantSite|SharePointPnPPowerShellOnline|[spo site classic set](../cmd/spo/site/site-classic-set.md)

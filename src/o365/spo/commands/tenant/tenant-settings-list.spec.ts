@@ -261,6 +261,8 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
         assert.equal(cmdInstanceLogSpy.lastCall.args[0]["FolderAnonymousLinkType"], 'Edit');
         assert.equal(cmdInstanceLogSpy.lastCall.args[0]["DefaultLinkPermission"], 'View');
         assert.equal(cmdInstanceLogSpy.lastCall.args[0]["ConditionalAccessPolicy"], 'AllowFullAccess');
+        assert.equal(cmdInstanceLogSpy.lastCall.args[0]["SpecialCharactersStateInFileFolderNames"], 'Allowed');
+        assert.equal(cmdInstanceLogSpy.lastCall.args[0]["LimitedAccessFileType"], 'WebPreviewableFiles');
         done();
       }
       catch (e) {

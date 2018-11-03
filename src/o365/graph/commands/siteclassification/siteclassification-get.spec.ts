@@ -292,7 +292,7 @@ describe(commands.SITECLASSIFICATION_GET, () => {
                 },
                 {
                   "name": "GuestUsageGuidelinesUrl",
-                  "value": ""
+                  "value": "https://test"
                 },
                 {
                   "name": "GroupCreationAllowedGroupId",
@@ -331,7 +331,8 @@ describe(commands.SITECLASSIFICATION_GET, () => {
         assert(cmdInstanceLogSpy.calledWith({
           "Classifications": ["TopSecret"],
           "DefaultClassification": "TopSecret",
-          "UsageGuidelinesUrl": "https://test"
+          "UsageGuidelinesUrl": "https://test",
+          "GuestUsageGuidelinesUrl": "https://test"
         }));
         done();
       }
@@ -420,7 +421,8 @@ describe(commands.SITECLASSIFICATION_GET, () => {
         assert(cmdInstanceLogSpy.calledWith({
           "Classifications": ["TopSecret", "HBI"],
           "DefaultClassification": "TopSecret",
-          "UsageGuidelinesUrl": "https://test"
+          "UsageGuidelinesUrl": "https://test",
+          "GuestUsageGuidelinesUrl": ""
         }));
         done();
       }
@@ -469,7 +471,7 @@ describe(commands.SITECLASSIFICATION_GET, () => {
                   "value": "true"
                 },
                 {
-                  "name": "GuestUsageGuidelinesUrl",
+                  "name": "GuestUsageGuidelinesUrl_not_exist",
                   "value": ""
                 },
                 {
@@ -509,7 +511,8 @@ describe(commands.SITECLASSIFICATION_GET, () => {
         assert(cmdInstanceLogSpy.calledWith({
           "Classifications": [],
           "DefaultClassification": "",
-          "UsageGuidelinesUrl": ""
+          "UsageGuidelinesUrl": "",
+          "GuestUsageGuidelinesUrl": ""
         }));
         done();
       }

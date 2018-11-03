@@ -31,7 +31,7 @@ export interface CommandTypes {
 }
 
 export class CommandError {
-  constructor(public message: string) {
+  constructor(public message: string, public code?: number) {
   }
 }
 
