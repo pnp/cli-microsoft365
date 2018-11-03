@@ -32,6 +32,7 @@ interface Options extends GlobalOptions {
   queryTemplate:string;
   sortList:string;
   rankingModelId:string;
+  startRow?:number;
 }
 
 class SearchCommand extends SpoCommand {
@@ -57,6 +58,7 @@ class SearchCommand extends SpoCommand {
     telemetryProps.queryTemplate = args.options.queryTemplate;
     telemetryProps.sortList = args.options.sortList;
     telemetryProps.rankingModelId = args.options.rankingModelId;
+    telemetryProps.startRow = args.options.startRow;
     return telemetryProps;
   }
 
@@ -83,7 +85,9 @@ class SearchCommand extends SpoCommand {
         return accessToken;
       })
       .then((accessToken:string):Promise<any[]> => {
-        return this.executeSearchQuery(cmd,args,accessToken,webUrl,[],0);
+        const startRow = args.options.startRow ? args.options.startRow : 0;
+
+        return this.executeSearchQuery(cmd,args,accessToken,webUrl,[],startRow);
       })
       .then((results:SearchResult[]) => { 
         this.printResults(cmd,args,results);
@@ -234,6 +238,10 @@ class SearchCommand extends SpoCommand {
       {
         option:'--rankingModelId <rankingModelId>',
         description: 'The ID of the ranking model to use for the query.'
+      },
+      {
+        option: '--startRow <startRow>',
+        description: 'The first row that is included in the search results that are returned. You use this parameter when you want to implement paging for search results.'
       }
     ];
 
