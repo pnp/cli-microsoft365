@@ -30,7 +30,8 @@ Option|Description
 `--sourceName <sourceName>`|Specified the name of the result source to be used to run the query.
 `--refiners <refiners>`|The set of refiners to return in a search result.
 `--web <web>`|The web against which we want to execute the query. If the parameter is not defined, the query is executed against the web that\'s used when logging in to the SPO environment.
-`--hiddenConstraints`|The additional query terms to append to the query.
+`--hiddenConstraints <hiddenConstraints>`|The additional query terms to append to the query.
+`--clientType <clientType> `|The type of the client that issued the query.
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
