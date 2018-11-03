@@ -95,12 +95,8 @@ class SpoListWebhookRemoveCommand extends SpoCommand {
         })
         .then((res: any): void => {
           // REST delete call doesn't return anything
-
           cb();
         }, (err: any): void => {
-          if (this.verbose) {
-            cmd.log('Specified webhook not found');
-          }
           this.handleRejectedODataJsonPromise(err, cmd, cb)
         });
     }
