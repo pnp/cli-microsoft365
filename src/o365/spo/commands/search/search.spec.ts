@@ -32,7 +32,8 @@ enum TestID
   QueryAll_WithSourceNameAndPreviousPropertiesTest,
   QueryAll_WithSourceNameAndNoPreviousPropertiesTest,
   QueryAll_WithRefinersTest,
-  QueryAll_WithWebTest
+  QueryAll_WithWebTest,
+  QueryAll_WithHiddenConstraintsTest
 }
 
 describe(commands.SEARCH, () => {
@@ -270,6 +271,10 @@ describe(commands.SEARCH, () => {
       }
       if(urlContains(opts,'https://contoso.sharepoint.com/sites/subsite')) {
         executedTest = TestID.QueryAll_WithWebTest;
+        return Promise.resolve(getQueryResult(fakeRows));
+      }
+      if(urlContains(opts,'hiddenConstraints=\'developer\'')) {
+        executedTest = TestID.QueryAll_WithHiddenConstraintsTest;
         return Promise.resolve(getQueryResult(fakeRows));
       }
 
@@ -1082,6 +1087,39 @@ describe(commands.SEARCH, () => {
       try {
         assert.equal(returnArrayLength, 4);
         assert.equal(executedTest,TestID.QueryAll_WithWebTest);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('executes search request with hiddenConstraints defined', (done) => {
+    stubAuth();
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        output: 'text',
+        debug: true,
+        query: '*',
+        hiddenConstraints: 'developer'
+      }
+    }, () => {
+      try {
+        assert.equal(returnArrayLength, 4);
+        assert.equal(executedTest,TestID.QueryAll_WithHiddenConstraintsTest);
         done();
       }
       catch (e) {
