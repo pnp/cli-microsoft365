@@ -39,6 +39,10 @@ interface Options extends GlobalOptions {
   web:string;
   hiddenConstraints:string;
   clientType:string;
+  enablePhonetic?:boolean;
+  processBestBets?:boolean;
+  enableQueryRules?:boolean;
+  processPersonalFavorites?:boolean;
 }
 
 class SearchCommand extends SpoCommand {
@@ -71,6 +75,10 @@ class SearchCommand extends SpoCommand {
     telemetryProps.web = args.options.web;
     telemetryProps.hiddenConstraints = args.options.hiddenConstraints;
     telemetryProps.clientType = args.options.clientType;
+    telemetryProps.enablePhonetic = args.options.enablePhonetic;
+    telemetryProps.processBestBets = args.options.processBestBets;
+    telemetryProps.enableQueryRules = args.options.enableQueryRules;
+    telemetryProps.processPersonalFavorites = args.options.processPersonalFavorites;
     return telemetryProps;
   }
 
@@ -175,6 +183,10 @@ class SearchCommand extends SpoCommand {
     const refinersRequestString = args.options.refiners ? `&refiners='${args.options.refiners}'` : ``;
     const hiddenConstraintsRequestString = args.options.hiddenConstraints ? `&hiddenconstraints='${args.options.hiddenConstraints}'` : ``;
     const clientTypeRequestString = args.options.clientType ? `&clienttype='${args.options.clientType}'` : ``;
+    const enablePhoneticRequestString = typeof(args.options.enablePhonetic) === 'undefined' ? `` : `&enablephonetic=${args.options.enablePhonetic}`;    
+    const processBestBetsRequestString = typeof(args.options.processBestBets) === 'undefined' ? `` : `&processbestbets=${args.options.processBestBets}`;
+    const enableQueryRulesRequestString = typeof(args.options.enableQueryRules) === 'undefined' ? `` : `&enablequeryrules=${args.options.enableQueryRules}`;
+    const processPersonalFavoritesRequestString = typeof(args.options.processPersonalFavorites) === 'undefined' ? `` : `&processpersonalfavorites=${args.options.processPersonalFavorites}`;
 
     //Construct single requestUrl
     const requestUrl = `${webUrl}/_api/search/query?querytext='${args.options.query}'`.concat(
@@ -192,7 +204,11 @@ class SearchCommand extends SpoCommand {
       propertiesRequestString,
       refinersRequestString,
       hiddenConstraintsRequestString,
-      clientTypeRequestString
+      clientTypeRequestString,
+      enablePhoneticRequestString,
+      processBestBetsRequestString,
+      enableQueryRulesRequestString,
+      processPersonalFavoritesRequestString
     );
 
     if(this.debug) {
@@ -295,6 +311,22 @@ class SearchCommand extends SpoCommand {
       {
         option: '--clientType <clientType>',
         description: 'The type of the client that issued the query.'
+      },
+      {
+        option: '--enablePhonetic',
+        description: 'A Boolean value that specifies whether the phonetic forms of the query terms are used to find matches. (Default = false).'
+      },
+      {
+        option: '--processBestBets',
+        description: 'A Boolean value that specifies whether to return best bet results for the query.'
+      },
+      {
+        option: '--enableQueryRules',
+        description: 'A Boolean value that specifies whether to enable query rules for the query. '
+      },
+      {
+        option: '--processPersonalFavorites',
+        description: 'A Boolean value that specifies whether to return personal favorites with the search results.'
       }
     ];
 
