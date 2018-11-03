@@ -34,6 +34,7 @@ interface Options extends GlobalOptions {
   rankingModelId:string;
   startRow?:number;
   properties:string;
+  sourceName:string;
 }
 
 class SearchCommand extends SpoCommand {
@@ -61,6 +62,7 @@ class SearchCommand extends SpoCommand {
     telemetryProps.rankingModelId = args.options.rankingModelId;
     telemetryProps.startRow = args.options.startRow;
     telemetryProps.properties = args.options.properties;
+    telemetryProps.sourceName = args.options.sourceName;
     return telemetryProps;
   }
 
@@ -161,7 +163,7 @@ class SearchCommand extends SpoCommand {
     const queryTemplateRequestString = args.options.queryTemplate ? `&querytemplate='${args.options.queryTemplate}'` : ``;
     const sortListRequestString = args.options.sortList ? `&sortList='${encodeURIComponent(args.options.sortList)}'` : ``;
     const rankingModelIdRequestString = args.options.rankingModelId ? `&rankingmodelid='${args.options.rankingModelId}'` : ``;
-    const propertiesRequestString = args.options.properties ? `&properties='${args.options.properties}'` : ``;
+    const propertiesRequestString = this.getPropertiesRequestString(args);
 
     //Construct single requestUrl
     const requestUrl = `${webUrl}/_api/search/query?querytext='${args.options.query}'`.concat(
@@ -183,6 +185,15 @@ class SearchCommand extends SpoCommand {
       cmd.log(`RequestURL: ${requestUrl}`);
     }
     return requestUrl;
+  }
+
+  private getPropertiesRequestString(args: CommandArgs):string {
+    let properties = args.options.properties ? args.options.properties : '';
+    if(args.options.sourceName) {
+      if(properties && !properties.endsWith(",")) { properties += `,`; }
+      properties += `SourceName:${args.options.sourceName},SourceLevel:SPSite`;
+    }
+    return properties ? `&properties='${properties}'` : ``;
   }
 
   private getSelectPropertiesArray(args: CommandArgs) {
@@ -213,7 +224,7 @@ class SearchCommand extends SpoCommand {
       },
       {
         option: '--sourceId <sourceId>',
-        description: 'Specifies the identifier (ID or name) of the result source to be used to run the query.'
+        description: 'Specifies the identifier (GUID) of the result source to be used to run the query.'
       },
       {
         option: '--trimDuplicates',
@@ -250,6 +261,10 @@ class SearchCommand extends SpoCommand {
       {
         option: '--properties <properties>',
         description: 'Additional properties for the query. GET requests support only string values. POST requests support values of any type.'
+      },
+      {
+        option: '--sourceName <sourceName>',
+        description: 'Specified the name of the result source to be used to run the query.'
       }
     ];
 
