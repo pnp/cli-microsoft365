@@ -27,7 +27,8 @@ enum TestID
   QueryAll_WithRefinementFiltersTest,
   QueryAll_SortListTest,
   QueryAll_WithRankingModelIdTest,
-  QueryAll_WithStartTowTest
+  QueryAll_WithStartRowTest,
+  QueryAll_WithPropertiesTest
 }
 
 describe(commands.SEARCH, () => {
@@ -242,8 +243,13 @@ describe(commands.SEARCH, () => {
         return Promise.resolve(getQueryResult(fakeRows));
       }
       if(urlContains(opts,'startRow=1')) {
-        executedTest = TestID.QueryAll_WithStartTowTest;
-        fakeRows.splice(0,1);
+        executedTest = TestID.QueryAll_WithStartRowTest;
+        var rowsToReturn = fakeRows.slice();
+        rowsToReturn.splice(0,1);
+        return Promise.resolve(getQueryResult(rowsToReturn));
+      }
+      if(urlContains(opts,'properties=\'termid:guid\'')) {
+        executedTest = TestID.QueryAll_WithPropertiesTest;
         return Promise.resolve(getQueryResult(fakeRows));
       }
 
@@ -855,7 +861,40 @@ describe(commands.SEARCH, () => {
     }, () => {
       try {
         assert.equal(returnArrayLength, 3);
-        assert.equal(executedTest,TestID.QueryAll_WithStartTowTest);
+        assert.equal(executedTest,TestID.QueryAll_WithStartRowTest);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('executes search request with properties defined', (done) => {
+    stubAuth();
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        output: 'text',
+        debug: true,
+        query: '*',
+        properties: 'termid:guid'
+      }
+    }, () => {
+      try {
+        assert.equal(returnArrayLength, 4);
+        assert.equal(executedTest,TestID.QueryAll_WithPropertiesTest);
         done();
       }
       catch (e) {
