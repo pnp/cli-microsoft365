@@ -37,6 +37,7 @@ interface Options extends GlobalOptions {
   sourceName:string;
   refiners:string;
   web:string;
+  hiddenConstraints:string;
 }
 
 class SearchCommand extends SpoCommand {
@@ -67,6 +68,7 @@ class SearchCommand extends SpoCommand {
     telemetryProps.sourceName = args.options.sourceName;
     telemetryProps.refiners = args.options.refiners;
     telemetryProps.web = args.options.web;
+    telemetryProps.hiddenConstraints = args.options.hiddenConstraints;
     return telemetryProps;
   }
 
@@ -168,6 +170,7 @@ class SearchCommand extends SpoCommand {
     const rankingModelIdRequestString = args.options.rankingModelId ? `&rankingmodelid='${args.options.rankingModelId}'` : ``;
     const propertiesRequestString = this.getPropertiesRequestString(args);
     const refinersRequestString = args.options.refiners ? `&refiners='${args.options.refiners}'` : ``;
+    const hiddenConstraintsString = args.options.hiddenConstraints ? `&hiddenconstraints='${args.options.hiddenConstraints}'` : ``;
 
     //Construct single requestUrl
     const requestUrl = `${webUrl}/_api/search/query?querytext='${args.options.query}'`.concat(
@@ -183,7 +186,8 @@ class SearchCommand extends SpoCommand {
       sortListRequestString,
       rankingModelIdRequestString,
       propertiesRequestString,
-      refinersRequestString
+      refinersRequestString,
+      hiddenConstraintsString
     );
 
     if(this.debug) {
@@ -278,6 +282,10 @@ class SearchCommand extends SpoCommand {
       {
         option: '--web <web>',
         description: 'The web against which we want to execute the query. If the parameter is not defined, the query is executed against the web that\'s used when logging in to the SPO environment.'
+      },
+      {
+        option: '--hiddenConstraints <hiddenConstraints>',
+        description: 'The additional query terms to append to the query.'
       }
     ];
 
