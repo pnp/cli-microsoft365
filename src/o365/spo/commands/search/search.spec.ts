@@ -28,7 +28,9 @@ enum TestID
   QueryAll_SortListTest,
   QueryAll_WithRankingModelIdTest,
   QueryAll_WithStartRowTest,
-  QueryAll_WithPropertiesTest
+  QueryAll_WithPropertiesTest,
+  QueryAll_WithSourceNameAndPreviousPropertiesTest,
+  QueryAll_WithSourceNameAndNoPreviousPropertiesTest
 }
 
 describe(commands.SEARCH, () => {
@@ -250,6 +252,14 @@ describe(commands.SEARCH, () => {
       }
       if(urlContains(opts,'properties=\'termid:guid\'')) {
         executedTest = TestID.QueryAll_WithPropertiesTest;
+        return Promise.resolve(getQueryResult(fakeRows));
+      }
+      if(urlContains(opts,'properties=\'SourceName:Local SharePoint Results,SourceLevel:SPSite\'')) {
+        executedTest = TestID.QueryAll_WithSourceNameAndNoPreviousPropertiesTest;
+        return Promise.resolve(getQueryResult(fakeRows));
+      }
+      if(urlContains(opts,'properties=\'some:property,SourceName:Local SharePoint Results,SourceLevel:SPSite\'')) {
+        executedTest = TestID.QueryAll_WithSourceNameAndPreviousPropertiesTest;
         return Promise.resolve(getQueryResult(fakeRows));
       }
 
@@ -895,6 +905,107 @@ describe(commands.SEARCH, () => {
       try {
         assert.equal(returnArrayLength, 4);
         assert.equal(executedTest,TestID.QueryAll_WithPropertiesTest);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('executes search request with sourceName defined and no previous properties', (done) => {
+    stubAuth();
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        output: 'text',
+        debug: true,
+        query: '*',
+        sourceName: 'Local SharePoint Results'
+      }
+    }, () => {
+      try {
+        assert.equal(returnArrayLength, 4);
+        assert.equal(executedTest,TestID.QueryAll_WithSourceNameAndNoPreviousPropertiesTest);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('executes search request with sourceName defined and previous properties (ends with \',\')', (done) => {
+    stubAuth();
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        output: 'text',
+        debug: true,
+        query: '*',
+        properties: 'some:property,',
+        sourceName: 'Local SharePoint Results'
+      }
+    }, () => {
+      try {
+        assert.equal(returnArrayLength, 4);
+        assert.equal(executedTest,TestID.QueryAll_WithSourceNameAndPreviousPropertiesTest);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('executes search request with sourceName defined and previous properties (Doesn\'t end with \',\')', (done) => {
+    stubAuth();
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        output: 'text',
+        debug: true,
+        query: '*',
+        properties: 'some:property',
+        sourceName: 'Local SharePoint Results'
+      }
+    }, () => {
+      try {
+        assert.equal(returnArrayLength, 4);
+        assert.equal(executedTest,TestID.QueryAll_WithSourceNameAndPreviousPropertiesTest);
         done();
       }
       catch (e) {
