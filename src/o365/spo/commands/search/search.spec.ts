@@ -26,7 +26,8 @@ enum TestID
   QueryAll_WithCultureTest,
   QueryAll_WithRefinementFiltersTest,
   QueryAll_SortListTest,
-  QueryAll_WithRankingModelIdTest
+  QueryAll_WithRankingModelIdTest,
+  QueryAll_WithStartTowTest
 }
 
 describe(commands.SEARCH, () => {
@@ -238,6 +239,11 @@ describe(commands.SEARCH, () => {
       }
       if(urlContains(opts,'rankingModelId=\'d4ac6500-d1d0-48aa-86d4-8fe9a57a74af\'')) {
         executedTest = TestID.QueryAll_WithRankingModelIdTest;
+        return Promise.resolve(getQueryResult(fakeRows));
+      }
+      if(urlContains(opts,'startRow=1')) {
+        executedTest = TestID.QueryAll_WithStartTowTest;
+        fakeRows.splice(0,1);
         return Promise.resolve(getQueryResult(fakeRows));
       }
 
@@ -817,6 +823,39 @@ describe(commands.SEARCH, () => {
       try {
         assert.equal(returnArrayLength, 1);
         assert.equal(executedTest,TestID.QueryAll_WithRowLimitTest);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('executes search request with startRow defined', (done) => {
+    stubAuth();
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        output: 'text',
+        debug: true,
+        query: '*',
+        startRow: 1
+      }
+    }, () => {
+      try {
+        assert.equal(returnArrayLength, 3);
+        assert.equal(executedTest,TestID.QueryAll_WithStartTowTest);
         done();
       }
       catch (e) {
