@@ -68,6 +68,7 @@ export default {
   LIST_WEBHOOK_GET: `${prefix} list webhook get`,
   LIST_WEBHOOK_LIST: `${prefix} list webhook list`,
   LIST_WEBHOOK_REMOVE: `${prefix} list webhook remove`,
+  LIST_WEBHOOK_SET: `${prefix} list webhook set`,
   LISTITEM_ADD: `${prefix} listitem add`,
   LISTITEM_GET: `${prefix} listitem get`,
   LISTITEM_LIST: `${prefix} listitem list`,

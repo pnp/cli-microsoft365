@@ -470,7 +470,7 @@ Set-PnPUnifiedGroup|SharePointPnPPowerShellOnline|[graph o365group set](../cmd/g
 Set-PnPUserProfileProperty|SharePointPnPPowerShellOnline|
 Set-PnPView|SharePointPnPPowerShellOnline|[spo list view set](../cmd/spo/list/list-view-set.md)
 Set-PnPWeb|SharePointPnPPowerShellOnline|[spo web set](../cmd/spo/web/web-set.md)
-Set-PnPWebhookSubscription|SharePointPnPPowerShellOnline|
+Set-PnPWebhookSubscription|SharePointPnPPowerShellOnline|[spo list webhook set](../cmd/spo/list/list-webhook-set.md)
 Set-PnPWebPartProperty|SharePointPnPPowerShellOnline|
 Set-PnPWebPermission|SharePointPnPPowerShellOnline|
 Set-PnPWebTheme|SharePointPnPPowerShellOnline|
