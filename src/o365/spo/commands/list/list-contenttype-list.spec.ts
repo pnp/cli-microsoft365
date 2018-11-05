@@ -40,7 +40,8 @@ describe(commands.LIST_CONTENTTYPE_LIST, () => {
   afterEach(() => {
     Utils.restore([
       vorpal.find,
-      request.get
+      request.get,
+      request.post
     ]);
   });
 
@@ -49,7 +50,8 @@ describe(commands.LIST_CONTENTTYPE_LIST, () => {
       appInsights.trackEvent,
       auth.getAccessToken,
       auth.restoreAuth,
-      request.get
+      request.get,
+      request.post
     ]);
   });
 
