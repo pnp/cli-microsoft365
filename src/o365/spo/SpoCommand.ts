@@ -1,8 +1,11 @@
 import Command, { CommandAction, CommandError } from '../../Command';
 import auth from './SpoAuth';
-import { SearchResponse, FormDigestInfo } from './spo';
+import { SearchResponse, FormDigestInfo, ClientSvcResponse, ClientSvcResponseContents } from './spo';
 import * as request from 'request-promise-native';
 import Utils from '../../Utils';
+import { SpoOperation } from './commands/site/SpoOperation';
+import config from '../../config';
+
 
 export default abstract class SpoCommand extends Command {
   protected requiresTenantAdmin(): boolean {
@@ -149,13 +152,14 @@ export default abstract class SpoCommand extends Command {
           context.FormDigestTimeoutSeconds = res.FormDigestTimeoutSeconds
           context.FormDigestExpiresAt = new Date();
           context.FormDigestExpiresAt.setSeconds(context.FormDigestExpiresAt.getSeconds() + res.FormDigestTimeoutSeconds - 5);
-          
+
           Promise.resolve(context);
         }, (error: any): void => {
           reject(error);
         });
     });
   }
+
 
   private isUnexpiredFormDigest(contextinfo: FormDigestInfo): boolean {
     const now: Date = new Date();
@@ -166,5 +170,68 @@ export default abstract class SpoCommand extends Command {
     }
 
     return false;
+  }
+
+  protected waitUntilFinished(operationId: string, resolve: () => void, reject: (error: any) => void, accessToken: string, cmd: CommandInstance, currentContext: FormDigestInfo, dots?: string, timeout?: NodeJS.Timer): void {
+    this
+      .ensureFormDigest(cmd, currentContext)
+      .then((res: FormDigestInfo): request.RequestPromise => {
+        currentContext = res;
+
+        if (this.debug) {
+          cmd.log(`Checking if operation ${operationId} completed...`);
+        }
+
+        if (!this.debug && this.verbose) {
+          dots += '.';
+          process.stdout.write(`\r${dots}`);
+        }
+
+        const requestOptions: any = {
+          url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+          headers: Utils.getRequestHeaders({
+            authorization: `Bearer ${auth.service.accessToken}`,
+            'X-RequestDigest': currentContext.FormDigestValue
+          }),
+          body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="188" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="184" Name="${operationId.replace(/\\n/g, '&#xA;').replace(/"/g, '')}" /></ObjectPaths></Request>`
+        };
+
+        if (this.debug) {
+          cmd.log('Executing web request...');
+          cmd.log(requestOptions);
+          cmd.log('');
+        }
+
+        return request.post(requestOptions);
+      })
+      .then((res: string): void => {
+        if (this.debug) {
+          cmd.log('Response:');
+          cmd.log(res);
+          cmd.log('');
+        }
+
+        const json: ClientSvcResponse = JSON.parse(res);
+        const response: ClientSvcResponseContents = json[0];
+        if (response.ErrorInfo) {
+          reject(response.ErrorInfo.ErrorMessage);
+        }
+        else {
+          const operation: SpoOperation = json[json.length - 1];
+          let isComplete: boolean = operation.IsComplete;
+          if (isComplete) {
+            if (this.verbose) {
+              process.stdout.write('\n');
+            }
+
+            resolve();
+            return;
+          }
+
+          timeout = setTimeout(() => {
+            this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), resolve, reject, accessToken, cmd, currentContext, dots);
+          }, operation.PollingInterval);
+        }
+      });
   }
 }

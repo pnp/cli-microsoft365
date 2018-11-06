@@ -183,7 +183,7 @@ class SpoSiteClassicSetCommand extends SpoCommand {
             }
 
             this.timeout = setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), resolve, reject, this.accessToken as string, cmd);
+              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), resolve, reject, this.accessToken as string, cmd, this.currentContext, this.dots, this.timeout);
             }, operation.PollingInterval);
           }
         });
@@ -258,7 +258,7 @@ class SpoSiteClassicSetCommand extends SpoCommand {
             }
 
             this.timeout = setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), resolve, reject, this.accessToken as string, cmd);
+              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), resolve, reject, this.accessToken as string, cmd, this.currentContext, this.dots, this.timeout);
             }, operation.PollingInterval);
           }
         });
@@ -322,69 +322,6 @@ class SpoSiteClassicSetCommand extends SpoCommand {
           reject(err);
         });
     });
-  }
-
-  private waitUntilFinished(operationId: string, resolve: () => void, reject: (error: any) => void, accessToken: string, cmd: CommandInstance): void {
-    this
-      .ensureFormDigest(cmd, this.currentContext)
-      .then((res: FormDigestInfo): request.RequestPromise => {
-        this.currentContext = res; 
-
-        if (this.debug) {
-          cmd.log(`Checking if operation ${operationId} completed...`);
-        }
-
-        if (!this.debug && this.verbose) {
-          this.dots += '.';
-          process.stdout.write(`\r${this.dots}`);
-        }
-
-        const requestOptions: any = {
-          url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
-          headers: Utils.getRequestHeaders({
-            authorization: `Bearer ${auth.service.accessToken}`,
-            'X-RequestDigest': this.currentContext.FormDigestValue
-          }),
-          body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="188" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="184" Name="${operationId.replace(/\\n/g, '&#xA;').replace(/"/g, '')}" /></ObjectPaths></Request>`
-        };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
-        return request.post(requestOptions);
-      })
-      .then((res: string): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
-        const json: ClientSvcResponse = JSON.parse(res);
-        const response: ClientSvcResponseContents = json[0];
-        if (response.ErrorInfo) {
-          reject(response.ErrorInfo.ErrorMessage);
-        }
-        else {
-          const operation: SpoOperation = json[json.length - 1];
-          let isComplete: boolean = operation.IsComplete;
-          if (isComplete) {
-            if (this.verbose) {
-              process.stdout.write('\n');
-            }
-
-            resolve();
-            return;
-          }
-
-          this.timeout = setTimeout(() => {
-            this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), resolve, reject, accessToken, cmd);
-          }, operation.PollingInterval);
-        }
-      });
   }
 
   public options(): CommandOption[] {
