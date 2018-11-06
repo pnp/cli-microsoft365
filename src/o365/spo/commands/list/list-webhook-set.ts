@@ -114,19 +114,19 @@ class SpoListWebhookSetCommand extends SpoCommand {
     const options: CommandOption[] = [
       {
         option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the list to retrieve webhooks for is located'
+        description: 'URL of the site where the list which contains the webhook is located'
       },
       {
         option: '-l, --listId [listId]',
-        description: 'ID of the list from which to retrieve the webhook. Specify either listId or listTitle but not both'
+        description: 'ID of the list which contains the webhook which should be updated. Specify either listId or listTitle but not both'
       },
       {
         option: '-t, --listTitle [listTitle]',
-        description: 'Title of the list from which to retrieve the webhook. Specify either listId or listTitle but not both'
+        description: 'Title f the list which contains the webhook which should be updated. Specify either listId or listTitle but not both'
       },
       {
         option: '-i, --id <id>',
-        description: 'ID of the webhook to retrieve'
+        description: 'ID of the webhook to update'
       },
       {
         option: '-n, --notificationUrl [notificationUrl]',
@@ -218,8 +218,15 @@ class SpoListWebhookSetCommand extends SpoCommand {
 
     Update the expiration date of a webhook with ID ${chalk.grey('cc27a922-8224-4296-90a5-ebbc54da2e81')} which
     belongs to a list with title ${chalk.grey('Documents')} located in site 
-    ${chalk.grey('https://contoso.sharepoint.com/sites/ninja')} to to October 9 2018
-      ${chalk.grey(config.delimiter)} ${commands.LIST_WEBHOOK_SET} --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e81 --expirationDateTime 2018-10-09
+    ${chalk.grey('https://contoso.sharepoint.com/sites/ninja')} to ${chalk.grey('October 9th, 2018 at 6:15 PM')}
+      ${chalk.grey(config.delimiter)} ${commands.LIST_WEBHOOK_SET} --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e81 --expirationDateTime 2018-10-09T18:15
+
+    From the webhook with ID ${chalk.grey('cc27a922-8224-4296-90a5-ebbc54da2e81')} which
+    belongs to a list with title ${chalk.grey('Documents')} located in site 
+    ${chalk.grey('https://contoso.sharepoint.com/sites/ninja')} update the notification url to 
+    to ${chalk.grey('https://contoso-funcions.azurewebsites.net/webhook')} and the expiration date
+    to ${chalk.grey('March 2nd, 2019')}
+      ${chalk.grey(config.delimiter)} ${commands.LIST_WEBHOOK_SET} --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e81 --notificationUrl https://contoso-funcions.azurewebsites.net/webhook --expirationDateTime 2019-03-02
       `);
   }
 }
