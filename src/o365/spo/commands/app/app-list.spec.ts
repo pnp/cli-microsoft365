@@ -448,6 +448,18 @@ describe(commands.APP_LIST, () => {
     assert.notEqual(actual, true);
   });
 
+  it('should fail when \'sitecollection\' scope, but no siteUrl specified', () => {
+
+    const actual = (command.validate() as CommandValidate)({ options: { name: 'solution', filePath: 'abc', scope: 'sitecollection' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('should fail when \'sitecollection\' scope, but  bad siteUrl format specified', () => {
+
+    const actual = (command.validate() as CommandValidate)({ options: { name: 'solution', filePath: 'abc', scope: 'sitecollection', siteUrl:'contoso.sharepoint.com'  } });
+    assert.notEqual(actual, true);
+  });
+
   it('passes validation when the scope is specified with \'sitecollection\' and siteUrl present', () => {
     const actual = (command.validate() as CommandValidate)({ options: { scope: 'sitecollection', siteUrl: 'https://contoso-admin.sharepoint.com' } });
     assert.equal(actual, true);

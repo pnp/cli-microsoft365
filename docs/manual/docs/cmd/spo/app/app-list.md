@@ -13,7 +13,7 @@ spo app list [options]
 Option|Description
 ------|-----------
 `-s, --scope [scope]`|Target app catalog. `tenant|sitecollection`. Default `tenant`.
-`-u, --siteUrl [siteUrl]`|Absolute URL of the site to list the apps in. Required if scope is set to `sitecollection`.
+`-u, --siteUrl [siteUrl]`|Absolute URL of the site to list the apps.
 `--help`|Output usage information.
 `-o, --output [output]`|Output type. `json|text`. Default `text`.
 `--verbose`|Runs command with verbose logging.
@@ -36,16 +36,10 @@ List all apps available in the tenant app catalog
 spo app list
 ```
 
-List all apps available in a site collection app catalog
+List all apps available in a site collection app catalog of site _https://contoso.sharepoint.com/sites/site1_.
 
 ```sh
-spo app list --scope sitecollection --siteUrl https://contoso.sharepoint.com/sites/foo
-```
-
-Return the list of available apps from a site collection app catalog of the site you are currently logged in. Show the installed version in the site if applicable.
-
-```sh     
-spo app list --scope sitecollection
+spo app list --scope sitecollection --siteUrl https://contoso.sharepoint.com/sites/site1
 ```
 
 ## More information

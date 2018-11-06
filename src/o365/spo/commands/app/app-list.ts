@@ -132,17 +132,21 @@ class AppListCommand extends SpoCommand {
       if (args.options.scope) {
         const testScope: string = args.options.scope.toLowerCase();
         if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
-          return `Scope must be either 'tenant' or 'sitecollection' if specified`
+
+          return `Scope must be either 'tenant' or 'sitecollection' if specified`;
         }
 
-        if (testScope === 'tenant' && args.options.siteUrl){
-          return `siteUrl must be used with scope 'sitecollection'`;
+        if (testScope === 'sitecollection' && !args.options.siteUrl) {
+          
+          return `You must specify siteUrl when the scope is sitecollection`;
         }
 
         if (args.options.siteUrl) {
+
           return SpoCommand.isValidSharePointUrl(args.options.siteUrl);
         }
       } else if (args.options.siteUrl) {
+        
           return `siteUrl must be used with scope 'sitecollection'`;
       }
 
@@ -170,12 +174,9 @@ class AppListCommand extends SpoCommand {
     Return the list of available apps from the tenant app catalog. Show the installed version in the site if applicable.
       ${chalk.grey(config.delimiter)} ${commands.APP_LIST} --scope tenant
 
-    Return the list of available apps from a site collection app catalog. Show the installed version in the site if applicable.
-      ${chalk.grey(config.delimiter)} ${commands.APP_LIST} --scope sitecollection --siteUrl https://contoso.sharepoint.com/sites/foo
-
-    Return the list of available apps from a site collection app catalog of the site you are currently logged in. 
-    Show the installed version in the site if applicable.
-      ${chalk.grey(config.delimiter)} ${commands.APP_LIST} --scope sitecollection
+    Return the list of available apps from a site collection app catalog
+    of site ${chalk.grey('https://contoso.sharepoint.com/sites/site1')}.
+      ${chalk.grey(config.delimiter)} ${commands.APP_LIST} --scope sitecollection --siteUrl https://contoso.sharepoint.com/sites/site1
 
   More information:
   

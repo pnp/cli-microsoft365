@@ -16,6 +16,7 @@ Option|Description
 `-i, --id <id>`|ID of the app to remove. Needs to be available in the tenant app catalog.
 `-u, --appCatalogUrl [appCatalogUrl]`|(optional) URL of the tenant app catalog site. If not specified, the CLI will try to resolve it automatically
 `-s, --scope [scope]`|Target app catalog. `tenant|sitecollection`. Default `tenant`.
+`--siteUrl [siteUrl]`|The site url where the soultion package is. It must be specified when the scope is `sitecollection`.
 `--confirm`|Don't prompt for confirming removing the app from the tenant app catalog
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
@@ -52,10 +53,10 @@ Remove the specified app from the tenant app catalog located at _https://contoso
 spo app remove --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --appCatalogUrl https://contoso.sharepoint.com/sites/apps --confirm
 ```
 
-Remove the specified app from a site colleciton app catalog of the site you are currently logged in.
+Remove the specified app from a site colleciton app catalog of site _https://contoso.sharepoint.com/sites/site1_.
 
 ```sh
-spo app remove --id d95f8c94-67a1-4615-9af8-361ad33be93c --scope sitecollection
+spo app remove --id d95f8c94-67a1-4615-9af8-361ad33be93c --scope sitecollection --siteUrl https://contoso.sharepoint.com/sites/site1
 ```
 
 ## More information

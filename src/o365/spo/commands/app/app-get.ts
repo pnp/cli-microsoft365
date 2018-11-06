@@ -23,6 +23,7 @@ interface Options extends GlobalOptions {
   name?: string;
   appCatalogUrl?: string;
   scope?: string;
+  siteUrl?: string;
 }
 
 class AppGetCommand extends SpoCommand {
@@ -40,6 +41,7 @@ class AppGetCommand extends SpoCommand {
     telemetryProps.name = typeof args.options.name !== 'undefined';
     telemetryProps.appCatalogUrl = typeof args.options.appCatalogUrl !== 'undefined';
     telemetryProps.scope = (!(!args.options.scope)).toString();
+    telemetryProps.siteUrl = (!(!args.options.siteUrl)).toString();
     return telemetryProps;
   }
 
@@ -61,19 +63,20 @@ class AppGetCommand extends SpoCommand {
 
           return Promise.resolve(args.options.id);
 
-        } else if (args.options.appCatalogUrl) {
+        } else if (args.options.scope === 'sitecollection') {
+
+          return this.getAppUniqueId(args.options.siteUrl as string, args.options.name, cmd);
+
+        }
+        else if (args.options.appCatalogUrl) {
 
           return this.getAppUniqueId(args.options.appCatalogUrl, args.options.name, cmd);
-
-        } else if (args.options.scope === 'sitecollection'){
-
-          return this.getAppUniqueId(auth.site.url, args.options.name, cmd);
 
         } else {
 
           return this.getTenantAppCatalogUrl(cmd, this.debug)
             .then((appCatalogUrl: string): Promise<string> => {
-            
+
               return Promise.resolve(appCatalogUrl);
 
             }, (error: any): Promise<string> => {
@@ -82,7 +85,7 @@ class AppGetCommand extends SpoCommand {
                 cmd.log(error);
                 cmd.log('');
               }
-  
+
               return new Promise<string>((resolve: (appCatalogUrl: string) => void, reject: (error: any) => void): void => {
                 cmd.log('CLI could not automatically determine the URL of the tenant app catalog');
                 cmd.log('What is the absolute URL of your tenant app catalog site');
@@ -106,8 +109,8 @@ class AppGetCommand extends SpoCommand {
                 });
               });
             })
-            .then((appCatalogUrl: string) =>{
-                return this.getAppUniqueId(appCatalogUrl, args.options.name, cmd);
+            .then((appCatalogUrl: string) => {
+              return this.getAppUniqueId(appCatalogUrl, args.options.name, cmd);
             });
         }
       })
@@ -116,8 +119,13 @@ class AppGetCommand extends SpoCommand {
           cmd.log(`Retrieving information for app ${appId}...`);
         }
 
+        let siteUrl: string = auth.site.url;
+        if(args.options.scope === 'sitecollection') {
+          siteUrl = args.options.siteUrl as string;
+        }
+
         const requestOptions: any = {
-          url: `${auth.site.url}/_api/web/${scope}appcatalog/AvailableApps/GetById('${encodeURIComponent(appId)}')`,
+          url: `${siteUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${encodeURIComponent(appId)}')`,
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${auth.service.accessToken}`,
             accept: 'application/json;odata=nometadata'
@@ -164,6 +172,10 @@ class AppGetCommand extends SpoCommand {
         option: '-s, --scope [scope]',
         description: 'Specify the target app catalog: \'tenant\' or \'sitecollection\' (default = tenant)',
         autocomplete: ['tenant', 'sitecollection']
+      },
+      {
+        option: '--siteUrl [siteUrl]',
+        description: 'The site url where the soultion package is. It must be specified when the scope is \'sitecollection\''
       }
     ];
 
@@ -178,6 +190,17 @@ class AppGetCommand extends SpoCommand {
         const testScope: string = args.options.scope.toLowerCase();
         if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
           return `Scope must be either 'tenant' or 'sitecollection' if specified`
+        }
+
+        if (testScope === 'sitecollection' && !args.options.siteUrl) {
+          
+          if(args.options.appCatalogUrl){
+            return `You must specify siteUrl when the scope is sitecollection instead of appCatalogUrl`;
+          }  
+          return `You must specify siteUrl when the scope is sitecollection`;
+
+        } else if(testScope === 'tenant' && args.options.siteUrl) {
+          return `The siteUrl option can only be used when the scope option is set to sitecollection`;
         }
       }
       if (!args.options.id && !args.options.name) {
@@ -194,6 +217,14 @@ class AppGetCommand extends SpoCommand {
 
       if (args.options.appCatalogUrl) {
         return SpoCommand.isValidSharePointUrl(args.options.appCatalogUrl);
+      }
+
+      if (!args.options.scope && args.options.siteUrl) {
+        return `The siteUrl option can only be used when the scope option is set to sitecollection`;
+      }
+
+      if(args.options.siteUrl) {
+        return SpoCommand.isValidSharePointUrl(args.options.siteUrl);
       }
 
       return true;
@@ -229,8 +260,8 @@ class AppGetCommand extends SpoCommand {
 
     Return details about the app with ID ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
     available in the site collection app catalog
-    of the site you are currently logged in.
-      ${chalk.grey(config.delimiter)} ${commands.APP_GET} --id b2307a39-e878-458b-bc90-03bc578531d6 --scope sitecollection
+    of site ${chalk.grey('https://contoso.sharepoint.com/sites/site1')}.
+      ${chalk.grey(config.delimiter)} ${commands.APP_GET} --id b2307a39-e878-458b-bc90-03bc578531d6 --scope sitecollection --siteUrl https://contoso.sharepoint.com/sites/site1
 
   More information:
   
@@ -242,7 +273,7 @@ class AppGetCommand extends SpoCommand {
   private getAppUniqueId(appCatalogUrl: string, appName: any, cmd: any): Promise<string> {
 
     return new Promise<string>((resolve: any, reject: any) => {
-      
+
       if (this.debug) {
         cmd.log(`Retrieved tenant app catalog URL ${appCatalogUrl}`);
       }

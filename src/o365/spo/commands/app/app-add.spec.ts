@@ -573,27 +573,13 @@ describe(commands.APP_ADD, () => {
     assert.equal(actual, true);
   });
 
-  it('passes validation on valid \'sitecollection\' scope', () => {
-    const stats: fs.Stats = new fs.Stats();
-    sinon.stub(stats, 'isDirectory').callsFake(() => false);
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'lstatSync').callsFake(() => stats);
-
-    const actual = (command.validate() as CommandValidate)({ options: { scope: 'sitecollection', filePath: 'abc' } });
-    Utils.restore([
-      fs.existsSync,
-      fs.lstatSync
-    ]);
-    assert.equal(actual, true);
-  });
-
   it('passes validation on valid \'SiteCollection\' scope', () => {
     const stats: fs.Stats = new fs.Stats();
     sinon.stub(stats, 'isDirectory').callsFake(() => false);
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
 
-    const actual = (command.validate() as CommandValidate)({ options: { scope: 'SiteCollection', filePath: 'abc' } });
+    const actual = (command.validate() as CommandValidate)({ options: { scope: 'SiteCollection', siteUrl:'https://contoso.sharepoint.com', filePath: 'abc' } });
     Utils.restore([
       fs.existsSync,
       fs.lstatSync
@@ -830,20 +816,6 @@ describe(commands.APP_ADD, () => {
     assert.equal(actual, true);
   });
 
-  it('passes validation when the scope is specified with \'sitecollection\'', () => {
-    const stats: fs.Stats = new fs.Stats();
-    sinon.stub(stats, 'isDirectory').callsFake(() => false);
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'lstatSync').callsFake(() => stats);
-
-    const actual = (command.validate() as CommandValidate)({ options: { filePath: 'abc', scope: 'sitecollection' } });
-
-    Utils.restore([
-      fs.existsSync,
-      fs.lstatSync
-    ]);
-    assert.equal(actual, true);
-  });
 
   it('passes validation when no scope is specified', () => {
     const stats: fs.Stats = new fs.Stats();
@@ -875,7 +847,7 @@ describe(commands.APP_ADD, () => {
     assert.equal(actual, true);
   });
 
-  it('passes validation when the scope is specified with \'sitecollection\'', () => {
+  it('should fail when \'sitecollection\' scope, but no siteUrl specified', () => {
     const stats: fs.Stats = new fs.Stats();
     sinon.stub(stats, 'isDirectory').callsFake(() => false);
     sinon.stub(fs, 'existsSync').callsFake(() => true);
@@ -887,7 +859,52 @@ describe(commands.APP_ADD, () => {
       fs.existsSync,
       fs.lstatSync
     ]);
-    assert.equal(actual, true);
+    assert.notEqual(actual, true);
+  });
+
+  it('should fail when \'tenant\' scope, but also siteUrl specified', () => {
+    const stats: fs.Stats = new fs.Stats();
+    sinon.stub(stats, 'isDirectory').callsFake(() => false);
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    sinon.stub(fs, 'lstatSync').callsFake(() => stats);
+
+    const actual = (command.validate() as CommandValidate)({ options: { filePath: 'abc', scope: 'tenant', siteUrl:'https://contoso.sharepoint.com'  } });
+
+    Utils.restore([
+      fs.existsSync,
+      fs.lstatSync
+    ]);
+    assert.notEqual(actual, true);
+  });
+
+  it('should fail when \'sitecollection\' scope, but  bad siteUrl format specified', () => {
+    const stats: fs.Stats = new fs.Stats();
+    sinon.stub(stats, 'isDirectory').callsFake(() => false);
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    sinon.stub(fs, 'lstatSync').callsFake(() => stats);
+
+    const actual = (command.validate() as CommandValidate)({ options: { filePath: 'abc', scope: 'sitecollection', siteUrl:'contoso.sharepoint.com'  } });
+
+    Utils.restore([
+      fs.existsSync,
+      fs.lstatSync
+    ]);
+    assert.notEqual(actual, true);
+  });
+
+  it('should fail when no scope, but siteUrl specified', () => {
+    const stats: fs.Stats = new fs.Stats();
+    sinon.stub(stats, 'isDirectory').callsFake(() => false);
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    sinon.stub(fs, 'lstatSync').callsFake(() => stats);
+
+    const actual = (command.validate() as CommandValidate)({ options: { filePath: 'abc', siteUrl:'https://contoso.sharepoint.com'  } });
+
+    Utils.restore([
+      fs.existsSync,
+      fs.lstatSync
+    ]);
+    assert.notEqual(actual, true);
   });
 
   it('has help referring to the right command', () => {

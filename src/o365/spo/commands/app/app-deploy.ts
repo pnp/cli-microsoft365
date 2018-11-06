@@ -23,6 +23,7 @@ interface Options extends GlobalOptions {
   appCatalogUrl?: string;
   skipFeatureDeployment?: boolean;
   scope?: string;
+  siteUrl?: string;
 }
 
 class AppDeployCommand extends SpoCommand {
@@ -41,6 +42,7 @@ class AppDeployCommand extends SpoCommand {
     telemetryProps.appCatalogUrl = (!(!args.options.appCatalogUrl)).toString();
     telemetryProps.skipFeatureDeployment = args.options.skipFeatureDeployment || false;
     telemetryProps.scope = (!(!args.options.scope)).toString();
+    telemetryProps.siteUrl = (!(!args.options.siteUrl)).toString();
     return telemetryProps;
   }
 
@@ -54,12 +56,16 @@ class AppDeployCommand extends SpoCommand {
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
       .then((accessToken: string): Promise<string> => {
         return new Promise<string>((resolve: (appCatalogUrl: string) => void, reject: (error: any) => void): void => {
-          if (args.options.appCatalogUrl) {
+          
+          if(args.options.scope === 'sitecollection') {
+            
+            resolve(args.options.siteUrl as string);
+
+          } else if (args.options.appCatalogUrl) {
+
             resolve(args.options.appCatalogUrl);
-          } else if(args.options.scope === 'sitecollection') {
-            resolve(auth.site.url);
-          }
-          else {
+
+          } else {
             this
               .getTenantAppCatalogUrl(cmd, this.debug)
               .then((appCatalogUrl: string): void => {
@@ -97,7 +103,7 @@ class AppDeployCommand extends SpoCommand {
       })
       .then((appCatalog: string): Promise<string> => {
         if (this.debug) {
-          cmd.log(`Retrieved tenant app catalog URL ${appCatalog}`);
+          cmd.log(`Retrieved app catalog URL ${appCatalog}`);
         }
 
         appCatalogUrl = appCatalog;
@@ -215,6 +221,10 @@ class AppDeployCommand extends SpoCommand {
         option: '-s, --scope [scope]',
         description: 'Specify the target app catalog: \'tenant\' or \'sitecollection\' (default = tenant)',
         autocomplete: ['tenant', 'sitecollection']
+      },
+      {
+        option: '--siteUrl [siteUrl]',
+        description: 'The site url where the soultion package to be deployed. It must be specified when the scope is \'sitecollection\''
       }
     ];
 
@@ -229,6 +239,17 @@ class AppDeployCommand extends SpoCommand {
         const testScope: string = args.options.scope.toLowerCase();
         if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
           return `Scope must be either 'tenant' or 'sitecollection' if specified`
+        }
+
+        if (testScope === 'sitecollection' && !args.options.siteUrl) {
+          
+          if(args.options.appCatalogUrl){
+            return `You must specify siteUrl when the scope is sitecollection instead of appCatalogUrl`;
+          }  
+          return `You must specify siteUrl when the scope is sitecollection`;
+
+        } else if(testScope === 'tenant' && args.options.siteUrl) {
+          return `The siteUrl option can only be used when the scope option is set to sitecollection`;
         }
       }
 
@@ -246,6 +267,14 @@ class AppDeployCommand extends SpoCommand {
 
       if (args.options.appCatalogUrl) {
         return SpoCommand.isValidSharePointUrl(args.options.appCatalogUrl);
+      }
+
+      if (!args.options.scope && args.options.siteUrl) {
+        return `The siteUrl option can only be used when the scope option is set to sitecollection`;
+      }
+
+      if(args.options.siteUrl) {
+          return SpoCommand.isValidSharePointUrl(args.options.siteUrl);
       }
 
       return true;
@@ -279,8 +308,9 @@ class AppDeployCommand extends SpoCommand {
     of the tenant app catalog automatically.
       ${chalk.grey(config.delimiter)} ${commands.APP_DEPLOY} --id 058140e3-0e37-44fc-a1d3-79c487d371a3
 
-    Deploy the specified app in the site collection app catalog.
-      ${chalk.grey(config.delimiter)} ${commands.APP_DEPLOY} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --scope sitecollection
+    Deploy the specified app in the site collection app catalog 
+    of site ${chalk.grey('https://contoso.sharepoint.com/sites/site1')}.
+      ${chalk.grey(config.delimiter)} ${commands.APP_DEPLOY} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --scope sitecollection --siteUrl https://contoso.sharepoint.com/sites/site1
 
     Deploy the app with the specified name in the tenant app catalog.
     Try to resolve the URL of the tenant app catalog automatically.

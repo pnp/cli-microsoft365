@@ -22,6 +22,7 @@ interface Options extends GlobalOptions {
   filePath: string;
   overwrite?: boolean; 
   scope?: string;
+  siteUrl?: string;
 }
 
 class SpoAppAddCommand extends SpoCommand {
@@ -37,6 +38,7 @@ class SpoAppAddCommand extends SpoCommand {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.overwrite = args.options.overwrite || false;
     telemetryProps.scope = (!(!args.options.scope)).toString();
+    telemetryProps.siteUrl = (!(!args.options.siteUrl)).toString();
     return telemetryProps;
   }
 
@@ -62,9 +64,14 @@ class SpoAppAddCommand extends SpoCommand {
           cmd.log(`Adding app '${fullPath}' to app catalog...`);
         }
 
+        let siteUrl: string = auth.site.url;
+        if(args.options.scope === 'sitecollection') {
+          siteUrl = args.options.siteUrl as string;
+        }
+
         const fileName: string = path.basename(fullPath);
         const requestOptions: any = {
-          url: `${auth.site.url}/_api/web/${scope}appcatalog/Add(overwrite=${(overwrite.toString().toLowerCase())}, url='${fileName}')`,
+          url: `${siteUrl}/_api/web/${scope}appcatalog/Add(overwrite=${(overwrite.toString().toLowerCase())}, url='${fileName}')`,
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${auth.service.accessToken}`,
             accept: 'application/json;odata=nometadata',
@@ -116,6 +123,10 @@ class SpoAppAddCommand extends SpoCommand {
         autocomplete: ['tenant', 'sitecollection']
       },
       {
+        option: '--siteUrl [siteUrl]',
+        description: 'The site url where the soultion package to be added. It must be specified when the scope is \'sitecollection\'',
+      },
+      {
         option: '--overwrite [overwrite]',
         description: 'Set to overwrite the existing package file'
       }
@@ -131,7 +142,13 @@ class SpoAppAddCommand extends SpoCommand {
       if (args.options.scope) {
         const testScope: string = args.options.scope.toLowerCase();
         if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
-          return `Scope must be either 'tenant' or 'sitecollection' if specified`
+          return `Scope must be either 'tenant' or 'sitecollection' if specified`;
+        }
+
+        if (testScope === 'sitecollection' && !args.options.siteUrl) {
+          return `You must specify siteUrl when the scope is sitecollection`;
+        } else if(testScope === 'tenant' && args.options.siteUrl) {
+          return `The siteUrl option can only be used when the scope option is set to sitecollection`;
         }
       }
 
@@ -147,6 +164,14 @@ class SpoAppAddCommand extends SpoCommand {
 
       if (fs.lstatSync(fullPath).isDirectory()) {
         return `Path '${fullPath}' points to a directory`;
+      }
+
+      if (!args.options.scope && args.options.siteUrl) {
+        return `The siteUrl option can only be used when the scope option is set to sitecollection`;
+      }
+
+      if(args.options.siteUrl) {
+          return SpoCommand.isValidSharePointUrl(args.options.siteUrl);
       }
 
       return true;
@@ -181,8 +206,8 @@ class SpoAppAddCommand extends SpoCommand {
       ${chalk.grey(config.delimiter)} ${commands.APP_ADD} --filePath sharepoint/solution/spfx.sppkg --overwrite
 
     Add the ${chalk.grey('spfx.sppkg')} package to the site collection app catalog 
-    of the site you are currently logged in
-      ${chalk.grey(config.delimiter)} ${commands.APP_ADD} --filePath c:/spfx.sppkg --scope sitecollection
+    of site ${chalk.grey('https://contoso.sharepoint.com/sites/site1')}
+      ${chalk.grey(config.delimiter)} ${commands.APP_ADD} --filePath c:/spfx.sppkg --scope sitecollection --siteUrl https://contoso.sharepoint.com/sites/site1
 
   More information:
 
