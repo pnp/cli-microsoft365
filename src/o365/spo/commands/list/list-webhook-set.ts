@@ -181,7 +181,7 @@ class SpoListWebhookSetCommand extends SpoCommand {
 
       const parsedDateTime = Date.parse(args.options.expirationDateTime as string)
       const chalk = vorpal.chalk;
-      if (!(!parsedDateTime) !== true) {
+      if (args.options.expirationDateTime && !(!parsedDateTime) !== true) {
         return `Provide the date in one of the following formats:
       ${chalk.grey('YYYY-MM-DD')}
       ${chalk.grey('YYYY-MM-DDThh:mm')}
@@ -219,7 +219,7 @@ class SpoListWebhookSetCommand extends SpoCommand {
     Update the expiration date of a webhook with ID ${chalk.grey('cc27a922-8224-4296-90a5-ebbc54da2e81')} which
     belongs to a list with title ${chalk.grey('Documents')} located in site 
     ${chalk.grey('https://contoso.sharepoint.com/sites/ninja')} to to October 9 2018
-      ${chalk.grey(config.delimiter)} ${commands.LIST_WEBHOOK_SET} --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e81 --expirationDateTime
+      ${chalk.grey(config.delimiter)} ${commands.LIST_WEBHOOK_SET} --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e81 --expirationDateTime 2018-10-09
       `);
   }
 }
