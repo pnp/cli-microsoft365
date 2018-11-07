@@ -62,8 +62,7 @@ class SpoListWebhookSetCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          const list: string = args.options.listId ? encodeURIComponent(args.options.listId as string) : encodeURIComponent(args.options.listTitle as string);
-          cmd.log(`Updating webhook ${args.options.id} belonging to list ${list} located at site ${args.options.webUrl}...`);
+          cmd.log(`Updating webhook ${args.options.id} belonging to list ${args.options.listId ? encodeURIComponent(args.options.listId) : encodeURIComponent(args.options.listTitle as string)} located at site ${args.options.webUrl}...`);
         }
 
         let requestUrl: string = '';

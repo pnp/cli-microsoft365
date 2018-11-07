@@ -170,7 +170,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     });
   });
 
-  it('updates the webhook (debug)', (done) => {
+  it('updates notification url and expiration date of the webhook by passing list title (debug)', (done) => {
     let actual: string = '';
     const expected: string = JSON.stringify({
       notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
@@ -210,7 +210,47 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     });
   });
 
-  it('updates the webhook', (done) => {
+  it('updates notification url and expiration date of the webhook by passing list id (verbose)', (done) => {
+    let actual: string = '';
+    const expected: string = JSON.stringify({
+      notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
+      expirationDateTime: '2018-10-09'
+    });
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'cc27a922-8224-4296-90a5-ebbc54da2e77')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')`) > -1) {
+        actual = JSON.stringify(opts.body);
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options:
+      {
+        verbose: true,
+        webUrl: 'https://contoso.sharepoint.com/sites/ninja',
+        listId: 'cc27a922-8224-4296-90a5-ebbc54da2e77',
+        id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
+        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
+        expirationDateTime: '2018-10-09'
+      }
+    }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('updates notification url and expiration date of the webhook by passing list title', (done) => {
     let actual: string = '';
     const expected: string = JSON.stringify({
       notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
@@ -238,6 +278,82 @@ describe(commands.LIST_WEBHOOK_SET, () => {
         id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
         expirationDateTime: '2018-10-09'
+      }
+    }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('updates notification url of the webhook by passing list title', (done) => {
+    let actual: string = '';
+    const expected: string = JSON.stringify({
+      notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
+    });
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')`) > -1) {
+        actual = JSON.stringify(opts.body);
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options:
+      {
+        debug: false,
+        webUrl: 'https://contoso.sharepoint.com/sites/ninja',
+        listTitle: 'Documents',
+        id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
+        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
+      }
+    }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('updates expiration date of the webhook by passing list title', (done) => {
+    let actual: string = '';
+    const expected: string = JSON.stringify({
+      expirationDateTime: '2019-03-02'
+    });
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')`) > -1) {
+        actual = JSON.stringify(opts.body);
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options:
+      {
+        debug: false,
+        webUrl: 'https://contoso.sharepoint.com/sites/ninja',
+        listTitle: 'Documents',
+        id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
+        expirationDateTime: '2019-03-02'
       }
     }, () => {
       try {
