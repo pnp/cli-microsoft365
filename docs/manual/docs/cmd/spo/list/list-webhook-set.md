@@ -51,5 +51,5 @@ From the webhook with ID _cc27a922-8224-4296-90a5-ebbc54da2e81_ which belongs to
 and the expiration date to _March 2nd, 2019_
 
 ```sh
-spo list webhook set --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e81 --expirationDateTime 2019-03-02
+spo list webhook set --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e81 --notificationUrl https://contoso-funcions.azurewebsites.net/webhook --expirationDateTime 2019-03-02
 ```
