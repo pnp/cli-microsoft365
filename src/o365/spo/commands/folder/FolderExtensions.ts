@@ -14,21 +14,15 @@ export class FolderExtensions {
 
     const webUrl = url.parse(webFullUrl);
     if(!webUrl.protocol || !webUrl.hostname) {
-      return new Promise<void>((resolve: any, reject:any) => {
-          return reject('webFullUrl is not a valid URL');
-      });
+      return Promise.reject('webFullUrl is not a valid URL');
     }
 
     if(!folderToEnsure){
-      return new Promise<void>((resolve: any, reject:any) => {
-          return reject('folderToEnsure cannot be empty');
-      });
+      return Promise.reject('folderToEnsure cannot be empty');
     }
 
     if(!siteAccessToken){
-      return new Promise<void>((resolve: any, reject:any) => {
-          return reject('siteAccessToken cannot be empty');
-      });
+      return Promise.reject('siteAccessToken cannot be empty');
     }
 
     // remove the end '/' in the folder path
@@ -61,7 +55,7 @@ export class FolderExtensions {
     // recursive function
     const checkOrAddFolder = (resolve: () => void, reject: (error: any) => void): void => {
 
-      if (folderIndex == folders.length) {
+      if (folderIndex === folders.length) {
 
         if (this.debug) {
           this.cmd.log(`All sub-folders exist`);

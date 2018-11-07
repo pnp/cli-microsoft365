@@ -161,8 +161,7 @@ class SpoFileAddCommand extends SpoCommand {
             authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata',
             'content-length': bodyLength
-          }),
-          json: true
+          })
         };
 
         return request.post(requestOptions);
