@@ -438,11 +438,6 @@ describe(commands.APP_LIST, () => {
     assert.notEqual(actual, true);
   });
 
-  it('fails validation when siteUrl and tenant scope', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { scope: 'tenant', siteUrl: 'https://contoso-admin.sharepoint.com' } });
-    assert.notEqual(actual, true);
-  });
-
   it('fails validation when siteUrl and no scope', () => {
     const actual = (command.validate() as CommandValidate)({ options: { siteUrl: 'https://contoso-admin.sharepoint.com' } });
     assert.notEqual(actual, true);
