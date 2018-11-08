@@ -866,7 +866,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.0', output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[0];
-      assert.equal(findings.length, 9);
+      assert.equal(findings.length, 8);
     });
   });
 
@@ -876,7 +876,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.0', debug: true, output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[3];
-      assert.equal(findings.length, 9);
+      assert.equal(findings.length, 8);
     });
   });
 
@@ -886,7 +886,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.0', output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[0];
-      assert.equal(findings.length, 10);
+      assert.equal(findings.length, 9);
     });
   });
 
@@ -896,7 +896,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.0', output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[0];
-      assert.equal(findings.length, 10);
+      assert.equal(findings.length, 9);
     });
   });
 
@@ -906,7 +906,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.0', output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[0];
-      assert.equal(findings.length, 10);
+      assert.equal(findings.length, 9);
     });
   });
 
@@ -1016,7 +1016,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.4', output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[0];
-      assert.equal(findings.length, 12);
+      assert.equal(findings.length, 11);
     });
   });
 
@@ -1026,7 +1026,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.4', debug: true, output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[3];
-      assert.equal(findings.length, 12);
+      assert.equal(findings.length, 11);
     });
   });
 
@@ -1036,7 +1036,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.4', output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[0];
-      assert.equal(findings.length, 13);
+      assert.equal(findings.length, 12);
     });
   });
 
@@ -1046,7 +1046,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.4', output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[0];
-      assert.equal(findings.length, 13);
+      assert.equal(findings.length, 12);
     });
   });
 
@@ -1056,7 +1056,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.4', output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[0];
-      assert.equal(findings.length, 12);
+      assert.equal(findings.length, 11);
     });
   });
 

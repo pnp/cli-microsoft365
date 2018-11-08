@@ -5,7 +5,7 @@
     "id": "8b980172-b8d4-463f-8631-eb656e4af42a",
     "version": "1.0.0.0",
     "includeClientSideAssets": true,
-    "skipFeatureDeployment": "false"
+    "skipFeatureDeployment": false
   },
   "paths": {
     "zippedPackage": "solution/spfx.sppkg"

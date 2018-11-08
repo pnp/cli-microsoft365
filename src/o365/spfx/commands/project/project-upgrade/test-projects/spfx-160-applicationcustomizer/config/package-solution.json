@@ -5,7 +5,7 @@
     "id": "f3145292-4b03-4211-bc85-dbd5fc6a3789",
     "version": "1.0.0.0",
     "includeClientSideAssets": true,
-    "skipFeatureDeployment": "false",
+    "skipFeatureDeployment": false,
     "features": [
       {
         "title": "Application Extension - Deployment of custom action.",

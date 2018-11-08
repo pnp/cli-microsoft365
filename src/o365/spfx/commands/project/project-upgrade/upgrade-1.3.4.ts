@@ -13,7 +13,6 @@ import { FN010001_YORC_version } from "./rules/FN010001_YORC_version";
 import { FN002007_DEVDEP_ajv } from "./rules/FN002007_DEVDEP_ajv";
 import { FN014002_CODE_extensions } from "./rules/FN014002_CODE_extensions";
 import { FN014003_CODE_launch } from "./rules/FN014003_CODE_launch";
-import { FN006003_CFG_PS_skipFeatureDeployment } from "./rules/FN006003_CFG_PS_skipFeatureDeployment";
 
 module.exports = [
   new FN001001_DEP_microsoft_sp_core_library('1.3.4'),
@@ -28,7 +27,6 @@ module.exports = [
   new FN002002_DEVDEP_microsoft_sp_module_interfaces('1.3.4'),
   new FN002003_DEVDEP_microsoft_sp_webpart_workbench('1.3.4'),
   new FN002007_DEVDEP_ajv('5.2.2'),
-  new FN006003_CFG_PS_skipFeatureDeployment('boolean'),
   new FN010001_YORC_version('1.3.4'),
   new FN014002_CODE_extensions(),
   new FN014003_CODE_launch()
