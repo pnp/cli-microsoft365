@@ -468,7 +468,7 @@ Set-PnPTheme|SharePointPnPPowerShellOnline|
 Set-PnPTraceLog|SharePointPnPPowerShellOnline|
 Set-PnPUnifiedGroup|SharePointPnPPowerShellOnline|[graph o365group set](../cmd/graph/o365group/o365group-set.md)
 Set-PnPUserProfileProperty|SharePointPnPPowerShellOnline|
-Set-PnPView|SharePointPnPPowerShellOnline|
+Set-PnPView|SharePointPnPPowerShellOnline|[spo list view set](../cmd/spo/list/list-view-set.md)
 Set-PnPWeb|SharePointPnPPowerShellOnline|[spo web set](../cmd/spo/web/web-set.md)
 Set-PnPWebhookSubscription|SharePointPnPPowerShellOnline|
 Set-PnPWebPartProperty|SharePointPnPPowerShellOnline|

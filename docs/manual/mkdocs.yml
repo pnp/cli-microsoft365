@@ -80,6 +80,7 @@ nav:
         - list list: 'cmd/spo/list/list-list.md'
         - list remove: 'cmd/spo/list/list-remove.md'
         - list set: 'cmd/spo/list/list-set.md'
+        - list view set: 'cmd/spo/list/list-view-set.md'
         - list webhook get: 'cmd/spo/list/list-webhook-get.md'
         - list webhook list: 'cmd/spo/list/list-webhook-list.md'
         - list webhook remove: 'cmd/spo/list/list-webhook-remove.md'
