@@ -12,6 +12,7 @@ import { Auth } from '../../../../Auth';
 import Utils from '../../../../Utils';
 import { SearchResult } from './datatypes/SearchResult';
 import { ResultTableRow } from './datatypes/ResultTableRow';
+import { isNumber } from 'util';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -21,24 +22,24 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   query: string;
-  rowLimit:number;
-  selectProperties:string;
+  rowLimit?:number;
+  selectProperties?:string;
+  webUrl?:string;
   allResults?:boolean;
-  sourceId:string;
+  sourceId?:string;
   trimDuplicates?:boolean;
   enableStemming?:boolean;
   culture?:number;
-  refinementFilters:string;
-  queryTemplate:string;
-  sortList:string;
-  rankingModelId:string;
+  refinementFilters?:string;
+  queryTemplate?:string;
+  sortList?:string;
+  rankingModelId?:string;
   startRow?:number;
-  properties:string;
-  sourceName:string;
-  refiners:string;
-  web:string;
-  hiddenConstraints:string;
-  clientType:string;
+  properties?:string;
+  sourceName?:string;
+  refiners?:string;
+  hiddenConstraints?:string;
+  clientType?:string;
   enablePhonetic?:boolean;
   processBestBets?:boolean;
   enableQueryRules?:boolean;
@@ -56,25 +57,24 @@ class SearchCommand extends SpoCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.query = args.options.query;
-    telemetryProps.selectproperties = args.options.selectProperties;
+    telemetryProps.selectproperties = typeof args.options.selectProperties !== 'undefined';
     telemetryProps.allResults = args.options.allResults;
     telemetryProps.rowLimit = args.options.rowLimit;
-    telemetryProps.sourceId = args.options.sourceId;
+    telemetryProps.sourceId = typeof args.options.sourceId !== 'undefined';
     telemetryProps.trimDuplicates = args.options.trimDuplicates;
     telemetryProps.enableStemming = args.options.enableStemming;
     telemetryProps.culture = args.options.culture;
-    telemetryProps.refinementFilters = args.options.refinementFilters;
-    telemetryProps.queryTemplate = args.options.queryTemplate;
-    telemetryProps.sortList = args.options.sortList;
-    telemetryProps.rankingModelId = args.options.rankingModelId;
-    telemetryProps.startRow = args.options.startRow;
-    telemetryProps.properties = args.options.properties;
-    telemetryProps.sourceName = args.options.sourceName;
-    telemetryProps.refiners = args.options.refiners;
-    telemetryProps.web = args.options.web;
-    telemetryProps.hiddenConstraints = args.options.hiddenConstraints;
-    telemetryProps.clientType = args.options.clientType;
+    telemetryProps.refinementFilters = typeof args.options.refinementFilters !== 'undefined';
+    telemetryProps.queryTemplate = typeof args.options.queryTemplate !== 'undefined';
+    telemetryProps.sortList = typeof args.options.sortList !== 'undefined';
+    telemetryProps.rankingModelId = typeof args.options.rankingModelId !== 'undefined';
+    telemetryProps.startRow = typeof args.options.startRow !== 'undefined';
+    telemetryProps.properties = typeof args.options.properties !== 'undefined';
+    telemetryProps.sourceName = typeof args.options.sourceName !== 'undefined';
+    telemetryProps.refiners = typeof args.options.refiners !== 'undefined';
+    telemetryProps.webUrl = typeof args.options.webUrl !== 'undefined';
+    telemetryProps.hiddenConstraints = typeof args.options.hiddenConstraints !== 'undefined';
+    telemetryProps.clientType = typeof args.options.clientType !== 'undefined';
     telemetryProps.enablePhonetic = args.options.enablePhonetic;
     telemetryProps.processBestBets = args.options.processBestBets;
     telemetryProps.enableQueryRules = args.options.enableQueryRules;
@@ -83,7 +83,7 @@ class SearchCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const webUrl = args.options.web ? args.options.web : auth.site.url;
+    const webUrl = args.options.webUrl ? args.options.webUrl : auth.site.url;
     const resource: string = Auth.getResourceFromUrl(webUrl);
 
     if (this.debug) {
@@ -104,15 +104,13 @@ class SearchCommand extends SpoCommand {
 
         return accessToken;
       })
-      .then((accessToken:string):Promise<any[]> => {
+      .then((accessToken:string):Promise<SearchResult[]> => {
         const startRow = args.options.startRow ? args.options.startRow : 0;
 
         return this.executeSearchQuery(cmd,args,accessToken,webUrl,[],startRow);
       })
-      .then((results:SearchResult[]) => { 
+      .then((results:SearchResult[]) => {
         this.printResults(cmd,args,results);
-      })
-      .then(() => {
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
@@ -230,7 +228,7 @@ class SearchCommand extends SpoCommand {
     return args.options.selectProperties 
       ? args.options.selectProperties.split(",")
       : (!args.options.output || args.options.output === "text") 
-        ? ["Rank","DocId","OriginalPath"/*,"PartitionId","UrlZone","Culture","ResultTypeId","RenderTemplateId"*/]
+        ? ["Title","OriginalPath"]
         : [];
   }
 
@@ -241,92 +239,92 @@ class SearchCommand extends SpoCommand {
         description: 'Query to be executed in KQL format'
       },
       {
-        option: '-p, --selectProperties <selectProperties>',
+        option: '-p, --selectProperties [selectProperties]',
         description: 'Comma separated list of properties to retrieve. Will retrieve all properties if not specified and json output is requested.'
       },
       {
-        option: '--allResults',
-        description: 'Get all results of the search query, not only the amount specified by the rowlimit (default: 10)'
+        option: '-u, --webUrl [webUrl]',
+        description: 'The web against which we want to execute the query. If the parameter is not defined, the query is executed against the web that\'s used when logging in to the SPO environment.'
       },
       {
-        option: '--rowLimit <rowLimit>',
+        option: '--allResults',
+        description: 'Set, to get all results of the search query, not only the amount specified by the rowlimit (default: 10)'
+      },
+      {
+        option: '--rowLimit [rowLimit]',
         description: 'Sets the number of rows to be returned. When the \'allResults\' parameter is enabled, it will determines the size of the batches being retrieved'
       },
       {
-        option: '--sourceId <sourceId>',
+        option: '--sourceId [sourceId]',
         description: 'Specifies the identifier (GUID) of the result source to be used to run the query.'
       },
       {
         option: '--trimDuplicates',
-        description: 'Specifies whether near duplicate items should be removed from the search results.'
+        description: 'Set, to remove near duplicate items from the search results.'
       },
       {
         option: '--enableStemming',
-        description: 'Specifies whether stemming is enabled.'
+        description: 'Set, to enable stemming.'
       },
       {
-        option: '--culture <culture>',
+        option: '--culture [culture]',
         description: 'The locale for the query.'
       },
       {
-        option: '--refinementFilters <refinementFilters>',
-        description: 'The set of refinement filters used when issuing a refinement query. For GET requests, the RefinementFilters parameter is specified as an FQL filter. For POST requests, the RefinementFilters parameter is specified as an array of FQL filters.'
+        option: '--refinementFilters [refinementFilters]',
+        description: 'The set of refinement filters used when issuing a refinement query.'
       },
       {
-        option: '--queryTemplate <queryTemplate>',
+        option: '--queryTemplate [queryTemplate]',
         description: 'A string that contains the text that replaces the query text, as part of a query transformation.'
       },
       {
-        option:'--sortList <sortList>',
+        option:'--sortList [sortList]',
         description: 'The list of properties by which the search results are ordered.'
       },
       {
-        option:'--rankingModelId <rankingModelId>',
+        option:'--rankingModelId [rankingModelId]',
         description: 'The ID of the ranking model to use for the query.'
       },
       {
-        option: '--startRow <startRow>',
+        option: '--startRow [startRow]',
         description: 'The first row that is included in the search results that are returned. You use this parameter when you want to implement paging for search results.'
       },
       {
-        option: '--properties <properties>',
-        description: 'Additional properties for the query. GET requests support only string values. POST requests support values of any type.'
+        option: '--properties [properties]',
+        description: 'Additional properties for the query.'
       },
       {
-        option: '--sourceName <sourceName>',
+        option: '--sourceName [sourceName]',
         description: 'Specified the name of the result source to be used to run the query.'
       },
       {
-        option: '--refiners <refiners>',
+        option: '--refiners [refiners]',
         description: 'The set of refiners to return in a search result.'
       },
       {
-        option: '--web <web>',
-        description: 'The web against which we want to execute the query. If the parameter is not defined, the query is executed against the web that\'s used when logging in to the SPO environment.'
-      },
-      {
-        option: '--hiddenConstraints <hiddenConstraints>',
+        option: '--hiddenConstraints [hiddenConstraints]',
         description: 'The additional query terms to append to the query.'
       },
       {
-        option: '--clientType <clientType>',
+        option: '--clientType [clientType]',
         description: 'The type of the client that issued the query.'
       },
       {
         option: '--enablePhonetic',
-        description: 'A Boolean value that specifies whether the phonetic forms of the query terms are used to find matches. (Default = false).'
+        description: 'Set, to use the phonetic forms of the query terms to find matches. (Default = false).'
       },
       {
         option: '--processBestBets',
-        description: 'A Boolean value that specifies whether to return best bet results for the query.'
+        description: 'Set, to return best bet results for the query.'
       },
       {
         option: '--enableQueryRules',
-        description: 'A Boolean value that specifies whether to enable query rules for the query. '
+        description: 'Set, to enable query rules for the query. '
       },
       {
         option: '--processPersonalFavorites',
-        description: 'A Boolean value that specifies whether to return personal favorites with the search results.'
+        description: 'Set, to return personal favorites with the search results.'
       }
     ];
 
@@ -345,10 +343,18 @@ class SearchCommand extends SpoCommand {
       if (args.options.rankingModelId && !Utils.isValidGuid(args.options.rankingModelId)) {
         return `${args.options.rankingModelId} is not a valid GUID`;
       }
-      if(args.options.sortList && !Utils.isRegExMatch(args.options.sortList,"^([a-z0-9_]+:(ascending|descending))(,([a-z0-9_]+:(ascending|descending)))*$")) {
+      if(args.options.sortList && !/^([a-z0-9_]+:(ascending|descending))(,([a-z0-9_]+:(ascending|descending)))*$/gi.test(args.options.sortList)) {
         return `sortlist parameter value '${args.options.sortList}' does not match the required pattern (=comma separated list of '<property>:(ascending|descending)'-pattern)`;
       }
-
+      if(args.options.rowLimit && !isNumber(args.options.rowLimit)) {
+        return `${args.options.rowLimit} is not a valid number`;
+      }      
+      if(args.options.startRow && !isNumber(args.options.startRow)) {
+        return `${args.options.startRow} is not a valid number`;
+      }      
+      if(args.options.culture && !isNumber(args.options.culture)) {
+        return `${args.options.culture} is not a valid number`;
+      }
       return true;
     };
   }
@@ -388,8 +394,8 @@ class SearchCommand extends SpoCommand {
   }
 
   private getTextOutput(args: CommandArgs,searchResultRows: ResultTableRow[]) {
-    var selectProperties = this.getSelectPropertiesArray(args);
-    var outputData = searchResultRows.map(row => {
+    const selectProperties = this.getSelectPropertiesArray(args);
+    const outputData = searchResultRows.map(row => {
       var rowOutput:any = {};
 
       row.Cells.map(cell => { 

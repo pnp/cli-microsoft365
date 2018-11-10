@@ -1107,7 +1107,7 @@ describe(commands.SEARCH, () => {
         output: 'text',
         debug: true,
         query: '*',
-        web: 'https://contoso.sharepoint.com/sites/subsite'
+        webUrl: 'https://contoso.sharepoint.com/sites/subsite'
       }
     }, () => {
       try {
@@ -1357,6 +1357,33 @@ describe(commands.SEARCH, () => {
       } 
     });
     assert.equal(actual, true);
+  });
+
+  it('fails validation if the rowLimit is not a valid number', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { 
+        rowLimit: '1X',
+        query:'*'
+      } 
+    });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation if the startRow is not a valid number', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { 
+        startRow: '1X',
+        query:'*'
+      } 
+    });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation if the culture is not a valid number', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { 
+        culture: '1X',
+        query:'*'
+      } 
+    });
+    assert.notEqual(actual, true);
   });
 
   it('command correctly handles reject request', (done) => {
