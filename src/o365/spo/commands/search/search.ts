@@ -163,9 +163,7 @@ class SearchCommand extends SpoCommand {
     const selectPropertiesArray: string[] = this.getSelectPropertiesArray(args);
 
     //Transform arg data to requeststrings
-    const propertySelectRequestString: string = selectPropertiesArray.length > 0 ?
-        `&selectproperties='${encodeURIComponent(selectPropertiesArray.join(","))}'` :
-        ``;
+    const propertySelectRequestString: string = `&selectproperties='${encodeURIComponent(selectPropertiesArray.join(","))}'`
     const startRowRequestString = `&startrow=${startRow ? startRow : 0}`;
     const rowLimitRequestString = args.options.rowLimit ? `&rowlimit=${args.options.rowLimit}` : ``;
     const sourceIdRequestString = args.options.sourceId ? `&sourceid='${args.options.sourceId}'` : ``;
@@ -226,9 +224,7 @@ class SearchCommand extends SpoCommand {
   private getSelectPropertiesArray(args: CommandArgs) {
     return args.options.selectProperties 
       ? args.options.selectProperties.split(",")
-      : (!args.options.output || args.options.output === "text") 
-        ? ["Title","OriginalPath"]
-        : [];
+      : ["Title","OriginalPath"];
   }
 
   public options(): CommandOption[] {
@@ -359,23 +355,11 @@ class SearchCommand extends SpoCommand {
   }
 
   private printResults(cmd:CommandInstance,args:CommandArgs,results:SearchResult[]) {
-    if(results.length === 1) {
-      if(args.options.output === 'json') {
-        cmd.log(results[0]);
-      } else {
-        cmd.log(this.getTextOutput(args,results[0].PrimaryQueryResult.RelevantResults.Table.Rows));
-      }
-    } else {
-      if(args.options.output === 'json') {
-        cmd.log(results);
-      } else {
-        let allRows:ResultTableRow[] = [];
-        for(let i = 0;i < results.length;i++) {
-          allRows.push(...results[i].PrimaryQueryResult.RelevantResults.Table.Rows);
-        }
-        cmd.log(this.getTextOutput(args,allRows));
-      }
-    }
+    //if(args.options.output === 'rawResults') {
+    //  if(results.length == 1) { cmd.log(results[0]); }
+    //  else { cmd.log(results); }
+    // }     
+    cmd.log(this.getParsedOutput(args,results));
 
     if(!args.options.output || args.options.output == 'text') {
       cmd.log("# Rows: "+results[results.length-1].PrimaryQueryResult.RelevantResults.TotalRows);
@@ -392,7 +376,16 @@ class SearchCommand extends SpoCommand {
     return totalTime;
   }
 
-  private getTextOutput(args: CommandArgs,searchResultRows: ResultTableRow[]) {
+  private getRowsFromSearchResults(results:SearchResult[]):ResultTableRow[] {
+    let searchResultRows:ResultTableRow[] = [];
+    for(let i = 0;i < results.length;i++) {
+      searchResultRows.push(...results[i].PrimaryQueryResult.RelevantResults.Table.Rows);
+    }
+    return searchResultRows;
+  }
+
+  private getParsedOutput(args: CommandArgs,results:SearchResult[]) {
+    const searchResultRows = this.getRowsFromSearchResults(results);
     const selectProperties = this.getSelectPropertiesArray(args);
     const outputData = searchResultRows.map(row => {
       var rowOutput:any = {};
