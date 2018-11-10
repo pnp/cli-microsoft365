@@ -31,6 +31,7 @@ export default {
   EXTERNALUSER_LIST: `${prefix} externaluser list`,
   FIELD_ADD: `${prefix} field add`,
   FIELD_GET: `${prefix} field get`,
+  FIELD_SET: `${prefix} field set`,
   FILE_CHECKIN: `${prefix} file checkin`,
   FILE_CHECKOUT: `${prefix} file checkout`,
   FILE_COPY: `${prefix} file copy`,

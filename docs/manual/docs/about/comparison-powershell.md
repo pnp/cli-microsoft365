@@ -429,7 +429,7 @@ Set-PnPDefaultColumnValues|SharePointPnPPowerShellOnline|
 Set-PnPDefaultContentTypeToList|SharePointPnPPowerShellOnline|
 Set-PnPDefaultPageLayout|SharePointPnPPowerShellOnline|
 Set-PnPDocumentSetField|SharePointPnPPowerShellOnline|
-Set-PnPField|SharePointPnPPowerShellOnline|
+Set-PnPField|SharePointPnPPowerShellOnline|[spo field set](../cmd/spo/field/field-set.md)
 Set-PnPFileCheckedIn|SharePointPnPPowerShellOnline|[spo file checkin](../cmd/spo/file/file-checkin.md)
 Set-PnPFileCheckedOut|SharePointPnPPowerShellOnline|[spo file checkout](../cmd/spo/file/file-checkout.md)
 Set-PnPGroup|SharePointPnPPowerShellOnline|
