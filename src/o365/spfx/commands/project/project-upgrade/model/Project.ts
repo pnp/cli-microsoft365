@@ -14,6 +14,7 @@ export interface Project {
   tsConfigJson?: TsConfigJson;
   tsFiles?: TsFile[];
   tsLintJson?: TsLintJson;
+  tsLintJsonRoot?: TsLintJson;
   vsCode?: VsCode;
   writeManifestsJson?: WriteManifestsJson;
   yoRcJson?: YoRcJson;

@@ -5,7 +5,7 @@ import { Project } from "../model";
 import { Finding } from "../Finding";
 
 export abstract class FileAddRemoveRule extends Rule {
-  constructor(private filePath: string, private add: boolean, private contents?: string) {
+  constructor(protected filePath: string, protected add: boolean, private contents?: string) {
     super();
   }
 

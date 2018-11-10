@@ -4,8 +4,15 @@ export interface Manifest {
   $schema: string;
   componentType: string;
   extensionType?: string;
+  id?: string;
   preconfiguredEntries?: {
+    description?: {
+      default?: string;
+    },
     group?: {
+      default?: string;
+    },
+    title?: {
       default?: string;
     }
   }[];

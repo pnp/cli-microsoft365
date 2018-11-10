@@ -9,7 +9,6 @@ import { FN001012_DEP_microsoft_sp_application_base } from "./rules/FN001012_DEP
 import { FN001014_DEP_microsoft_sp_listview_extensibility } from "./rules/FN001014_DEP_microsoft_sp_listview_extensibility";
 import { FN001013_DEP_microsoft_decorators } from "./rules/FN001013_DEP_microsoft_decorators";
 import { FN010001_YORC_version } from "./rules/FN010001_YORC_version";
-import { FN006003_CFG_PS_skipFeatureDeployment } from "./rules/FN006003_CFG_PS_skipFeatureDeployment";
 import { FN011005_MAN_webpart_defaultGroup } from "./rules/FN011005_MAN_webpart_defaultGroup";
 
 module.exports = [
@@ -23,7 +22,6 @@ module.exports = [
   new FN002001_DEVDEP_microsoft_sp_build_web('1.3.0'),
   new FN002002_DEVDEP_microsoft_sp_module_interfaces('1.3.0'),
   new FN002003_DEVDEP_microsoft_sp_webpart_workbench('1.3.0'),
-  new FN006003_CFG_PS_skipFeatureDeployment('string'),
   new FN010001_YORC_version('1.3.0'),
   new FN011005_MAN_webpart_defaultGroup('Under Development', 'Other')
 ];
