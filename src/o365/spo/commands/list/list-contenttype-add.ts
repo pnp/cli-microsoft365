@@ -119,11 +119,11 @@ class SpoListContentTypeAddCommand extends SpoCommand {
       },
       {
         option: '-l, --listId [listId]',
-        description: 'ID of the list for which to list configured content types, specify listId or listTitle but not both'
+        description: 'ID of the list to which to add the content type, specify listId or listTitle but not both'
       },
       {
         option: '-t, --listTitle [listTitle]',
-        description: 'Title of the list for which to list configured content types, specify listId or listTitle but not both'
+        description: 'Title of the list to which to add the content type, specify listId or listTitle but not both'
       },
       {
         option: '-c, --contentTypeId <contentTypeId>',

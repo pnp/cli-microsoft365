@@ -14,8 +14,8 @@ Option|Description
 ------|-----------
 `--help`|output usage information
 `-u, --webUrl <webUrl>`|URL of the site where the list is located
-`-l, --listId [listId]`|ID of the list for which to list configured content types, specify `listId` or `listTitle` but not both
-`-t, --listTitle [listTitle]`|Title of the list for which to list configured content types, specify `listId` or `listTitle` but not both
+`-l, --listId [listId]`|ID of the list to which to add the content type, specify `listId` or `listTitle` but not both
+`-t, --listTitle [listTitle]`|Title of the list to which to add the content type, specify `listId` or `listTitle` but not both
 `-c, --contentTypeId <contentTypeId>`|ID of the content type to add to the list
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging

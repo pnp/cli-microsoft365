@@ -93,7 +93,14 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents' } }, (err?: any) => {
+    cmdInstance.action({
+      options: {
+        debug: false,
+        listTitle: 'Documents',
+        webUrl: 'https://contoso.sharepoint.com/sites/ninja',
+        contentTypeId: '0x0120'
+      }
+    }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
         done();
