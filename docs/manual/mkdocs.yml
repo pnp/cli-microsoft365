@@ -45,6 +45,7 @@ nav:
       - field:
         - field add: 'cmd/spo/field/field-add.md'
         - field get: 'cmd/spo/field/field-get.md'
+        - field set: 'cmd/spo/field/field-set.md'
       - file:
         - file checkin: 'cmd/spo/file/file-checkin.md'
         - file checkout: 'cmd/spo/file/file-checkout.md'
@@ -80,8 +81,10 @@ nav:
         - list list: 'cmd/spo/list/list-list.md'
         - list remove: 'cmd/spo/list/list-remove.md'
         - list set: 'cmd/spo/list/list-set.md'
+        - list view set: 'cmd/spo/list/list-view-set.md'
         - list webhook get: 'cmd/spo/list/list-webhook-get.md'
         - list webhook list: 'cmd/spo/list/list-webhook-list.md'
+        - list webhook remove: 'cmd/spo/list/list-webhook-remove.md'
       - listitem:
         - listitem add: 'cmd/spo/listitem/listitem-add.md'
         - listitem get: 'cmd/spo/listitem/listitem-get.md'
@@ -114,6 +117,7 @@ nav:
       - search:
         - search: 'cmd/spo/search/search.md'
       - serviceprincipal:
+        - serviceprincipal grant add: 'cmd/spo/serviceprincipal/serviceprincipal-grant-add.md'
         - serviceprincipal grant list: 'cmd/spo/serviceprincipal/serviceprincipal-grant-list.md'
         - serviceprincipal grant revoke: 'cmd/spo/serviceprincipal/serviceprincipal-grant-revoke.md'
         - serviceprincipal permissionrequest approve: 'cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-approve.md'
@@ -207,9 +211,11 @@ nav:
         - siteclassification disable: 'cmd/graph/siteclassification/siteclassification-disable.md'
         - siteclassification enable: 'cmd/graph/siteclassification/siteclassification-enable.md'
         - siteclassification get: 'cmd/graph/siteclassification/siteclassification-get.md'
+        - siteclassification set: 'cmd/graph/siteclassification/siteclassification-set.md'
       - teams:
         - teams list: 'cmd/graph/teams/teams-list.md'
         - teams channel add: 'cmd/graph/teams/teams-channel-add.md'
+        - teams channel message get: 'cmd/graph/teams/teams-channel-message-get.md'
       - user:
         - user get: 'cmd/graph/user/user-get.md'
         - user list: 'cmd/graph/user/user-list.md'
