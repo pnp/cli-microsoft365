@@ -61,6 +61,7 @@ export default {
   LIST_ADD: `${prefix} list add`,
   LIST_CONTENTTYPE_ADD: `${prefix} list contenttype add`,
   LIST_CONTENTTYPE_LIST: `${prefix} list contenttype list`,
+  LIST_CONTENTTYPE_REMOVE: `${prefix} list contenttype remove`,
   LIST_GET: `${prefix} list get`,
   LIST_LIST: `${prefix} list list`,
   LIST_REMOVE: `${prefix} list remove`,
