@@ -44,6 +44,7 @@ interface Options extends GlobalOptions {
   processBestBets?:boolean;
   enableQueryRules?:boolean;
   processPersonalFavorites?:boolean;
+  rawOutput?:boolean;
 }
 
 class SearchCommand extends SpoCommand {
@@ -79,6 +80,7 @@ class SearchCommand extends SpoCommand {
     telemetryProps.processBestBets = args.options.processBestBets;
     telemetryProps.enableQueryRules = args.options.enableQueryRules;
     telemetryProps.processPersonalFavorites = args.options.processPersonalFavorites;
+    telemetryProps.rawOutput = args.options.rawOutput;
     return telemetryProps;
   }
 
@@ -320,6 +322,10 @@ class SearchCommand extends SpoCommand {
       {
         option: '--processPersonalFavorites',
         description: 'Set, to return personal favorites with the search results.'
+      },
+      {
+        option: '--rawOutput',
+        description: 'Set, to return the unparsed, raw results of the REST call to the search api.'
       }
     ];
 
@@ -355,11 +361,12 @@ class SearchCommand extends SpoCommand {
   }
 
   private printResults(cmd:CommandInstance,args:CommandArgs,results:SearchResult[]) {
-    //if(args.options.output === 'rawResults') {
-    //  if(results.length == 1) { cmd.log(results[0]); }
-    //  else { cmd.log(results); }
-    // }     
-    cmd.log(this.getParsedOutput(args,results));
+    if(args.options.rawOutput) {
+      cmd.log(results);
+    }     
+    else {
+      cmd.log(this.getParsedOutput(args,results));
+    }
 
     if(!args.options.output || args.options.output == 'text') {
       cmd.log("# Rows: "+results[results.length-1].PrimaryQueryResult.RelevantResults.TotalRows);
