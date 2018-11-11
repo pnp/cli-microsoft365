@@ -59,6 +59,7 @@ export default {
   HUBSITE_THEME_SYNC: `${prefix} hubsite theme sync`,
   HUBSITE_UNREGISTER: `${prefix} hubsite unregister`,
   LIST_ADD: `${prefix} list add`,
+  LIST_CONTENTTYPE_ADD: `${prefix} list contenttype add`,
   LIST_CONTENTTYPE_LIST: `${prefix} list contenttype list`,
   LIST_GET: `${prefix} list get`,
   LIST_LIST: `${prefix} list list`,

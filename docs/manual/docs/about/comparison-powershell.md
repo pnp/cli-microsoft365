@@ -152,7 +152,7 @@ Add-PnPClientSideText|SharePointPnPPowerShellOnline|
 Add-PnPClientSideWebPart|SharePointPnPPowerShellOnline|[spo page clientsidewebpart add](../cmd/spo/page/page-clientsidewebpart-add.md)
 Add-PnPContentType|SharePointPnPPowerShellOnline|[spo contenttype add](../cmd/spo/contenttype/contenttype-add.md)
 Add-PnPContentTypeToDocumentSet|SharePointPnPPowerShellOnline|
-Add-PnPContentTypeToList|SharePointPnPPowerShellOnline|
+Add-PnPContentTypeToList|SharePointPnPPowerShellOnline|[spo list contenttype add](../cmd/spo/list/list-contenttype-add.md)
 Add-PnPCustomAction|SharePointPnPPowerShellOnline|[spo customaction add](../cmd/spo/customaction/customaction-add.md)
 Add-PnPDataRowsToProvisioningTemplate|SharePointPnPPowerShellOnline|
 Add-PnPDocumentSet|SharePointPnPPowerShellOnline|
