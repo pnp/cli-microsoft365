@@ -212,7 +212,7 @@ describe(commands.SEARCH, () => {
       let rows = fakeRows;
       if(urlContains(opts,'ROWLIMIT=1')) {
         executedTest = TestID.QueryAll_WithRowLimitTest;
-        return Promise.resolve(getQueryResult([rows[0]]));;
+        return Promise.resolve(getQueryResult([rows[0]]));
       }
       if(urlContains(opts,'SOURCEID=\'6E71030E-5E16-4406-9BFF-9C1829843083\'')) {
         executedTest = TestID.QueryAll_WithSourceIdTest;
@@ -1311,6 +1311,39 @@ describe(commands.SEARCH, () => {
       try {
         assert.equal(returnArrayLength, 4);
         assert.equal(executedTest,TestID.QueryAll_WithProcessPersonalFavoritesTest);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('executes search request with parameter rawOutput', (done) => {
+    stubAuth();
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        output: 'json',
+        debug: true,
+        query: '*',
+        rawOutput: true
+      }
+    }, () => {
+      try {
+        assert.equal(returnArrayLength, 4);
+        assert.equal(executedTest,TestID.QueryAll_NoParameterTest);
         done();
       }
       catch (e) {
