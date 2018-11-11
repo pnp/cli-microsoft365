@@ -36,6 +36,7 @@ Option|Description
 `--processBestBets`|A Boolean value that specifies whether to return best bet results for the query. (Default = false).
 `--enableQueryRules`|A Boolean value that specifies whether to enable query rules for the query. (Default = true).
 `--processPersonalFavorites`|A Boolean value that specifies whether to return personal favorites with the search results.
+`--rawOutput`|Set, to return the unparsed, raw results of the REST call to the search api.
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
