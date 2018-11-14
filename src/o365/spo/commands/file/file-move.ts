@@ -128,7 +128,7 @@ class SpoFileMoveCommand extends SpoCommand {
             exportObjectUris: [sourceAbsoluteUrl],
             destinationUri: this.urlCombine(tenantUrl, args.options.targetUrl),
             options: { 
-              ignoreVersionHistory,
+              "IgnoreVersionHistory":ignoreVersionHistory,
               "IsMoveMode":true,
              }
           },
