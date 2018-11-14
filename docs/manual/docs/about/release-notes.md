@@ -5,7 +5,7 @@
 ### New commands
 
 **SharePoint Online:**
-
+- [spo file move](../cmd/spo/file/file-move.md) - copies a file to another location [#671](https://github.com/pnp/office365-cli/issues/671
 - [spo field set](../cmd/spo/field/field-set.md) - updates existing list or site column [#661](https://github.com/pnp/office365-cli/issues/661)
 - [spo list view set](../cmd/spo/list/list-view-set.md) - updates existing list view [#662](https://github.com/pnp/office365-cli/issues/662)
 - [spo list webhook remove](../cmd/spo/list/list-webhook-remove.md) - removes the specified webhook from the list [#650](https://github.com/pnp/office365-cli/issues/650)
