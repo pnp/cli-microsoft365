@@ -338,7 +338,7 @@ Measure-PnPList|SharePointPnPPowerShellOnline|
 Measure-PnPResponseTime|SharePointPnPPowerShellOnline|
 Measure-PnPWeb|SharePointPnPPowerShellOnline|
 Move-PnPClientSideComponent|SharePointPnPPowerShellOnline|
-Move-PnPFile|SharePointPnPPowerShellOnline|
+Move-PnPFile|SharePointPnPPowerShellOnline|[spo file move](../cmd/spo/file/file-copy.md)
 Move-PnPFolder|SharePointPnPPowerShellOnline|[spo folder move](../cmd/spo/folder/folder-move.md)
 Move-PnPItemProxy|SharePointPnPPowerShellOnline|
 Move-PnPListItemToRecycleBin|SharePointPnPPowerShellOnline|

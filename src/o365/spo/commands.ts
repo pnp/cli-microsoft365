@@ -38,6 +38,7 @@ export default {
   FILE_COPY: `${prefix} file copy`,
   FILE_GET: `${prefix} file get`,
   FILE_LIST: `${prefix} file list`,
+  FILE_MOVE: `${prefix} file move`,
   FILE_REMOVE: `${prefix} file remove`,
   FOLDER_ADD: `${prefix} folder add`,
   FOLDER_COPY: `${prefix} folder copy`,

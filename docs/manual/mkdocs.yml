@@ -53,6 +53,7 @@ nav:
         - file copy: 'cmd/spo/file/file-copy.md'
         - file get: 'cmd/spo/file/file-get.md'
         - file list: 'cmd/spo/file/file-list.md'
+        - file move: 'cmd/spo/file/file-move.md'
         - file remove: 'cmd/spo/file/file-remove.md'
       - folder:
         - folder add: 'cmd/spo/folder/folder-add.md'
