@@ -339,7 +339,7 @@ Measure-PnPResponseTime|SharePointPnPPowerShellOnline|
 Measure-PnPWeb|SharePointPnPPowerShellOnline|
 Move-PnPClientSideComponent|SharePointPnPPowerShellOnline|
 Move-PnPFile|SharePointPnPPowerShellOnline|
-Move-PnPFolder|SharePointPnPPowerShellOnline|
+Move-PnPFolder|SharePointPnPPowerShellOnline|[spo folder move](../cmd/spo/folder/folder-move.md)
 Move-PnPItemProxy|SharePointPnPPowerShellOnline|
 Move-PnPListItemToRecycleBin|SharePointPnPPowerShellOnline|
 Move-PnPRecycleBinItem|SharePointPnPPowerShellOnline|
