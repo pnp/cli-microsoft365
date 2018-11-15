@@ -59,6 +59,7 @@ nav:
         - folder copy: 'cmd/spo/folder/folder-copy.md'
         - folder get: 'cmd/spo/folder/folder-get.md'
         - folder list: 'cmd/spo/folder/folder-list.md'
+        - folder move: 'cmd/spo/folder/folder-move.md'
         - folder remove: 'cmd/spo/folder/folder-remove.md'
         - folder rename: 'cmd/spo/folder/folder-rename.md'
       - hidedefaultthemes:

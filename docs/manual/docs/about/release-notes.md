@@ -1,5 +1,13 @@
 # Release notes
 
+## [v1.12.0](https://github.com/pnp/office365-cli/releases/tag/v1.12.0)
+
+### New commands
+
+**SharePoint Online:**
+
+- [spo folder move](../cmd/spo/folder/folder-move.md) - moves a folder to another location [#672](https://github.com/pnp/office365-cli/issues/672)
+
 ## [v1.11.0](https://github.com/pnp/office365-cli/releases/tag/v1.11.0)
 
 ### New commands

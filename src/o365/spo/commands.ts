@@ -43,6 +43,7 @@ export default {
   FOLDER_COPY: `${prefix} folder copy`,
   FOLDER_GET: `${prefix} folder get`,
   FOLDER_LIST: `${prefix} folder list`,
+  FOLDER_MOVE: `${prefix} folder move`,
   FOLDER_REMOVE: `${prefix} folder remove`,
   FOLDER_RENAME: `${prefix} folder rename`,
   HIDEDEFAULTTHEMES_GET: `${prefix} hidedefaultthemes get`,
