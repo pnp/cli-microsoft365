@@ -128,7 +128,7 @@ export default abstract class SpoCommand extends Command {
     });
   }
 
-  protected ensureFormDigest(cmd: CommandInstance, context: FormDigestInfo): Promise<FormDigestInfo> {
+  public ensureFormDigest(cmd: CommandInstance, context: FormDigestInfo): Promise<FormDigestInfo> {
     return new Promise<FormDigestInfo>((reject: (error: any) => void): void => {
       if (this.isUnexpiredFormDigest(context)) {
 
@@ -159,7 +159,6 @@ export default abstract class SpoCommand extends Command {
         });
     });
   }
-
 
   private isUnexpiredFormDigest(contextinfo: FormDigestInfo): boolean {
     const now: Date = new Date();
