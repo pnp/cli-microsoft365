@@ -49,6 +49,7 @@ class SearchCommand extends SpoCommand {
     const resource: string = Auth.getResourceFromUrl(webUrl);
 
     if (this.debug) {
+      cmd.log("Calling Search API on = " + auth.site.url);
       cmd.log(`Retrieving access token for ${resource}...`);
     }
 
