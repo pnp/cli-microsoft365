@@ -105,6 +105,7 @@ export default {
   SERVICEPRINCIPAL_PERMISSIONREQUEST_DENY: `${prefix} serviceprincipal permissionrequest deny`,
   SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST: `${prefix} serviceprincipal permissionrequest list`,
   SERVICEPRINCIPAL_SET: `${prefix} serviceprincipal set`,
+  SEARCH: `${prefix} search`,
   SITE_ADD: `${prefix} site add`,
   SITE_APPCATALOG_ADD: `${prefix} site appcatalog add`,
   SITE_APPCATALOG_REMOVE: `${prefix} site appcatalog remove`,
