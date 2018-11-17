@@ -477,7 +477,7 @@ Set-PnPWebTheme|SharePointPnPPowerShellOnline|
 Set-PnPWikiPageContent|SharePointPnPPowerShellOnline|
 Start-PnPWorkflowInstance|SharePointPnPPowerShellOnline|
 Stop-PnPWorkflowInstance|SharePointPnPPowerShellOnline|
-Submit-PnPSearchQuery|SharePointPnPPowerShellOnline|
+Submit-PnPSearchQuery|SharePointPnPPowerShellOnline|[spo search](../cmd/spo/search/search.md)
 Test-PnPListItemIsRecord|SharePointPnPPowerShellOnline|
 Test-PnPOffice365GroupAliasIsUsed|SharePointPnPPowerShellOnline|
 Uninstall-PnPApp|SharePointPnPPowerShellOnline|[spo app uninstall](../cmd/spo/app/app-uninstall.md)
