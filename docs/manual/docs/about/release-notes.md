@@ -7,8 +7,13 @@
 **SharePoint Online:**
 
 - [spo field set](../cmd/spo/field/field-set.md) - updates existing list or site column [#661](https://github.com/pnp/office365-cli/issues/661)
+- [spo file add](../cmd/spo/file/file-add.md) - uploads file to the specified folder [#283](https://github.com/pnp/office365-cli/issues/283)
+- [spo list contenttype add](../cmd/spo/list/list-contenttype-add.md) - adds content type to list [#594](https://github.com/pnp/office365-cli/issues/594)
+- [spo list contenttype list](../cmd/spo/list/list-contenttype-list.md) - lists content types configured on the list [#595](https://github.com/pnp/office365-cli/issues/595)
+- [spo list contenttype remove](../cmd/spo/list/list-contenttype-remove.md) - removes content type from list [#668](https://github.com/pnp/office365-cli/issues/668)
 - [spo list view set](../cmd/spo/list/list-view-set.md) - updates existing list view [#662](https://github.com/pnp/office365-cli/issues/662)
 - [spo list webhook remove](../cmd/spo/list/list-webhook-remove.md) - removes the specified webhook from the list [#650](https://github.com/pnp/office365-cli/issues/650)
+- [spo list webhook set](../cmd/spo/list/list-webhook-set.md) - updates the specified webhook [#651](https://github.com/pnp/office365-cli/issues/651)
 - [spo serviceprincipal grant add](../cmd/spo/serviceprincipal/serviceprincipal-grant-add.md) - grants the service principal permission to the specified API [#590](https://github.com/pnp/office365-cli/issues/590)
 
 **Microsoft Graph:**
