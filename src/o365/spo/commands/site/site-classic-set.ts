@@ -76,7 +76,7 @@ class SpoSiteClassicSetCommand extends SpoCommand {
 
         this.accessToken = accessToken;
 
-        return this.ensureFormDigest(cmd, this.currentContext);
+        return this.ensureFormDigest(cmd, this.currentContext, this.debug);
       })
       .then((res: FormDigestInfo): request.RequestPromise | Promise<void> => {
         this.currentContext = res; 
@@ -189,7 +189,7 @@ class SpoSiteClassicSetCommand extends SpoCommand {
         });
       })
       .then((): Promise<FormDigestInfo> => {
-        return this.ensureFormDigest(cmd, this.currentContext);
+        return this.ensureFormDigest(cmd, this.currentContext, this.debug);
       })
       .then((res: FormDigestInfo): Promise<void> => {
         this.currentContext = res; 
@@ -283,7 +283,7 @@ class SpoSiteClassicSetCommand extends SpoCommand {
   private setAdmin(cmd: CommandInstance, siteUrl: string, principal: string): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       this
-        .ensureFormDigest(cmd, this.currentContext)
+        .ensureFormDigest(cmd, this.currentContext, this.debug)
         .then((res: FormDigestInfo): request.RequestPromise => {
           this.currentContext = res; 
           const requestOptions: any = {

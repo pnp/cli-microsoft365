@@ -75,7 +75,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
 
         this.accessToken = accessToken;
 
-        return this.ensureFormDigest(cmd, this.currentContext);
+        return this.ensureFormDigest(cmd, this.currentContext, this.debug);
       })
       .then((res: FormDigestInfo): Promise<boolean> => {
         this.currentContext = res;
@@ -105,7 +105,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
         }
       })
       .then((): Promise<FormDigestInfo> => {
-        return this.ensureFormDigest(cmd, this.currentContext);
+        return this.ensureFormDigest(cmd, this.currentContext, this.debug);
       })
       .then((res: FormDigestInfo): request.RequestPromise => {
         this.currentContext = res;
@@ -186,7 +186,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
   private siteExistsInTheRecycleBin(url: string, accessToken: string, cmd: CommandInstance): Promise<boolean> {
     return new Promise<boolean>((resolve: (exists: boolean) => void, reject: (error: any) => void): void => {
       this
-        .ensureFormDigest(cmd, this.currentContext)
+        .ensureFormDigest(cmd, this.currentContext, this.debug)
         .then((res: FormDigestInfo): request.RequestPromise => {
           this.currentContext = res;
 
@@ -300,7 +300,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
   private deleteSiteFromTheRecycleBin(url: string, wait: boolean, accessToken: string, cmd: CommandInstance): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       this
-        .ensureFormDigest(cmd, this.currentContext)
+        .ensureFormDigest(cmd, this.currentContext, this.debug)
         .then((res: FormDigestInfo): request.RequestPromise => {
           this.currentContext = res;
 

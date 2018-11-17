@@ -128,11 +128,11 @@ export default abstract class SpoCommand extends Command {
     });
   }
 
-  public ensureFormDigest(cmd: CommandInstance, context: FormDigestInfo): Promise<FormDigestInfo> {
+  public ensureFormDigest(cmd: CommandInstance, context: FormDigestInfo, debug: boolean): Promise<FormDigestInfo> {
     return new Promise<FormDigestInfo>((reject: (error: any) => void): void => {
       if (this.isUnexpiredFormDigest(context)) {
 
-        if (this.debug) {
+        if (debug) {
           cmd.log('Existing form digest still valid');
         }
 
@@ -140,9 +140,9 @@ export default abstract class SpoCommand extends Command {
       }
 
       this
-        .getRequestDigest(cmd, this.debug)
+        .getRequestDigest(cmd, debug)
         .then((res: FormDigestInfo): void => {
-          if (this.debug) {
+          if (debug) {
             cmd.log('Response:');
             cmd.log(res);
             cmd.log('');
@@ -173,7 +173,7 @@ export default abstract class SpoCommand extends Command {
 
   protected waitUntilFinished(operationId: string, resolve: () => void, reject: (error: any) => void, accessToken: string, cmd: CommandInstance, currentContext: FormDigestInfo, dots?: string, timeout?: NodeJS.Timer): void {
     this
-      .ensureFormDigest(cmd, currentContext)
+      .ensureFormDigest(cmd, currentContext, this.debug)
       .then((res: FormDigestInfo): request.RequestPromise => {
         currentContext = res;
 

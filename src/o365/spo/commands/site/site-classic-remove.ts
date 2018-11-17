@@ -63,7 +63,7 @@ class SpoSiteClassicRemoveCommand extends SpoCommand {
 
           this.accessToken = accessToken;
 
-          return this.ensureFormDigest(cmd, this.currentContext);
+          return this.ensureFormDigest(cmd, this.currentContext, this.debug);
         })
         .then((res: FormDigestInfo): Promise<void> => {
           this.currentContext = res;
@@ -134,7 +134,7 @@ class SpoSiteClassicRemoveCommand extends SpoCommand {
   private deleteSite(url: string, wait: boolean, accessToken: string, cmd: CommandInstance): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       this
-        .ensureFormDigest(cmd, this.currentContext)
+        .ensureFormDigest(cmd, this.currentContext, this.debug)
         .then((res: FormDigestInfo): request.RequestPromise => {
           this.currentContext = res;
 
@@ -190,7 +190,7 @@ class SpoSiteClassicRemoveCommand extends SpoCommand {
   private deleteSiteFromTheRecycleBin(url: string, wait: boolean, accessToken: string, cmd: CommandInstance): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       this
-        .ensureFormDigest(cmd, this.currentContext)
+        .ensureFormDigest(cmd, this.currentContext, this.debug)
         .then((res: FormDigestInfo): request.RequestPromise => {
           this.currentContext = res;
           if (this.verbose) {
