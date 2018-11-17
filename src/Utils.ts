@@ -65,11 +65,6 @@ export default class Utils {
     return guidRegEx.test(guid);
   }
 
-  public static isRegExMatch(stringValue:string,regExString:string) {
-    const regEx:RegExp = new RegExp(regExString,"gi");
-    return regEx.test(stringValue);
-  }
-
   public static isValidBoolean(value: string): boolean {
     return value.toLowerCase() === 'true' || value.toLowerCase() === 'false'
   }
