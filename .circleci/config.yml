@@ -1,7 +1,7 @@
 defaults: &defaults
   working_directory: ~/office365-cli
   docker:
-    - image: circleci/node:8.11.2
+    - image: circleci/node:8.12.0
 
 version: 2
 jobs:
@@ -15,7 +15,7 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}
       - run:
           name: Restore dependencies
-          command: npm i
+          command: npm ci
       - save_cache:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:
