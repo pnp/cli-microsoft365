@@ -18,6 +18,7 @@ Option|Description
 `-t, --targetUrl <targetUrl>`|Server-relative URL where to move the file
 `--deleteIfAlreadyExists`|If a file already exists at the targetUrl, it will be moved to the recycle bin. If omitted, the move operation will be canceled if the file already exists at the targetUrl location
 `--ignoreVersionHistory`|Ignores version history of the file and will only move the main version
+`--allowSchemaMismatch`|Ignores any missing fields in the target destination and moves the file anyway
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
@@ -51,9 +52,18 @@ Move file to a document library in another site collection. If a file with the s
 spo file move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --deleteIfAlreadyExists
 ```
 
+Move file to a document library in another site collection. Ignores version history of the file and will only move the main version
+
 ```sh
 spo file move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --ignoreVersionHistory
 ```
+
+Move file to a document library in another site collection. Allow for schema mismatch
+
+ ```sh
+spo file move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
+```
+
 
 ## More information
 

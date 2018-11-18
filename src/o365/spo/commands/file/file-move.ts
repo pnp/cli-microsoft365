@@ -25,6 +25,7 @@ interface Options extends GlobalOptions {
   targetUrl: string;
   deleteIfAlreadyExists?: boolean;
   ignoreVersionHistory?: boolean;
+  allowSchemaMismatch: boolean;
 }
 
 interface JobProgressOptions {
@@ -116,8 +117,9 @@ class SpoFileMoveCommand extends SpoCommand {
 
         // all preconditions met, now create copy job
         const sourceAbsoluteUrl = this.urlCombine(webUrl, args.options.sourceUrl);
-        const requestUrl: string = `${webUrl}/_api/site/CreateCopyJobs`;
         const ignoreVersionHistory: boolean = args.options.ignoreVersionHistory || true;
+        const allowSchemaMismatch: boolean = args.options.allowSchemaMismatch || false;
+        const requestUrl: string = `${webUrl}/_api/site/CreateCopyJobs`;
         const requestOptions: any = {
           url: requestUrl,
           headers: Utils.getRequestHeaders({
@@ -128,6 +130,7 @@ class SpoFileMoveCommand extends SpoCommand {
             exportObjectUris: [sourceAbsoluteUrl],
             destinationUri: this.urlCombine(tenantUrl, args.options.targetUrl),
             options: { 
+              "AllowSchemaMismatch": allowSchemaMismatch,
               "IgnoreVersionHistory":ignoreVersionHistory,
               "IsMoveMode":true,
              }
@@ -388,6 +391,10 @@ class SpoFileMoveCommand extends SpoCommand {
       {
         option: '--ignoreVersionHistory',
         description: 'Ignores version history of the file and will only move the main version' 
+      },
+      {
+        option: '--allowSchemaMismatch',
+        description: 'Ignores any missing fields in the target and moves folder'
       }
     ];
 
@@ -449,6 +456,9 @@ class SpoFileMoveCommand extends SpoCommand {
     Move file to a document library in another site collection. Will ignore the version history of the file when moved and only create the main version of the file
         ${chalk.grey(config.delimiter)} ${commands.FILE_MOVE} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --ignoreVersionHistory
 
+    Moves folder to a document library in another site collection. Will ignore any missing fields in the target destination and move anyway
+      ${chalk.grey(config.delimiter)} ${commands.FILE_MOVE} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFOlder --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
+   
   More information:
 
     Move items from a SharePoint document library
