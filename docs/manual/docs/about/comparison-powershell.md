@@ -152,7 +152,7 @@ Add-PnPClientSideText|SharePointPnPPowerShellOnline|
 Add-PnPClientSideWebPart|SharePointPnPPowerShellOnline|[spo page clientsidewebpart add](../cmd/spo/page/page-clientsidewebpart-add.md)
 Add-PnPContentType|SharePointPnPPowerShellOnline|[spo contenttype add](../cmd/spo/contenttype/contenttype-add.md)
 Add-PnPContentTypeToDocumentSet|SharePointPnPPowerShellOnline|
-Add-PnPContentTypeToList|SharePointPnPPowerShellOnline|
+Add-PnPContentTypeToList|SharePointPnPPowerShellOnline|[spo list contenttype add](../cmd/spo/list/list-contenttype-add.md)
 Add-PnPCustomAction|SharePointPnPPowerShellOnline|[spo customaction add](../cmd/spo/customaction/customaction-add.md)
 Add-PnPDataRowsToProvisioningTemplate|SharePointPnPPowerShellOnline|
 Add-PnPDocumentSet|SharePointPnPPowerShellOnline|
@@ -160,7 +160,7 @@ Add-PnPEventReceiver|SharePointPnPPowerShellOnline|
 Add-PnPField|SharePointPnPPowerShellOnline|
 Add-PnPFieldFromXml|SharePointPnPPowerShellOnline|[spo field add](../cmd/spo/field/field-add.md)
 Add-PnPFieldToContentType|SharePointPnPPowerShellOnline|[spo contenttype field set](../cmd/spo/contenttype/contenttype-field-set.md)
-Add-PnPFile|SharePointPnPPowerShellOnline|
+Add-PnPFile|SharePointPnPPowerShellOnline|[spo file add](../cmd/spo/file/file-add.md)
 Add-PnPFileToProvisioningTemplate|SharePointPnPPowerShellOnline|
 Add-PnPFolder|SharePointPnPPowerShellOnline|[spo folder add](../cmd/spo/folder/folder-add.md)
 Add-PnPHtmlPublishingPageLayout|SharePointPnPPowerShellOnline|
@@ -234,7 +234,7 @@ Get-PnPAzureCertificate|SharePointPnPPowerShellOnline|
 Get-PnPClientSideComponent|SharePointPnPPowerShellOnline|
 Get-PnPClientSidePage|SharePointPnPPowerShellOnline|[spo page get](../cmd/spo/page/page-get.md), [spo page control list](../cmd/spo/page/page-control-list.md), [spo page control get](../cmd/spo/page/page-control-get.md), [spo page section get](../cmd/spo/page/page-section-get.md), [spo page section list](../cmd/spo/page/page-section-list.md), [spo page column get](../cmd/spo/page/page-column-get.md), [spo page column list](../cmd/spo/page/page-column-list.md)
 Get-PnPConnection|SharePointPnPPowerShellOnline|
-Get-PnPContentType|SharePointPnPPowerShellOnline|[spo contenttype get](../cmd/spo/contenttype/contenttype-get.md)
+Get-PnPContentType|SharePointPnPPowerShellOnline|[spo contenttype get](../cmd/spo/contenttype/contenttype-get.md), [spo list contenttype list](../cmd/spo/list/list-contenttype-list.md)
 Get-PnPContentTypePublishingHubUrl|SharePointPnPPowerShellOnline|
 Get-PnPContext|SharePointPnPPowerShellOnline|
 Get-PnPCustomAction|SharePointPnPPowerShellOnline|[spo customaction get](../cmd/spo/customaction/customaction-get.md), [spo customaction list](../cmd/spo/customaction/customaction-list.md)
@@ -367,7 +367,7 @@ Remove-PnPClientSideComponent|SharePointPnPPowerShellOnline|
 Remove-PnPClientSidePage|SharePointPnPPowerShellOnline|[spo page remove](../cmd/spo/page/page-remove.md)
 Remove-PnPContentType|SharePointPnPPowerShellOnline|
 Remove-PnPContentTypeFromDocumentSet|SharePointPnPPowerShellOnline|
-Remove-PnPContentTypeFromList|SharePointPnPPowerShellOnline|
+Remove-PnPContentTypeFromList|SharePointPnPPowerShellOnline|[spo list contenttype remove](../cmd/spo/list/list-contenttype-remove.md)
 Remove-PnPCustomAction|SharePointPnPPowerShellOnline|[spo customaction remove](../cmd/spo/customaction/customaction-remove.md)
 Remove-PnPEventReceiver|SharePointPnPPowerShellOnline|
 Remove-PnPField|SharePointPnPPowerShellOnline|
@@ -470,7 +470,7 @@ Set-PnPUnifiedGroup|SharePointPnPPowerShellOnline|[graph o365group set](../cmd/g
 Set-PnPUserProfileProperty|SharePointPnPPowerShellOnline|
 Set-PnPView|SharePointPnPPowerShellOnline|[spo list view set](../cmd/spo/list/list-view-set.md)
 Set-PnPWeb|SharePointPnPPowerShellOnline|[spo web set](../cmd/spo/web/web-set.md)
-Set-PnPWebhookSubscription|SharePointPnPPowerShellOnline|
+Set-PnPWebhookSubscription|SharePointPnPPowerShellOnline|[spo list webhook set](../cmd/spo/list/list-webhook-set.md)
 Set-PnPWebPartProperty|SharePointPnPPowerShellOnline|
 Set-PnPWebPermission|SharePointPnPPowerShellOnline|
 Set-PnPWebTheme|SharePointPnPPowerShellOnline|

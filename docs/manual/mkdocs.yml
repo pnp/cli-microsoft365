@@ -47,6 +47,7 @@ nav:
         - field get: 'cmd/spo/field/field-get.md'
         - field set: 'cmd/spo/field/field-set.md'
       - file:
+        - file add: 'cmd/spo/file/file-add.md'
         - file checkin: 'cmd/spo/file/file-checkin.md'
         - file checkout: 'cmd/spo/file/file-checkout.md'
         - file copy: 'cmd/spo/file/file-copy.md'
@@ -81,10 +82,14 @@ nav:
         - list list: 'cmd/spo/list/list-list.md'
         - list remove: 'cmd/spo/list/list-remove.md'
         - list set: 'cmd/spo/list/list-set.md'
+        - list contenttype add: 'cmd/spo/list/list-contenttype-add.md'
+        - list contenttype list: 'cmd/spo/list/list-contenttype-list.md'
+        - list contenttype remove: 'cmd/spo/list/list-contenttype-remove.md'
         - list view set: 'cmd/spo/list/list-view-set.md'
         - list webhook get: 'cmd/spo/list/list-webhook-get.md'
         - list webhook list: 'cmd/spo/list/list-webhook-list.md'
         - list webhook remove: 'cmd/spo/list/list-webhook-remove.md'
+        - list webhook set: 'cmd/spo/list/list-webhook-set.md'
       - listitem:
         - listitem add: 'cmd/spo/listitem/listitem-add.md'
         - listitem get: 'cmd/spo/listitem/listitem-get.md'
