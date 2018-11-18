@@ -12,6 +12,7 @@ spo folder move [options]
 `-s, --sourceUrl <sourceUrl>`|Site-relative URL of the folder to move
 `-t, --targetUrl <targetUrl>`|Server-relative URL where to move the folder
 `--ignoreVersionHistory`|Ignores version history of the folder and will only move the main version
+`--allowSchemaMismatch`|Ignores any missing fields in the target destination and moves the folder anyway
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
@@ -32,6 +33,10 @@ spo folder move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl 
  Move folder to a document library in another site collection. Ignore the version history and only move main version
  ```sh
 spo file move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --ignoreVersionHistory
+```
+Move folder to a document library in another site collection. Allow for schema mismatch
+ ```sh
+spo file move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
 ```
  ## More information
  - Move items from a SharePoint document library: [https://support.office.com/en-us/article/move-or-copy-items-from-a-sharepoint-document-library-00e2f483-4df3-46be-a861-1f5f0c1a87bc](https://support.office.com/en-us/article/move-or-copy-items-from-a-sharepoint-document-library-00e2f483-4df3-46be-a861-1f5f0c1a87bc)

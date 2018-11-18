@@ -23,6 +23,7 @@ interface Options extends GlobalOptions {
   sourceUrl: string;
   targetUrl: string;
   ignoreVersionHistory: boolean;
+  allowSchemaMismatch: boolean;
 }
 
 interface JobProgressOptions {
@@ -78,8 +79,9 @@ class SpoFolderMoveCommand extends SpoCommand {
         siteAccessToken = accessToken;
 
         const sourceAbsoluteUrl: string = this.urlCombine(webUrl, args.options.sourceUrl);
-        const requestUrl: string = `${webUrl}/_api/site/CreateCopyJobs`;
         const ignoreVersionHistory: boolean = args.options.ignoreVersionHistory || true;
+        const allowSchemaMismatch: boolean = args.options.allowSchemaMismatch || false;
+        const requestUrl: string = `${webUrl}/_api/site/CreateCopyJobs`;
         const requestOptions: any = {
           url: requestUrl,
           headers: Utils.getRequestHeaders({
@@ -91,6 +93,7 @@ class SpoFolderMoveCommand extends SpoCommand {
             destinationUri: this.urlCombine(tenantUrl, args.options.targetUrl),
             options: { 
               "IgnoreVersionHistory": ignoreVersionHistory,
+              "AllowSchemaMismatch": allowSchemaMismatch,
               "IsMoveMode":true, 
             }
           },
@@ -260,6 +263,10 @@ class SpoFolderMoveCommand extends SpoCommand {
       {
         option: '--ignoreVersionHistory',
         description: 'Ignores version history in the folder and will only move the main version'
+      },
+      {
+        option: '--allowSchemaMismatch',
+        description: 'Ignores any missing fields in the target and moves folder'
       }
     ];
 
@@ -318,6 +325,9 @@ class SpoFolderMoveCommand extends SpoCommand {
     
     Moves folder to a document library in another site collection. Will ignore the version history when moved and only create the main version of the file
       ${chalk.grey(config.delimiter)} ${commands.FOLDER_MOVE} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFOlder --targetUrl /sites/test2/Shared%20Documents/ --ignoreVersionHistory
+    
+    Moves folder to a document library in another site collection. Will ignore any missing fields in the target destination and move anyway
+      ${chalk.grey(config.delimiter)} ${commands.FOLDER_MOVE} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFOlder --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
 
   More information:
 
