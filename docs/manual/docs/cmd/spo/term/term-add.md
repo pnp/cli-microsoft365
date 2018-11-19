@@ -20,6 +20,7 @@ Option|Description
 `--termGroupName [termGroupName]`|Name of the term group to which the term set belongs. Specify `termGroupId` or `termGroupName` but not both
 `-i, --id [id]`|ID of the term to add
 `-d, --description [description]`|Description of the term to add
+`--parentTermId [parentTermId]`|ID of the term below which the term should be added
 `--customProperties [customProperties]`|JSON string with key-value pairs representing custom properties to set on the term
 `--localCustomProperties [localCustomProperties]`|JSON string with key-value pairs representing local custom properties to set on the term
 `-o, --output [output]`|Output type. `json|text`. Default `text`
@@ -57,4 +58,10 @@ Add taxonomy term with custom properties
 
 ```sh
 spo term add --name IT --termSetName Department --termGroupName People --customProperties '{"Property": "Value"}'
+```
+
+Add taxonomy term below the specified term
+
+```sh
+spo term add --name IT --parentTermId 5c928151-c140-4d48-aab9-54da901c7fef --termGroupName People
 ```
