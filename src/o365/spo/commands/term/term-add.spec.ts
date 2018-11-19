@@ -170,6 +170,31 @@ describe(commands.TERM_ADD, () => {
     });
   });
 
+  it('adds term with the specified name and id below the specified term', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
+        if (opts.body.indexOf(`<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><ObjectIdentityQuery Id="5" ObjectPathId="3" /><ObjectPath Id="7" ObjectPathId="6" /><ObjectIdentityQuery Id="8" ObjectPathId="6" /><ObjectPath Id="10" ObjectPathId="9" /><ObjectPath Id="12" ObjectPathId="11" /><ObjectIdentityQuery Id="13" ObjectPathId="11" /><ObjectPath Id="15" ObjectPathId="14" /><ObjectPath Id="17" ObjectPathId="16" /><ObjectIdentityQuery Id="18" ObjectPathId="16" /><ObjectPath Id="20" ObjectPathId="19" /><ObjectIdentityQuery Id="21" ObjectPathId="19" /><Query Id="22" ObjectPathId="19"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><StaticMethod Id="3" Name="GetTaxonomySession" TypeId="{981cbc68-9edc-4f8d-872f-71146fcbb84f}" /><Method Id="6" ParentId="3" Name="GetDefaultSiteCollectionTermStore" /><Property Id="9" ParentId="6" Name="Groups" /><Method Id="11" ParentId="9" Name="GetById"><Parameters><Parameter Type="Guid">{5c928151-c140-4d48-aab9-54da901c7fef}</Parameter></Parameters></Method><Property Id="14" ParentId="11" Name="TermSets" /><Method Id="16" ParentId="6" Name="GetTerm"><Parameters><Parameter Type="Guid">{8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f}</Parameter></Parameters></Method><Method Id="19" ParentId="16" Name="CreateTerm"><Parameters><Parameter Type="String">IT</Parameter><Parameter Type="Int32">1033</Parameter><Parameter Type="Guid">{47fdacfe-ff64-4a05-b611-e84e767f04de}</Parameter></Parameters></Method></ObjectPaths></Request>`) > -1) {
+          return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8210.1205", "ErrorInfo": null, "TraceCorrelationId": "d7f59a9e-a0f5-0000-37ae-17ef5f03c2e6" }, 4, { "IsNull": false }, 5, { "_ObjectIdentity_": "d7f59a9e-a0f5-0000-37ae-17ef5f03c2e6|fec14c62-7c3b-481b-851b-c80d7802b224:ss:" }, 7, { "IsNull": false }, 8, { "_ObjectIdentity_": "d7f59a9e-a0f5-0000-37ae-17ef5f03c2e6|fec14c62-7c3b-481b-851b-c80d7802b224:st:MvRe/3xHkEqrmEXxmJ7Lxw==" }, 10, { "IsNull": false }, 12, { "IsNull": false }, 13, { "_ObjectIdentity_": "d7f59a9e-a0f5-0000-37ae-17ef5f03c2e6|fec14c62-7c3b-481b-851b-c80d7802b224:gr:MvRe/3xHkEqrmEXxmJ7Lx1GBklxAwUhNqrlU2pAcf+8=" }, 15, { "IsNull": false }, 17, { "IsNull": false }, 18, { "_ObjectIdentity_": "d7f59a9e-a0f5-0000-37ae-17ef5f03c2e6|fec14c62-7c3b-481b-851b-c80d7802b224:se:MvRe/3xHkEqrmEXxmJ7Lx1GBklxAwUhNqrlU2pAcf+/qydiOUnAdTKTXucEL/+pv" }, 20, { "IsNull": false }, 21, { "_ObjectIdentity_": "d7f59a9e-a0f5-0000-37ae-17ef5f03c2e6|fec14c62-7c3b-481b-851b-c80d7802b224:te:MvRe/3xHkEqrmEXxmJ7Lx1GBklxAwUhNqrlU2pAcf+/qydiOUnAdTKTXucEL/+pv/qz9R2T/BUq2EehOdn8E3g==" }, 22, { "_ObjectType_": "SP.Taxonomy.Term", "_ObjectIdentity_": "d7f59a9e-a0f5-0000-37ae-17ef5f03c2e6|fec14c62-7c3b-481b-851b-c80d7802b224:te:MvRe/3xHkEqrmEXxmJ7Lx1GBklxAwUhNqrlU2pAcf+/qydiOUnAdTKTXucEL/+pv/qz9R2T/BUq2EehOdn8E3g==", "CreatedDate": "/Date(1540235503669)/", "Id": "/Guid(47fdacfe-ff64-4a05-b611-e84e767f04de)/", "LastModifiedDate": "/Date(1540235503669)/", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }]));
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, name: 'IT', id: '47fdacfe-ff64-4a05-b611-e84e767f04de', parentTermId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef' } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith({ "CreatedDate": "2018-10-22T19:11:43.669Z", "Id": "47fdacfe-ff64-4a05-b611-e84e767f04de", "LastModifiedDate": "2018-10-22T19:11:43.669Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('adds term with description', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
@@ -755,6 +780,21 @@ describe(commands.TERM_ADD, () => {
     assert.notEqual(actual, true);
   });
 
+  it('fails validation if both parentTermId and termSetName specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { name: 'IT', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27', parentTermId: '9e54299e-208a-4000-8546-cc4139091b28', termSetName: 'Department' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation if both parentTermId and termSetId specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { name: 'IT', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27', parentTermId: '9e54299e-208a-4000-8546-cc4139091b28', termSetId: '9e54299e-208a-4000-8546-cc4139091b29' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation if both parentTermId is not a valid GUID', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { name: 'IT', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27', parentTermId: 'invalid' } });
+    assert.notEqual(actual, true);
+  });
+
   it('fails validation if termSetId is not a valid GUID', () => {
     const actual = (command.validate() as CommandValidate)({ options: { name: 'IT', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27', termSetId: 'invalid' } });
     assert.notEqual(actual, true);
@@ -777,6 +817,11 @@ describe(commands.TERM_ADD, () => {
 
   it('passes validation when id, termSetName and termGroupName specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { name: 'IT', id: '9e54299e-208a-4000-8546-cc4139091b26', termGroupName: 'People', termSetName: 'Department' } });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation when id, parentTermId and termGroupName specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { name: 'IT', id: '9e54299e-208a-4000-8546-cc4139091b26', termGroupName: 'People', parentTermId: '9e54299e-208a-4000-8546-cc4139091b26' } });
     assert.equal(actual, true);
   });
 
