@@ -4,6 +4,7 @@ export interface YoRcJson {
     environment?: string;
     framework?: string;
     isCreatingSolution?: boolean;
+    isDomainIsolated?: boolean;
     packageManager?: string;
     version?: string;
   }

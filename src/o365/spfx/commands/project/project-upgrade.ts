@@ -45,7 +45,8 @@ class SpfxProjectUpgradeCommand extends Command {
     '1.4.1',
     '1.5.0',
     '1.5.1',
-    '1.6.0'
+    '1.6.0',
+    '1.7.0'
   ];
 
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
@@ -235,6 +236,14 @@ class SpfxProjectUpgradeCommand extends Command {
     if (fs.existsSync(tsLintJsonPath)) {
       try {
         project.tsLintJson = JSON.parse(Utils.removeSingleLineComments(fs.readFileSync(tsLintJsonPath, 'utf-8')));
+      }
+      catch { }
+    }
+
+    const tsLintJsonRootPath: string = path.join(projectRootPath, 'tslint.json');
+    if (fs.existsSync(tsLintJsonRootPath)) {
+      try {
+        project.tsLintJsonRoot = JSON.parse(Utils.removeSingleLineComments(fs.readFileSync(tsLintJsonRootPath, 'utf-8')));
       }
       catch { }
     }
@@ -580,7 +589,7 @@ ${f.resolution}
     The ${this.name} command helps you upgrade your SharePoint Framework
     project to the specified version. If no version is specified, the command
     will upgrade to the latest version of the SharePoint Framework it supports
-    (v1.6.0).
+    (v1.7.0).
 
     This command doesn't change your project files. Instead, it gives you
     a report with all steps necessary to upgrade your project to the specified

@@ -45,7 +45,9 @@ nav:
       - field:
         - field add: 'cmd/spo/field/field-add.md'
         - field get: 'cmd/spo/field/field-get.md'
+        - field set: 'cmd/spo/field/field-set.md'
       - file:
+        - file add: 'cmd/spo/file/file-add.md'
         - file checkin: 'cmd/spo/file/file-checkin.md'
         - file checkout: 'cmd/spo/file/file-checkout.md'
         - file copy: 'cmd/spo/file/file-copy.md'
@@ -80,8 +82,14 @@ nav:
         - list list: 'cmd/spo/list/list-list.md'
         - list remove: 'cmd/spo/list/list-remove.md'
         - list set: 'cmd/spo/list/list-set.md'
+        - list contenttype add: 'cmd/spo/list/list-contenttype-add.md'
+        - list contenttype list: 'cmd/spo/list/list-contenttype-list.md'
+        - list contenttype remove: 'cmd/spo/list/list-contenttype-remove.md'
+        - list view set: 'cmd/spo/list/list-view-set.md'
         - list webhook get: 'cmd/spo/list/list-webhook-get.md'
         - list webhook list: 'cmd/spo/list/list-webhook-list.md'
+        - list webhook remove: 'cmd/spo/list/list-webhook-remove.md'
+        - list webhook set: 'cmd/spo/list/list-webhook-set.md'
       - listitem:
         - listitem add: 'cmd/spo/listitem/listitem-add.md'
         - listitem get: 'cmd/spo/listitem/listitem-get.md'
@@ -112,6 +120,7 @@ nav:
         - propertybag remove: 'cmd/spo/propertybag/propertybag-remove.md'
         - propertybag set: 'cmd/spo/propertybag/propertybag-set.md'
       - serviceprincipal:
+        - serviceprincipal grant add: 'cmd/spo/serviceprincipal/serviceprincipal-grant-add.md'
         - serviceprincipal grant list: 'cmd/spo/serviceprincipal/serviceprincipal-grant-list.md'
         - serviceprincipal grant revoke: 'cmd/spo/serviceprincipal/serviceprincipal-grant-revoke.md'
         - serviceprincipal permissionrequest approve: 'cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-approve.md'
@@ -156,6 +165,7 @@ nav:
         - tenant settings list: 'cmd/spo/tenant/tenant-settings-list.md'
         - tenant settings set: 'cmd/spo/tenant/tenant-settings-set.md'
       - term:
+        - term add: 'cmd/spo/term/term-add.md'
         - term get: 'cmd/spo/term/term-get.md'
         - term list: 'cmd/spo/term/term-list.md'
         - term group add: 'cmd/spo/term/term-group-add.md'
@@ -201,11 +211,14 @@ nav:
         - o365group restore: 'cmd/graph/o365group/o365group-restore.md'
         - o365group set: 'cmd/graph/o365group/o365group-set.md'
       - siteclassification:
+        - siteclassification disable: 'cmd/graph/siteclassification/siteclassification-disable.md'
         - siteclassification enable: 'cmd/graph/siteclassification/siteclassification-enable.md'
         - siteclassification get: 'cmd/graph/siteclassification/siteclassification-get.md'
+        - siteclassification set: 'cmd/graph/siteclassification/siteclassification-set.md'
       - teams:
         - teams list: 'cmd/graph/teams/teams-list.md'
         - teams channel add: 'cmd/graph/teams/teams-channel-add.md'
+        - teams channel message get: 'cmd/graph/teams/teams-channel-message-get.md'
       - user:
         - user get: 'cmd/graph/user/user-get.md'
         - user list: 'cmd/graph/user/user-list.md'

@@ -1,5 +1,32 @@
 # Release notes
 
+## [v1.10.0](https://github.com/pnp/office365-cli/releases/tag/v1.10.0)
+
+### New commands
+
+**SharePoint Online:**
+
+- [spo field set](../cmd/spo/field/field-set.md) - updates existing list or site column [#661](https://github.com/pnp/office365-cli/issues/661)
+- [spo file add](../cmd/spo/file/file-add.md) - uploads file to the specified folder [#283](https://github.com/pnp/office365-cli/issues/283)
+- [spo list contenttype add](../cmd/spo/list/list-contenttype-add.md) - adds content type to list [#594](https://github.com/pnp/office365-cli/issues/594)
+- [spo list contenttype list](../cmd/spo/list/list-contenttype-list.md) - lists content types configured on the list [#595](https://github.com/pnp/office365-cli/issues/595)
+- [spo list contenttype remove](../cmd/spo/list/list-contenttype-remove.md) - removes content type from list [#668](https://github.com/pnp/office365-cli/issues/668)
+- [spo list view set](../cmd/spo/list/list-view-set.md) - updates existing list view [#662](https://github.com/pnp/office365-cli/issues/662)
+- [spo list webhook remove](../cmd/spo/list/list-webhook-remove.md) - removes the specified webhook from the list [#650](https://github.com/pnp/office365-cli/issues/650)
+- [spo list webhook set](../cmd/spo/list/list-webhook-set.md) - updates the specified webhook [#651](https://github.com/pnp/office365-cli/issues/651)
+- [spo serviceprincipal grant add](../cmd/spo/serviceprincipal/serviceprincipal-grant-add.md) - grants the service principal permission to the specified API [#590](https://github.com/pnp/office365-cli/issues/590)
+
+**Microsoft Graph:**
+
+- [graph siteclassification set](../cmd/graph/siteclassification/siteclassification-set.md) - updates site classification configuration [#304](https://github.com/pnp/office365-cli/issues/304)
+- [graph teams channel message get](../cmd/graph/teams/teams-channel-message-get.md) - retrieves a message from a channel in a Microsoft Teams team [#589](https://github.com/pnp/office365-cli/issues/589)
+
+## [v1.9.0](https://github.com/pnp/office365-cli/releases/tag/v1.9.0)
+
+### Changes
+
+- added support for upgrading projects built using SharePoint Framework v1.6.0 [#663](https://github.com/pnp/office365-cli/issues/663)
+
 ## [v1.8.0](https://github.com/pnp/office365-cli/releases/tag/v1.8.0)
 
 ### New commands
@@ -8,6 +35,7 @@
 
 - [spo list webhook get](../cmd/spo/list/list-webhook-get.md) - gets information about the specific webhook [#590](https://github.com/pnp/office365-cli/issues/590)
 - [spo tenant settings set](../cmd/spo/tenant/tenant-settings-set.md) - sets tenant global settings [#549](https://github.com/pnp/office365-cli/issues/549)
+- [spo term add](../cmd/spo/term/term-add.md) - adds taxonomy term [#605](https://github.com/pnp/office365-cli/issues/605)
 - [spo term get](../cmd/spo/term/term-get.md) - gets information about the specified taxonomy term [#604](https://github.com/pnp/office365-cli/issues/604)
 - [spo term list](../cmd/spo/term/term-list.md) - lists taxonomy terms from the given term set [#603](https://github.com/pnp/office365-cli/issues/603)
 - [spo term group add](../cmd/spo/term/term-group-add.md) - adds taxonomy term group [#598](https://github.com/pnp/office365-cli/issues/598)
@@ -17,7 +45,8 @@
 
 **Microsoft Graph:**
 
-- [graph siteclassification enable](../cmd/graph/siteclassification/siteclassification-enable.md) - enables site classification configuration [#301](https://github.com/pnp/office365-cli/issues/301)
+- [graph siteclassification disable](../cmd/graph/siteclassification/siteclassification-disable.md) - disables site classification [#302](https://github.com/pnp/office365-cli/issues/302)
+- [graph siteclassification enable](../cmd/graph/siteclassification/siteclassification-enable.md) - enables site classification [#301](https://github.com/pnp/office365-cli/issues/301)
 - [graph teams channel add](../cmd/graph/teams/teams-channel-add.md) - adds a channel to the specified Microsoft Teams team [#587](https://github.com/pnp/office365-cli/issues/587)
 
 ### Changes
@@ -27,6 +56,7 @@
 - changed commands to be lazy-loaded [#624](https://github.com/pnp/office365-cli/issues/624)
 - added error codes to the 'spfx project upgrade' command [#630](https://github.com/pnp/office365-cli/issues/630)
 - changed vorpal dependency to https [#637](https://github.com/pnp/office365-cli/issues/637)
+- added retrieving GuestUsageGuidelinesUrl [#640](https://github.com/pnp/office365-cli/issues/640)
 
 ## [v1.7.0](https://github.com/pnp/office365-cli/releases/tag/v1.7.0)
 
