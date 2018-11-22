@@ -339,6 +339,7 @@ describe(commands.APP_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
+    stubAllPostRequests();
 
     auth.site = new Site();
     auth.site.connected = true;
@@ -355,6 +356,46 @@ describe(commands.APP_LIST, () => {
       }
       finally {
         Utils.restore(request.get);
+      }
+    });
+  });
+
+  it('handles if tenant appcatalog is null or not exist (debug)', (done) => {
+    // get tenant app catalog
+    sinon.stub(request, 'post').callsFake((opts) => {
+      
+      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+        return Promise.resolve(JSON.stringify([
+          {
+            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
+          }, 58, {
+            "IsNull": false
+          }, 59, {
+            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": null
+          }
+        ]));
+      }
+      if (opts.url.indexOf('contextinfo') > -1) {
+        return Promise.resolve('abc');
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        debug: true
+      }
+    }, (err?: any) => {
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Tenant app catalog is not configured.')));
+        done();
+      }
+      catch (e) {
+        done(e);
       }
     });
   });

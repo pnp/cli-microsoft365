@@ -89,9 +89,7 @@ export abstract class SpoAppBaseCommand extends SpoCommand {
               resolve(catalogUrl);
             }
             else {
-              if (this.verbose) {
-                reject("Tenant app catalog is not configured.");
-              }
+              reject("Tenant app catalog is not configured.");
             }
           }
         }, (err: any): void => reject(err));
