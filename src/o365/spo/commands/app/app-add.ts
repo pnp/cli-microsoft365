@@ -7,10 +7,11 @@ import {
   CommandOption,
   CommandValidate
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
 import * as fs from 'fs';
 import * as path from 'path';
 import Utils from '../../../../Utils';
+import { Auth } from '../../../../Auth';
+import { SpoAppBaseCommand } from './app-base';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -20,12 +21,12 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   filePath: string;
-  overwrite?: boolean; 
+  overwrite?: boolean;
   scope?: string;
   siteUrl?: string;
 }
 
-class SpoAppAddCommand extends SpoCommand {
+class SpoAppAddCommand extends SpoAppBaseCommand {
   public get name(): string {
     return `${commands.APP_ADD}`;
   }
@@ -45,17 +46,26 @@ class SpoAppAddCommand extends SpoCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
     const overwrite: boolean = args.options.overwrite || false;
+    let appCatalogSiteUrl = '';
+    let siteAccessToken = '';
 
     if (this.debug) {
       cmd.log(`Retrieving access token for ${auth.service.resource}...`);
     }
 
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((res: any): request.RequestPromise => {
+    this.getAppCatalogSiteUrl(cmd, args)
+      .then((siteUrl: string): Promise<string> => {
+        appCatalogSiteUrl = siteUrl;
+
+        const resource: string = Auth.getResourceFromUrl(appCatalogSiteUrl);
+        return auth.getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug);
+      })
+      .then((accessToken: string): request.RequestPromise => {
+        siteAccessToken = accessToken;
+
         if (this.debug) {
           cmd.log('Response:');
-          cmd.log(res);
+          cmd.log(accessToken);
           cmd.log('');
         }
 
@@ -64,16 +74,11 @@ class SpoAppAddCommand extends SpoCommand {
           cmd.log(`Adding app '${fullPath}' to app catalog...`);
         }
 
-        let siteUrl: string = auth.site.url;
-        if(args.options.scope === 'sitecollection') {
-          siteUrl = args.options.siteUrl as string;
-        }
-
         const fileName: string = path.basename(fullPath);
         const requestOptions: any = {
-          url: `${siteUrl}/_api/web/${scope}appcatalog/Add(overwrite=${(overwrite.toString().toLowerCase())}, url='${fileName}')`,
+          url: `${appCatalogSiteUrl}/_api/web/${scope}appcatalog/Add(overwrite=${(overwrite.toString().toLowerCase())}, url='${fileName}')`,
           headers: Utils.getRequestHeaders({
-            authorization: `Bearer ${auth.service.accessToken}`,
+            authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata',
             binaryStringRequestBody: 'true'
           }),
@@ -147,7 +152,7 @@ class SpoAppAddCommand extends SpoCommand {
 
         if (testScope === 'sitecollection' && !args.options.siteUrl) {
           return `You must specify siteUrl when the scope is sitecollection`;
-        } else if(testScope === 'tenant' && args.options.siteUrl) {
+        } else if (testScope === 'tenant' && args.options.siteUrl) {
           return `The siteUrl option can only be used when the scope option is set to sitecollection`;
         }
       }
@@ -170,8 +175,8 @@ class SpoAppAddCommand extends SpoCommand {
         return `The siteUrl option can only be used when the scope option is set to sitecollection`;
       }
 
-      if(args.options.siteUrl) {
-          return SpoCommand.isValidSharePointUrl(args.options.siteUrl);
+      if (args.options.siteUrl) {
+        return SpoAppBaseCommand.isValidSharePointUrl(args.options.siteUrl);
       }
 
       return true;

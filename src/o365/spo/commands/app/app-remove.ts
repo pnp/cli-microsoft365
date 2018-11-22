@@ -8,8 +8,8 @@ import {
   CommandOption,
   CommandValidate
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
+import { SpoAppBaseCommand } from './app-base';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -25,7 +25,7 @@ interface Options extends GlobalOptions {
   siteUrl?: string;
 }
 
-class AppRemoveCommand extends SpoCommand {
+class AppRemoveCommand extends SpoAppBaseCommand {
   public get name(): string {
     return commands.APP_REMOVE;
   }
@@ -45,77 +45,33 @@ class AppRemoveCommand extends SpoCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
-    let appCatalogUrl: string = '';
+    let siteAccessToken: string = '';
+    let appCatalogSiteUrl: string = '';
 
     const removeApp: () => void = (): void => {
-      auth
-        .ensureAccessToken(auth.service.resource, cmd, this.debug)
-        .then((accessToken: string): Promise<string> => {
-          return new Promise<string>((resolve: (appCatalogUrl: string) => void, reject: (error: any) => void): void => {
-            
-            if (scope === 'sitecollection') {
-              resolve(args.options.siteUrl as string);
-            }
-            else {
-              if (args.options.appCatalogUrl) {
-                resolve(args.options.appCatalogUrl);
-              }
-              else {
-                this
-                  .getTenantAppCatalogUrl(cmd, this.debug)
-                  .then((appCatalogUrl: string): void => {
-                    resolve(appCatalogUrl);
-                  }, (error: any): void => {
-                    if (this.debug) {
-                      cmd.log('Error');
-                      cmd.log(error);
-                      cmd.log('');
-                    }
+      
+      this.getAppCatalogSiteUrl(cmd, args)
+        .then((siteUrl: string): Promise<string> => {
+          appCatalogSiteUrl = siteUrl;
 
-                    cmd.log('CLI could not automatically determine the URL of the tenant app catalog');
-                    cmd.log('What is the absolute URL of your tenant app catalog site');
-                    cmd.prompt({
-                      type: 'input',
-                      name: 'appCatalogUrl',
-                      message: '? ',
-                    }, (result: { appCatalogUrl?: string }): void => {
-                      if (!result.appCatalogUrl) {
-                        reject(`Couldn't determine tenant app catalog URL`);
-                      }
-                      else {
-                        let isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(result.appCatalogUrl);
-                        if (isValidSharePointUrl === true) {
-                          resolve(result.appCatalogUrl);
-                        }
-                        else {
-                          reject(isValidSharePointUrl);
-                        }
-                      }
-                    });
-                  });
-              }
-            }
-          });
-        })
-        .then((appCatalog: string): Promise<string> => {
           if (this.debug) {
-            cmd.log(`Retrieved app catalog URL ${appCatalog}`);
+            cmd.log(`Retrieved app catalog URL ${appCatalogSiteUrl}`);
           }
 
-          appCatalogUrl = appCatalog;
-
-          let appCatalogResource: string = Auth.getResourceFromUrl(appCatalog);
-          return auth.getAccessToken(appCatalogResource, auth.service.refreshToken as string, cmd, this.debug);
+          const resource: string = Auth.getResourceFromUrl(appCatalogSiteUrl);
+          return auth.getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug);
         })
         .then((accessToken: string): request.RequestPromise => {
+          siteAccessToken = accessToken;
+
           if (this.debug) {
-            cmd.log(`Retrieved access token for the tenant app catalog ${accessToken}. Removing app from the app catalog...`);
+            cmd.log(`Retrieved access token for the app catalog ${siteAccessToken}. Removing app from the app catalog...`);
           }
 
           const requestOptions: any = {
-            url: `${appCatalogUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${encodeURIComponent(args.options.id)}')/remove`,
+            url: `${appCatalogSiteUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${encodeURIComponent(args.options.id)}')/remove`,
             headers: Utils.getRequestHeaders({
-              authorization: `Bearer ${accessToken}`,
+              authorization: `Bearer ${siteAccessToken}`,
               accept: 'application/json;odata=nometadata'
             })
           };
@@ -141,7 +97,7 @@ class AppRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the app ${args.options.id} from the tenant app catalog?`,
+        message: `Are you sure you want to remove the app ${args.options.id} from the app catalog?`,
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();
@@ -192,13 +148,13 @@ class AppRemoveCommand extends SpoCommand {
         }
 
         if (testScope === 'sitecollection' && !args.options.siteUrl) {
-          
-          if(args.options.appCatalogUrl){
+
+          if (args.options.appCatalogUrl) {
             return `You must specify siteUrl when the scope is sitecollection instead of appCatalogUrl`;
-          }  
+          }
           return `You must specify siteUrl when the scope is sitecollection`;
 
-        } else if(testScope === 'tenant' && args.options.siteUrl) {
+        } else if (testScope === 'tenant' && args.options.siteUrl) {
           return `The siteUrl option can only be used when the scope option is set to sitecollection`;
         }
       }
@@ -212,7 +168,7 @@ class AppRemoveCommand extends SpoCommand {
       }
 
       if (args.options.appCatalogUrl) {
-        const isValidSharePointUrl: string | boolean = SpoCommand.isValidSharePointUrl(args.options.appCatalogUrl);
+        const isValidSharePointUrl: string | boolean = SpoAppBaseCommand.isValidSharePointUrl(args.options.appCatalogUrl);
         if (isValidSharePointUrl !== true) {
           return isValidSharePointUrl;
         }
@@ -222,8 +178,8 @@ class AppRemoveCommand extends SpoCommand {
         return `The siteUrl option can only be used when the scope option is set to sitecollection`;
       }
 
-      if(args.options.siteUrl) {
-          return SpoCommand.isValidSharePointUrl(args.options.siteUrl);
+      if (args.options.siteUrl) {
+        return SpoAppBaseCommand.isValidSharePointUrl(args.options.siteUrl);
       }
 
       return true;

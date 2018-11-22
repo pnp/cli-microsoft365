@@ -8,9 +8,9 @@ import {
   CommandOption,
   CommandValidate
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
 import { AppMetadata } from './AppMetadata';
 import Utils from '../../../../Utils';
+import { SpoAppBaseCommand } from './app-base';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -26,7 +26,7 @@ interface Options extends GlobalOptions {
   siteUrl?: string;
 }
 
-class AppGetCommand extends SpoCommand {
+class AppGetCommand extends SpoAppBaseCommand {
   public get name(): string {
     return commands.APP_GET;
   }
@@ -51,83 +51,58 @@ class AppGetCommand extends SpoCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
+    let siteAccessToken: string = '';
+    let appCatalogSiteUrl: string = '';
 
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise | Promise<string> => {
+    this.getAppCatalogSiteUrl(cmd, args)
+      .then((siteUrl: string): Promise<string> => {
+        appCatalogSiteUrl = siteUrl;
+
+        const resource: string = Auth.getResourceFromUrl(appCatalogSiteUrl);
+        return auth.getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug);
+      })
+      .then((accessToken: string): Promise<{ UniqueId: string }> | request.RequestPromise => {
+        siteAccessToken = accessToken;
+
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}...`);
         }
 
         if (args.options.id) {
 
-          return Promise.resolve(args.options.id);
-
-        } else if (args.options.scope === 'sitecollection') {
-
-          return this.getAppUniqueId(args.options.siteUrl as string, args.options.name, cmd);
-
+          return Promise.resolve({ UniqueId: args.options.id });
         }
-        else if (args.options.appCatalogUrl) {
 
-          return this.getAppUniqueId(args.options.appCatalogUrl, args.options.name, cmd);
-
-        } else {
-
-          return this.getTenantAppCatalogUrl(cmd, this.debug)
-            .then((appCatalogUrl: string): Promise<string> => {
-
-              return Promise.resolve(appCatalogUrl);
-
-            }, (error: any): Promise<string> => {
-              if (this.debug) {
-                cmd.log('Error');
-                cmd.log(error);
-                cmd.log('');
-              }
-
-              return new Promise<string>((resolve: (appCatalogUrl: string) => void, reject: (error: any) => void): void => {
-                cmd.log('CLI could not automatically determine the URL of the tenant app catalog');
-                cmd.log('What is the absolute URL of your tenant app catalog site');
-                cmd.prompt({
-                  type: 'input',
-                  name: 'appCatalogUrl',
-                  message: '? ',
-                }, (result: { appCatalogUrl?: string }): void => {
-                  if (!result.appCatalogUrl) {
-                    reject(`Couldn't determine tenant app catalog URL`);
-                  }
-                  else {
-                    let isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(result.appCatalogUrl);
-                    if (isValidSharePointUrl === true) {
-                      resolve(result.appCatalogUrl);
-                    }
-                    else {
-                      reject(isValidSharePointUrl);
-                    }
-                  }
-                });
-              });
-            })
-            .then((appCatalogUrl: string) => {
-              return this.getAppUniqueId(appCatalogUrl, args.options.name, cmd);
-            });
-        }
-      })
-      .then((appId: string): request.RequestPromise => {
         if (this.verbose) {
-          cmd.log(`Retrieving information for app ${appId}...`);
-        }
-
-        let siteUrl: string = auth.site.url;
-        if(args.options.scope === 'sitecollection') {
-          siteUrl = args.options.siteUrl as string;
+          cmd.log(`Looking up app id for app named ${args.options.name}...`);
         }
 
         const requestOptions: any = {
-          url: `${siteUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${encodeURIComponent(appId)}')`,
+          url: `${appCatalogSiteUrl}/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('${args.options.name}')?$select=UniqueId`,
           headers: Utils.getRequestHeaders({
-            authorization: `Bearer ${auth.service.accessToken}`,
+            authorization: `Bearer ${siteAccessToken}`,
+            accept: 'application/json;odata=nometadata'
+          }),
+          json: true
+        };
+
+        if (this.debug) {
+          cmd.log('Executing web request...');
+          cmd.log(requestOptions);
+          cmd.log('');
+        }
+
+        return request.get(requestOptions);
+      })
+      .then((res: { UniqueId: string }): request.RequestPromise => {
+        if (this.verbose) {
+          cmd.log(`Retrieving information for app ${res}...`);
+        }
+
+        const requestOptions: any = {
+          url: `${appCatalogSiteUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${encodeURIComponent(res.UniqueId)}')`,
+          headers: Utils.getRequestHeaders({
+            authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata'
           }),
           json: true
@@ -193,13 +168,13 @@ class AppGetCommand extends SpoCommand {
         }
 
         if (testScope === 'sitecollection' && !args.options.siteUrl) {
-          
-          if(args.options.appCatalogUrl){
+
+          if (args.options.appCatalogUrl) {
             return `You must specify siteUrl when the scope is sitecollection instead of appCatalogUrl`;
-          }  
+          }
           return `You must specify siteUrl when the scope is sitecollection`;
 
-        } else if(testScope === 'tenant' && args.options.siteUrl) {
+        } else if (testScope === 'tenant' && args.options.siteUrl) {
           return `The siteUrl option can only be used when the scope option is set to sitecollection`;
         }
       }
@@ -216,15 +191,15 @@ class AppGetCommand extends SpoCommand {
       }
 
       if (args.options.appCatalogUrl) {
-        return SpoCommand.isValidSharePointUrl(args.options.appCatalogUrl);
+        return SpoAppBaseCommand.isValidSharePointUrl(args.options.appCatalogUrl);
       }
 
       if (!args.options.scope && args.options.siteUrl) {
         return `The siteUrl option can only be used when the scope option is set to sitecollection`;
       }
 
-      if(args.options.siteUrl) {
-        return SpoCommand.isValidSharePointUrl(args.options.siteUrl);
+      if (args.options.siteUrl) {
+        return SpoAppBaseCommand.isValidSharePointUrl(args.options.siteUrl);
       }
 
       return true;
@@ -268,58 +243,6 @@ class AppGetCommand extends SpoCommand {
     Application Lifecycle Management (ALM) APIs
       https://docs.microsoft.com/en-us/sharepoint/dev/apis/alm-api-for-spfx-add-ins
 `);
-  }
-
-  private getAppUniqueId(appCatalogUrl: string, appName: any, cmd: any): Promise<string> {
-
-    return new Promise<string>((resolve: any, reject: any) => {
-
-      if (this.debug) {
-        cmd.log(`Retrieved tenant app catalog URL ${appCatalogUrl}`);
-      }
-
-      if (this.verbose) {
-        cmd.log(`Retrieving access token for the app catalog at ${appCatalogUrl}...`);
-      }
-
-      const appCatalogResource: string = Auth.getResourceFromUrl(appCatalogUrl);
-
-      return auth.getAccessToken(appCatalogResource, auth.service.refreshToken as string, cmd, this.debug)
-        .then((token: string): request.RequestPromise => {
-          if (this.verbose) {
-            cmd.log(`Looking up app id for app named ${appName}...`);
-          }
-
-          const requestOptions: any = {
-            url: `${appCatalogUrl}/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('${appName}')?$select=UniqueId`,
-            headers: Utils.getRequestHeaders({
-              authorization: `Bearer ${token}`,
-              accept: 'application/json;odata=nometadata'
-            }),
-            json: true
-          };
-
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
-
-          return request.get(requestOptions);
-        })
-        .then((res: { UniqueId: string }): Promise<string> => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
-          }
-
-          return resolve(res.UniqueId);
-        })
-        .catch((err: any) => {
-          return reject(err);
-        });
-    });
   }
 }
 

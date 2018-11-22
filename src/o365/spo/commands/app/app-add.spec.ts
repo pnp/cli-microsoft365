@@ -20,7 +20,9 @@ describe(commands.APP_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
+    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
+    sinon.stub(command as any, 'getRequestDigestForSite').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc' }); });
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
       telemetry = t;
     });
@@ -51,6 +53,7 @@ describe(commands.APP_ADD, () => {
   after(() => {
     Utils.restore([
       appInsights.trackEvent,
+      auth.getAccessToken,
       auth.ensureAccessToken,
       auth.restoreAuth,
       request.get
@@ -107,7 +110,23 @@ describe(commands.APP_ADD, () => {
   });
 
   it('adds new app to the tenant app catalog', (done) => {
+
     sinon.stub(request, 'post').callsFake((opts) => {
+
+      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+        return Promise.resolve(JSON.stringify([
+          {
+            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
+          }, 58, {
+            "IsNull": false
+          }, 59, {
+            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fapps"
+          }
+        ]));
+      }
+      if (opts.url.indexOf('contextinfo') > -1) {
+        return Promise.resolve('abc');
+      }
 
       if (opts.url.indexOf(`/_api/web/tenantappcatalog/Add(overwrite=false, url='spfx.sppkg')`) > -1) {
         if (opts.headers.authorization &&
@@ -143,6 +162,21 @@ describe(commands.APP_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
+      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+        return Promise.resolve(JSON.stringify([
+          {
+            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
+          }, 58, {
+            "IsNull": false
+          }, 59, {
+            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fapps"
+          }
+        ]));
+      }
+      if (opts.url.indexOf('contextinfo') > -1) {
+        return Promise.resolve('abc');
+      }
+
       if (opts.url.indexOf(`/_api/web/tenantappcatalog/Add(overwrite=false, url='spfx.sppkg')`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
@@ -150,7 +184,7 @@ describe(commands.APP_ADD, () => {
           opts.headers.accept.indexOf('application/json') === 0 &&
           opts.headers.binaryStringRequestBody &&
           opts.body) {
-            return Promise.resolve('{"CheckInComment":"","CheckOutType":2,"ContentTag":"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4,3","CustomizedPageStatus":0,"ETag":"\\"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4\\"","Exists":true,"IrmEnabled":false,"Length":"3752","Level":1,"LinkingUri":null,"LinkingUrl":"","MajorVersion":3,"MinorVersion":0,"Name":"spfx-01.sppkg","ServerRelativeUrl":"/sites/apps/AppCatalog/spfx.sppkg","TimeCreated":"2018-05-25T06:59:20Z","TimeLastModified":"2018-05-25T08:23:18Z","Title":"spfx-01-client-side-solution","UIVersion":1536,"UIVersionLabel":"3.0","UniqueId":"bda5ce2f-9ac7-4a6f-a98b-7ae1c168519e"}');
+          return Promise.resolve('{"CheckInComment":"","CheckOutType":2,"ContentTag":"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4,3","CustomizedPageStatus":0,"ETag":"\\"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4\\"","Exists":true,"IrmEnabled":false,"Length":"3752","Level":1,"LinkingUri":null,"LinkingUrl":"","MajorVersion":3,"MinorVersion":0,"Name":"spfx-01.sppkg","ServerRelativeUrl":"/sites/apps/AppCatalog/spfx.sppkg","TimeCreated":"2018-05-25T06:59:20Z","TimeLastModified":"2018-05-25T08:23:18Z","Title":"spfx-01-client-side-solution","UIVersion":1536,"UIVersionLabel":"3.0","UniqueId":"bda5ce2f-9ac7-4a6f-a98b-7ae1c168519e"}');
         }
       }
 
@@ -196,6 +230,21 @@ describe(commands.APP_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
+      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+        return Promise.resolve(JSON.stringify([
+          {
+            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
+          }, 58, {
+            "IsNull": false
+          }, 59, {
+            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fapps"
+          }
+        ]));
+      }
+      if (opts.url.indexOf('contextinfo') > -1) {
+        return Promise.resolve('abc');
+      }
+
       if (opts.url.indexOf(`/_api/web/sitecollectionappcatalog/Add(overwrite=false, url='spfx.sppkg')`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
@@ -203,7 +252,7 @@ describe(commands.APP_ADD, () => {
           opts.headers.accept.indexOf('application/json') === 0 &&
           opts.headers.binaryStringRequestBody &&
           opts.body) {
-            return Promise.resolve('{"CheckInComment":"","CheckOutType":2,"ContentTag":"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4,3","CustomizedPageStatus":0,"ETag":"\\"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4\\"","Exists":true,"IrmEnabled":false,"Length":"3752","Level":1,"LinkingUri":null,"LinkingUrl":"","MajorVersion":3,"MinorVersion":0,"Name":"spfx-01.sppkg","ServerRelativeUrl":"/sites/apps/AppCatalog/spfx.sppkg","TimeCreated":"2018-05-25T06:59:20Z","TimeLastModified":"2018-05-25T08:23:18Z","Title":"spfx-01-client-side-solution","UIVersion":1536,"UIVersionLabel":"3.0","UniqueId":"bda5ce2f-9ac7-4a6f-a98b-7ae1c168519e"}');
+          return Promise.resolve('{"CheckInComment":"","CheckOutType":2,"ContentTag":"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4,3","CustomizedPageStatus":0,"ETag":"\\"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4\\"","Exists":true,"IrmEnabled":false,"Length":"3752","Level":1,"LinkingUri":null,"LinkingUrl":"","MajorVersion":3,"MinorVersion":0,"Name":"spfx-01.sppkg","ServerRelativeUrl":"/sites/apps/AppCatalog/spfx.sppkg","TimeCreated":"2018-05-25T06:59:20Z","TimeLastModified":"2018-05-25T08:23:18Z","Title":"spfx-01-client-side-solution","UIVersion":1536,"UIVersionLabel":"3.0","UniqueId":"bda5ce2f-9ac7-4a6f-a98b-7ae1c168519e"}');
         }
       }
 
@@ -215,7 +264,7 @@ describe(commands.APP_ADD, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, filePath: 'spfx.sppkg', scope: 'sitecollection' } }, () => {
+    cmdInstance.action({ options: { debug: true, filePath: 'spfx.sppkg', scope: 'sitecollection', siteUrl: 'https://contoso.sharepoint.com' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/web/sitecollectionappcatalog/Add(overwrite=false, url='spfx.sppkg')`) > -1 &&
@@ -248,6 +297,21 @@ describe(commands.APP_ADD, () => {
   it('returns all info about the added app in the JSON output mode', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
+
+      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+        return Promise.resolve(JSON.stringify([
+          {
+            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
+          }, 58, {
+            "IsNull": false
+          }, 59, {
+            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fapps"
+          }
+        ]));
+      }
+      if (opts.url.indexOf('contextinfo') > -1) {
+        return Promise.resolve('abc');
+      }
 
       if (opts.url.indexOf(`/_api/web/tenantappcatalog/Add(overwrite=false, url='spfx.sppkg')`) > -1) {
         if (opts.headers.authorization &&
@@ -288,6 +352,21 @@ describe(commands.APP_ADD, () => {
   it('correctly handles failure when the app already exists in the tenant app catalog', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
+
+      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+        return Promise.resolve(JSON.stringify([
+          {
+            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
+          }, 58, {
+            "IsNull": false
+          }, 59, {
+            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fapps"
+          }
+        ]));
+      }
+      if (opts.url.indexOf('contextinfo') > -1) {
+        return Promise.resolve('abc');
+      }
 
       if (opts.url.indexOf(`/_api/web/tenantappcatalog/Add(overwrite=false, url='spfx.sppkg')`) > -1) {
         if (opts.headers.authorization &&
@@ -352,7 +431,7 @@ describe(commands.APP_ADD, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, filePath: 'spfx.sppkg', scope: 'sitecollection' } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: true, filePath: 'spfx.sppkg', scope: 'sitecollection', siteUrl: 'https://contoso.sharepoint.com' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('A file with the name AppCatalog/spfx.sppkg already exists. It was last modified by i:0#.f|membership|admin@contoso.onmi on 24 Nov 2017 12:50:43 -0800.')));
         done();
@@ -372,6 +451,21 @@ describe(commands.APP_ADD, () => {
   it('correctly handles random API error', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
+
+      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+        return Promise.resolve(JSON.stringify([
+          {
+            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
+          }, 58, {
+            "IsNull": false
+          }, 59, {
+            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fapps"
+          }
+        ]));
+      }
+      if (opts.url.indexOf('contextinfo') > -1) {
+        return Promise.resolve('abc');
+      }
 
       if (opts.url.indexOf(`/_api/web/tenantappcatalog/Add(overwrite=false, url='spfx.sppkg')`) > -1) {
         if (opts.headers.authorization &&
@@ -432,7 +526,7 @@ describe(commands.APP_ADD, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, filePath: 'spfx.sppkg', scope: 'sitecollection' } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: true, filePath: 'spfx.sppkg', scope: 'sitecollection', siteUrl: 'https://contoso.sharepoint.com' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -452,6 +546,21 @@ describe(commands.APP_ADD, () => {
   it('correctly handles random API error (string error)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
+
+      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+        return Promise.resolve(JSON.stringify([
+          {
+            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
+          }, 58, {
+            "IsNull": false
+          }, 59, {
+            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fapps"
+          }
+        ]));
+      }
+      if (opts.url.indexOf('contextinfo') > -1) {
+        return Promise.resolve('abc');
+      }
 
       if (opts.url.indexOf(`/_api/web/tenantappcatalog/Add(overwrite=false, url='spfx.sppkg')`) > -1) {
         if (opts.headers.authorization &&
@@ -512,7 +621,7 @@ describe(commands.APP_ADD, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, filePath: 'spfx.sppkg', scope: 'sitecollection' } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: true, filePath: 'spfx.sppkg', scope: 'sitecollection', siteUrl: 'https://contoso.sharepoint.com' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -525,6 +634,157 @@ describe(commands.APP_ADD, () => {
           request.post,
           fs.readFileSync
         ]);
+      }
+    });
+  });
+
+  it('handles promise error while getting tenant appcatalog', (done) => {
+    // get tenant app catalog
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+
+      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+        return Promise.reject('An error has occurred');
+      }
+      if (opts.url.indexOf('contextinfo') > -1) {
+        return Promise.resolve('abc');
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        debug: true, filePath: 'spfx.sppkg'
+      }
+    }, (err?: any) => {
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('handles error while getting tenant appcatalog', (done) => {
+    // get tenant app catalog
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+        return Promise.resolve(JSON.stringify([
+          {
+            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": {
+              "ErrorMessage": "An error has occurred", "ErrorValue": null, "TraceCorrelationId": "18091989-62a6-4cad-9717-29892ee711bc", "ErrorCode": -1, "ErrorTypeName": "Microsoft.SharePoint.Client.ServerException"
+            }, "TraceCorrelationId": "18091989-62a6-4cad-9717-29892ee711bc"
+          }
+        ]));
+      }
+      if (opts.url.indexOf('contextinfo') > -1) {
+        return Promise.resolve('abc');
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        debug: true, filePath: 'spfx.sppkg'
+      }
+    }, (err?: any) => {
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('gets the tenant appcatalog url (debug)', (done) => {
+    // get tenant app catalog
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+        return Promise.resolve(JSON.stringify([
+          {
+            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
+          }, 58, {
+            "IsNull": false
+          }, 59, {
+            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fapps"
+          }
+        ]));
+      }
+      if (opts.url.indexOf('contextinfo') > -1) {
+        return Promise.resolve('abc');
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        debug: true, filePath: 'spfx.sppkg'
+      }
+    }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(sinon.match('https://contoso.sharepoint.com/sites/apps')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('handles if tenant appcatalog is null or not exist', (done) => {
+    // get tenant app catalog
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+        return Promise.resolve(JSON.stringify([
+          {
+            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
+          }, 58, {
+            "IsNull": false
+          }, 59, {
+            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": null
+          }
+        ]));
+      }
+      if (opts.url.indexOf('contextinfo') > -1) {
+        return Promise.resolve('abc');
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        debug: true, filePath: 'spfx.sppkg'
+      }
+    }, (err?: any) => {
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Tenant app catalog is not configured.')));
+        done();
+      }
+      catch (e) {
+        done(e);
       }
     });
   });
@@ -579,7 +839,7 @@ describe(commands.APP_ADD, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
 
-    const actual = (command.validate() as CommandValidate)({ options: { scope: 'SiteCollection', siteUrl:'https://contoso.sharepoint.com', filePath: 'abc' } });
+    const actual = (command.validate() as CommandValidate)({ options: { scope: 'SiteCollection', siteUrl: 'https://contoso.sharepoint.com', filePath: 'abc' } });
     Utils.restore([
       fs.existsSync,
       fs.lstatSync
@@ -592,15 +852,30 @@ describe(commands.APP_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
+      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+        return Promise.resolve(JSON.stringify([
+          {
+            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
+          }, 58, {
+            "IsNull": false
+          }, 59, {
+            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fapps"
+          }
+        ]));
+      }
+      if (opts.url.indexOf('contextinfo') > -1) {
+        return Promise.resolve('abc');
+      }
+
       if (opts.url.indexOf(`/_api/web/`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0 &&
-          
+
           opts.headers.binaryStringRequestBody &&
           opts.body) {
-            return Promise.resolve('{"CheckInComment":"","CheckOutType":2,"ContentTag":"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4,3","CustomizedPageStatus":0,"ETag":"\\"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4\\"","Exists":true,"IrmEnabled":false,"Length":"3752","Level":1,"LinkingUri":null,"LinkingUrl":"","MajorVersion":3,"MinorVersion":0,"Name":"spfx-01.sppkg","ServerRelativeUrl":"/sites/apps/AppCatalog/spfx.sppkg","TimeCreated":"2018-05-25T06:59:20Z","TimeLastModified":"2018-05-25T08:23:18Z","Title":"spfx-01-client-side-solution","UIVersion":1536,"UIVersionLabel":"3.0","UniqueId":"bda5ce2f-9ac7-4a6f-a98b-7ae1c168519e"}');
+          return Promise.resolve('{"CheckInComment":"","CheckOutType":2,"ContentTag":"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4,3","CustomizedPageStatus":0,"ETag":"\\"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4\\"","Exists":true,"IrmEnabled":false,"Length":"3752","Level":1,"LinkingUri":null,"LinkingUrl":"","MajorVersion":3,"MinorVersion":0,"Name":"spfx-01.sppkg","ServerRelativeUrl":"/sites/apps/AppCatalog/spfx.sppkg","TimeCreated":"2018-05-25T06:59:20Z","TimeLastModified":"2018-05-25T08:23:18Z","Title":"spfx-01-client-side-solution","UIVersion":1536,"UIVersionLabel":"3.0","UniqueId":"bda5ce2f-9ac7-4a6f-a98b-7ae1c168519e"}');
         }
       }
 
@@ -640,15 +915,30 @@ describe(commands.APP_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
+      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+        return Promise.resolve(JSON.stringify([
+          {
+            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
+          }, 58, {
+            "IsNull": false
+          }, 59, {
+            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fapps"
+          }
+        ]));
+      }
+      if (opts.url.indexOf('contextinfo') > -1) {
+        return Promise.resolve('abc');
+      }
+
       if (opts.url.indexOf(`/_api/web/`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0 &&
-          
+
           opts.headers.binaryStringRequestBody &&
           opts.body) {
-            return Promise.resolve('{"CheckInComment":"","CheckOutType":2,"ContentTag":"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4,3","CustomizedPageStatus":0,"ETag":"\\"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4\\"","Exists":true,"IrmEnabled":false,"Length":"3752","Level":1,"LinkingUri":null,"LinkingUrl":"","MajorVersion":3,"MinorVersion":0,"Name":"spfx-01.sppkg","ServerRelativeUrl":"/sites/apps/AppCatalog/spfx.sppkg","TimeCreated":"2018-05-25T06:59:20Z","TimeLastModified":"2018-05-25T08:23:18Z","Title":"spfx-01-client-side-solution","UIVersion":1536,"UIVersionLabel":"3.0","UniqueId":"bda5ce2f-9ac7-4a6f-a98b-7ae1c168519e"}');
+          return Promise.resolve('{"CheckInComment":"","CheckOutType":2,"ContentTag":"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4,3","CustomizedPageStatus":0,"ETag":"\\"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4\\"","Exists":true,"IrmEnabled":false,"Length":"3752","Level":1,"LinkingUri":null,"LinkingUrl":"","MajorVersion":3,"MinorVersion":0,"Name":"spfx-01.sppkg","ServerRelativeUrl":"/sites/apps/AppCatalog/spfx.sppkg","TimeCreated":"2018-05-25T06:59:20Z","TimeLastModified":"2018-05-25T08:23:18Z","Title":"spfx-01-client-side-solution","UIVersion":1536,"UIVersionLabel":"3.0","UniqueId":"bda5ce2f-9ac7-4a6f-a98b-7ae1c168519e"}');
         }
       }
 
@@ -693,10 +983,10 @@ describe(commands.APP_ADD, () => {
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0 &&
-          
+
           opts.headers.binaryStringRequestBody &&
           opts.body) {
-            return Promise.resolve('{"CheckInComment":"","CheckOutType":2,"ContentTag":"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4,3","CustomizedPageStatus":0,"ETag":"\\"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4\\"","Exists":true,"IrmEnabled":false,"Length":"3752","Level":1,"LinkingUri":null,"LinkingUrl":"","MajorVersion":3,"MinorVersion":0,"Name":"spfx-01.sppkg","ServerRelativeUrl":"/sites/apps/AppCatalog/spfx.sppkg","TimeCreated":"2018-05-25T06:59:20Z","TimeLastModified":"2018-05-25T08:23:18Z","Title":"spfx-01-client-side-solution","UIVersion":1536,"UIVersionLabel":"3.0","UniqueId":"bda5ce2f-9ac7-4a6f-a98b-7ae1c168519e"}');
+          return Promise.resolve('{"CheckInComment":"","CheckOutType":2,"ContentTag":"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4,3","CustomizedPageStatus":0,"ETag":"\\"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4\\"","Exists":true,"IrmEnabled":false,"Length":"3752","Level":1,"LinkingUri":null,"LinkingUrl":"","MajorVersion":3,"MinorVersion":0,"Name":"spfx-01.sppkg","ServerRelativeUrl":"/sites/apps/AppCatalog/spfx.sppkg","TimeCreated":"2018-05-25T06:59:20Z","TimeLastModified":"2018-05-25T08:23:18Z","Title":"spfx-01-client-side-solution","UIVersion":1536,"UIVersionLabel":"3.0","UniqueId":"bda5ce2f-9ac7-4a6f-a98b-7ae1c168519e"}');
         }
       }
 
@@ -708,7 +998,7 @@ describe(commands.APP_ADD, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { scope: 'sitecollection', filePath: 'spfx.sppkg' } }, () => {
+    cmdInstance.action({ options: { scope: 'sitecollection', filePath: 'spfx.sppkg', siteUrl: 'https://contoso.sharepoint.com' } }, () => {
       let correctAppCatalogUsed = false;
       requests.forEach(r => {
         if (r.url.indexOf('/sitecollectionappcatalog/') > -1) {
@@ -778,7 +1068,7 @@ describe(commands.APP_ADD, () => {
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
 
     const actual = (command.validate() as CommandValidate)({ options: { filePath: 'abc' } });
-    
+
     Utils.restore([
       fs.existsSync,
       fs.lstatSync
@@ -868,7 +1158,7 @@ describe(commands.APP_ADD, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
 
-    const actual = (command.validate() as CommandValidate)({ options: { filePath: 'abc', scope: 'tenant', siteUrl:'https://contoso.sharepoint.com'  } });
+    const actual = (command.validate() as CommandValidate)({ options: { filePath: 'abc', scope: 'tenant', siteUrl: 'https://contoso.sharepoint.com' } });
 
     Utils.restore([
       fs.existsSync,
@@ -877,13 +1167,13 @@ describe(commands.APP_ADD, () => {
     assert.notEqual(actual, true);
   });
 
-  it('should fail when \'sitecollection\' scope, but  bad siteUrl format specified', () => {
+  it('should fail when \'sitecollection\' scope, but bad siteUrl format specified', () => {
     const stats: fs.Stats = new fs.Stats();
     sinon.stub(stats, 'isDirectory').callsFake(() => false);
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
 
-    const actual = (command.validate() as CommandValidate)({ options: { filePath: 'abc', scope: 'sitecollection', siteUrl:'contoso.sharepoint.com'  } });
+    const actual = (command.validate() as CommandValidate)({ options: { filePath: 'abc', scope: 'sitecollection', siteUrl: 'contoso.sharepoint.com' } });
 
     Utils.restore([
       fs.existsSync,
@@ -898,7 +1188,7 @@ describe(commands.APP_ADD, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
 
-    const actual = (command.validate() as CommandValidate)({ options: { filePath: 'abc', siteUrl:'https://contoso.sharepoint.com'  } });
+    const actual = (command.validate() as CommandValidate)({ options: { filePath: 'abc', siteUrl: 'https://contoso.sharepoint.com' } });
 
     Utils.restore([
       fs.existsSync,
@@ -909,13 +1199,13 @@ describe(commands.APP_ADD, () => {
 
   it('has help referring to the right command', () => {
     const cmd: any = {
-      log: (msg: string) => {},
-      prompt: () => {},
-      helpInformation: () => {}
+      log: (msg: string) => { },
+      prompt: () => { },
+      helpInformation: () => { }
     };
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
-    cmd.help({}, () => {});
+    cmd.help({}, () => { });
     assert(find.calledWith(commands.APP_ADD));
   });
 
@@ -925,12 +1215,12 @@ describe(commands.APP_ADD, () => {
       log: (msg: string) => {
         _log.push(msg);
       },
-      prompt: () => {},
-      helpInformation: () => {}
+      prompt: () => { },
+      helpInformation: () => { }
     };
     sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
-    cmd.help({}, () => {});
+    cmd.help({}, () => { });
     let containsExamples: boolean = false;
     _log.forEach(l => {
       if (l && l.indexOf('Examples:') > -1) {
@@ -942,8 +1232,30 @@ describe(commands.APP_ADD, () => {
   });
 
   it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.ensureAccessToken);
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+
+      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+        return Promise.resolve(JSON.stringify([
+          {
+            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
+          }, 58, {
+            "IsNull": false
+          }, 59, {
+            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fapps"
+          }
+        ]));
+      }
+      if (opts.url.indexOf('contextinfo') > -1) {
+        return Promise.resolve('abc');
+      }
+
+      return Promise.reject('Invalid request');
+    });
+    sinon.stub(fs, 'readFileSync').callsFake(() => '123');
+
+    Utils.restore(auth.getAccessToken);
+    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';

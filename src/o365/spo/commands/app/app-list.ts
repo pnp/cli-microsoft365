@@ -6,10 +6,11 @@ import {
   CommandOption,
   CommandValidate
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
 import { AppMetadata } from './AppMetadata';
 import Utils from '../../../../Utils';
 import GlobalOptions from '../../../../GlobalOptions';
+import { Auth } from '../../../../Auth';
+import { SpoAppBaseCommand } from './app-base';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -22,7 +23,7 @@ interface Options extends GlobalOptions {
   scope?: string;
 }
 
-class AppListCommand extends SpoCommand {
+class AppListCommand extends SpoAppBaseCommand {
   public get name(): string {
     return commands.APP_LIST;
   }
@@ -44,26 +45,31 @@ class AppListCommand extends SpoCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
+    let siteAccessToken: string = '';
+    let appCatalogSiteUrl: string = '';
+
+    this.getAppCatalogSiteUrl(cmd, args)
+      .then((siteUrl: string): Promise<string> => {
+        appCatalogSiteUrl = siteUrl;
+
+        const resource: string = Auth.getResourceFromUrl(appCatalogSiteUrl);
+        return auth.getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug);
+      })
       .then((accessToken: string): request.RequestPromise => {
+        siteAccessToken = accessToken;
+
         if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Loading apps from tenant app catalog...`);
+          cmd.log(`Retrieved access token ${accessToken}...`);
         }
 
         if (this.verbose) {
           cmd.log(`Retrieving apps...`);
         }
 
-        let siteUrl = auth.site.url;
-        if(args.options.siteUrl) {
-          siteUrl = args.options.siteUrl;
-        }
-
         const requestOptions: any = {
-          url: `${siteUrl}/_api/web/${scope}appcatalog/AvailableApps`,
+          url: `${appCatalogSiteUrl}/_api/web/${scope}appcatalog/AvailableApps`,
           headers: Utils.getRequestHeaders({
-            authorization: `Bearer ${accessToken}`,
+            authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata'
           })
         };
@@ -143,7 +149,7 @@ class AppListCommand extends SpoCommand {
 
         if (args.options.siteUrl) {
 
-          return SpoCommand.isValidSharePointUrl(args.options.siteUrl);
+          return SpoAppBaseCommand.isValidSharePointUrl(args.options.siteUrl);
         }
       } else if (args.options.siteUrl) {
         
