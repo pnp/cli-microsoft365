@@ -3,8 +3,6 @@ import * as assert from 'assert';
 import SpoCommand from './SpoCommand';
 import * as request from 'request-promise-native';
 import auth, { Site } from './SpoAuth';
-//import auth  from './SpoAuth';
-
 import Utils from '../../Utils';
 import { CommandError } from '../../Command';
 import { FormDigestInfo } from './spo';
