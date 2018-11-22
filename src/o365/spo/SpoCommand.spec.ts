@@ -3,6 +3,8 @@ import * as assert from 'assert';
 import SpoCommand from './SpoCommand';
 import * as request from 'request-promise-native';
 import auth, { Site } from './SpoAuth';
+//import auth  from './SpoAuth';
+
 import Utils from '../../Utils';
 import { CommandError } from '../../Command';
 import { FormDigestInfo } from './spo';
@@ -42,6 +44,14 @@ describe('SpoCommand', () => {
   afterEach(() => {
     Utils.restore([
       request.post,
+    ]);
+  });
+
+  after(() => {
+    Utils.restore([
+      request.post, 
+      auth.ensureAccessToken,
+      auth.restoreAuth
     ]);
   });
 
@@ -98,10 +108,16 @@ describe('SpoCommand', () => {
     });
   });
 
-  // ensures formdigest
-  // fails ensure formdigest
-
   it('reuses current digestcontext when expireat is a future date', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        return Promise.resolve({
+          FormDigestValue: 'abc'
+        });
+      }
+      return Promise.reject('Invalid request');
+    });
+
     const command = new MockCommand();
     const cmdInstance = {
       commandWrapper: {
@@ -139,6 +155,15 @@ describe('SpoCommand', () => {
   });
 
   it('reuses current digestcontext when expireat is a future date (debug)', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        return Promise.resolve({
+          FormDigestValue: 'abc'
+        });
+      }
+      return Promise.reject('Invalid request');
+    });
+
     const command = new MockCommand();
     const cmdInstance = {
       commandWrapper: {
@@ -176,6 +201,15 @@ describe('SpoCommand', () => {
   });
 
   it('retrieves updated digestcontext when expireat is past date', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        return Promise.resolve({
+          FormDigestValue: 'abc'
+        });
+      }
+      return Promise.reject('Invalid request');
+    });
+
     const command = new MockCommand();
     const cmdInstance = {
       commandWrapper: {
@@ -185,15 +219,6 @@ describe('SpoCommand', () => {
       prompt: () => { },
       action: command.action()
     };
-
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-      return Promise.reject('Invalid request');
-    });
 
     auth.site = new Site();
     auth.site.connected = true;
@@ -222,6 +247,15 @@ describe('SpoCommand', () => {
   });
 
   it('retrieves updated digestcontext when expireat is past date (debug)', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        return Promise.resolve({
+          FormDigestValue: 'abc'
+        });
+      }
+      return Promise.reject('Invalid request');
+    });
+
     const command = new MockCommand();
     const cmdInstance = {
       commandWrapper: {
@@ -231,15 +265,6 @@ describe('SpoCommand', () => {
       prompt: () => { },
       action: command.action()
     };
-
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-      return Promise.reject('Invalid request');
-    });
 
     auth.site = new Site();
     auth.site.connected = true;
@@ -265,5 +290,49 @@ describe('SpoCommand', () => {
     catch (e) {
       done(e);
     }
+  });
+
+  it('handles error when contextinfo could not be retrieved (debug)', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        return Promise.reject('Invalid request');
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    const command = new MockCommand();
+    const cmdInstance = {
+      commandWrapper: {
+        command: 'spo command'
+      },
+      log: (msg: any) => { },
+      prompt: () => { },
+      action: command.action()
+    };
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    auth.site.tenantId = 'abc';
+
+    let pastDate = new Date();
+    pastDate.setSeconds(pastDate.getSeconds() - 1800);
+
+    const ctx: FormDigestInfo = {
+      FormDigestValue: 'value',
+      FormDigestTimeoutSeconds: 1800,
+      FormDigestExpiresAt: pastDate,
+      WebFullUrl: 'https://contoso.sharepoint.com'
+    }
+
+    command.ensureFormDigest(cmdInstance, ctx, true).then((err?: any) => {
+      try {
+        assert(err === "Invalid request");
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    })   
   });
 });
