@@ -11,11 +11,6 @@ interface Token {
   expiresOn: string;
 }
 
-export interface FormDigest {
-  formDigestValue: string; 
-  formDigestExpiresAt: Date; 
-}
-
 export class Site extends Service {
   tenantId!: string;
   url!: string;

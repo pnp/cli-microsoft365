@@ -6,6 +6,10 @@ import Utils from '../../Utils';
 import { SpoOperation } from './commands/site/SpoOperation';
 import config from '../../config';
 
+export interface FormDigest {
+  formDigestValue: string; 
+  formDigestExpiresAt: Date; 
+}
 
 export default abstract class SpoCommand extends Command {
   protected requiresTenantAdmin(): boolean {
