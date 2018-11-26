@@ -47,7 +47,7 @@ describe('SpoCommand', () => {
 
   after(() => {
     Utils.restore([
-      request.post, 
+      request.post,
       auth.ensureAccessToken,
       auth.restoreAuth
     ]);
@@ -125,7 +125,7 @@ describe('SpoCommand', () => {
       prompt: () => { },
       action: command.action()
     };
-    
+
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
@@ -171,7 +171,7 @@ describe('SpoCommand', () => {
       prompt: () => { },
       action: command.action()
     };
-    
+
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
@@ -323,7 +323,7 @@ describe('SpoCommand', () => {
       WebFullUrl: 'https://contoso.sharepoint.com'
     }
 
-    command.ensureFormDigest(cmdInstance, ctx, true).then((err?: any) => {
+    command.ensureFormDigest(cmdInstance, ctx, true).catch((err?: any) => {
       try {
         assert(err === "Invalid request");
         done();
@@ -331,6 +331,6 @@ describe('SpoCommand', () => {
       catch (e) {
         done(e);
       }
-    })   
+    })
   });
 });

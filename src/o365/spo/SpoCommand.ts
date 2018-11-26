@@ -129,14 +129,15 @@ export default abstract class SpoCommand extends Command {
   }
 
   public ensureFormDigest(cmd: CommandInstance, context: FormDigestInfo, debug: boolean): Promise<FormDigestInfo> {
-    return new Promise<FormDigestInfo>((reject: (error: any) => void): void => {
-      if (this.isUnexpiredFormDigest(context)) {
+    return new Promise<FormDigestInfo>((resolve: () => void, reject: (error: any) => void): void => {
+      if (this.isValidFormDigest(context)) {
 
         if (debug) {
           cmd.log('Existing form digest still valid');
         }
 
         Promise.resolve(context);
+        return; 
       }
 
       this
@@ -160,11 +161,9 @@ export default abstract class SpoCommand extends Command {
     });
   }
 
-  private isUnexpiredFormDigest(contextinfo: FormDigestInfo): boolean {
+  private isValidFormDigest(contextinfo: FormDigestInfo): boolean {
     const now: Date = new Date();
-    if (contextinfo.FormDigestValue &&
-      now < (contextinfo.FormDigestExpiresAt as Date)) {
-
+    if (contextinfo.FormDigestValue && now < contextinfo.FormDigestExpiresAt) {
       return true;
     }
 
