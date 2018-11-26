@@ -14,12 +14,17 @@
 - [spo list view set](../cmd/spo/list/list-view-set.md) - updates existing list view [#662](https://github.com/pnp/office365-cli/issues/662)
 - [spo list webhook remove](../cmd/spo/list/list-webhook-remove.md) - removes the specified webhook from the list [#650](https://github.com/pnp/office365-cli/issues/650)
 - [spo list webhook set](../cmd/spo/list/list-webhook-set.md) - updates the specified webhook [#651](https://github.com/pnp/office365-cli/issues/651)
+- [spo search](../cmd/spo/search/search.md) - executes a search query [#316](https://github.com/pnp/office365-cli/issues/316)
 - [spo serviceprincipal grant add](../cmd/spo/serviceprincipal/serviceprincipal-grant-add.md) - grants the service principal permission to the specified API [#590](https://github.com/pnp/office365-cli/issues/590)
 
 **Microsoft Graph:**
 
 - [graph siteclassification set](../cmd/graph/siteclassification/siteclassification-set.md) - updates site classification configuration [#304](https://github.com/pnp/office365-cli/issues/304)
 - [graph teams channel message get](../cmd/graph/teams/teams-channel-message-get.md) - retrieves a message from a channel in a Microsoft Teams team [#589](https://github.com/pnp/office365-cli/issues/589)
+
+### Changes
+
+- added support for adding child terms [#686](https://github.com/pnp/office365-cli/issues/686)
 
 ## [v1.9.0](https://github.com/pnp/office365-cli/releases/tag/v1.9.0)
 
