@@ -86,6 +86,7 @@ nav:
         - list contenttype list: 'cmd/spo/list/list-contenttype-list.md'
         - list contenttype remove: 'cmd/spo/list/list-contenttype-remove.md'
         - list view set: 'cmd/spo/list/list-view-set.md'
+        - list webhook add: 'cmd/spo/list/list-webhook-add.md'
         - list webhook get: 'cmd/spo/list/list-webhook-get.md'
         - list webhook list: 'cmd/spo/list/list-webhook-list.md'
         - list webhook remove: 'cmd/spo/list/list-webhook-remove.md'

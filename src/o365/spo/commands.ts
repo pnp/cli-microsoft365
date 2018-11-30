@@ -67,6 +67,7 @@ export default {
   LIST_REMOVE: `${prefix} list remove`,
   LIST_SET: `${prefix} list set`,
   LIST_VIEW_SET: `${prefix} list view set`,
+  LIST_WEBHOOK_ADD: `${prefix} list webhook add`,
   LIST_WEBHOOK_GET: `${prefix} list webhook get`,
   LIST_WEBHOOK_LIST: `${prefix} list webhook list`,
   LIST_WEBHOOK_REMOVE: `${prefix} list webhook remove`,
