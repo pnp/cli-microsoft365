@@ -186,7 +186,7 @@ Add-PnPTenantTheme|SharePointPnPPowerShellOnline|[spo theme set](../cmd/spo/them
 Add-PnPTaxonomyField|SharePointPnPPowerShellOnline|
 Add-PnPUserToGroup|SharePointPnPPowerShellOnline|
 Add-PnPView|SharePointPnPPowerShellOnline|
-Add-PnPWebhookSubscription|SharePointPnPPowerShellOnline|
+Add-PnPWebhookSubscription|SharePointPnPPowerShellOnline|[spo list webhook add](../cmd/spo/list/list-webhook-add.md)
 Add-PnPWebPartToWebPartPage|SharePointPnPPowerShellOnline|
 Add-PnPWebPartToWikiPage|SharePointPnPPowerShellOnline|
 Add-PnPWikiPage|SharePointPnPPowerShellOnline|
