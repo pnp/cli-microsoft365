@@ -17,6 +17,7 @@ Option|Description
 `-l, --location <location>`|Navigation type where the node should be added. Available options: `QuickLaunch`, `TopNavigationBar`
 `-t, --title <title>`|Navigation node title
 `--url <url>`|Navigation node URL
+`--parentNodeId [parentNodeId]`|ID of the node below which the node should be added
 `--isExternal`|Set, if the navigation node points to an external URL
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
@@ -41,4 +42,10 @@ Add a navigation node pointing to an external page to the quick launch
 
 ```sh
 spo navigation node add --webUrl https://contoso.sharepoint.com/sites/team-a --location QuickLaunch --title "About us" --url https://contoso.com/about-us --isExternal
+```
+
+Add a navigation node below an existing node
+
+```sh
+spo navigation node add --webUrl https://contoso.sharepoint.com/sites/team-a --parentNodeId 2010 --title About --url /sites/team-s/sitepages/about.aspx
 ```
