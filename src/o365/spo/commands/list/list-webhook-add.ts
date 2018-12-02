@@ -110,8 +110,15 @@ class SpoListWebhookSetCommand extends SpoCommand {
         return request.post(requestOptions);
       })
       .then((res: any): void => {
-         // ToDo
-         cb();
+        if (this.debug) {
+          cmd.log('Response:');
+          cmd.log(res);
+          cmd.log('');
+        }
+
+        cmd.log(res);
+        
+        cb();
       }, (err: any): void => {
         this.handleRejectedODataJsonPromise(err, cmd, cb)
       });
