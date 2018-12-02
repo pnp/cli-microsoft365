@@ -15,6 +15,7 @@ Option|Description
 `--help`|output usage information
 `-n, --name <name>`|Name of the page to create
 `-u, --webUrl <webUrl>`|URL of the site where the page should be created
+`-t, --title [title]`|Title of the page to create. If not specified, will use the page name as its title
 `-l, --layoutType [layoutType]`|Layout of the page. Allowed values `Article|Home`. Default `Article`
 `-p, --promoteAs [promoteAs]`|Create the page for a specific purpose. Allowed values `HomePage|NewsPage`
 `--commentsEnabled`|Set to enable comments on the page
@@ -41,6 +42,12 @@ Create new modern page. Use the Article layout
 
 ```sh
 spo page add --name new-page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team
+```
+
+Create new modern page and set its title
+
+```sh
+spo page add --name new-page.aspx --title 'My page' --webUrl https://contoso.sharepoint.com/sites/a-team
 ```
 
 Create new modern page. Use the Home page layout and include the default set of web parts
