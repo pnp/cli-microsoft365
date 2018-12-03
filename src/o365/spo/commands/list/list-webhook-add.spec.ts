@@ -412,7 +412,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
       }
     });
-    assert.notEqual(actual, true);
+    assert.strictEqual(actual, 'Required parameter webUrl missing');
   });
 
   it('fails validation if both list id and title options are not passed', () => {
@@ -423,7 +423,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
       }
     });
-    assert.notEqual(actual, true);
+    assert.strictEqual(actual, 'Specify listId or listTitle, one is required');
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
@@ -435,7 +435,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
       }
     });
-    assert.notEqual(actual, true);
+    assert.strictEqual(typeof(actual), 'string');
   });
 
   it('passes validation if the url option is a valid SharePoint site URL', () => {
@@ -447,7 +447,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation if the notificationUrl option is not passed', () => {
@@ -470,7 +470,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
       }
     });
-    assert.notEqual(actual, true);
+    assert.strictEqual(typeof(actual), 'string');
   });
 
   it('passes validation if the listid option is a valid GUID', () => {
@@ -482,7 +482,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation if both id and title options are passed', () => {
@@ -495,7 +495,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
       }
     });
-    assert.notEqual(actual, true);
+    assert.strictEqual(actual, 'Specify listId or listTitle, but not both');
   });
 
   it('fails validation if the expirationDateTime is in the past', () => {
@@ -547,7 +547,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         expirationDateTime: '2018-X-09'
       }
     });
-    assert.notEqual(actual, true);
+    assert.strictEqual(typeof(actual), 'string');
   });
 
   it('fails validation if the expirationDateTime option is not a valid date string (json output)', () => {
@@ -561,7 +561,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         output: 'json'
       }
     });
-    assert.notEqual(actual, true);
+    assert.strictEqual(typeof(actual), 'string');
   });
 
   it('supports verbose mode', () => {
