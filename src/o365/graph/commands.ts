@@ -26,7 +26,7 @@ export default {
   TEAMS_LIST: `${prefix} teams list`,
   TEAMS_CHANNEL_ADD: `${prefix} teams channel add`,
   TEAMS_CHANNEL_MESSAGE_GET: `${prefix} teams channel message get`,
-  TEAMS_USERS_LIST: `${prefix} teams users list`,
+  TEAMS_USER_LIST: `${prefix} teams user list`,
   USER_GET: `${prefix} user get`,
   USER_LIST: `${prefix} user list`,
   USER_SENDMAIL: `${prefix} user sendmail`,

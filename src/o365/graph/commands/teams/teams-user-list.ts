@@ -5,11 +5,9 @@ import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandOption, CommandValidate
 } from '../../../../Command';
-import { Team } from './Team';
 import { GraphItemsListCommand } from '../GraphItemsListCommand';
-import * as request from 'request-promise-native';
 import Utils from '../../../../Utils';
-import { GroupUserCollection } from './groupUserCollection';
+import { GroupUser } from './GroupUser';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -18,13 +16,14 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  groupId: string;
+  teamId: string;
   role?: string;
 }
 
-class TeamsListCommand extends GraphItemsListCommand<Team> {
+
+class TeamsUserListCommand extends GraphItemsListCommand<GroupUser> {
   public get name(): string {
-    return `${commands.TEAMS_USERS_LIST}`;
+    return `${commands.TEAMS_USER_LIST}`;
   }
 
   public get description(): string {
@@ -41,59 +40,77 @@ class TeamsListCommand extends GraphItemsListCommand<Team> {
   // do call to /members for guest and members (filter on usertype)
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((): request.RequestPromise => {
-        const requestOptions: any = {
-          url: `${auth.service.resource}/v1.0/groups/${args.options.groupId}/owners?$select=id,displayName,userPrincipalName,userType`,
-          headers: Utils.getRequestHeaders({
-            authorization: `Bearer ${auth.service.accessToken}`,
-            accept: 'application/json;odata.metadata=none',
-            'content-type': 'application/json;odata=nometadata'
-          }),
-          json: true
-        };
+    let groupOwners: GroupUser[] = [];
+    let groupMembers: GroupUser[] = [];
+    //let users: GroupUser[] = [];
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
+    this.getOwners(cmd, args.options.teamId)
+      .then((): Promise<any> => {
+        console.log("Retrieved owners");
+
+        // currently there is a bug in the Graph that returns Owners as userType 'member'
+        // We therefor update all returned user as owner  
+        for (var i in this.items) {
+          this.items[i].userType = "Owner";
         }
 
-        return request.get(requestOptions);
+        groupOwners = this.items;
+
+        if (args.options.role || args.options.role !== "Owner") {
+          console.log("retrieving Members");
+          return this.getMembers(cmd, args.options.teamId)
+            .then((): Promise<any> => {
+
+              groupMembers = this.items;
+
+              return Promise.resolve();
+            });
+        } else {
+          return Promise.resolve();
+        }
       })
-      .then((groupUsers: GroupUserCollection): void => {
+
+      .then((): void => {
+
+        // construct array with both members and owners / filter out duplicate 
+
         if (this.debug) {
           cmd.log('Response:')
-          cmd.log(groupUsers);
+          cmd.log(groupOwners)
+          cmd.log(groupMembers)
           cmd.log('');
         }
 
-        if (args.options.output === 'json') {
-          cmd.log(groupUsers);
-        }
-        else {
-          cmd.log(groupUsers.value.map(u => {
-            return {
-              DisplayName: u.displayName,
-              UserPrincipalName: u.userPrincipalName,
-              UserType: u.userType
-            };
-          }));
-        }
+        //cmd.log(groupOwners);
 
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
         }
+
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+  }
+
+  private getOwners(cmd: CommandInstance, teamId: string): Promise<any> {
+    cmd.log('Retrieving Owners')
+    let endpoint: string = `${auth.service.resource}/v1.0/groups/${teamId}/owners?$select=id,displayName,userPrincipalName,userType`;
+
+    // Bug in the graph, we should upgrade to owners
+    return this.getAllItems(endpoint, cmd, true);
+  }
+
+  private getMembers(cmd: CommandInstance, teamId: string): Promise<any> {
+    cmd.log('Retrieving Members')
+
+    let endpoint: string = `${auth.service.resource}/v1.0/groups/${teamId}/members?$select=id,displayName,userPrincipalName,userType`;
+    return this.getAllItems(endpoint, cmd, true);
   }
 
   public options(): CommandOption[] {
 
     const options: CommandOption[] = [
       {
-        option: '-i, --groupId <groupId>',
+        option: '-i, --teamId <teamId>',
         description: 'The GroupId of the team'
       },
       {
@@ -109,12 +126,12 @@ class TeamsListCommand extends GraphItemsListCommand<Team> {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.groupId) {
-        return 'Required parameter groupId missing';
+      if (!args.options.teamId) {
+        return 'Required parameter teamId missing';
       }
 
-      if (!Utils.isValidGuid(args.options.groupId as string)) {
-        return `${args.options.groupId} is not a valid GUID`;
+      if (!Utils.isValidGuid(args.options.teamId as string)) {
+        return `${args.options.teamId} is not a valid GUID`;
       }
 
       return true;
@@ -148,6 +165,8 @@ class TeamsListCommand extends GraphItemsListCommand<Team> {
       ${chalk.grey(config.delimiter)} ${this.name} --i '00000000-0000-0000-0000-000000000000' -r Guest
 `);
   }
+
+
 }
 
-module.exports = new TeamsListCommand();
+module.exports = new TeamsUserListCommand();
