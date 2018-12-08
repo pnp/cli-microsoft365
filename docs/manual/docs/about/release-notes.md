@@ -1,5 +1,19 @@
 # Release notes
 
+## [v1.11.0](https://github.com/pnp/office365-cli/releases/tag/v1.11.0)
+
+### New commands
+
+**SharePoint Online:**
+
+- [spo list webhook add](../cmd/spo/list/list-webhook-add.md) - adds a new webhook to the specified list [#652](https://github.com/pnp/office365-cli/issues/652)
+- [spo page header set](../cmd/spo/page/page-header-set.md) - sets modern page header [#697](https://github.com/pnp/office365-cli/issues/697)
+
+### Changes
+
+- added support for setting page title [#693](https://github.com/pnp/office365-cli/issues/693)
+- added support for adding child navigation nodes [#695](https://github.com/pnp/office365-cli/issues/695)
+
 ## [v1.10.0](https://github.com/pnp/office365-cli/releases/tag/v1.10.0)
 
 ### New commands
