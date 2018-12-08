@@ -17,7 +17,8 @@ Option|Description
 `-n, --pageName <pageName>`|Name of the page to which add the web part
 `--standardWebPart [standardWebPart]`|Name of the standard web part to add (see the possible values below)
 `--webPartId [webPartId]`|ID of the custom web part to add
-`--webPartProperties [webPartProperties]`|JSON string with web part properties to set on the web part
+`--webPartProperties [webPartProperties]`|JSON string with web part properties to set on the web part. Specify `webPartProperties` or `webPartData` but not both
+`--webPartData [webPartData]`|JSON string with web part data as retrieved from the web part maintenance mode. Specify `webPartProperties` or `webPartData` but not both
 `--section [section]`|Number of the section to which the web part should be added (1 or higher)
 `--column [column]`|Number of the column in which the web part should be added (1 or higher)
 `--order [order]`|Order of the web part in the column
@@ -68,4 +69,10 @@ Using Windows command line, add the standard Bing Map web part with the specific
 
 ```sh
 o365 spo page clientsidewebpart add --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --standardWebPart BingMap --webPartProperties `"{""Title"":""Foo location""}"`
+```
+
+Add the standard Image web part with the preconfigured image
+
+```sh
+spo page clientsidewebpart add --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --standardWebPart Image --webPartData '`{ "dataVersion": "1.8", "serverProcessedContent": {"htmlStrings":{},"searchablePlainTexts":{"captionText":""},"imageSources":{"imageSource":"/sites/team-a/SiteAssets/work-life-balance.png"},"links":{}}, "properties": {"imageSourceType":2,"altText":"a group of people on a beach","overlayText":"Work life balance","fileName":"48146-OFF12_Justice_01.png","siteId":"27664b85-067d-4be9-a7d7-89b2e804d09f","webId":"a7664b85-067d-4be9-a7d7-89b2e804d09f","listId":"37664b85-067d-4be9-a7d7-89b2e804d09f","uniqueId":"67664b85-067d-4be9-a7d7-89b2e804d09f","imgWidth":650,"imgHeight":433,"fixAspectRatio":false,"isOverlayTextEnabled":true}}`'
 ```
