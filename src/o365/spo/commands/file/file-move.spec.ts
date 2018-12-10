@@ -7,6 +7,7 @@ const command: Command = require('./file-move');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import Utils from '../../../../Utils';
+import * as url from 'url';
 
 describe(commands.FILE_MOVE, () => {
   let vorpal: Vorpal;
@@ -311,35 +312,6 @@ describe(commands.FILE_MOVE, () => {
       }
     });
   });
-
-  it('should succeed when run with option --ignoreVersionHistory', (done) => {
-    stubAllPostRequests();
-    stubAllGetRequests();
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
-    cmdInstance.action({
-      options: {
-        debug: true,
-        webUrl: 'https://contoso.sharepoint.com',
-        sourceUrl: 'abc/abc.pdf',
-        targetUrl: 'abc',
-        ignoreVersionHistory: true
-      }
-    }, () => {
-      try {
-        assert(cmdInstanceLogSpy.lastCall.calledWith('DONE'));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
 
   it('should show error when recycleFile rejects with error', (done) => {
     const recycleFile = new Promise<any>((resolve, reject) => {
@@ -666,17 +638,17 @@ describe(commands.FILE_MOVE, () => {
   });
 
   it('should combine url with baseUrl that last char is /', () => {
-    const actual = (command as any).urlCombine('https://contoso.com/', 'sites/abc');
-    assert.equal(actual, 'https://contoso.com/sites/abc');
-  });
-
-  it('should combine url with relativeUrl that last char is /', () => {
-    const actual = (command as any).urlCombine('https://contoso.com', 'sites/abc/');
+    const actual = url.resolve('https://contoso.com/', 'sites/abc');
     assert.equal(actual, 'https://contoso.com/sites/abc');
   });
 
   it('should combine url with relativeUrl that first char is /', () => {
-    const actual = (command as any).urlCombine('https://contoso.com/', '/sites/abc/');
+    const actual = url.resolve('https://contoso.com', '/sites/abc');
+    assert.equal(actual, 'https://contoso.com/sites/abc');
+  });
+
+  it('should combine url with baseurl that last char is / and relativeUrl that first char is /', () => {
+    const actual = url.resolve('https://contoso.com/', '/sites/abc');
     assert.equal(actual, 'https://contoso.com/sites/abc');
   });
 

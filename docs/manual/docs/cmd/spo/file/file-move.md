@@ -52,12 +52,6 @@ Move file to a document library in another site collection. If a file with the s
 spo file move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --deleteIfAlreadyExists
 ```
 
-Move file to a document library in another site collection. Ignores version history of the file and will only move the main version
-
-```sh
-spo file move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --ignoreVersionHistory
-```
-
 Move file to a document library in another site collection. Allow for schema mismatch
 
  ```sh

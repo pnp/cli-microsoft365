@@ -24,7 +24,6 @@ interface Options extends GlobalOptions {
   sourceUrl: string;
   targetUrl: string;
   deleteIfAlreadyExists?: boolean;
-  ignoreVersionHistory?: boolean;
   allowSchemaMismatch: boolean;
 }
 
@@ -71,7 +70,8 @@ class SpoFileMoveCommand extends SpoCommand {
     const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
     let siteAccessToken = '';
     const webUrl = args.options.webUrl;
-    const tenantUrl = `${url.parse(webUrl).protocol}//${url.parse(webUrl).hostname}`;
+    const parsedUrl: url.UrlWithStringQuery = url.parse(webUrl);
+    const tenantUrl: string = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
 
     if (this.debug) {
       cmd.log(`Retrieving access token for ${resource}...`);
@@ -116,8 +116,7 @@ class SpoFileMoveCommand extends SpoCommand {
         }
 
         // all preconditions met, now create copy job
-        const sourceAbsoluteUrl = this.urlCombine(webUrl, args.options.sourceUrl);
-        const ignoreVersionHistory: boolean = args.options.ignoreVersionHistory || true;
+        const sourceAbsoluteUrl = url.resolve(webUrl, args.options.sourceUrl);
         const allowSchemaMismatch: boolean = args.options.allowSchemaMismatch || false;
         const requestUrl: string = `${webUrl}/_api/site/CreateCopyJobs`;
         const requestOptions: any = {
@@ -128,10 +127,10 @@ class SpoFileMoveCommand extends SpoCommand {
           }),
           body: {
             exportObjectUris: [sourceAbsoluteUrl],
-            destinationUri: this.urlCombine(tenantUrl, args.options.targetUrl),
+            destinationUri: url.resolve(tenantUrl, args.options.targetUrl),
             options: { 
               "AllowSchemaMismatch": allowSchemaMismatch,
-              "IgnoreVersionHistory":ignoreVersionHistory,
+              "IgnoreVersionHistory":true,
               "IsMoveMode":true,
              }
           },
@@ -163,7 +162,7 @@ class SpoFileMoveCommand extends SpoCommand {
 
         return this.getCopyJobProgress(jobProgressOptions, cmd);
       })
-      .then((resp: any): void => {
+      .then((): void => {
         if (this.verbose) {
           cmd.log('DONE');
         }
@@ -289,7 +288,7 @@ class SpoFileMoveCommand extends SpoCommand {
    */
   private recycleFile(tenantUrl: string, targetUrl: string, filename: string, siteAccessToken: string, cmd: CommandInstance): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      const targetFolderAbsoluteUrl: string = this.urlCombine(tenantUrl, targetUrl);
+      const targetFolderAbsoluteUrl: string = url.resolve(tenantUrl, targetUrl);
 
       // since the target WebFullUrl is unknown we can use getRequestDigestForSite
       // to get it from target folder absolute url.
@@ -346,30 +345,6 @@ class SpoFileMoveCommand extends SpoCommand {
     });
   }
 
-  /**
-   * Combines base and relative url considering any missing slashes
-   * @param baseUrl https://contoso.com
-   * @param relativeUrl sites/abc
-   */
-  private urlCombine(baseUrl: string, relativeUrl: string): string {
-    // remove last '/' of base if exists
-    if (baseUrl.lastIndexOf('/') === baseUrl.length - 1) {
-      baseUrl = baseUrl.substring(0, baseUrl.length - 1);
-    }
-
-    // remove '/' at 0
-    if (relativeUrl.charAt(0) === '/') {
-      relativeUrl = relativeUrl.substring(1, relativeUrl.length);
-    }
-
-    // remove last '/' of next if exists
-    if (relativeUrl.lastIndexOf('/') === relativeUrl.length - 1) {
-      relativeUrl = relativeUrl.substring(0, relativeUrl.length - 1);
-    }
-
-    return `${baseUrl}/${relativeUrl}`;
-  }
-
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
@@ -389,12 +364,8 @@ class SpoFileMoveCommand extends SpoCommand {
         description: 'If a file already exists at the targetUrl, it will be moved to the recycle bin. If omitted, the move operation will be canceled if the file already exists at the targetUrl location'
       },
       {
-        option: '--ignoreVersionHistory',
-        description: 'Ignores version history of the file and will only move the main version' 
-      },
-      {
         option: '--allowSchemaMismatch',
-        description: 'Ignores any missing fields in the target and moves folder'
+        description: 'Ignores any missing fields in the target and moves file'
       }
     ];
 
@@ -438,7 +409,7 @@ class SpoFileMoveCommand extends SpoCommand {
     ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
 
     When you move a file using the ${chalk.grey(this.name)} command,
-    only the latest version of the file is moved.
+    all of the versions are being moved.
         
   Examples:
   
@@ -453,11 +424,8 @@ class SpoFileMoveCommand extends SpoCommand {
     to the recycle bin
         ${chalk.grey(config.delimiter)} ${commands.FILE_MOVE} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --deleteIfAlreadyExists
     
-    Move file to a document library in another site collection. Will ignore the version history of the file when moved and only create the main version of the file
-        ${chalk.grey(config.delimiter)} ${commands.FILE_MOVE} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --ignoreVersionHistory
-
-    Moves folder to a document library in another site collection. Will ignore any missing fields in the target destination and move anyway
-      ${chalk.grey(config.delimiter)} ${commands.FILE_MOVE} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFOlder --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
+    Moves file to a document library in another site collection. Will ignore any missing fields in the target destination and move anyway
+      ${chalk.grey(config.delimiter)} ${commands.FILE_MOVE} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
    
   More information:
 
