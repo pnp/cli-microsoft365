@@ -16,6 +16,7 @@ Option|Description
 `-u, --webUrl <webUrl>`|The URL of the site where the folder is located
 `-s, --sourceUrl <sourceUrl>`|Site-relative URL of the folder to copy
 `-t, --targetUrl <targetUrl>`|Server-relative URL where to copy the folder
+`--allowSchemaMismatch`|Ignores any missing fields in the target document library and copies the folder anyway
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
@@ -41,6 +42,12 @@ Copies folder from a document library to another site in the same site collectio
 
 ```sh
 spo folder copy --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFolder --targetUrl /sites/test1/HRDocuments/
+```
+
+Copies folder to a document library in another site collection. Allow for schema mismatch
+
+```sh
+spo folder cope --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFolder --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
 ```
 
 ## More information
