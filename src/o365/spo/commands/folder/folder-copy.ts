@@ -22,6 +22,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   sourceUrl: string;
   targetUrl: string;
+  allowSchemaMismatch: boolean;
 }
 
 interface JobProgressOptions {
@@ -61,7 +62,8 @@ class SpoFolderCopyCommand extends SpoCommand {
     const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
     let siteAccessToken: string = '';
     const webUrl: string = args.options.webUrl;
-    const tenantUrl: string = `${url.parse(webUrl).protocol}//${url.parse(webUrl).hostname}`;
+    const parsedUrl: url.UrlWithStringQuery = url.parse(webUrl);
+    const tenantUrl: string = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
 
     if (this.debug) {
       cmd.log(`Retrieving access token for ${resource}...`);
@@ -76,7 +78,8 @@ class SpoFolderCopyCommand extends SpoCommand {
 
         siteAccessToken = accessToken;
 
-        const sourceAbsoluteUrl: string = this.urlCombine(webUrl, args.options.sourceUrl);
+        const sourceAbsoluteUrl: string = url.resolve(webUrl, args.options.sourceUrl);
+        const allowSchemaMismatch: boolean = args.options.allowSchemaMismatch || false;
         const requestUrl: string = `${webUrl}/_api/site/CreateCopyJobs`;
         const requestOptions: any = {
           url: requestUrl,
@@ -86,8 +89,11 @@ class SpoFolderCopyCommand extends SpoCommand {
           }),
           body: {
             exportObjectUris: [sourceAbsoluteUrl],
-            destinationUri: this.urlCombine(tenantUrl, args.options.targetUrl),
-            options: { "IgnoreVersionHistory": true }
+            destinationUri: url.resolve(tenantUrl, args.options.targetUrl),
+            options: {
+              "AllowSchemaMismatch": allowSchemaMismatch,
+              "IgnoreVersionHistory": true
+            }
           },
           json: true
         };
@@ -116,7 +122,7 @@ class SpoFolderCopyCommand extends SpoCommand {
 
         return this.getCopyJobProgress(jobProgressOptions, cmd);
       })
-      .then((resp: any): void => {
+      .then((): void => {
         if (this.verbose) {
           cmd.log('DONE');
         }
@@ -213,31 +219,6 @@ class SpoFolderCopyCommand extends SpoCommand {
     return new Promise<void>(checkCondition);
   }
 
-  /**
-   * Combines base and relative url 
-   * considering any missing slashes
-   * @param baseUrl https://contoso.com
-   * @param relativeUrl sites/abc
-   */
-  private urlCombine(baseUrl: string, relativeUrl: string): string {
-    // remove last '/' of base if exists
-    if (baseUrl.lastIndexOf('/') === baseUrl.length - 1) {
-      baseUrl = baseUrl.substring(0, baseUrl.length - 1);
-    }
-
-    // remove '/' at 0
-    if (relativeUrl.charAt(0) === '/') {
-      relativeUrl = relativeUrl.substring(1, relativeUrl.length);
-    }
-
-    // remove last '/' of next if exists
-    if (relativeUrl.lastIndexOf('/') === relativeUrl.length - 1) {
-      relativeUrl = relativeUrl.substring(0, relativeUrl.length - 1);
-    }
-
-    return `${baseUrl}/${relativeUrl}`;
-  }
-
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
@@ -251,6 +232,10 @@ class SpoFolderCopyCommand extends SpoCommand {
       {
         option: '-t, --targetUrl <targetUrl>',
         description: 'Server-relative URL where to copy the folder'
+      },
+      {
+        option: '--allowSchemaMismatch',
+        description: 'Ignores any missing fields in the target and copies folder'
       }
     ];
 
@@ -306,6 +291,9 @@ class SpoFolderCopyCommand extends SpoCommand {
     Copies folder from a document library to another site in the same site
     collection
       ${chalk.grey(config.delimiter)} ${commands.FOLDER_COPY} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFolder --targetUrl /sites/test1/HRDocuments/
+      
+    Copy folder to a document library in another site collection. Will ignore any missing fields in the target destination and copy anyway
+      ${chalk.grey(config.delimiter)} ${commands.FILE_COPY} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFolder --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
 
   More information:
 
