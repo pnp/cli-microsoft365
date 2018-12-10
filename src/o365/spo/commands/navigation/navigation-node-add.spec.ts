@@ -19,7 +19,6 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    sinon.stub(command as any, 'getRequestDigestForSite').callsFake(() => { return Promise.resolve('ABC'); });
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
       telemetry = t;
     });
@@ -49,7 +48,6 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
     Utils.restore([
       appInsights.trackEvent,
       auth.getAccessToken,
-      (command as any).getRequestDigestForSite,
       auth.restoreAuth
     ]);
   });
@@ -236,6 +234,52 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
     });
   });
 
+  it('adds new navigation node below an existing node', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/navigation/GetNodeById(1000)/Children`) > -1 &&
+        JSON.stringify(opts.body) === JSON.stringify({
+          Title: 'About',
+          Url: '/sites/team-a/sitepages/about.aspx',
+          IsExternal: false
+        })) {
+        return Promise.resolve(
+          {
+            "Id": 2001,
+            "IsDocLib": true,
+            "IsExternal": false,
+            "IsVisible": true,
+            "ListTemplateType": 0,
+            "Title": "About",
+            "Url": "/sites/team-a/sitepages/about.aspx"
+          });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', parentNodeId: 1000, title: 'About', url: '/sites/team-a/sitepages/about.aspx' } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith({
+          "Id": 2001,
+          "IsDocLib": true,
+          "IsExternal": false,
+          "IsVisible": true,
+          "ListTemplateType": 0,
+          "Title": "About",
+          "Url": "/sites/team-a/sitepages/about.aspx"
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('correctly handles random API error', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf(`/_api/web/navigation/topnavigationbar`) > -1) {
@@ -305,6 +349,11 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
     assert.notEqual(actual, true);
   });
 
+  it('fails validation if the specified parentNodeId is not a number', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', title: 'About', url: '/sites/team-s/sitepages/about.aspx', parentNodeId: 'invalid' } });
+    assert.notEqual(actual, true);
+  });
+
   it('fails validation if location is not specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', title: 'About', url: '/sites/team-s/sitepages/about.aspx' } });
     assert.notEqual(actual, true);
@@ -342,6 +391,11 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
 
   it('passes validation when location is QuickLaunch and the link is external', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'QuickLaunch', title: 'About', url: '/sites/team-a/sitepages/about.aspx', isExternal: true } });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation when location is not specified but parentNodeId is', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', parentNodeId: 2000, title: 'About', url: '/sites/team-a/sitepages/about.aspx' } });
     assert.equal(actual, true);
   });
 

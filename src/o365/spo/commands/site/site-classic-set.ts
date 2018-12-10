@@ -6,7 +6,7 @@ import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import { CommandOption, CommandValidate, CommandCancel } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
+import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo } from '../../spo';
 import { SpoOperation } from './SpoOperation';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -31,8 +31,7 @@ interface Options extends GlobalOptions {
 }
 
 class SpoSiteClassicSetCommand extends SpoCommand {
-  private formDigest?: string;
-  private formDigestExpiresAt?: Date;
+  private context?: FormDigestInfo;
   private accessToken?: string;
   private dots?: string;
   private timeout?: NodeJS.Timer;
@@ -70,16 +69,17 @@ class SpoSiteClassicSetCommand extends SpoCommand {
 
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<void> => {
+      .then((accessToken: string): Promise<FormDigestInfo> => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest for tenant admin site at ${auth.site.url}...`);
         }
 
         this.accessToken = accessToken;
 
-        return this.ensureFormDigest(cmd);
+        return this.ensureFormDigest(cmd, this.context, this.debug);
       })
-      .then((): request.RequestPromise | Promise<void> => {
+      .then((res: FormDigestInfo): request.RequestPromise | Promise<void> => {
+        this.context = res; 
         if (this.verbose) {
           cmd.log(`Setting basic properties ${args.options.url}...`);
         }
@@ -143,7 +143,7 @@ class SpoSiteClassicSetCommand extends SpoCommand {
           url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${auth.service.accessToken}`,
-            'X-RequestDigest': this.formDigest
+            'X-RequestDigest': this.context.FormDigestValue
           }),
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${updates.join('')}<ObjectPath Id="14" ObjectPathId="13" /><ObjectIdentityQuery Id="15" ObjectPathId="5" /><Query Id="16" ObjectPathId="13"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="53d8499e-d0d2-5000-cb83-9ade5be42ca4|${auth.site.tenantId.substr(pos, auth.site.tenantId.indexOf('&') - pos)}&#xA;SiteProperties&#xA;${encodeURIComponent(args.options.url)}" /><Method Id="13" ParentId="5" Name="Update" /></ObjectPaths></Request>`
         };
@@ -183,15 +183,16 @@ class SpoSiteClassicSetCommand extends SpoCommand {
             }
 
             this.timeout = setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), resolve, reject, this.accessToken as string, cmd);
+              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), resolve, reject, this.accessToken as string, cmd, this.context as FormDigestInfo, this.dots, this.timeout);
             }, operation.PollingInterval);
           }
         });
       })
-      .then((): Promise<void> => {
-        return this.ensureFormDigest(cmd);
+      .then((): Promise<FormDigestInfo> => {
+        return this.ensureFormDigest(cmd, this.context, this.debug);
       })
-      .then((): Promise<void> => {
+      .then((res: FormDigestInfo): Promise<void> => {
+        this.context = res; 
         return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
           if (!args.options.owners) {
             resolve();
@@ -217,7 +218,7 @@ class SpoSiteClassicSetCommand extends SpoCommand {
           url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${auth.service.accessToken}`,
-            'X-RequestDigest': this.formDigest
+            'X-RequestDigest': (this.context as FormDigestInfo).FormDigestValue
           }),
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="7" ObjectPathId="5" Name="LockState"><Parameter Type="String">${Utils.escapeXml(args.options.lockState)}</Parameter></SetProperty><ObjectPath Id="9" ObjectPathId="8" /><ObjectIdentityQuery Id="10" ObjectPathId="5" /><Query Id="11" ObjectPathId="8"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Method Id="5" ParentId="3" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.url)}</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Id="8" ParentId="5" Name="Update" /><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
         };
@@ -257,7 +258,7 @@ class SpoSiteClassicSetCommand extends SpoCommand {
             }
 
             this.timeout = setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), resolve, reject, this.accessToken as string, cmd);
+              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), resolve, reject, this.accessToken as string, cmd, this.context as FormDigestInfo, this.dots, this.timeout);
             }, operation.PollingInterval);
           }
         });
@@ -282,13 +283,14 @@ class SpoSiteClassicSetCommand extends SpoCommand {
   private setAdmin(cmd: CommandInstance, siteUrl: string, principal: string): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       this
-        .ensureFormDigest(cmd)
-        .then((): request.RequestPromise => {
+        .ensureFormDigest(cmd, this.context, this.debug)
+        .then((res: FormDigestInfo): request.RequestPromise => {
+          this.context = res; 
           const requestOptions: any = {
             url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
             headers: Utils.getRequestHeaders({
               authorization: `Bearer ${auth.service.accessToken}`,
-              'X-RequestDigest': this.formDigest
+              'X-RequestDigest': this.context.FormDigestValue
             }),
             body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="48" ObjectPathId="47" /></Actions><ObjectPaths><Method Id="47" ParentId="34" Name="SetSiteAdmin"><Parameters><Parameter Type="String">${Utils.escapeXml(siteUrl)}</Parameter><Parameter Type="String">${Utils.escapeXml(principal)}</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Constructor Id="34" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
           };
@@ -320,100 +322,6 @@ class SpoSiteClassicSetCommand extends SpoCommand {
           reject(err);
         });
     });
-  }
-
-  private ensureFormDigest(cmd: CommandInstance): Promise<void> {
-    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      const now: Date = new Date();
-      if (this.formDigest &&
-        now < (this.formDigestExpiresAt as Date)) {
-        if (this.debug) {
-          cmd.log('Existing form digest still valid');
-        }
-
-        resolve();
-        return;
-      }
-
-      this
-        .getRequestDigest(cmd, this.debug)
-        .then((res: ContextInfo): void => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
-          }
-
-          this.formDigest = res.FormDigestValue;
-          this.formDigestExpiresAt = new Date();
-          this.formDigestExpiresAt.setSeconds(this.formDigestExpiresAt.getSeconds() + res.FormDigestTimeoutSeconds - 5);
-
-          resolve();
-        }, (error: any): void => {
-          reject(error);
-        });
-    });
-  }
-
-  private waitUntilFinished(operationId: string, resolve: () => void, reject: (error: any) => void, accessToken: string, cmd: CommandInstance): void {
-    this
-      .ensureFormDigest(cmd)
-      .then((): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log(`Checking if operation ${operationId} completed...`);
-        }
-
-        if (!this.debug && this.verbose) {
-          this.dots += '.';
-          process.stdout.write(`\r${this.dots}`);
-        }
-
-        const requestOptions: any = {
-          url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
-          headers: Utils.getRequestHeaders({
-            authorization: `Bearer ${auth.service.accessToken}`,
-            'X-RequestDigest': this.formDigest
-          }),
-          body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="188" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="184" Name="${operationId.replace(/\\n/g, '&#xA;').replace(/"/g, '')}" /></ObjectPaths></Request>`
-        };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
-        return request.post(requestOptions);
-      })
-      .then((res: string): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
-        const json: ClientSvcResponse = JSON.parse(res);
-        const response: ClientSvcResponseContents = json[0];
-        if (response.ErrorInfo) {
-          reject(response.ErrorInfo.ErrorMessage);
-        }
-        else {
-          const operation: SpoOperation = json[json.length - 1];
-          let isComplete: boolean = operation.IsComplete;
-          if (isComplete) {
-            if (this.verbose) {
-              process.stdout.write('\n');
-            }
-
-            resolve();
-            return;
-          }
-
-          this.timeout = setTimeout(() => {
-            this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), resolve, reject, accessToken, cmd);
-          }, operation.PollingInterval);
-        }
-      });
   }
 
   public options(): CommandOption[] {

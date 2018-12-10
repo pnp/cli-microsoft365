@@ -234,15 +234,6 @@ describe(commands.CDN_SET, () => {
     cmdInstance.action({ options: { debug: false, enabled: true } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
-        if (r.url.indexOf('/_api/contextinfo') > -1) {
-          if (r.headers.authorization &&
-            r.headers.authorization.indexOf('Bearer ') === 0 &&
-            r.headers.accept &&
-            r.headers.accept.indexOf('application/json') === 0) {
-            return Promise.resolve({ FormDigestValue: 'abc' });
-          }
-        }
-
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
@@ -250,9 +241,6 @@ describe(commands.CDN_SET, () => {
           r.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
           setRequestIssued = true;
         }
-
-        return Promise.reject('Invalid request');
-
       });
 
       try {

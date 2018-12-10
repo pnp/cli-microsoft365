@@ -4,7 +4,7 @@ import commands from '../../commands';
 import * as request from 'request-promise-native';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
-  CommandOption, CommandValidate, CommandError
+  CommandOption, CommandValidate
 } from '../../../../Command';
 import Utils from '../../../../Utils';
 import GraphCommand from '../../GraphCommand';
@@ -68,8 +68,7 @@ class GraphSiteClassificationEnableCommand extends GraphCommand {
 
         if (!unifiedGroupSetting ||
           unifiedGroupSetting.length === 0) {
-          cb(new CommandError("Missing DirectorySettingTemplate for \"Group.Unified\""));
-          return Promise.reject();
+          return Promise.reject("Missing DirectorySettingTemplate for \"Group.Unified\"");
         }
 
         const updatedDirSettings: UpdateDirectorySetting = new UpdateDirectorySetting();

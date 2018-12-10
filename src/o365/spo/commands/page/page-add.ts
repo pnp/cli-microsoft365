@@ -25,6 +25,7 @@ interface Options extends GlobalOptions {
   commentsEnabled: boolean;
   publish: boolean;
   publishMessage?: string;
+  title?: string;
 }
 
 class SpoPageAddCommand extends SpoCommand {
@@ -127,7 +128,7 @@ class SpoPageAddCommand extends SpoCommand {
           }),
           body: {
             ContentTypeId: '0x0101009D1CB255DA76424F860D91F20E6C4118',
-            Title: args.options.name.indexOf('.aspx') > -1 ? args.options.name.substr(0, args.options.name.indexOf('.aspx')) : args.options.name,
+            Title: args.options.title ? args.options.title : (args.options.name.indexOf('.aspx') > -1 ? args.options.name.substr(0, args.options.name.indexOf('.aspx')) : args.options.name),
             ClientSideApplicationId: 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec',
             PageLayoutType: layoutType
           },
@@ -281,6 +282,10 @@ class SpoPageAddCommand extends SpoCommand {
         description: 'URL of the site where the page should be created'
       },
       {
+        option: '-t, --title [title]',
+        description: 'Title of the page to create. If not specified, will use the page name as its title'
+      },
+      {
         option: '-l, --layoutType [layoutType]',
         description: 'Layout of the page. Allowed values Article|Home. Default Article',
         autocomplete: ['Article', 'Home']
@@ -370,6 +375,9 @@ class SpoPageAddCommand extends SpoCommand {
 
     Create new modern page. Use the Article layout
       ${chalk.grey(config.delimiter)} ${this.name} --name new-page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team
+
+    Create new modern page and set its title
+      ${chalk.grey(config.delimiter)} ${this.name} --name new-page.aspx --title 'My page' --webUrl https://contoso.sharepoint.com/sites/a-team
 
     Create new modern page. Use the Home page layout and include the default set
     of web parts 
