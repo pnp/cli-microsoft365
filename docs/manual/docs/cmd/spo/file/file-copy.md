@@ -18,7 +18,7 @@ Option|Description
 `-t, --targetUrl <targetUrl>`|Server-relative URL where to copy the file
 `--deleteIfAlreadyExists`|If a file already exists at the targetUrl, it will be moved to the recycle bin. If omitted, the copy
  operation will be canceled if the file already exists at the targetUrl location
-`--allowSchemaMismatch`|Ignores any missing fields in the target destination and moves the file anyway
+`--allowSchemaMismatch`|Ignores any missing fields in the target destination and copies the file anyway
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
@@ -54,7 +54,7 @@ spo file copy --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /S
 
 Copy file to a document library in another site collection. Allow for schema mismatch
   ```sh
-spo file move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
+spo file copy --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
 ```
 
 ## More information
