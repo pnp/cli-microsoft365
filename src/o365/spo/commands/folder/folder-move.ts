@@ -22,7 +22,6 @@ interface Options extends GlobalOptions {
   webUrl: string;
   sourceUrl: string;
   targetUrl: string;
-  ignoreVersionHistory: boolean;
   allowSchemaMismatch: boolean;
 }
 
@@ -63,7 +62,8 @@ class SpoFolderMoveCommand extends SpoCommand {
     const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
     let siteAccessToken: string = '';
     const webUrl: string = args.options.webUrl;
-    const tenantUrl: string = `${url.parse(webUrl).protocol}//${url.parse(webUrl).hostname}`;
+    const parsedUrl: url.UrlWithStringQuery = url.parse(webUrl);
+    const tenantUrl: string = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
 
     if (this.debug) {
       cmd.log(`Retrieving access token for ${resource}...`);
@@ -78,8 +78,7 @@ class SpoFolderMoveCommand extends SpoCommand {
 
         siteAccessToken = accessToken;
 
-        const sourceAbsoluteUrl: string = this.urlCombine(webUrl, args.options.sourceUrl);
-        const ignoreVersionHistory: boolean = args.options.ignoreVersionHistory || true;
+        const sourceAbsoluteUrl: string = url.resolve(webUrl, args.options.sourceUrl);
         const allowSchemaMismatch: boolean = args.options.allowSchemaMismatch || false;
         const requestUrl: string = `${webUrl}/_api/site/CreateCopyJobs`;
         const requestOptions: any = {
@@ -90,10 +89,10 @@ class SpoFolderMoveCommand extends SpoCommand {
           }),
           body: {
             exportObjectUris: [sourceAbsoluteUrl],
-            destinationUri: this.urlCombine(tenantUrl, args.options.targetUrl),
-            options: { 
-              "IgnoreVersionHistory": ignoreVersionHistory,
-              "AllowSchemaMismatch": allowSchemaMismatch,
+            destinationUri: url.resolve(tenantUrl, args.options.targetUrl),
+            options: {
+              "AllowSchemaMismatch": allowSchemaMismatch, 
+              "IgnoreVersionHistory": true,
               "IsMoveMode":true, 
             }
           },
@@ -124,7 +123,7 @@ class SpoFolderMoveCommand extends SpoCommand {
 
         return this.getCopyJobProgress(jobProgressOptions, cmd);
       })
-      .then((resp: any): void => {
+      .then((): void => {
         if (this.verbose) {
           cmd.log('DONE');
         }
@@ -221,31 +220,6 @@ class SpoFolderMoveCommand extends SpoCommand {
     return new Promise<void>(checkCondition);
   }
 
-  /**
-   * Combines base and relative url 
-   * considering any missing slashes
-   * @param baseUrl https://contoso.com
-   * @param relativeUrl sites/abc
-   */
-  private urlCombine(baseUrl: string, relativeUrl: string): string {
-    // remove last '/' of base if exists
-    if (baseUrl.lastIndexOf('/') === baseUrl.length - 1) {
-      baseUrl = baseUrl.substring(0, baseUrl.length - 1);
-    }
-
-    // remove '/' at 0
-    if (relativeUrl.charAt(0) === '/') {
-      relativeUrl = relativeUrl.substring(1, relativeUrl.length);
-    }
-
-    // remove last '/' of next if exists
-    if (relativeUrl.lastIndexOf('/') === relativeUrl.length - 1) {
-      relativeUrl = relativeUrl.substring(0, relativeUrl.length - 1);
-    }
-
-    return `${baseUrl}/${relativeUrl}`;
-  }
-
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
@@ -259,10 +233,6 @@ class SpoFolderMoveCommand extends SpoCommand {
       {
         option: '-t, --targetUrl <targetUrl>',
         description: 'Server-relative URL where to move the folder'
-      },
-      {
-        option: '--ignoreVersionHistory',
-        description: 'Ignores version history in the folder and will only move the main version'
       },
       {
         option: '--allowSchemaMismatch',
@@ -311,7 +281,7 @@ class SpoFolderMoveCommand extends SpoCommand {
     ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
 
     When you move a folder with documents that have version history,
-    only the latest document version is moved.
+    all of the versions are being moved.
         
   Examples:
   
@@ -323,11 +293,8 @@ class SpoFolderMoveCommand extends SpoCommand {
     collection
       ${chalk.grey(config.delimiter)} ${commands.FOLDER_MOVE} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFolder --targetUrl /sites/test1/HRDocuments/
     
-    Moves folder to a document library in another site collection. Will ignore the version history when moved and only create the main version of the file
-      ${chalk.grey(config.delimiter)} ${commands.FOLDER_MOVE} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFOlder --targetUrl /sites/test2/Shared%20Documents/ --ignoreVersionHistory
-    
     Moves folder to a document library in another site collection. Will ignore any missing fields in the target destination and move anyway
-      ${chalk.grey(config.delimiter)} ${commands.FOLDER_MOVE} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFOlder --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
+      ${chalk.grey(config.delimiter)} ${commands.FOLDER_MOVE} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFolder --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
 
   More information:
 
