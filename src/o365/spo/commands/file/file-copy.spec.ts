@@ -7,6 +7,7 @@ const command: Command = require('./file-copy');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import Utils from '../../../../Utils';
+import * as url from 'url';
 
 describe(commands.FILE_COPY, () => {
   let vorpal: Vorpal;
@@ -637,17 +638,17 @@ describe(commands.FILE_COPY, () => {
   });
 
   it('should combine url with baseUrl that last char is /', () => {
-    const actual = (command as any).urlCombine('https://contoso.com/', 'sites/abc');
-    assert.equal(actual, 'https://contoso.com/sites/abc');
-  });
-
-  it('should combine url with relativeUrl that last char is /', () => {
-    const actual = (command as any).urlCombine('https://contoso.com', 'sites/abc/');
+    const actual = url.resolve('https://contoso.com/', 'sites/abc');
     assert.equal(actual, 'https://contoso.com/sites/abc');
   });
 
   it('should combine url with relativeUrl that first char is /', () => {
-    const actual = (command as any).urlCombine('https://contoso.com/', '/sites/abc/');
+    const actual = url.resolve('https://contoso.com', '/sites/abc');
+    assert.equal(actual, 'https://contoso.com/sites/abc');
+  });
+
+  it('should combine url with baseurl that last char is / and relativeUrl that first char is /', () => {
+    const actual = url.resolve('https://contoso.com/', '/sites/abc');
     assert.equal(actual, 'https://contoso.com/sites/abc');
   });
 
