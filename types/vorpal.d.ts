@@ -17,6 +17,15 @@ interface Vorpal {
   use: (extension: any) => Vorpal;
   version: (version: string) => Vorpal;
   chalk: any;
+  util: {
+    buildCommandArgs: (passedArgs: string, cmd: CommandInstance, execCommand: CurrentCommand | undefined, isCommandArgKeyPairNormalized: boolean) => { options: any };
+    parseCommand: (command: string, commands: CommandInfo[]) => {
+      command: CommandInfo,
+      match: any,
+      matchArgs: any,
+      pipes: any
+    }
+  }
 }
 
 interface VorpalCommand {

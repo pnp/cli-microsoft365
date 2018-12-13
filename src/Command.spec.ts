@@ -13,7 +13,7 @@ const vorpal: Vorpal = require('./vorpal-init');
 
 class MockCommand1 extends Command {
   public get name(): string {
-    return 'Mock command';
+    return 'mock-command';
   }
 
   public get description(): string {
@@ -65,15 +65,25 @@ class MockCommand1 extends Command {
 
   public types(): CommandTypes | undefined {
     return {
-      string: ['']
+      string: ['option2']
     };
   }
 
   public options(): CommandOption[] {
-    return [{
-      option: '--debug',
-      description: 'Runs command with debug logging'
-    }];
+    return [
+      {
+        option: '--debug',
+        description: 'Runs command with debug logging'
+      },
+      {
+        option: '--option1 [option1]',
+        description: 'Some option'
+      },
+      {
+        option: '--option2 [option2]',
+        description: 'Some other option'
+      }
+    ];
   }
 }
 
@@ -95,6 +105,65 @@ class MockCommand2 extends Command {
 
   public handlePromiseError(response: any, cmd: CommandInstance, callback: (err?: any) => void): void {
     this.handleRejectedODataJsonPromise(response, cmd, callback);
+  }
+}
+
+class MockCommand3 extends Command {
+  public get name(): string {
+    return 'mock-command';
+  }
+
+  public get description(): string {
+    return 'Mock command description';
+  }
+
+  public commandAction(): void {
+  }
+
+  public commandHelp(args: any, log: (message: string) => void): void {
+  }
+
+  public options(): CommandOption[] {
+    return [
+      {
+        option: '--debug',
+        description: 'Runs command with debug logging'
+      },
+      {
+        option: '--option1 [option1]',
+        description: 'Some option'
+      }
+    ];
+  }
+}
+
+class MockCommand4 extends Command {
+  public get name(): string {
+    return 'mock-command';
+  }
+
+  public get description(): string {
+    return 'Mock command description';
+  }
+
+  public allowUnknownOptions(): boolean {
+    return true;
+  }
+
+  public commandAction(cmd: CommandInstance, args: any, cb: (err?: any) => void): void {
+    cb();
+  }
+
+  public commandHelp(args: any, log: (message: string) => void): void {
+  }
+
+  public options(): CommandOption[] {
+    return [
+      {
+        option: '--debug',
+        description: 'Runs command with debug logging'
+      }
+    ];
   }
 }
 
@@ -144,8 +213,13 @@ describe('Command', () => {
       vcmd.cancel,
       vcmd.help,
       vcmd.types,
-      vcmd.allowUnknownOptions
+      vcmd.allowUnknownOptions,
+      vorpal.command,
+      process.exit,
+      vorpal.util.parseCommand
     ]);
+    vorpal.commands = [];
+    (vorpal as any)._command = undefined;
   });
 
   after(() => {
@@ -217,7 +291,7 @@ describe('Command', () => {
     sinon.stub(vorpal, 'command').callsFake(() => vcmd);
     cmd.init(vorpal);
     Utils.restore(vorpal.command);
-    assert(optionSpy.calledOnce);
+    assert(optionSpy.calledThrice); // there are three options
   });
 
   it('configures alias when available', () => {
@@ -392,14 +466,14 @@ describe('Command', () => {
     const cmdLogSpy: sinon.SinonSpy = sinon.spy(cmd, 'log');
     const mock = new MockCommand1();
     mock.commandAction(cmd, {}, (err?: any): void => {
-      assert(cmdLogSpy.calledWith(vorpal.chalk.yellow(`Command 'mc1' is deprecated. Please use 'Mock command' instead`)))
+      assert(cmdLogSpy.calledWith(vorpal.chalk.yellow(`Command 'mc1' is deprecated. Please use 'mock-command' instead`)))
     });
   });
 
   it('logs command name in the telemetry when command name used', (done) => {
     const cmd = {
       commandWrapper: {
-        command: 'Mock command'
+        command: 'mock-command'
       },
       log: (msg?: string) => { },
       prompt: () => { }
@@ -407,7 +481,7 @@ describe('Command', () => {
     const mock = new MockCommand1();
     mock.commandAction(cmd, {}, (err?: any): void => {
       try {
-        assert.equal(telemetry.name, 'Mock command');
+        assert.equal(telemetry.name, 'mock-command');
         done();
       }
       catch (e) {
@@ -454,5 +528,130 @@ describe('Command', () => {
         done(e);
       }
     });
+  });
+
+  it('doesn\'t remove leading zeroes from unknown options', (done) => {
+    const cmd = new MockCommand1();
+    const delimiter = (vorpal as any)._delimiter;
+    const argv = process.argv;
+    vorpal.delimiter('');
+    sinon.stub(cmd as any, 'initAction').callsFake((args) => {
+      try {
+        assert.strictEqual(args.options.option3, '00123');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        vorpal.delimiter(delimiter);
+        process.argv = argv;
+      }
+    });
+    sinon.stub(process, 'exit').callsFake(() => { });
+    cmd.init(vorpal);
+    process.argv = ['node', 'o365', 'mock-command', '--option3', '00123'];
+    vorpal.parse(['node', 'o365', 'mock-command', '--option3', '00123']);
+    process.argv = argv;
+  });
+
+  it('removes leading zeroes from known options that aren\'t a string', (done) => {
+    const cmd = new MockCommand1();
+    const delimiter = (vorpal as any)._delimiter;
+    const argv = process.argv;
+    vorpal.delimiter('');
+    sinon.stub(cmd as any, 'initAction').callsFake((args) => {
+      try {
+        assert.strictEqual(args.options.option1, 123);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        vorpal.delimiter(delimiter);
+        process.argv = argv;
+      }
+    });
+    sinon.stub(process, 'exit').callsFake(() => { });
+    cmd.init(vorpal);
+    process.argv = ['node', 'o365', 'mock-command', '--option1', '00123'];
+    vorpal.parse(['node', 'o365', 'mock-command', '--option1', '00123']);
+    process.argv = argv;
+  });
+
+  it('doesn\'t remove leading zeroes from known options that are a string', (done) => {
+    const cmd = new MockCommand1();
+    const delimiter = (vorpal as any)._delimiter;
+    const argv = process.argv;
+    vorpal.delimiter('');
+    sinon.stub(cmd as any, 'initAction').callsFake((args) => {
+      try {
+        assert.strictEqual(args.options.option2, '00123');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        vorpal.delimiter(delimiter);
+        process.argv = argv;
+      }
+    });
+    sinon.stub(process, 'exit').callsFake(() => { });
+    cmd.init(vorpal);
+    process.argv = ['node', 'o365', 'mock-command', '--option2', '00123'];
+    vorpal.parse(['node', 'o365', 'mock-command', '--option2', '00123']);
+    process.argv = argv;
+  });
+
+  it('doesn\'t remove leading zeroes from unknown options where no types specified', (done) => {
+    const cmd = new MockCommand4();
+    const delimiter = (vorpal as any)._delimiter;
+    const argv = process.argv;
+    vorpal.delimiter('');
+    sinon.stub(cmd as any, 'initAction').callsFake((args) => {
+      try {
+        assert.strictEqual(args.options.option1, '00123');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        vorpal.delimiter(delimiter);
+        process.argv = argv;
+      }
+    });
+    sinon.stub(process, 'exit').callsFake(() => { });
+    cmd.init(vorpal);
+    process.argv = ['node', 'o365', 'mock-command', '--option1', '00123'];
+    vorpal.parse(['node', 'o365', 'mock-command', '--option1', '00123']);
+    process.argv = argv;
+  });
+
+  it('removes leading zeroes from known options when the command doesn\'t support unknown options', (done) => {
+    const cmd = new MockCommand3();
+    const delimiter = (vorpal as any)._delimiter;
+    const argv = process.argv;
+    vorpal.delimiter('');
+    sinon.stub(cmd as any, 'initAction').callsFake((args) => {
+      try {
+        assert.strictEqual(args.options.option1, 123);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        vorpal.delimiter(delimiter);
+        process.argv = argv;
+      }
+    });
+    sinon.stub(process, 'exit').callsFake(() => { });
+    cmd.init(vorpal);
+    process.argv = ['node', 'o365', 'mock-command', '--option1', '00123'];
+    vorpal.parse(['node', 'o365', 'mock-command', '--option1', '00123']);
+    process.argv = argv;
   });
 });

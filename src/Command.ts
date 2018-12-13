@@ -96,6 +96,7 @@ export default abstract class Command {
   public action(): CommandAction {
     const cmd: Command = this;
     return function (this: CommandInstance, args: CommandArgs, cb: () => void) {
+      args = cmd.processArgs(args);
       cmd.initAction(args);
       cmd.commandAction(this, args, cb);
     }
@@ -307,5 +308,40 @@ export default abstract class Command {
       properties: this.getTelemetryProperties(args)
     });
     appInsights.flush();
+  }
+
+  private processArgs(args: CommandArgs): CommandArgs {
+    if (!this.allowUnknownOptions()) {
+      return args;
+    }
+
+    const commandData = vorpal.util.parseCommand(process.argv.slice(2).join(' '), vorpal.commands);
+    const cmd = commandData.match;
+    // required for tests not to fail.
+    // Can't happen on runtime because we are already inside a command
+    /* istanbul ignore next */
+    if (!cmd) {
+      return args;
+    }
+
+    if (!cmd._types) {
+      cmd._types = {};
+    }
+    if (!cmd._types.string) {
+      cmd._types.string = [];
+    }
+    process.argv.slice(2).forEach(a => {
+      if (!a.startsWith('--')) {
+        return;
+      }
+
+      if (!cmd.options.find((o: any) => o.long === a)) {
+        cmd._types.string.push(a.substr(2));
+      }
+    });
+    
+    args = vorpal.util.buildCommandArgs(commandData.matchArgs, cmd, undefined, vorpal.isCommandArgKeyPairNormalized);
+
+    return args;
   }
 }
