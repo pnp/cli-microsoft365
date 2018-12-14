@@ -15,32 +15,10 @@ describe(commands.APP_LIST, () => {
   let cmdInstanceLogSpy: sinon.SinonSpy;
   let trackEvent: any;
   let telemetry: any;
-  let stubAllPostRequests = (): sinon.SinonStub => {
-    return sinon.stub(request, 'post').callsFake((opts) => {
-
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-        return Promise.resolve(JSON.stringify([
-          {
-            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
-          }, 58, {
-            "IsNull": false
-          }, 59, {
-            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fapps"
-          }
-        ]));
-      }
-      if (opts.url.indexOf('contextinfo') > -1) {
-        return Promise.resolve('abc');
-      }
-
-      return Promise.reject('Invalid request');
-    });
-  }
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
       telemetry = t;
     });
@@ -70,7 +48,6 @@ describe(commands.APP_LIST, () => {
   after(() => {
     Utils.restore([
       appInsights.trackEvent,
-      auth.ensureAccessToken,
       auth.getAccessToken,
       auth.restoreAuth
     ]);
@@ -127,6 +104,9 @@ describe(commands.APP_LIST, () => {
 
   it('retrieves available apps from the tenant app catalog', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('SP_TenantSettings_Current') > -1) {
+        return Promise.resolve(JSON.stringify({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" }));
+      }
       if (opts.url.indexOf('/_api/web/tenantappcatalog/AvailableApps') > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
@@ -153,7 +133,6 @@ describe(commands.APP_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    stubAllPostRequests();
 
     auth.site = new Site();
     auth.site.connected = true;
@@ -250,6 +229,10 @@ describe(commands.APP_LIST, () => {
 
   it('includes all properties for output json', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('SP_TenantSettings_Current') > -1) {
+        return Promise.resolve(JSON.stringify({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" }));
+      }
+
       if (opts.url.indexOf('/_api/web/tenantappcatalog/AvailableApps') > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
@@ -284,7 +267,6 @@ describe(commands.APP_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    stubAllPostRequests();
 
     auth.site = new Site();
     auth.site.connected = true;
@@ -328,6 +310,9 @@ describe(commands.APP_LIST, () => {
 
   it('correctly handles no apps in the tenant app catalog', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('SP_TenantSettings_Current') > -1) {
+        return Promise.resolve(JSON.stringify({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" }));
+      }
       if (opts.url.indexOf('/_api/web/tenantappcatalog/AvailableApps') > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
@@ -339,7 +324,6 @@ describe(commands.APP_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    stubAllPostRequests();
 
     auth.site = new Site();
     auth.site.connected = true;
@@ -361,26 +345,7 @@ describe(commands.APP_LIST, () => {
   });
 
   it('handles if tenant appcatalog is null or not exist (debug)', (done) => {
-    // get tenant app catalog
-    sinon.stub(request, 'post').callsFake((opts) => {
-      
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-        return Promise.resolve(JSON.stringify([
-          {
-            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
-          }, 58, {
-            "IsNull": false
-          }, 59, {
-            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": null
-          }
-        ]));
-      }
-      if (opts.url.indexOf('contextinfo') > -1) {
-        return Promise.resolve('abc');
-      }
-      return Promise.reject('Invalid request');
-    });
-
+    sinon.stub(request, 'get').resolves(JSON.stringify({ "CorporateCatalogUrl": null }));
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso-admin.sharepoint.com';
@@ -435,6 +400,9 @@ describe(commands.APP_LIST, () => {
 
   it('correctly handles no apps in the tenant app catalog (verbose)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('SP_TenantSettings_Current') > -1) {
+        return Promise.resolve(JSON.stringify({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" }));
+      }
       if (opts.url.indexOf('/_api/web/tenantappcatalog/AvailableApps') > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
@@ -446,7 +414,6 @@ describe(commands.APP_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    stubAllPostRequests();
 
     auth.site = new Site();
     auth.site.connected = true;
@@ -565,8 +532,9 @@ describe(commands.APP_LIST, () => {
   });
 
   it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.ensureAccessToken);
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
+    sinon.stub(request, 'get').resolves(JSON.stringify({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" }));
+    Utils.restore(auth.getAccessToken);
+    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';

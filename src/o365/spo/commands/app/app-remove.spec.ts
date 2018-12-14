@@ -19,7 +19,6 @@ describe(commands.APP_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
     sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
       telemetry = t;
@@ -42,19 +41,21 @@ describe(commands.APP_REMOVE, () => {
     telemetry = null;
     requests = [];
     promptOptions = undefined;
+    sinon.stub(request, 'get').resolves(JSON.stringify({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" }));
   });
 
   afterEach(() => {
-    Utils.restore(vorpal.find);
+    Utils.restore([
+      vorpal.find,
+      request.get
+    ]);
   });
 
   after(() => {
     Utils.restore([
       appInsights.trackEvent,
-      auth.ensureAccessToken,
       auth.getAccessToken,
       auth.restoreAuth,
-      request.get,
       request.post
     ]);
   });
@@ -112,23 +113,6 @@ describe(commands.APP_REMOVE, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-        return Promise.resolve(JSON.stringify([
-          {
-            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
-          }, 58, {
-            "IsNull": false
-          }, 59, {
-            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fapps"
-          }
-        ]));
-      }
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
       if (opts.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/remove`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
@@ -176,23 +160,6 @@ describe(commands.APP_REMOVE, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-        return Promise.resolve(JSON.stringify([
-          {
-            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
-          }, 58, {
-            "IsNull": false
-          }, 59, {
-            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fapps"
-          }
-        ]));
-      }
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
       if (opts.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/remove`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
@@ -239,23 +206,6 @@ describe(commands.APP_REMOVE, () => {
   it('removes app from the sitecollection app catalog', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-        return Promise.resolve(JSON.stringify([
-          {
-            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
-          }, 58, {
-            "IsNull": false
-          }, 59, {
-            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fapps"
-          }
-        ]));
-      }
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
 
       if (opts.url.indexOf(`/_api/web/sitecollectionappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/remove`) > -1) {
         if (opts.headers.authorization &&
@@ -398,23 +348,6 @@ describe(commands.APP_REMOVE, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-        return Promise.resolve(JSON.stringify([
-          {
-            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
-          }, 58, {
-            "IsNull": false
-          }, 59, {
-            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fapps"
-          }
-        ]));
-      }
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
       if (opts.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/remove`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
@@ -457,22 +390,6 @@ describe(commands.APP_REMOVE, () => {
 
   it('correctly handles random API error', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-        return Promise.resolve(JSON.stringify([
-          {
-            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
-          }, 58, {
-            "IsNull": false
-          }, 59, {
-            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fapps"
-          }
-        ]));
-      }
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
 
       if (opts.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/remove`) > -1) {
         if (opts.headers.authorization &&
@@ -507,22 +424,6 @@ describe(commands.APP_REMOVE, () => {
 
   it('correctly handles random API error (error message is not ODataError)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-        return Promise.resolve(JSON.stringify([
-          {
-            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
-          }, 58, {
-            "IsNull": false
-          }, 59, {
-            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fapps"
-          }
-        ]));
-      }
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
 
       if (opts.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/remove`) > -1) {
         if (opts.headers.authorization &&
@@ -557,22 +458,6 @@ describe(commands.APP_REMOVE, () => {
 
   it('correctly handles API OData error', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-        return Promise.resolve(JSON.stringify([
-          {
-            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
-          }, 58, {
-            "IsNull": false
-          }, 59, {
-            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fapps"
-          }
-        ]));
-      }
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
 
       if (opts.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/remove`) > -1) {
         if (opts.headers.authorization &&
@@ -736,28 +621,6 @@ describe(commands.APP_REMOVE, () => {
   it('correctly handles lack of valid access token', (done) => {
     Utils.restore(auth.getAccessToken);
     sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    sinon.stub(request, 'post').callsFake((opts) => {
-      requests.push(opts);
-
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-        return Promise.resolve(JSON.stringify([
-          {
-            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
-          }, 58, {
-            "IsNull": false
-          }, 59, {
-            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fapps"
-          }
-        ]));
-      }
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';

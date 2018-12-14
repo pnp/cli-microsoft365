@@ -48,7 +48,7 @@ class AppListCommand extends SpoAppBaseCommand {
     let siteAccessToken: string = '';
     let appCatalogSiteUrl: string = '';
 
-    this.getAppCatalogSiteUrl(cmd, args)
+    this.getAppCatalogSiteUrl(cmd, auth.site.url, auth.service.accessToken, args)
       .then((siteUrl: string): Promise<string> => {
         appCatalogSiteUrl = siteUrl;
 

@@ -21,8 +21,6 @@ describe(commands.APP_ADD, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    sinon.stub(command as any, 'getRequestDigestForSite').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc' }); });
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
       telemetry = t;
     });
@@ -40,12 +38,14 @@ describe(commands.APP_ADD, () => {
     auth.site = new Site();
     telemetry = null;
     requests = [];
+    sinon.stub(request, 'get').resolves(JSON.stringify({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" }));
   });
 
   afterEach(() => {
     Utils.restore([
       vorpal.find,
       request.post,
+      request.get,
       fs.readFileSync
     ]);
   });
@@ -54,9 +54,7 @@ describe(commands.APP_ADD, () => {
     Utils.restore([
       appInsights.trackEvent,
       auth.getAccessToken,
-      auth.ensureAccessToken,
-      auth.restoreAuth,
-      request.get
+      auth.restoreAuth
     ]);
   });
 
@@ -110,23 +108,7 @@ describe(commands.APP_ADD, () => {
   });
 
   it('adds new app to the tenant app catalog', (done) => {
-
     sinon.stub(request, 'post').callsFake((opts) => {
-
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-        return Promise.resolve(JSON.stringify([
-          {
-            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
-          }, 58, {
-            "IsNull": false
-          }, 59, {
-            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fapps"
-          }
-        ]));
-      }
-      if (opts.url.indexOf('contextinfo') > -1) {
-        return Promise.resolve('abc');
-      }
 
       if (opts.url.indexOf(`/_api/web/tenantappcatalog/Add(overwrite=false, url='spfx.sppkg')`) > -1) {
         if (opts.headers.authorization &&
@@ -141,6 +123,7 @@ describe(commands.APP_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
+
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
 
     auth.site = new Site();
@@ -161,21 +144,6 @@ describe(commands.APP_ADD, () => {
   it('adds new app to the tenant app catalog (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-        return Promise.resolve(JSON.stringify([
-          {
-            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
-          }, 58, {
-            "IsNull": false
-          }, 59, {
-            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fapps"
-          }
-        ]));
-      }
-      if (opts.url.indexOf('contextinfo') > -1) {
-        return Promise.resolve('abc');
-      }
 
       if (opts.url.indexOf(`/_api/web/tenantappcatalog/Add(overwrite=false, url='spfx.sppkg')`) > -1) {
         if (opts.headers.authorization &&
@@ -230,21 +198,6 @@ describe(commands.APP_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-        return Promise.resolve(JSON.stringify([
-          {
-            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
-          }, 58, {
-            "IsNull": false
-          }, 59, {
-            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fapps"
-          }
-        ]));
-      }
-      if (opts.url.indexOf('contextinfo') > -1) {
-        return Promise.resolve('abc');
-      }
-
       if (opts.url.indexOf(`/_api/web/sitecollectionappcatalog/Add(overwrite=false, url='spfx.sppkg')`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
@@ -298,21 +251,6 @@ describe(commands.APP_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-        return Promise.resolve(JSON.stringify([
-          {
-            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
-          }, 58, {
-            "IsNull": false
-          }, 59, {
-            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fapps"
-          }
-        ]));
-      }
-      if (opts.url.indexOf('contextinfo') > -1) {
-        return Promise.resolve('abc');
-      }
-
       if (opts.url.indexOf(`/_api/web/tenantappcatalog/Add(overwrite=false, url='spfx.sppkg')`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
@@ -352,21 +290,6 @@ describe(commands.APP_ADD, () => {
   it('correctly handles failure when the app already exists in the tenant app catalog', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-        return Promise.resolve(JSON.stringify([
-          {
-            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
-          }, 58, {
-            "IsNull": false
-          }, 59, {
-            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fapps"
-          }
-        ]));
-      }
-      if (opts.url.indexOf('contextinfo') > -1) {
-        return Promise.resolve('abc');
-      }
 
       if (opts.url.indexOf(`/_api/web/tenantappcatalog/Add(overwrite=false, url='spfx.sppkg')`) > -1) {
         if (opts.headers.authorization &&
@@ -452,21 +375,6 @@ describe(commands.APP_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-        return Promise.resolve(JSON.stringify([
-          {
-            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
-          }, 58, {
-            "IsNull": false
-          }, 59, {
-            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fapps"
-          }
-        ]));
-      }
-      if (opts.url.indexOf('contextinfo') > -1) {
-        return Promise.resolve('abc');
-      }
-
       if (opts.url.indexOf(`/_api/web/tenantappcatalog/Add(overwrite=false, url='spfx.sppkg')`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
@@ -547,21 +455,6 @@ describe(commands.APP_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-        return Promise.resolve(JSON.stringify([
-          {
-            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
-          }, 58, {
-            "IsNull": false
-          }, 59, {
-            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fapps"
-          }
-        ]));
-      }
-      if (opts.url.indexOf('contextinfo') > -1) {
-        return Promise.resolve('abc');
-      }
-
       if (opts.url.indexOf(`/_api/web/tenantappcatalog/Add(overwrite=false, url='spfx.sppkg')`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
@@ -639,17 +532,9 @@ describe(commands.APP_ADD, () => {
   });
 
   it('handles promise error while getting tenant appcatalog', (done) => {
-    // get tenant app catalog
-    sinon.stub(request, 'post').callsFake((opts) => {
-      requests.push(opts);
-
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-        return Promise.reject('An error has occurred');
-      }
-      if (opts.url.indexOf('contextinfo') > -1) {
-        return Promise.resolve('abc');
-      }
-      return Promise.reject('Invalid request');
+    Utils.restore(request.get);
+    sinon.stub(request, 'get').callsFake((opts) => {
+      return Promise.reject('An error has occurred');
     });
 
     auth.site = new Site();
@@ -672,7 +557,11 @@ describe(commands.APP_ADD, () => {
   });
 
   it('handles error while getting tenant appcatalog', (done) => {
-    // get tenant app catalog
+    Utils.restore(request.get);
+    sinon.stub(request, 'get').callsFake((opts) => {
+      return Promise.reject('An error has occurred');
+    });
+    
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
       if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
@@ -701,86 +590,6 @@ describe(commands.APP_ADD, () => {
     }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('gets the tenant appcatalog url (debug)', (done) => {
-    // get tenant app catalog
-    sinon.stub(request, 'post').callsFake((opts) => {
-      requests.push(opts);
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-        return Promise.resolve(JSON.stringify([
-          {
-            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
-          }, 58, {
-            "IsNull": false
-          }, 59, {
-            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fapps"
-          }
-        ]));
-      }
-      if (opts.url.indexOf('contextinfo') > -1) {
-        return Promise.resolve('abc');
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        debug: true, filePath: 'spfx.sppkg'
-      }
-    }, () => {
-      try {
-        assert(cmdInstanceLogSpy.calledWith(sinon.match('https://contoso.sharepoint.com/sites/apps')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('handles if tenant appcatalog is null or not exist', (done) => {
-    // get tenant app catalog
-    sinon.stub(request, 'post').callsFake((opts) => {
-      requests.push(opts);
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-        return Promise.resolve(JSON.stringify([
-          {
-            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
-          }, 58, {
-            "IsNull": false
-          }, 59, {
-            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": null
-          }
-        ]));
-      }
-      if (opts.url.indexOf('contextinfo') > -1) {
-        return Promise.resolve('abc');
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        debug: true, filePath: 'spfx.sppkg'
-      }
-    }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Tenant app catalog is not configured.')));
         done();
       }
       catch (e) {
@@ -852,21 +661,6 @@ describe(commands.APP_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-        return Promise.resolve(JSON.stringify([
-          {
-            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
-          }, 58, {
-            "IsNull": false
-          }, 59, {
-            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fapps"
-          }
-        ]));
-      }
-      if (opts.url.indexOf('contextinfo') > -1) {
-        return Promise.resolve('abc');
-      }
-
       if (opts.url.indexOf(`/_api/web/`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
@@ -914,21 +708,6 @@ describe(commands.APP_ADD, () => {
     // setup call to fake requests...
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-        return Promise.resolve(JSON.stringify([
-          {
-            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
-          }, 58, {
-            "IsNull": false
-          }, 59, {
-            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fapps"
-          }
-        ]));
-      }
-      if (opts.url.indexOf('contextinfo') > -1) {
-        return Promise.resolve('abc');
-      }
 
       if (opts.url.indexOf(`/_api/web/`) > -1) {
         if (opts.headers.authorization &&
@@ -1233,23 +1012,6 @@ describe(commands.APP_ADD, () => {
 
   it('correctly handles lack of valid access token', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      requests.push(opts);
-
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-        return Promise.resolve(JSON.stringify([
-          {
-            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
-          }, 58, {
-            "IsNull": false
-          }, 59, {
-            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fapps"
-          }
-        ]));
-      }
-      if (opts.url.indexOf('contextinfo') > -1) {
-        return Promise.resolve('abc');
-      }
-
       return Promise.reject('Invalid request');
     });
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');

@@ -53,7 +53,7 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
       cmd.log(`Retrieving access token for ${auth.service.resource}...`);
     }
 
-    this.getAppCatalogSiteUrl(cmd, args)
+    this.getAppCatalogSiteUrl(cmd, auth.site.url, auth.service.accessToken, args)
       .then((siteUrl: string): Promise<string> => {
         appCatalogSiteUrl = siteUrl;
 
@@ -62,7 +62,7 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
       })
       .then((accessToken: string): request.RequestPromise => {
         siteAccessToken = accessToken;
-
+        
         if (this.debug) {
           cmd.log('Response:');
           cmd.log(accessToken);

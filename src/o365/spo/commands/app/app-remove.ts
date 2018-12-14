@@ -50,7 +50,7 @@ class AppRemoveCommand extends SpoAppBaseCommand {
 
     const removeApp: () => void = (): void => {
       
-      this.getAppCatalogSiteUrl(cmd, args)
+      this.getAppCatalogSiteUrl(cmd, auth.site.url, auth.service.accessToken, args)
         .then((siteUrl: string): Promise<string> => {
           appCatalogSiteUrl = siteUrl;
 

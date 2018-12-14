@@ -15,27 +15,6 @@ describe(commands.APP_GET, () => {
   let cmdInstanceLogSpy: sinon.SinonSpy;
   let trackEvent: any;
   let telemetry: any;
-  let stubAllPostRequests = (): sinon.SinonStub => {
-    return sinon.stub(request, 'post').callsFake((opts) => {
-
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-        return Promise.resolve(JSON.stringify([
-          {
-            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
-          }, 58, {
-            "IsNull": false
-          }, 59, {
-            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fapps"
-          }
-        ]));
-      }
-      if (opts.url.indexOf('contextinfo') > -1) {
-        return Promise.resolve('abc');
-      }
-
-      return Promise.reject('Invalid request');
-    });
-  }
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -62,8 +41,7 @@ describe(commands.APP_GET, () => {
   afterEach(() => {
     Utils.restore([
       vorpal.find,
-      request.get,
-      request.post
+      request.get
     ]);
   });
 
@@ -127,6 +105,10 @@ describe(commands.APP_GET, () => {
 
   it('retrieves information about the app with the specified id from the tenant app catalog (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
+
+      if (opts.url.indexOf('SP_TenantSettings_Current') > -1) {
+        return Promise.resolve(JSON.stringify({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" }));
+      }
       if (opts.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
@@ -143,7 +125,6 @@ describe(commands.APP_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    stubAllPostRequests();
 
     auth.site = new Site();
     auth.site.connected = true;
@@ -171,6 +152,9 @@ describe(commands.APP_GET, () => {
 
   it('retrieves information about the app with the specified id from the site app catalog (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('SP_TenantSettings_Current') > -1) {
+        return Promise.resolve(JSON.stringify({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" }));
+      }
       if (opts.url.indexOf(`/_api/web/sitecollectionappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
@@ -215,6 +199,9 @@ describe(commands.APP_GET, () => {
 
   it('retrieves information about the app with the specified id from the tenant app catalog', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('SP_TenantSettings_Current') > -1) {
+        return Promise.resolve(JSON.stringify({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" }));
+      }
       if (opts.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
@@ -231,7 +218,6 @@ describe(commands.APP_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    stubAllPostRequests();
 
     auth.site = new Site();
     auth.site.connected = true;
@@ -259,6 +245,9 @@ describe(commands.APP_GET, () => {
 
   it('retrieves information about the app with the specified id from the site app catalog', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('SP_TenantSettings_Current') > -1) {
+        return Promise.resolve(JSON.stringify({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" }));
+      }
       if (opts.url.indexOf(`/_api/web/sitecollectionappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
@@ -302,6 +291,9 @@ describe(commands.APP_GET, () => {
 
   it('retrieves information about the app with the specified name from the specified tenant app catalog', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('SP_TenantSettings_Current') > -1) {
+        return Promise.resolve(JSON.stringify({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" }));
+      }
       if (opts.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
@@ -351,6 +343,9 @@ describe(commands.APP_GET, () => {
 
   it('retrieves information about the app with the specified name from the specified site app catalog', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('SP_TenantSettings_Current') > -1) {
+        return Promise.resolve(JSON.stringify({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" }));
+      }
 
       if (opts.url.indexOf(`/_api/web/sitecollectionappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')`) > -1) {
         if (opts.headers.authorization &&
@@ -401,6 +396,9 @@ describe(commands.APP_GET, () => {
 
   it('retrieves information about the app with the specified name with auto-discovered tenant app catalog (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('SP_TenantSettings_Current') > -1) {
+        return Promise.resolve(JSON.stringify({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" }));
+      }
       if (opts.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
@@ -423,7 +421,6 @@ describe(commands.APP_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    stubAllPostRequests();
 
     auth.site = new Site();
     auth.site.connected = true;
@@ -487,6 +484,10 @@ describe(commands.APP_GET, () => {
 
   it('retrieves information about the app with the specified name from the specified tenant app catalog', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('SP_TenantSettings_Current') > -1) {
+        return Promise.resolve(JSON.stringify({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" }));
+      }
+
       if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('solution.sppkg')?$select=UniqueId`) {
         return Promise.resolve({
           UniqueId: 'b2307a39-e878-458b-bc90-03bc578531d6'
@@ -509,7 +510,6 @@ describe(commands.APP_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    stubAllPostRequests();
 
     auth.site = new Site();
     auth.site.connected = true;
@@ -536,6 +536,10 @@ describe(commands.APP_GET, () => {
 
   it('correctly handles no app found in the tenant app catalog', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('SP_TenantSettings_Current') > -1) {
+        return Promise.resolve(JSON.stringify({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" }));
+      }
+
       if (opts.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
@@ -555,7 +559,6 @@ describe(commands.APP_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    stubAllPostRequests();
 
     auth.site = new Site();
     auth.site.connected = true;
@@ -578,6 +581,9 @@ describe(commands.APP_GET, () => {
 
   it('correctly handles no app found in the site app catalog', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('SP_TenantSettings_Current') > -1) {
+        return Promise.resolve(JSON.stringify({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" }));
+      }
       if (opts.url.indexOf(`/_api/web/sitecollectionappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
@@ -597,7 +603,6 @@ describe(commands.APP_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    stubAllPostRequests();
 
     auth.site = new Site();
     auth.site.connected = true;
@@ -620,6 +625,9 @@ describe(commands.APP_GET, () => {
 
   it('correctly handles random API error', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('SP_TenantSettings_Current') > -1) {
+        return Promise.resolve(JSON.stringify({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" }));
+      }
       if (opts.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
@@ -631,7 +639,6 @@ describe(commands.APP_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    stubAllPostRequests();
 
     auth.site = new Site();
     auth.site.connected = true;
@@ -654,6 +661,10 @@ describe(commands.APP_GET, () => {
 
   it('correctly handles API OData error', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('SP_TenantSettings_Current') > -1) {
+        return Promise.resolve(JSON.stringify({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" }));
+      }
+
       if (opts.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
@@ -672,7 +683,6 @@ describe(commands.APP_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    stubAllPostRequests();
 
     auth.site = new Site();
     auth.site.connected = true;
@@ -839,13 +849,13 @@ describe(commands.APP_GET, () => {
 
   it('correctly handles lack of valid access token', (done) => {
     Utils.restore(auth.getAccessToken);
-    stubAllPostRequests();
     sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
+
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: true, siteUrl: 'https://contoso.sharepoint.com', scope: 'sitecollection'  } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
         done();
