@@ -1,6 +1,6 @@
 import { Rule } from "./Rule";
 import { Occurrence } from "../";
-import * as path from 'path'
+import * as path from 'path';
 
 export abstract class ManifestRule extends Rule {
   get resolutionType(): string {
