@@ -16,7 +16,7 @@ Option|Description
 `-p, --filePath <filePath>`|Absolute or relative path to the solution package file to add to the app catalog
 `--overwrite`|Set to overwrite the existing package file
 `-s, --scope [scope]`|Scope of the app catalog: `tenant|sitecollection`. Default `tenant`
-`--siteUrl [siteUrl]`|The URL of the site collection with app catalog where the solution package will be added. Must be specified when the scope is `sitecollection`.
+`-u, --appCatalogUrl [appCatalogUrl]`|The app catalog url where the soultion package to be added. It must be specified when the scope is `sitecollection`
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
@@ -49,7 +49,7 @@ spo app add --filePath sharepoint/solution/spfx.sppkg --overwrite
 Add the _spfx.sppkg_ package to the site collection app catalog of site _https://contoso.sharepoint.com/sites/site1_
 
 ```sh
-spo app add --filePath c:\spfx.sppkg --scope sitecollection --siteUrl https://contoso.sharepoint.com/sites/site1
+spo app add --filePath c:\spfx.sppkg --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1/AppCatalog
 ```
 
 ## More information

@@ -10,14 +10,14 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   appCatalogUrl?: string;
   scope?: string;
-  siteUrl?: string;
 }
 
 export abstract class SpoAppBaseCommand extends SpoCommand {
   public getAppCatalogSiteUrl(cmd: CommandInstance, authSiteUrl: string, accessToken: string, args: CommandArgs): Promise<string> {
     return new Promise<string>((resolve: (appCatalogSiteUrl: string) => void, reject: (error: any) => void): void => {
       if (args.options.scope === 'sitecollection') {
-        return resolve(args.options.siteUrl as string);
+
+        return resolve((args.options.appCatalogUrl as string).toLowerCase().replace('/appcatalog', ''));
       }
 
       if (args.options.appCatalogUrl) {

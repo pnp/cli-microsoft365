@@ -23,7 +23,7 @@ interface Options extends GlobalOptions {
   filePath: string;
   overwrite?: boolean;
   scope?: string;
-  siteUrl?: string;
+  appCatalogUrl?: string;
 }
 
 class SpoAppAddCommand extends SpoAppBaseCommand {
@@ -37,9 +37,9 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.overwrite = args.options.overwrite || false;
+    telemetryProps.overwrite = (!(!args.options.overwrite)).toString();
     telemetryProps.scope = (!(!args.options.scope)).toString();
-    telemetryProps.siteUrl = (!(!args.options.siteUrl)).toString();
+    telemetryProps.appCatalogUrl = (!(!args.options.appCatalogUrl)).toString();
     return telemetryProps;
   }
 
@@ -50,8 +50,8 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
     let siteAccessToken = '';
 
     this.getAppCatalogSiteUrl(cmd, auth.site.url, auth.service.accessToken, args)
-      .then((siteUrl: string): Promise<string> => {
-        appCatalogSiteUrl = siteUrl;
+      .then((appCatalogUrl: string): Promise<string> => {
+        appCatalogSiteUrl = appCatalogUrl;
 
         const resource: string = Auth.getResourceFromUrl(appCatalogSiteUrl);
 
@@ -129,8 +129,8 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
         autocomplete: ['tenant', 'sitecollection']
       },
       {
-        option: '--siteUrl [siteUrl]',
-        description: 'The URL of the site collection with app catalog where the solution package will be added. Must be specified when the scope is \'sitecollection\'',
+        option: '-u, --appCatalogUrl [appCatalogUrl]',
+        description: 'The app catalog url where the soultion package to be added. It must be specified when the scope is \'sitecollection\'',
       },
       {
         option: '--overwrite [overwrite]',
@@ -144,6 +144,10 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
+      if (!args.options.scope && args.options.appCatalogUrl) {
+        return 'You must specify scope when the appCatalogUrl option is specified';
+      }
+
       // verify either 'tenant' or 'sitecollection' specified if scope provided
       if (args.options.scope) {
         const testScope: string = args.options.scope.toLowerCase();
@@ -151,11 +155,8 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
           return `Scope must be either 'tenant' or 'sitecollection'`;
         }
 
-        if (testScope === 'sitecollection' && !args.options.siteUrl) {
-          return `You must specify siteUrl when the scope is sitecollection`;
-        }
-        else if (testScope === 'tenant' && args.options.siteUrl) {
-          return `The siteUrl option can only be used when the scope option is set to sitecollection`;
+        if (testScope === 'sitecollection' && !args.options.appCatalogUrl) {
+          return `You must specify appCatalogUrl when the scope is sitecollection`;
         }
       }
 
@@ -173,12 +174,8 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
         return `Path '${fullPath}' points to a directory`;
       }
 
-      if (!args.options.scope && args.options.siteUrl) {
-        return `The siteUrl option can only be used when the scope option is set to sitecollection`;
-      }
-
-      if (args.options.siteUrl) {
-        return SpoAppBaseCommand.isValidSharePointUrl(args.options.siteUrl);
+      if (args.options.appCatalogUrl) {
+        return SpoAppBaseCommand.isValidSharePointUrl(args.options.appCatalogUrl);
       }
 
       return true;
@@ -216,7 +213,7 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
 
     Add the ${chalk.grey('spfx.sppkg')} package to the site collection app catalog 
     of site ${chalk.grey('https://contoso.sharepoint.com/sites/site1')}
-      ${chalk.grey(config.delimiter)} ${commands.APP_ADD} --filePath c:\\spfx.sppkg --scope sitecollection --siteUrl https://contoso.sharepoint.com/sites/site1
+      ${chalk.grey(config.delimiter)} ${commands.APP_ADD} --filePath c:\\spfx.sppkg --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1/AppCatalog
 
   More information:
 

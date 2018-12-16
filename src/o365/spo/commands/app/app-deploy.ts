@@ -22,7 +22,6 @@ interface Options extends GlobalOptions {
   id?: string;
   name?: string;
   scope?: string;
-  siteUrl?: string;
   skipFeatureDeployment?: boolean;
 }
 
@@ -37,12 +36,11 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.id = typeof args.options.id !== 'undefined';
-    telemetryProps.name = typeof args.options.name !== 'undefined';
+    telemetryProps.id = (!(!args.options.id)).toString();
+    telemetryProps.name = (!(!args.options.name)).toString();
     telemetryProps.appCatalogUrl = (!(!args.options.appCatalogUrl)).toString();
     telemetryProps.skipFeatureDeployment = args.options.skipFeatureDeployment || false;
     telemetryProps.scope = (!(!args.options.scope)).toString();
-    telemetryProps.siteUrl = (!(!args.options.siteUrl)).toString();
     return telemetryProps;
   }
 
@@ -53,8 +51,8 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
     let appCatalogSiteUrl: string = '';
 
     this.getAppCatalogSiteUrl(cmd, auth.site.url, auth.service.accessToken, args)
-      .then((siteUrl: string): Promise<string> => {
-        appCatalogSiteUrl = siteUrl;
+      .then((appCatalogUrl: string): Promise<string> => {
+        appCatalogSiteUrl = appCatalogUrl;
 
         const resource: string = Auth.getResourceFromUrl(appCatalogSiteUrl);
         return auth.getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug);
@@ -147,15 +145,15 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
     const options: CommandOption[] = [
       {
         option: '-i, --id [id]',
-        description: 'ID of the app to deploy. Specify the id or the name but not both.'
+        description: 'ID of the app to deploy. Specify the id or the name but not both'
       },
       {
         option: '-n, --name [name]',
-        description: 'Name of the app to deploy. Specify the id or the name but not both.'
+        description: 'Name of the app to deploy. Specify the id or the name but not both'
       },
       {
         option: '-u, --appCatalogUrl [appCatalogUrl]',
-        description: 'URL of the tenant app catalog site. If not specified, the CLI will try to resolve it automatically'
+        description: 'URL of the tenant or site app catalog. It must be specified when the scope is \'sitecollection\''
       },
       {
         option: '--skipFeatureDeployment',
@@ -165,10 +163,6 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
         option: '-s, --scope [scope]',
         description: 'Scope of the app catalog: tenant|sitecollection. Default tenant',
         autocomplete: ['tenant', 'sitecollection']
-      },
-      {
-        option: '--siteUrl [siteUrl]',
-        description: 'The URL of the site collection with app catalog where the solution package will be deployed. Must be specified when the scope is \'sitecollection\''
       }
     ];
 
@@ -178,6 +172,10 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
+      if (!args.options.scope && args.options.appCatalogUrl) {
+        return 'You must specify scope when the appCatalogUrl option is specified';
+      }
+
       // verify either 'tenant' or 'sitecollection' specified if scope provided
       if (args.options.scope) {
         const testScope: string = args.options.scope.toLowerCase();
@@ -185,15 +183,8 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
           return `Scope must be either 'tenant' or 'sitecollection'`
         }
 
-        if (testScope === 'sitecollection' && !args.options.siteUrl) {
-          
-          if(args.options.appCatalogUrl){
-            return `You must specify siteUrl when the scope is sitecollection instead of appCatalogUrl`;
-          }  
-          return `You must specify siteUrl when the scope is sitecollection`;
-
-        } else if(testScope === 'tenant' && args.options.siteUrl) {
-          return `The siteUrl option can only be used when the scope option is set to sitecollection`;
+        if (testScope === 'sitecollection' && !args.options.appCatalogUrl) { 
+          return `You must specify appCatalogUrl when the scope is sitecollection`;
         }
       }
 
@@ -209,16 +200,8 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
         return `${args.options.id} is not a valid GUID`;
       }
 
-      if (args.options.appCatalogUrl) {
-        return SpoAppBaseCommand.isValidSharePointUrl(args.options.appCatalogUrl);
-      }
-
-      if (!args.options.scope && args.options.siteUrl) {
-        return `The siteUrl option can only be used when the scope option is set to sitecollection`;
-      }
-
-      if(args.options.siteUrl) {
-          return SpoAppBaseCommand.isValidSharePointUrl(args.options.siteUrl);
+      if(args.options.appCatalogUrl) {
+          return SpoAppBaseCommand.isValidSharePointUrl(args.options.appCatalogUrl);
       }
 
       return true;
@@ -254,7 +237,7 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
 
     Deploy the specified app in the site collection app catalog 
     of site ${chalk.grey('https://contoso.sharepoint.com/sites/site1')}.
-      ${chalk.grey(config.delimiter)} ${commands.APP_DEPLOY} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --scope sitecollection --siteUrl https://contoso.sharepoint.com/sites/site1
+      ${chalk.grey(config.delimiter)} ${commands.APP_DEPLOY} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1/AppCatalog
 
     Deploy the app with the specified name in the tenant app catalog.
     Try to resolve the URL of the tenant app catalog automatically.

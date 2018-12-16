@@ -105,14 +105,14 @@ describe(commands.APP_LIST, () => {
   it('retrieves available apps from the tenant app catalog', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf('SP_TenantSettings_Current') > -1) {
-        return Promise.resolve(JSON.stringify({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" }));
+        return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" });
       }
       if (opts.url.indexOf('/_api/web/tenantappcatalog/AvailableApps') > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve(JSON.stringify({
+          return Promise.resolve({
             value: [
               {
                 ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
@@ -127,7 +127,7 @@ describe(commands.APP_LIST, () => {
                 AppCatalogVersion: '1.0.0.0'
               }
             ]
-          }));
+          });
         }
       }
 
@@ -173,7 +173,7 @@ describe(commands.APP_LIST, () => {
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve(JSON.stringify({
+          return Promise.resolve({
             value: [
               {
                 ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
@@ -188,7 +188,7 @@ describe(commands.APP_LIST, () => {
                 AppCatalogVersion: '1.0.0.0'
               }
             ]
-          }));
+          });
         }
       }
 
@@ -200,7 +200,7 @@ describe(commands.APP_LIST, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, scope: 'sitecollection', siteUrl: 'https://contoso-admin.sharepoint.com' } }, () => {
+    cmdInstance.action({ options: { debug: true, scope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith([
           {
@@ -230,7 +230,7 @@ describe(commands.APP_LIST, () => {
   it('includes all properties for output json', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf('SP_TenantSettings_Current') > -1) {
-        return Promise.resolve(JSON.stringify({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" }));
+        return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" });
       }
 
       if (opts.url.indexOf('/_api/web/tenantappcatalog/AvailableApps') > -1) {
@@ -238,7 +238,7 @@ describe(commands.APP_LIST, () => {
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve(JSON.stringify({
+          return Promise.resolve({
             value: [
               {
                 "AppCatalogVersion": "1.0.0.0",
@@ -261,7 +261,7 @@ describe(commands.APP_LIST, () => {
                 "Title": "spfx-140-online-client-side-solution"
               }
             ]
-          }));
+          });
         }
       }
 
@@ -311,7 +311,7 @@ describe(commands.APP_LIST, () => {
   it('correctly handles no apps in the tenant app catalog', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf('SP_TenantSettings_Current') > -1) {
-        return Promise.resolve(JSON.stringify({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" }));
+        return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" });
       }
       if (opts.url.indexOf('/_api/web/tenantappcatalog/AvailableApps') > -1) {
         if (opts.headers.authorization &&
@@ -384,7 +384,7 @@ describe(commands.APP_LIST, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, scope: 'sitecollection', siteUrl: 'https://contoso-admin.sharepoint.com' } }, () => {
+    cmdInstance.action({ options: { debug: false, scope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } }, () => {
       try {
         assert.equal(log.length, 0);
         done();
@@ -401,7 +401,7 @@ describe(commands.APP_LIST, () => {
   it('correctly handles no apps in the tenant app catalog (verbose)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf('SP_TenantSettings_Current') > -1) {
-        return Promise.resolve(JSON.stringify({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" }));
+        return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" });
       }
       if (opts.url.indexOf('/_api/web/tenantappcatalog/AvailableApps') > -1) {
         if (opts.headers.authorization &&
@@ -470,30 +470,30 @@ describe(commands.APP_LIST, () => {
     assert.equal(actual, true);
   });
 
-  it('fails validation when siteUrl is not a valid url', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { scope: 'sitecollection', siteUrl: 'abc' } });
+  it('fails validation when appCatalogUrl is not a valid url', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { scope: 'sitecollection', appCatalogUrl: 'abc' } });
     assert.notEqual(actual, true);
   });
 
-  it('fails validation when siteUrl and no scope', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { siteUrl: 'https://contoso-admin.sharepoint.com' } });
+  it('fails validation when appCatalogUrl and no scope', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { appCatalogUrl: 'https://contoso-admin.sharepoint.com' } });
     assert.notEqual(actual, true);
   });
 
-  it('should fail when \'sitecollection\' scope, but no siteUrl specified', () => {
+  it('should fail when \'sitecollection\' scope, but no appCatalogUrl specified', () => {
 
     const actual = (command.validate() as CommandValidate)({ options: { name: 'solution', filePath: 'abc', scope: 'sitecollection' } });
     assert.notEqual(actual, true);
   });
 
-  it('should fail when \'sitecollection\' scope, but  bad siteUrl format specified', () => {
+  it('should fail when \'sitecollection\' scope, but  bad appCatalogUrl format specified', () => {
 
-    const actual = (command.validate() as CommandValidate)({ options: { name: 'solution', filePath: 'abc', scope: 'sitecollection', siteUrl: 'contoso.sharepoint.com' } });
+    const actual = (command.validate() as CommandValidate)({ options: { name: 'solution', filePath: 'abc', scope: 'sitecollection', appCatalogUrl: 'contoso.sharepoint.com' } });
     assert.notEqual(actual, true);
   });
 
-  it('passes validation when the scope is specified with \'sitecollection\' and siteUrl present', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { scope: 'sitecollection', siteUrl: 'https://contoso-admin.sharepoint.com' } });
+  it('passes validation when the scope is specified with \'sitecollection\' and appCatalogUrl present', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { scope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } });
     assert.equal(actual, true);
   });
 
@@ -532,7 +532,7 @@ describe(commands.APP_LIST, () => {
   });
 
   it('correctly handles lack of valid access token', (done) => {
-    sinon.stub(request, 'get').resolves(JSON.stringify({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" }));
+    sinon.stub(request, 'get').resolves({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" });
     Utils.restore(auth.getAccessToken);
     sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
     auth.site = new Site();

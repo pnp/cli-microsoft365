@@ -23,7 +23,6 @@ interface Options extends GlobalOptions {
   confirm?: boolean;
   id: string;
   scope?: string;
-  siteUrl?: string;
 }
 
 class SpoAppRemoveCommand extends SpoAppBaseCommand {
@@ -40,7 +39,6 @@ class SpoAppRemoveCommand extends SpoAppBaseCommand {
     telemetryProps.appCatalogUrl = (!(!args.options.appCatalogUrl)).toString();
     telemetryProps.confirm = (!(!args.options.confirm)).toString();
     telemetryProps.scope = (!(!args.options.scope)).toString();
-    telemetryProps.siteUrl = (!(!args.options.siteUrl)).toString();
     return telemetryProps;
   }
 
@@ -51,8 +49,8 @@ class SpoAppRemoveCommand extends SpoAppBaseCommand {
 
     const removeApp: () => void = (): void => {
       this.getAppCatalogSiteUrl(cmd, auth.site.url, auth.service.accessToken, args)
-        .then((siteUrl: string): Promise<string> => {
-          appCatalogSiteUrl = siteUrl;
+        .then((appCatalogUrl: string): Promise<string> => {
+          appCatalogSiteUrl = appCatalogUrl;
 
           if (this.debug) {
             cmd.log(`Retrieved app catalog URL ${appCatalogSiteUrl}`);
@@ -117,16 +115,12 @@ class SpoAppRemoveCommand extends SpoAppBaseCommand {
       },
       {
         option: '-u, --appCatalogUrl [appCatalogUrl]',
-        description: 'URL of the tenant app catalog site. If not specified, the CLI will try to resolve it automatically'
+        description: 'URL of the tenant or site app catalog. It must be specified when the scope is \'sitecollection\''
       },
       {
         option: '-s, --scope [scope]',
         description: 'Scope of the app catalog: tenant|sitecollection. Default tenant',
         autocomplete: ['tenant', 'sitecollection']
-      },
-      {
-        option: '--siteUrl [siteUrl]',
-        description: 'The URL of the site collection with app catalog where the solution package to remove is located. Must be specified when the scope is \'sitecollection\'.'
       },
       {
         option: '--confirm',
@@ -140,6 +134,10 @@ class SpoAppRemoveCommand extends SpoAppBaseCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
+      if (!args.options.scope && args.options.appCatalogUrl) {
+        return 'You must specify scope when the appCatalogUrl option is specified';
+      }
+
       // verify either 'tenant' or 'sitecollection' specified if scope provided
       if (args.options.scope) {
         const testScope: string = args.options.scope.toLowerCase();
@@ -147,15 +145,8 @@ class SpoAppRemoveCommand extends SpoAppBaseCommand {
           return `Scope must be either 'tenant' or 'sitecollection' if specified`
         }
 
-        if (testScope === 'sitecollection' && !args.options.siteUrl) {
-          if (args.options.appCatalogUrl) {
-            return `You must specify siteUrl when the scope is sitecollection instead of appCatalogUrl`;
-          }
-
-          return `You must specify siteUrl when the scope is sitecollection`;
-        }
-        else if (testScope === 'tenant' && args.options.siteUrl) {
-          return `The siteUrl option can only be used when the scope option is set to sitecollection`;
+        if (testScope === 'sitecollection' && !args.options.appCatalogUrl) {
+          return `You must specify appCatalogUrl when the scope is sitecollection`;
         }
       }
 
@@ -168,18 +159,7 @@ class SpoAppRemoveCommand extends SpoAppBaseCommand {
       }
 
       if (args.options.appCatalogUrl) {
-        const isValidSharePointUrl: string | boolean = SpoCommand.isValidSharePointUrl(args.options.appCatalogUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-      }
-
-      if (!args.options.scope && args.options.siteUrl) {
-        return `The siteUrl option can only be used when the scope option is set to sitecollection`;
-      }
-
-      if (args.options.siteUrl) {
-        return SpoCommand.isValidSharePointUrl(args.options.siteUrl);
+        return SpoCommand.isValidSharePointUrl(args.options.appCatalogUrl);
       }
 
       return true;
@@ -224,7 +204,7 @@ class SpoAppRemoveCommand extends SpoAppBaseCommand {
 
     Remove the specified app from a site colleciton app catalog 
     of site ${chalk.grey('https://contoso.sharepoint.com/sites/site1')}.
-      ${chalk.grey(config.delimiter)} ${commands.APP_REMOVE} --id d95f8c94-67a1-4615-9af8-361ad33be93c --scope sitecollection --siteUrl https://contoso.sharepoint.com/sites/site1
+      ${chalk.grey(config.delimiter)} ${commands.APP_REMOVE} --id d95f8c94-67a1-4615-9af8-361ad33be93c --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1/AppCatalog
     
   More information:
   

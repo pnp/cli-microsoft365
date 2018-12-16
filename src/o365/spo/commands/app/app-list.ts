@@ -20,7 +20,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   scope?: string;
-  siteUrl?: string;
+  appCatalogUrl?: string;
 }
 
 class SpoAppListCommand extends SpoAppBaseCommand {
@@ -38,7 +38,7 @@ class SpoAppListCommand extends SpoAppBaseCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.siteUrl = (!(!args.options.siteUrl)).toString();
+    telemetryProps.appCatalogUrl = (!(!args.options.appCatalogUrl)).toString();
     telemetryProps.scope = (!(!args.options.scope)).toString();
     return telemetryProps;
   }
@@ -49,8 +49,8 @@ class SpoAppListCommand extends SpoAppBaseCommand {
     let appCatalogSiteUrl: string = '';
 
     this.getAppCatalogSiteUrl(cmd, auth.site.url, auth.service.accessToken, args)
-      .then((siteUrl: string): Promise<string> => {
-        appCatalogSiteUrl = siteUrl;
+      .then((appCatalogUrl: string): Promise<string> => {
+        appCatalogSiteUrl = appCatalogUrl;
 
         const resource: string = Auth.getResourceFromUrl(appCatalogSiteUrl);
         return auth.getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug);
@@ -122,8 +122,8 @@ class SpoAppListCommand extends SpoAppBaseCommand {
         autocomplete: ['tenant', 'sitecollection']
       },
       {
-        option: '-u, --siteUrl [siteUrl]',
-        description: 'The URL of the site collection with app catalog for which to list available solution packages. Must be specified when the scope is \'sitecollection\''
+        option: '-u, --appCatalogUrl [appCatalogUrl]',
+        description: 'URL of the tenant or site app catalog. It must be specified when the scope is \'sitecollection\''
       }
     ];
 
@@ -133,6 +133,11 @@ class SpoAppListCommand extends SpoAppBaseCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
+
+      if (!args.options.scope && args.options.appCatalogUrl) {
+        return 'You must specify scope when the appCatalogUrl option is specified';
+      }
+      
       // verify either 'tenant' or 'sitecollection' specified if scope provided
       if (args.options.scope) {
         const testScope: string = args.options.scope.toLowerCase();
@@ -141,16 +146,13 @@ class SpoAppListCommand extends SpoAppBaseCommand {
           return `Scope must be either 'tenant' or 'sitecollection'`;
         }
 
-        if (testScope === 'sitecollection' && !args.options.siteUrl) {
-          return `You must specify siteUrl when the scope is sitecollection`;
+        if (testScope === 'sitecollection' && !args.options.appCatalogUrl) {
+          return `You must specify appCatalogUrl when the scope is sitecollection`;
         }
 
-        if (args.options.siteUrl) {
-          return SpoAppBaseCommand.isValidSharePointUrl(args.options.siteUrl);
+        if (args.options.appCatalogUrl) {
+          return SpoAppBaseCommand.isValidSharePointUrl(args.options.appCatalogUrl);
         }
-      }
-      else if (args.options.siteUrl) {
-        return `siteUrl must be used with scope 'sitecollection'`;
       }
 
       return true;
@@ -179,7 +181,7 @@ class SpoAppListCommand extends SpoAppBaseCommand {
 
     Return the list of available apps from a site collection app catalog
     of site ${chalk.grey('https://contoso.sharepoint.com/sites/site1')}.
-      ${chalk.grey(config.delimiter)} ${commands.APP_LIST} --scope sitecollection --siteUrl https://contoso.sharepoint.com/sites/site1
+      ${chalk.grey(config.delimiter)} ${commands.APP_LIST} --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1/AppCatalog
 
   More information:
   
