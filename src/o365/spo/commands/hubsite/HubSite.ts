@@ -1,3 +1,5 @@
+import { AssociatedSite } from './AssociatedSite';
+
 export interface HubSite {
   Description: string;
   ID: string;
@@ -7,4 +9,5 @@ export interface HubSite {
   Targets: string;
   TenantInstanceId: string;
   Title: string;
+  AssociatedSites: AssociatedSite[];
 }

@@ -2,6 +2,7 @@ import auth from '../../SpoAuth';
 import config from '../../../../config';
 import * as request from 'request-promise-native';
 import commands from '../../commands';
+import { CommandOption } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -10,7 +11,11 @@ import { HubSite } from './HubSite';
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
 interface CommandArgs {
-  options: GlobalOptions;
+  options: Options;
+}
+
+interface Options extends GlobalOptions {
+  includeAssociatedSites?: boolean;
 }
 
 class SpoHubSiteListCommand extends SpoCommand {
@@ -20,6 +25,12 @@ class SpoHubSiteListCommand extends SpoCommand {
 
   public get description(): string {
     return 'Lists hub sites in the current tenant';
+  }
+
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.classifications = args.options.includeAssociatedSites === true; 
+    return telemetryProps;
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
@@ -75,6 +86,18 @@ class SpoHubSiteListCommand extends SpoCommand {
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
 
+  public options(): CommandOption[] {
+    const options: CommandOption[] = [
+      {
+        option: '-i, --includeAssociatedSites',
+        description: `Include the associated sites in the result`
+      }
+    ];
+
+    const parentOptions: CommandOption[] = super.options();
+    return options.concat(parentOptions);
+  }
+
   public commandHelp(args: {}, log: (help: string) => void): void {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
@@ -100,6 +123,9 @@ class SpoHubSiteListCommand extends SpoCommand {
   
     List hub sites in the current tenant
       ${chalk.grey(config.delimiter)} ${this.name}
+
+    List hub sites, including their associated sites, in the current tenant
+      ${chalk.grey(config.delimiter)} ${this.name} --includeAssociatedSites
 
   More information:
 
