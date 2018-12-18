@@ -7,6 +7,7 @@ import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import GlobalOptions from '../../../../GlobalOptions';
 import { HubSite } from './HubSite';
+import { QueryListResult } from './QueryListResult';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -29,11 +30,13 @@ class SpoHubSiteListCommand extends SpoCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.classifications = args.options.includeAssociatedSites === true; 
+    telemetryProps.classifications = args.options.includeAssociatedSites === true;
     return telemetryProps;
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    let hubSites: HubSite[];
+
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
       .then((accessToken: string): request.RequestPromise => {
@@ -58,18 +61,87 @@ class SpoHubSiteListCommand extends SpoCommand {
 
         return request.get(requestOptions);
       })
-      .then((res: { value: HubSite[] }): void => {
+      .then((res: { value: HubSite[] }): request.RequestPromise | Promise<string> => {
         if (this.debug) {
           cmd.log('Response:');
           cmd.log(res);
           cmd.log('');
         }
 
+        hubSites = res.value;
+
+        if (args.options.includeAssociatedSites !== true) {
+          return Promise.resolve('');
+        } else {
+          if (this.debug) {
+            cmd.log('Retrieving associated sites...');
+            cmd.log('');
+          }
+        }
+
+        const requestOptions: any = {
+          url: `${auth.site.url}/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/RenderListDataAsStream`,
+          headers: Utils.getRequestHeaders({
+            authorization: `Bearer ${auth.service.accessToken}`,
+            accept: 'application/json;odata=nometadata'
+          }),
+          json: true,
+          body: {
+            parameters: {
+              ViewXml: "<View><Query><Where><And><And><IsNull><FieldRef Name=\"TimeDeleted\"/></IsNull><Neq><FieldRef Name=\"State\"/><Value Type='Integer'>0</Value></Neq></And><Neq><FieldRef Name=\"HubSiteId\"/><Value Type='Text'>{00000000-0000-0000-0000-000000000000}</Value></Neq></And></Where><OrderBy><FieldRef Name='Title' Ascending='true' /></OrderBy></Query><ViewFields><FieldRef Name=\"Title\"/><FieldRef Name=\"SiteUrl\"/><FieldRef Name=\"SiteId\"/><FieldRef Name=\"HubSiteId\"/></ViewFields><RowLimit Paged=\"TRUE\">100</RowLimit></View>",
+              DatesInUtc: true
+            }
+          }
+        };
+
+        if (this.debug) {
+          cmd.log('Executing web request...');
+          cmd.log(requestOptions);
+          cmd.log('');
+        }
+
+        return request.post(requestOptions);
+      })
+      .then((res: QueryListResult): void => {
+        if (this.debug) {
+          cmd.log('Response:');
+          cmd.log(res);
+          cmd.log('');
+        }
+
+        if (res) {
+          hubSites.forEach(h => {
+            const filteredSites = res.Row.filter(f => {
+              // Only include sites of which the Site Id is not the same as the
+              // Hub Site ID (as this site is the actual hub site) and of which the
+              // Hub Site ID matches the ID of the Hub
+              return f.SiteId != f.HubSiteId 
+                && f.HubSiteId.toUpperCase() == `{${h.ID.toUpperCase()}}`;
+            });
+            h.AssociatedSites = filteredSites.map(a => {
+              return {
+                Title: a.Title,
+                SiteUrl: a.SiteUrl
+              }
+            })
+          });
+        };
+
         if (args.options.output === 'json') {
-          cmd.log(res.value);
+          cmd.log(hubSites);
+        }
+        else if (args.options.includeAssociatedSites === true) {
+          cmd.log(hubSites.map(h => {
+            return {
+              ID: h.ID,
+              SiteUrl: h.SiteUrl,
+              Title: h.Title,
+              AssociatedSites: h.AssociatedSites.map(a => a.Title)
+            };
+          }));
         }
         else {
-          cmd.log(res.value.map(h => {
+          cmd.log(hubSites.map(h => {
             return {
               ID: h.ID,
               SiteUrl: h.SiteUrl,
