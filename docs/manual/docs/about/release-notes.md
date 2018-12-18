@@ -16,6 +16,7 @@
 - added support for specifying web part data and fixed web parts lookup [#701](https://github.com/pnp/office365-cli/issues/701), [#703](https://github.com/pnp/office365-cli/issues/703)
 - removed treating values of unknown options as numbers [#702](https://github.com/pnp/office365-cli/issues/702)
 - added support for site collection app catalog in the spo app add, -deploy, -get, -list and -remove commands [#405](https://github.com/pnp/office365-cli/issues/405) (partially)
+- added support for upgrading projects built using SharePoint Framework v1.7.0 [#716](https://github.com/pnp/office365-cli/pull/716)
 
 ## [v1.10.0](https://github.com/pnp/office365-cli/releases/tag/v1.10.0)
 
