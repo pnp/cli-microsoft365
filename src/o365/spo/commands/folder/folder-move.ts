@@ -78,7 +78,7 @@ class SpoFolderMoveCommand extends SpoCommand {
 
         siteAccessToken = accessToken;
 
-        const sourceAbsoluteUrl: string = url.resolve(webUrl, args.options.sourceUrl);
+        const sourceAbsoluteUrl: string = this.urlCombine(webUrl, args.options.sourceUrl);
         const allowSchemaMismatch: boolean = args.options.allowSchemaMismatch || false;
         const requestUrl: string = `${webUrl}/_api/site/CreateCopyJobs`;
         const requestOptions: any = {
@@ -89,11 +89,11 @@ class SpoFolderMoveCommand extends SpoCommand {
           }),
           body: {
             exportObjectUris: [sourceAbsoluteUrl],
-            destinationUri: url.resolve(tenantUrl, args.options.targetUrl),
+            destinationUri: this.urlCombine(tenantUrl, args.options.targetUrl),
             options: {
-              "AllowSchemaMismatch": allowSchemaMismatch, 
+              "AllowSchemaMismatch": allowSchemaMismatch,
               "IgnoreVersionHistory": true,
-              "IsMoveMode":true, 
+              "IsMoveMode": true,
             }
           },
           json: true
@@ -218,6 +218,30 @@ class SpoFolderMoveCommand extends SpoCommand {
     };
 
     return new Promise<void>(checkCondition);
+  }
+
+  /**
+   * Combines base and relative url considering any missing slashes
+   * @param baseUrl https://contoso.com
+   * @param relativeUrl sites/abc
+   */
+  private urlCombine(baseUrl: string, relativeUrl: string): string {
+    // remove last '/' of base if exists
+    if (baseUrl.lastIndexOf('/') === baseUrl.length - 1) {
+      baseUrl = baseUrl.substring(0, baseUrl.length - 1);
+    }
+
+    // remove '/' at 0
+    if (relativeUrl.charAt(0) === '/') {
+      relativeUrl = relativeUrl.substring(1, relativeUrl.length);
+    }
+
+    // remove last '/' of next if exists
+    if (relativeUrl.lastIndexOf('/') === relativeUrl.length - 1) {
+      relativeUrl = relativeUrl.substring(0, relativeUrl.length - 1);
+    }
+
+    return `${baseUrl}/${relativeUrl}`;
   }
 
   public options(): CommandOption[] {
