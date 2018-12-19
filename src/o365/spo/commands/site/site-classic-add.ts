@@ -6,7 +6,7 @@ import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import { CommandOption, CommandValidate, CommandCancel } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
+import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo } from '../../spo';
 import { SiteProperties } from './SiteProperties';
 import { DeletedSiteProperties } from './DeletedSiteProperties';
 import { SpoOperation } from './SpoOperation';
@@ -33,8 +33,7 @@ interface Options extends GlobalOptions {
 }
 
 class SpoSiteClassicAddCommand extends SpoCommand {
-  private formDigest?: string;
-  private formDigestExpiresAt?: Date;
+  private context?: FormDigestInfo;
   private accessToken?: string;
   private dots?: string;
   private timeout?: NodeJS.Timer;
@@ -69,16 +68,18 @@ class SpoSiteClassicAddCommand extends SpoCommand {
 
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<void> => {
+      .then((accessToken: string): Promise<FormDigestInfo> => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest for tenant admin at ${auth.site.url}...`);
         }
 
         this.accessToken = accessToken;
 
-        return this.ensureFormDigest(cmd);
+        return this.ensureFormDigest(cmd, this.context, this.debug);
       })
-      .then((): Promise<boolean> => {
+      .then((res: FormDigestInfo): Promise<boolean> => {
+        this.context = res;
+
         if (args.options.removeDeletedSite) {
           return this.siteExistsInTheRecycleBin(args.options.url, this.accessToken as string, cmd);
         }
@@ -103,10 +104,12 @@ class SpoSiteClassicAddCommand extends SpoCommand {
           return Promise.resolve();
         }
       })
-      .then((): Promise<void> => {
-        return this.ensureFormDigest(cmd);
+      .then((): Promise<FormDigestInfo> => {
+        return this.ensureFormDigest(cmd, this.context, this.debug);
       })
-      .then((): request.RequestPromise => {
+      .then((res: FormDigestInfo): request.RequestPromise => {
+        this.context = res;
+
         if (this.verbose) {
           cmd.log(`Creating site collection ${args.options.url}...`);
         }
@@ -122,7 +125,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
           url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${auth.service.accessToken}`,
-            'X-RequestDigest': this.formDigest
+            'X-RequestDigest': this.context.FormDigestValue
           }),
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><ObjectPath Id="6" ObjectPathId="5" /><Query Id="7" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query></Query><Query Id="8" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="5" ParentId="3" Name="CreateSite"><Parameters><Parameter TypeId="{11f84fff-b8cf-47b6-8b50-34e692656606}"><Property Name="CompatibilityLevel" Type="Int32">0</Property><Property Name="Lcid" Type="UInt32">${lcid}</Property><Property Name="Owner" Type="String">${Utils.escapeXml(args.options.owner)}</Property><Property Name="StorageMaximumLevel" Type="Int64">${storageQuota}</Property><Property Name="StorageWarningLevel" Type="Int64">${storageQuotaWarningLevel}</Property><Property Name="Template" Type="String">${Utils.escapeXml(webTemplate)}</Property><Property Name="TimeZoneId" Type="Int32">${args.options.timeZone}</Property><Property Name="Title" Type="String">${Utils.escapeXml(args.options.title)}</Property><Property Name="Url" Type="String">${Utils.escapeXml(args.options.url)}</Property><Property Name="UserCodeMaximumLevel" Type="Double">${resourceQuota}</Property><Property Name="UserCodeWarningLevel" Type="Double">${resourceQuotaWarningLevel}</Property></Parameter></Parameters></Method></ObjectPaths></Request>`
         };
@@ -142,7 +145,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
             cmd.log(res);
             cmd.log('');
           }
-  
+
           const json: ClientSvcResponse = JSON.parse(res);
           const response: ClientSvcResponseContents = json[0];
           if (response.ErrorInfo) {
@@ -155,9 +158,10 @@ class SpoSiteClassicAddCommand extends SpoCommand {
               resolve();
               return;
             }
-  
+
             this.timeout = setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), resolve, reject, this.accessToken as string, cmd);
+              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), resolve, reject, this.accessToken as string, cmd, this.context as FormDigestInfo, this.dots, this.timeout);
+
             }, operation.PollingInterval);
           }
         });
@@ -179,44 +183,13 @@ class SpoSiteClassicAddCommand extends SpoCommand {
     }
   }
 
-  private ensureFormDigest(cmd: CommandInstance): Promise<void> {
-    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      const now: Date = new Date();
-      if (this.formDigest &&
-        now < (this.formDigestExpiresAt as Date)) {
-        if (this.debug) {
-          cmd.log('Existing form digest still valid');
-        }
-
-        resolve();
-        return;
-      }
-
-      this
-        .getRequestDigest(cmd, this.debug)
-        .then((res: ContextInfo): void => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
-          }
-
-          this.formDigest = res.FormDigestValue;
-          this.formDigestExpiresAt = new Date();
-          this.formDigestExpiresAt.setSeconds(this.formDigestExpiresAt.getSeconds() + res.FormDigestTimeoutSeconds - 5);
-
-          resolve();
-        }, (error: any): void => {
-          reject(error);
-        });
-    });
-  }
-
   private siteExistsInTheRecycleBin(url: string, accessToken: string, cmd: CommandInstance): Promise<boolean> {
     return new Promise<boolean>((resolve: (exists: boolean) => void, reject: (error: any) => void): void => {
       this
-        .ensureFormDigest(cmd)
-        .then((): request.RequestPromise => {
+        .ensureFormDigest(cmd, this.context, this.debug)
+        .then((res: FormDigestInfo): request.RequestPromise => {
+          this.context = res;
+
           if (this.verbose) {
             cmd.log(`Checking if the site ${url} exists...`);
           }
@@ -225,7 +198,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
             url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
             headers: Utils.getRequestHeaders({
               authorization: `Bearer ${auth.service.accessToken}`,
-              'X-RequestDigest': this.formDigest
+              'X-RequestDigest': this.context.FormDigestValue
             }),
             body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="197" ObjectPathId="196" /><ObjectPath Id="199" ObjectPathId="198" /><Query Id="200" ObjectPathId="198"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Constructor Id="196" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="198" ParentId="196" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">${Utils.escapeXml(url)}</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></ObjectPaths></Request>`
           };
@@ -274,7 +247,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
             url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
             headers: Utils.getRequestHeaders({
               authorization: `Bearer ${auth.service.accessToken}`,
-              'X-RequestDigest': this.formDigest
+              'X-RequestDigest': (this.context as FormDigestInfo).FormDigestValue
             }),
             body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="181" ObjectPathId="180" /><Query Id="182" ObjectPathId="180"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Method Id="180" ParentId="175" Name="GetDeletedSitePropertiesByUrl"><Parameters><Parameter Type="String">${Utils.escapeXml(url)}</Parameter></Parameters></Method><Constructor Id="175" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
           };
@@ -327,8 +300,10 @@ class SpoSiteClassicAddCommand extends SpoCommand {
   private deleteSiteFromTheRecycleBin(url: string, wait: boolean, accessToken: string, cmd: CommandInstance): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       this
-        .ensureFormDigest(cmd)
-        .then((): request.RequestPromise => {
+        .ensureFormDigest(cmd, this.context, this.debug)
+        .then((res: FormDigestInfo): request.RequestPromise => {
+          this.context = res;
+
           if (this.verbose) {
             cmd.log(`Deleting site ${url} from the recycle bin...`);
           }
@@ -337,7 +312,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
             url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
             headers: Utils.getRequestHeaders({
               authorization: `Bearer ${auth.service.accessToken}`,
-              'X-RequestDigest': this.formDigest
+              'X-RequestDigest': this.context.FormDigestValue
             }),
             body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="185" ObjectPathId="184" /><Query Id="186" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Method Id="184" ParentId="175" Name="RemoveDeletedSite"><Parameters><Parameter Type="String">${Utils.escapeXml(url)}</Parameter></Parameters></Method><Constructor Id="175" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
           };
@@ -371,72 +346,11 @@ class SpoSiteClassicAddCommand extends SpoCommand {
             }
 
             setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), resolve, reject, accessToken, cmd);
+              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), resolve, reject, accessToken, cmd, this.context as FormDigestInfo, this.dots, this.timeout);
             }, operation.PollingInterval);
           }
         });
     });
-  }
-
-  private waitUntilFinished(operationId: string, resolve: () => void, reject: (error: any) => void, accessToken: string, cmd: CommandInstance): void {
-    this
-      .ensureFormDigest(cmd)
-      .then((): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log(`Checking if operation ${operationId} completed...`);
-        }
-
-        if (!this.debug && this.verbose) {
-          this.dots += '.';
-          process.stdout.write(`\r${this.dots}`);
-        }
-
-        const requestOptions: any = {
-          url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
-          headers: Utils.getRequestHeaders({
-            authorization: `Bearer ${auth.service.accessToken}`,
-            'X-RequestDigest': this.formDigest
-          }),
-          body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="188" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="184" Name="${operationId.replace(/\\n/g, '&#xA;').replace(/"/g, '')}" /></ObjectPaths></Request>`
-        };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
-        return request.post(requestOptions);
-      })
-      .then((res: string): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
-        const json: ClientSvcResponse = JSON.parse(res);
-        const response: ClientSvcResponseContents = json[0];
-        if (response.ErrorInfo) {
-          reject(response.ErrorInfo.ErrorMessage);
-        }
-        else {
-          const operation: SpoOperation = json[json.length - 1];
-          let isComplete: boolean = operation.IsComplete;
-          if (isComplete) {
-            if (this.verbose) {
-              process.stdout.write('\n');
-            }
-
-            resolve();
-            return;
-          }
-
-          this.timeout = setTimeout(() => {
-            this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), resolve, reject, accessToken, cmd);
-          }, operation.PollingInterval);
-        }
-      });
   }
 
   public options(): CommandOption[] {

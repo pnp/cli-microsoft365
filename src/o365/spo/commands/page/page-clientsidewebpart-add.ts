@@ -12,7 +12,8 @@ import {
   CanvasSection,
   ClientSideWebpart,
   ClientSidePageComponent,
-  CanvasColumn
+  CanvasColumn,
+  ServerProcessedContent
 } from './clientsidepages';
 import { StandardWebPart, StandardWebPartUtils } from '../../common/StandardWebPartTypes';
 import { ContextInfo } from '../../spo';
@@ -29,6 +30,7 @@ interface Options extends GlobalOptions {
   pageName: string;
   webUrl: string;
   standardWebPart?: StandardWebPart;
+  webPartData?: string;
   webPartId?: string;
   webPartProperties?: string;
   section?: number;
@@ -48,6 +50,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.standardWebPart = args.options.standardWebPart;
+    telemetryProps.webPartData = typeof args.options.webPartData !== 'undefined';
     telemetryProps.webPartId = typeof args.options.webPartId !== 'undefined';
     telemetryProps.webPartProperties = typeof args.options.webPartProperties !== 'undefined';
     telemetryProps.section = typeof args.options.section !== 'undefined';
@@ -191,11 +194,16 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
             return;
           }
 
-          const clientSidePage: ClientSidePage = ClientSidePage.fromHtml(
-            res.ListItemAllFields.CanvasContent1
-          );
+          try {
+            const clientSidePage: ClientSidePage = ClientSidePage.fromHtml(
+              res.ListItemAllFields.CanvasContent1
+            );
+            resolve(clientSidePage);
+          }
+          catch (e) {
+            reject(e);
+          }
 
-          resolve(clientSidePage);
         }, (error: any): void => {
           reject(error);
         });
@@ -239,7 +247,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
             cmd.log('');
           }
 
-          const webPartDefinition = res.value.filter((c) => c.Id === webPartId);
+          const webPartDefinition = res.value.filter((c) => c.Id.toLowerCase() === (webPartId as string).toLowerCase() || c.Id.toLowerCase() === `{${(webPartId as string).toLowerCase()}}`);
           if (webPartDefinition.length === 0) {
             reject(new Error(`There is no available WebPart with Id ${webPartId}.`));
             return;
@@ -315,6 +323,28 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
       }
     }
 
+    if (args.options.webPartData) {
+      if (this.debug) {
+        cmd.log('WebPart data:');
+        cmd.log(args.options.webPartData);
+        cmd.log('');
+      }
+
+      try {
+        const webPartData: { dataVersion?: string; properties?: any; serverProcessedContent?: ServerProcessedContent } = JSON.parse(args.options.webPartData);
+        if (webPartData.dataVersion) {
+          webPart.dataVersion = webPartData.dataVersion;
+        }
+        if (webPartData.properties) {
+          webPart.setProperties(webPartData.properties);
+        }
+        if (webPartData.serverProcessedContent) {
+          (webPart as any).serverProcessedContent = webPartData.serverProcessedContent;
+        }
+      }
+      catch { }
+    }
+
     // Add the WebPart to to appropriate location
     column.addControl(webPart);
   }
@@ -385,7 +415,11 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
       },
       {
         option: '--webPartProperties [webPartProperties]',
-        description: 'JSON string with web part properties to set on the web part'
+        description: 'JSON string with web part properties to set on the web part. Specify webPartProperties or webPartData but not both'
+      },
+      {
+        option: '--webPartData [webPartData]',
+        description: 'JSON string with web part data as retrieved from the web part maintenance mode. Specify webPartProperties or webPartData but not both'
       },
       {
         option: '--section [section]',
@@ -431,6 +465,10 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
         return `${args.options.standardWebPart} is not a valid standard web part type`;
       }
 
+      if (args.options.webPartProperties && args.options.webPartData) {
+        return 'Specify webPartProperties or webPartData but not both';
+      }
+
       if (args.options.webPartProperties) {
         try {
           JSON.parse(args.options.webPartProperties);
@@ -438,6 +476,16 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
         catch (e) {
           return `Specified webPartProperties is not a valid JSON string. Input: ${args.options
             .webPartProperties}. Error: ${e}`;
+        }
+      }
+
+      if (args.options.webPartData) {
+        try {
+          JSON.parse(args.options.webPartData);
+        }
+        catch (e) {
+          return `Specified webPartData is not a valid JSON string. Input: ${args.options
+            .webPartData}. Error: ${e}`;
         }
       }
 
@@ -498,6 +546,9 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
 
     Using Windows command line, add the standard Bing Map web part with the specific properties to a modern page
       ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --standardWebPart BingMap --webPartProperties \`"{""Title"":""Foo location""}"\`
+
+    Add the standard Image web part with the preconfigured image
+      ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --standardWebPart Image --webPartData '\`{ "dataVersion": "1.8", "serverProcessedContent": {"htmlStrings":{},"searchablePlainTexts":{"captionText":""},"imageSources":{"imageSource":"/sites/team-a/SiteAssets/work-life-balance.png"},"links":{}}, "properties": {"imageSourceType":2,"altText":"a group of people on a beach","overlayText":"Work life balance","fileName":"48146-OFF12_Justice_01.png","siteId":"27664b85-067d-4be9-a7d7-89b2e804d09f","webId":"a7664b85-067d-4be9-a7d7-89b2e804d09f","listId":"37664b85-067d-4be9-a7d7-89b2e804d09f","uniqueId":"67664b85-067d-4be9-a7d7-89b2e804d09f","imgWidth":650,"imgHeight":433,"fixAspectRatio":false,"isOverlayTextEnabled":true}}\`'
       `
     );
   }

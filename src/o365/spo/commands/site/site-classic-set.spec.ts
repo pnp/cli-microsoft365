@@ -26,7 +26,10 @@ describe(commands.SITE_CLASSIC_SET, () => {
   });
 
   beforeEach(() => {
-    sinon.stub(command as any, 'getRequestDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800 }); });
+    let futureDate = new Date();
+    futureDate.setSeconds(futureDate.getSeconds() + 1800);
+    sinon.stub(command as any, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: futureDate.toISOString() }); });
+
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
@@ -40,12 +43,12 @@ describe(commands.SITE_CLASSIC_SET, () => {
   });
 
   afterEach(() => {
-    (command as any).formDigest = undefined;
+    (command as any).currentContext = undefined;
     Utils.restore([
       vorpal.find,
       request.post,
       global.setTimeout,
-      (command as any).getRequestDigest
+      (command as any).ensureFormDigest
     ]);
   });
 
@@ -1354,26 +1357,6 @@ describe(commands.SITE_CLASSIC_SET, () => {
     cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title>', sharing: 'Disabled', resourceQuota: 100, resourceQuotaWarningLevel: 100, storageQuota: 100, storageQuotaWarningLevel: 100, allowSelfServiceUpgrade: 'true', noScriptSite: 'true', owners: 'admin@contoso.com>', lockState: 'NoAccess', wait: true } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('updates site title. doesn\'t wait for completion. refreshing expired token failed', (done) => {
-    Utils.restore((command as any).getRequestDigest);
-    sinon.stub(command as any, 'getRequestDigest').callsFake(() => { return Promise.reject('An error has occurred'); });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'a61d499e-50aa-5000-8242-7169ab88ce08|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023&#xA;Tenant';
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title' } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {

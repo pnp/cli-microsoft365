@@ -1,4 +1,4 @@
-![SharePoint Patterns and Practices](https://devofficecdn.azureedge.net/media/Default/PnP/sppnp.png)
+<img src="./docs/manual/docs/images/pnp-office365-cli-blue.svg" alt="Office 365 CLI" height=78 />
 
 @latest (master) | @next (dev)
 :--------------: | :---------:
@@ -74,6 +74,8 @@ We'd love your help! If you have ideas for new features or feedback, let us know
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
 contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+
+![SharePoint Patterns and Practices](https://devofficecdn.azureedge.net/media/Default/PnP/sppnp.png)
 
 ## Disclaimer
 

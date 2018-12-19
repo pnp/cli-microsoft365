@@ -1,5 +1,4 @@
 import auth from '../../SpoAuth';
-import { ContextInfo } from '../../spo';
 import config from '../../../../config';
 import * as request from 'request-promise-native';
 import commands from '../../commands';
@@ -20,7 +19,8 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   isExternal?: boolean;
-  location: string;
+  location?: string;
+  parentNodeId?: number;
   title: string;
   url: string;
   webUrl: string;
@@ -38,6 +38,7 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.isExternal = args.options.isExternal;
+    telemetryProps.parentNodeId = typeof args.options.parentNodeId !== 'undefined';
     return telemetryProps;
   }
 
@@ -55,29 +56,23 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
         siteAccessToken = accessToken;
 
         if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
-
-        return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
-      })
-      .then((res: ContextInfo): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
+          cmd.log(`Retrieved access token ${accessToken}`);
         }
 
         if (this.verbose) {
           cmd.log(`Adding navigation node...`);
         }
 
+        const nodesCollection: string = args.options.parentNodeId ?
+          `GetNodeById(${args.options.parentNodeId})/Children` :
+          (args.options.location as string).toLowerCase();
+
         const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/navigation/${args.options.location.toLowerCase()}`,
+          url: `${args.options.webUrl}/_api/web/navigation/${nodesCollection}`,
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata',
-            'content-type': 'application/json;odata=nometadata',
-            'X-RequestDigest': res.FormDigestValue
+            'content-type': 'application/json;odata=nometadata'
           }),
           body: {
             Title: args.options.title,
@@ -132,6 +127,10 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
         description: 'Navigation node URL'
       },
       {
+        option: '--parentNodeId [parentNodeId]',
+        description: 'ID of the node below which the node should be added'
+      },
+      {
         option: '--isExternal',
         description: 'Set, if the navigation node points to an external URL'
       }
@@ -152,13 +151,20 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
         return isValidSharePointUrl;
       }
 
-      if (!args.options.location) {
-        return 'Required option location missing';
+      if (args.options.parentNodeId) {
+        if (isNaN(args.options.parentNodeId)) {
+          return `${args.options.parentNodeId} is not a number`;
+        }
       }
       else {
-        if (args.options.location !== 'QuickLaunch' &&
-          args.options.location !== 'TopNavigationBar') {
-          return `${args.options.location} is not a valid value for the location option. Allowed values are QuickLaunch|TopNavigationBar`;
+        if (!args.options.location) {
+          return 'Required option location missing';
+        }
+        else {
+          if (args.options.location !== 'QuickLaunch' &&
+            args.options.location !== 'TopNavigationBar') {
+            return `${args.options.location} is not a valid value for the location option. Allowed values are QuickLaunch|TopNavigationBar`;
+          }
         }
       }
 
@@ -194,6 +200,9 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
 
     Add a navigation node pointing to an external page to the quick launch
       ${chalk.grey(config.delimiter)} ${commands.NAVIGATION_NODE_ADD} --webUrl https://contoso.sharepoint.com/sites/team-a --location QuickLaunch --title "About us" --url https://contoso.com/about-us --isExternal
+
+    Add a navigation node below an existing node
+      ${chalk.grey(config.delimiter)} ${commands.NAVIGATION_NODE_ADD} --webUrl https://contoso.sharepoint.com/sites/team-a --parentNodeId 2010 --title About --url /sites/team-s/sitepages/about.aspx
 `);
   }
 }

@@ -288,7 +288,7 @@ export class ClientSidePage {
 
     return JSON.parse(escapedString
       .replace(/&quot;/g, `"`)
-      .replace(/&#58;/g, ":") 
+      .replace(/&#58;/g, ":")
       .replace(/&#123;/g, "{")
       .replace(/&#125;/g, "}"));
   }
@@ -296,15 +296,15 @@ export class ClientSidePage {
   /**
    * Add a section to this page
    */
-  public addSection(sectionTemplate? : CanvasSectionTemplate, order? : number): CanvasSection {
+  public addSection(sectionTemplate?: CanvasSectionTemplate, order?: number): CanvasSection {
     var section: CanvasSection;
     var sectionOrder = order ? order : 1;
-    if(sectionTemplate && order) {
+    if (sectionTemplate && order) {
       section = new CanvasSection(this, sectionOrder);
-      switch(CanvasSectionTemplate[sectionTemplate].toString()) {
+      switch (CanvasSectionTemplate[sectionTemplate].toString()) {
         case CanvasSectionTemplate.OneColumnFullWidth.toString():
           section.addColumn(0);
-          break;  
+          break;
         case CanvasSectionTemplate.TwoColumn.toString():
           section.addColumn(6);
           section.addColumn(6);
@@ -329,7 +329,7 @@ export class ClientSidePage {
       }
 
       // Insert the sections at the specified order.
-      this.sections.splice(sectionOrder-1, 0, section)
+      this.sections.splice(sectionOrder - 1, 0, section)
 
     }
     else {
@@ -349,7 +349,7 @@ export class ClientSidePage {
     reindex(this.sections);
 
     const html: string[] = [];
- 
+
     html.push("<div>");
 
     for (let i = 0; i < this.sections.length; i++) {
@@ -454,9 +454,9 @@ export class ClientSidePage {
     let section: CanvasSection | null = null;
     let column: CanvasColumn | null = null;
 
-    const sections = this.sections.filter(s => control.controlData && s.order === control.controlData.position.zoneIndex);
+    const sections = this.sections.filter(s => control.controlData && control.controlData.position && s.order === control.controlData.position.zoneIndex);
     if (sections.length < 1) {
-      section = new CanvasSection(this, control.controlData ? control.controlData.position.zoneIndex : 0);
+      section = new CanvasSection(this, control.controlData && control.controlData.position ? control.controlData.position.zoneIndex : 0);
       this.sections.push(section);
     } else {
       section = sections[0];
@@ -483,10 +483,10 @@ export class ClientSidePage {
   private mergeColumnToTree(column: CanvasColumn): void {
 
     let section: CanvasSection | null = null;
-    const sections = this.sections.filter(s => column.controlData && s.order === column.controlData.position.zoneIndex);
+    const sections = this.sections.filter(s => column.controlData && column.controlData.position && s.order === column.controlData.position.zoneIndex);
 
     if (sections.length < 1) {
-      section = new CanvasSection(this, column.controlData ? column.controlData.position.zoneIndex : 0);
+      section = new CanvasSection(this, column.controlData && column.controlData.position ? column.controlData.position.zoneIndex : 0);
       this.sections.push(section);
     } else {
       section = sections[0];
@@ -631,8 +631,10 @@ export class CanvasColumn extends CanvasControl {
     super.fromHtml(html);
 
     this.controlData = ClientSidePage.escapedStringToJson<ClientSideControlData>(getAttrValueFromString(html, "data-sp-controldata"));
-    this.factor = this.controlData.position.sectionFactor;
-    this.order = this.controlData.position.sectionIndex;
+    if (this.controlData.position) {
+      this.factor = this.controlData.position.sectionFactor;
+      this.order = this.controlData.position.sectionIndex;
+    }
   }
 
   public getControlData(): ClientSideControlData {

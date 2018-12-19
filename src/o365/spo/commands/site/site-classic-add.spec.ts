@@ -26,7 +26,10 @@ describe(commands.SITE_CLASSIC_ADD, () => {
   });
 
   beforeEach(() => {
-    sinon.stub(command as any, 'getRequestDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800 }); });
+    let futureDate = new Date();
+    futureDate.setSeconds(futureDate.getSeconds() + 1800);
+    sinon.stub(command as any, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: futureDate.toISOString() }); });
+
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
@@ -40,12 +43,12 @@ describe(commands.SITE_CLASSIC_ADD, () => {
   });
 
   afterEach(() => {
-    (command as any).formDigest = undefined;
+    (command as any).currentContext = undefined;
     Utils.restore([
       vorpal.find,
       request.post,
       global.setTimeout,
-      (command as any).getRequestDigest
+      (command as any).ensureFormDigest
     ]);
   });
 
@@ -867,8 +870,12 @@ describe(commands.SITE_CLASSIC_ADD, () => {
   });
 
   it('creates classic site with minimal options. doesn\'t wait for completion. remove deleted site, site doesn\'t exist. refreshes expired token', (done) => {
-    Utils.restore((command as any).getRequestDigest);
-    sinon.stub(command as any, 'getRequestDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 0 }); });
+    Utils.restore((command as any).ensureFormDigest);
+
+    let pastDate = new Date();
+    pastDate.setSeconds(pastDate.getSeconds() - 1800);
+    sinon.stub(command as any, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: pastDate.toISOString() }); });
+
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="197" ObjectPathId="196" /><ObjectPath Id="199" ObjectPathId="198" /><Query Id="200" ObjectPathId="198"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Constructor Id="196" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="198" ParentId="196" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/team</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -938,8 +945,12 @@ describe(commands.SITE_CLASSIC_ADD, () => {
   });
 
   it('creates classic site with minimal options. doesn\'t wait for completion. remove deleted site, site doesn\'t exist. refreshes expired token (debug)', (done) => {
-    Utils.restore((command as any).getRequestDigest);
-    sinon.stub(command as any, 'getRequestDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: -1 }); });
+    Utils.restore((command as any).ensureFormDigest);
+    //sinon.stub(command as any, 'getRequestDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: -1 }); });
+    let pastDate = new Date();
+    pastDate.setSeconds(pastDate.getSeconds() - 1800);
+    sinon.stub(command as any, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: pastDate.toISOString() }); });
+
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="197" ObjectPathId="196" /><ObjectPath Id="199" ObjectPathId="198" /><Query Id="200" ObjectPathId="198"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Constructor Id="196" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="198" ParentId="196" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/team</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -1000,26 +1011,6 @@ describe(commands.SITE_CLASSIC_ADD, () => {
     cmdInstance.action({ options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com', removeDeletedSite: true } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('creates classic site with minimal options. doesn\'t wait for completion. remove deleted site, site doesn\'t exist. refreshing expired token failed', (done) => {
-    Utils.restore((command as any).getRequestDigest);
-    sinon.stub(command as any, 'getRequestDigest').callsFake(() => { return Promise.reject('An error has occurred'); });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com', removeDeletedSite: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -1588,11 +1579,11 @@ describe(commands.SITE_CLASSIC_ADD, () => {
         if (opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="188" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="184" Name="e13c489e-304e-5000-8242-705e26a87302|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023&#xA;SpoOperation&#xA;RemoveDeletedSite&#xA;636536266495764941&#xA;https%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam&#xA;cb09f194-0ee7-4c48-a44f-8c112fff4d4e" /></ObjectPaths></Request>`) {
           return Promise.resolve(JSON.stringify([
             {
-            "SchemaVersion":"15.0.0.0","LibraryVersion":"16.0.7324.1200","ErrorInfo":{
-            "ErrorMessage":"An error has occurred.","ErrorValue":null,"TraceCorrelationId":"b33c489e-009b-5000-8240-a8c28e5fd8b4","ErrorCode":-1,"ErrorTypeName":"SPException"
-            },"TraceCorrelationId":"b33c489e-009b-5000-8240-a8c28e5fd8b4"
+              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7324.1200", "ErrorInfo": {
+                "ErrorMessage": "An error has occurred.", "ErrorValue": null, "TraceCorrelationId": "b33c489e-009b-5000-8240-a8c28e5fd8b4", "ErrorCode": -1, "ErrorTypeName": "SPException"
+              }, "TraceCorrelationId": "b33c489e-009b-5000-8240-a8c28e5fd8b4"
             }
-            ]));
+          ]));
         }
       }
 
