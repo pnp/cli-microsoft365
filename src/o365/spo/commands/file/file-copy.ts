@@ -116,7 +116,7 @@ class SpoFileCopyCommand extends SpoCommand {
         }
 
         // all preconditions met, now create copy job
-        const sourceAbsoluteUrl = url.resolve(webUrl, args.options.sourceUrl);
+        const sourceAbsoluteUrl = this.urlCombine(webUrl, args.options.sourceUrl);
         const allowSchemaMismatch: boolean = args.options.allowSchemaMismatch || false;
         const requestUrl: string = `${webUrl}/_api/site/CreateCopyJobs`;
         const requestOptions: any = {
@@ -127,10 +127,10 @@ class SpoFileCopyCommand extends SpoCommand {
           }),
           body: {
             exportObjectUris: [sourceAbsoluteUrl],
-            destinationUri: url.resolve(tenantUrl, args.options.targetUrl),
+            destinationUri: this.urlCombine(tenantUrl, args.options.targetUrl),
             options: {
-              "AllowSchemaMismatch": allowSchemaMismatch, 
-              "IgnoreVersionHistory": true 
+              "AllowSchemaMismatch": allowSchemaMismatch,
+              "IgnoreVersionHistory": true
             }
           },
           json: true
@@ -287,7 +287,7 @@ class SpoFileCopyCommand extends SpoCommand {
    */
   private recycleFile(tenantUrl: string, targetUrl: string, filename: string, siteAccessToken: string, cmd: CommandInstance): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      const targetFolderAbsoluteUrl: string = url.resolve(tenantUrl, targetUrl);
+      const targetFolderAbsoluteUrl: string = this.urlCombine(tenantUrl, targetUrl);
 
       // since the target WebFullUrl is unknown we can use getRequestDigestForSite
       // to get it from target folder absolute url.
@@ -342,6 +342,30 @@ class SpoFileCopyCommand extends SpoCommand {
             });
         }, (e: any) => reject(e));
     });
+  }
+
+  /**
+   * Combines base and relative url considering any missing slashes
+   * @param baseUrl https://contoso.com
+   * @param relativeUrl sites/abc
+   */
+  private urlCombine(baseUrl: string, relativeUrl: string): string {
+    // remove last '/' of base if exists
+    if (baseUrl.lastIndexOf('/') === baseUrl.length - 1) {
+      baseUrl = baseUrl.substring(0, baseUrl.length - 1);
+    }
+
+    // remove '/' at 0
+    if (relativeUrl.charAt(0) === '/') {
+      relativeUrl = relativeUrl.substring(1, relativeUrl.length);
+    }
+
+    // remove last '/' of next if exists
+    if (relativeUrl.lastIndexOf('/') === relativeUrl.length - 1) {
+      relativeUrl = relativeUrl.substring(0, relativeUrl.length - 1);
+    }
+
+    return `${baseUrl}/${relativeUrl}`;
   }
 
   public options(): CommandOption[] {
