@@ -221,7 +221,7 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
 
   Remarks:
   
-    To deploy an app in the tenant app catalog, you have to first log in to
+    To deploy an app in the tenant or site collection app catalog, you have to first log in to
     a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
     eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
 
@@ -235,7 +235,7 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
     ${chalk.grey('https://contoso.sharepoint.com/sites/team-a/AppCatalog')} or
     ${chalk.grey('https://contoso.sharepoint.com/sites/team-a')}. CLI will accept both formats.
 
-    If the app with the specified ID doesn't exist in the tenant app catalog,
+    If the app with the specified ID doesn't exist in the app catalog,
     the command will fail with an error. Before you can deploy an app,
     you have to add it to the tenant app catalog first
     using the ${chalk.blue(commands.APP_ADD)} command.

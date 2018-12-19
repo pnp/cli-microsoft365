@@ -15,6 +15,7 @@ Option|Description
 `--help`|output usage information
 `-i, --id <id>`|ID of the app to retrieve information for
 `-s, --siteUrl <siteUrl>`|Absolute URL of the site to install the app in
+`--scope [scope]`|Scope of the app catalog: tenant|sitecollection. Default tenant
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
@@ -33,7 +34,13 @@ If the app with the specified ID doesn't exist in the tenant app catalog, the co
 Install the app with ID _b2307a39-e878-458b-bc90-03bc578531d6_ in the _https://contoso.sharepoint.com_ site.
 
 ```sh
-spo app install -i b2307a39-e878-458b-bc90-03bc578531d6 -s https://contoso.sharepoint.com
+spo app install --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com
+```
+
+Install the app with ID _b2307a39-e878-458b-bc90-03bc578531d6_ in the _https://contoso.sharepoint.com_ site from site collection app catalog.
+      
+```sh
+spo app install --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com --scope sitecollection
 ```
 
 ## More information

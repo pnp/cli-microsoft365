@@ -32,7 +32,7 @@ When removing an app from the tenant app catalog, it's not necessary to specify 
 
 When specifying site collection app catalog, you can specify the URL either with our without the _AppCatalog_ part, for example `https://contoso.sharepoint.com/sites/team-a/AppCatalog` or `https://contoso.sharepoint.com/sites/team-a`. CLI will accept both formats.
 
-If the app with the specified ID doesn't exist in the tenant app catalog, the command will fail with an error.
+If the app with the specified ID doesn't exist in the app catalog, the command will fail with an error.
 
 ## Examples
 
