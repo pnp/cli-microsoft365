@@ -66,6 +66,9 @@ describe('Utils', () => {
 
   it('formats output as JSON when JSON output requested', (done) => {
     const sandbox = sinon.createSandbox();
+    if (!vorpal._command) {
+      (vorpal as any)._command = undefined;
+    }
     sandbox.stub(vorpal, '_command').value({
       args: {
         options: {

@@ -1,4 +1,10 @@
+import { Hash } from "../Hash";
+
 export interface VsCodeLaunchJson {
   version: string;
-  configurations?: any[];
+  configurations?: VsCodeLaunchJsonConfiguration[];
+}
+
+export interface VsCodeLaunchJsonConfiguration {
+  sourceMapPathOverrides?: Hash;
 }

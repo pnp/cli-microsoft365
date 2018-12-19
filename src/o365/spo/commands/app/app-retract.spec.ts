@@ -7,7 +7,6 @@ const command: Command = require('./app-retract');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import Utils from '../../../../Utils';
-import { SearchResponse } from '../../spo';
 
 describe(commands.APP_RETRACT, () => {
   let vorpal: Vorpal;
@@ -20,7 +19,6 @@ describe(commands.APP_RETRACT, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
     sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
       telemetry = t;
@@ -43,19 +41,21 @@ describe(commands.APP_RETRACT, () => {
     telemetry = null;
     requests = [];
     promptOptions = undefined;
+    sinon.stub(request, 'get').resolves({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" });
   });
 
   afterEach(() => {
-    Utils.restore(vorpal.find);
+    Utils.restore([
+      vorpal.find,
+      request.get
+    ]);
   });
 
   after(() => {
     Utils.restore([
       appInsights.trackEvent,
-      auth.ensureAccessToken,
       auth.getAccessToken,
       auth.restoreAuth,
-      request.get,
       request.post
     ]);
   });
@@ -110,35 +110,6 @@ describe(commands.APP_RETRACT, () => {
   });
 
   it('retracts app from the tenant app catalog (debug)', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`search/query?querytext='contentclass:STS_Site%20AND%20SiteTemplate:APPCATALOG'`) > -1) {
-        return Promise.resolve({
-          PrimaryQueryResult: {
-            RelevantResults: {
-              RowCount: 1,
-              Table: {
-                Rows: [{
-                  Cells: [
-                    {
-                      Key: 'ID',
-                      Value: '1',
-                      ValueType: 'Number'
-                    },
-                    {
-                      Key: 'SPWebUrl',
-                      Value: 'https://contoso.sharepoint.com/sites/apps',
-                      ValueType: 'String'
-                    }
-                  ]
-                }]
-              }
-            }
-          }
-        } as SearchResponse);
-      }
-
-      return Promise.reject('Invalid request');
-    });
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -192,35 +163,6 @@ describe(commands.APP_RETRACT, () => {
   });
 
   it('retracts app from the tenant app catalog', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`search/query?querytext='contentclass:STS_Site%20AND%20SiteTemplate:APPCATALOG'`) > -1) {
-        return Promise.resolve({
-          PrimaryQueryResult: {
-            RelevantResults: {
-              RowCount: 1,
-              Table: {
-                Rows: [{
-                  Cells: [
-                    {
-                      Key: 'ID',
-                      Value: '1',
-                      ValueType: 'Number'
-                    },
-                    {
-                      Key: 'SPWebUrl',
-                      Value: 'https://contoso.sharepoint.com/sites/apps',
-                      ValueType: 'String'
-                    }
-                  ]
-                }]
-              }
-            }
-          }
-        } as SearchResponse);
-      }
-
-      return Promise.reject('Invalid request');
-    });
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -303,293 +245,6 @@ describe(commands.APP_RETRACT, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`https://contoso.sharepoint.com/sites/apps/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/retract`) > -1 &&
-          r.headers.authorization &&
-          r.headers.authorization.indexOf('Bearer ') === 0 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        Utils.restore([
-          request.post,
-          request.get
-        ]);
-      }
-    });
-  });
-
-  it('prompts for tenant app catalog URL when no app catalog site found', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`search/query?querytext='contentclass:STS_Site%20AND%20SiteTemplate:APPCATALOG'`) > -1) {
-        return Promise.resolve({
-          PrimaryQueryResult: {
-            RelevantResults: {
-              RowCount: 0,
-              Table: {}
-            }
-          }
-        } as SearchResponse);
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, id: 'b2307a39-e878-458b-bc90-03bc578531d6', confirm: true } }, () => {
-      let promptIssued = false;
-
-      if (promptOptions && promptOptions.name === 'appCatalogUrl') {
-        promptIssued = true;
-      }
-
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        Utils.restore([
-          request.post,
-          request.get
-        ]);
-      }
-    });
-  });
-
-  it('prompts for tenant app catalog URL when app catalog site found but no URL was retrieved', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`search/query?querytext='contentclass:STS_Site%20AND%20SiteTemplate:APPCATALOG'`) > -1) {
-        return Promise.resolve({
-          PrimaryQueryResult: {
-            RelevantResults: {
-              RowCount: 1,
-              Table: {
-                Rows: [{
-                  Cells: [{
-                    Key: 'ID',
-                    Value: '1',
-                    ValueType: 'Number'
-                  }]
-                }]
-              }
-            }
-          }
-        } as SearchResponse);
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, id: 'b2307a39-e878-458b-bc90-03bc578531d6', confirm: true } }, () => {
-      let promptIssued = false;
-
-      if (promptOptions && promptOptions.name === 'appCatalogUrl') {
-        promptIssued = true;
-      }
-
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        Utils.restore([
-          request.post,
-          request.get
-        ]);
-      }
-    });
-  });
-
-  it('prompts for tenant app catalog URL when error occurred while retrieving tenant app catalog URL (debug)', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`search/query?querytext='contentclass:STS_Site%20AND%20SiteTemplate:APPCATALOG'`) > -1) {
-        return Promise.reject('Error while executing search query');
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, id: 'b2307a39-e878-458b-bc90-03bc578531d6', confirm: true } }, () => {
-      let promptIssued = false;
-
-      if (promptOptions && promptOptions.name === 'appCatalogUrl') {
-        promptIssued = true;
-      }
-
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        Utils.restore([
-          request.post,
-          request.get
-        ]);
-      }
-    });
-  });
-
-  it('prompts for tenant app catalog URL when error occurred while retrieving tenant app catalog URL', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`search/query?querytext='contentclass:STS_Site%20AND%20SiteTemplate:APPCATALOG'`) > -1) {
-        return Promise.reject('Error while executing search query');
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', confirm: true } }, () => {
-      let promptIssued = false;
-
-      if (promptOptions && promptOptions.name === 'appCatalogUrl') {
-        promptIssued = true;
-      }
-
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        Utils.restore([
-          request.post,
-          request.get
-        ]);
-      }
-    });
-  });
-
-  it('fails when no URL provided in the prompt for tenant app catalog URL', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`search/query?querytext='contentclass:STS_Site%20AND%20SiteTemplate:APPCATALOG'`) > -1) {
-        return Promise.reject('Error while executing search query');
-      }
-
-      return Promise.reject('Invalid request');
-    });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.prompt = (options: any, cb: (result: { appCatalogUrl: string }) => void) => {
-      cb({ appCatalogUrl: '' });
-    };
-    cmdInstance.action({ options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', confirm: true } }, () => {
-      try {
-        assert(requests.length === 0);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        Utils.restore(request.get);
-      }
-    });
-  });
-
-  it('fails when invalid URL provided in the prompt for tenant app catalog URL', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`search/query?querytext='contentclass:STS_Site%20AND%20SiteTemplate:APPCATALOG'`) > -1) {
-        return Promise.reject('Error while executing search query');
-      }
-
-      return Promise.reject('Invalid request');
-    });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.prompt = (options: any, cb: (result: { appCatalogUrl: string }) => void) => {
-      cb({ appCatalogUrl: 'foo' });
-    };
-    cmdInstance.action({ options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', confirm: true } }, () => {
-      try {
-        assert(requests.length === 0);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        Utils.restore(request.get);
-      }
-    });
-  });
-
-  it('correctly retracts the app with valid URL provided in the prompt for tenant app catalog URL', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`search/query?querytext='contentclass:STS_Site%20AND%20SiteTemplate:APPCATALOG'`) > -1) {
-        return Promise.reject('Error while executing search query');
-      }
-
-      return Promise.reject('Invalid request');
-    });
-    sinon.stub(request, 'post').callsFake((opts) => {
-      requests.push(opts);
-
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
-      if (opts.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/retract`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve();
-        }
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.prompt = (options: any, cb: (result: { appCatalogUrl: string }) => void) => {
-      cb({ appCatalogUrl: 'https://contoso.sharepoint.com' });
-    };
-    cmdInstance.action({ options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', confirm: true } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/retract`) > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
           r.headers.accept &&
@@ -809,7 +464,7 @@ describe(commands.APP_RETRACT, () => {
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.reject({ error: JSON.stringify({message: 'An error has occurred'}) });
+          return Promise.reject({ error: JSON.stringify({ message: 'An error has occurred' }) });
         }
       }
 
@@ -916,13 +571,13 @@ describe(commands.APP_RETRACT, () => {
 
   it('has help referring to the right command', () => {
     const cmd: any = {
-      log: (msg: string) => {},
-      prompt: () => {},
-      helpInformation: () => {}
+      log: (msg: string) => { },
+      prompt: () => { },
+      helpInformation: () => { }
     };
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
-    cmd.help({}, () => {});
+    cmd.help({}, () => { });
     assert(find.calledWith(commands.APP_RETRACT));
   });
 
@@ -932,12 +587,12 @@ describe(commands.APP_RETRACT, () => {
       log: (msg: string) => {
         _log.push(msg);
       },
-      prompt: () => {},
-      helpInformation: () => {}
+      prompt: () => { },
+      helpInformation: () => { }
     };
     sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
-    cmd.help({}, () => {});
+    cmd.help({}, () => { });
     let containsExamples: boolean = false;
     _log.forEach(l => {
       if (l && l.indexOf('Examples:') > -1) {
@@ -949,8 +604,21 @@ describe(commands.APP_RETRACT, () => {
   });
 
   it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.ensureAccessToken);
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
+    Utils.restore(auth.getAccessToken);
+    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        return Promise.resolve({
+          FormDigestValue: 'abc'
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
@@ -964,7 +632,7 @@ describe(commands.APP_RETRACT, () => {
         done(e);
       }
       finally {
-        Utils.restore(auth.ensureAccessToken);
+        Utils.restore(auth.getAccessToken);
       }
     });
   });

@@ -1,6 +1,6 @@
 # spo app get
 
-Gets information about the specific app from the tenant app catalog
+Gets information about the specific app from the specified app catalog
 
 ## Usage
 
@@ -15,7 +15,8 @@ Option|Description
 `--help`|output usage information
 `-i, --id [id]`|ID of the app to retrieve information for. Specify the `id` or the `name` but not both
 `-n, --name [name]`|Name of the app to retrieve information for. Specify the `id` or the `name` but not both
-`-u, --appCatalogUrl [appCatalogUrl]`|URL of the tenant app catalog site. If not specified, the CLI will try to resolve it automatically
+`-u, --appCatalogUrl [appCatalogUrl]`|URL of the tenant or site app catalog. It must be specified when the scope is `sitecollection`
+`-s, --scope [scope]`|Scope of the app catalog: `tenant|sitecollection`. Default `tenant`
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
@@ -25,14 +26,18 @@ Option|Description
 
 ## Remarks
 
-To get information about the specified app available in the tenant app catalog, you have to first log in to a SharePoint site using the [spo login](../login.md) command, eg. `spo login https://contoso.sharepoint.com`.
+To get information about the specified app available in the tenant or site collection app catalog, you have to first log in to a SharePoint site using the [spo login](../login.md) command, eg. `spo login https://contoso.sharepoint.com`.
+
+When getting information about an app from the tenant app catalog, it's not necessary to specify the tenant app catalog URL. When the URL is not specified, the CLI will try to resolve the URL itself. Specifying the app catalog URL is required when you want to get information about an app from a site collection app catalog.
+
+When specifying site collection app catalog, you can specify the URL either with our without the _AppCatalog_ part, for example `https://contoso.sharepoint.com/sites/team-a/AppCatalog` or `https://contoso.sharepoint.com/sites/team-a`. CLI will accept both formats.
 
 ## Examples
 
 Return details about the app with ID _b2307a39-e878-458b-bc90-03bc578531d6_ available in the tenant app catalog.
 
 ```sh
-spo app get -i b2307a39-e878-458b-bc90-03bc578531d6
+spo app get --id b2307a39-e878-458b-bc90-03bc578531d6
 ```
 
 Return details about the app with name _solution.sppkg_ available in the tenant app catalog. Will try to detect the app catalog URL
@@ -45,6 +50,12 @@ Return details about the app with name _solution.sppkg_ available in the tenant 
 
 ```sh
 spo app get --name solution.sppkg --appCatalogUrl https://contoso.sharepoint.com/sites/apps
+```
+
+Return details about the app with ID _b2307a39-e878-458b-bc90-03bc578531d6_ available in the site collection app catalog of site _https://contoso.sharepoint.com/sites/site1_.
+
+```sh
+spo app get --id b2307a39-e878-458b-bc90-03bc578531d6 --scope sitecollection --siteUrl https://contoso.sharepoint.com/sites/site1
 ```
 
 ## More information
