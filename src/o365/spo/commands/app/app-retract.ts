@@ -8,7 +8,6 @@ import {
   CommandOption,
   CommandValidate
 } from '../../../../Command';
-import { ContextInfo } from '../../spo';
 import Utils from '../../../../Utils';
 import { SpoAppBaseCommand } from './SpoAppBaseCommand';
 import SpoCommand from '../../SpoCommand';
@@ -22,6 +21,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   id: string;
   appCatalogUrl?: string;
+  scope?: string;
   confirm?: boolean;
 }
 
@@ -31,17 +31,19 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
   }
 
   public get description(): string {
-    return 'Retracts the specified app from the tenant app catalog';
+    return 'Retracts the specified app from the specified app catalog';
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.appCatalogUrl = (!(!args.options.appCatalogUrl)).toString();
     telemetryProps.confirm = (!(!args.options.confirm)).toString();
+    telemetryProps.scope = args.options.scope || 'tenant';
     return telemetryProps;
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
     let siteAccessToken: string = '';
     let appCatalogSiteUrl: string = '';
 
@@ -58,15 +60,11 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
           return auth.getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug);
         })
         .then((accessToken: string): request.RequestPromise => {
+
           siteAccessToken = accessToken;
 
-          return this.getRequestDigestForSite(appCatalogSiteUrl, accessToken, cmd, this.debug);
-        })
-        .then((res: ContextInfo): request.RequestPromise => {
           if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
+            cmd.log(`Retrieved access token ${accessToken}.`);
           }
 
           if (this.verbose) {
@@ -74,11 +72,10 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
           }
 
           const requestOptions: any = {
-            url: `${appCatalogSiteUrl}/_api/web/tenantappcatalog/AvailableApps/GetById('${args.options.id}')/retract`,
+            url: `${appCatalogSiteUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${encodeURIComponent(args.options.id)}')/retract`,
             headers: Utils.getRequestHeaders({
               authorization: `Bearer ${siteAccessToken}`,
-              accept: 'application/json;odata=nometadata',
-              'X-RequestDigest': res.FormDigestValue
+              accept: 'application/json;odata=nometadata'
             })
           };
 
@@ -113,7 +110,7 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to retract the app ${args.options.id} from the tenant app catalog?`,
+        message: `Are you sure you want to retract the app ${args.options.id} from the app catalog?`,
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();
@@ -129,11 +126,16 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
     const options: CommandOption[] = [
       {
         option: '-i, --id <id>',
-        description: 'ID of the app to retract. Needs to be available in the tenant app catalog.'
+        description: 'ID of the app to retract. Needs to be available in the app catalog.'
       },
       {
         option: '-u, --appCatalogUrl [appCatalogUrl]',
-        description: '(optional) URL of the tenant app catalog site. If not specified, the CLI will try to resolve it automatically'
+        description: 'URL of the tenant or site collection app catalog. It must be specified when the scope is \'sitecollection\''
+      },
+      {
+        option: '-s, --scope [scope]',
+        description: 'Scope of the app catalog: tenant|sitecollection. Default tenant',
+        autocomplete: ['tenant', 'sitecollection']
       },
       {
         option: '--confirm',
@@ -147,8 +149,23 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
+      if (args.options.scope) {
+        const testScope: string = args.options.scope.toLowerCase();
+        if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
+          return `Scope must be either 'tenant' or 'sitecollection' if specified`
+        }
+
+        if (testScope === 'sitecollection' && !args.options.appCatalogUrl) {
+          return `You must specify appCatalogUrl when the scope is sitecollection`;
+        }
+      }
+
       if (!args.options.id) {
         return 'Required parameter id missing';
+      }
+
+      if (!Utils.isValidGuid(args.options.id)) {
+        return `${args.options.id} is not a valid GUID`;
       }
 
       if (args.options.appCatalogUrl) {
@@ -168,15 +185,21 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
 
   Remarks:
   
-    To retract an app from the tenant app catalog, you have to first log in to a SharePoint site
-    using the ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
+    To retract an app from the tenant or site collection app catalog,
+    you have to first log in to a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
+    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
 
-    If you don't specify the URL of the tenant app catalog site using the ${chalk.grey('appCatalogUrl')} option,
-    the CLI will try to determine its URL automatically. This will be done using SharePoint Search.
-    If the tenant app catalog site hasn't been crawled yet, the CLI will not find it and will
-    prompt you to provide the URL yourself.
+    When adding an app to the tenant app catalog, it's not necessary to specify
+    the tenant app catalog URL. When the URL is not specified, the CLI will
+    try to resolve the URL itself. Specifying the app catalog URL is required
+    when you want to add the app to a site collection app catalog.
 
-    If the app with the specified ID doesn't exist in the tenant app catalog, the command will fail
+    When specifying site collection app catalog, you can specify the URL either
+    with our without the ${chalk.grey('AppCatalog')} part, for example
+    ${chalk.grey('https://contoso.sharepoint.com/sites/team-a/AppCatalog')} or
+    ${chalk.grey('https://contoso.sharepoint.com/sites/team-a')}. CLI will accept both formats.
+
+    If the app with the specified ID doesn't exist in the app catalog, the command will fail
     with an error.
    
   Examples:
@@ -195,6 +218,10 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
     of the tenant app catalog automatically. Will not prompt for confirmation before retracting
     the app.
       ${chalk.grey(config.delimiter)} ${commands.APP_RETRACT} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --confirm
+
+    Retract the specified app from a site collection app catalog 
+    of site ${chalk.grey('https://contoso.sharepoint.com/sites/site1')}.
+      ${chalk.grey(config.delimiter)} ${commands.APP_RETRACT} --id d95f8c94-67a1-4615-9af8-361ad33be93c --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
     
   More information:
   

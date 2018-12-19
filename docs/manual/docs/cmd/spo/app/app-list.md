@@ -14,7 +14,7 @@ Option|Description
 ------|-----------
 `--help`|Output usage information.
 `-s, --scope [scope]`|Target app catalog. `tenant|sitecollection`. Default `tenant`
-`-u, --appCatalogUrl [appCatalogUrl]`|URL of the tenant or site app catalog. It must be specified when the scope is `sitecollection`
+`-u, --appCatalogUrl [appCatalogUrl]`|URL of the tenant or site collection app catalog. It must be specified when the scope is `sitecollection`
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

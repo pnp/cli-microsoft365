@@ -963,21 +963,6 @@ describe(commands.APP_ADD, () => {
     assert.notEqual(actual, true);
   });
 
-  it('should fail when no scope, but appCatalogUrl specified', () => {
-    const stats: fs.Stats = new fs.Stats();
-    sinon.stub(stats, 'isDirectory').callsFake(() => false);
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'lstatSync').callsFake(() => stats);
-
-    const actual = (command.validate() as CommandValidate)({ options: { filePath: 'abc', appCatalogUrl: 'https://contoso.sharepoint.com' } });
-
-    Utils.restore([
-      fs.existsSync,
-      fs.lstatSync
-    ]);
-    assert.notEqual(actual, true);
-  });
-
   it('has help referring to the right command', () => {
     const cmd: any = {
       log: (msg: string) => { },

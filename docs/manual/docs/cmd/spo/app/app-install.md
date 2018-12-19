@@ -1,6 +1,6 @@
 # spo app install
 
-Installs an app from the tenant app catalog in the site
+Installs an app from the specified app catalog in the site
 
 ## Usage
 
@@ -13,8 +13,9 @@ spo app install [options]
 Option|Description
 ------|-----------
 `--help`|output usage information
-`-i, --id <id>`|ID of the app to retrieve information for
+`-i, --id <id>`|ID of the app to install
 `-s, --siteUrl <siteUrl>`|Absolute URL of the site to install the app in
+`--scope [scope]`|Scope of the app catalog: `tenant|sitecollection`. Default `tenant`
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
@@ -24,16 +25,22 @@ Option|Description
 
 ## Remarks
 
-To install an app from the tenant app catalog in a site, you have to first log in to a SharePoint site using the [spo login](../login.md) command, eg. `spo login https://contoso.sharepoint.com`.
+To install an app from the tenant or site collection app catalog in a site, you have to first log in to a SharePoint site using the [spo login](../login.md) command, eg. `spo login https://contoso.sharepoint.com`.
 
-If the app with the specified ID doesn't exist in the tenant app catalog, the command will fail with an error. Before you can install app in a site, you have to add it to the tenant app catalog first using the [spo app add](./app-add.md) command.
+If the app with the specified ID doesn't exist in the app catalog, the command will fail with an error. Before you can install app in a site, you have to add it to the tenant or site collection app catalog first using the [spo app add](./app-add.md) command.
 
 ## Examples
 
 Install the app with ID _b2307a39-e878-458b-bc90-03bc578531d6_ in the _https://contoso.sharepoint.com_ site.
 
 ```sh
-spo app install -i b2307a39-e878-458b-bc90-03bc578531d6 -s https://contoso.sharepoint.com
+spo app install --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com
+```
+
+Install the app with ID _b2307a39-e878-458b-bc90-03bc578531d6_ in the _https://contoso.sharepoint.com_ site from site collection app catalog.
+
+```sh
+spo app install --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com --scope sitecollection
 ```
 
 ## More information

@@ -477,11 +477,6 @@ describe(commands.APP_LIST, () => {
     assert.notEqual(actual, true);
   });
 
-  it('fails validation when appCatalogUrl and no scope', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { appCatalogUrl: 'https://contoso-admin.sharepoint.com' } });
-    assert.notEqual(actual, true);
-  });
-
   it('should fail when \'sitecollection\' scope, but no appCatalogUrl specified', () => {
 
     const actual = (command.validate() as CommandValidate)({ options: { name: 'solution', filePath: 'abc', scope: 'sitecollection' } });

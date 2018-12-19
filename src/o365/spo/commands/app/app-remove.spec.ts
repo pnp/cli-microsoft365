@@ -532,11 +532,6 @@ describe(commands.APP_REMOVE, () => {
     assert.equal(actual, true);
   });
 
-  it('should fail when no scope, but appCatalogUrl specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', filePath: 'abc', appCatalogUrl: 'https://contoso.sharepoint.com' } });
-    assert.notEqual(actual, true);
-  });
-
   it('should fail when \'sitecollection\' scope, but  bad appCatalogUrl format specified', () => {
 
     const actual = (command.validate() as CommandValidate)({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', filePath: 'abc', scope: 'sitecollection', appCatalogUrl: 'contoso.sharepoint.com' } });

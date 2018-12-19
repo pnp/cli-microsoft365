@@ -1,4 +1,3 @@
-import { ContextInfo } from './../../spo';
 import auth from '../../SpoAuth';
 import { Auth } from '../../../../Auth';
 import config from '../../../../config';
@@ -21,9 +20,10 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   id: string;
   siteUrl: string;
+  scope?: string;
 }
 
-class AppUpgradeCommand extends SpoCommand {
+class SpoAppUpgradeCommand extends SpoCommand {
   public get name(): string {
     return commands.APP_UPGRADE;
   }
@@ -32,7 +32,14 @@ class AppUpgradeCommand extends SpoCommand {
     return 'Upgrades app in the specified site';
   }
 
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.scope = args.options.scope || 'tenant';
+    return telemetryProps;
+  }
+
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
     const resource: string = Auth.getResourceFromUrl(args.options.siteUrl);
     let siteAccessToken: string = '';
 
@@ -42,16 +49,7 @@ class AppUpgradeCommand extends SpoCommand {
         siteAccessToken = accessToken;
 
         if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
-
-        return this.getRequestDigestForSite(args.options.siteUrl, siteAccessToken, cmd, this.debug);
-      })
-      .then((res: ContextInfo): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
+          cmd.log(`Retrieved access token ${accessToken}.`);
         }
 
         if (this.verbose) {
@@ -59,11 +57,10 @@ class AppUpgradeCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          url: `${args.options.siteUrl}/_api/web/tenantappcatalog/AvailableApps/GetById('${encodeURIComponent(args.options.id)}')/upgrade`,
+          url: `${args.options.siteUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${encodeURIComponent(args.options.id)}')/upgrade`,
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${siteAccessToken}`,
-            accept: 'application/json;odata=nometadata',
-            'X-RequestDigest': res.FormDigestValue
+            accept: 'application/json;odata=nometadata'
           })
         };
 
@@ -82,6 +79,10 @@ class AppUpgradeCommand extends SpoCommand {
           cmd.log('');
         }
 
+        if (this.verbose) {
+          cmd.log(vorpal.chalk.green('DONE'));
+        }
+
         cb();
       }, (rawRes: any): void => this.handleRejectedODataPromise(rawRes, cmd, cb));
   }
@@ -90,11 +91,16 @@ class AppUpgradeCommand extends SpoCommand {
     const options: CommandOption[] = [
       {
         option: '-i, --id <id>',
-        description: 'ID of the app to retrieve information for'
+        description: 'ID of the app to upgrade'
       },
       {
         option: '-s, --siteUrl <siteUrl>',
-        description: 'Absolute URL of the site to install the app in'
+        description: 'Absolute URL of the site to upgrade the app in'
+      },
+      {
+        option: '--scope [scope]',
+        description: 'Scope of the app catalog: tenant|sitecollection. Default tenant',
+        autocomplete: ['tenant', 'sitecollection']
       }
     ];
 
@@ -104,20 +110,26 @@ class AppUpgradeCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
+      if (args.options.scope) {
+        const testScope: string = args.options.scope.toLowerCase();
+        if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
+          return `Scope must be either 'tenant' or 'sitecollection' if specified`
+        }
+      }
+
       if (!args.options.id) {
         return 'Required parameter id missing';
+      }
+
+      if (!Utils.isValidGuid(args.options.id)) {
+        return `${args.options.id} is not a valid GUID`;
       }
 
       if (!args.options.siteUrl) {
         return 'Required parameter siteUrl missing';
       }
-
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.siteUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
-
-      return true;
+      
+      return SpoCommand.isValidSharePointUrl(args.options.siteUrl);
     };
   }
 
@@ -130,14 +142,22 @@ class AppUpgradeCommand extends SpoCommand {
 
   Remarks:
   
-    To upgrade an app in the site, you have to first log in to a SharePoint site using
-    the ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
+    To upgrade an app in the site, you have to first log in to a SharePoint site
+    using the ${chalk.blue(commands.LOGIN)} command,
+    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
+
+    If the app with the specified ID doesn't exist in the app catalog,
+    the command will fail with an error.
  
   Examples:
   
     Upgrade the app with ID ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
     in the ${chalk.grey('https://contoso.sharepoint.com')} site.
-      ${chalk.grey(config.delimiter)} ${commands.APP_UPGRADE} -i b2307a39-e878-458b-bc90-03bc578531d6 -s https://contoso.sharepoint.com
+      ${chalk.grey(config.delimiter)} ${commands.APP_UPGRADE} --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com
+
+    Upgrade the app with ID ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
+    in the ${chalk.grey('https://contoso.sharepoint.com')} site from site collection app catalog.
+      ${chalk.grey(config.delimiter)} ${commands.APP_INSTALL} --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com --scope sitecollection
 
   More information:
   
@@ -147,4 +167,4 @@ class AppUpgradeCommand extends SpoCommand {
   }
 }
 
-module.exports = new AppUpgradeCommand();
+module.exports = new SpoAppUpgradeCommand();
