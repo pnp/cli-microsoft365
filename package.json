@@ -1,6 +1,6 @@
 {
   "name": "@pnp/office365-cli",
-  "version": "1.11.0",
+  "version": "1.12.0",
   "description": "Manage Microsoft Office 365 and SharePoint Framework projects on any platform",
   "license": "MIT",
   "main": "./dist/index.js",

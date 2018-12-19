@@ -49,7 +49,12 @@ export class Page {
             return;
           }
 
-          resolve(ClientSidePage.fromHtml(res.ListItemAllFields.CanvasContent1));
+          try {
+            resolve(ClientSidePage.fromHtml(res.ListItemAllFields.CanvasContent1));
+          }
+          catch (e) {
+            reject(e);
+          }
         }, (error: any): void => {
           reject(error);
         });
