@@ -1,10 +1,10 @@
 import Command, { CommandAction, CommandError } from '../../Command';
 import auth from './SpoAuth';
-import { SearchResponse, FormDigestInfo, ClientSvcResponse, ClientSvcResponseContents } from './spo';
 import * as request from 'request-promise-native';
 import Utils from '../../Utils';
 import { SpoOperation } from './commands/site/SpoOperation';
 import config from '../../config';
+import { FormDigestInfo, ClientSvcResponse, ClientSvcResponseContents } from './spo';
 
 export interface FormDigest {
   formDigestValue: string; 
@@ -79,57 +79,6 @@ export default abstract class SpoCommand extends Command {
     else {
       return true;
     }
-  }
-
-  protected getTenantAppCatalogUrl(cmd: CommandInstance, debug: boolean): Promise<string> {
-    return new Promise<string>((resolve: (appCatalogUrl: string) => void, reject: (error: any) => void): void => {
-      const requestOptions: any = {
-        url: `${auth.site.url}/_api/search/query?querytext='contentclass:STS_Site%20AND%20SiteTemplate:APPCATALOG'&SelectProperties='SPWebUrl'`,
-        headers: Utils.getRequestHeaders({
-          authorization: `Bearer ${auth.site.accessToken}`,
-          accept: 'application/json;odata=nometadata'
-        }),
-        json: true
-      };
-
-      if (debug) {
-        cmd.log('Executing web request...');
-        cmd.log(requestOptions);
-        cmd.log('');
-      }
-
-      request
-        .get(requestOptions)
-        .then((res: SearchResponse): void => {
-          if (debug) {
-            cmd.log('Response');
-            cmd.log(res);
-            cmd.log('');
-          }
-
-          if (res.PrimaryQueryResult.RelevantResults.RowCount < 1) {
-            reject('Tenant app catalog not found');
-            return;
-          }
-
-          for (let i: number = 0; i < res.PrimaryQueryResult.RelevantResults.Table.Rows[0].Cells.length; i++) {
-            if (res.PrimaryQueryResult.RelevantResults.Table.Rows[0].Cells[i].Key === 'SPWebUrl') {
-              resolve(res.PrimaryQueryResult.RelevantResults.Table.Rows[0].Cells[i].Value);
-              return;
-            }
-          }
-
-          reject('Tenant app catalog URL not found');
-        }, (error: any): void => {
-          if (debug) {
-            cmd.log('Error');
-            cmd.log(error);
-            cmd.log('');
-          }
-
-          reject(error);
-        });
-    });
   }
 
   public ensureFormDigest(cmd: CommandInstance, context: FormDigestInfo | undefined, debug: boolean): Promise<FormDigestInfo> {

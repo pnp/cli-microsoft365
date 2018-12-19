@@ -21,7 +21,6 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    sinon.stub(command as any, 'getRequestDigestForSite').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc' }); });
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
       telemetry = t;
     });
@@ -142,51 +141,10 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
 
   it('handles promise error while getting tenant appcatalog', (done) => {
     // get tenant app catalog
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+      if (opts.url.indexOf('SP_TenantSettings_Current') > -1) {
         return Promise.reject('An error has occurred');
-      }
-      if (opts.url.indexOf('contextinfo') > -1) {
-        return Promise.resolve('abc');
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-
-      }
-    }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('handles error while getting tenant appcatalog', (done) => {
-    // get tenant app catalog
-    sinon.stub(request, 'post').callsFake((opts) => {
-      requests.push(opts);
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-        return Promise.resolve(JSON.stringify([
-          {
-            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": {
-              "ErrorMessage": "An error has occurred", "ErrorValue": null, "TraceCorrelationId": "18091989-62a6-4cad-9717-29892ee711bc", "ErrorCode": -1, "ErrorTypeName": "Microsoft.SharePoint.Client.ServerException"
-            }, "TraceCorrelationId": "18091989-62a6-4cad-9717-29892ee711bc"
-          }
-        ]));
-      }
-      if (opts.url.indexOf('contextinfo') > -1) {
-        return Promise.resolve('abc');
       }
       return Promise.reject('Invalid request');
     });
@@ -212,21 +170,10 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
 
   it('gets the tenant appcatalog url (debug)', (done) => {
     // get tenant app catalog
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-        return Promise.resolve(JSON.stringify([
-          {
-            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
-          }, 58, {
-            "IsNull": false
-          }, 59, {
-            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fapps"
-          }
-        ]));
-      }
-      if (opts.url.indexOf('contextinfo') > -1) {
-        return Promise.resolve('abc');
+      if (opts.url.indexOf('SP_TenantSettings_Current') > -1) {
+        return Promise.resolve(JSON.stringify({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" }));
       }
       return Promise.reject('Invalid request');
     });
@@ -241,7 +188,7 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(sinon.match('https://contoso.sharepoint.com/sites/apps')));
+        assert(cmdInstanceLogSpy.lastCall.args[0] === 'https://contoso.sharepoint.com/sites/apps');
         done();
       }
       catch (e) {
@@ -252,21 +199,10 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
 
   it('handles if tenant appcatalog is null or not exist', (done) => {
     // get tenant app catalog
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-        return Promise.resolve(JSON.stringify([
-          {
-            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
-          }, 58, {
-            "IsNull": false
-          }, 59, {
-            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": null
-          }
-        ]));
-      }
-      if (opts.url.indexOf('contextinfo') > -1) {
-        return Promise.resolve('abc');
+      if (opts.url.indexOf('SP_TenantSettings_Current') > -1) {
+        return Promise.resolve(JSON.stringify({ "CorporateCatalogUrl": null }));
       }
       return Promise.reject('Invalid request');
     });
@@ -292,21 +228,10 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
 
   it('handles if tenant appcatalog is null or not exist (debug)', (done) => {
     // get tenant app catalog
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-        return Promise.resolve(JSON.stringify([
-          {
-            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": null, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
-          }, 58, {
-            "IsNull": false
-          }, 59, {
-            "_ObjectType_": "SP.TenantSettings", "CorporateCatalogUrl": null
-          }
-        ]));
-      }
-      if (opts.url.indexOf('contextinfo') > -1) {
-        return Promise.resolve('abc');
+      if (opts.url.indexOf('SP_TenantSettings_Current') > -1) {
+        return Promise.resolve(JSON.stringify({ "CorporateCatalogUrl": null }));
       }
       return Promise.reject('Invalid request');
     });
