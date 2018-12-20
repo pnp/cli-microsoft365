@@ -6,5 +6,6 @@ export interface QueryListResult {
   HierarchyHasIndention: string | null;
   LastRow: number;
   Row: any[];
+  NextHref: string | null;
   RowLimit: number;
 }

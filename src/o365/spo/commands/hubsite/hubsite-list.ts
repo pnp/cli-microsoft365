@@ -34,7 +34,7 @@ class SpoHubSiteListCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void, listQueryBatchSize: number = 30): void {
     let hubSites: HubSite[];
 
     auth
@@ -61,7 +61,7 @@ class SpoHubSiteListCommand extends SpoCommand {
 
         return request.get(requestOptions);
       })
-      .then((res: { value: HubSite[] }): request.RequestPromise | Promise<string> => {
+      .then((res: { value: HubSite[] }): Promise<any[]> => {
         if (this.debug) {
           cmd.log('Response:');
           cmd.log(res);
@@ -71,7 +71,7 @@ class SpoHubSiteListCommand extends SpoCommand {
         hubSites = res.value;
 
         if (args.options.includeAssociatedSites !== true) {
-          return Promise.resolve('');
+          return Promise.resolve([]);
         } else {
           if (this.debug) {
             cmd.log('Retrieving associated sites...');
@@ -88,7 +88,7 @@ class SpoHubSiteListCommand extends SpoCommand {
           json: true,
           body: {
             parameters: {
-              ViewXml: "<View><Query><Where><And><And><IsNull><FieldRef Name=\"TimeDeleted\"/></IsNull><Neq><FieldRef Name=\"State\"/><Value Type='Integer'>0</Value></Neq></And><Neq><FieldRef Name=\"HubSiteId\"/><Value Type='Text'>{00000000-0000-0000-0000-000000000000}</Value></Neq></And></Where><OrderBy><FieldRef Name='Title' Ascending='true' /></OrderBy></Query><ViewFields><FieldRef Name=\"Title\"/><FieldRef Name=\"SiteUrl\"/><FieldRef Name=\"SiteId\"/><FieldRef Name=\"HubSiteId\"/></ViewFields><RowLimit Paged=\"TRUE\">100</RowLimit></View>",
+              ViewXml: "<View><Query><Where><And><And><IsNull><FieldRef Name=\"TimeDeleted\"/></IsNull><Neq><FieldRef Name=\"State\"/><Value Type='Integer'>0</Value></Neq></And><Neq><FieldRef Name=\"HubSiteId\"/><Value Type='Text'>{00000000-0000-0000-0000-000000000000}</Value></Neq></And></Where><OrderBy><FieldRef Name='Title' Ascending='true' /></OrderBy></Query><ViewFields><FieldRef Name=\"Title\"/><FieldRef Name=\"SiteUrl\"/><FieldRef Name=\"SiteId\"/><FieldRef Name=\"HubSiteId\"/></ViewFields><RowLimit Paged=\"TRUE\">" + listQueryBatchSize + "</RowLimit></View>",
               DatesInUtc: true
             }
           }
@@ -100,9 +100,38 @@ class SpoHubSiteListCommand extends SpoCommand {
           cmd.log('');
         }
 
-        return request.post(requestOptions);
+        if (this.debug || this.verbose) {
+          cmd.log(`Will retrieve associated sites (including the hub sites) in batches of ${listQueryBatchSize}`);
+        }
+        const getSites = async (reqOptions: any, nonPagedUrl: string, sites: any[]): Promise<any> => {
+          try {
+            const res: QueryListResult = await request.post(requestOptions);
+            const retreivedSites = sites.concat(res.Row);
+            if (this.debug || this.verbose) {
+              cmd.log(`Retrieved ${res.Row.length} sites`);
+            }
+            if (!!res.NextHref) {
+              reqOptions.url = nonPagedUrl + res.NextHref;
+              if (this.debug) {
+                cmd.log(`Url for next batch of sites: ${reqOptions.url}`);
+              }
+              return getSites(reqOptions, nonPagedUrl, retreivedSites);
+            }
+            else {
+              if (this.debug || this.verbose) {
+                cmd.log(`Retrieved ${retreivedSites.length} sites in total`);
+              }
+              return retreivedSites;
+            }
+          }
+          catch (error) {
+            Promise.reject(new Error(error));
+          }
+        }
+
+        return getSites(requestOptions, requestOptions.url, []);
       })
-      .then((res: QueryListResult): void => {
+      .then((res: any[]): void => {
         if (this.debug) {
           cmd.log('Response:');
           cmd.log(res);
@@ -111,11 +140,11 @@ class SpoHubSiteListCommand extends SpoCommand {
 
         if (res) {
           hubSites.forEach(h => {
-            const filteredSites = res.Row.filter(f => {
+            const filteredSites = res.filter(f => {
               // Only include sites of which the Site Id is not the same as the
               // Hub Site ID (as this site is the actual hub site) and of which the
               // Hub Site ID matches the ID of the Hub
-              return f.SiteId != f.HubSiteId 
+              return f.SiteId != f.HubSiteId
                 && f.HubSiteId.toUpperCase() == `{${h.ID.toUpperCase()}}`;
             });
             h.AssociatedSites = filteredSites.map(a => {
