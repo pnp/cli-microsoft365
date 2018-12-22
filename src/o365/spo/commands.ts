@@ -97,6 +97,7 @@ export default {
   PAGE_SECTION_ADD: `${prefix} page section add`,
   PAGE_SECTION_GET: `${prefix} page section get`,
   PAGE_SECTION_LIST: `${prefix} page section list`,  
+  PAGE_TEXT_ADD: `${prefix} page text add`,  
   PROPERTYBAG_GET: `${prefix} propertybag get`,
   PROPERTYBAG_LIST: `${prefix} propertybag list`,
   PROPERTYBAG_REMOVE: `${prefix} propertybag remove`,
