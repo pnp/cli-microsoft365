@@ -453,19 +453,154 @@ describe(commands.FOLDER_MOVE, () => {
     }
   });
 
-  it('should combine url with baseUrl that last char is /', () => {
-    const actual = (command as any).urlCombine('https://contoso.com/', 'sites/abc');
-    assert.equal(actual, 'https://contoso.com/sites/abc');
+  it('should complete successfully where baseUrl has a trailing /', (done) => {
+    let actual: string = '';
+    const expected: string = JSON.stringify({
+      exportObjectUris: [
+        'https://contoso.sharepoint.com/sites/team-a/library/folder1'
+      ],
+      destinationUri: 'https://contoso.sharepoint.com/sites/team-b/library2',
+      options: {
+        'AllowSchemaMismatch': false,
+        'IgnoreVersionHistory': true,
+        'IsMoveMode': true
+      }
+    });
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      actual = JSON.stringify(opts.body);
+      if (
+        opts.body.exportObjectUris[0] === 'https://contoso.sharepoint.com/sites/team-a/library/folder1' &&
+        opts.body.destinationUri === 'https://contoso.sharepoint.com/sites/team-b/library2' &&
+        opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/site/CreateCopyJobs'
+      ) {
+        return Promise.resolve();
+
+      }
+      return Promise.reject('Invalid request');
+
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    cmdInstance.action({
+      options: {
+        webUrl: 'https://contoso.sharepoint.com/sites/team-a/',
+        sourceUrl: 'library/folder1',
+        targetUrl: 'sites/team-b/library2'
+      }
+    }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 
-  it('should combine url with relativeUrl that last char is /', () => {
-    const actual = (command as any).urlCombine('https://contoso.com', 'sites/abc/');
-    assert.equal(actual, 'https://contoso.com/sites/abc');
+  it('should complete successfully where sourceUrl and targetUrl has a trailing /', (done) => {
+    let actual: string = '';
+    const expected: string = JSON.stringify({
+      exportObjectUris: [
+        'https://contoso.sharepoint.com/sites/team-a/library/folder1'
+      ],
+      destinationUri: 'https://contoso.sharepoint.com/sites/team-b/library2',
+      options: {
+        'AllowSchemaMismatch': false,
+        'IgnoreVersionHistory': true,
+        'IsMoveMode': true
+      }
+    });
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      actual = JSON.stringify(opts.body);
+      if (
+        opts.body.exportObjectUris[0] === 'https://contoso.sharepoint.com/sites/team-a/library/folder1' &&
+        opts.body.destinationUri === 'https://contoso.sharepoint.com/sites/team-b/library2' &&
+        opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/site/CreateCopyJobs'
+      ) {
+        return Promise.resolve();
+
+      }
+      return Promise.reject('Invalid request');
+
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    cmdInstance.action({
+      options: {
+        webUrl: 'https://contoso.sharepoint.com/sites/team-a/',
+        sourceUrl: 'library/folder1/',
+        targetUrl: 'sites/team-b/library2/'
+      }
+    }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 
-  it('should combine url with relativeUrl that first char is /', () => {
-    const actual = (command as any).urlCombine('https://contoso.com/', '/sites/abc/');
-    assert.equal(actual, 'https://contoso.com/sites/abc');
+  it('should complete successfully where sourceUrl and targetUrl has a beginning /', (done) => {
+    let actual: string = '';
+    const expected: string = JSON.stringify({
+      exportObjectUris: [
+        'https://contoso.sharepoint.com/sites/team-a/library/folder1'
+      ],
+      destinationUri: 'https://contoso.sharepoint.com/sites/team-b/library2',
+      options: {
+        'AllowSchemaMismatch': false,
+        'IgnoreVersionHistory': true,
+        'IsMoveMode': true
+      }
+    });
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      actual = JSON.stringify(opts.body);
+      if (
+        opts.body.exportObjectUris[0] === 'https://contoso.sharepoint.com/sites/team-a/library/folder1' &&
+        opts.body.destinationUri === 'https://contoso.sharepoint.com/sites/team-b/library2' &&
+        opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/site/CreateCopyJobs'
+      ) {
+        return Promise.resolve();
+
+      }
+      return Promise.reject('Invalid request');
+
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    cmdInstance.action({
+      options: {
+        webUrl: 'https://contoso.sharepoint.com/sites/team-a/',
+        sourceUrl: '/library/folder1/',
+        targetUrl: '/sites/team-b/library2/'
+      }
+    }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 
   it('supports debug mode', () => {
