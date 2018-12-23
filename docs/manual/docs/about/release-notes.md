@@ -7,6 +7,11 @@
 **SharePoint Online:**
 
 - [spo folder move](../cmd/spo/folder/folder-move.md) - moves a folder to another location [#672](https://github.com/pnp/office365-cli/issues/672)
+- [spo page text add](../cmd/spo/page/page-text-add.md) - adds text to a modern page [#365](https://github.com/pnp/office365-cli/issues/365)
+
+### Changes
+
+- added support for site collection app catalog in the spo app install, -retract, -uninstall and -upgrade commands [#405](https://github.com/pnp/office365-cli/issues/405)
 
 ## [v1.11.0](https://github.com/pnp/office365-cli/releases/tag/v1.11.0)
 
