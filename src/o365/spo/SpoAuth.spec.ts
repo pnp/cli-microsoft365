@@ -310,7 +310,7 @@ describe('SpoAuth', () => {
       accessToken: 'ABC',
       expiresOn: expiresOn.toISOString()
     };
-    const authGetAccessTokenSpy = sinon.spy(Auth.prototype, 'getAccessToken');
+    const authGetAccessTokenSpy = sinon.spy(Auth.prototype, 'getAccessTokenWithResponse');
     auth
       .getAccessToken('https://contoso.sharepoint.com', 'ABC', stdout)
       .then((accessToken) => {
@@ -323,7 +323,7 @@ describe('SpoAuth', () => {
           done(e);
         }
         finally {
-          Utils.restore(Auth.prototype.getAccessToken);
+          Utils.restore(Auth.prototype.getAccessTokenWithResponse);
         }
       });
   });
@@ -339,7 +339,10 @@ describe('SpoAuth', () => {
       accessToken: 'ABC',
       expiresOn: expiresOn.toISOString()
     };
-    sinon.stub(Auth.prototype, 'getAccessToken').callsFake(() => Promise.resolve('DEF'));
+    sinon.stub(Auth.prototype, 'getAccessTokenWithResponse').callsFake(() => Promise.resolve({
+      accessToken: 'DEF',
+      expiresOn: new Date().toISOString()
+    }));
     sinon.stub(auth as any, 'setServiceConnectionInfo').callsFake(() => Promise.resolve());
     auth
       .getAccessToken('https://contoso.sharepoint.com', 'ABC', stdout)
@@ -353,7 +356,7 @@ describe('SpoAuth', () => {
         }
         finally {
           Utils.restore([
-            Auth.prototype.getAccessToken,
+            Auth.prototype.getAccessTokenWithResponse,
             (auth as any).setServiceConnectionInfo
           ]);
         }
@@ -366,7 +369,10 @@ describe('SpoAuth', () => {
     };
     auth.site = new Site();
     auth.site.accessTokens = {};
-    sinon.stub(Auth.prototype, 'getAccessToken').callsFake(() => Promise.resolve('DEF'));
+    sinon.stub(Auth.prototype, 'getAccessTokenWithResponse').callsFake(() => Promise.resolve({
+      accessToken: 'DEF',
+      expiresOn: new Date().toISOString()
+    }));
     sinon.stub(auth as any, 'setServiceConnectionInfo').callsFake(() => Promise.resolve());
     auth
       .getAccessToken('https://contoso.sharepoint.com', 'ABC', stdout)
@@ -380,7 +386,7 @@ describe('SpoAuth', () => {
         }
         finally {
           Utils.restore([
-            Auth.prototype.getAccessToken,
+            Auth.prototype.getAccessTokenWithResponse,
             (auth as any).setServiceConnectionInfo
           ]);
         }
@@ -393,7 +399,10 @@ describe('SpoAuth', () => {
     };
     auth.site = new Site();
     auth.site.accessTokens = {};
-    sinon.stub(Auth.prototype, 'getAccessToken').callsFake(() => Promise.resolve('DEF'));
+    sinon.stub(Auth.prototype, 'getAccessTokenWithResponse').callsFake(() => Promise.resolve({
+      accessToken: 'DEF',
+      expiresOn: new Date().toISOString()
+    }));
     sinon.stub(auth as any, 'setServiceConnectionInfo').callsFake(() => Promise.resolve());
     auth
       .getAccessToken('https://contoso.sharepoint.com', 'ABC', stdout)
@@ -407,7 +416,7 @@ describe('SpoAuth', () => {
         }
         finally {
           Utils.restore([
-            Auth.prototype.getAccessToken,
+            Auth.prototype.getAccessTokenWithResponse,
             (auth as any).setServiceConnectionInfo
           ]);
         }
@@ -420,7 +429,10 @@ describe('SpoAuth', () => {
     };
     auth.site = new Site();
     auth.site.accessTokens = {};
-    sinon.stub(Auth.prototype, 'getAccessToken').callsFake(() => Promise.resolve('DEF'));
+    sinon.stub(Auth.prototype, 'getAccessTokenWithResponse').callsFake(() => Promise.resolve({
+      accessToken: 'DEF',
+      expiresOn: new Date().toISOString()
+    }));
     sinon.stub(auth as any, 'setServiceConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
     auth
       .getAccessToken('https://contoso.sharepoint.com', 'ABC', stdout)
@@ -434,7 +446,7 @@ describe('SpoAuth', () => {
         }
         finally {
           Utils.restore([
-            Auth.prototype.getAccessToken,
+            Auth.prototype.getAccessTokenWithResponse,
             (auth as any).setServiceConnectionInfo
           ]);
         }
@@ -448,7 +460,7 @@ describe('SpoAuth', () => {
     auth.site = new Site();
     auth.site.accessTokens = {};
     const stdoutLogSpy = sinon.spy(stdout, 'log');
-    sinon.stub(Auth.prototype, 'getAccessToken').callsFake(() => Promise.resolve('DEF'));
+    sinon.stub(Auth.prototype, 'getAccessTokenWithResponse').callsFake(() => Promise.resolve('DEF'));
     sinon.stub(auth as any, 'setServiceConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
     auth
       .getAccessToken('https://contoso.sharepoint.com', 'ABC', stdout, true)
@@ -462,7 +474,7 @@ describe('SpoAuth', () => {
         }
         finally {
           Utils.restore([
-            Auth.prototype.getAccessToken,
+            Auth.prototype.getAccessTokenWithResponse,
             (auth as any).setServiceConnectionInfo
           ]);
         }
@@ -475,12 +487,12 @@ describe('SpoAuth', () => {
     };
     auth.site = new Site();
     auth.site.accessTokens = {};
-    sinon.stub(Auth.prototype, 'getAccessToken').callsFake(() => Promise.reject('An error has occurred'));
+    sinon.stub(Auth.prototype, 'getAccessTokenWithResponse').callsFake(() => Promise.reject('An error has occurred'));
     auth
       .getAccessToken('https://contoso.sharepoint.com', 'ABC', stdout, true)
       .then(() => {
         Utils.restore([
-          Auth.prototype.getAccessToken,
+          Auth.prototype.getAccessTokenWithResponse,
           (auth as any).setServiceConnectionInfo
         ]);
         fail('Failure expected but passed');
@@ -494,7 +506,7 @@ describe('SpoAuth', () => {
         }
         finally {
           Utils.restore([
-            Auth.prototype.getAccessToken,
+            Auth.prototype.getAccessTokenWithResponse,
             (auth as any).setServiceConnectionInfo
           ]);
         }

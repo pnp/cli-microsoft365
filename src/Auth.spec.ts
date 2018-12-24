@@ -457,9 +457,9 @@ describe('Auth', () => {
   it('gets access token using refresh token for the specified resource', (done) => {
     sinon.stub((auth as any).authCtx, 'acquireTokenWithRefreshToken').callsArgWith(3, undefined, { accessToken: 'acc' });
 
-    auth.getAccessToken(resource, 'ref', stdout).then((accessToken) => {
+    auth.getAccessTokenWithResponse(resource, 'ref', stdout).then((tokenResponse) => {
       try {
-        assert(accessToken, 'abc');
+        assert(tokenResponse.accessToken, 'abc');
         done();
       }
       catch (e) {
@@ -473,9 +473,9 @@ describe('Auth', () => {
   it('gets access token using refresh token for the specified resource (debug)', (done) => {
     sinon.stub((auth as any).authCtx, 'acquireTokenWithRefreshToken').callsArgWith(3, undefined, { accessToken: 'acc' });
 
-    auth.getAccessToken(resource, 'ref', stdout, true).then((accessToken) => {
+    auth.getAccessTokenWithResponse(resource, 'ref', stdout, true).then((tokenResponse) => {
       try {
-        assert(accessToken, 'abc');
+        assert(tokenResponse.accessToken, 'abc');
         done();
       }
       catch (e) {
@@ -489,7 +489,7 @@ describe('Auth', () => {
   it('handles error when getting access token using refresh token for the specified resource', (done) => {
     sinon.stub((auth as any).authCtx, 'acquireTokenWithRefreshToken').callsArgWith(3, { message: 'An error has occurred' }, undefined);
 
-    auth.getAccessToken(resource, 'ref', stdout).then((accessToken) => {
+    auth.getAccessTokenWithResponse(resource, 'ref', stdout).then((tokenResponse) => {
       done('Got access token');
     }, (err) => {
       try {
@@ -505,7 +505,7 @@ describe('Auth', () => {
   it('shows AAD error when getting access token using refresh token for the specified resource', (done) => {
     sinon.stub((auth as any).authCtx, 'acquireTokenWithRefreshToken').callsArgWith(3, { message: 'An error has occurred' }, { error_description: 'AADSTS00000 An error has occurred' });
 
-    auth.getAccessToken(resource, 'ref', stdout).then((accessToken) => {
+    auth.getAccessTokenWithResponse(resource, 'ref', stdout).then((tokenResponse) => {
       done('Got access token');
     }, (err) => {
       try {
@@ -521,7 +521,7 @@ describe('Auth', () => {
   it('logs the error message when getting access token using refresh token for the specified resource failed in debug mode', (done) => {
     sinon.stub((auth as any).authCtx, 'acquireTokenWithRefreshToken').callsArgWith(3, { message: 'An error has occurred' }, undefined);
 
-    auth.getAccessToken(resource, 'ref', stdout, true).then((accessToken) => {
+    auth.getAccessTokenWithResponse(resource, 'ref', stdout, true).then((tokenResponse) => {
       done('Got access token');
     }, (err) => {
       try {

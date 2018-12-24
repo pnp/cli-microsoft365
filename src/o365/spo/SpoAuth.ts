@@ -1,6 +1,7 @@
 import { Auth, Logger, Service } from "../../Auth";
 import { CommandError } from '../../Command';
 import config from "../../config";
+import { TokenResponse } from "adal-node";
 
 interface Hash {
   [indexer: string]: Token;
@@ -73,7 +74,9 @@ class SpoAuth extends Auth {
         .then((accessToken: string): void => {
           this.site.accessTokens[resource] = {
             accessToken: accessToken,
-            expiresOn: new Date().toISOString()
+            // this is assigned inside the Auth.ensureAccessToken method
+            // and needs to be copied here for completeness
+            expiresOn: this.service.expiresOn
           };
           this
             .setServiceConnectionInfo(this.serviceId(), this.site)
@@ -104,21 +107,21 @@ class SpoAuth extends Auth {
       }
 
       super
-        .getAccessToken(resource, refreshToken, stdout, debug)
-        .then((accessToken: string): void => {
+        .getAccessTokenWithResponse(resource, refreshToken, stdout, debug)
+        .then((tokenResponse: TokenResponse): void => {
           this.site.accessTokens[resource] = {
-            accessToken: accessToken,
-            expiresOn: new Date().toISOString()
+            accessToken: tokenResponse.accessToken,
+            expiresOn: tokenResponse.expiresOn as string
           };
           this
             .setServiceConnectionInfo(this.serviceId(), this.site)
             .then((): void => {
-              resolve(accessToken);
+              resolve(tokenResponse.accessToken);
             }, (error: any): void => {
               if (debug) {
                 stdout.log(new CommandError(error));
               }
-              resolve(accessToken);
+              resolve(tokenResponse.accessToken);
             });
         }, (error: any): void => {
           reject(error);
