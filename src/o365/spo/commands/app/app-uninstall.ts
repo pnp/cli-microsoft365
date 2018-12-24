@@ -1,4 +1,3 @@
-import { ContextInfo } from './../../spo';
 import auth from '../../SpoAuth';
 import { Auth } from '../../../../Auth';
 import config from '../../../../config';
@@ -22,9 +21,10 @@ interface Options extends GlobalOptions {
   id: string;
   siteUrl: string;
   confirm?: boolean;
+  scope?: string;
 }
 
-class AppUninstallCommand extends SpoCommand {
+class SpoAppUninstallCommand extends SpoCommand {
   public get name(): string {
     return commands.APP_UNINSTALL;
   }
@@ -36,11 +36,13 @@ class AppUninstallCommand extends SpoCommand {
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.confirm = (!(!args.options.confirm)).toString();
+    telemetryProps.scope = args.options.scope || 'tenant';
     return telemetryProps;
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const uninstallApp: () => void = (): void => {
+      const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
       const resource: string = Auth.getResourceFromUrl(args.options.siteUrl);
       let siteAccessToken: string = '';
 
@@ -50,16 +52,7 @@ class AppUninstallCommand extends SpoCommand {
           siteAccessToken = accessToken;
 
           if (this.debug) {
-            cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-          }
-
-          return this.getRequestDigestForSite(args.options.siteUrl, siteAccessToken, cmd, this.debug);
-        })
-        .then((res: ContextInfo): request.RequestPromise => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
+            cmd.log(`Retrieved access token ${accessToken}. `);
           }
 
           if (this.verbose) {
@@ -67,11 +60,10 @@ class AppUninstallCommand extends SpoCommand {
           }
 
           const requestOptions: any = {
-            url: `${args.options.siteUrl}/_api/web/tenantappcatalog/AvailableApps/GetById('${encodeURIComponent(args.options.id)}')/uninstall`,
+            url: `${args.options.siteUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${encodeURIComponent(args.options.id)}')/uninstall`,
             headers: Utils.getRequestHeaders({
               authorization: `Bearer ${siteAccessToken}`,
-              accept: 'application/json;odata=nometadata',
-              'X-RequestDigest': res.FormDigestValue
+              accept: 'application/json;odata=nometadata'
             })
           };
 
@@ -88,6 +80,10 @@ class AppUninstallCommand extends SpoCommand {
             cmd.log('Response:');
             cmd.log(res);
             cmd.log('');
+          }
+
+          if (this.verbose) {
+            cmd.log(vorpal.chalk.green('DONE'));
           }
 
           cb();
@@ -118,11 +114,16 @@ class AppUninstallCommand extends SpoCommand {
     const options: CommandOption[] = [
       {
         option: '-i, --id <id>',
-        description: 'ID of the app to retrieve information for'
+        description: 'ID of the app to uninstall'
       },
       {
         option: '-s, --siteUrl <siteUrl>',
-        description: 'Absolute URL of the site to install the app in'
+        description: 'Absolute URL of the site to uninstall the app from'
+      },
+      {
+        option: '--scope [scope]',
+        description: 'Scope of the app catalog: tenant|sitecollection. Default tenant',
+        autocomplete: ['tenant', 'sitecollection']
       },
       {
         option: '--confirm',
@@ -136,20 +137,26 @@ class AppUninstallCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
+      if (args.options.scope) {
+        const testScope: string = args.options.scope.toLowerCase();
+        if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
+          return `Scope must be either 'tenant' or 'sitecollection' if specified`
+        }
+      }
+
       if (!args.options.id) {
         return 'Required parameter id missing';
+      }
+
+      if (!Utils.isValidGuid(args.options.id)) {
+        return `${args.options.id} is not a valid GUID`;
       }
 
       if (!args.options.siteUrl) {
         return 'Required parameter siteUrl missing';
       }
-
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.siteUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
-
-      return true;
+      
+      return SpoCommand.isValidSharePointUrl(args.options.siteUrl);
     };
   }
 
@@ -158,22 +165,32 @@ class AppUninstallCommand extends SpoCommand {
     log(vorpal.find(commands.APP_UNINSTALL).helpInformation());
     log(
       `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-      using the ${chalk.blue(commands.LOGIN)} command.
+    using the ${chalk.blue(commands.LOGIN)} command.
 
   Remarks:
   
-    To uninstall an app from the site, you have to first log in to a SharePoint site using
-    the ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
+    To uninstall an app from the site, you have to first log in to a SharePoint
+    site using the ${chalk.blue(commands.LOGIN)} command,
+    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
+
+    If the app with the specified ID doesn't exist in the app catalog,
+    the command will fail with an error.
    
   Examples:
   
     Uninstall the app with ID ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
     from the ${chalk.grey('https://contoso.sharepoint.com')} site.
-      ${chalk.grey(config.delimiter)} ${commands.APP_UNINSTALL} -i b2307a39-e878-458b-bc90-03bc578531d6 -s https://contoso.sharepoint.com
+      ${chalk.grey(config.delimiter)} ${commands.APP_UNINSTALL} --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com
 
     Uninstall the app with ID ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
-    from the ${chalk.grey('https://contoso.sharepoint.com')} site without prompting for confirmation.
-      ${chalk.grey(config.delimiter)} ${commands.APP_UNINSTALL} -i b2307a39-e878-458b-bc90-03bc578531d6 -s https://contoso.sharepoint.com --confirm
+    from the ${chalk.grey('https://contoso.sharepoint.com')} site without prompting
+    for confirmation.
+      ${chalk.grey(config.delimiter)} ${commands.APP_UNINSTALL} --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com --confirm
+
+    Uninstall the app with ID ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
+    from the ${chalk.grey('https://contoso.sharepoint.com')} site where the app is deployed
+    to the site collection app catalog of ${chalk.grey('https://contoso.sharepoint.com')}.
+      ${chalk.grey(config.delimiter)} ${commands.APP_UNINSTALL} --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com --scope sitecollection
 
   More information:
   
@@ -183,4 +200,4 @@ class AppUninstallCommand extends SpoCommand {
   }
 }
 
-module.exports = new AppUninstallCommand();
+module.exports = new SpoAppUninstallCommand();

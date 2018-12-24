@@ -436,7 +436,7 @@ describe(commands.PAGE_COLUMN_GET, () => {
           "order": 1,
           "dataVersion": "1.0",
           "jsonData": "&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1&#125;&#125;",
-          "controls": [{ "controlType": 4, "dataVersion": "1.0", "order": 1, "id": "ccaa96dc-4d16-4940-bf0d-7b179628a8fd", "controlData": { "controlType": 4, "displayMode": 2, "id": "ccaa96dc-4d16-4940-bf0d-7b179628a8fd", "position": { "zoneIndex": 1, "sectionIndex": 1, "controlIndex": 1, "sectionFactor": 6 }, "editorType": "CKEditor" }, "_text": "<p>asd</p></div>" }]
+          "controls": [{ "controlType": 4, "dataVersion": "1.0", "order": 1, "id": "ccaa96dc-4d16-4940-bf0d-7b179628a8fd", "controlData": { "controlType": 4, "displayMode": 2, "id": "ccaa96dc-4d16-4940-bf0d-7b179628a8fd", "position": { "zoneIndex": 1, "sectionIndex": 1, "controlIndex": 1, "sectionFactor": 6 }, "editorType": "CKEditor" }, "_text": "<p>asd</p>" }]
         }));
         done();
       }
