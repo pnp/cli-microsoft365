@@ -234,12 +234,12 @@ export abstract class Auth {
     }
   }
 
-  public getAccessToken(resource: string, refreshToken: string, stdout: Logger, debug: boolean = false): Promise<string> {
+  public getAccessTokenWithResponse(resource: string, refreshToken: string, stdout: Logger, debug: boolean = false): Promise<TokenResponse> {
     if (debug) {
-      stdout.log(`Starting Auth.getAccessToken. resource: ${resource}, refreshToken: ${refreshToken}, debug: ${debug}`);
+      stdout.log(`Starting Auth.getAccessTokenWithResponse. resource: ${resource}, refreshToken: ${refreshToken}, debug: ${debug}`);
     }
 
-    return new Promise<string>((resolve: (accessToken: string) => void, reject: (err: any) => void): void => {
+    return new Promise<TokenResponse>((resolve: (tokenResponse: TokenResponse) => void, reject: (err: any) => void): void => {
       if (debug) {
         stdout.log(`Retrieving access token for ${resource} using refresh token ${refreshToken}`);
       }
@@ -264,7 +264,7 @@ export abstract class Auth {
           }
 
           const tokenResponse: TokenResponse = <TokenResponse>response;
-          resolve(tokenResponse.accessToken);
+          resolve(tokenResponse);
         });
     });
   }

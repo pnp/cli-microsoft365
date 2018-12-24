@@ -38,7 +38,7 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.overwrite = (!(!args.options.overwrite)).toString();
-    telemetryProps.scope = (!(!args.options.scope)).toString();
+    telemetryProps.scope = args.options.scope || 'tenant';
     telemetryProps.appCatalogUrl = (!(!args.options.appCatalogUrl)).toString();
     return telemetryProps;
   }
@@ -148,10 +148,6 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.scope && args.options.appCatalogUrl) {
-        return 'You must specify scope when the appCatalogUrl option is specified';
-      }
-
       // verify either 'tenant' or 'sitecollection' specified if scope provided
       if (args.options.scope) {
         const testScope: string = args.options.scope.toLowerCase();

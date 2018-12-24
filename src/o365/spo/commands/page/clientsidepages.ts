@@ -1,5 +1,5 @@
 // Reused by courtesy of PnPJS
-// original at: https://github.com/pnp/pnpjs/blob/b18b30ae563d302d5400ef12aeba20f2c8cb5749/packages/sp/src/clientsidepages.ts
+// original at: https://github.com/pnp/pnpjs/blob/b4336b370c9b10950a22d12c48ad69789d1382fc/packages/sp/src/clientsidepages.ts
 
 /**
  * Interface defining an object with a known property type
@@ -33,6 +33,16 @@ export enum CanvasSectionTemplate {
   /// Two columns, left one is 1/3, right one 2/3
   /// </summary>
   TwoColumnRight
+}
+
+/**
+ * Shorthand for Object.hasOwnProperty
+ * 
+ * @param o Object to check for
+ * @param p Name of the property
+ */
+function hOP(o: any, p: string): boolean {
+  return Object.hasOwnProperty.call(o, p);
 }
 
 /**
@@ -247,10 +257,10 @@ function reindex(collection?: { order: number, columns?: { order: number }[], co
 
   for (let i = 0; i < collection.length; i++) {
     collection[i].order = i + 1;
-    if (collection[i].hasOwnProperty("columns")) {
-      reindex(collection[i].columns);
-    } else if (collection[i].hasOwnProperty("controls")) {
-      reindex(collection[i].controls);
+    if (hOP(collection[i], "columns")) {
+        reindex(collection[i].columns);
+    } else if (hOP(collection[i], "controls")) {
+        reindex(collection[i].controls);
     }
   }
 }
@@ -273,7 +283,12 @@ export class ClientSidePage {
       .replace(/"/g, "&quot;")
       .replace(/:/g, "&#58;")
       .replace(/{/g, "&#123;")
-      .replace(/}/g, "&#125;");
+      .replace(/}/g, "&#125;")
+      .replace(/\[/g, "\[")
+      .replace(/\]/g, "\]")
+      .replace(/\*/g, "\*")
+      .replace(/\$/g, "\$")
+      .replace(/\./g, "\.");
   }
 
   /**
@@ -286,21 +301,26 @@ export class ClientSidePage {
       return {} as any;
     }
 
-    return JSON.parse(escapedString
-      .replace(/&quot;/g, `"`)
-      .replace(/&#58;/g, ":")
-      .replace(/&#123;/g, "{")
-      .replace(/&#125;/g, "}"));
+    const unespace = (escaped: string): string => {
+      const mapDict = [
+          [/&quot;/g, "\""], [/&#58;/g, ":"], [/&#123;/g, "{"], [/&#125;/g, "}"],
+          [/\\\\/g, "\\"], [/\\\?/g, "?"], [/\\\./g, "."], [/\\\[/g, "["], [/\\\]/g, "]"],
+          [/\\\(/g, "("], [/\\\)/g, ")"], [/\\\|/g, "|"], [/\\\+/g, "+"], [/\\\*/g, "*"],
+          [/\\\$/g, "$"],
+      ];
+      return mapDict.reduce((r, m) => r.replace(m[0], m[1] as string), escaped);
+  };
+
+    return JSON.parse(unespace(escapedString));
   }
 
   /**
    * Add a section to this page
    */
   public addSection(sectionTemplate?: CanvasSectionTemplate, order?: number): CanvasSection {
-    var section: CanvasSection;
-    var sectionOrder = order ? order : 1;
-    if (sectionTemplate && order) {
-      section = new CanvasSection(this, sectionOrder);
+    var sectionOrder = typeof order !== 'undefined' ? order : getNextOrder(this.sections);
+    var section: CanvasSection = new CanvasSection(this, sectionOrder);
+    if (sectionTemplate) {
       switch (CanvasSectionTemplate[sectionTemplate].toString()) {
         case CanvasSectionTemplate.OneColumnFullWidth.toString():
           section.addColumn(0);
@@ -327,13 +347,13 @@ export class ClientSidePage {
           section.addColumn(12);
           break;
       }
+    }
 
+    if (typeof order !== undefined) {
       // Insert the sections at the specified order.
       this.sections.splice(sectionOrder - 1, 0, section)
-
     }
     else {
-      section = new CanvasSection(this, getNextOrder(this.sections));
       this.sections.push(section);
     }
 
@@ -453,21 +473,39 @@ export class ClientSidePage {
 
     let section: CanvasSection | null = null;
     let column: CanvasColumn | null = null;
+    let sectionFactor: CanvasColumnFactorType = 12;
+    let sectionIndex = 0;
+    let zoneIndex = 0;
 
-    const sections = this.sections.filter(s => control.controlData && control.controlData.position && s.order === control.controlData.position.zoneIndex);
-    if (sections.length < 1) {
-      section = new CanvasSection(this, control.controlData && control.controlData.position ? control.controlData.position.zoneIndex : 0);
-      this.sections.push(section);
-    } else {
-      section = sections[0];
+    if (control.controlData) {
+      // handle case where we don't have position data
+      if (hOP(control.controlData, "position")) {
+          if (hOP(control.controlData.position, "zoneIndex")) {
+              zoneIndex = control.controlData.position.zoneIndex;
+          }
+          if (hOP(control.controlData.position, "sectionIndex")) {
+              sectionIndex = control.controlData.position.sectionIndex;
+          }
+          if (hOP(control.controlData.position, "sectionFactor")) {
+              sectionFactor = control.controlData.position.sectionFactor;
+          }
+      }
     }
 
-    const columns = section.columns.filter(c => control.controlData && c.order === control.controlData.position.sectionIndex);
-    if (columns.length < 1) {
-      column = new CanvasColumn(section, control.controlData ? control.controlData.position.sectionIndex : 0, control.controlData ? control.controlData.position.sectionFactor : 0);
-      section.columns.push(column);
+    const sections = this.sections.filter(s => s.order === zoneIndex);
+    if (sections.length < 1) {
+        section = new CanvasSection(this, zoneIndex);
+        this.sections.push(section);
     } else {
-      column = columns[0];
+        section = sections[0];
+    }
+
+    const columns = section.columns.filter(c => c.order === sectionIndex);
+    if (columns.length < 1) {
+        column = new CanvasColumn(section, sectionIndex, sectionFactor);
+        section.columns.push(column);
+    } else {
+        column = columns[0];
     }
 
     control.column = column;
@@ -482,14 +520,15 @@ export class ClientSidePage {
    */
   private mergeColumnToTree(column: CanvasColumn): void {
 
+    const order = column.controlData && hOP(column.controlData, "position") && hOP(column.controlData.position, "zoneIndex") ? column.controlData.position.zoneIndex : 0;
     let section: CanvasSection | null = null;
-    const sections = this.sections.filter(s => column.controlData && column.controlData.position && s.order === column.controlData.position.zoneIndex);
+    const sections = this.sections.filter(s => s.order === order);
 
     if (sections.length < 1) {
-      section = new CanvasSection(this, column.controlData && column.controlData.position ? column.controlData.position.zoneIndex : 0);
-      this.sections.push(section);
+        section = new CanvasSection(this, order);
+        this.sections.push(section);
     } else {
-      section = sections[0];
+        section = sections[0];
     }
 
     column.section = section;
@@ -606,6 +645,21 @@ export class CanvasColumn extends CanvasControl {
     return this;
   }
 
+  public insertControl(control: ClientSidePart, index?: number): this {
+    if (typeof index === 'undefined' ||
+      index < 0 ||
+      index >= this.controls.length) {
+      this.addControl(control);
+    }
+    else {
+      control.column = this;
+			control.order = index;
+			this.controls.splice(index, 0, control);
+    }
+
+		return this;
+  }
+
   public getControl<T extends ClientSidePart>(index: number): T {
     return <T>this.controls[index];
   }
@@ -631,9 +685,13 @@ export class CanvasColumn extends CanvasControl {
     super.fromHtml(html);
 
     this.controlData = ClientSidePage.escapedStringToJson<ClientSideControlData>(getAttrValueFromString(html, "data-sp-controldata"));
-    if (this.controlData.position) {
-      this.factor = this.controlData.position.sectionFactor;
-      this.order = this.controlData.position.sectionIndex;
+    if (hOP(this.controlData, "position")) {
+        if (hOP(this.controlData.position, "sectionFactor")) {
+            this.factor = this.controlData.position.sectionFactor;
+        }
+        if (hOP(this.controlData.position, "sectionIndex")) {
+            this.order = this.controlData.position.sectionIndex;
+        }
     }
   }
 
@@ -679,12 +737,12 @@ export abstract class ClientSidePart extends CanvasControl {
 
 export class ClientSideText extends ClientSidePart {
 
-  private _text: string;
+  private _text: string = '';
 
   constructor(text = "") {
     super(4, "1.0");
 
-    this._text = text;
+    this.text = text;
   }
 
   /**
@@ -738,9 +796,15 @@ export class ClientSideText extends ClientSidePart {
 
     super.fromHtml(html);
 
-    const match = /<div[^>]*data-sp-rte[^>]*>(.*?)<\/div>$/i.exec(html);
+    this.text = "";
 
-    this.text = match && match.length > 1 ? match[1] : "";
+    getBoundedDivMarkup(html, /<div[^>]*data-sp-rte[^>]*>/i, (s: string) => {
+
+        // now we need to grab the inner text between the divs
+        const match = /<div[^>]*data-sp-rte[^>]*>(.*?)<\/div>$/i.exec(s);
+
+        this.text = match && match.length > 1 ? match[1] : "";
+    });
   }
 }
 
@@ -767,7 +831,7 @@ export class ClientSideWebpart extends ClientSidePart {
     const manifest: ClientSidePageComponentManifest = JSON.parse(component.Manifest);
     this.title = manifest.preconfiguredEntries[0].title.default;
     this.description = manifest.preconfiguredEntries[0].description.default;
-    this.dataVersion = "";
+    this.dataVersion = "1.0";
     this.propertieJson = this.parseJsonProperties(manifest.preconfiguredEntries[0].properties);
   }
 
@@ -792,6 +856,7 @@ export class ClientSideWebpart extends ClientSidePart {
       id: this.webPartId,
       instanceId: this.id,
       properties: this.propertieJson,
+      serverProcessedContent: this.serverProcessedContent,
       title: this.title,
     };
 
@@ -824,8 +889,8 @@ export class ClientSideWebpart extends ClientSidePart {
     this.title = webPartData.title;
     this.description = webPartData.description;
     this.webPartId = webPartData.id;
-    this.canvasDataVersion = getAttrValueFromString(html, "data-sp-canvasdataversion");
-    this.dataVersion = getAttrValueFromString(html, "data-sp-webpartdataversion");
+    this.canvasDataVersion = (getAttrValueFromString(html, "data-sp-canvasdataversion") || '').replace(/\\\./, ".");
+    this.dataVersion = (getAttrValueFromString(html, "data-sp-webpartdataversion") || '').replace(/\\\./, ".");
     this.setProperties(webPartData.properties);
 
     if (typeof webPartData.serverProcessedContent !== "undefined") {

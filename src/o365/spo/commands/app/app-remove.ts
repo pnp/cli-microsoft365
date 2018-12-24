@@ -38,7 +38,7 @@ class SpoAppRemoveCommand extends SpoAppBaseCommand {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.appCatalogUrl = (!(!args.options.appCatalogUrl)).toString();
     telemetryProps.confirm = (!(!args.options.confirm)).toString();
-    telemetryProps.scope = (!(!args.options.scope)).toString();
+    telemetryProps.scope = args.options.scope || 'tenant';
     return telemetryProps;
   }
 
@@ -119,7 +119,7 @@ class SpoAppRemoveCommand extends SpoAppBaseCommand {
       },
       {
         option: '-u, --appCatalogUrl [appCatalogUrl]',
-        description: 'URL of the tenant or site app catalog. It must be specified when the scope is \'sitecollection\''
+        description: 'URL of the tenant or site collection app catalog. It must be specified when the scope is \'sitecollection\''
       },
       {
         option: '-s, --scope [scope]',
@@ -138,10 +138,6 @@ class SpoAppRemoveCommand extends SpoAppBaseCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.scope && args.options.appCatalogUrl) {
-        return 'You must specify scope when the appCatalogUrl option is specified';
-      }
-
       // verify either 'tenant' or 'sitecollection' specified if scope provided
       if (args.options.scope) {
         const testScope: string = args.options.scope.toLowerCase();

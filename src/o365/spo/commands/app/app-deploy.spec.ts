@@ -1156,12 +1156,6 @@ describe(commands.APP_DEPLOY, () => {
     assert.notEqual(actual, true);
   });
 
-  it('should fail when no scope, but appCatalogUrl specified', () => {
-
-    const actual = (command.validate() as CommandValidate)({ options: { name: 'solution', filePath: 'abc', appCatalogUrl: 'https://contoso.sharepoint.com' } });
-    assert.notEqual(actual, true);
-  });
-
   it('passes validation when the id is specified and the appCatalogUrl is not', () => {
     const actual = (command.validate() as CommandValidate)({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
     assert.equal(actual, true);

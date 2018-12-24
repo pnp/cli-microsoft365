@@ -157,7 +157,7 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
       },
       {
         option: '-u, --appCatalogUrl [appCatalogUrl]',
-        description: 'URL of the tenant or site app catalog. It must be specified when the scope is \'sitecollection\''
+        description: 'URL of the tenant or site collection app catalog. It must be specified when the scope is \'sitecollection\''
       },
       {
         option: '--skipFeatureDeployment',
@@ -176,10 +176,6 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.scope && args.options.appCatalogUrl) {
-        return 'You must specify scope when the appCatalogUrl option is specified';
-      }
-
       // verify either 'tenant' or 'sitecollection' specified if scope provided
       if (args.options.scope) {
         const testScope: string = args.options.scope.toLowerCase();
@@ -221,8 +217,8 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
 
   Remarks:
   
-    To deploy an app in the tenant app catalog, you have to first log in to
-    a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
+    To deploy an app in the tenant or site collection app catalog, you have to
+    first log in to a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
     eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
 
     When adding an app to the tenant app catalog, it's not necessary to specify
@@ -235,9 +231,9 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
     ${chalk.grey('https://contoso.sharepoint.com/sites/team-a/AppCatalog')} or
     ${chalk.grey('https://contoso.sharepoint.com/sites/team-a')}. CLI will accept both formats.
 
-    If the app with the specified ID doesn't exist in the tenant app catalog,
+    If the app with the specified ID doesn't exist in the app catalog,
     the command will fail with an error. Before you can deploy an app,
-    you have to add it to the tenant app catalog first
+    you have to add it to the app catalog first
     using the ${chalk.blue(commands.APP_ADD)} command.
    
   Examples:
@@ -258,7 +254,8 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
     ${chalk.grey('https://contoso.sharepoint.com/sites/apps')}
       ${chalk.grey(config.delimiter)} ${commands.APP_DEPLOY} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --appCatalogUrl https://contoso.sharepoint.com/sites/apps
 
-    Deploy the specified app to the whole tenant at once. Features included in the solution will not be activated.
+    Deploy the specified app to the whole tenant at once. Features included in
+    the solution will not be activated.
       ${chalk.grey(config.delimiter)} ${commands.APP_DEPLOY} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --skipFeatureDeployment
     
   More information:

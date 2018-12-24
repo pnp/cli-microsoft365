@@ -13,8 +13,9 @@ spo app uninstall [options]
 Option|Description
 ------|-----------
 `--help`|output usage information
-`-i, --id <id>`|ID of the app to retrieve information for
+`-i, --id <id>`|ID of the app to uninstall
 `-s, --siteUrl <siteUrl>`|Absolute URL of the site to uninstall the app from
+`--scope [scope]`|Scope of the app catalog: `tenant|sitecollection`. Default `tenant`
 `--confirm`|Don't prompt for confirming uninstalling the app
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
@@ -27,18 +28,26 @@ Option|Description
 
 To uninstall an app from the site, you have to first log in to a SharePoint site using the [spo login](../login.md) command, eg. `spo login https://contoso.sharepoint.com`.
 
+If the app with the specified ID doesn't exist in the app catalog, the command will fail with an error.
+
 ## Examples
 
 Uninstall the app with ID _b2307a39-e878-458b-bc90-03bc578531d6_ from the _https://contoso.sharepoint.com_ site.
 
 ```sh
-spo app uninstall -i b2307a39-e878-458b-bc90-03bc578531d6 -s https://contoso.sharepoint.com
+spo app uninstall --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com
 ```
 
 Uninstall the app with ID _b2307a39-e878-458b-bc90-03bc578531d6_ from the _https://contoso.sharepoint.com_ site without prompting for confirmation.
 
 ```sh
-spo app uninstall -i b2307a39-e878-458b-bc90-03bc578531d6 -s https://contoso.sharepoint.com
+spo app uninstall --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com
+```
+
+Uninstall the app with ID _b2307a39-e878-458b-bc90-03bc578531d6_ from the _https://contoso.sharepoint.com_ site where the app is deployed to the site collection app catalog of _https://contoso.sharepoint.com_.
+
+```sh
+spo app uninstall --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com --scope sitecollection
 ```
 
 ## More information

@@ -39,7 +39,7 @@ class SpoAppGetCommand extends SpoAppBaseCommand {
     telemetryProps.id = (!(!args.options.id)).toString();
     telemetryProps.name = (!(!args.options.name)).toString();
     telemetryProps.appCatalogUrl = (!(!args.options.appCatalogUrl)).toString();
-    telemetryProps.scope = (!(!args.options.scope)).toString();
+    telemetryProps.scope = args.options.scope || 'tenant';
     return telemetryProps;
   }
 
@@ -142,7 +142,7 @@ class SpoAppGetCommand extends SpoAppBaseCommand {
       },
       {
         option: '-u, --appCatalogUrl [appCatalogUrl]',
-        description: 'URL of the tenant or site app catalog. It must be specified when the scope is \'sitecollection\''
+        description: 'URL of the tenant or site collection app catalog. It must be specified when the scope is \'sitecollection\''
       },
       {
         option: '-s, --scope [scope]',
@@ -157,11 +157,6 @@ class SpoAppGetCommand extends SpoAppBaseCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-
-      if (!args.options.scope && args.options.appCatalogUrl) {
-        return 'You must specify scope when the appCatalogUrl option is specified';
-      }
-
       // verify either 'tenant' or 'sitecollection' specified if scope provided
       if (args.options.scope) {
         const testScope: string = args.options.scope.toLowerCase();

@@ -13,10 +13,10 @@ spo app remove [options]
 Option|Description
 ------|-----------
 `--help`|output usage information
-`-i, --id <id>`|ID of the app to remove. Needs to be available in the tenant app catalog
-`-u, --appCatalogUrl [appCatalogUrl]`|URL of the tenant or site app catalog. It must be specified when the scope is `sitecollection`
+`-i, --id <id>`|ID of the app to remove. Needs to be available in the app catalog
+`-u, --appCatalogUrl [appCatalogUrl]`|URL of the tenant or site collection app catalog. It must be specified when the scope is `sitecollection`
 `-s, --scope [scope]`|Scope of the app catalog: `tenant|sitecollection`. Default `tenant`
-`--confirm`|Don't prompt for confirming removing the app from the tenant app catalog
+`--confirm`|Don't prompt for confirming removing the app
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
@@ -32,7 +32,7 @@ When removing an app from the tenant app catalog, it's not necessary to specify 
 
 When specifying site collection app catalog, you can specify the URL either with our without the _AppCatalog_ part, for example `https://contoso.sharepoint.com/sites/team-a/AppCatalog` or `https://contoso.sharepoint.com/sites/team-a`. CLI will accept both formats.
 
-If the app with the specified ID doesn't exist in the tenant app catalog, the command will fail with an error.
+If the app with the specified ID doesn't exist in the app catalog, the command will fail with an error.
 
 ## Examples
 

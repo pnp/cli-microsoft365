@@ -505,7 +505,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '88f7b5b2-83a8-45d1-bc61-c11425f233e3' } }, () => {
       try {
-        assert.equal(JSON.stringify(log[0]), JSON.stringify({"controlType":"Empty column","dataVersion":"1.0","order":1,"id":"88f7b5b2-83a8-45d1-bc61-c11425f233e3","controlData":null,"_text":""}));
+        assert.equal(JSON.stringify(log[0]), JSON.stringify({"controlType":"Empty column","dataVersion":"1.0","order":1,"id":"88f7b5b2-83a8-45d1-bc61-c11425f233e3","controlData":null,"_text":"<p></p>"}));
         done();
       }
       catch (e) {
@@ -591,7 +591,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '88f7b5b2-83a8-45d1-bc61-c11425f233e3' } }, () => {
       try {
-        assert.equal(JSON.stringify(log[0]), JSON.stringify({"controlType":"Client-side text","dataVersion":"1.0","order":1,"id":"88f7b5b2-83a8-45d1-bc61-c11425f233e3","controlData":null,"_text":""}));
+        assert.equal(JSON.stringify(log[0]), JSON.stringify({"controlType":"Client-side text","dataVersion":"1.0","order":1,"id":"88f7b5b2-83a8-45d1-bc61-c11425f233e3","controlData":null,"_text":"<p></p>"}));
         done();
       }
       catch (e) {
@@ -678,7 +678,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '88f7b5b2-83a8-45d1-bc61-c11425f233e3' } }, () => {
       try {
-        assert.equal(JSON.stringify(log[0]), JSON.stringify({"controlType":"5","dataVersion":"1.0","order":1,"id":"88f7b5b2-83a8-45d1-bc61-c11425f233e3","controlData":null,"_text":""}));
+        assert.equal(JSON.stringify(log[0]), JSON.stringify({"controlType":"5","dataVersion":"1.0","order":1,"id":"88f7b5b2-83a8-45d1-bc61-c11425f233e3","controlData":null,"_text":"<p></p>"}));
         done();
       }
       catch (e) {
