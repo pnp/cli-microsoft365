@@ -12,6 +12,7 @@
 ### Changes
 
 - added support for site collection app catalog in the spo app install, -retract, -uninstall and -upgrade commands [#405](https://github.com/pnp/office365-cli/issues/405)
+- fixed bug with caching tokens for SPO commands [#719](https://github.com/pnp/office365-cli/issues/719)
 
 ## [v1.11.0](https://github.com/pnp/office365-cli/releases/tag/v1.11.0)
 
