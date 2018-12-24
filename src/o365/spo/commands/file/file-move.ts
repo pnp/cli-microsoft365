@@ -118,7 +118,7 @@ class SpoFileMoveCommand extends SpoCommand {
         // all preconditions met, now create copy job
         const sourceAbsoluteUrl = this.urlCombine(webUrl, args.options.sourceUrl);
         const allowSchemaMismatch: boolean = args.options.allowSchemaMismatch || false;
-        const requestUrl: string = `${webUrl}/_api/site/CreateCopyJobs`;
+        const requestUrl: string = this.urlCombine(webUrl, '/_api/site/CreateCopyJobs');
         const requestOptions: any = {
           url: requestUrl,
           headers: Utils.getRequestHeaders({
