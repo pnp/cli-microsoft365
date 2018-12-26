@@ -60,7 +60,37 @@ Using credentials to log in to Office 365 is convenient in automation scenarios 
 !!! attention
     When logging in to Office 365 using credentials, Office 365 CLI will persist not only the retrieved access and refresh token, but also the credentials you specified when logging in. This is necessary for the CLI to be able to retrieve a new refresh token, in case the previously retrieved refresh token expired or has been invalidated.
 
-Generally, you should use the default device code flow. If you need to use a non-interactive authentication flow, you can authenticate using credentials of an account that has sufficient privileges in your tenant and doesn't have multi-factor authentication or other advanced security features enabled.
+Generally, you should use the default device code flow. If you need to use a non-interactive authentication flow, you can authenticate using a certificate or credentials of an account that has sufficient privileges in your tenant and doesn't have multi-factor authentication or other advanced security features enabled.
+
+#### Log in using a certificate
+
+Another way to log in to an Office 365 service in the Office 365 CLI is by using a certificate. To use this authentication method, set the `OFFICE365CLI_AADAADAPPID` environment variable to the ID of the Azure AD application that you want to use to authenticate the Office 365 CLI and the `OFFICE365CLI_TENANT` environment variable to the ID of your Azure AD directory. When calling the login command, set the `authType` option to `certificate`, specify the path to the certificate private key using the `certificateFile` option and specify the certificate thumbprint using the `thumbprint` option.
+
+To log in to SharePoint Online using a certificate, execute:
+
+```sh
+spo login https://contoso-admin.sharepoint.com --authType certificate --certificateFile /Users/user/dev/localhost.pfx --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1
+```
+
+To log in to Azure AD using a certificate, execute:
+
+```sh
+aad login --authType certificate --certificateFile /Users/user/dev/localhost.pfx --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1
+```
+
+Logging in to Office 365 using a certificate is convenient for automation scenarios where you cannot authenticate interactively but also don't want to use credentials.
+
+Because there is no user context when logging in using a certificate, you will typically create a new Azure AD application, specific to your organization and grant it the required permissions.
+
+!!! attention
+    You should keep in mind, that because the Office 365 CLI will be accessing these APIs with app-only context, you need to grant the correct application permissions rather than delegated permissions that would be used in other authentication methods.
+
+Logging in using a certificate gives the Office 365 CLI app-only access to Office 365 services. Not all operations support app-only access so it is possible, that some CLI commands will fail when executed while logged in to Office 365 using a certificate.
+
+!!! attention
+    When logging in to Office 365 using a certificate, Office 365 CLI will persist not only the retrieved access token but also the contents of the certificate's private key and its thumbprint. This is necessary for the CLI to be able to retrieve a new access token in case of the previously retrieved access token expired or has been invalidated.
+
+Generally, you should use the default device code flow. If you need to use a non-interactive authentication flow, to for example integrate the Office 365 CLI in your build pipeline, you can login using a certificate or user credentials.
 
 ### Check login status
 
@@ -69,6 +99,8 @@ To see if you're logged in to the particular Office 365 service and if so, with 
 ```sh
 spo status
 ```
+
+If you're logged in to Office 365 using a certificate, the `<service> status` command will show the name of the Azure AD application used to log in.
 
 ### Log out from an Office 365 service
 
@@ -85,7 +117,7 @@ spo logout
 
 ### Logging in to SharePoint Online
 
-When logging in to SharePoint Online, you can log in either to the tenant admin site (eg. `https://contoso-admin.sharepoint.com`) or any other site in your tenant. If you are logged in to the tenant admin site, but would like to get information for some other site, such as the list of its subsites or lists, the CLI will automatically switch to that site, without you having to reauthenticate.
+When logging in to SharePoint Online, you can log in either to the tenant admin site (eg. `https://contoso-admin.sharepoint.com`) or any other site in your tenant. If you are logged in to the tenant admin site, but would like to get information for some other site, such as the list of its subsites or lists, the CLI will automatically switch to that site, without you having to re-authenticate.
 
 !!! attention
     Please note, that some commands require login to the tenant admin site, and if you try to execute them, while being logged in to a different site, you will get an error. For more information whether the login to the tenant admin site is required or not, refer to the help of that particular command.

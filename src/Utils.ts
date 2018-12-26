@@ -171,7 +171,9 @@ export default class Utils {
     const tokenString: string = Buffer.from(chunks[1], 'base64').toString();
     try {
       const token: any = JSON.parse(tokenString);
-      userName = token.upn;
+      // if authenticated using certificate, there is no upn so use
+      // app display name instead
+      userName = token.upn || token.app_displayname;
     }
     catch {
     }
