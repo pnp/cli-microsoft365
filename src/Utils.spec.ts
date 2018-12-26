@@ -471,4 +471,14 @@ describe('Utils', () => {
     const actual = Utils.getServerRelativePath('sites/site1', 'sites/site1/Shared Documents/');
     assert.equal(actual, '/sites/site1/Shared Documents');
   });
+
+  it('shows app display name as connected-as for app-only auth', () => {
+    const jwt = JSON.stringify({
+      app_displayname: 'Office 365 CLI Contoso'
+    });
+    const jwt64 = Buffer.from(jwt).toString('base64');
+    const accessToken = `abc.${jwt64}.def`;
+    const actual = Utils.getUserNameFromAccessToken(accessToken);
+    assert.equal(actual, 'Office 365 CLI Contoso');
+  });
 });

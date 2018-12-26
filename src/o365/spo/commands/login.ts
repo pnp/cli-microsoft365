@@ -14,6 +14,7 @@ import Command, {
 import SpoCommand from '../SpoCommand';
 import Utils from '../../../Utils';
 import appInsights from '../../../appInsights';
+import * as fs from 'fs';
 
 const vorpal: Vorpal = require('../../../vorpal-init');
 
@@ -26,6 +27,8 @@ interface Options extends GlobalOptions {
   authType?: string;
   userName?: string;
   password?: string;
+  certificateFile?: string;
+  thumbprint?: string;
 }
 
 class SpoLoginCommand extends Command {
@@ -70,10 +73,17 @@ class SpoLoginCommand extends Command {
       const resource = Auth.getResourceFromUrl(args.url);
       auth.site.url = args.url;
 
-      if (args.options.authType === 'password') {
-        auth.service.authType = AuthType.Password;
-        auth.service.userName = args.options.userName;
-        auth.service.password = args.options.password;
+      switch (args.options.authType) {
+        case 'password':
+          auth.service.authType = AuthType.Password;
+          auth.service.userName = args.options.userName;
+          auth.service.password = args.options.password;
+          break;
+        case 'certificate':
+          auth.service.authType = AuthType.Certificate;
+          auth.service.certificate = fs.readFileSync(args.options.certificateFile as string, 'utf8');
+          auth.service.thumbprint = args.options.thumbprint;
+          break;
       }
 
       if (auth.site.isTenantAdminSite()) {
@@ -217,8 +227,8 @@ class SpoLoginCommand extends Command {
     const options: CommandOption[] = [
       {
         option: '-t, --authType [authType]',
-        description: 'The type of authentication to use. Allowed values deviceCode|password. Default deviceCode',
-        autocomplete: ['deviceCode', 'password']
+        description: 'The type of authentication to use. Allowed values certificate|deviceCode|password. Default deviceCode',
+        autocomplete: ['certificate', 'deviceCode', 'password']
       },
       {
         option: '-u, --userName [userName]',
@@ -227,6 +237,14 @@ class SpoLoginCommand extends Command {
       {
         option: '-p, --password [password]',
         description: 'Password for the user. Required when authType is set to password'
+      },
+      {
+        option: '-c, --certificateFile [certificateFile]',
+        description: 'Path to the file with certificate private key. Required when authType is set to certificate'
+      },
+      {
+        option: '--thumbprint [thumbprint]',
+        description: 'Certificate thumbprint. Required when authType is set to certificate'
       }
     ];
 
@@ -243,6 +261,20 @@ class SpoLoginCommand extends Command {
 
         if (!args.options.password) {
           return 'Required option password missing';
+        }
+      }
+
+      if (args.options.authType === 'certificate') {
+        if (!args.options.certificateFile) {
+          return 'Required option certificateFile missing';
+        }
+
+        if (!fs.existsSync(args.options.certificateFile)) {
+          return `File '${args.options.certificateFile}' does not exist`;
+        }
+
+        if (!args.options.thumbprint) {
+          return 'Required option thumbprint missing';
         }
       }
 
@@ -273,9 +305,9 @@ class SpoLoginCommand extends Command {
 
     By default, the ${chalk.blue(commands.LOGIN)} command uses device code OAuth flow
     to log in to SharePoint Online. Alternatively, you can
-    authenticate using a user name and password, which is convenient for CI/CD
-    scenarios, but which comes with its own limitations. See the Office 365 CLI
-    manual for more information.
+    authenticate using a user name and password or certificate, which are
+    convenient for CI/CD scenarios, but which come with their own limitations.
+    See the Office 365 CLI manual for more information.
     
     When logging in to a SharePoint site, the ${chalk.blue(commands.LOGIN)} command
     stores in memory the access token and the refresh token for the specified
@@ -284,10 +316,23 @@ class SpoLoginCommand extends Command {
 
     When logging in to SharePoint Online using the user name and
     password, next to the access and refresh token, the Office 365 CLI will
-    store the user credentials so that it can automatically reauthenticate if
+    store the user credentials so that it can automatically re-authenticate if
     necessary. Similarly to the tokens, the credentials are removed by
-    reauthenticating using the device code or by calling the ${chalk.blue(commands.LOGOUT)}
+    re-authenticating using the device code or by calling the ${chalk.blue(commands.LOGOUT)}
     command.
+
+    When logging in to SharePoint Online using a certificate, the Office 365 CLI
+    will store the contents of the certificate so that it can automatically
+    re-authenticate if necessary. The contents of the certificate are removed
+    by re-authenticating using the device code or by calling the ${chalk.blue(commands.LOGOUT)}
+    command.
+
+    To log in to SharePoint Online using a certificate, you will typically
+    create a custom Azure AD application. To use this application
+    with the Office 365 CLI, you will set the ${chalk.grey('OFFICE365CLI_AADAADAPPID')}
+    environment variable to the application's ID and the ${chalk.grey('OFFICE365CLI_TENANT')}
+    environment variable to the ID of the Azure AD tenant, where you created
+    the Azure AD application.
 
   Examples:
   
@@ -303,6 +348,9 @@ class SpoLoginCommand extends Command {
 
     Log in to a SharePoint Online tenant admin site using a user name and password
       ${chalk.grey(config.delimiter)} ${commands.LOGIN} https://contoso-admin.sharepoint.com --authType password --userName user@contoso.com --password pass@word1
+
+    Log in to a SharePoint Online tenant admin site using a certificate
+      ${chalk.grey(config.delimiter)} ${commands.LOGIN} https://contoso-admin.sharepoint.com --authType certificate --certificateFile /Users/user/dev/localhost.pfx --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1
 `);
   }
 }

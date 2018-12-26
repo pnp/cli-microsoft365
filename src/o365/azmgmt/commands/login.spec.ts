@@ -8,6 +8,7 @@ import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import Utils from '../../../Utils';
 import { Service, AuthType } from '../../../Auth';
+import * as fs from 'fs';
 
 describe(commands.LOGIN, () => {
   let vorpal: Vorpal;
@@ -47,7 +48,9 @@ describe(commands.LOGIN, () => {
   afterEach(() => {
     Utils.restore([
       vorpal.find,
-      auth.cancel
+      auth.cancel,
+      fs.existsSync,
+      fs.readFileSync
     ]);
   });
 
@@ -140,6 +143,24 @@ describe(commands.LOGIN, () => {
     });
   });
 
+  it('logs in to AAD Graph using certificate when authType certificate set', (done) => {
+    sinon.stub(fs, 'readFileSync').callsFake(() => 'certificate');
+
+    auth.service = new Service('https://management.azure.com/');
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, authType: 'certificate', certificateFile: 'certificateFile', thumbprint: 'thumbprint' } }, () => {
+      try {
+        assert.equal(auth.service.authType, AuthType.Certificate, 'Incorrect authType set');
+        assert.equal(auth.service.certificate, 'certificate', 'Incorrect certificate set');
+        assert.equal(auth.service.thumbprint, 'thumbprint', 'Incorrect thumbprint set');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('can be cancelled', () => {
     assert(command.cancel());
   });
@@ -198,6 +219,23 @@ describe(commands.LOGIN, () => {
     assert.notEqual(actual, true);
   });
 
+  it('fails validation if authType is set to certificate and certificateFile not specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { authType: 'certificate', thumbprint: 'thumbprint' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation if authType is set to certificate and certificateFile does not exist', () => {
+    sinon.stub(fs, 'existsSync').callsFake(() => false);
+    const actual = (command.validate() as CommandValidate)({ options: { authType: 'certificate', certificateFile: 'certificate', thumbprint: 'thumbprint' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation if authType is set to certificate and thumbprint not specified', () => {
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    const actual = (command.validate() as CommandValidate)({ options: { authType: 'certificate', certificateFile: 'certificate' } });
+    assert.notEqual(actual, true);
+  });
+
   it('passes validation if authType is set to password and userName and password specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { authType: 'password', userName: 'user', password: 'password' } });
     assert.equal(actual, true);
@@ -210,6 +248,12 @@ describe(commands.LOGIN, () => {
 
   it('passes validation if authType is not set and userName and password not specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { } });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation if authType is set to certificate and certificateFile and thumbprint are specified', () => {
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    const actual = (command.validate() as CommandValidate)({ options: { authType: 'certificate', certificateFile: 'certificate', thumbprint: 'thumbprint' } });
     assert.equal(actual, true);
   });
 
