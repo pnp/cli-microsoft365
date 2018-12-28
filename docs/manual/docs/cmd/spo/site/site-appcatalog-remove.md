@@ -23,7 +23,7 @@ Option|Description
 
 ## Remarks
 
-To remove an app catalog from a site collection, you have to first log in to a SharePoint site using the [spo login](../login.md) command, eg. `spo login https://contoso.sharepoint.com`.
+To remove an app catalog from a site collection, you have to first log in to a SharePoint site using the [spo login](../login.md) command, eg. `spo login https://contoso-admin.sharepoint.com`.
 
 While the command uses the term *"remove"*, like the PowerShell equivalent cmdlet, it does not remove the special library **Apps for SharePoint** from the site collection. It simply disables the site collection app catalog in that site. Packages deployed to the app catalog are not available within the site collection.
 
