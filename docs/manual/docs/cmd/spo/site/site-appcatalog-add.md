@@ -23,7 +23,7 @@ Option|Description
 
 ## Remarks
 
-To create a site collection app catalog, you have to first log in to a SharePoint site using the [spo login](../login.md) command, eg. `spo login https://contoso.sharepoint.com`.
+To create a site collection app catalog, you have to first log in to a SharePoint site using the [spo login](../login.md) command, eg. `spo login https://contoso-admin.sharepoint.com`.
 
 ## Examples
 
