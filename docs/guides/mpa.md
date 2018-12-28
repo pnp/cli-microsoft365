@@ -31,6 +31,8 @@ If you renamed files:
 
 Office 365 CLI uses [MkDocs](http://www.mkdocs.org) to publish documentation pages. See more information about installing MkDocs on your operating system at http://www.mkdocs.org/#installation.
 
+MkDocs use `mkdocs-material` theme. See more information about installing mkdocs-material on your operating system at https://squidfunk.github.io/mkdocs-material.
+
 Once you have MkDocs installed on your machine, in the command line:
 
 - run `cd ./docs/manual` to change directory to where the manual pages are stored
