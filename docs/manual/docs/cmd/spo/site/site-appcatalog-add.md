@@ -5,7 +5,7 @@ Creates a site collection app catalog in the specified site
 ## Usage
 
 ```sh
-spo site appcatalog add --url <url>
+spo site appcatalog add [options]
 ```
 
 ## Options
@@ -19,11 +19,11 @@ Option|Description
 `--debug`|Runs command with debug logging
 
 !!! important
-    Before using this command, log in to a SharePoint Online site, using the [spo login](../login.md) command.
+    Before using this command, log in to a SharePoint Online tenant admin site, using the [spo login](../login.md) command.
 
 ## Remarks
 
-To create a site collection app catalog, you have to first log in to a SharePoint site using the [spo login](../login.md) command, eg. `spo login https://contoso.sharepoint.com`.
+To create a site collection app catalog, you have to first log in to a tenant admin site using the [spo login](../login.md) command, eg. `spo login https://contoso-admin.sharepoint.com`.
 
 ## Examples
 
