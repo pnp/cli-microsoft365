@@ -31,7 +31,17 @@ If you renamed files:
 
 Office 365 CLI uses [MkDocs](http://www.mkdocs.org) to publish documentation pages. See more information about installing MkDocs on your operating system at http://www.mkdocs.org/#installation.
 
+Office 365 CLI documentation uses the `mkdocs-material` theme. See more information about installing mkdocs-material on your operating system at https://squidfunk.github.io/mkdocs-material.
+
 Once you have MkDocs installed on your machine, in the command line:
 
 - run `cd ./docs/manual` to change directory to where the manual pages are stored
 - run `mkdocs serve` to start the local web server with MkDocs and view the documentation in the web browser
+
+Alternatively, you can use the mkdocs-material Docker image to test documentation:
+
+- on macOS:
+  - run `cd ./docs/manual` to change directory to where the manual pages are stored
+  - run `docker run --rm -it -p 8000:8000 -v ${PWD}:/docs squidfunk/mkdocs-material` to start the local web server with MkDocs and view the documentation in the web browser
+- on Windows:
+  - run `docker run --rm -it -p 8000:8000 -v c/projects/office365-cli/docs/manual:/docs squidfunk/mkdocs-material` to start the local web server with MkDocs and view the documentation in the web browser
