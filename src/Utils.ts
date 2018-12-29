@@ -204,7 +204,7 @@ export default class Utils {
     let relativePathToRemove: string = webRelativePath;
 
     // add '/' at 0
-    if (webRelativePath.charAt(0) !== '/') {
+    if (webRelativePath[0] !== '/') {
       webRelativePath = `/${webRelativePath}`;
     }
     else {
@@ -212,23 +212,32 @@ export default class Utils {
     }
 
     // remove last '/' of webRelativePath
+    const webPathLastCharPos: number = webRelativePath.length - 1;
+
     if (webRelativePath.length > 1 &&
-      webRelativePath.lastIndexOf('/') === webRelativePath.length - 1) {
-      webRelativePath = webRelativePath.substring(0, webRelativePath.length - 1);
+      webRelativePath[webPathLastCharPos] === '/') {
+      webRelativePath = webRelativePath.substring(0, webPathLastCharPos);
     }
 
     // remove the web relative path if it is contained in the folder relative path
-    folderRelativePath = folderRelativePath.replace(relativePathToRemove, '');
+    const relativePathToRemoveIdx: number = folderRelativePath.toLowerCase().indexOf(relativePathToRemove.toLowerCase());
+
+    if (relativePathToRemoveIdx > -1) {
+      const pos: number = relativePathToRemoveIdx + relativePathToRemove.length;
+      folderRelativePath = folderRelativePath.substring(pos, folderRelativePath.length);
+    }
 
     if (folderRelativePath !== '') {
       // add '/' at 0 for siteRelativePath 
-      if (folderRelativePath.charAt(0) !== '/') {
+      if (folderRelativePath[0] !== '/') {
         folderRelativePath = `/${folderRelativePath}`;
       }
 
       // remove last '/' of siteRelativePath
-      if (folderRelativePath.lastIndexOf('/') === folderRelativePath.length - 1) {
-        folderRelativePath = folderRelativePath.substring(0, folderRelativePath.length - 1);
+      const folderPathLastCharPos: number = folderRelativePath.length - 1;
+
+      if (folderRelativePath[folderPathLastCharPos] === '/') {
+        folderRelativePath = folderRelativePath.substring(0, folderPathLastCharPos);
       }
 
       if (webRelativePath === '/' && folderRelativePath !== '') {
@@ -240,5 +249,69 @@ export default class Utils {
     }
 
     return webRelativePath.replace('//', '/');
+  }
+
+  /**
+   * Returns web relative path from webUrl and folderUrl.
+   * @param webUrl web full or web relative url e.g. https://contoso.sharepoint.com/sites/team1/
+   * @param folderUrl folder server relative url e.g. /sites/team1/Lists/MyList
+   * @example
+   * // returns "/Lists/MyList"
+   * Utils.getWebRelativePath("https://contoso.sharepoint.com/sites/team1/", "/sites/team1/Lists/MyList");
+   * @example
+   * // returns "/Shared Documents"
+   * Utils.getWebRelativePath("/sites/team1/", "/sites/team1/Shared Documents");
+   */
+  public static getWebRelativePath(webUrl: string, folderUrl: string): string {
+
+    let folderWebRelativePath: string = '';
+
+    const tenantUrl: string = `${url.parse(webUrl).protocol}//${url.parse(webUrl).hostname}`;
+    let webRelativePath: string = webUrl.replace(tenantUrl, '');
+
+    // will be used to remove relative path from the folderRelativePath
+    // in case the web relative url is included
+    let relativePathToRemove: string = webRelativePath;
+
+    // add '/' at 0
+    if (webRelativePath[0] !== '/') {
+      webRelativePath = `/${webRelativePath}`;
+    }
+    else {
+      relativePathToRemove = webRelativePath.substring(1);
+    }
+
+    // remove last '/' of webRelativePath
+    const webPathLastCharPos: number = webRelativePath.length - 1;
+
+    if (webRelativePath.length > 1 &&
+      webRelativePath[webPathLastCharPos] === '/') {
+      webRelativePath = webRelativePath.substring(0, webPathLastCharPos);
+    }
+
+    // remove the web relative path if it is contained in the folder relative path
+    const relativePathToRemoveIdx: number = folderUrl.toLowerCase().indexOf(relativePathToRemove.toLowerCase());
+
+    if (relativePathToRemoveIdx > -1) {
+      const pos: number = relativePathToRemoveIdx + relativePathToRemove.length;
+      folderWebRelativePath = folderUrl.substring(pos, folderUrl.length);
+    }
+    else {
+      folderWebRelativePath = folderUrl;
+    }
+
+    // add '/' at 0 for folderWebRelativePath 
+    if (folderWebRelativePath[0] !== '/') {
+      folderWebRelativePath = `/${folderWebRelativePath}`;
+    }
+
+    // remove last '/' of folderWebRelativePath
+    const folderPathLastCharPos: number = folderWebRelativePath.length - 1;
+
+    if (folderWebRelativePath.length > 1 && folderWebRelativePath[folderPathLastCharPos] === '/') {
+      folderWebRelativePath = folderWebRelativePath.substring(0, folderPathLastCharPos);
+    }
+
+    return folderWebRelativePath.replace('//', '/');
   }
 }

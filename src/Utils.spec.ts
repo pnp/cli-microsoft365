@@ -232,244 +232,484 @@ describe('Utils', () => {
     }
   });
 
-  it('should get relative path when https://contoso.sharepoint.com/sites/team1', () => {
+  it('should get server relative path when https://contoso.sharepoint.com/sites/team1', () => {
     const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com/sites/team1');
     assert.equal(actual, '/sites/team1');
   });
 
-  it('should get relative path when https://contoso.sharepoint.com/sites/team1/', () => {
+  it('should get server relative path when https://contoso.sharepoint.com/sites/team1/', () => {
     const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com/sites/team1/');
     assert.equal(actual, '/sites/team1');
   });
 
-  it('should get relative path when https://contoso.sharepoint.com/', () => {
+  it('should get server relative path when https://contoso.sharepoint.com/', () => {
     const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com/');
     assert.equal(actual, '/');
   });
 
-  it('should get relative path when domain only', () => {
+  it('should get server relative path when domain only', () => {
     const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com');
     assert.equal(actual, '/');
   });
 
-  it('should get relative path when /sites/team1 relative path passed as param', () => {
+  it('should get server relative path when /sites/team1 relative path passed as param', () => {
     const actual = Utils.getServerRelativePath('/sites/team1');
     assert.equal(actual, '/sites/team1');
   });
 
-  it('should get relative path when /sites/team1/ relative path passed as param', () => {
+  it('should get server relative path when /sites/team1/ relative path passed as param', () => {
     const actual = Utils.getServerRelativePath('/sites/team1/');
     assert.equal(actual, '/sites/team1');
   });
 
-  it('should get relative path when / relative path passed as param', () => {
+  it('should get server relative path when / relative path passed as param', () => {
     const actual = Utils.getServerRelativePath('/');
     assert.equal(actual, '/');
   });
 
-  it('should get relative path for https://contoso.sharepoint.com/sites/team1 and Shared Documents', () => {
+  it('should get server relative path for https://contoso.sharepoint.com/sites/team1 and Shared Documents', () => {
     const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com/sites/team1', 'Shared Documents');
     assert.equal(actual, '/sites/team1/Shared Documents');
   });
 
-  it('should get relative path when https://contoso.sharepoint.com/ and /Shared Documents', () => {
+  it('should get server relative path when https://contoso.sharepoint.com/ and /Shared Documents', () => {
     const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com/sites/team1/', '/Shared Documents');
     assert.equal(actual, '/sites/team1/Shared Documents');
   });
 
-  it('should get relative path when https://contoso.sharepoint.com/ and /Shared Documents', () => {
+  it('should get server relative path when https://contoso.sharepoint.com/ and /Shared Documents', () => {
     const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com/', '/Shared Documents');
     assert.equal(actual, '/Shared Documents');
   });
 
-  it('should get relative path when domain only and Shared Documents', () => {
+  it('should get server relative path when domain only and Shared Documents', () => {
     const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com', 'Shared Documents');
     assert.equal(actual, '/Shared Documents');
   });
 
-  it('should get relative path when /sites/team1 and /Shared Documents', () => {
+  it('should get server relative path when /sites/team1 and /Shared Documents', () => {
     const actual = Utils.getServerRelativePath('/sites/team1', '/Shared Documents');
     assert.equal(actual, '/sites/team1/Shared Documents');
   });
 
-  it('should get relative path when /sites/team1 and /Shared Documents/', () => {
+  it('should get server relative path when /sites/team1 and /Shared Documents/', () => {
     const actual = Utils.getServerRelativePath('/sites/team1', '/Shared Documents/');
     assert.equal(actual, '/sites/team1/Shared Documents');
   });
 
-  it('should get relative path when /sites/team1/ and /Shared Documents/', () => {
+  it('should get server relative path when /sites/team1/ and /Shared Documents/', () => {
     const actual = Utils.getServerRelativePath('/sites/team1/', '/Shared Documents/');
     assert.equal(actual, '/sites/team1/Shared Documents');
   });
 
-  it('should get relative path when sites/team1/ and Shared Documents', () => {
+  it('should get server relative path when sites/team1/ and Shared Documents', () => {
     const actual = Utils.getServerRelativePath('sites/team1/', 'Shared Documents');
     assert.equal(actual, '/sites/team1/Shared Documents');
   });
 
-  it('should get relative path when sites/team1/ and Shared Documents', () => {
+  it('should get server relative path when sites/team1/ and Shared Documents', () => {
     const actual = Utils.getServerRelativePath('sites/team1', 'Shared Documents');
     assert.equal(actual, '/sites/team1/Shared Documents');
   });
 
-  it('should get relative path when / and Shared Documents', () => {
+  it('should get server relative path when / and Shared Documents', () => {
     const actual = Utils.getServerRelativePath('/', 'Shared Documents');
     assert.equal(actual, '/Shared Documents');
   });
 
-  it('should get relative path when / and /Shared Documents', () => {
+  it('should get server relative path when / and /Shared Documents', () => {
     const actual = Utils.getServerRelativePath('/', '/Shared Documents');
     assert.equal(actual, '/Shared Documents');
   });
 
-  it('should get relative path when / and /Shared Documents/', () => {
+  it('should get server relative path when / and /Shared Documents/', () => {
     const actual = Utils.getServerRelativePath('/', '/Shared Documents/');
     assert.equal(actual, '/Shared Documents');
   });
 
-  it('should get relative path when "" and ""', () => {
+  it('should get server relative path when "" and ""', () => {
     const actual = Utils.getServerRelativePath('', '');
     assert.equal(actual, '/');
   });
 
-  it('should get relative path when / and /', () => {
+  it('should get server relative path when / and /', () => {
     const actual = Utils.getServerRelativePath('/', '/');
     assert.equal(actual, '/');
   });
 
-  it('should get relative path when "" and /', () => {
+  it('should get server relative path when "" and /', () => {
     const actual = Utils.getServerRelativePath('', '/');
     assert.equal(actual, '/');
   });
 
-  it('should get relative path when "" and Shared Documents', () => {
+  it('should get server relative path when "" and Shared Documents', () => {
     const actual = Utils.getServerRelativePath('', 'Shared Documents');
     assert.equal(actual, '/Shared Documents');
   });
 
-  it('should get relative path when https://contoso.sharepoint.com/sites/site1 and /sites/site1/Shared Documents', () => {
+  it('should get server relative path when https://contoso.sharepoint.com/sites/site1 and /sites/site1/Shared Documents', () => {
     const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com/sites/site1', '/sites/site1/Shared Documents');
     assert.equal(actual, '/sites/site1/Shared Documents');
   });
 
-  it('should get relative path when https://contoso.sharepoint.com/sites/site1 and sites/site1/Shared Documents', () => {
+  it('should get server relative path when https://contoso.sharepoint.com/sites/site1 and sites/site1/Shared Documents', () => {
     const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com/sites/site1', 'sites/site1/Shared Documents');
     assert.equal(actual, '/sites/site1/Shared Documents');
   });
 
-  it('should get relative path when https://contoso.sharepoint.com/sites/site1/ and /sites/site1/Shared Documents', () => {
+  it('should get server relative path when https://contoso.sharepoint.com/sites/site1/ and /sites/site1/Shared Documents', () => {
     const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com/sites/site1/', '/sites/site1/Shared Documents');
     assert.equal(actual, '/sites/site1/Shared Documents');
   });
 
-  it('should get relative path when https://contoso.sharepoint.com/sites/site1 and sites/site1/Shared Documents/', () => {
+  it('should get server relative path when https://contoso.sharepoint.com/sites/site1 and sites/site1/Shared Documents/', () => {
     const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com/sites/site1', 'sites/site1/Shared Documents/');
     assert.equal(actual, '/sites/site1/Shared Documents');
   });
 
-  it('should get relative path when https://contoso.sharepoint.com/sites/site1/ and /sites/site1/Shared Documents/', () => {
+  it('should get server relative path when https://contoso.sharepoint.com/sites/site1/ and /sites/site1/Shared Documents/', () => {
     const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com/sites/site1/', '/sites/site1/Shared Documents/');
     assert.equal(actual, '/sites/site1/Shared Documents');
   });
 
-  it('should get relative path when https://contoso.sharepoint.com/sites/site1 and /sites/site1/Shared Documents/', () => {
+  it('should get server relative path when https://contoso.sharepoint.com/sites/site1 and /sites/site1/Shared Documents/', () => {
     const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com/sites/site1', '/sites/site1/Shared Documents/');
     assert.equal(actual, '/sites/site1/Shared Documents');
   });
 
-  it('should get relative path when https://contoso.sharepoint.com/sites/site1/ and sites/site1/Shared Documents/', () => {
+  it('should get server relative path when https://contoso.sharepoint.com/sites/site1/ and sites/site1/Shared Documents/', () => {
     const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com/sites/site1/', 'sites/site1/Shared Documents/');
     assert.equal(actual, '/sites/site1/Shared Documents');
   });
 
-  it('should get relative path when https://contoso.sharepoint.com/sites/site1 and /sites/site1/Shared Documents', () => {
+  it('should get server relative path when https://contoso.sharepoint.com/sites/site1 and /sites/site1/Shared Documents', () => {
     const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com/sites/site1', '/sites/site1/Shared Documents');
     assert.equal(actual, '/sites/site1/Shared Documents');
   });
 
-  it('should get relative path when https://contoso.sharepoint.com/sites/site1 and sites/site1/Shared Documents', () => {
+  it('should get server relative path when https://contoso.sharepoint.com/sites/site1 and sites/site1/Shared Documents', () => {
     const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com/sites/site1', 'sites/site1/Shared Documents');
     assert.equal(actual, '/sites/site1/Shared Documents');
   });
 
-  it('should get relative path when /sites/site1/ and /sites/site1/Shared Documents', () => {
+  it('should get server relative path when /sites/site1/ and /sites/site1/Shared Documents', () => {
     const actual = Utils.getServerRelativePath('/sites/site1/', '/sites/site1/Shared Documents');
     assert.equal(actual, '/sites/site1/Shared Documents');
   });
 
-  it('should get relative path when sites/site1/ and /sites/site1/Shared Documents', () => {
+  it('should get server relative path when sites/site1/ and /sites/site1/Shared Documents', () => {
     const actual = Utils.getServerRelativePath('sites/site1', '/sites/site1/Shared Documents');
     assert.equal(actual, '/sites/site1/Shared Documents');
   });
 
-  it('should get relative path when /sites/site1 and /sites/site1/Shared Documents', () => {
+  it('should get server relative path when /sites/site1 and /sites/site1/Shared Documents', () => {
     const actual = Utils.getServerRelativePath('/sites/site1', '/sites/site1/Shared Documents');
     assert.equal(actual, '/sites/site1/Shared Documents');
   });
 
-  it('should get relative path when sites/site1 and /sites/site1/Shared Documents', () => {
+  it('should get server relative path when sites/site1 and /sites/site1/Shared Documents', () => {
     const actual = Utils.getServerRelativePath('sites/site1', '/sites/site1/Shared Documents');
     assert.equal(actual, '/sites/site1/Shared Documents');
   });
 
-  it('should get relative path when /sites/site1/ and sites/site1/Shared Documents', () => {
+  it('should get server relative path when /sites/site1/ and sites/site1/Shared Documents', () => {
     const actual = Utils.getServerRelativePath('/sites/site1/', 'sites/site1/Shared Documents');
     assert.equal(actual, '/sites/site1/Shared Documents');
   });
 
-  it('should get relative path when sites/site1/ and sites/site1/Shared Documents', () => {
+  it('should get server relative path when sites/site1/ and sites/site1/Shared Documents', () => {
     const actual = Utils.getServerRelativePath('sites/site1', 'sites/site1/Shared Documents');
     assert.equal(actual, '/sites/site1/Shared Documents');
   });
 
-  it('should get relative path when /sites/site1 and sites/site1/Shared Documents', () => {
+  it('should get server relative path when /sites/site1 and sites/site1/Shared Documents', () => {
     const actual = Utils.getServerRelativePath('/sites/site1', 'sites/site1/Shared Documents');
     assert.equal(actual, '/sites/site1/Shared Documents');
   });
 
-  it('should get relative path when sites/site1 and sites/site1/Shared Documents', () => {
+  it('should get server relative path when sites/site1 and sites/site1/Shared Documents', () => {
     const actual = Utils.getServerRelativePath('sites/site1', 'sites/site1/Shared Documents');
     assert.equal(actual, '/sites/site1/Shared Documents');
   });
 
-  it('should get relative path when /sites/site1/ and /sites/site1/Shared Documents/', () => {
+  it('should get server relative path when /sites/site1/ and /sites/site1/Shared Documents/', () => {
     const actual = Utils.getServerRelativePath('/sites/site1/', '/sites/site1/Shared Documents/');
     assert.equal(actual, '/sites/site1/Shared Documents');
   });
 
-  it('should get relative path when sites/site1/ and /sites/site1/Shared Documents/', () => {
+  it('should get server relative path when sites/site1/ and /sites/site1/Shared Documents/', () => {
     const actual = Utils.getServerRelativePath('sites/site1', '/sites/site1/Shared Documents/');
     assert.equal(actual, '/sites/site1/Shared Documents');
   });
 
-  it('should get relative path when /sites/site1 and /sites/site1/Shared Documents/', () => {
+  it('should get server relative path when /sites/site1 and /sites/site1/Shared Documents/', () => {
     const actual = Utils.getServerRelativePath('/sites/site1', '/sites/site1/Shared Documents/');
     assert.equal(actual, '/sites/site1/Shared Documents');
   });
 
-  it('should get relative path when sites/site1 and /sites/site1/Shared Documents/', () => {
+  it('should get server relative path when sites/site1 and /sites/site1/Shared Documents/', () => {
     const actual = Utils.getServerRelativePath('sites/site1', '/sites/site1/Shared Documents/');
     assert.equal(actual, '/sites/site1/Shared Documents');
   });
 
-  it('should get relative path when /sites/site1/ and sites/site1/Shared Documents/', () => {
+  it('should get server relative path when /sites/site1/ and sites/site1/Shared Documents/', () => {
     const actual = Utils.getServerRelativePath('/sites/site1/', 'sites/site1/Shared Documents/');
     assert.equal(actual, '/sites/site1/Shared Documents');
   });
 
-  it('should get relative path when sites/site1/ and sites/site1/Shared Documents/', () => {
+  it('should get server relative path when sites/site1/ and sites/site1/Shared Documents/', () => {
     const actual = Utils.getServerRelativePath('sites/site1', 'sites/site1/Shared Documents/');
     assert.equal(actual, '/sites/site1/Shared Documents');
   });
 
-  it('should get relative path when /sites/site1 and sites/site1/Shared Documents/', () => {
+  it('should get server relative path when /sites/site1 and sites/site1/Shared Documents/', () => {
     const actual = Utils.getServerRelativePath('/sites/site1', 'sites/site1/Shared Documents/');
     assert.equal(actual, '/sites/site1/Shared Documents');
   });
 
-  it('should get relative path when sites/site1 and sites/site1/Shared Documents/', () => {
+  it('should get server relative path when sites/site1 and sites/site1/Shared Documents/', () => {
     const actual = Utils.getServerRelativePath('sites/site1', 'sites/site1/Shared Documents/');
     assert.equal(actual, '/sites/site1/Shared Documents');
+  });
+
+  it('should get server relative path when uppercase in web url e.g. sites/Site1 and /sites/site1/Shared Documents', () => {
+    const actual = Utils.getServerRelativePath('sites/Site1', '/sites/site1/Shared Documents');
+    assert.equal(actual, '/sites/Site1/Shared Documents');
+  });
+
+  it('should get server relative path when uppercase in folder url e.g. sites/site1 and /sites/Site1/Shared Documents', () => {
+    const actual = Utils.getServerRelativePath('sites/site1', '/sites/Site1/Shared Documents');
+    assert.equal(actual, '/sites/site1/Shared Documents');
+  });
+
+  it('should get server relative path when sub folder present url e.g. sites/site1 and /sites/Site1/Shared Documents/MyFolder', () => {
+    const actual = Utils.getServerRelativePath('sites/site1', '/sites/Site1/Shared Documents/MyFolder');
+    assert.equal(actual, '/sites/site1/Shared Documents/MyFolder');
+  });
+
+  it('should get web relative path when / relative path passed as param', () => {
+    const actual = Utils.getWebRelativePath('/', '/');
+    assert.equal(actual, '/');
+  });
+
+  it('should get web relative path for https://contoso.sharepoint.com/sites/team1 and Shared Documents', () => {
+    const actual = Utils.getWebRelativePath('https://contoso.sharepoint.com/sites/team1', 'Shared Documents');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when https://contoso.sharepoint.com/ and /Shared Documents', () => {
+    const actual = Utils.getWebRelativePath('https://contoso.sharepoint.com/sites/team1/', '/Shared Documents');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when https://contoso.sharepoint.com/ and /Shared Documents', () => {
+    const actual = Utils.getWebRelativePath('https://contoso.sharepoint.com/', '/Shared Documents');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when domain only and Shared Documents', () => {
+    const actual = Utils.getWebRelativePath('https://contoso.sharepoint.com', 'Shared Documents');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when /sites/team1 and /Shared Documents', () => {
+    const actual = Utils.getWebRelativePath('/sites/team1', '/Shared Documents');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when /sites/team1 and /Shared Documents/', () => {
+    const actual = Utils.getWebRelativePath('/sites/team1', '/Shared Documents/');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when /sites/team1/ and /Shared Documents/', () => {
+    const actual = Utils.getWebRelativePath('/sites/team1/', '/Shared Documents/');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when sites/team1/ and Shared Documents', () => {
+    const actual = Utils.getWebRelativePath('sites/team1/', 'Shared Documents');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when sites/team1/ and Shared Documents', () => {
+    const actual = Utils.getWebRelativePath('sites/team1', 'Shared Documents');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when / and Shared Documents', () => {
+    const actual = Utils.getWebRelativePath('/', 'Shared Documents');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when / and /Shared Documents', () => {
+    const actual = Utils.getWebRelativePath('/', '/Shared Documents');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when / and /Shared Documents/', () => {
+    const actual = Utils.getWebRelativePath('/', '/Shared Documents/');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when "" and ""', () => {
+    const actual = Utils.getWebRelativePath('', '');
+    assert.equal(actual, '/');
+  });
+
+  it('should get web relative path when / and /', () => {
+    const actual = Utils.getWebRelativePath('/', '/');
+    assert.equal(actual, '/');
+  });
+
+  it('should get web relative path when "" and /', () => {
+    const actual = Utils.getWebRelativePath('', '/');
+    assert.equal(actual, '/');
+  });
+
+  it('should get web relative path when "" and Shared Documents', () => {
+    const actual = Utils.getWebRelativePath('', 'Shared Documents');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when https://contoso.sharepoint.com/sites/site1 and /sites/site1/Shared Documents', () => {
+    const actual = Utils.getWebRelativePath('https://contoso.sharepoint.com/sites/site1', '/sites/site1/Shared Documents');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when https://contoso.sharepoint.com/sites/site1 and sites/site1/Shared Documents', () => {
+    const actual = Utils.getWebRelativePath('https://contoso.sharepoint.com/sites/site1', 'sites/site1/Shared Documents');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when https://contoso.sharepoint.com/sites/site1/ and /sites/site1/Shared Documents', () => {
+    const actual = Utils.getWebRelativePath('https://contoso.sharepoint.com/sites/site1/', '/sites/site1/Shared Documents');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when https://contoso.sharepoint.com/sites/site1 and sites/site1/Shared Documents/', () => {
+    const actual = Utils.getWebRelativePath('https://contoso.sharepoint.com/sites/site1', 'sites/site1/Shared Documents/');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when https://contoso.sharepoint.com/sites/site1/ and /sites/site1/Shared Documents/', () => {
+    const actual = Utils.getWebRelativePath('https://contoso.sharepoint.com/sites/site1/', '/sites/site1/Shared Documents/');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when https://contoso.sharepoint.com/sites/site1 and /sites/site1/Shared Documents/', () => {
+    const actual = Utils.getWebRelativePath('https://contoso.sharepoint.com/sites/site1', '/sites/site1/Shared Documents/');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when https://contoso.sharepoint.com/sites/site1/ and sites/site1/Shared Documents/', () => {
+    const actual = Utils.getWebRelativePath('https://contoso.sharepoint.com/sites/site1/', 'sites/site1/Shared Documents/');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when https://contoso.sharepoint.com/sites/site1 and /sites/site1/Shared Documents', () => {
+    const actual = Utils.getWebRelativePath('https://contoso.sharepoint.com/sites/site1', '/sites/site1/Shared Documents');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when https://contoso.sharepoint.com/sites/site1 and sites/site1/Shared Documents', () => {
+    const actual = Utils.getWebRelativePath('https://contoso.sharepoint.com/sites/site1', 'sites/site1/Shared Documents');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when /sites/site1/ and /sites/site1/Shared Documents', () => {
+    const actual = Utils.getWebRelativePath('/sites/site1/', '/sites/site1/Shared Documents');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when sites/site1/ and /sites/site1/Shared Documents', () => {
+    const actual = Utils.getWebRelativePath('sites/site1', '/sites/site1/Shared Documents');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when /sites/site1 and /sites/site1/Shared Documents', () => {
+    const actual = Utils.getWebRelativePath('/sites/site1', '/sites/site1/Shared Documents');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when sites/site1 and /sites/site1/Shared Documents', () => {
+    const actual = Utils.getWebRelativePath('sites/site1', '/sites/site1/Shared Documents');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when /sites/site1/ and sites/site1/Shared Documents', () => {
+    const actual = Utils.getWebRelativePath('/sites/site1/', 'sites/site1/Shared Documents');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when sites/site1/ and sites/site1/Shared Documents', () => {
+    const actual = Utils.getWebRelativePath('sites/site1', 'sites/site1/Shared Documents');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when /sites/site1 and sites/site1/Shared Documents', () => {
+    const actual = Utils.getWebRelativePath('/sites/site1', 'sites/site1/Shared Documents');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when sites/site1 and sites/site1/Shared Documents', () => {
+    const actual = Utils.getWebRelativePath('sites/site1', 'sites/site1/Shared Documents');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when /sites/site1/ and /sites/site1/Shared Documents/', () => {
+    const actual = Utils.getWebRelativePath('/sites/site1/', '/sites/site1/Shared Documents/');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when sites/site1/ and /sites/site1/Shared Documents/', () => {
+    const actual = Utils.getWebRelativePath('sites/site1', '/sites/site1/Shared Documents/');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when /sites/site1 and /sites/site1/Shared Documents/', () => {
+    const actual = Utils.getWebRelativePath('/sites/site1', '/sites/site1/Shared Documents/');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when sites/site1 and /sites/site1/Shared Documents/', () => {
+    const actual = Utils.getWebRelativePath('sites/site1', '/sites/site1/Shared Documents/');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when /sites/site1/ and sites/site1/Shared Documents/', () => {
+    const actual = Utils.getWebRelativePath('/sites/site1/', 'sites/site1/Shared Documents/');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when sites/site1/ and sites/site1/Shared Documents/', () => {
+    const actual = Utils.getWebRelativePath('sites/site1', 'sites/site1/Shared Documents/');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when /sites/site1 and sites/site1/Shared Documents/', () => {
+    const actual = Utils.getWebRelativePath('/sites/site1', 'sites/site1/Shared Documents/');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when sites/site1 and sites/site1/Shared Documents/', () => {
+    const actual = Utils.getWebRelativePath('sites/site1', 'sites/site1/Shared Documents/');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when uppercase in web url e.g. sites/Site1 and /sites/site1/Shared Documents', () => {
+    const actual = Utils.getWebRelativePath('sites/Site1', '/sites/site1/Shared Documents');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when uppercase in folder url e.g. sites/site1 and /sites/Site1/Shared Documents', () => {
+    const actual = Utils.getWebRelativePath('sites/site1', '/sites/Site1/Shared Documents');
+    assert.equal(actual, '/Shared Documents');
+  });
+
+  it('should get web relative path when sub folder present url e.g. sites/site1 and /sites/Site1/Shared Documents/MyFolder', () => {
+    const actual = Utils.getWebRelativePath('sites/site1', '/sites/Site1/Shared Documents/MyFolder');
+    assert.equal(actual, '/Shared Documents/MyFolder');
   });
 
   it('shows app display name as connected-as for app-only auth', () => {
