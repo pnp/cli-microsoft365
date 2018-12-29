@@ -10,6 +10,12 @@ export class FolderExtensions {
   public constructor(private cmd: CommandInstance, private debug: boolean) {
   }
 
+  /**
+   * Ensures the folder path exists
+   * @param webFullUrl web full url e.g. https://contoso.sharepoint.com/sites/site1
+   * @param folderToEnsure web relative or server relative folder path e.g. /Documents/MyFolder or /sites/site1/Documents/MyFolder
+   * @param siteAccessToken a valid access token for the site specified in the webFullUrl param
+   */
   public ensureFolder(webFullUrl: string, folderToEnsure: string, siteAccessToken: string): Promise<void> {
 
     const webUrl = url.parse(webFullUrl);
@@ -50,6 +56,7 @@ export class FolderExtensions {
     // build array of folders e.g. ["Shared%20Documents","22","54","55"]
     let folders: string[] = folderToEnsure.split('/');
     let nextFolder: string = '';
+    let prevFolder: string = '';
     let folderIndex: number = 0;
 
     // recursive function
@@ -65,6 +72,7 @@ export class FolderExtensions {
       }
 
       // append the next sub-folder to the folder path and check if it exists
+      prevFolder = nextFolder;
       nextFolder += `/${folders[folderIndex]}`;
       const folderServerRelativeUrl = `${webRelativePath}${nextFolder}`;
 
@@ -94,17 +102,13 @@ export class FolderExtensions {
           folderIndex++;
           checkOrAddFolder(resolve, reject);
         })
-        .catch((err: any) => {
-          
+        .catch(() => {
           const requestOptions: any = {
-            url: `${webFullUrl}/_api/web/folders`,
+            url: `${webFullUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27${encodeURIComponent(`${webRelativePath}${prevFolder}`)}%27&@a2=%27${encodeURIComponent(folders[folderIndex])}%27`,
             headers: Utils.getRequestHeaders({
               authorization: `Bearer ${siteAccessToken}`,
-              'accept': 'application/json;odata=nometadata',
+              'accept': 'application/json;odata=nometadata'
             }),
-            body: {
-              'ServerRelativeUrl': folderServerRelativeUrl
-            },
             json: true
           };
 

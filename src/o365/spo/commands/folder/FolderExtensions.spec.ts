@@ -18,7 +18,7 @@ describe('FolderExtensions', () => {
   ) => {
     return sinon.stub(request, 'post').callsFake((opts) => {
 
-      if (opts.url.indexOf('/_api/web/folders') > -1) {
+      if (opts.url.indexOf('/_api/web/GetFolderByServerRelativePath') > -1) {
         if (folderAddResp) {
           return folderAddResp;
         } else {
@@ -269,6 +269,27 @@ describe('FolderExtensions', () => {
     .then(res => {
       
       assert.equal(cmdInstanceLogSpy.calledWith('folder2/folder3'), true);
+      done();
+      
+    },  (err:any) => {
+      
+      done(err);
+    });
+  });
+
+  it('should have the correct url when calling AddSubFolderUsingPath (POST)', (done) => { 
+    const postStubs: sinon.SinonStub = stubPostResponses();
+    const folderDoesNotExistErrorResp: any = new Promise<any>((resolve, reject) => {
+      return reject(JSON.stringify({"odata.error":{"code":"-2130575338, Microsoft.SharePoint.SPException","message":{"lang":"en-US","value":"Error: Not found."}}}));
+    });
+    stubGetResponses(folderDoesNotExistErrorResp);
+
+    folderExtensions = new FolderExtensions(cmdInstance, true);
+
+    folderExtensions.ensureFolder("https://contoso.sharepoint.com", "/folder2/folder3", "abc")
+    .then(res => {
+      
+      assert.equal(postStubs.lastCall.args[0].url, 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Ffolder2%27&@a2=%27folder3%27');
       done();
       
     },  (err:any) => {
