@@ -52,7 +52,7 @@
 **Microsoft Graph:**
 
 - [graph siteclassification set](../cmd/graph/siteclassification/siteclassification-set.md) - updates site classification configuration [#304](https://github.com/pnp/office365-cli/issues/304)
-- [graph teams channel message get](../cmd/graph/teams/teams-channel-message-get.md) - retrieves a message from a channel in a Microsoft Teams team [#589](https://github.com/pnp/office365-cli/issues/589)
+- [graph teams channel message get](../cmd/graph/teams/teams-message-get.md) - retrieves a message from a channel in a Microsoft Teams team [#589](https://github.com/pnp/office365-cli/issues/589)
 
 ### Changes
 

@@ -21,16 +21,22 @@ interface Options extends GlobalOptions {
   messageId: string;
 }
 
-class GraphTeamsChannelMessageGetCommand extends GraphCommand {
+class GraphTeamsMessageGetCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.TEAMS_CHANNEL_MESSAGE_GET}`;
+    return `${commands.TEAMS_MESSAGE_GET}`;
   }
 
   public get description(): string {
     return 'Retrieves a message from a channel in a Microsoft Teams team';
   }
 
+  public alias(): string[] | undefined {
+    return [commands.TEAMS_CHANNEL_MESSAGE_GET];
+  }
+
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    this.showDeprecationWarning(cmd, commands.TEAMS_CHANNEL_MESSAGE_GET, commands.TEAMS_MESSAGE_GET);
+
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
       .then((): request.RequestPromise => {
@@ -136,4 +142,4 @@ class GraphTeamsChannelMessageGetCommand extends GraphCommand {
   }
 }
 
-module.exports = new GraphTeamsChannelMessageGetCommand();
+module.exports = new GraphTeamsMessageGetCommand();
