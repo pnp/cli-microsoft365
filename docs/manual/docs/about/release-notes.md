@@ -1,5 +1,26 @@
 # Release notes
 
+## [v1.13.0](https://github.com/pnp/office365-cli/releases/tag/v1.13.0)
+
+### New commands
+
+**SharePoint Online:**
+
+- [spo file move](../cmd/spo/file/file-move.md) - moves a file to another location [#671](https://github.com/pnp/office365-cli/issues/671)
+
+**Microsoft Graph:**
+
+- [graph teams message list](../cmd/graph/teams/teams-message-list.md) - lists all messages from a channel in a Microsoft Teams team [#588](https://github.com/pnp/office365-cli/issues/588)
+
+### Changes
+
+- added support for specifying language when creating site [#728](https://github.com/pnp/office365-cli/issues/728)
+- fixed bug in setting client-side web part order [#712](https://github.com/pnp/office365-cli/issues/712)
+- added support for authentication using certificate [#389](https://github.com/pnp/office365-cli/issues/389)
+- renamed 'graph teams channel message get' to 'graph teams message get'
+- extended 'spo folder copy' with support for schema mismatch [#706](https://github.com/pnp/office365-cli/pull/706)
+- extended 'spo file copy' with support for schema mismatch [#705](https://github.com/pnp/office365-cli/pull/705)
+
 ## [v1.12.0](https://github.com/pnp/office365-cli/releases/tag/v1.12.0)
 
 ### New commands
