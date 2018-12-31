@@ -167,12 +167,7 @@ class SpoListItemAddCommand extends SpoCommand {
                 cmd.log(rootFolderResponse);
               }
 
-              targetFolderServerRelativeUrl = `${rootFolderResponse["ServerRelativeUrl"]}/${args.options.folder}`.replace(/\/\//g, '/');
-              
-              // remove the end '/' in the folder path
-              if (targetFolderServerRelativeUrl[targetFolderServerRelativeUrl.length - 1] === '/') {
-                targetFolderServerRelativeUrl = targetFolderServerRelativeUrl.substring(0, targetFolderServerRelativeUrl.length - 1);
-              }
+              targetFolderServerRelativeUrl = Utils.getServerRelativePath(rootFolderResponse["ServerRelativeUrl"], args.options.folder);
                         
               return folderExtensions.ensureFolder(args.options.webUrl, targetFolderServerRelativeUrl, siteAccessToken);
             });
