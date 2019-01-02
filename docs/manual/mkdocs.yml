@@ -42,6 +42,8 @@ nav:
         - customaction set: 'cmd/spo/customaction/customaction-set.md'
       - externaluser:
         - externaluser list: 'cmd/spo/externaluser/externaluser-list.md'
+      - feature:
+        - feature list: 'cmd/spo/feature/feature-list.md'
       - field:
         - field add: 'cmd/spo/field/field-add.md'
         - field get: 'cmd/spo/field/field-get.md'
