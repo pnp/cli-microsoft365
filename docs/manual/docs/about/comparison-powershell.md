@@ -322,7 +322,7 @@ Get-PnPUnifiedGroupOwners|SharePointPnPPowerShellOnline|
 Get-PnPUPABulkImportStatus|SharePointPnPPowerShellOnline|
 Get-PnPUser|SharePointPnPPowerShellOnline|
 Get-PnPUserProfileProperty|SharePointPnPPowerShellOnline|
-Get-PnPView|SharePointPnPPowerShellOnline|[spo list view list](../cmd/spo/list/list-view-list.md)
+Get-PnPView|SharePointPnPPowerShellOnline|[spo list view get](../cmd/spo/list/list-view-get.md), [spo list view list](../cmd/spo/list/list-view-list.md)
 Get-PnPWeb|SharePointPnPPowerShellOnline|[spo web get](../cmd/spo/web/web-get.md), [spo web list](../cmd/spo/web/web-list.md)
 Get-PnPWebhookSubscriptions|SharePointPnPPowerShellOnline|[spo list webhook get](../cmd/spo/list/list-webhook-get.md), [spo list webhook list](../cmd/spo/list/list-webhook-list.md)
 Get-PnPWebPart|SharePointPnPPowerShellOnline|
