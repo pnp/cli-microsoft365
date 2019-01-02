@@ -252,7 +252,7 @@ Get-PnPDefaultColumnValues|SharePointPnPPowerShellOnline|
 Get-PnPDocumentSetTemplate|SharePointPnPPowerShellOnline|
 Get-PnPEventReceiver|SharePointPnPPowerShellOnline|
 Get-PnPException|SharePointPnPPowerShellOnline|
-Get-PnPFeature|SharePointPnPPowerShellOnline|
+Get-PnPFeature|SharePointPnPPowerShellOnline|[spo feature list](../cmd/spo/feature/feature-list.md)
 Get-PnPField|SharePointPnPPowerShellOnline|[spo field get](../cmd/spo/field/field-get.md)
 Get-PnPFile|SharePointPnPPowerShellOnline|[spo file get](../cmd/spo/file/file-get.md), [spo file list](../cmd/spo/file/file-list.md)
 Get-PnPFolder|SharePointPnPPowerShellOnline|[spo folder get](../cmd/spo/folder/folder-get.md), [spo folder list](../cmd/spo/folder/folder-list.md)
