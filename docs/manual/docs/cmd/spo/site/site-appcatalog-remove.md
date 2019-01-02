@@ -1,11 +1,11 @@
 # spo site appcatalog remove
 
-Removes a site collection app catalog in the specified site
+Removes site collection app catalog from the specified site
 
 ## Usage
 
 ```sh
-spo site appcatalog remove --url <url>
+spo site appcatalog remove [options]
 ```
 
 ## Options
@@ -19,17 +19,17 @@ Option|Description
 `--debug`|Runs command with debug logging
 
 !!! important
-    Before using this command, log in to a SharePoint Online site, using the [spo login](../login.md) command.
+    Before using this command, log in to a SharePoint Online tenant admin site, using the [spo login](../login.md) command.
 
 ## Remarks
 
-To remove an app catalog from a site collection, you have to first log in to a SharePoint site using the [spo login](../login.md) command, eg. `spo login https://contoso.sharepoint.com`.
+To remove a site collection catalog, you have to first log in to a tenant admin site using the [spo login](../login.md) command, eg. `spo login https://contoso-admin.sharepoint.com`.
 
-While the command uses the term *"remove"*, like the PowerShell equivalent cmdlet, it does not remove the special library **Apps for SharePoint** from the site collection. It simply disables the site collection app catalog in that site. Packages deployed to the app catalog are not available within the site collection.
+While the command uses the term *'remove'*, like its equivalent PowerShell cmdlet, it does not remove the special library **Apps for SharePoint** from the site collection. Instead, it disables the site collection app catalog in that site. Packages deployed to the app catalog are not available within the site collection.
 
 ## Examples
 
-Remove app catalog for specified site collection.
+Remove the site collection app catalog from specified site
 
 ```sh
 spo site appcatalog remove --url https://contoso.sharepoint/sites/site

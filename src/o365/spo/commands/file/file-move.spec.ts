@@ -3,12 +3,12 @@ import Command, { CommandValidate, CommandOption, CommandError } from '../../../
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
-const command: Command = require('./file-copy');
+const command: Command = require('./file-move');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import Utils from '../../../../Utils';
 
-describe(commands.FILE_COPY, () => {
+describe(commands.FILE_MOVE, () => {
   let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
@@ -61,7 +61,7 @@ describe(commands.FILE_COPY, () => {
         }
         return Promise.resolve({
           JobState: 0,
-          Logs: ["{\r\n  \"Event\": \"JobEnd\",\r\n  \"JobId\": \"cee65dc5-8d05-41cc-8657-92a12d213f76\",\r\n  \"Time\": \"04/29/2018 22:00:08.370\",\r\n  \"FilesCreated\": \"1\",\r\n  \"BytesProcessed\": \"4860914\",\r\n  \"ObjectsProcessed\": \"2\",\r\n  \"TotalExpectedSPObjects\": \"2\",\r\n  \"TotalErrors\": \"0\",\r\n  \"TotalWarnings\": \"0\",\r\n  \"TotalRetryCount\": \"0\",\r\n  \"MigrationType\": \"Copy\",\r\n  \"MigrationDirection\": \"Import\",\r\n  \"CreatedOrUpdatedFileStatsBySize\": \"{\\\"1-10M\\\":{\\\"Count\\\":1,\\\"TotalSize\\\":4860914,\\\"TotalDownloadTime\\\":24,\\\"TotalCreationTime\\\":2824}}\",\r\n  \"ObjectsStatsByType\": \"{\\\"SPUser\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":0,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0},\\\"SPFile\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":3184,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0},\\\"SPListItem\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":360,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0}}\",\r\n  \"TotalExpectedBytes\": \"4860914\",\r\n  \"CorrelationId\": \"8559629e-0036-5000-c38d-80b698e0cd79\"\r\n}"]
+          Logs: ["{\r\n  \"Event\": \"JobEnd\",\r\n  \"JobId\": \"cee65dc5-8d05-41cc-8657-92a12d213f76\",\r\n  \"Time\": \"04/29/2018 22:00:08.370\",\r\n  \"FilesCreated\": \"1\",\r\n  \"BytesProcessed\": \"4860914\",\r\n  \"ObjectsProcessed\": \"2\",\r\n  \"TotalExpectedSPObjects\": \"2\",\r\n  \"TotalErrors\": \"0\",\r\n  \"TotalWarnings\": \"0\",\r\n  \"TotalRetryCount\": \"0\",\r\n  \"MigrationType\": \"Move\",\r\n  \"MigrationDirection\": \"Import\",\r\n  \"CreatedOrUpdatedFileStatsBySize\": \"{\\\"1-10M\\\":{\\\"Count\\\":1,\\\"TotalSize\\\":4860914,\\\"TotalDownloadTime\\\":24,\\\"TotalCreationTime\\\":2824}}\",\r\n  \"ObjectsStatsByType\": \"{\\\"SPUser\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":0,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0},\\\"SPFile\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":3184,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0},\\\"SPListItem\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":360,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0}}\",\r\n  \"TotalExpectedBytes\": \"4860914\",\r\n  \"CorrelationId\": \"8559629e-0036-5000-c38d-80b698e0cd79\"\r\n}"]
         });
       }
 
@@ -122,7 +122,7 @@ describe(commands.FILE_COPY, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.FILE_COPY), true);
+    assert.equal(command.name.startsWith(commands.FILE_MOVE), true);
   });
 
   it('has a description', () => {
@@ -146,7 +146,7 @@ describe(commands.FILE_COPY, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, () => {
       try {
-        assert.equal(telemetry.name, commands.FILE_COPY);
+        assert.equal(telemetry.name, commands.FILE_MOVE);
         done();
       }
       catch (e) {
@@ -472,12 +472,12 @@ describe(commands.FILE_COPY, () => {
     const postRequests = sinon.stub(request, 'post');
     postRequests.onFirstCall().resolves({
       JobState: 4,
-      Logs: ["{\r\n  \"Event\": \"JobEnd\",\r\n  \"JobId\": \"7be2c14c-b998-4b30-9b43-c2be0f95d8b9\",\r\n  \"Time\": \"04/29/2018 23:39:29.945\",\r\n  \"FilesCreated\": \"1\",\r\n  \"BytesProcessed\": \"4860914\",\r\n  \"ObjectsProcessed\": \"2\",\r\n  \"TotalExpectedSPObjects\": \"2\",\r\n  \"TotalErrors\": \"0\",\r\n  \"TotalWarnings\": \"0\",\r\n  \"TotalRetryCount\": \"0\",\r\n  \"MigrationType\": \"Copy\",\r\n  \"MigrationDirection\": \"Export\",\r\n  \"CreatedOrUpdatedFileStatsBySize\": \"{}\",\r\n  \"ObjectsStatsByType\": \"{}\",\r\n  \"TotalExpectedBytes\": \"4860914\",\r\n  \"CorrelationId\": \"355f629e-707d-5000-634c-4c5cdd1e62d2\"\r\n}", "{\r\n  \"Event\": \"JobLogFileCreate\",\r\n  \"JobId\": \"7be2c14c-b998-4b30-9b43-c2be0f95d8b9\",\r\n  \"Time\": \"04/29/2018 23:39:30.539\",\r\n  \"FileName\": \"Import-7be2c14c-b998-4b30-9b43-c2be0f95d8b9-0.log\",\r\n  \"CorrelationId\": \"355f629e-707d-5000-634c-4c5cdd1e62d2\"\r\n}", "{\r\n  \"Event\": \"JobStart\",\r\n  \"JobId\": \"7be2c14c-b998-4b30-9b43-c2be0f95d8b9\",\r\n  \"Time\": \"04/29/2018 23:39:30.570\",\r\n  \"SiteId\": \"956c8970-f858-42ac-a06f-bbdca4a0374b\",\r\n  \"WebId\": \"d6d96969-217f-4306-b15b-fe35b6b754cc\",\r\n  \"DBId\": \"eb30ff26-a12c-431e-bb10-68fdac21ce28\",\r\n  \"FarmId\": \"67b76b49-9245-4dfc-a1f7-b4503cf6ea69\",\r\n  \"ServerId\": \"2a00b725-2871-4e42-98fd-e41c577ed494\",\r\n  \"SubscriptionId\": \"ea1787c6-7ce2-4e71-be47-5e0deb30f9e4\",\r\n  \"TotalRetryCount\": \"0\",\r\n  \"MigrationType\": \"Copy\",\r\n  \"MigrationDirection\": \"Import\",\r\n  \"CorrelationId\": \"355f629e-707d-5000-634c-4c5cdd1e62d2\"\r\n}"]
+      Logs: ["{\r\n  \"Event\": \"JobEnd\",\r\n  \"JobId\": \"7be2c14c-b998-4b30-9b43-c2be0f95d8b9\",\r\n  \"Time\": \"04/29/2018 23:39:29.945\",\r\n  \"FilesCreated\": \"1\",\r\n  \"BytesProcessed\": \"4860914\",\r\n  \"ObjectsProcessed\": \"2\",\r\n  \"TotalExpectedSPObjects\": \"2\",\r\n  \"TotalErrors\": \"0\",\r\n  \"TotalWarnings\": \"0\",\r\n  \"TotalRetryCount\": \"0\",\r\n  \"MigrationType\": \"Move\",\r\n  \"MigrationDirection\": \"Export\",\r\n  \"CreatedOrUpdatedFileStatsBySize\": \"{}\",\r\n  \"ObjectsStatsByType\": \"{}\",\r\n  \"TotalExpectedBytes\": \"4860914\",\r\n  \"CorrelationId\": \"355f629e-707d-5000-634c-4c5cdd1e62d2\"\r\n}", "{\r\n  \"Event\": \"JobLogFileCreate\",\r\n  \"JobId\": \"7be2c14c-b998-4b30-9b43-c2be0f95d8b9\",\r\n  \"Time\": \"04/29/2018 23:39:30.539\",\r\n  \"FileName\": \"Import-7be2c14c-b998-4b30-9b43-c2be0f95d8b9-0.log\",\r\n  \"CorrelationId\": \"355f629e-707d-5000-634c-4c5cdd1e62d2\"\r\n}", "{\r\n  \"Event\": \"JobStart\",\r\n  \"JobId\": \"7be2c14c-b998-4b30-9b43-c2be0f95d8b9\",\r\n  \"Time\": \"04/29/2018 23:39:30.570\",\r\n  \"SiteId\": \"956c8970-f858-42ac-a06f-bbdca4a0374b\",\r\n  \"WebId\": \"d6d96969-217f-4306-b15b-fe35b6b754cc\",\r\n  \"DBId\": \"eb30ff26-a12c-431e-bb10-68fdac21ce28\",\r\n  \"FarmId\": \"67b76b49-9245-4dfc-a1f7-b4503cf6ea69\",\r\n  \"ServerId\": \"2a00b725-2871-4e42-98fd-e41c577ed494\",\r\n  \"SubscriptionId\": \"ea1787c6-7ce2-4e71-be47-5e0deb30f9e4\",\r\n  \"TotalRetryCount\": \"0\",\r\n  \"MigrationType\": \"Copy\",\r\n  \"MigrationDirection\": \"Import\",\r\n  \"CorrelationId\": \"355f629e-707d-5000-634c-4c5cdd1e62d2\"\r\n}"]
     });
 
     postRequests.onSecondCall().resolves({
       JobState: 0,
-      Logs: ["{\r\n  \"Event\": \"JobEnd\",\r\n  \"JobId\": \"cee65dc5-8d05-41cc-8657-92a12d213f76\",\r\n  \"Time\": \"04/29/2018 22:00:08.370\",\r\n  \"FilesCreated\": \"1\",\r\n  \"BytesProcessed\": \"4860914\",\r\n  \"ObjectsProcessed\": \"2\",\r\n  \"TotalExpectedSPObjects\": \"2\",\r\n  \"TotalErrors\": \"0\",\r\n  \"TotalWarnings\": \"0\",\r\n  \"TotalRetryCount\": \"0\",\r\n  \"MigrationType\": \"Copy\",\r\n  \"MigrationDirection\": \"Import\",\r\n  \"CreatedOrUpdatedFileStatsBySize\": \"{\\\"1-10M\\\":{\\\"Count\\\":1,\\\"TotalSize\\\":4860914,\\\"TotalDownloadTime\\\":24,\\\"TotalCreationTime\\\":2824}}\",\r\n  \"ObjectsStatsByType\": \"{\\\"SPUser\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":0,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0},\\\"SPFile\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":3184,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0},\\\"SPListItem\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":360,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0}}\",\r\n  \"TotalExpectedBytes\": \"4860914\",\r\n  \"CorrelationId\": \"8559629e-0036-5000-c38d-80b698e0cd79\"\r\n}"]
+      Logs: ["{\r\n  \"Event\": \"JobEnd\",\r\n  \"JobId\": \"cee65dc5-8d05-41cc-8657-92a12d213f76\",\r\n  \"Time\": \"04/29/2018 22:00:08.370\",\r\n  \"FilesCreated\": \"1\",\r\n  \"BytesProcessed\": \"4860914\",\r\n  \"ObjectsProcessed\": \"2\",\r\n  \"TotalExpectedSPObjects\": \"2\",\r\n  \"TotalErrors\": \"0\",\r\n  \"TotalWarnings\": \"0\",\r\n  \"TotalRetryCount\": \"0\",\r\n  \"MigrationType\": \"Move\",\r\n  \"MigrationDirection\": \"Import\",\r\n  \"CreatedOrUpdatedFileStatsBySize\": \"{\\\"1-10M\\\":{\\\"Count\\\":1,\\\"TotalSize\\\":4860914,\\\"TotalDownloadTime\\\":24,\\\"TotalCreationTime\\\":2824}}\",\r\n  \"ObjectsStatsByType\": \"{\\\"SPUser\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":0,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0},\\\"SPFile\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":3184,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0},\\\"SPListItem\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":360,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0}}\",\r\n  \"TotalExpectedBytes\": \"4860914\",\r\n  \"CorrelationId\": \"8559629e-0036-5000-c38d-80b698e0cd79\"\r\n}"]
     });
 
     const jobProgressOptions: any = {
@@ -518,7 +518,7 @@ describe(commands.FILE_COPY, () => {
     // GetCopyJobProgress #2 JobState = 0
     postRequests.onSecondCall().resolves({
       JobState: 0,
-      Logs: ["{\r\n  \"Event\": \"JobEnd\",\r\n  \"JobId\": \"cee65dc5-8d05-41cc-8657-92a12d213f76\",\r\n  \"Time\": \"04/29/2018 22:00:08.370\",\r\n  \"FilesCreated\": \"1\",\r\n  \"BytesProcessed\": \"4860914\",\r\n  \"ObjectsProcessed\": \"2\",\r\n  \"TotalExpectedSPObjects\": \"2\",\r\n  \"TotalErrors\": \"0\",\r\n  \"TotalWarnings\": \"0\",\r\n  \"TotalRetryCount\": \"0\",\r\n  \"MigrationType\": \"Copy\",\r\n  \"MigrationDirection\": \"Import\",\r\n  \"CreatedOrUpdatedFileStatsBySize\": \"{\\\"1-10M\\\":{\\\"Count\\\":1,\\\"TotalSize\\\":4860914,\\\"TotalDownloadTime\\\":24,\\\"TotalCreationTime\\\":2824}}\",\r\n  \"ObjectsStatsByType\": \"{\\\"SPUser\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":0,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0},\\\"SPFile\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":3184,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0},\\\"SPListItem\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":360,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0}}\",\r\n  \"TotalExpectedBytes\": \"4860914\",\r\n  \"CorrelationId\": \"8559629e-0036-5000-c38d-80b698e0cd79\"\r\n}"]
+      Logs: ["{\r\n  \"Event\": \"JobEnd\",\r\n  \"JobId\": \"cee65dc5-8d05-41cc-8657-92a12d213f76\",\r\n  \"Time\": \"04/29/2018 22:00:08.370\",\r\n  \"FilesCreated\": \"1\",\r\n  \"BytesProcessed\": \"4860914\",\r\n  \"ObjectsProcessed\": \"2\",\r\n  \"TotalExpectedSPObjects\": \"2\",\r\n  \"TotalErrors\": \"0\",\r\n  \"TotalWarnings\": \"0\",\r\n  \"TotalRetryCount\": \"0\",\r\n  \"MigrationType\": \"Move\",\r\n  \"MigrationDirection\": \"Import\",\r\n  \"CreatedOrUpdatedFileStatsBySize\": \"{\\\"1-10M\\\":{\\\"Count\\\":1,\\\"TotalSize\\\":4860914,\\\"TotalDownloadTime\\\":24,\\\"TotalCreationTime\\\":2824}}\",\r\n  \"ObjectsStatsByType\": \"{\\\"SPUser\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":0,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0},\\\"SPFile\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":3184,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0},\\\"SPListItem\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":360,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0}}\",\r\n  \"TotalExpectedBytes\": \"4860914\",\r\n  \"CorrelationId\": \"8559629e-0036-5000-c38d-80b698e0cd79\"\r\n}"]
     });
 
     const jobProgressOptions: any = {
@@ -558,7 +558,7 @@ describe(commands.FILE_COPY, () => {
     postRequests.onSecondCall().rejects('error');
     postRequests.onThirdCall().resolves({
       JobState: 0,
-      Logs: ["{\r\n  \"Event\": \"JobEnd\",\r\n  \"JobId\": \"cee65dc5-8d05-41cc-8657-92a12d213f76\",\r\n  \"Time\": \"04/29/2018 22:00:08.370\",\r\n  \"FilesCreated\": \"1\",\r\n  \"BytesProcessed\": \"4860914\",\r\n  \"ObjectsProcessed\": \"2\",\r\n  \"TotalExpectedSPObjects\": \"2\",\r\n  \"TotalErrors\": \"0\",\r\n  \"TotalWarnings\": \"0\",\r\n  \"TotalRetryCount\": \"0\",\r\n  \"MigrationType\": \"Copy\",\r\n  \"MigrationDirection\": \"Import\",\r\n  \"CreatedOrUpdatedFileStatsBySize\": \"{\\\"1-10M\\\":{\\\"Count\\\":1,\\\"TotalSize\\\":4860914,\\\"TotalDownloadTime\\\":24,\\\"TotalCreationTime\\\":2824}}\",\r\n  \"ObjectsStatsByType\": \"{\\\"SPUser\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":0,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0},\\\"SPFile\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":3184,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0},\\\"SPListItem\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":360,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0}}\",\r\n  \"TotalExpectedBytes\": \"4860914\",\r\n  \"CorrelationId\": \"8559629e-0036-5000-c38d-80b698e0cd79\"\r\n}"]
+      Logs: ["{\r\n  \"Event\": \"JobEnd\",\r\n  \"JobId\": \"cee65dc5-8d05-41cc-8657-92a12d213f76\",\r\n  \"Time\": \"04/29/2018 22:00:08.370\",\r\n  \"FilesCreated\": \"1\",\r\n  \"BytesProcessed\": \"4860914\",\r\n  \"ObjectsProcessed\": \"2\",\r\n  \"TotalExpectedSPObjects\": \"2\",\r\n  \"TotalErrors\": \"0\",\r\n  \"TotalWarnings\": \"0\",\r\n  \"TotalRetryCount\": \"0\",\r\n  \"MigrationType\": \"Move\",\r\n  \"MigrationDirection\": \"Import\",\r\n  \"CreatedOrUpdatedFileStatsBySize\": \"{\\\"1-10M\\\":{\\\"Count\\\":1,\\\"TotalSize\\\":4860914,\\\"TotalDownloadTime\\\":24,\\\"TotalCreationTime\\\":2824}}\",\r\n  \"ObjectsStatsByType\": \"{\\\"SPUser\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":0,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0},\\\"SPFile\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":3184,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0},\\\"SPListItem\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":360,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0}}\",\r\n  \"TotalExpectedBytes\": \"4860914\",\r\n  \"CorrelationId\": \"8559629e-0036-5000-c38d-80b698e0cd79\"\r\n}"]
     });
 
     const jobProgressOptions: any = {
@@ -597,12 +597,12 @@ describe(commands.FILE_COPY, () => {
     // GetCopyJobProgress #1 JobState = 4
     postRequests.onFirstCall().resolves({
       JobState: 4,
-      Logs: ["{\r\n  \"Event\": \"JobEnd\",\r\n  \"JobId\": \"7be2c14c-b998-4b30-9b43-c2be0f95d8b9\",\r\n  \"Time\": \"04/29/2018 23:39:29.945\",\r\n  \"FilesCreated\": \"1\",\r\n  \"BytesProcessed\": \"4860914\",\r\n  \"ObjectsProcessed\": \"2\",\r\n  \"TotalExpectedSPObjects\": \"2\",\r\n  \"TotalErrors\": \"0\",\r\n  \"TotalWarnings\": \"0\",\r\n  \"TotalRetryCount\": \"0\",\r\n  \"MigrationType\": \"Copy\",\r\n  \"MigrationDirection\": \"Export\",\r\n  \"CreatedOrUpdatedFileStatsBySize\": \"{}\",\r\n  \"ObjectsStatsByType\": \"{}\",\r\n  \"TotalExpectedBytes\": \"4860914\",\r\n  \"CorrelationId\": \"355f629e-707d-5000-634c-4c5cdd1e62d2\"\r\n}", "{\r\n  \"Event\": \"JobLogFileCreate\",\r\n  \"JobId\": \"7be2c14c-b998-4b30-9b43-c2be0f95d8b9\",\r\n  \"Time\": \"04/29/2018 23:39:30.539\",\r\n  \"FileName\": \"Import-7be2c14c-b998-4b30-9b43-c2be0f95d8b9-0.log\",\r\n  \"CorrelationId\": \"355f629e-707d-5000-634c-4c5cdd1e62d2\"\r\n}", "{\r\n  \"Event\": \"JobStart\",\r\n  \"JobId\": \"7be2c14c-b998-4b30-9b43-c2be0f95d8b9\",\r\n  \"Time\": \"04/29/2018 23:39:30.570\",\r\n  \"SiteId\": \"956c8970-f858-42ac-a06f-bbdca4a0374b\",\r\n  \"WebId\": \"d6d96969-217f-4306-b15b-fe35b6b754cc\",\r\n  \"DBId\": \"eb30ff26-a12c-431e-bb10-68fdac21ce28\",\r\n  \"FarmId\": \"67b76b49-9245-4dfc-a1f7-b4503cf6ea69\",\r\n  \"ServerId\": \"2a00b725-2871-4e42-98fd-e41c577ed494\",\r\n  \"SubscriptionId\": \"ea1787c6-7ce2-4e71-be47-5e0deb30f9e4\",\r\n  \"TotalRetryCount\": \"0\",\r\n  \"MigrationType\": \"Copy\",\r\n  \"MigrationDirection\": \"Import\",\r\n  \"CorrelationId\": \"355f629e-707d-5000-634c-4c5cdd1e62d2\"\r\n}"]
+      Logs: ["{\r\n  \"Event\": \"JobEnd\",\r\n  \"JobId\": \"7be2c14c-b998-4b30-9b43-c2be0f95d8b9\",\r\n  \"Time\": \"04/29/2018 23:39:29.945\",\r\n  \"FilesCreated\": \"1\",\r\n  \"BytesProcessed\": \"4860914\",\r\n  \"ObjectsProcessed\": \"2\",\r\n  \"TotalExpectedSPObjects\": \"2\",\r\n  \"TotalErrors\": \"0\",\r\n  \"TotalWarnings\": \"0\",\r\n  \"TotalRetryCount\": \"0\",\r\n  \"MigrationType\": \"Move\",\r\n  \"MigrationDirection\": \"Export\",\r\n  \"CreatedOrUpdatedFileStatsBySize\": \"{}\",\r\n  \"ObjectsStatsByType\": \"{}\",\r\n  \"TotalExpectedBytes\": \"4860914\",\r\n  \"CorrelationId\": \"355f629e-707d-5000-634c-4c5cdd1e62d2\"\r\n}", "{\r\n  \"Event\": \"JobLogFileCreate\",\r\n  \"JobId\": \"7be2c14c-b998-4b30-9b43-c2be0f95d8b9\",\r\n  \"Time\": \"04/29/2018 23:39:30.539\",\r\n  \"FileName\": \"Import-7be2c14c-b998-4b30-9b43-c2be0f95d8b9-0.log\",\r\n  \"CorrelationId\": \"355f629e-707d-5000-634c-4c5cdd1e62d2\"\r\n}", "{\r\n  \"Event\": \"JobStart\",\r\n  \"JobId\": \"7be2c14c-b998-4b30-9b43-c2be0f95d8b9\",\r\n  \"Time\": \"04/29/2018 23:39:30.570\",\r\n  \"SiteId\": \"956c8970-f858-42ac-a06f-bbdca4a0374b\",\r\n  \"WebId\": \"d6d96969-217f-4306-b15b-fe35b6b754cc\",\r\n  \"DBId\": \"eb30ff26-a12c-431e-bb10-68fdac21ce28\",\r\n  \"FarmId\": \"67b76b49-9245-4dfc-a1f7-b4503cf6ea69\",\r\n  \"ServerId\": \"2a00b725-2871-4e42-98fd-e41c577ed494\",\r\n  \"SubscriptionId\": \"ea1787c6-7ce2-4e71-be47-5e0deb30f9e4\",\r\n  \"TotalRetryCount\": \"0\",\r\n  \"MigrationType\": \"Copy\",\r\n  \"MigrationDirection\": \"Import\",\r\n  \"CorrelationId\": \"355f629e-707d-5000-634c-4c5cdd1e62d2\"\r\n}"]
     });
     // GetCopyJobProgress #2 JobState = 0
     postRequests.onSecondCall().resolves({
       JobState: 4,
-      Logs: ["{\r\n  \"Event\": \"JobEnd\",\r\n  \"JobId\": \"cee65dc5-8d05-41cc-8657-92a12d213f76\",\r\n  \"Time\": \"04/29/2018 22:00:08.370\",\r\n  \"FilesCreated\": \"1\",\r\n  \"BytesProcessed\": \"4860914\",\r\n  \"ObjectsProcessed\": \"2\",\r\n  \"TotalExpectedSPObjects\": \"2\",\r\n  \"TotalErrors\": \"0\",\r\n  \"TotalWarnings\": \"0\",\r\n  \"TotalRetryCount\": \"0\",\r\n  \"MigrationType\": \"Copy\",\r\n  \"MigrationDirection\": \"Import\",\r\n  \"CreatedOrUpdatedFileStatsBySize\": \"{\\\"1-10M\\\":{\\\"Count\\\":1,\\\"TotalSize\\\":4860914,\\\"TotalDownloadTime\\\":24,\\\"TotalCreationTime\\\":2824}}\",\r\n  \"ObjectsStatsByType\": \"{\\\"SPUser\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":0,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0},\\\"SPFile\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":3184,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0},\\\"SPListItem\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":360,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0}}\",\r\n  \"TotalExpectedBytes\": \"4860914\",\r\n  \"CorrelationId\": \"8559629e-0036-5000-c38d-80b698e0cd79\"\r\n}"]
+      Logs: ["{\r\n  \"Event\": \"JobEnd\",\r\n  \"JobId\": \"cee65dc5-8d05-41cc-8657-92a12d213f76\",\r\n  \"Time\": \"04/29/2018 22:00:08.370\",\r\n  \"FilesCreated\": \"1\",\r\n  \"BytesProcessed\": \"4860914\",\r\n  \"ObjectsProcessed\": \"2\",\r\n  \"TotalExpectedSPObjects\": \"2\",\r\n  \"TotalErrors\": \"0\",\r\n  \"TotalWarnings\": \"0\",\r\n  \"TotalRetryCount\": \"0\",\r\n  \"MigrationType\": \"Move\",\r\n  \"MigrationDirection\": \"Import\",\r\n  \"CreatedOrUpdatedFileStatsBySize\": \"{\\\"1-10M\\\":{\\\"Count\\\":1,\\\"TotalSize\\\":4860914,\\\"TotalDownloadTime\\\":24,\\\"TotalCreationTime\\\":2824}}\",\r\n  \"ObjectsStatsByType\": \"{\\\"SPUser\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":0,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0},\\\"SPFile\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":3184,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0},\\\"SPListItem\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":360,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0}}\",\r\n  \"TotalExpectedBytes\": \"4860914\",\r\n  \"CorrelationId\": \"8559629e-0036-5000-c38d-80b698e0cd79\"\r\n}"]
     });
 
     const jobProgressOptions: any = {
@@ -645,7 +645,8 @@ describe(commands.FILE_COPY, () => {
       destinationUri: 'https://contoso.sharepoint.com/sites/team-b/library2',
       options: {
         'AllowSchemaMismatch': false,
-        'IgnoreVersionHistory': true
+        'IgnoreVersionHistory': true,
+        'IsMoveMode': true
       }
     });
 
@@ -695,7 +696,8 @@ describe(commands.FILE_COPY, () => {
       destinationUri: 'https://contoso.sharepoint.com/sites/team-b/library2',
       options: {
         'AllowSchemaMismatch': false,
-        'IgnoreVersionHistory': true
+        'IgnoreVersionHistory': true,
+        'IsMoveMode': true
       }
     });
 
@@ -746,7 +748,8 @@ describe(commands.FILE_COPY, () => {
       destinationUri: 'https://contoso.sharepoint.com/sites/team-b/library2',
       options: {
         'AllowSchemaMismatch': false,
-        'IgnoreVersionHistory': true
+        'IgnoreVersionHistory': true,
+        'IsMoveMode': true
       }
     });
 
@@ -844,7 +847,7 @@ describe(commands.FILE_COPY, () => {
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
     cmd.help({}, () => { });
-    assert(find.calledWith(commands.FILE_COPY));
+    assert(find.calledWith(commands.FILE_MOVE));
   });
 
   it('has help with examples', () => {
@@ -891,4 +894,5 @@ describe(commands.FILE_COPY, () => {
       }
     });
   });
+
 });

@@ -10,6 +10,7 @@ import {
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import { Auth } from '../../../../Auth';
+import { ContextInfo } from '../../spo';
 import * as url from 'url';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -22,6 +23,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   sourceUrl: string;
   targetUrl: string;
+  deleteIfAlreadyExists?: boolean;
   allowSchemaMismatch?: boolean;
 }
 
@@ -49,19 +51,26 @@ interface JobProgressOptions {
   progressRetryAttempts: number;
 }
 
-class SpoFolderCopyCommand extends SpoCommand {
+class SpoFileMoveCommand extends SpoCommand {
   public get name(): string {
-    return commands.FOLDER_COPY;
+    return commands.FILE_MOVE;
   }
 
   public get description(): string {
-    return 'Copies a folder to another location';
+    return 'Moves a file to another location';
+  }
+
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.deleteIfAlreadyExists = args.options.deleteIfAlreadyExists || false;
+    telemetryProps.allowSchemaMismatch = args.options.allowSchemaMismatch || false;
+    return telemetryProps;
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-    let siteAccessToken: string = '';
-    const webUrl: string = args.options.webUrl;
+    let siteAccessToken = '';
+    const webUrl = args.options.webUrl;
     const parsedUrl: url.UrlWithStringQuery = url.parse(webUrl);
     const tenantUrl: string = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
 
@@ -78,6 +87,31 @@ class SpoFolderCopyCommand extends SpoCommand {
 
         siteAccessToken = accessToken;
 
+        // Check if the source file exists.
+        // Called on purpose, we explicitly check if user specified file
+        // in the sourceUrl option. 
+        // The CreateCopyJobs endpoint accepts file, folder or batch from both.
+        // A user might enter folder instead of file as source url by mistake
+        // then there are edge cases when deleteIfAlreadyExists flag is set
+        // the user can receive misleading error message.
+        return this.fileExists(tenantUrl, webUrl, args.options.sourceUrl, siteAccessToken, cmd);
+      })
+      .then((resp: any): Promise<void> => {
+        if (this.debug) {
+          cmd.log(`fileExists response...`);
+          cmd.log(resp);
+        }
+
+        if (args.options.deleteIfAlreadyExists) {
+          // try delete target file, if deleteIfAlreadyExists flag is set
+          const filename: string = args.options.sourceUrl.replace(/^.*[\\\/]/, '');
+          return this.recycleFile(tenantUrl, args.options.targetUrl, filename, siteAccessToken, cmd);
+        }
+
+        return Promise.resolve();
+      })
+      .then((): request.RequestPromise => {
+        // all preconditions met, now create copy job
         const sourceAbsoluteUrl: string = this.urlCombine(webUrl, args.options.sourceUrl);
         const allowSchemaMismatch: boolean = args.options.allowSchemaMismatch || false;
         const requestUrl: string = this.urlCombine(webUrl, '/_api/site/CreateCopyJobs');
@@ -92,7 +126,8 @@ class SpoFolderCopyCommand extends SpoCommand {
             destinationUri: this.urlCombine(tenantUrl, args.options.targetUrl),
             options: {
               "AllowSchemaMismatch": allowSchemaMismatch,
-              "IgnoreVersionHistory": true
+              "IgnoreVersionHistory": true,
+              "IsMoveMode": true,
             }
           },
           json: true
@@ -126,18 +161,41 @@ class SpoFolderCopyCommand extends SpoCommand {
         if (this.verbose) {
           cmd.log('DONE');
         }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
 
   /**
-   * A polling function that awaits the 
-   * Azure queued copy job to return JobStatus = 0 meaning it is done with the task.
+   * Checks if a file exists on the server relative url
    */
-  private waitForJobResult(opts: JobProgressOptions, cmd: CommandInstance):
-    Promise<void> {
+  private fileExists(tenantUrl: string, webUrl: string, sourceUrl: string, siteAccessToken: string, cmd: CommandInstance): request.RequestPromise {
+    const webServerRelativeUrl: string = webUrl.replace(tenantUrl, '');
+    const fileServerRelativeUrl: string = `${webServerRelativeUrl}${sourceUrl}`;
 
+    const requestUrl = `${webUrl}/_api/web/GetFileByServerRelativeUrl('${encodeURIComponent(fileServerRelativeUrl)}')/`;
+    const requestOptions: any = {
+      url: requestUrl,
+      method: 'GET',
+      headers: Utils.getRequestHeaders({
+        authorization: `Bearer ${siteAccessToken}`,
+        'accept': 'application/json;odata=nometadata'
+      }),
+      json: true
+    };
+
+    if (this.debug) {
+      cmd.log(`fileExists request...`);
+      cmd.log(requestOptions);
+    }
+
+    return request.get(requestOptions);
+  }
+
+  /**
+   * A polling function that awaits the 
+   * queued copy job to return JobStatus = 0 meaning it is done with the task.
+   */
+  private waitForJobResult(opts: JobProgressOptions, cmd: CommandInstance): Promise<void> {
     let pollCount: number = 0;
     let retryAttemptsCount: number = 0;
 
@@ -159,7 +217,7 @@ class SpoFolderCopyCommand extends SpoCommand {
         cmd.log(requestOptions);
       }
 
-      request.post(requestOptions).then((resp: any): void => {
+      request.post(requestOptions).then((resp: { JobState?: number, Logs: string[] }): void => {
         retryAttemptsCount = 0; // clear retry on promise success 
 
         if (this.debug) {
@@ -192,8 +250,10 @@ class SpoFolderCopyCommand extends SpoCommand {
         if (resp.JobState === 0) {
           // job done
           resolve();
+          return;
         }
-        else if (pollCount < opts.progressMaxPollAttempts) {
+
+        if (pollCount < opts.progressMaxPollAttempts) {
           // if the condition isn't met but the timeout hasn't elapsed, go again
           setTimeout(checkCondition, opts.progressPollInterval, resolve, reject);
         }
@@ -201,22 +261,83 @@ class SpoFolderCopyCommand extends SpoCommand {
           reject(new Error('waitForJobResult timed out'));
         }
       },
-        (error: any) => {
+        (error: any): void => {
           retryAttemptsCount++;
 
           // let's retry x times in row before we give up since
           // this is progress check and even if rejects a promise
-          // the actual copy process can success.
+          // the actual move process can success.
           if (retryAttemptsCount <= opts.progressRetryAttempts) {
             setTimeout(checkCondition, opts.progressPollInterval, resolve, reject);
-          }
-          else {
+          } else {
             reject(error);
           }
         });
-    };
+    }
 
     return new Promise<void>(checkCondition);
+  }
+
+  /**
+   * Moves file in the site recycle bin
+   */
+  private recycleFile(tenantUrl: string, targetUrl: string, filename: string, siteAccessToken: string, cmd: CommandInstance): Promise<void> {
+    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
+      const targetFolderAbsoluteUrl: string = this.urlCombine(tenantUrl, targetUrl);
+
+      // since the target WebFullUrl is unknown we can use getRequestDigestForSite
+      // to get it from target folder absolute url.
+      // Similar approach used here Microsoft.SharePoint.Client.Web.WebUrlFromFolderUrlDirect
+      this.getRequestDigestForSite(targetFolderAbsoluteUrl, siteAccessToken, cmd, this.debug)
+        .then((contextResponse: ContextInfo): void => {
+          if (this.debug) {
+            cmd.log(`contextResponse.WebFullUrl: ${contextResponse.WebFullUrl}`);
+          }
+
+          if (targetUrl.charAt(0) !== '/') {
+            targetUrl = `/${targetUrl}`;
+          }
+          if (targetUrl.lastIndexOf('/') !== targetUrl.length - 1) {
+            targetUrl = `${targetUrl}/`;
+          }
+
+          const requestUrl: string = `${contextResponse.WebFullUrl}/_api/web/GetFileByServerRelativeUrl('${encodeURIComponent(`${targetUrl}${filename}`)}')/recycle()`;
+          const requestOptions: any = {
+            url: requestUrl,
+            method: 'POST',
+            headers: Utils.getRequestHeaders({
+              authorization: `Bearer ${siteAccessToken}`,
+              'X-HTTP-Method': 'DELETE',
+              'If-Match': '*',
+              'accept': 'application/json;odata=nometadata'
+            }),
+            json: true
+          };
+
+          if (this.debug) {
+            cmd.log(`recycleFile request...`);
+            cmd.log(requestOptions);
+          }
+
+          request.post(requestOptions)
+            .then((resp: any): void => {
+              resolve();
+            })
+            .catch((err: any): any => {
+              if (err.statusCode === 404) {
+                // file does not exist so can proceed
+                return resolve();
+              }
+
+              if (this.debug) {
+                cmd.log(`recycleFile error...`);
+                cmd.log(err);
+              }
+
+              reject(err);
+            });
+        }, (e: any) => reject(e));
+    });
   }
 
   /**
@@ -247,19 +368,23 @@ class SpoFolderCopyCommand extends SpoCommand {
     const options: CommandOption[] = [
       {
         option: '-u, --webUrl <webUrl>',
-        description: 'The URL of the site where the folder is located'
+        description: 'The URL of the site where the file is located'
       },
       {
         option: '-s, --sourceUrl <sourceUrl>',
-        description: 'Site-relative URL of the folder to copy'
+        description: 'Site-relative URL of the file to move'
       },
       {
         option: '-t, --targetUrl <targetUrl>',
-        description: 'Server-relative URL where to copy the folder'
+        description: 'Server-relative URL where to move the file'
+      },
+      {
+        option: '--deleteIfAlreadyExists',
+        description: 'If a file already exists at the targetUrl, it will be moved to the recycle bin. If omitted, the move operation will be canceled if the file already exists at the targetUrl location'
       },
       {
         option: '--allowSchemaMismatch',
-        description: 'Ignores any missing fields in the target document library and copies the folder anyway'
+        description: 'Ignores any missing fields in the target document library and moves the file anyway'
       }
     ];
 
@@ -269,7 +394,6 @@ class SpoFolderCopyCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-
       if (!args.options.webUrl) {
         return 'Required parameter webUrl missing';
       }
@@ -300,31 +424,34 @@ class SpoFolderCopyCommand extends SpoCommand {
   
   Remarks:
   
-    To copy a folder, you have to first log in to SharePoint using the
+    To move a file, you have to first log in to SharePoint using the
     ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
 
-    When you copy a folder with documents that have version history,
-    only the latest document version is copied.
+    When you move a file using the ${chalk.grey(this.name)} command,
+    all of the versions are being moved.
         
   Examples:
   
-    Copies folder from a document library located in one site collection to
-    another site collection
-      ${chalk.grey(config.delimiter)} ${commands.FOLDER_COPY} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFolder --targetUrl /sites/test2/Shared%20Documents/
+    Move file to a document library in another site collection
+      ${chalk.grey(config.delimiter)} ${commands.FILE_MOVE} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/
 
-    Copies folder from a document library to another site in the same site
-    collection
-      ${chalk.grey(config.delimiter)} ${commands.FOLDER_COPY} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFolder --targetUrl /sites/test1/HRDocuments/
-      
-    Copy folder to a document library in another site collection. Will ignore any missing fields in the target destination and copy anyway
-      ${chalk.grey(config.delimiter)} ${commands.FILE_COPY} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFolder --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
+    Move file to a document library in the same site collection
+        ${chalk.grey(config.delimiter)} ${commands.FILE_MOVE} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test1/HRDocuments/
 
+    Move file to a document library in another site collection. If a file with
+    the same name already exists in the target document library, move it
+    to the recycle bin
+        ${chalk.grey(config.delimiter)} ${commands.FILE_MOVE} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --deleteIfAlreadyExists
+    
+    Moves file to a document library in another site collection. Will ignore any missing fields in the target destination and move anyway
+      ${chalk.grey(config.delimiter)} ${commands.FILE_MOVE} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
+   
   More information:
 
-    Copy items from a SharePoint document library
+    Move items from a SharePoint document library
       https://support.office.com/en-us/article/move-or-copy-items-from-a-sharepoint-document-library-00e2f483-4df3-46be-a861-1f5f0c1a87bc
     `);
   }
 }
 
-module.exports = new SpoFolderCopyCommand();
+module.exports = new SpoFileMoveCommand();

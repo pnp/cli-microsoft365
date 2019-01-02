@@ -18,13 +18,13 @@ interface Options extends GlobalOptions {
   url: string;
 }
 
-class SiteAppCatalogRemoveCommand extends SpoCommand {
+class SpoSiteAppCatalogRemoveCommand extends SpoCommand {
   public get name(): string {
     return commands.SITE_APPCATALOG_REMOVE;
   }
 
   public get description(): string {
-    return 'Removes site collection scoped app catalog from site';
+    return 'Removes site collection app catalog from the specified site';
   }
 
   protected requiresTenantAdmin(): boolean {
@@ -131,25 +131,32 @@ class SiteAppCatalogRemoveCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online tenant admin site,
-      using the ${chalk.blue(commands.LOGIN)} command.
+      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online
+    tenant admin site, using the ${chalk.blue(commands.LOGIN)} command.
    
   Remarks:
 
-    To remove site collection app catalogs, you have to first log in to a tenant admin site using the
-    ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso-admin.sharepoint.com`)}.
+    To remove a site collection app catalog, you have to first log in
+    to a tenant admin site using the ${chalk.blue(commands.LOGIN)} command,
+    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso-admin.sharepoint.com`)}.
 
-    While the command uses the term "remove", like the PowerShell equivalent cmdlet, it does not remove
-    the special library Apps for SharePoint from the site collection. It simply disables the site
-    collection app catalog in that site. Packages deployed to the app catalog are not available within
+    While the command uses the term 'remove', like its equivalent PowerShell
+    cmdlet, it does not remove the special library Apps for SharePoint from
+    the site collection. Instead, it disables the site collection app catalog in
+    that site. Packages deployed to the app catalog are not available within
     the site collection.
 
   Examples:
   
-    Remove a site collection app catalog to the specified site
+    Remove the site collection app catalog from the specified site
       ${chalk.grey(config.delimiter)} ${commands.SITE_APPCATALOG_REMOVE} --url https://contoso.sharepoint.com/sites/site
+
+  More information:
+    
+    Use the site collection app catalog
+      https://docs.microsoft.com/en-us/sharepoint/dev/general-development/site-collection-app-catalog
       `);
   }
 }
 
-module.exports = new SiteAppCatalogRemoveCommand();
+module.exports = new SpoSiteAppCatalogRemoveCommand();

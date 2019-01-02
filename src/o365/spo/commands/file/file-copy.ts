@@ -24,6 +24,7 @@ interface Options extends GlobalOptions {
   sourceUrl: string;
   targetUrl: string;
   deleteIfAlreadyExists?: boolean;
+  allowSchemaMismatch: boolean;
 }
 
 interface JobProgressOptions {
@@ -69,7 +70,8 @@ class SpoFileCopyCommand extends SpoCommand {
     const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
     let siteAccessToken = '';
     const webUrl = args.options.webUrl;
-    const tenantUrl = `${url.parse(webUrl).protocol}//${url.parse(webUrl).hostname}`;
+    const parsedUrl: url.UrlWithStringQuery = url.parse(webUrl);
+    const tenantUrl: string = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
 
     if (this.debug) {
       cmd.log(`Retrieving access token for ${resource}...`);
@@ -115,7 +117,8 @@ class SpoFileCopyCommand extends SpoCommand {
 
         // all preconditions met, now create copy job
         const sourceAbsoluteUrl = this.urlCombine(webUrl, args.options.sourceUrl);
-        const requestUrl: string = `${webUrl}/_api/site/CreateCopyJobs`;
+        const allowSchemaMismatch: boolean = args.options.allowSchemaMismatch || false;
+        const requestUrl: string = this.urlCombine(webUrl, '/_api/site/CreateCopyJobs');
         const requestOptions: any = {
           url: requestUrl,
           headers: Utils.getRequestHeaders({
@@ -125,7 +128,10 @@ class SpoFileCopyCommand extends SpoCommand {
           body: {
             exportObjectUris: [sourceAbsoluteUrl],
             destinationUri: this.urlCombine(tenantUrl, args.options.targetUrl),
-            options: { "IgnoreVersionHistory": true }
+            options: {
+              "AllowSchemaMismatch": allowSchemaMismatch,
+              "IgnoreVersionHistory": true
+            }
           },
           json: true
         };
@@ -153,9 +159,9 @@ class SpoFileCopyCommand extends SpoCommand {
           progressRetryAttempts: 5
         }
 
-        return this.getCopyJobProgress(jobProgressOptions, cmd);
+        return this.waitForJobResult(jobProgressOptions, cmd);
       })
-      .then((resp: any): void => {
+      .then((): void => {
         if (this.verbose) {
           cmd.log('DONE');
         }
@@ -193,7 +199,7 @@ class SpoFileCopyCommand extends SpoCommand {
    * A polling function that awaits the 
    * queued copy job to return JobStatus = 0 meaning it is done with the task.
    */
-  private getCopyJobProgress(opts: JobProgressOptions, cmd: CommandInstance): Promise<void> {
+  private waitForJobResult(opts: JobProgressOptions, cmd: CommandInstance): Promise<void> {
     let pollCount: number = 0;
     let retryAttemptsCount: number = 0;
 
@@ -211,7 +217,7 @@ class SpoFileCopyCommand extends SpoCommand {
       };
 
       if (this.debug) {
-        cmd.log('getCopyJobProgress request...');
+        cmd.log('waitForJobResult request...');
         cmd.log(requestOptions);
       }
 
@@ -219,7 +225,7 @@ class SpoFileCopyCommand extends SpoCommand {
         retryAttemptsCount = 0; // clear retry on promise success 
 
         if (this.debug) {
-          cmd.log('getCopyJobProgress response...');
+          cmd.log('waitForJobResult response...');
           cmd.log(resp);
         }
 
@@ -256,7 +262,7 @@ class SpoFileCopyCommand extends SpoCommand {
           setTimeout(checkCondition, opts.progressPollInterval, resolve, reject);
         }
         else {
-          reject(new Error('getCopyJobProgress timed out'));
+          reject(new Error('waitForJobResult timed out'));
         }
       },
         (error: any): void => {
@@ -379,6 +385,10 @@ class SpoFileCopyCommand extends SpoCommand {
       {
         option: '--deleteIfAlreadyExists',
         description: 'If a file already exists at the targetUrl, it will be moved to the recycle bin. If omitted, the copy operation will be canceled if the file already exists at the targetUrl location'
+      },
+      {
+        option: '--allowSchemaMismatch',
+        description: 'Ignores any missing fields in the target document library and copies the file anyway'
       }
     ];
 
@@ -430,12 +440,16 @@ class SpoFileCopyCommand extends SpoCommand {
       ${chalk.grey(config.delimiter)} ${commands.FILE_COPY} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/
 
     Copy file to a document library in the same site collection
-        ${chalk.grey(config.delimiter)} ${commands.FILE_COPY} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test1/HRDocuments/
+      ${chalk.grey(config.delimiter)} ${commands.FILE_COPY} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test1/HRDocuments/
 
     Copy file to a document library in another site collection. If a file with
     the same name already exists in the target document library, move it
     to the recycle bin
-        ${chalk.grey(config.delimiter)} ${commands.FILE_COPY} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --deleteIfAlreadyExists
+      ${chalk.grey(config.delimiter)} ${commands.FILE_COPY} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --deleteIfAlreadyExists
+  
+    Copy file to a document library in another site collection. Will ignore
+    any missing fields in the target destination and copy anyway
+      ${chalk.grey(config.delimiter)} ${commands.FILE_COPY} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
 
   More information:
 
