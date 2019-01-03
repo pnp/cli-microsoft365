@@ -235,6 +235,68 @@ describe(commands.FEATURE_LIST, () => {
     });
   });
 
+  it('retrieves available features from site (default) when no scope is entered', (done) => {
+    stubAuth();
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
+        return Promise.reject('Invalid request');
+      }
+
+      if (opts.url.indexOf('/_api/Web/Features?$select=DisplayName,DefinitionId') > -1) {
+        return Promise.resolve({
+          value: [
+            {
+              DefinitionId: "3019c9b4-e371-438d-98f6-0a08c34d06eb",
+              DisplayName: "TenantSitesList"
+            },
+            {
+              DefinitionId: "915c240e-a6cc-49b8-8b2c-0bff8b553ed3",
+              DisplayName: "Ratings"
+            }
+          ]
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        debug: false,
+        verbose: false,
+        url: 'https://contoso.sharepoint.com'
+      }
+    }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith([
+          {
+            DefinitionId: "3019c9b4-e371-438d-98f6-0a08c34d06eb",
+            DisplayName: "TenantSitesList"
+          },
+          {
+            DefinitionId: "915c240e-a6cc-49b8-8b2c-0bff8b553ed3",
+            DisplayName: "Ratings"
+          }
+        ]))
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore([
+          request.post,
+          request.get
+        ]);
+      }
+    });
+  });
+
   it('returns all properties for output JSON', (done) => {
     stubAuth();
 
