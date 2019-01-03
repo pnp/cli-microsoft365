@@ -117,6 +117,124 @@ describe(commands.FEATURE_LIST, () => {
     });
   });
 
+  it('retrieves available features from site collection', (done) => {
+    stubAuth();
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
+        return Promise.resolve({
+          value: [
+            {
+              DefinitionId: "3019c9b4-e371-438d-98f6-0a08c34d06eb",
+              DisplayName: "TenantSitesList"
+            },
+            {
+              DefinitionId: "915c240e-a6cc-49b8-8b2c-0bff8b553ed3",
+              DisplayName: "Ratings"
+            }
+          ]
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        debug: false,
+        verbose: false,
+        url: 'https://contoso.sharepoint.com',
+        scope: 'Site'
+      }
+    }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith([
+          {
+            DefinitionId: "3019c9b4-e371-438d-98f6-0a08c34d06eb",
+            DisplayName: "TenantSitesList"
+          },
+          {
+            DefinitionId: "915c240e-a6cc-49b8-8b2c-0bff8b553ed3",
+            DisplayName: "Ratings"
+          }
+        ]))
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore([
+          request.post,
+          request.get
+        ]);
+      }
+    });
+  });
+
+  it('retrieves available features from site', (done) => {
+    stubAuth();
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('/_api/Web/Features?$select=DisplayName,DefinitionId') > -1) {
+        return Promise.resolve({
+          value: [
+            {
+              DefinitionId: "3019c9b4-e371-438d-98f6-0a08c34d06eb",
+              DisplayName: "TenantSitesList"
+            },
+            {
+              DefinitionId: "915c240e-a6cc-49b8-8b2c-0bff8b553ed3",
+              DisplayName: "Ratings"
+            }
+          ]
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        debug: false,
+        verbose: false,
+        url: 'https://contoso.sharepoint.com',
+        scope: 'Web'
+      }
+    }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith([
+          {
+            DefinitionId: "3019c9b4-e371-438d-98f6-0a08c34d06eb",
+            DisplayName: "TenantSitesList"
+          },
+          {
+            DefinitionId: "915c240e-a6cc-49b8-8b2c-0bff8b553ed3",
+            DisplayName: "Ratings"
+          }
+        ]))
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore([
+          request.post,
+          request.get
+        ]);
+      }
+    });
+  });
+
   it('returns all properties for output JSON', (done) => {
     stubAuth();
 
@@ -151,7 +269,7 @@ describe(commands.FEATURE_LIST, () => {
     cmdInstance.action = command.action();
 
     const options: Object = {
-      debug: false,
+      debug: true,
       url: 'https://contoso.sharepoint.com',
       scope: 'Site',
       output: 'json'
@@ -177,6 +295,170 @@ describe(commands.FEATURE_LIST, () => {
               "DisplayName": "Ratings"
             }
           ]));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+        Utils.restore(request.get);
+      }
+    });
+  });
+
+  it('correctly handles no features in site collection', (done) => {
+    stubAuth();
+    sinon.stub(request, 'get').callsFake((opts) => {
+
+      if (opts.url.indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
+        return Promise.resolve(JSON.stringify({ value: [] }));
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    const options: Object = {
+      debug: false,
+      url: 'https://contoso.sharepoint.com',
+      scope: 'Site',
+    }
+
+    cmdInstance.action({ options: options }, () => {
+      try {
+        assert.equal(log.length, 0);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+        Utils.restore(request.get);
+      }
+    });
+  });
+
+  it('correctly handles no features in site', (done) => {
+    stubAuth();
+    sinon.stub(request, 'get').callsFake((opts) => {
+
+      if (opts.url.indexOf('/_api/Web/Features?$select=DisplayName,DefinitionId') > -1) {
+        return Promise.resolve(JSON.stringify({ value: [] }));
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    const options: Object = {
+      debug: false,
+      url: 'https://contoso.sharepoint.com',
+      scope: 'Web',
+    }
+
+    cmdInstance.action({ options: options }, () => {
+      try {
+        assert.equal(log.length, 0);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+        Utils.restore(request.get);
+      }
+    });
+  });
+
+  it('correctly handles no features in site collection (verbose)', (done) => {
+    stubAuth();
+    sinon.stub(request, 'get').callsFake((opts) => {
+
+      if (opts.url.indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
+        return Promise.resolve(JSON.stringify({ value: [] }));
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    const options: Object = {
+      verbose: true,
+      debug: false,
+      url: 'https://contoso.sharepoint.com',
+      scope: 'Site',
+    }
+    cmdInstance.action({ options: options }, () => {
+      let correctLogStatement = false;
+      log.forEach(l => {
+        if (!l || typeof l !== 'string') {
+          return;
+        }
+
+        if (l.indexOf('No features found') > -1) {
+          correctLogStatement = true;
+        }
+      })
+      try {
+        assert(correctLogStatement);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.post);
+        Utils.restore(request.get);
+      }
+    });
+  });
+
+  it('correctly handles no features in site (verbose)', (done) => {
+    stubAuth();
+    sinon.stub(request, 'get').callsFake((opts) => {
+
+      if (opts.url.indexOf('/_api/Web/Features?$select=DisplayName,DefinitionId') > -1) {
+        return Promise.resolve(JSON.stringify({ value: [] }));
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    const options: Object = {
+      verbose: true,
+      debug: false,
+      url: 'https://contoso.sharepoint.com',
+      scope: 'Web',
+    }
+    cmdInstance.action({ options: options }, () => {
+      let correctLogStatement = false;
+      log.forEach(l => {
+        if (!l || typeof l !== 'string') {
+          return;
+        }
+
+        if (l.indexOf('No features found') > -1) {
+          correctLogStatement = true;
+        }
+      })
+      try {
+        assert(correctLogStatement);
         done();
       }
       catch (e) {

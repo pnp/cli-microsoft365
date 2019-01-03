@@ -82,12 +82,7 @@ class SpoFeatureListCommand extends SpoCommand {
           cmd.log('');
         }
 
-        if (features.value.length === 0) {
-          if (this.verbose) {
-            cmd.log(`Features not found`);
-          }
-        }
-        else {
+        if (features.value && features.value.length > 0) {
           if (args.options.output === 'json') {
             cmd.log(features.value);
           }
@@ -95,9 +90,14 @@ class SpoFeatureListCommand extends SpoCommand {
             cmd.log(features.value.map(f => {
               return {
                 DefinitionId: f.DefinitionId,
-                DisplayName: f.DisplayName,
+                DisplayName: f.DisplayName
               };
             }));
+          }
+        }
+        else {
+          if (this.verbose) {
+            cmd.log('No features found');
           }
         }
         cb();
