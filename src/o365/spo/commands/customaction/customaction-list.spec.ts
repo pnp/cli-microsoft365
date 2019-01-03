@@ -613,6 +613,86 @@ describe(commands.CUSTOMACTION_LIST, () => {
     });
   });
 
+  it('correctly handles no scope entered (debug)', (done) => {
+    stubAuth();
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('/_api/Web/UserCustomActions') > -1) {
+        return Promise.resolve({
+          value: [
+            {
+              Id: "9f7ade35-0f8d-4c8a-82e1-5008ab42df55",
+              Location: "Microsoft.SharePoint.StandardMenu",
+              Name: "customaction1",
+              Scope: 3
+            }]
+        });
+      }
+
+      if (opts.url.indexOf('/_api/Site/UserCustomActions') > -1) {
+        return Promise.resolve({
+          value: [
+            {
+              Id: "9f7ade35-0f8d-4c8a-82e1-5008ab42df56",
+              Location: "Microsoft.SharePoint.StandardMenu",
+              Name: "customaction2",
+              Scope: 2
+            }
+          ]
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ 
+      options: { 
+        url: 'https://contoso.sharepoint.com/sites/abc',
+        debug: true 
+      } }, () => {
+      let correctLogStatement = false;
+      log.forEach(l => {
+        if (!l || typeof l !== 'string') {
+          return;
+        }
+
+        if (l.indexOf('Attempt to get custom actions list with scope: All') > -1) {
+          correctLogStatement = true;
+        }
+      })
+      try {
+        assert(correctLogStatement);
+        assert(cmdInstanceLogSpy.calledWith([
+          {
+            Name: 'customaction2',
+            Location: 'Microsoft.SharePoint.StandardMenu',
+            Scope: 'Site',
+            Id: '9f7ade35-0f8d-4c8a-82e1-5008ab42df56'
+          },
+          {
+            Name: 'customaction1',
+            Location: 'Microsoft.SharePoint.StandardMenu',
+            Scope: 'Web',
+            Id: '9f7ade35-0f8d-4c8a-82e1-5008ab42df55'
+          }]
+        ));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+  });
+
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
     const actual = (command.validate() as CommandValidate)({
       options:

@@ -40,6 +40,7 @@ class SpoCustomActionListCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    const scope: string = args.options.scope ? args.options.scope : 'All';
     const resource: string = Auth.getResourceFromUrl(args.options.url);
     let siteAccessToken: string = '';
 
@@ -60,11 +61,11 @@ class SpoCustomActionListCommand extends SpoCommand {
           cmd.log(JSON.stringify(contextResponse));
           cmd.log('');
 
-          cmd.log(`Attempt to get custom actions list with scope: ${args.options.scope}`);
+          cmd.log(`Attempt to get custom actions list with scope: ${scope}`);
           cmd.log('');
         }
 
-        if (args.options.scope && args.options.scope.toLowerCase() !== "all") {
+        if (scope && scope.toLowerCase() !== "all") {
           return this.getCustomActions(args.options, siteAccessToken, cmd);
         }
         return this.searchAllScopes(args.options, siteAccessToken, cmd);
