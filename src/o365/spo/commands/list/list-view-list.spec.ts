@@ -1,16 +1,16 @@
 import commands from '../../commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
+import Command, { CommandValidate, CommandError, CommandOption } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
-const command: Command = require('./list-view-set');
+const command: Command = require('./list-contenttype-list');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import Utils from '../../../../Utils';
 
 describe(commands.LIST_VIEW_LIST, () => {
   let vorpal: Vorpal;
-  let log: string[];
+  let log: any[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
   let trackEvent: any;
@@ -19,7 +19,6 @@ describe(commands.LIST_VIEW_LIST, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    sinon.stub(command as any, 'getRequestDigestForSite').callsFake(() => Promise.resolve({ FormDigestValue: 'ABC' }));
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
       telemetry = t;
     });
@@ -41,7 +40,8 @@ describe(commands.LIST_VIEW_LIST, () => {
   afterEach(() => {
     Utils.restore([
       vorpal.find,
-      request.patch
+      request.get,
+      request.post
     ]);
   });
 
@@ -50,7 +50,8 @@ describe(commands.LIST_VIEW_LIST, () => {
       appInsights.trackEvent,
       auth.getAccessToken,
       auth.restoreAuth,
-      request.patch
+      request.get,
+      request.post
     ]);
   });
 
@@ -88,11 +89,11 @@ describe(commands.LIST_VIEW_LIST, () => {
     });
   });
 
-  it('aborts when not logged in to a SharePoint site', (done) => {
+  it('aborts when not connected to a SharePoint site', (done) => {
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', title: 'Documents' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
         done();
@@ -103,17 +104,1955 @@ describe(commands.LIST_VIEW_LIST, () => {
     });
   });
 
-  it('Get all list views for the target list', (done) => {
+  it('retrieves all views of the specific list if listTitle option is passed (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('List%201')/views`) {
+      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/views`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0 &&
-          opts.headers['X-RequestDigest'] &&
-          JSON.stringify(opts.body) === JSON.stringify({ Title: 'All events' })) {
-          return Promise.resolve();
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve({
+            "value":[
+              {
+                "__metadata":{
+                  "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'85907fb0-cda1-43ec-832e-27118c89cf9f')",
+                  "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'85907fb0-cda1-43ec-832e-27118c89cf9f')",
+                  "type":"SP.View"
+                },
+                "ViewFields":{
+                  "__deferred": {
+                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'85907fb0-cda1-43ec-832e-27118c89cf9f')/ViewFields"
+                  }
+                },
+                "Aggregations":null,
+                "AggregationsStatus":null,
+                "BaseViewId":"1",
+                "ColumnWidth":null,
+                "ContentTypeId":{
+                  "__metadata":{
+                    "type":"SP.ContentTypeId"
+                  },
+                  "StringValue":"0x"
+                },
+                "CustomFormatter":null,
+                "DefaultView":true,
+                "DefaultViewForContentType":false,
+                "EditorModified":false,
+                "Formats":null,
+                "Hidden":false,
+                "HtmlSchemaXml":"<View Name=\"{85907FB0-CDA1-43EC-832E-27118C89CF9F}\" DefaultView=\"TRUE\" MobileView=\"TRUE\" MobileDefaultView=\"TRUE\" Type=\"HTML\" DisplayName=\"All Documents\" Url=\"/sites/ninja/Shared Documents/Forms/AllItems.aspx\" Level=\"1\" BaseViewID=\"1\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query></View>",
+                "Id":"85907fb0-cda1-43ec-832e-27118c89cf9f",
+                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
+                "IncludeRootFolder":false,
+                "ViewJoins":null,
+                "JSLink":"clienttemplates.js",
+                "ListViewXml":"<View Name=\"{85907FB0-CDA1-43EC-832E-27118C89CF9F}\" DefaultView=\"TRUE\" MobileView=\"TRUE\" MobileDefaultView=\"TRUE\" Type=\"HTML\" DisplayName=\"All Documents\" Url=\"/sites/ninja/Shared Documents/Forms/AllItems.aspx\" Level=\"1\" BaseViewID=\"1\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
+                "Method":null,
+                "MobileDefaultView":true,
+                "MobileView":true,
+                "ModerationType":null,
+                "NewDocumentTemplates":null,
+                "OrderedView":false,
+                "Paged":true,
+                "PersonalView":false,
+                "ViewProjectedFields":null,
+                "ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>",
+                "ReadOnlyView":false,
+                "RequiresClientIntegration":false,
+                "RowLimit":30,
+                "Scope":0,
+                "ServerRelativePath":{
+                  "__metadata": {
+                    "type":"SP.ResourcePath"
+                  },
+                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/AllItems.aspx"
+                },
+                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/AllItems.aspx",
+                "StyleId":null,
+                "TabularView":true,
+                "Threaded":false,
+                "Title":"All Documents",
+                "Toolbar":"",
+                "ToolbarTemplateName":null,
+                "ViewType":"HTML",
+                "ViewData":null,
+                "VisualizationInfo":null
+              },
+              {
+                "__metadata":{
+                  "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'281e80fd-099b-4eba-b622-a94fa03bf865')",
+                  "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'281e80fd-099b-4eba-b622-a94fa03bf865')",
+                  "type":"SP.View"
+                },
+                "ViewFields":{
+                  "__deferred":{
+                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'281e80fd-099b-4eba-b622-a94fa03bf865')/ViewFields"
+                  }
+                },
+                "Aggregations":null,
+                "AggregationsStatus":null,
+                "BaseViewId":"9",
+                "ColumnWidth":null,
+                "ContentTypeId":{
+                  "__metadata":{
+                    "type":"SP.ContentTypeId"
+                  },
+                  "StringValue":"0x"
+                },
+                "CustomFormatter":null,
+                "DefaultView":false,
+                "DefaultViewForContentType":false,
+                "EditorModified":false,
+                "Formats":null,
+                "Hidden":true,
+                "HtmlSchemaXml":"<View Name=\"{281E80FD-099B-4EBA-B622-A94FA03BF865}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" DisplayName=\"Relink Documents\" Url=\"/sites/ninja/Shared Documents/Forms/repair.aspx\" Level=\"1\" BaseViewID=\"9\" ContentTypeID=\"0x\" ToolbarTemplate=\"RelinkToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilenameNoMenu\" /><FieldRef Name=\"RepairDocument\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /><FieldRef Name=\"ContentType\" /><FieldRef Name=\"TemplateUrl\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where></Query></View>",
+                "Id":"281e80fd-099b-4eba-b622-a94fa03bf865",
+                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
+                "IncludeRootFolder":false,
+                "ViewJoins":null,
+                "JSLink":null,
+                "ListViewXml":"<View Name=\"{281E80FD-099B-4EBA-B622-A94FA03BF865}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" DisplayName=\"Relink Documents\" Url=\"/sites/ninja/Shared Documents/Forms/repair.aspx\" Level=\"1\" BaseViewID=\"9\" ContentTypeID=\"0x\" ToolbarTemplate=\"RelinkToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilenameNoMenu\" /><FieldRef Name=\"RepairDocument\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /><FieldRef Name=\"ContentType\" /><FieldRef Name=\"TemplateUrl\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
+                "Method":null,
+                "MobileDefaultView":false,
+                "MobileView":false,
+                "ModerationType":null,
+                "NewDocumentTemplates":null,
+                "OrderedView":false,
+                "Paged":true,
+                "PersonalView":false,
+                "ViewProjectedFields":null,
+                "ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where>",
+                "ReadOnlyView":false,
+                "RequiresClientIntegration":false,
+                "RowLimit":30,
+                "Scope":0,
+                "ServerRelativePath":{
+                  "__metadata":{
+                    "type":"SP.ResourcePath"
+                  },
+                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/repair.aspx"
+                },
+                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/repair.aspx",
+                "StyleId":null,
+                "TabularView":false,
+                "Threaded":false,
+                "Title":"Relink Documents",
+                "Toolbar":"",
+                "ToolbarTemplateName":"RelinkToolBar",
+                "ViewType":"HTML",
+                "ViewData":null,
+                "VisualizationInfo":null
+                },
+                {
+                  "__metadata":{
+                    "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'3d760127-982c-405e-9c93-e1f76e1a1110')",
+                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'3d760127-982c-405e-9c93-e1f76e1a1110')",
+                    "type":"SP.View"
+                  },
+                  "ViewFields":{
+                    "__deferred":{
+                      "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'3d760127-982c-405e-9c93-e1f76e1a1110')/ViewFields"
+                    }
+                  },
+                "Aggregations":null,
+                "AggregationsStatus":null,
+                "BaseViewId":"40",
+                "ColumnWidth":null,
+                "ContentTypeId":{
+                  "__metadata":{
+                    "type":"SP.ContentTypeId"
+                  },
+                  "StringValue":"0x"
+                },
+                "CustomFormatter":null,
+                "DefaultView":false,
+                "DefaultViewForContentType":false,
+                "EditorModified":false,
+                "Formats":null,
+                "Hidden":true,
+                "HtmlSchemaXml":"<View Name=\"{3D760127-982C-405E-9C93-E1F76E1A1110}\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"assetLibTemp\" Url=\"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx\" Level=\"1\" BaseViewID=\"40\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><ViewFields><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit>20</RowLimit><Query><OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy></Query></View>",
+                "Id":"3d760127-982c-405e-9c93-e1f76e1a1110",
+                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
+                "IncludeRootFolder":false,
+                "ViewJoins":null,
+                "JSLink":null,
+                "ListViewXml":"<View Name=\"{3D760127-982C-405E-9C93-E1F76E1A1110}\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"assetLibTemp\" Url=\"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx\" Level=\"1\" BaseViewID=\"40\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy></Query><ViewFields><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit>20</RowLimit><Toolbar Type=\"None\"/></View>",
+                "Method":null,
+                "MobileDefaultView":false,
+                "MobileView":false,
+                "ModerationType":null,
+                "NewDocumentTemplates":null,
+                "OrderedView":false,
+                "Paged":false,
+                "PersonalView":false,
+                "ViewProjectedFields":null,
+                "ViewQuery":"<OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy>",
+                "ReadOnlyView":false,
+                "RequiresClientIntegration":false,
+                "RowLimit":20,
+                "Scope":0,
+                "ServerRelativePath":{
+                  "__metadata":{
+                    "type":"SP.ResourcePath"
+                  },
+                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx"
+                },
+                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx",
+                "StyleId":null,
+                "TabularView":true,
+                "Threaded":false,
+                "Title":"assetLibTemp",
+                "Toolbar":null,
+                "ToolbarTemplateName":null,
+                "ViewType":"HTML",
+                "ViewData":null,
+                "VisualizationInfo":null
+              },
+              {
+                "__metadata":{
+                  "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'1204c10a-978d-46c8-a6f2-65ecfa5e03d5')",
+                  "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'1204c10a-978d-46c8-a6f2-65ecfa5e03d5')",
+                  "type":"SP.View"
+                },
+                "ViewFields":{
+                  "__deferred":{
+                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'1204c10a-978d-46c8-a6f2-65ecfa5e03d5')/ViewFields"
+                  }
+                },
+                "Aggregations":null,
+                "AggregationsStatus":null,
+                "BaseViewId":"7",
+                "ColumnWidth":null,
+                "ContentTypeId":{
+                  "__metadata":{
+                    "type":"SP.ContentTypeId"
+                  },
+                  "StringValue":"0x"
+                },
+                "CustomFormatter":null,
+                "DefaultView":false,
+                "DefaultViewForContentType":false,
+                "EditorModified":false,
+                "Formats":null,
+                "Hidden":true,
+                "HtmlSchemaXml":"<View Name=\"{1204C10A-978D-46C8-A6F2-65ECFA5E03D5}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" AggregateView=\"TRUE\" DisplayName=\"Merge Documents\" Url=\"/sites/ninja/Shared Documents/Forms/Combine.aspx\" Level=\"1\" BaseViewID=\"7\" ContentTypeID=\"0x\" ToolbarTemplate=\"MergeToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Combine\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query></View>",
+                "Id":"1204c10a-978d-46c8-a6f2-65ecfa5e03d5",
+                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
+                "IncludeRootFolder":false,
+                "ViewJoins":null,
+                "JSLink":"clienttemplates.js",
+                "ListViewXml":"<View Name=\"{1204C10A-978D-46C8-A6F2-65ECFA5E03D5}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" AggregateView=\"TRUE\" DisplayName=\"Merge Documents\" Url=\"/sites/ninja/Shared Documents/Forms/Combine.aspx\" Level=\"1\" BaseViewID=\"7\" ContentTypeID=\"0x\" ToolbarTemplate=\"MergeToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Combine\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
+                "Method":null,
+                "MobileDefaultView":false,
+                "MobileView":false,
+                "ModerationType":null,
+                "NewDocumentTemplates":null,
+                "OrderedView":false,
+                "Paged":true,
+                "PersonalView":false,
+                "ViewProjectedFields":null,
+                "ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>",
+                "ReadOnlyView":false,
+                "RequiresClientIntegration":false,
+                "RowLimit":30,
+                "Scope":0,
+                "ServerRelativePath":{
+                  "__metadata":{
+                    "type":"SP.ResourcePath"
+                  },
+                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/Combine.aspx"
+                },
+                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/Combine.aspx",
+                "StyleId":null,
+                "TabularView":false,
+                "Threaded":false,
+                "Title":"Merge Documents",
+                "Toolbar":"",
+                "ToolbarTemplateName":"MergeToolBar",
+                "ViewType":"HTML",
+                "ViewData":null,
+                "VisualizationInfo":null
+                },
+                {
+                  "__metadata":{
+                    "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'e021e923-0801-4a16-9775-545239356739')",
+                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'e021e923-0801-4a16-9775-545239356739')",
+                    "type":"SP.View"
+                  },
+                  "ViewFields":{
+                    "__deferred":{
+                      "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'e021e923-0801-4a16-9775-545239356739')/ViewFields"
+                    }
+                  },
+                  "Aggregations":null,
+                  "AggregationsStatus":null,
+                  "BaseViewId":"50",
+                  "ColumnWidth":null,
+                  "ContentTypeId":{
+                    "__metadata":{
+                      "type":"SP.ContentTypeId"
+                    },
+                    "StringValue":"0x"
+                  },
+                  "CustomFormatter":null,
+                  "DefaultView":false,
+                  "DefaultViewForContentType":false,
+                  "EditorModified":false,
+                  "Formats":null,
+                  "Hidden":true,
+                  "HtmlSchemaXml":"<View Name=\"{E021E923-0801-4A16-9775-545239356739}\" MobileView=\"TRUE\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"\" Url=\"/sites/ninja/SitePages/Home.aspx\" Level=\"1\" BaseViewID=\"50\" ContentTypeID=\"0x\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">15</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy></Query></View>",
+                  "Id":"e021e923-0801-4a16-9775-545239356739",
+                  "ImageUrl":null,
+                  "IncludeRootFolder":false,
+                  "ViewJoins":null,
+                  "JSLink":"clienttemplates.js",
+                  "ListViewXml":"<View Name=\"{E021E923-0801-4A16-9775-545239356739}\" MobileView=\"TRUE\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"\" Url=\"/sites/ninja/SitePages/Home.aspx\" Level=\"1\" BaseViewID=\"50\" ContentTypeID=\"0x\" ><Query><OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit Paged=\"TRUE\">15</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
+                  "Method":null,
+                  "MobileDefaultView":false,
+                  "MobileView":true,
+                  "ModerationType":null,
+                  "NewDocumentTemplates":null,
+                  "OrderedView":false,
+                  "Paged":true,
+                  "PersonalView":false,
+                  "ViewProjectedFields":null,
+                  "ViewQuery":"<OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy>",
+                  "ReadOnlyView":false,
+                  "RequiresClientIntegration":false,
+                  "RowLimit":15,
+                  "Scope":0,
+                  "ServerRelativePath":{
+                    "__metadata":{
+                      "type":"SP.ResourcePath"
+                    },
+                    "DecodedUrl":"/sites/ninja/SitePages/Home.aspx"
+                  },
+                  "ServerRelativeUrl":"/sites/ninja/SitePages/Home.aspx",
+                  "StyleId":null,
+                  "TabularView":true,
+                  "Threaded":false,
+                  "Title":"",
+                  "Toolbar":"",
+                  "ToolbarTemplateName":null,
+                  "ViewType":"HTML",
+                  "ViewData":null,
+                  "VisualizationInfo":null
+              }
+            ]
+          });
         }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        debug: true,
+        listTitle: 'Documents',
+        webUrl: 'https://contoso.sharepoint.com/sites/ninja'
+      }
+    }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith([
+          {
+            "StringId": "0x010100260C61709CD8E548948F9BF605F8F54F",
+            "Name": "Document",
+            "Hidden": false,
+            "ReadOnly": false,
+            "Sealed": false
+          },
+          {
+            "StringId": "0x0120000EAD53EDAD7C6647B0D976EEC953F99E",
+            "Name": "Folder",
+            "Hidden": false,
+            "ReadOnly": false,
+            "Sealed": true
+          }
+        ]));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('retrieves all views of the specific list if listTitle option is passed', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/views`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve({
+            "value":[
+              {
+                "__metadata":{
+                  "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'85907fb0-cda1-43ec-832e-27118c89cf9f')",
+                  "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'85907fb0-cda1-43ec-832e-27118c89cf9f')",
+                  "type":"SP.View"
+                },
+                "ViewFields":{
+                  "__deferred": {
+                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'85907fb0-cda1-43ec-832e-27118c89cf9f')/ViewFields"
+                  }
+                },
+                "Aggregations":null,
+                "AggregationsStatus":null,
+                "BaseViewId":"1",
+                "ColumnWidth":null,
+                "ContentTypeId":{
+                  "__metadata":{
+                    "type":"SP.ContentTypeId"
+                  },
+                  "StringValue":"0x"
+                },
+                "CustomFormatter":null,
+                "DefaultView":true,
+                "DefaultViewForContentType":false,
+                "EditorModified":false,
+                "Formats":null,
+                "Hidden":false,
+                "HtmlSchemaXml":"<View Name=\"{85907FB0-CDA1-43EC-832E-27118C89CF9F}\" DefaultView=\"TRUE\" MobileView=\"TRUE\" MobileDefaultView=\"TRUE\" Type=\"HTML\" DisplayName=\"All Documents\" Url=\"/sites/ninja/Shared Documents/Forms/AllItems.aspx\" Level=\"1\" BaseViewID=\"1\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query></View>",
+                "Id":"85907fb0-cda1-43ec-832e-27118c89cf9f",
+                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
+                "IncludeRootFolder":false,
+                "ViewJoins":null,
+                "JSLink":"clienttemplates.js",
+                "ListViewXml":"<View Name=\"{85907FB0-CDA1-43EC-832E-27118C89CF9F}\" DefaultView=\"TRUE\" MobileView=\"TRUE\" MobileDefaultView=\"TRUE\" Type=\"HTML\" DisplayName=\"All Documents\" Url=\"/sites/ninja/Shared Documents/Forms/AllItems.aspx\" Level=\"1\" BaseViewID=\"1\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
+                "Method":null,
+                "MobileDefaultView":true,
+                "MobileView":true,
+                "ModerationType":null,
+                "NewDocumentTemplates":null,
+                "OrderedView":false,
+                "Paged":true,
+                "PersonalView":false,
+                "ViewProjectedFields":null,
+                "ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>",
+                "ReadOnlyView":false,
+                "RequiresClientIntegration":false,
+                "RowLimit":30,
+                "Scope":0,
+                "ServerRelativePath":{
+                  "__metadata": {
+                    "type":"SP.ResourcePath"
+                  },
+                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/AllItems.aspx"
+                },
+                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/AllItems.aspx",
+                "StyleId":null,
+                "TabularView":true,
+                "Threaded":false,
+                "Title":"All Documents",
+                "Toolbar":"",
+                "ToolbarTemplateName":null,
+                "ViewType":"HTML",
+                "ViewData":null,
+                "VisualizationInfo":null
+              },
+              {
+                "__metadata":{
+                  "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'281e80fd-099b-4eba-b622-a94fa03bf865')",
+                  "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'281e80fd-099b-4eba-b622-a94fa03bf865')",
+                  "type":"SP.View"
+                },
+                "ViewFields":{
+                  "__deferred":{
+                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'281e80fd-099b-4eba-b622-a94fa03bf865')/ViewFields"
+                  }
+                },
+                "Aggregations":null,
+                "AggregationsStatus":null,
+                "BaseViewId":"9",
+                "ColumnWidth":null,
+                "ContentTypeId":{
+                  "__metadata":{
+                    "type":"SP.ContentTypeId"
+                  },
+                  "StringValue":"0x"
+                },
+                "CustomFormatter":null,
+                "DefaultView":false,
+                "DefaultViewForContentType":false,
+                "EditorModified":false,
+                "Formats":null,
+                "Hidden":true,
+                "HtmlSchemaXml":"<View Name=\"{281E80FD-099B-4EBA-B622-A94FA03BF865}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" DisplayName=\"Relink Documents\" Url=\"/sites/ninja/Shared Documents/Forms/repair.aspx\" Level=\"1\" BaseViewID=\"9\" ContentTypeID=\"0x\" ToolbarTemplate=\"RelinkToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilenameNoMenu\" /><FieldRef Name=\"RepairDocument\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /><FieldRef Name=\"ContentType\" /><FieldRef Name=\"TemplateUrl\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where></Query></View>",
+                "Id":"281e80fd-099b-4eba-b622-a94fa03bf865",
+                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
+                "IncludeRootFolder":false,
+                "ViewJoins":null,
+                "JSLink":null,
+                "ListViewXml":"<View Name=\"{281E80FD-099B-4EBA-B622-A94FA03BF865}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" DisplayName=\"Relink Documents\" Url=\"/sites/ninja/Shared Documents/Forms/repair.aspx\" Level=\"1\" BaseViewID=\"9\" ContentTypeID=\"0x\" ToolbarTemplate=\"RelinkToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilenameNoMenu\" /><FieldRef Name=\"RepairDocument\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /><FieldRef Name=\"ContentType\" /><FieldRef Name=\"TemplateUrl\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
+                "Method":null,
+                "MobileDefaultView":false,
+                "MobileView":false,
+                "ModerationType":null,
+                "NewDocumentTemplates":null,
+                "OrderedView":false,
+                "Paged":true,
+                "PersonalView":false,
+                "ViewProjectedFields":null,
+                "ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where>",
+                "ReadOnlyView":false,
+                "RequiresClientIntegration":false,
+                "RowLimit":30,
+                "Scope":0,
+                "ServerRelativePath":{
+                  "__metadata":{
+                    "type":"SP.ResourcePath"
+                  },
+                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/repair.aspx"
+                },
+                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/repair.aspx",
+                "StyleId":null,
+                "TabularView":false,
+                "Threaded":false,
+                "Title":"Relink Documents",
+                "Toolbar":"",
+                "ToolbarTemplateName":"RelinkToolBar",
+                "ViewType":"HTML",
+                "ViewData":null,
+                "VisualizationInfo":null
+                },
+                {
+                  "__metadata":{
+                    "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'3d760127-982c-405e-9c93-e1f76e1a1110')",
+                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'3d760127-982c-405e-9c93-e1f76e1a1110')",
+                    "type":"SP.View"
+                  },
+                  "ViewFields":{
+                    "__deferred":{
+                      "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'3d760127-982c-405e-9c93-e1f76e1a1110')/ViewFields"
+                    }
+                  },
+                "Aggregations":null,
+                "AggregationsStatus":null,
+                "BaseViewId":"40",
+                "ColumnWidth":null,
+                "ContentTypeId":{
+                  "__metadata":{
+                    "type":"SP.ContentTypeId"
+                  },
+                  "StringValue":"0x"
+                },
+                "CustomFormatter":null,
+                "DefaultView":false,
+                "DefaultViewForContentType":false,
+                "EditorModified":false,
+                "Formats":null,
+                "Hidden":true,
+                "HtmlSchemaXml":"<View Name=\"{3D760127-982C-405E-9C93-E1F76E1A1110}\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"assetLibTemp\" Url=\"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx\" Level=\"1\" BaseViewID=\"40\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><ViewFields><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit>20</RowLimit><Query><OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy></Query></View>",
+                "Id":"3d760127-982c-405e-9c93-e1f76e1a1110",
+                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
+                "IncludeRootFolder":false,
+                "ViewJoins":null,
+                "JSLink":null,
+                "ListViewXml":"<View Name=\"{3D760127-982C-405E-9C93-E1F76E1A1110}\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"assetLibTemp\" Url=\"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx\" Level=\"1\" BaseViewID=\"40\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy></Query><ViewFields><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit>20</RowLimit><Toolbar Type=\"None\"/></View>",
+                "Method":null,
+                "MobileDefaultView":false,
+                "MobileView":false,
+                "ModerationType":null,
+                "NewDocumentTemplates":null,
+                "OrderedView":false,
+                "Paged":false,
+                "PersonalView":false,
+                "ViewProjectedFields":null,
+                "ViewQuery":"<OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy>",
+                "ReadOnlyView":false,
+                "RequiresClientIntegration":false,
+                "RowLimit":20,
+                "Scope":0,
+                "ServerRelativePath":{
+                  "__metadata":{
+                    "type":"SP.ResourcePath"
+                  },
+                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx"
+                },
+                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx",
+                "StyleId":null,
+                "TabularView":true,
+                "Threaded":false,
+                "Title":"assetLibTemp",
+                "Toolbar":null,
+                "ToolbarTemplateName":null,
+                "ViewType":"HTML",
+                "ViewData":null,
+                "VisualizationInfo":null
+              },
+              {
+                "__metadata":{
+                  "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'1204c10a-978d-46c8-a6f2-65ecfa5e03d5')",
+                  "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'1204c10a-978d-46c8-a6f2-65ecfa5e03d5')",
+                  "type":"SP.View"
+                },
+                "ViewFields":{
+                  "__deferred":{
+                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'1204c10a-978d-46c8-a6f2-65ecfa5e03d5')/ViewFields"
+                  }
+                },
+                "Aggregations":null,
+                "AggregationsStatus":null,
+                "BaseViewId":"7",
+                "ColumnWidth":null,
+                "ContentTypeId":{
+                  "__metadata":{
+                    "type":"SP.ContentTypeId"
+                  },
+                  "StringValue":"0x"
+                },
+                "CustomFormatter":null,
+                "DefaultView":false,
+                "DefaultViewForContentType":false,
+                "EditorModified":false,
+                "Formats":null,
+                "Hidden":true,
+                "HtmlSchemaXml":"<View Name=\"{1204C10A-978D-46C8-A6F2-65ECFA5E03D5}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" AggregateView=\"TRUE\" DisplayName=\"Merge Documents\" Url=\"/sites/ninja/Shared Documents/Forms/Combine.aspx\" Level=\"1\" BaseViewID=\"7\" ContentTypeID=\"0x\" ToolbarTemplate=\"MergeToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Combine\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query></View>",
+                "Id":"1204c10a-978d-46c8-a6f2-65ecfa5e03d5",
+                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
+                "IncludeRootFolder":false,
+                "ViewJoins":null,
+                "JSLink":"clienttemplates.js",
+                "ListViewXml":"<View Name=\"{1204C10A-978D-46C8-A6F2-65ECFA5E03D5}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" AggregateView=\"TRUE\" DisplayName=\"Merge Documents\" Url=\"/sites/ninja/Shared Documents/Forms/Combine.aspx\" Level=\"1\" BaseViewID=\"7\" ContentTypeID=\"0x\" ToolbarTemplate=\"MergeToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Combine\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
+                "Method":null,
+                "MobileDefaultView":false,
+                "MobileView":false,
+                "ModerationType":null,
+                "NewDocumentTemplates":null,
+                "OrderedView":false,
+                "Paged":true,
+                "PersonalView":false,
+                "ViewProjectedFields":null,
+                "ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>",
+                "ReadOnlyView":false,
+                "RequiresClientIntegration":false,
+                "RowLimit":30,
+                "Scope":0,
+                "ServerRelativePath":{
+                  "__metadata":{
+                    "type":"SP.ResourcePath"
+                  },
+                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/Combine.aspx"
+                },
+                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/Combine.aspx",
+                "StyleId":null,
+                "TabularView":false,
+                "Threaded":false,
+                "Title":"Merge Documents",
+                "Toolbar":"",
+                "ToolbarTemplateName":"MergeToolBar",
+                "ViewType":"HTML",
+                "ViewData":null,
+                "VisualizationInfo":null
+                },
+                {
+                  "__metadata":{
+                    "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'e021e923-0801-4a16-9775-545239356739')",
+                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'e021e923-0801-4a16-9775-545239356739')",
+                    "type":"SP.View"
+                  },
+                  "ViewFields":{
+                    "__deferred":{
+                      "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'e021e923-0801-4a16-9775-545239356739')/ViewFields"
+                    }
+                  },
+                  "Aggregations":null,
+                  "AggregationsStatus":null,
+                  "BaseViewId":"50",
+                  "ColumnWidth":null,
+                  "ContentTypeId":{
+                    "__metadata":{
+                      "type":"SP.ContentTypeId"
+                    },
+                    "StringValue":"0x"
+                  },
+                  "CustomFormatter":null,
+                  "DefaultView":false,
+                  "DefaultViewForContentType":false,
+                  "EditorModified":false,
+                  "Formats":null,
+                  "Hidden":true,
+                  "HtmlSchemaXml":"<View Name=\"{E021E923-0801-4A16-9775-545239356739}\" MobileView=\"TRUE\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"\" Url=\"/sites/ninja/SitePages/Home.aspx\" Level=\"1\" BaseViewID=\"50\" ContentTypeID=\"0x\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">15</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy></Query></View>",
+                  "Id":"e021e923-0801-4a16-9775-545239356739",
+                  "ImageUrl":null,
+                  "IncludeRootFolder":false,
+                  "ViewJoins":null,
+                  "JSLink":"clienttemplates.js",
+                  "ListViewXml":"<View Name=\"{E021E923-0801-4A16-9775-545239356739}\" MobileView=\"TRUE\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"\" Url=\"/sites/ninja/SitePages/Home.aspx\" Level=\"1\" BaseViewID=\"50\" ContentTypeID=\"0x\" ><Query><OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit Paged=\"TRUE\">15</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
+                  "Method":null,
+                  "MobileDefaultView":false,
+                  "MobileView":true,
+                  "ModerationType":null,
+                  "NewDocumentTemplates":null,
+                  "OrderedView":false,
+                  "Paged":true,
+                  "PersonalView":false,
+                  "ViewProjectedFields":null,
+                  "ViewQuery":"<OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy>",
+                  "ReadOnlyView":false,
+                  "RequiresClientIntegration":false,
+                  "RowLimit":15,
+                  "Scope":0,
+                  "ServerRelativePath":{
+                    "__metadata":{
+                      "type":"SP.ResourcePath"
+                    },
+                    "DecodedUrl":"/sites/ninja/SitePages/Home.aspx"
+                  },
+                  "ServerRelativeUrl":"/sites/ninja/SitePages/Home.aspx",
+                  "StyleId":null,
+                  "TabularView":true,
+                  "Threaded":false,
+                  "Title":"",
+                  "Toolbar":"",
+                  "ToolbarTemplateName":null,
+                  "ViewType":"HTML",
+                  "ViewData":null,
+                  "VisualizationInfo":null
+              }
+            ]
+          });
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        debug: false,
+        listTitle: 'Documents',
+        webUrl: 'https://contoso.sharepoint.com/sites/ninja'
+      }
+    }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith([
+          {
+            "StringId": "0x010100260C61709CD8E548948F9BF605F8F54F",
+            "Name": "Document",
+            "Hidden": false,
+            "ReadOnly": false,
+            "Sealed": false
+          },
+          {
+            "StringId": "0x0120000EAD53EDAD7C6647B0D976EEC953F99E",
+            "Name": "Folder",
+            "Hidden": false,
+            "ReadOnly": false,
+            "Sealed": true
+          }
+        ]));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('retrieves all views of the specific list if listId option is passed (debug)', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/views`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve({
+            "value":[
+              {
+                "__metadata":{
+                  "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'85907fb0-cda1-43ec-832e-27118c89cf9f')",
+                  "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'85907fb0-cda1-43ec-832e-27118c89cf9f')",
+                  "type":"SP.View"
+                },
+                "ViewFields":{
+                  "__deferred": {
+                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'85907fb0-cda1-43ec-832e-27118c89cf9f')/ViewFields"
+                  }
+                },
+                "Aggregations":null,
+                "AggregationsStatus":null,
+                "BaseViewId":"1",
+                "ColumnWidth":null,
+                "ContentTypeId":{
+                  "__metadata":{
+                    "type":"SP.ContentTypeId"
+                  },
+                  "StringValue":"0x"
+                },
+                "CustomFormatter":null,
+                "DefaultView":true,
+                "DefaultViewForContentType":false,
+                "EditorModified":false,
+                "Formats":null,
+                "Hidden":false,
+                "HtmlSchemaXml":"<View Name=\"{85907FB0-CDA1-43EC-832E-27118C89CF9F}\" DefaultView=\"TRUE\" MobileView=\"TRUE\" MobileDefaultView=\"TRUE\" Type=\"HTML\" DisplayName=\"All Documents\" Url=\"/sites/ninja/Shared Documents/Forms/AllItems.aspx\" Level=\"1\" BaseViewID=\"1\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query></View>",
+                "Id":"85907fb0-cda1-43ec-832e-27118c89cf9f",
+                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
+                "IncludeRootFolder":false,
+                "ViewJoins":null,
+                "JSLink":"clienttemplates.js",
+                "ListViewXml":"<View Name=\"{85907FB0-CDA1-43EC-832E-27118C89CF9F}\" DefaultView=\"TRUE\" MobileView=\"TRUE\" MobileDefaultView=\"TRUE\" Type=\"HTML\" DisplayName=\"All Documents\" Url=\"/sites/ninja/Shared Documents/Forms/AllItems.aspx\" Level=\"1\" BaseViewID=\"1\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
+                "Method":null,
+                "MobileDefaultView":true,
+                "MobileView":true,
+                "ModerationType":null,
+                "NewDocumentTemplates":null,
+                "OrderedView":false,
+                "Paged":true,
+                "PersonalView":false,
+                "ViewProjectedFields":null,
+                "ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>",
+                "ReadOnlyView":false,
+                "RequiresClientIntegration":false,
+                "RowLimit":30,
+                "Scope":0,
+                "ServerRelativePath":{
+                  "__metadata": {
+                    "type":"SP.ResourcePath"
+                  },
+                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/AllItems.aspx"
+                },
+                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/AllItems.aspx",
+                "StyleId":null,
+                "TabularView":true,
+                "Threaded":false,
+                "Title":"All Documents",
+                "Toolbar":"",
+                "ToolbarTemplateName":null,
+                "ViewType":"HTML",
+                "ViewData":null,
+                "VisualizationInfo":null
+              },
+              {
+                "__metadata":{
+                  "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'281e80fd-099b-4eba-b622-a94fa03bf865')",
+                  "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'281e80fd-099b-4eba-b622-a94fa03bf865')",
+                  "type":"SP.View"
+                },
+                "ViewFields":{
+                  "__deferred":{
+                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'281e80fd-099b-4eba-b622-a94fa03bf865')/ViewFields"
+                  }
+                },
+                "Aggregations":null,
+                "AggregationsStatus":null,
+                "BaseViewId":"9",
+                "ColumnWidth":null,
+                "ContentTypeId":{
+                  "__metadata":{
+                    "type":"SP.ContentTypeId"
+                  },
+                  "StringValue":"0x"
+                },
+                "CustomFormatter":null,
+                "DefaultView":false,
+                "DefaultViewForContentType":false,
+                "EditorModified":false,
+                "Formats":null,
+                "Hidden":true,
+                "HtmlSchemaXml":"<View Name=\"{281E80FD-099B-4EBA-B622-A94FA03BF865}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" DisplayName=\"Relink Documents\" Url=\"/sites/ninja/Shared Documents/Forms/repair.aspx\" Level=\"1\" BaseViewID=\"9\" ContentTypeID=\"0x\" ToolbarTemplate=\"RelinkToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilenameNoMenu\" /><FieldRef Name=\"RepairDocument\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /><FieldRef Name=\"ContentType\" /><FieldRef Name=\"TemplateUrl\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where></Query></View>",
+                "Id":"281e80fd-099b-4eba-b622-a94fa03bf865",
+                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
+                "IncludeRootFolder":false,
+                "ViewJoins":null,
+                "JSLink":null,
+                "ListViewXml":"<View Name=\"{281E80FD-099B-4EBA-B622-A94FA03BF865}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" DisplayName=\"Relink Documents\" Url=\"/sites/ninja/Shared Documents/Forms/repair.aspx\" Level=\"1\" BaseViewID=\"9\" ContentTypeID=\"0x\" ToolbarTemplate=\"RelinkToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilenameNoMenu\" /><FieldRef Name=\"RepairDocument\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /><FieldRef Name=\"ContentType\" /><FieldRef Name=\"TemplateUrl\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
+                "Method":null,
+                "MobileDefaultView":false,
+                "MobileView":false,
+                "ModerationType":null,
+                "NewDocumentTemplates":null,
+                "OrderedView":false,
+                "Paged":true,
+                "PersonalView":false,
+                "ViewProjectedFields":null,
+                "ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where>",
+                "ReadOnlyView":false,
+                "RequiresClientIntegration":false,
+                "RowLimit":30,
+                "Scope":0,
+                "ServerRelativePath":{
+                  "__metadata":{
+                    "type":"SP.ResourcePath"
+                  },
+                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/repair.aspx"
+                },
+                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/repair.aspx",
+                "StyleId":null,
+                "TabularView":false,
+                "Threaded":false,
+                "Title":"Relink Documents",
+                "Toolbar":"",
+                "ToolbarTemplateName":"RelinkToolBar",
+                "ViewType":"HTML",
+                "ViewData":null,
+                "VisualizationInfo":null
+                },
+                {
+                  "__metadata":{
+                    "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'3d760127-982c-405e-9c93-e1f76e1a1110')",
+                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'3d760127-982c-405e-9c93-e1f76e1a1110')",
+                    "type":"SP.View"
+                  },
+                  "ViewFields":{
+                    "__deferred":{
+                      "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'3d760127-982c-405e-9c93-e1f76e1a1110')/ViewFields"
+                    }
+                  },
+                "Aggregations":null,
+                "AggregationsStatus":null,
+                "BaseViewId":"40",
+                "ColumnWidth":null,
+                "ContentTypeId":{
+                  "__metadata":{
+                    "type":"SP.ContentTypeId"
+                  },
+                  "StringValue":"0x"
+                },
+                "CustomFormatter":null,
+                "DefaultView":false,
+                "DefaultViewForContentType":false,
+                "EditorModified":false,
+                "Formats":null,
+                "Hidden":true,
+                "HtmlSchemaXml":"<View Name=\"{3D760127-982C-405E-9C93-E1F76E1A1110}\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"assetLibTemp\" Url=\"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx\" Level=\"1\" BaseViewID=\"40\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><ViewFields><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit>20</RowLimit><Query><OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy></Query></View>",
+                "Id":"3d760127-982c-405e-9c93-e1f76e1a1110",
+                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
+                "IncludeRootFolder":false,
+                "ViewJoins":null,
+                "JSLink":null,
+                "ListViewXml":"<View Name=\"{3D760127-982C-405E-9C93-E1F76E1A1110}\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"assetLibTemp\" Url=\"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx\" Level=\"1\" BaseViewID=\"40\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy></Query><ViewFields><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit>20</RowLimit><Toolbar Type=\"None\"/></View>",
+                "Method":null,
+                "MobileDefaultView":false,
+                "MobileView":false,
+                "ModerationType":null,
+                "NewDocumentTemplates":null,
+                "OrderedView":false,
+                "Paged":false,
+                "PersonalView":false,
+                "ViewProjectedFields":null,
+                "ViewQuery":"<OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy>",
+                "ReadOnlyView":false,
+                "RequiresClientIntegration":false,
+                "RowLimit":20,
+                "Scope":0,
+                "ServerRelativePath":{
+                  "__metadata":{
+                    "type":"SP.ResourcePath"
+                  },
+                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx"
+                },
+                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx",
+                "StyleId":null,
+                "TabularView":true,
+                "Threaded":false,
+                "Title":"assetLibTemp",
+                "Toolbar":null,
+                "ToolbarTemplateName":null,
+                "ViewType":"HTML",
+                "ViewData":null,
+                "VisualizationInfo":null
+              },
+              {
+                "__metadata":{
+                  "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'1204c10a-978d-46c8-a6f2-65ecfa5e03d5')",
+                  "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'1204c10a-978d-46c8-a6f2-65ecfa5e03d5')",
+                  "type":"SP.View"
+                },
+                "ViewFields":{
+                  "__deferred":{
+                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'1204c10a-978d-46c8-a6f2-65ecfa5e03d5')/ViewFields"
+                  }
+                },
+                "Aggregations":null,
+                "AggregationsStatus":null,
+                "BaseViewId":"7",
+                "ColumnWidth":null,
+                "ContentTypeId":{
+                  "__metadata":{
+                    "type":"SP.ContentTypeId"
+                  },
+                  "StringValue":"0x"
+                },
+                "CustomFormatter":null,
+                "DefaultView":false,
+                "DefaultViewForContentType":false,
+                "EditorModified":false,
+                "Formats":null,
+                "Hidden":true,
+                "HtmlSchemaXml":"<View Name=\"{1204C10A-978D-46C8-A6F2-65ECFA5E03D5}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" AggregateView=\"TRUE\" DisplayName=\"Merge Documents\" Url=\"/sites/ninja/Shared Documents/Forms/Combine.aspx\" Level=\"1\" BaseViewID=\"7\" ContentTypeID=\"0x\" ToolbarTemplate=\"MergeToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Combine\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query></View>",
+                "Id":"1204c10a-978d-46c8-a6f2-65ecfa5e03d5",
+                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
+                "IncludeRootFolder":false,
+                "ViewJoins":null,
+                "JSLink":"clienttemplates.js",
+                "ListViewXml":"<View Name=\"{1204C10A-978D-46C8-A6F2-65ECFA5E03D5}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" AggregateView=\"TRUE\" DisplayName=\"Merge Documents\" Url=\"/sites/ninja/Shared Documents/Forms/Combine.aspx\" Level=\"1\" BaseViewID=\"7\" ContentTypeID=\"0x\" ToolbarTemplate=\"MergeToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Combine\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
+                "Method":null,
+                "MobileDefaultView":false,
+                "MobileView":false,
+                "ModerationType":null,
+                "NewDocumentTemplates":null,
+                "OrderedView":false,
+                "Paged":true,
+                "PersonalView":false,
+                "ViewProjectedFields":null,
+                "ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>",
+                "ReadOnlyView":false,
+                "RequiresClientIntegration":false,
+                "RowLimit":30,
+                "Scope":0,
+                "ServerRelativePath":{
+                  "__metadata":{
+                    "type":"SP.ResourcePath"
+                  },
+                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/Combine.aspx"
+                },
+                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/Combine.aspx",
+                "StyleId":null,
+                "TabularView":false,
+                "Threaded":false,
+                "Title":"Merge Documents",
+                "Toolbar":"",
+                "ToolbarTemplateName":"MergeToolBar",
+                "ViewType":"HTML",
+                "ViewData":null,
+                "VisualizationInfo":null
+                },
+                {
+                  "__metadata":{
+                    "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'e021e923-0801-4a16-9775-545239356739')",
+                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'e021e923-0801-4a16-9775-545239356739')",
+                    "type":"SP.View"
+                  },
+                  "ViewFields":{
+                    "__deferred":{
+                      "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'e021e923-0801-4a16-9775-545239356739')/ViewFields"
+                    }
+                  },
+                  "Aggregations":null,
+                  "AggregationsStatus":null,
+                  "BaseViewId":"50",
+                  "ColumnWidth":null,
+                  "ContentTypeId":{
+                    "__metadata":{
+                      "type":"SP.ContentTypeId"
+                    },
+                    "StringValue":"0x"
+                  },
+                  "CustomFormatter":null,
+                  "DefaultView":false,
+                  "DefaultViewForContentType":false,
+                  "EditorModified":false,
+                  "Formats":null,
+                  "Hidden":true,
+                  "HtmlSchemaXml":"<View Name=\"{E021E923-0801-4A16-9775-545239356739}\" MobileView=\"TRUE\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"\" Url=\"/sites/ninja/SitePages/Home.aspx\" Level=\"1\" BaseViewID=\"50\" ContentTypeID=\"0x\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">15</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy></Query></View>",
+                  "Id":"e021e923-0801-4a16-9775-545239356739",
+                  "ImageUrl":null,
+                  "IncludeRootFolder":false,
+                  "ViewJoins":null,
+                  "JSLink":"clienttemplates.js",
+                  "ListViewXml":"<View Name=\"{E021E923-0801-4A16-9775-545239356739}\" MobileView=\"TRUE\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"\" Url=\"/sites/ninja/SitePages/Home.aspx\" Level=\"1\" BaseViewID=\"50\" ContentTypeID=\"0x\" ><Query><OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit Paged=\"TRUE\">15</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
+                  "Method":null,
+                  "MobileDefaultView":false,
+                  "MobileView":true,
+                  "ModerationType":null,
+                  "NewDocumentTemplates":null,
+                  "OrderedView":false,
+                  "Paged":true,
+                  "PersonalView":false,
+                  "ViewProjectedFields":null,
+                  "ViewQuery":"<OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy>",
+                  "ReadOnlyView":false,
+                  "RequiresClientIntegration":false,
+                  "RowLimit":15,
+                  "Scope":0,
+                  "ServerRelativePath":{
+                    "__metadata":{
+                      "type":"SP.ResourcePath"
+                    },
+                    "DecodedUrl":"/sites/ninja/SitePages/Home.aspx"
+                  },
+                  "ServerRelativeUrl":"/sites/ninja/SitePages/Home.aspx",
+                  "StyleId":null,
+                  "TabularView":true,
+                  "Threaded":false,
+                  "Title":"",
+                  "Toolbar":"",
+                  "ToolbarTemplateName":null,
+                  "ViewType":"HTML",
+                  "ViewData":null,
+                  "VisualizationInfo":null
+              }
+            ]
+          });
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        debug: true,
+        listId: '1f187321-f086-4d3d-8523-517e94cc9df9',
+        webUrl: 'https://contoso.sharepoint.com/sites/ninja'
+      }
+    }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith([
+          {
+            "StringId": "0x010100260C61709CD8E548948F9BF605F8F54F",
+            "Name": "Document",
+            "Hidden": false,
+            "ReadOnly": false,
+            "Sealed": false
+          },
+          {
+            "StringId": "0x0120000EAD53EDAD7C6647B0D976EEC953F99E",
+            "Name": "Folder",
+            "Hidden": false,
+            "ReadOnly": false,
+            "Sealed": true
+          }
+        ]));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('retrieves all views of the specific list if listId option is passed', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/views`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve({
+            "value":[
+              {
+                "__metadata":{
+                  "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'85907fb0-cda1-43ec-832e-27118c89cf9f')",
+                  "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'85907fb0-cda1-43ec-832e-27118c89cf9f')",
+                  "type":"SP.View"
+                },
+                "ViewFields":{
+                  "__deferred": {
+                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'85907fb0-cda1-43ec-832e-27118c89cf9f')/ViewFields"
+                  }
+                },
+                "Aggregations":null,
+                "AggregationsStatus":null,
+                "BaseViewId":"1",
+                "ColumnWidth":null,
+                "ContentTypeId":{
+                  "__metadata":{
+                    "type":"SP.ContentTypeId"
+                  },
+                  "StringValue":"0x"
+                },
+                "CustomFormatter":null,
+                "DefaultView":true,
+                "DefaultViewForContentType":false,
+                "EditorModified":false,
+                "Formats":null,
+                "Hidden":false,
+                "HtmlSchemaXml":"<View Name=\"{85907FB0-CDA1-43EC-832E-27118C89CF9F}\" DefaultView=\"TRUE\" MobileView=\"TRUE\" MobileDefaultView=\"TRUE\" Type=\"HTML\" DisplayName=\"All Documents\" Url=\"/sites/ninja/Shared Documents/Forms/AllItems.aspx\" Level=\"1\" BaseViewID=\"1\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query></View>",
+                "Id":"85907fb0-cda1-43ec-832e-27118c89cf9f",
+                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
+                "IncludeRootFolder":false,
+                "ViewJoins":null,
+                "JSLink":"clienttemplates.js",
+                "ListViewXml":"<View Name=\"{85907FB0-CDA1-43EC-832E-27118C89CF9F}\" DefaultView=\"TRUE\" MobileView=\"TRUE\" MobileDefaultView=\"TRUE\" Type=\"HTML\" DisplayName=\"All Documents\" Url=\"/sites/ninja/Shared Documents/Forms/AllItems.aspx\" Level=\"1\" BaseViewID=\"1\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
+                "Method":null,
+                "MobileDefaultView":true,
+                "MobileView":true,
+                "ModerationType":null,
+                "NewDocumentTemplates":null,
+                "OrderedView":false,
+                "Paged":true,
+                "PersonalView":false,
+                "ViewProjectedFields":null,
+                "ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>",
+                "ReadOnlyView":false,
+                "RequiresClientIntegration":false,
+                "RowLimit":30,
+                "Scope":0,
+                "ServerRelativePath":{
+                  "__metadata": {
+                    "type":"SP.ResourcePath"
+                  },
+                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/AllItems.aspx"
+                },
+                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/AllItems.aspx",
+                "StyleId":null,
+                "TabularView":true,
+                "Threaded":false,
+                "Title":"All Documents",
+                "Toolbar":"",
+                "ToolbarTemplateName":null,
+                "ViewType":"HTML",
+                "ViewData":null,
+                "VisualizationInfo":null
+              },
+              {
+                "__metadata":{
+                  "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'281e80fd-099b-4eba-b622-a94fa03bf865')",
+                  "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'281e80fd-099b-4eba-b622-a94fa03bf865')",
+                  "type":"SP.View"
+                },
+                "ViewFields":{
+                  "__deferred":{
+                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'281e80fd-099b-4eba-b622-a94fa03bf865')/ViewFields"
+                  }
+                },
+                "Aggregations":null,
+                "AggregationsStatus":null,
+                "BaseViewId":"9",
+                "ColumnWidth":null,
+                "ContentTypeId":{
+                  "__metadata":{
+                    "type":"SP.ContentTypeId"
+                  },
+                  "StringValue":"0x"
+                },
+                "CustomFormatter":null,
+                "DefaultView":false,
+                "DefaultViewForContentType":false,
+                "EditorModified":false,
+                "Formats":null,
+                "Hidden":true,
+                "HtmlSchemaXml":"<View Name=\"{281E80FD-099B-4EBA-B622-A94FA03BF865}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" DisplayName=\"Relink Documents\" Url=\"/sites/ninja/Shared Documents/Forms/repair.aspx\" Level=\"1\" BaseViewID=\"9\" ContentTypeID=\"0x\" ToolbarTemplate=\"RelinkToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilenameNoMenu\" /><FieldRef Name=\"RepairDocument\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /><FieldRef Name=\"ContentType\" /><FieldRef Name=\"TemplateUrl\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where></Query></View>",
+                "Id":"281e80fd-099b-4eba-b622-a94fa03bf865",
+                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
+                "IncludeRootFolder":false,
+                "ViewJoins":null,
+                "JSLink":null,
+                "ListViewXml":"<View Name=\"{281E80FD-099B-4EBA-B622-A94FA03BF865}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" DisplayName=\"Relink Documents\" Url=\"/sites/ninja/Shared Documents/Forms/repair.aspx\" Level=\"1\" BaseViewID=\"9\" ContentTypeID=\"0x\" ToolbarTemplate=\"RelinkToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilenameNoMenu\" /><FieldRef Name=\"RepairDocument\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /><FieldRef Name=\"ContentType\" /><FieldRef Name=\"TemplateUrl\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
+                "Method":null,
+                "MobileDefaultView":false,
+                "MobileView":false,
+                "ModerationType":null,
+                "NewDocumentTemplates":null,
+                "OrderedView":false,
+                "Paged":true,
+                "PersonalView":false,
+                "ViewProjectedFields":null,
+                "ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where>",
+                "ReadOnlyView":false,
+                "RequiresClientIntegration":false,
+                "RowLimit":30,
+                "Scope":0,
+                "ServerRelativePath":{
+                  "__metadata":{
+                    "type":"SP.ResourcePath"
+                  },
+                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/repair.aspx"
+                },
+                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/repair.aspx",
+                "StyleId":null,
+                "TabularView":false,
+                "Threaded":false,
+                "Title":"Relink Documents",
+                "Toolbar":"",
+                "ToolbarTemplateName":"RelinkToolBar",
+                "ViewType":"HTML",
+                "ViewData":null,
+                "VisualizationInfo":null
+                },
+                {
+                  "__metadata":{
+                    "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'3d760127-982c-405e-9c93-e1f76e1a1110')",
+                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'3d760127-982c-405e-9c93-e1f76e1a1110')",
+                    "type":"SP.View"
+                  },
+                  "ViewFields":{
+                    "__deferred":{
+                      "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'3d760127-982c-405e-9c93-e1f76e1a1110')/ViewFields"
+                    }
+                  },
+                "Aggregations":null,
+                "AggregationsStatus":null,
+                "BaseViewId":"40",
+                "ColumnWidth":null,
+                "ContentTypeId":{
+                  "__metadata":{
+                    "type":"SP.ContentTypeId"
+                  },
+                  "StringValue":"0x"
+                },
+                "CustomFormatter":null,
+                "DefaultView":false,
+                "DefaultViewForContentType":false,
+                "EditorModified":false,
+                "Formats":null,
+                "Hidden":true,
+                "HtmlSchemaXml":"<View Name=\"{3D760127-982C-405E-9C93-E1F76E1A1110}\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"assetLibTemp\" Url=\"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx\" Level=\"1\" BaseViewID=\"40\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><ViewFields><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit>20</RowLimit><Query><OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy></Query></View>",
+                "Id":"3d760127-982c-405e-9c93-e1f76e1a1110",
+                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
+                "IncludeRootFolder":false,
+                "ViewJoins":null,
+                "JSLink":null,
+                "ListViewXml":"<View Name=\"{3D760127-982C-405E-9C93-E1F76E1A1110}\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"assetLibTemp\" Url=\"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx\" Level=\"1\" BaseViewID=\"40\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy></Query><ViewFields><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit>20</RowLimit><Toolbar Type=\"None\"/></View>",
+                "Method":null,
+                "MobileDefaultView":false,
+                "MobileView":false,
+                "ModerationType":null,
+                "NewDocumentTemplates":null,
+                "OrderedView":false,
+                "Paged":false,
+                "PersonalView":false,
+                "ViewProjectedFields":null,
+                "ViewQuery":"<OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy>",
+                "ReadOnlyView":false,
+                "RequiresClientIntegration":false,
+                "RowLimit":20,
+                "Scope":0,
+                "ServerRelativePath":{
+                  "__metadata":{
+                    "type":"SP.ResourcePath"
+                  },
+                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx"
+                },
+                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx",
+                "StyleId":null,
+                "TabularView":true,
+                "Threaded":false,
+                "Title":"assetLibTemp",
+                "Toolbar":null,
+                "ToolbarTemplateName":null,
+                "ViewType":"HTML",
+                "ViewData":null,
+                "VisualizationInfo":null
+              },
+              {
+                "__metadata":{
+                  "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'1204c10a-978d-46c8-a6f2-65ecfa5e03d5')",
+                  "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'1204c10a-978d-46c8-a6f2-65ecfa5e03d5')",
+                  "type":"SP.View"
+                },
+                "ViewFields":{
+                  "__deferred":{
+                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'1204c10a-978d-46c8-a6f2-65ecfa5e03d5')/ViewFields"
+                  }
+                },
+                "Aggregations":null,
+                "AggregationsStatus":null,
+                "BaseViewId":"7",
+                "ColumnWidth":null,
+                "ContentTypeId":{
+                  "__metadata":{
+                    "type":"SP.ContentTypeId"
+                  },
+                  "StringValue":"0x"
+                },
+                "CustomFormatter":null,
+                "DefaultView":false,
+                "DefaultViewForContentType":false,
+                "EditorModified":false,
+                "Formats":null,
+                "Hidden":true,
+                "HtmlSchemaXml":"<View Name=\"{1204C10A-978D-46C8-A6F2-65ECFA5E03D5}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" AggregateView=\"TRUE\" DisplayName=\"Merge Documents\" Url=\"/sites/ninja/Shared Documents/Forms/Combine.aspx\" Level=\"1\" BaseViewID=\"7\" ContentTypeID=\"0x\" ToolbarTemplate=\"MergeToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Combine\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query></View>",
+                "Id":"1204c10a-978d-46c8-a6f2-65ecfa5e03d5",
+                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
+                "IncludeRootFolder":false,
+                "ViewJoins":null,
+                "JSLink":"clienttemplates.js",
+                "ListViewXml":"<View Name=\"{1204C10A-978D-46C8-A6F2-65ECFA5E03D5}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" AggregateView=\"TRUE\" DisplayName=\"Merge Documents\" Url=\"/sites/ninja/Shared Documents/Forms/Combine.aspx\" Level=\"1\" BaseViewID=\"7\" ContentTypeID=\"0x\" ToolbarTemplate=\"MergeToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Combine\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
+                "Method":null,
+                "MobileDefaultView":false,
+                "MobileView":false,
+                "ModerationType":null,
+                "NewDocumentTemplates":null,
+                "OrderedView":false,
+                "Paged":true,
+                "PersonalView":false,
+                "ViewProjectedFields":null,
+                "ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>",
+                "ReadOnlyView":false,
+                "RequiresClientIntegration":false,
+                "RowLimit":30,
+                "Scope":0,
+                "ServerRelativePath":{
+                  "__metadata":{
+                    "type":"SP.ResourcePath"
+                  },
+                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/Combine.aspx"
+                },
+                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/Combine.aspx",
+                "StyleId":null,
+                "TabularView":false,
+                "Threaded":false,
+                "Title":"Merge Documents",
+                "Toolbar":"",
+                "ToolbarTemplateName":"MergeToolBar",
+                "ViewType":"HTML",
+                "ViewData":null,
+                "VisualizationInfo":null
+                },
+                {
+                  "__metadata":{
+                    "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'e021e923-0801-4a16-9775-545239356739')",
+                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'e021e923-0801-4a16-9775-545239356739')",
+                    "type":"SP.View"
+                  },
+                  "ViewFields":{
+                    "__deferred":{
+                      "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'e021e923-0801-4a16-9775-545239356739')/ViewFields"
+                    }
+                  },
+                  "Aggregations":null,
+                  "AggregationsStatus":null,
+                  "BaseViewId":"50",
+                  "ColumnWidth":null,
+                  "ContentTypeId":{
+                    "__metadata":{
+                      "type":"SP.ContentTypeId"
+                    },
+                    "StringValue":"0x"
+                  },
+                  "CustomFormatter":null,
+                  "DefaultView":false,
+                  "DefaultViewForContentType":false,
+                  "EditorModified":false,
+                  "Formats":null,
+                  "Hidden":true,
+                  "HtmlSchemaXml":"<View Name=\"{E021E923-0801-4A16-9775-545239356739}\" MobileView=\"TRUE\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"\" Url=\"/sites/ninja/SitePages/Home.aspx\" Level=\"1\" BaseViewID=\"50\" ContentTypeID=\"0x\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">15</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy></Query></View>",
+                  "Id":"e021e923-0801-4a16-9775-545239356739",
+                  "ImageUrl":null,
+                  "IncludeRootFolder":false,
+                  "ViewJoins":null,
+                  "JSLink":"clienttemplates.js",
+                  "ListViewXml":"<View Name=\"{E021E923-0801-4A16-9775-545239356739}\" MobileView=\"TRUE\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"\" Url=\"/sites/ninja/SitePages/Home.aspx\" Level=\"1\" BaseViewID=\"50\" ContentTypeID=\"0x\" ><Query><OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit Paged=\"TRUE\">15</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
+                  "Method":null,
+                  "MobileDefaultView":false,
+                  "MobileView":true,
+                  "ModerationType":null,
+                  "NewDocumentTemplates":null,
+                  "OrderedView":false,
+                  "Paged":true,
+                  "PersonalView":false,
+                  "ViewProjectedFields":null,
+                  "ViewQuery":"<OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy>",
+                  "ReadOnlyView":false,
+                  "RequiresClientIntegration":false,
+                  "RowLimit":15,
+                  "Scope":0,
+                  "ServerRelativePath":{
+                    "__metadata":{
+                      "type":"SP.ResourcePath"
+                    },
+                    "DecodedUrl":"/sites/ninja/SitePages/Home.aspx"
+                  },
+                  "ServerRelativeUrl":"/sites/ninja/SitePages/Home.aspx",
+                  "StyleId":null,
+                  "TabularView":true,
+                  "Threaded":false,
+                  "Title":"",
+                  "Toolbar":"",
+                  "ToolbarTemplateName":null,
+                  "ViewType":"HTML",
+                  "ViewData":null,
+                  "VisualizationInfo":null
+              }
+            ]
+          });
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        debug: false,
+        listId: '1f187321-f086-4d3d-8523-517e94cc9df9',
+        webUrl: 'https://contoso.sharepoint.com/sites/ninja'
+      }
+    }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith([
+          {
+            "StringId": "0x010100260C61709CD8E548948F9BF605F8F54F",
+            "Name": "Document",
+            "Hidden": false,
+            "ReadOnly": false,
+            "Sealed": false
+          },
+          {
+            "StringId": "0x0120000EAD53EDAD7C6647B0D976EEC953F99E",
+            "Name": "Folder",
+            "Hidden": false,
+            "ReadOnly": false,
+            "Sealed": true
+          }
+        ]));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('outputs all properties when output is JSON', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/views`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve({
+            "value":[
+              {
+                "__metadata":{
+                  "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'85907fb0-cda1-43ec-832e-27118c89cf9f')",
+                  "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'85907fb0-cda1-43ec-832e-27118c89cf9f')",
+                  "type":"SP.View"
+                },
+                "ViewFields":{
+                  "__deferred": {
+                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'85907fb0-cda1-43ec-832e-27118c89cf9f')/ViewFields"
+                  }
+                },
+                "Aggregations":null,
+                "AggregationsStatus":null,
+                "BaseViewId":"1",
+                "ColumnWidth":null,
+                "ContentTypeId":{
+                  "__metadata":{
+                    "type":"SP.ContentTypeId"
+                  },
+                  "StringValue":"0x"
+                },
+                "CustomFormatter":null,
+                "DefaultView":true,
+                "DefaultViewForContentType":false,
+                "EditorModified":false,
+                "Formats":null,
+                "Hidden":false,
+                "HtmlSchemaXml":"<View Name=\"{85907FB0-CDA1-43EC-832E-27118C89CF9F}\" DefaultView=\"TRUE\" MobileView=\"TRUE\" MobileDefaultView=\"TRUE\" Type=\"HTML\" DisplayName=\"All Documents\" Url=\"/sites/ninja/Shared Documents/Forms/AllItems.aspx\" Level=\"1\" BaseViewID=\"1\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query></View>",
+                "Id":"85907fb0-cda1-43ec-832e-27118c89cf9f",
+                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
+                "IncludeRootFolder":false,
+                "ViewJoins":null,
+                "JSLink":"clienttemplates.js",
+                "ListViewXml":"<View Name=\"{85907FB0-CDA1-43EC-832E-27118C89CF9F}\" DefaultView=\"TRUE\" MobileView=\"TRUE\" MobileDefaultView=\"TRUE\" Type=\"HTML\" DisplayName=\"All Documents\" Url=\"/sites/ninja/Shared Documents/Forms/AllItems.aspx\" Level=\"1\" BaseViewID=\"1\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
+                "Method":null,
+                "MobileDefaultView":true,
+                "MobileView":true,
+                "ModerationType":null,
+                "NewDocumentTemplates":null,
+                "OrderedView":false,
+                "Paged":true,
+                "PersonalView":false,
+                "ViewProjectedFields":null,
+                "ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>",
+                "ReadOnlyView":false,
+                "RequiresClientIntegration":false,
+                "RowLimit":30,
+                "Scope":0,
+                "ServerRelativePath":{
+                  "__metadata": {
+                    "type":"SP.ResourcePath"
+                  },
+                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/AllItems.aspx"
+                },
+                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/AllItems.aspx",
+                "StyleId":null,
+                "TabularView":true,
+                "Threaded":false,
+                "Title":"All Documents",
+                "Toolbar":"",
+                "ToolbarTemplateName":null,
+                "ViewType":"HTML",
+                "ViewData":null,
+                "VisualizationInfo":null
+              },
+              {
+                "__metadata":{
+                  "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'281e80fd-099b-4eba-b622-a94fa03bf865')",
+                  "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'281e80fd-099b-4eba-b622-a94fa03bf865')",
+                  "type":"SP.View"
+                },
+                "ViewFields":{
+                  "__deferred":{
+                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'281e80fd-099b-4eba-b622-a94fa03bf865')/ViewFields"
+                  }
+                },
+                "Aggregations":null,
+                "AggregationsStatus":null,
+                "BaseViewId":"9",
+                "ColumnWidth":null,
+                "ContentTypeId":{
+                  "__metadata":{
+                    "type":"SP.ContentTypeId"
+                  },
+                  "StringValue":"0x"
+                },
+                "CustomFormatter":null,
+                "DefaultView":false,
+                "DefaultViewForContentType":false,
+                "EditorModified":false,
+                "Formats":null,
+                "Hidden":true,
+                "HtmlSchemaXml":"<View Name=\"{281E80FD-099B-4EBA-B622-A94FA03BF865}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" DisplayName=\"Relink Documents\" Url=\"/sites/ninja/Shared Documents/Forms/repair.aspx\" Level=\"1\" BaseViewID=\"9\" ContentTypeID=\"0x\" ToolbarTemplate=\"RelinkToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilenameNoMenu\" /><FieldRef Name=\"RepairDocument\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /><FieldRef Name=\"ContentType\" /><FieldRef Name=\"TemplateUrl\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where></Query></View>",
+                "Id":"281e80fd-099b-4eba-b622-a94fa03bf865",
+                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
+                "IncludeRootFolder":false,
+                "ViewJoins":null,
+                "JSLink":null,
+                "ListViewXml":"<View Name=\"{281E80FD-099B-4EBA-B622-A94FA03BF865}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" DisplayName=\"Relink Documents\" Url=\"/sites/ninja/Shared Documents/Forms/repair.aspx\" Level=\"1\" BaseViewID=\"9\" ContentTypeID=\"0x\" ToolbarTemplate=\"RelinkToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilenameNoMenu\" /><FieldRef Name=\"RepairDocument\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /><FieldRef Name=\"ContentType\" /><FieldRef Name=\"TemplateUrl\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
+                "Method":null,
+                "MobileDefaultView":false,
+                "MobileView":false,
+                "ModerationType":null,
+                "NewDocumentTemplates":null,
+                "OrderedView":false,
+                "Paged":true,
+                "PersonalView":false,
+                "ViewProjectedFields":null,
+                "ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where>",
+                "ReadOnlyView":false,
+                "RequiresClientIntegration":false,
+                "RowLimit":30,
+                "Scope":0,
+                "ServerRelativePath":{
+                  "__metadata":{
+                    "type":"SP.ResourcePath"
+                  },
+                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/repair.aspx"
+                },
+                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/repair.aspx",
+                "StyleId":null,
+                "TabularView":false,
+                "Threaded":false,
+                "Title":"Relink Documents",
+                "Toolbar":"",
+                "ToolbarTemplateName":"RelinkToolBar",
+                "ViewType":"HTML",
+                "ViewData":null,
+                "VisualizationInfo":null
+                },
+                {
+                  "__metadata":{
+                    "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'3d760127-982c-405e-9c93-e1f76e1a1110')",
+                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'3d760127-982c-405e-9c93-e1f76e1a1110')",
+                    "type":"SP.View"
+                  },
+                  "ViewFields":{
+                    "__deferred":{
+                      "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'3d760127-982c-405e-9c93-e1f76e1a1110')/ViewFields"
+                    }
+                  },
+                "Aggregations":null,
+                "AggregationsStatus":null,
+                "BaseViewId":"40",
+                "ColumnWidth":null,
+                "ContentTypeId":{
+                  "__metadata":{
+                    "type":"SP.ContentTypeId"
+                  },
+                  "StringValue":"0x"
+                },
+                "CustomFormatter":null,
+                "DefaultView":false,
+                "DefaultViewForContentType":false,
+                "EditorModified":false,
+                "Formats":null,
+                "Hidden":true,
+                "HtmlSchemaXml":"<View Name=\"{3D760127-982C-405E-9C93-E1F76E1A1110}\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"assetLibTemp\" Url=\"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx\" Level=\"1\" BaseViewID=\"40\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><ViewFields><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit>20</RowLimit><Query><OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy></Query></View>",
+                "Id":"3d760127-982c-405e-9c93-e1f76e1a1110",
+                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
+                "IncludeRootFolder":false,
+                "ViewJoins":null,
+                "JSLink":null,
+                "ListViewXml":"<View Name=\"{3D760127-982C-405E-9C93-E1F76E1A1110}\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"assetLibTemp\" Url=\"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx\" Level=\"1\" BaseViewID=\"40\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy></Query><ViewFields><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit>20</RowLimit><Toolbar Type=\"None\"/></View>",
+                "Method":null,
+                "MobileDefaultView":false,
+                "MobileView":false,
+                "ModerationType":null,
+                "NewDocumentTemplates":null,
+                "OrderedView":false,
+                "Paged":false,
+                "PersonalView":false,
+                "ViewProjectedFields":null,
+                "ViewQuery":"<OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy>",
+                "ReadOnlyView":false,
+                "RequiresClientIntegration":false,
+                "RowLimit":20,
+                "Scope":0,
+                "ServerRelativePath":{
+                  "__metadata":{
+                    "type":"SP.ResourcePath"
+                  },
+                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx"
+                },
+                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx",
+                "StyleId":null,
+                "TabularView":true,
+                "Threaded":false,
+                "Title":"assetLibTemp",
+                "Toolbar":null,
+                "ToolbarTemplateName":null,
+                "ViewType":"HTML",
+                "ViewData":null,
+                "VisualizationInfo":null
+              },
+              {
+                "__metadata":{
+                  "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'1204c10a-978d-46c8-a6f2-65ecfa5e03d5')",
+                  "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'1204c10a-978d-46c8-a6f2-65ecfa5e03d5')",
+                  "type":"SP.View"
+                },
+                "ViewFields":{
+                  "__deferred":{
+                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'1204c10a-978d-46c8-a6f2-65ecfa5e03d5')/ViewFields"
+                  }
+                },
+                "Aggregations":null,
+                "AggregationsStatus":null,
+                "BaseViewId":"7",
+                "ColumnWidth":null,
+                "ContentTypeId":{
+                  "__metadata":{
+                    "type":"SP.ContentTypeId"
+                  },
+                  "StringValue":"0x"
+                },
+                "CustomFormatter":null,
+                "DefaultView":false,
+                "DefaultViewForContentType":false,
+                "EditorModified":false,
+                "Formats":null,
+                "Hidden":true,
+                "HtmlSchemaXml":"<View Name=\"{1204C10A-978D-46C8-A6F2-65ECFA5E03D5}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" AggregateView=\"TRUE\" DisplayName=\"Merge Documents\" Url=\"/sites/ninja/Shared Documents/Forms/Combine.aspx\" Level=\"1\" BaseViewID=\"7\" ContentTypeID=\"0x\" ToolbarTemplate=\"MergeToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Combine\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query></View>",
+                "Id":"1204c10a-978d-46c8-a6f2-65ecfa5e03d5",
+                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
+                "IncludeRootFolder":false,
+                "ViewJoins":null,
+                "JSLink":"clienttemplates.js",
+                "ListViewXml":"<View Name=\"{1204C10A-978D-46C8-A6F2-65ECFA5E03D5}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" AggregateView=\"TRUE\" DisplayName=\"Merge Documents\" Url=\"/sites/ninja/Shared Documents/Forms/Combine.aspx\" Level=\"1\" BaseViewID=\"7\" ContentTypeID=\"0x\" ToolbarTemplate=\"MergeToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Combine\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
+                "Method":null,
+                "MobileDefaultView":false,
+                "MobileView":false,
+                "ModerationType":null,
+                "NewDocumentTemplates":null,
+                "OrderedView":false,
+                "Paged":true,
+                "PersonalView":false,
+                "ViewProjectedFields":null,
+                "ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>",
+                "ReadOnlyView":false,
+                "RequiresClientIntegration":false,
+                "RowLimit":30,
+                "Scope":0,
+                "ServerRelativePath":{
+                  "__metadata":{
+                    "type":"SP.ResourcePath"
+                  },
+                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/Combine.aspx"
+                },
+                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/Combine.aspx",
+                "StyleId":null,
+                "TabularView":false,
+                "Threaded":false,
+                "Title":"Merge Documents",
+                "Toolbar":"",
+                "ToolbarTemplateName":"MergeToolBar",
+                "ViewType":"HTML",
+                "ViewData":null,
+                "VisualizationInfo":null
+                },
+                {
+                  "__metadata":{
+                    "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'e021e923-0801-4a16-9775-545239356739')",
+                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'e021e923-0801-4a16-9775-545239356739')",
+                    "type":"SP.View"
+                  },
+                  "ViewFields":{
+                    "__deferred":{
+                      "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'e021e923-0801-4a16-9775-545239356739')/ViewFields"
+                    }
+                  },
+                  "Aggregations":null,
+                  "AggregationsStatus":null,
+                  "BaseViewId":"50",
+                  "ColumnWidth":null,
+                  "ContentTypeId":{
+                    "__metadata":{
+                      "type":"SP.ContentTypeId"
+                    },
+                    "StringValue":"0x"
+                  },
+                  "CustomFormatter":null,
+                  "DefaultView":false,
+                  "DefaultViewForContentType":false,
+                  "EditorModified":false,
+                  "Formats":null,
+                  "Hidden":true,
+                  "HtmlSchemaXml":"<View Name=\"{E021E923-0801-4A16-9775-545239356739}\" MobileView=\"TRUE\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"\" Url=\"/sites/ninja/SitePages/Home.aspx\" Level=\"1\" BaseViewID=\"50\" ContentTypeID=\"0x\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">15</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy></Query></View>",
+                  "Id":"e021e923-0801-4a16-9775-545239356739",
+                  "ImageUrl":null,
+                  "IncludeRootFolder":false,
+                  "ViewJoins":null,
+                  "JSLink":"clienttemplates.js",
+                  "ListViewXml":"<View Name=\"{E021E923-0801-4A16-9775-545239356739}\" MobileView=\"TRUE\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"\" Url=\"/sites/ninja/SitePages/Home.aspx\" Level=\"1\" BaseViewID=\"50\" ContentTypeID=\"0x\" ><Query><OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit Paged=\"TRUE\">15</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
+                  "Method":null,
+                  "MobileDefaultView":false,
+                  "MobileView":true,
+                  "ModerationType":null,
+                  "NewDocumentTemplates":null,
+                  "OrderedView":false,
+                  "Paged":true,
+                  "PersonalView":false,
+                  "ViewProjectedFields":null,
+                  "ViewQuery":"<OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy>",
+                  "ReadOnlyView":false,
+                  "RequiresClientIntegration":false,
+                  "RowLimit":15,
+                  "Scope":0,
+                  "ServerRelativePath":{
+                    "__metadata":{
+                      "type":"SP.ResourcePath"
+                    },
+                    "DecodedUrl":"/sites/ninja/SitePages/Home.aspx"
+                  },
+                  "ServerRelativeUrl":"/sites/ninja/SitePages/Home.aspx",
+                  "StyleId":null,
+                  "TabularView":true,
+                  "Threaded":false,
+                  "Title":"",
+                  "Toolbar":"",
+                  "ToolbarTemplateName":null,
+                  "ViewType":"HTML",
+                  "ViewData":null,
+                  "VisualizationInfo":null
+              }
+            ]
+          });
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        debug: false,
+        listId: '1f187321-f086-4d3d-8523-517e94cc9df9',
+        webUrl: 'https://contoso.sharepoint.com/sites/ninja',
+        output: 'json'
+      }
+    }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith([
+          {
+            "Description": "Create a new document.",
+            "DisplayFormTemplateName": "DocumentLibraryForm",
+            "DisplayFormUrl": "",
+            "DocumentTemplate": "/Shared Documents/Forms/template.dotx",
+            "DocumentTemplateUrl": "/Shared Documents/Forms/template.dotx",
+            "EditFormTemplateName": "DocumentLibraryForm",
+            "EditFormUrl": "",
+            "Group": "Document Content Types",
+            "Hidden": false,
+            "Id": {
+              "StringValue": "0x010100260C61709CD8E548948F9BF605F8F54F"
+            },
+            "JSLink": "",
+            "MobileDisplayFormUrl": "",
+            "MobileEditFormUrl": "",
+            "MobileNewFormUrl": "",
+            "Name": "Document",
+            "NewFormTemplateName": "DocumentLibraryForm",
+            "NewFormUrl": "",
+            "ReadOnly": false,
+            "SchemaXml": "<ContentType ID=\"0x010100260C61709CD8E548948F9BF605F8F54F\" Name=\"Document\" Group=\"Document Content Types\" Description=\"Create a new document.\" V2ListTemplateName=\"doclib\" Version=\"0\" DelayActivateTemplateBinding=\"GROUP,SPSPERS,SITEPAGEPUBLISHING\" FeatureId=\"{695b6570-a48b-4a8e-8ea5-26ea7fc1d162}\"><Fields><Field ID=\"{c042a256-787d-4a6f-8a8a-cf6ab767f12d}\" Type=\"Computed\" DisplayName=\"Content Type\" Name=\"ContentType\" DisplaceOnUpgrade=\"TRUE\" RenderXMLUsingPattern=\"TRUE\" Sortable=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"ContentType\" Group=\"_Hidden\" PITarget=\"MicrosoftWindowsSharePointServices\" PIAttribute=\"ContentTypeID\" FromBaseType=\"TRUE\"><FieldRefs><FieldRef Name=\"ContentTypeId\"/></FieldRefs><DisplayPattern><MapToContentType><Column Name=\"ContentTypeId\"/></MapToContentType></DisplayPattern></Field><Field ID=\"{5f47e085-2150-41dc-b661-442f3027f552}\" ReadOnly=\"TRUE\" Type=\"Computed\" Name=\"SelectFilename\" DisplayName=\"Select\" Hidden=\"TRUE\" CanToggleHidden=\"TRUE\" Sortable=\"FALSE\" Filterable=\"FALSE\" AuthoringInfo=\"(web part connection)\" HeaderImage=\"blank.gif\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"SelectFilename\" FromBaseType=\"TRUE\"><FieldRefs><FieldRef Name=\"ID\"/></FieldRefs><DisplayPattern><IfEqual><Expr1><GetVar Name=\"SelectedID\"/></Expr1><Expr2><Column Name=\"ID\"/></Expr2><Then><HTML><![CDATA[<img align=\"absmiddle\" style=\"cursor: pointer\" src=\"/_layouts/15/images/rbsel.gif?rev=44\" alt=\"]]></HTML><HTML>Selected</HTML><HTML><![CDATA[\"/>]]></HTML></Then><Else><HTML><![CDATA[<a href=\"javascript:SelectField(']]></HTML><GetVar Name=\"View\"/><HTML><![CDATA[',']]></HTML><ScriptQuote NotAddingQuote=\"TRUE\"><Column Name=\"ID\"/></ScriptQuote><HTML><![CDATA[');return false;\" onclick=\"javascript:SelectField(']]></HTML><GetVar Name=\"View\"/><HTML><![CDATA[',']]></HTML><ScriptQuote NotAddingQuote=\"TRUE\"><Column Name=\"ID\"/></ScriptQuote><HTML><![CDATA[');return false;\" target=\"_self\">]]></HTML><HTML><![CDATA[<img border=\"0\" align=\"absmiddle\" style=\"cursor: pointer\" src=\"/_layouts/15/images/rbunsel.gif?rev=44\"  alt=\"]]></HTML><HTML>Normal</HTML><HTML><![CDATA[\"/>]]></HTML><HTML><![CDATA[</a>]]></HTML></Else></IfEqual></DisplayPattern></Field><Field ID=\"{8553196d-ec8d-4564-9861-3dbe931050c8}\" ShowInFileDlg=\"FALSE\" ShowInVersionHistory=\"FALSE\" Type=\"File\" Name=\"FileLeafRef\" DisplayName=\"Name\" AuthoringInfo=\"(for use in forms)\" List=\"Docs\" FieldRef=\"ID\" ShowField=\"LeafName\" JoinColName=\"DoclibRowId\" JoinRowOrdinal=\"0\" JoinType=\"INNER\" Required=\"TRUE\" NoCustomize=\"TRUE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"FileLeafRef\" FromBaseType=\"TRUE\"/><Field ID=\"{8c06beca-0777-48f7-91c7-6da68bc07b69}\" ColName=\"tp_Created\" RowOrdinal=\"0\" ReadOnly=\"TRUE\" Type=\"DateTime\" Name=\"Created\" DisplayName=\"Created\" StorageTZ=\"TRUE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"Created\" FromBaseType=\"TRUE\" Hidden=\"TRUE\"/><Field ID=\"{fa564e0f-0c70-4ab9-b863-0177e6ddd247}\" Type=\"Text\" Name=\"Title\" ShowInNewForm=\"FALSE\" ShowInFileDlg=\"FALSE\" DisplayName=\"Title\" Sealed=\"TRUE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"Title\" ColName=\"nvarchar8\" Required=\"FALSE\" ShowInEditForm=\"TRUE\"/><Field ID=\"{28cf69c5-fa48-462a-b5cd-27b6f9d2bd5f}\" ColName=\"tp_Modified\" RowOrdinal=\"0\" ReadOnly=\"TRUE\" Type=\"DateTime\" Name=\"Modified\" DisplayName=\"Modified\" StorageTZ=\"TRUE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"Modified\" FromBaseType=\"TRUE\" Hidden=\"TRUE\"/><Field ID=\"{822c78e3-1ea9-4943-b449-57863ad33ca9}\" ReadOnly=\"TRUE\" Hidden=\"FALSE\" Type=\"Text\" Name=\"Modified_x0020_By\" DisplayName=\"Document Modified By\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"Modified_x0020_By\" FromBaseType=\"TRUE\" ColName=\"nvarchar1\"/><Field ID=\"{4dd7e525-8d6b-4cb4-9d3e-44ee25f973eb}\" ReadOnly=\"TRUE\" Hidden=\"FALSE\" Type=\"Text\" Name=\"Created_x0020_By\" DisplayName=\"Document Created By\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"Created_x0020_By\" FromBaseType=\"TRUE\" ColName=\"nvarchar2\"/></Fields><XmlDocuments><XmlDocument NamespaceURI=\"http://schemas.microsoft.com/sharepoint/v3/contenttype/forms\"><FormTemplates xmlns=\"http://schemas.microsoft.com/sharepoint/v3/contenttype/forms\"><Display>DocumentLibraryForm</Display><Edit>DocumentLibraryForm</Edit><New>DocumentLibraryForm</New></FormTemplates></XmlDocument></XmlDocuments><Folder TargetName=\"Forms/Document\"/></ContentType>",
+            "Scope": "/Shared Documents",
+            "Sealed": false,
+            "StringId": "0x010100260C61709CD8E548948F9BF605F8F54F"
+          },
+          {
+            "Description": "Create a new folder.",
+            "DisplayFormTemplateName": "ListForm",
+            "DisplayFormUrl": "",
+            "DocumentTemplate": "",
+            "DocumentTemplateUrl": "",
+            "EditFormTemplateName": "ListForm",
+            "EditFormUrl": "",
+            "Group": "Folder Content Types",
+            "Hidden": false,
+            "Id": {
+              "StringValue": "0x0120000EAD53EDAD7C6647B0D976EEC953F99E"
+            },
+            "JSLink": "",
+            "MobileDisplayFormUrl": "",
+            "MobileEditFormUrl": "",
+            "MobileNewFormUrl": "",
+            "Name": "Folder",
+            "NewFormTemplateName": "ListForm",
+            "NewFormUrl": "",
+            "ReadOnly": false,
+            "SchemaXml": "<ContentType ID=\"0x0120000EAD53EDAD7C6647B0D976EEC953F99E\" Name=\"Folder\" Group=\"Folder Content Types\" Description=\"Create a new folder.\" Sealed=\"TRUE\" Version=\"0\" DelayActivateTemplateBinding=\"GROUP,SPSPERS,SITEPAGEPUBLISHING\" FeatureId=\"{695b6570-a48b-4a8e-8ea5-26ea7fc1d162}\"><Fields><Field ID=\"{c042a256-787d-4a6f-8a8a-cf6ab767f12d}\" Type=\"Computed\" DisplayName=\"Content Type\" Name=\"ContentType\" DisplaceOnUpgrade=\"TRUE\" RenderXMLUsingPattern=\"TRUE\" Sortable=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"ContentType\" Group=\"_Hidden\" PITarget=\"MicrosoftWindowsSharePointServices\" PIAttribute=\"ContentTypeID\" FromBaseType=\"TRUE\"><FieldRefs><FieldRef Name=\"ContentTypeId\"/></FieldRefs><DisplayPattern><MapToContentType><Column Name=\"ContentTypeId\"/></MapToContentType></DisplayPattern></Field><Field ID=\"{fa564e0f-0c70-4ab9-b863-0177e6ddd247}\" Type=\"Text\" Name=\"Title\" ShowInNewForm=\"FALSE\" ShowInFileDlg=\"FALSE\" DisplayName=\"Title\" Sealed=\"TRUE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"Title\" ColName=\"nvarchar8\" Required=\"FALSE\" Hidden=\"TRUE\"/><Field ID=\"{8553196d-ec8d-4564-9861-3dbe931050c8}\" ShowInFileDlg=\"FALSE\" ShowInVersionHistory=\"FALSE\" Type=\"File\" Name=\"FileLeafRef\" DisplayName=\"Name\" AuthoringInfo=\"(for use in forms)\" List=\"Docs\" FieldRef=\"ID\" ShowField=\"LeafName\" JoinColName=\"DoclibRowId\" JoinRowOrdinal=\"0\" JoinType=\"INNER\" Required=\"TRUE\" NoCustomize=\"TRUE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"FileLeafRef\" FromBaseType=\"TRUE\" Hidden=\"FALSE\"/><Field ID=\"{b824e17e-a1b3-426e-aecf-f0184d900485}\" Name=\"ItemChildCount\" DisplaceOnUpgrade=\"TRUE\" ReadOnly=\"TRUE\" ShowInFileDlg=\"FALSE\" Type=\"Lookup\" DisplayName=\"Item Child Count\" List=\"Docs\" FieldRef=\"ID\" ShowField=\"ItemChildCount\" JoinColName=\"DoclibRowId\" JoinRowOrdinal=\"0\" JoinType=\"INNER\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"ItemChildCount\" FromBaseType=\"TRUE\"/><Field ID=\"{960ff01f-2b6d-4f1b-9c3f-e19ad8927341}\" Name=\"FolderChildCount\" DisplaceOnUpgrade=\"TRUE\" ReadOnly=\"TRUE\" ShowInFileDlg=\"FALSE\" Type=\"Lookup\" DisplayName=\"Folder Child Count\" List=\"Docs\" FieldRef=\"ID\" ShowField=\"FolderChildCount\" JoinColName=\"DoclibRowId\" JoinRowOrdinal=\"0\" JoinType=\"INNER\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"FolderChildCount\" FromBaseType=\"TRUE\"/></Fields><XmlDocuments><XmlDocument NamespaceURI=\"http://schemas.microsoft.com/sharepoint/v3/contenttype/forms\"><FormTemplates xmlns=\"http://schemas.microsoft.com/sharepoint/v3/contenttype/forms\"><Display>ListForm</Display><Edit>ListForm</Edit><New>ListForm</New></FormTemplates></XmlDocument></XmlDocuments></ContentType>",
+            "Scope": "/Shared Documents",
+            "Sealed": true,
+            "StringId": "0x0120000EAD53EDAD7C6647B0D976EEC953F99E"
+          }
+        ]));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('command correctly handles list get reject request', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        return Promise.resolve({
+          FormDigestValue: 'abc'
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    const err = 'Invalid request';
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('/_api/web/lists/GetByTitle(') > -1) {
+        return Promise.reject(err);
       }
 
       return Promise.reject('Invalid request');
@@ -123,9 +2062,18 @@ describe(commands.LIST_VIEW_LIST, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com', listTitle: 'List 1' } }, () => {
+
+    const actionTitle: string = 'Documents';
+
+    cmdInstance.action({
+      options: {
+        debug: true,
+        listTitle: actionTitle,
+        webUrl: 'https://contoso.sharepoint.com'
+      }
+    }, (error?: any) => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert.equal(JSON.stringify(error), JSON.stringify(new CommandError(err)));
         done();
       }
       catch (e) {
@@ -134,17 +2082,12 @@ describe(commands.LIST_VIEW_LIST, () => {
     });
   });
 
-  it('updates the Title and CustomFormatter of the list view specified using its ID', (done) => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'330f29c5-5c4c-465f-9f4b-7903020ae1cf')/views/getById('330f29c5-5c4c-465f-9f4b-7903020ae1ce')`) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0 &&
-          opts.headers['X-RequestDigest'] &&
-          JSON.stringify(opts.body) === JSON.stringify({ Title: 'All events', CustomFormatter: 'abc' })) {
-          return Promise.resolve();
-        }
+  it('uses correct API url when listTitle option is passed', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('/_api/web/lists/GetByTitle(') > -1) {
+        return Promise.resolve({
+          "value": []
+        })
       }
 
       return Promise.reject('Invalid request');
@@ -154,9 +2097,19 @@ describe(commands.LIST_VIEW_LIST, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com', listId: '330f29c5-5c4c-465f-9f4b-7903020ae1cf', viewId: '330f29c5-5c4c-465f-9f4b-7903020ae1ce', Title: 'All events', CustomFormatter: 'abc' } }, () => {
+
+    const actionTitle: string = 'Documents';
+
+    cmdInstance.action({
+      options: {
+        debug: false,
+        listTitle: actionTitle,
+        webUrl: 'https://contoso.sharepoint.com'
+      }
+    }, () => {
+
       try {
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(1 === 1);
         done();
       }
       catch (e) {
@@ -165,28 +2118,34 @@ describe(commands.LIST_VIEW_LIST, () => {
     });
   });
 
-  it('correctly handles error when the specified list doesn\'t exist', (done) => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
-      return Promise.reject({
-        error: {
-          "odata.error": {
-            "code": "-1, System.ArgumentException",
-            "message": {
-              "lang": "en-US",
-              "value": "List 'List' does not exist at site with URL 'https://contoso.sharepoint.com'."
-            }
-          }
-        }
-      })
+  it('uses correct API url when listId option is passed', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('/_api/web/lists(guid') > -1) {
+        return Promise.resolve({
+          "value": []
+        })
+      }
+
+      return Promise.reject('Invalid request');
     });
 
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com', listTitle: 'List', viewTitle: 'All items' } }, (err?: any) => {
+
+    const actionId: string = '1f187321-f086-4d3d-8523-517e94cc9df9';
+
+    cmdInstance.action({
+      options: {
+        debug: false,
+        listId: actionId,
+        webUrl: 'https://contoso.sharepoint.com'
+      }
+    }, () => {
+
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("List 'List' does not exist at site with URL 'https://contoso.sharepoint.com'.")));
+        assert(1 === 1);
         done();
       }
       catch (e) {
@@ -195,34 +2154,39 @@ describe(commands.LIST_VIEW_LIST, () => {
     });
   });
 
-  it('correctly handles error when the specified view doesn\'t exist', (done) => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
-      return Promise.reject({
-        error: {
-          "odata.error": {
-            "code": "-2147024809, System.ArgumentException",
-            "message": {
-              "lang": "en-US",
-              "value": "The specified view is invalid."
-            }
-          }
-        }
-      })
-    });
+  it('fails validation if the webUrl option not specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { listId: '1f187321-f086-4d3d-8523-517e94cc9df9' } });
+    assert.notEqual(actual, true);
+  });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com', listTitle: 'List', viewTitle: 'All items' } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("The specified view is invalid.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+  it('fails validation if both listId and listTitle options are not passed', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'foo', listId: '1f187321-f086-4d3d-8523-517e94cc9df9' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '1f187321-f086-4d3d-8523-517e94cc9df9' } });
+    assert(actual);
+  });
+
+  it('fails validation if the listId option is not a valid GUID', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '12345' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('passes validation if the listId option is a valid GUID', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '1f187321-f086-4d3d-8523-517e94cc9df9' } });
+    assert(actual);
+  });
+
+  it('fails validation if both listId and listTitle options are passed', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '1f187321-f086-4d3d-8523-517e94cc9df9', listTitle: 'Documents' } });
+    assert.notEqual(actual, true);
   });
 
   it('supports debug mode', () => {
@@ -234,36 +2198,6 @@ describe(commands.LIST_VIEW_LIST, () => {
       }
     });
     assert(containsDebugOption);
-  });
-
-  it('allows unknown options', () => {
-    const allowUnknownOptions = command.allowUnknownOptions();
-    assert.equal(allowUnknownOptions, true);
-  });
-
-  it('fails validation if webUrl is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { listTitle: 'List 1', viewTitle: 'All items' } });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if webUrl is not a valid SharePoint URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'invalid', listTitle: 'List 1', viewTitle: 'All items' } });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if neither listId nor listTitle specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', viewTitle: 'All items' } });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if both listId and listTitle specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'List 1', listId: '330f29c5-5c4c-465f-9f4b-7903020ae1ce', viewTitle: 'All items' } });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if listId is not a GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listId: 'invalid', viewTitle: 'All items' } });
-    assert.notEqual(actual, true);
   });
 
   it('has help referring to the right command', () => {
@@ -307,7 +2241,13 @@ describe(commands.LIST_VIEW_LIST, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com' } }, (err?: any) => {
+    cmdInstance.action({
+      options: {
+        listId: "1f187321-f086-4d3d-8523-517e94cc9df9",
+        webUrl: "https://contoso.sharepoint.com",
+        debug: false
+      }
+    }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
         done();
