@@ -3,7 +3,7 @@ import Command, { CommandValidate, CommandError, CommandOption } from '../../../
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
-const command: Command = require('./list-contenttype-list');
+const command: Command = require('./list-view-list');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import Utils from '../../../../Utils';
