@@ -35,33 +35,22 @@ class TeamsUserListCommand extends GraphItemsListCommand<GroupUser> {
     return telemetryProps;
   }
 
-  // assumption we can only have 100 owners per team, but 2500 members
-  // do call to /members & /owners if no paramter is added
-  // do call to /members for guest and members (filter on usertype)
-
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    let groupOwners: GroupUser[] = [];
-    let groupMembers: GroupUser[] = [];
-    //let users: GroupUser[] = [];
-
     this.getOwners(cmd, args.options.teamId)
       .then((): Promise<any> => {
-        console.log("Retrieved owners");
+        cmd.log(args.options.role);
 
-        // currently there is a bug in the Graph that returns Owners as userType 'member'
-        // We therefor update all returned user as owner  
-        for (var i in this.items) {
-          this.items[i].userType = "Owner";
-        }
+        if (args.options.role != "Owner") {
 
-        groupOwners = this.items;
-
-        if (args.options.role || args.options.role !== "Owner") {
-          console.log("retrieving Members");
-          return this.getMembers(cmd, args.options.teamId)
+          return this.getMembersAndGuests(cmd, args.options.teamId)
             .then((): Promise<any> => {
 
-              groupMembers = this.items;
+              // Filter out duplicate added values for owners (as they are returned as members as well)
+              this.items = this.items.filter((groupUser, index, self) =>
+                index === self.findIndex((t) => (
+                  t.id === groupUser.id && t.displayName === groupUser.displayName
+                ))
+              )
 
               return Promise.resolve();
             });
@@ -71,17 +60,15 @@ class TeamsUserListCommand extends GraphItemsListCommand<GroupUser> {
       })
 
       .then((): void => {
-
-        // construct array with both members and owners / filter out duplicate 
-
-        if (this.debug) {
-          cmd.log('Response:')
-          cmd.log(groupOwners)
-          cmd.log(groupMembers)
-          cmd.log('');
+        if (args.options.role) {
+          this.items = this.items.filter(i => i.userType === args.options.role)
         }
 
-        //cmd.log(groupOwners);
+        if (this.debug) {
+          cmd.log('Response:');
+          cmd.log(this.items);
+          cmd.log('');
+        }
 
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
@@ -91,23 +78,25 @@ class TeamsUserListCommand extends GraphItemsListCommand<GroupUser> {
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
 
-  private getOwners(cmd: CommandInstance, teamId: string): Promise<any> {
-    cmd.log('Retrieving Owners')
+  private getOwners(cmd: CommandInstance, teamId: string): Promise<void> {
     let endpoint: string = `${auth.service.resource}/v1.0/groups/${teamId}/owners?$select=id,displayName,userPrincipalName,userType`;
 
-    // Bug in the graph, we should upgrade to owners
-    return this.getAllItems(endpoint, cmd, true);
+    return this.getAllItems(endpoint, cmd, true).then((): void => {
+
+      // Currently there is a bug in the Graph that returns Owners as userType 'member'
+      // We therefor update all returned user as owner  
+      for (var i in this.items) {
+        this.items[i].userType = "Owner";
+      }
+    });
   }
 
-  private getMembers(cmd: CommandInstance, teamId: string): Promise<any> {
-    cmd.log('Retrieving Members')
-
+  private getMembersAndGuests(cmd: CommandInstance, teamId: string): Promise<any> {
     let endpoint: string = `${auth.service.resource}/v1.0/groups/${teamId}/members?$select=id,displayName,userPrincipalName,userType`;
-    return this.getAllItems(endpoint, cmd, true);
+    return this.getAllItems(endpoint, cmd, false);
   }
 
   public options(): CommandOption[] {
-
     const options: CommandOption[] = [
       {
         option: '-i, --teamId <teamId>',
@@ -165,8 +154,6 @@ class TeamsUserListCommand extends GraphItemsListCommand<GroupUser> {
       ${chalk.grey(config.delimiter)} ${this.name} --i '00000000-0000-0000-0000-000000000000' -r Guest
 `);
   }
-
-
 }
 
 module.exports = new TeamsUserListCommand();
