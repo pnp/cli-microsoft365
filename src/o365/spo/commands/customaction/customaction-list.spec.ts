@@ -693,53 +693,6 @@ describe(commands.CUSTOMACTION_LIST, () => {
     });
   });
 
-  // it('correctly handles no scope entered (debug)', (done) => {
-  //   stubAuth();
-  //   sinon.stub(request, 'get').callsFake((opts) => {
-
-  //     if (opts.url.indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
-  //       return Promise.resolve(JSON.stringify({ value: [] }));
-  //     }
-  //     return Promise.reject('Invalid request');
-  //   });
-
-  //   auth.site = new Site();
-  //   auth.site.connected = true;
-  //   auth.site.url = 'https://contoso.sharepoint.com';
-  //   cmdInstance.action = command.action();
-
-  //   const options: Object = {
-  //     verbose: true,
-  //     debug: false,
-  //     url: 'https://contoso.sharepoint.com',
-  //     scope: 'Site',
-  //   }
-  //   cmdInstance.action({ options: options }, () => {
-  //     let correctLogStatement = false;
-  //     log.forEach(l => {
-  //       if (!l || typeof l !== 'string') {
-  //         return;
-  //       }
-
-  //       if (l.indexOf('No features found') > -1) {
-  //         correctLogStatement = true;
-  //       }
-  //     })
-  //     try {
-  //       assert(correctLogStatement);
-  //       done();
-  //     }
-  //     catch (e) {
-  //       done(e);
-  //     }
-  //     finally {
-  //       Utils.restore(request.post);
-  //       Utils.restore(request.get);
-  //     }
-  //   });
-  // });
-
-
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
     const actual = (command.validate() as CommandValidate)({
       options:
