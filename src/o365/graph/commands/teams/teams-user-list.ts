@@ -27,7 +27,7 @@ class TeamsUserListCommand extends GraphItemsListCommand<GroupUser> {
   }
 
   public get description(): string {
-    return 'Lists users of the specified Microsoft Teams team';
+    return 'Lists Microsoft Teams teams users for a specified team';
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
@@ -128,8 +128,6 @@ class TeamsUserListCommand extends GraphItemsListCommand<GroupUser> {
     To list  users in  Microsoft Teams, you have to first log in to
     the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
     eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
-
-    You can only see the users of the Microsoft Teams you are a member of.
 
   Examples:
   
