@@ -19,6 +19,7 @@ describe(commands.LIST_VIEW_LIST, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
+    sinon.stub(command as any, 'getRequestDigestForSite').callsFake(() => Promise.resolve({ FormDigestValue: 'ABC' }));
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
       telemetry = t;
     });
@@ -106,339 +107,13 @@ describe(commands.LIST_VIEW_LIST, () => {
 
   it('retrieves all views of the specific list if listTitle option is passed (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/views`) > -1) {
+      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle(\'Documents\')/views`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
-            "value":[
-              {
-                "__metadata":{
-                  "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'85907fb0-cda1-43ec-832e-27118c89cf9f')",
-                  "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'85907fb0-cda1-43ec-832e-27118c89cf9f')",
-                  "type":"SP.View"
-                },
-                "ViewFields":{
-                  "__deferred": {
-                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'85907fb0-cda1-43ec-832e-27118c89cf9f')/ViewFields"
-                  }
-                },
-                "Aggregations":null,
-                "AggregationsStatus":null,
-                "BaseViewId":"1",
-                "ColumnWidth":null,
-                "ContentTypeId":{
-                  "__metadata":{
-                    "type":"SP.ContentTypeId"
-                  },
-                  "StringValue":"0x"
-                },
-                "CustomFormatter":null,
-                "DefaultView":true,
-                "DefaultViewForContentType":false,
-                "EditorModified":false,
-                "Formats":null,
-                "Hidden":false,
-                "HtmlSchemaXml":"<View Name=\"{85907FB0-CDA1-43EC-832E-27118C89CF9F}\" DefaultView=\"TRUE\" MobileView=\"TRUE\" MobileDefaultView=\"TRUE\" Type=\"HTML\" DisplayName=\"All Documents\" Url=\"/sites/ninja/Shared Documents/Forms/AllItems.aspx\" Level=\"1\" BaseViewID=\"1\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query></View>",
-                "Id":"85907fb0-cda1-43ec-832e-27118c89cf9f",
-                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
-                "IncludeRootFolder":false,
-                "ViewJoins":null,
-                "JSLink":"clienttemplates.js",
-                "ListViewXml":"<View Name=\"{85907FB0-CDA1-43EC-832E-27118C89CF9F}\" DefaultView=\"TRUE\" MobileView=\"TRUE\" MobileDefaultView=\"TRUE\" Type=\"HTML\" DisplayName=\"All Documents\" Url=\"/sites/ninja/Shared Documents/Forms/AllItems.aspx\" Level=\"1\" BaseViewID=\"1\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
-                "Method":null,
-                "MobileDefaultView":true,
-                "MobileView":true,
-                "ModerationType":null,
-                "NewDocumentTemplates":null,
-                "OrderedView":false,
-                "Paged":true,
-                "PersonalView":false,
-                "ViewProjectedFields":null,
-                "ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>",
-                "ReadOnlyView":false,
-                "RequiresClientIntegration":false,
-                "RowLimit":30,
-                "Scope":0,
-                "ServerRelativePath":{
-                  "__metadata": {
-                    "type":"SP.ResourcePath"
-                  },
-                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/AllItems.aspx"
-                },
-                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/AllItems.aspx",
-                "StyleId":null,
-                "TabularView":true,
-                "Threaded":false,
-                "Title":"All Documents",
-                "Toolbar":"",
-                "ToolbarTemplateName":null,
-                "ViewType":"HTML",
-                "ViewData":null,
-                "VisualizationInfo":null
-              },
-              {
-                "__metadata":{
-                  "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'281e80fd-099b-4eba-b622-a94fa03bf865')",
-                  "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'281e80fd-099b-4eba-b622-a94fa03bf865')",
-                  "type":"SP.View"
-                },
-                "ViewFields":{
-                  "__deferred":{
-                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'281e80fd-099b-4eba-b622-a94fa03bf865')/ViewFields"
-                  }
-                },
-                "Aggregations":null,
-                "AggregationsStatus":null,
-                "BaseViewId":"9",
-                "ColumnWidth":null,
-                "ContentTypeId":{
-                  "__metadata":{
-                    "type":"SP.ContentTypeId"
-                  },
-                  "StringValue":"0x"
-                },
-                "CustomFormatter":null,
-                "DefaultView":false,
-                "DefaultViewForContentType":false,
-                "EditorModified":false,
-                "Formats":null,
-                "Hidden":true,
-                "HtmlSchemaXml":"<View Name=\"{281E80FD-099B-4EBA-B622-A94FA03BF865}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" DisplayName=\"Relink Documents\" Url=\"/sites/ninja/Shared Documents/Forms/repair.aspx\" Level=\"1\" BaseViewID=\"9\" ContentTypeID=\"0x\" ToolbarTemplate=\"RelinkToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilenameNoMenu\" /><FieldRef Name=\"RepairDocument\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /><FieldRef Name=\"ContentType\" /><FieldRef Name=\"TemplateUrl\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where></Query></View>",
-                "Id":"281e80fd-099b-4eba-b622-a94fa03bf865",
-                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
-                "IncludeRootFolder":false,
-                "ViewJoins":null,
-                "JSLink":null,
-                "ListViewXml":"<View Name=\"{281E80FD-099B-4EBA-B622-A94FA03BF865}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" DisplayName=\"Relink Documents\" Url=\"/sites/ninja/Shared Documents/Forms/repair.aspx\" Level=\"1\" BaseViewID=\"9\" ContentTypeID=\"0x\" ToolbarTemplate=\"RelinkToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilenameNoMenu\" /><FieldRef Name=\"RepairDocument\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /><FieldRef Name=\"ContentType\" /><FieldRef Name=\"TemplateUrl\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
-                "Method":null,
-                "MobileDefaultView":false,
-                "MobileView":false,
-                "ModerationType":null,
-                "NewDocumentTemplates":null,
-                "OrderedView":false,
-                "Paged":true,
-                "PersonalView":false,
-                "ViewProjectedFields":null,
-                "ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where>",
-                "ReadOnlyView":false,
-                "RequiresClientIntegration":false,
-                "RowLimit":30,
-                "Scope":0,
-                "ServerRelativePath":{
-                  "__metadata":{
-                    "type":"SP.ResourcePath"
-                  },
-                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/repair.aspx"
-                },
-                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/repair.aspx",
-                "StyleId":null,
-                "TabularView":false,
-                "Threaded":false,
-                "Title":"Relink Documents",
-                "Toolbar":"",
-                "ToolbarTemplateName":"RelinkToolBar",
-                "ViewType":"HTML",
-                "ViewData":null,
-                "VisualizationInfo":null
-                },
-                {
-                  "__metadata":{
-                    "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'3d760127-982c-405e-9c93-e1f76e1a1110')",
-                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'3d760127-982c-405e-9c93-e1f76e1a1110')",
-                    "type":"SP.View"
-                  },
-                  "ViewFields":{
-                    "__deferred":{
-                      "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'3d760127-982c-405e-9c93-e1f76e1a1110')/ViewFields"
-                    }
-                  },
-                "Aggregations":null,
-                "AggregationsStatus":null,
-                "BaseViewId":"40",
-                "ColumnWidth":null,
-                "ContentTypeId":{
-                  "__metadata":{
-                    "type":"SP.ContentTypeId"
-                  },
-                  "StringValue":"0x"
-                },
-                "CustomFormatter":null,
-                "DefaultView":false,
-                "DefaultViewForContentType":false,
-                "EditorModified":false,
-                "Formats":null,
-                "Hidden":true,
-                "HtmlSchemaXml":"<View Name=\"{3D760127-982C-405E-9C93-E1F76E1A1110}\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"assetLibTemp\" Url=\"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx\" Level=\"1\" BaseViewID=\"40\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><ViewFields><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit>20</RowLimit><Query><OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy></Query></View>",
-                "Id":"3d760127-982c-405e-9c93-e1f76e1a1110",
-                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
-                "IncludeRootFolder":false,
-                "ViewJoins":null,
-                "JSLink":null,
-                "ListViewXml":"<View Name=\"{3D760127-982C-405E-9C93-E1F76E1A1110}\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"assetLibTemp\" Url=\"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx\" Level=\"1\" BaseViewID=\"40\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy></Query><ViewFields><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit>20</RowLimit><Toolbar Type=\"None\"/></View>",
-                "Method":null,
-                "MobileDefaultView":false,
-                "MobileView":false,
-                "ModerationType":null,
-                "NewDocumentTemplates":null,
-                "OrderedView":false,
-                "Paged":false,
-                "PersonalView":false,
-                "ViewProjectedFields":null,
-                "ViewQuery":"<OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy>",
-                "ReadOnlyView":false,
-                "RequiresClientIntegration":false,
-                "RowLimit":20,
-                "Scope":0,
-                "ServerRelativePath":{
-                  "__metadata":{
-                    "type":"SP.ResourcePath"
-                  },
-                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx"
-                },
-                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx",
-                "StyleId":null,
-                "TabularView":true,
-                "Threaded":false,
-                "Title":"assetLibTemp",
-                "Toolbar":null,
-                "ToolbarTemplateName":null,
-                "ViewType":"HTML",
-                "ViewData":null,
-                "VisualizationInfo":null
-              },
-              {
-                "__metadata":{
-                  "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'1204c10a-978d-46c8-a6f2-65ecfa5e03d5')",
-                  "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'1204c10a-978d-46c8-a6f2-65ecfa5e03d5')",
-                  "type":"SP.View"
-                },
-                "ViewFields":{
-                  "__deferred":{
-                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'1204c10a-978d-46c8-a6f2-65ecfa5e03d5')/ViewFields"
-                  }
-                },
-                "Aggregations":null,
-                "AggregationsStatus":null,
-                "BaseViewId":"7",
-                "ColumnWidth":null,
-                "ContentTypeId":{
-                  "__metadata":{
-                    "type":"SP.ContentTypeId"
-                  },
-                  "StringValue":"0x"
-                },
-                "CustomFormatter":null,
-                "DefaultView":false,
-                "DefaultViewForContentType":false,
-                "EditorModified":false,
-                "Formats":null,
-                "Hidden":true,
-                "HtmlSchemaXml":"<View Name=\"{1204C10A-978D-46C8-A6F2-65ECFA5E03D5}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" AggregateView=\"TRUE\" DisplayName=\"Merge Documents\" Url=\"/sites/ninja/Shared Documents/Forms/Combine.aspx\" Level=\"1\" BaseViewID=\"7\" ContentTypeID=\"0x\" ToolbarTemplate=\"MergeToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Combine\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query></View>",
-                "Id":"1204c10a-978d-46c8-a6f2-65ecfa5e03d5",
-                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
-                "IncludeRootFolder":false,
-                "ViewJoins":null,
-                "JSLink":"clienttemplates.js",
-                "ListViewXml":"<View Name=\"{1204C10A-978D-46C8-A6F2-65ECFA5E03D5}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" AggregateView=\"TRUE\" DisplayName=\"Merge Documents\" Url=\"/sites/ninja/Shared Documents/Forms/Combine.aspx\" Level=\"1\" BaseViewID=\"7\" ContentTypeID=\"0x\" ToolbarTemplate=\"MergeToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Combine\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
-                "Method":null,
-                "MobileDefaultView":false,
-                "MobileView":false,
-                "ModerationType":null,
-                "NewDocumentTemplates":null,
-                "OrderedView":false,
-                "Paged":true,
-                "PersonalView":false,
-                "ViewProjectedFields":null,
-                "ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>",
-                "ReadOnlyView":false,
-                "RequiresClientIntegration":false,
-                "RowLimit":30,
-                "Scope":0,
-                "ServerRelativePath":{
-                  "__metadata":{
-                    "type":"SP.ResourcePath"
-                  },
-                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/Combine.aspx"
-                },
-                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/Combine.aspx",
-                "StyleId":null,
-                "TabularView":false,
-                "Threaded":false,
-                "Title":"Merge Documents",
-                "Toolbar":"",
-                "ToolbarTemplateName":"MergeToolBar",
-                "ViewType":"HTML",
-                "ViewData":null,
-                "VisualizationInfo":null
-                },
-                {
-                  "__metadata":{
-                    "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'e021e923-0801-4a16-9775-545239356739')",
-                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'e021e923-0801-4a16-9775-545239356739')",
-                    "type":"SP.View"
-                  },
-                  "ViewFields":{
-                    "__deferred":{
-                      "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'e021e923-0801-4a16-9775-545239356739')/ViewFields"
-                    }
-                  },
-                  "Aggregations":null,
-                  "AggregationsStatus":null,
-                  "BaseViewId":"50",
-                  "ColumnWidth":null,
-                  "ContentTypeId":{
-                    "__metadata":{
-                      "type":"SP.ContentTypeId"
-                    },
-                    "StringValue":"0x"
-                  },
-                  "CustomFormatter":null,
-                  "DefaultView":false,
-                  "DefaultViewForContentType":false,
-                  "EditorModified":false,
-                  "Formats":null,
-                  "Hidden":true,
-                  "HtmlSchemaXml":"<View Name=\"{E021E923-0801-4A16-9775-545239356739}\" MobileView=\"TRUE\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"\" Url=\"/sites/ninja/SitePages/Home.aspx\" Level=\"1\" BaseViewID=\"50\" ContentTypeID=\"0x\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">15</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy></Query></View>",
-                  "Id":"e021e923-0801-4a16-9775-545239356739",
-                  "ImageUrl":null,
-                  "IncludeRootFolder":false,
-                  "ViewJoins":null,
-                  "JSLink":"clienttemplates.js",
-                  "ListViewXml":"<View Name=\"{E021E923-0801-4A16-9775-545239356739}\" MobileView=\"TRUE\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"\" Url=\"/sites/ninja/SitePages/Home.aspx\" Level=\"1\" BaseViewID=\"50\" ContentTypeID=\"0x\" ><Query><OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit Paged=\"TRUE\">15</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
-                  "Method":null,
-                  "MobileDefaultView":false,
-                  "MobileView":true,
-                  "ModerationType":null,
-                  "NewDocumentTemplates":null,
-                  "OrderedView":false,
-                  "Paged":true,
-                  "PersonalView":false,
-                  "ViewProjectedFields":null,
-                  "ViewQuery":"<OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy>",
-                  "ReadOnlyView":false,
-                  "RequiresClientIntegration":false,
-                  "RowLimit":15,
-                  "Scope":0,
-                  "ServerRelativePath":{
-                    "__metadata":{
-                      "type":"SP.ResourcePath"
-                    },
-                    "DecodedUrl":"/sites/ninja/SitePages/Home.aspx"
-                  },
-                  "ServerRelativeUrl":"/sites/ninja/SitePages/Home.aspx",
-                  "StyleId":null,
-                  "TabularView":true,
-                  "Threaded":false,
-                  "Title":"",
-                  "Toolbar":"",
-                  "ToolbarTemplateName":null,
-                  "ViewType":"HTML",
-                  "ViewData":null,
-                  "VisualizationInfo":null
-              }
-            ]
+            "value": [{"Aggregations":null,"AggregationsStatus":null,"BaseViewId":"1","ColumnWidth":null,"ContentTypeId":{"StringValue":"0x"},"CustomFormatter":null,"DefaultView":true,"DefaultViewForContentType":false,"EditorModified":false,"Formats":null,"Hidden":false,"HtmlSchemaXml":"<View Name=\"{85907FB0-CDA1-43EC-832E-27118C89CF9F}\" DefaultView=\"TRUE\" MobileView=\"TRUE\" MobileDefaultView=\"TRUE\" Type=\"HTML\" DisplayName=\"All Documents\" Url=\"/sites/ninja/Shared Documents/Forms/AllItems.aspx\" Level=\"1\" BaseViewID=\"1\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query></View>","Id":"85907fb0-cda1-43ec-832e-27118c89cf9f","ImageUrl":"/_layouts/15/images/dlicon.png?rev=45","IncludeRootFolder":false,"ViewJoins":null,"JSLink":"clienttemplates.js","ListViewXml":"<View Name=\"{85907FB0-CDA1-43EC-832E-27118C89CF9F}\" DefaultView=\"TRUE\" MobileView=\"TRUE\" MobileDefaultView=\"TRUE\" Type=\"HTML\" DisplayName=\"All Documents\" Url=\"/sites/ninja/Shared Documents/Forms/AllItems.aspx\" Level=\"1\" BaseViewID=\"1\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>","Method":null,"MobileDefaultView":true,"MobileView":true,"ModerationType":null,"NewDocumentTemplates":null,"OrderedView":false,"Paged":true,"PersonalView":false,"ViewProjectedFields":null,"ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>","ReadOnlyView":false,"RequiresClientIntegration":false,"RowLimit":30,"Scope":0,"ServerRelativePath":{"DecodedUrl":"/sites/ninja/Shared Documents/Forms/AllItems.aspx"},"ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/AllItems.aspx","StyleId":null,"TabularView":true,"Threaded":false,"Title":"All Documents","Toolbar":"","ToolbarTemplateName":null,"ViewType":"HTML","ViewData":null,"VisualizationInfo":null},{"Aggregations":null,"AggregationsStatus":null,"BaseViewId":"9","ColumnWidth":null,"ContentTypeId":{"StringValue":"0x"},"CustomFormatter":null,"DefaultView":false,"DefaultViewForContentType":false,"EditorModified":false,"Formats":null,"Hidden":true,"HtmlSchemaXml":"<View Name=\"{281E80FD-099B-4EBA-B622-A94FA03BF865}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" DisplayName=\"Relink Documents\" Url=\"/sites/ninja/Shared Documents/Forms/repair.aspx\" Level=\"1\" BaseViewID=\"9\" ContentTypeID=\"0x\" ToolbarTemplate=\"RelinkToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilenameNoMenu\" /><FieldRef Name=\"RepairDocument\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /><FieldRef Name=\"ContentType\" /><FieldRef Name=\"TemplateUrl\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where></Query></View>","Id":"281e80fd-099b-4eba-b622-a94fa03bf865","ImageUrl":"/_layouts/15/images/dlicon.png?rev=45","IncludeRootFolder":false,"ViewJoins":null,"JSLink":null,"ListViewXml":"<View Name=\"{281E80FD-099B-4EBA-B622-A94FA03BF865}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" DisplayName=\"Relink Documents\" Url=\"/sites/ninja/Shared Documents/Forms/repair.aspx\" Level=\"1\" BaseViewID=\"9\" ContentTypeID=\"0x\" ToolbarTemplate=\"RelinkToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilenameNoMenu\" /><FieldRef Name=\"RepairDocument\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\"/><FieldRef Name=\"ContentType\" /><FieldRef Name=\"TemplateUrl\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>","Method":null,"MobileDefaultView":false,"MobileView":false,"ModerationType":null,"NewDocumentTemplates":null,"OrderedView":false,"Paged":true,"PersonalView":false,"ViewProjectedFields":null,"ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where>","ReadOnlyView":false,"RequiresClientIntegration":false,"RowLimit":30,"Scope":0,"ServerRelativePath":{"DecodedUrl":"/sites/ninja/Shared Documents/Forms/repair.aspx"},"ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/repair.aspx","StyleId":null,"TabularView":false,"Threaded":false,"Title":"Relink Documents","Toolbar":"","ToolbarTemplateName":"RelinkToolBar","ViewType":"HTML","ViewData":null,"VisualizationInfo":null},{"Aggregations":null,"AggregationsStatus":null,"BaseViewId":"40","ColumnWidth":null,"ContentTypeId":{"StringValue":"0x"},"CustomFormatter":null,"DefaultView":false,"DefaultViewForContentType":false,"EditorModified":false,"Formats":null,"Hidden":true,"HtmlSchemaXml":"<View Name=\"{3D760127-982C-405E-9C93-E1F76E1A1110}\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"assetLibTemp\" Url=\"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx\" Level=\"1\" BaseViewID=\"40\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><ViewFields><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit>20</RowLimit><Query><OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy></Query></View>","Id":"3d760127-982c-405e-9c93-e1f76e1a1110","ImageUrl":"/_layouts/15/images/dlicon.png?rev=45","IncludeRootFolder":false,"ViewJoins":null,"JSLink":null,"ListViewXml":"<View Name=\"{3D760127-982C-405E-9C93-E1F76E1A1110}\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"assetLibTemp\" Url=\"/sites/ninja/SharedDocuments/Forms/Thumbnails.aspx\" Level=\"1\" BaseViewID=\"40\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy></Query><ViewFields><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit>20</RowLimit><Toolbar Type=\"None\"/></View>","Method":null,"MobileDefaultView":false,"MobileView":false,"ModerationType":null,"NewDocumentTemplates":null,"OrderedView":false,"Paged":false,"PersonalView":false,"ViewProjectedFields":null,"ViewQuery":"<OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy>","ReadOnlyView":false,"RequiresClientIntegration":false,"RowLimit":20,"Scope":0,"ServerRelativePath":{"DecodedUrl":"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx"},"ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx","StyleId":null,"TabularView":true,"Threaded":false,"Title":"assetLibTemp","Toolbar":null,"ToolbarTemplateName":null,"ViewType":"HTML","ViewData":null,"VisualizationInfo":null},{"Aggregations":null,"AggregationsStatus":null,"BaseViewId":"7","ColumnWidth":null,"ContentTypeId":{"StringValue":"0x"},"CustomFormatter":null,"DefaultView":false,"DefaultViewForContentType":false,"EditorModified":false,"Formats":null,"Hidden":true,"HtmlSchemaXml":"<View Name=\"{1204C10A-978D-46C8-A6F2-65ECFA5E03D5}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" AggregateView=\"TRUE\" DisplayName=\"Merge Documents\" Url=\"/sites/ninja/Shared Documents/Forms/Combine.aspx\" Level=\"1\" BaseViewID=\"7\" ContentTypeID=\"0x\" ToolbarTemplate=\"MergeToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Combine\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query></View>","Id":"1204c10a-978d-46c8-a6f2-65ecfa5e03d5","ImageUrl":"/_layouts/15/images/dlicon.png?rev=45","IncludeRootFolder":false,"ViewJoins":null,"JSLink":"clienttemplates.js","ListViewXml":"<View Name=\"{1204C10A-978D-46C8-A6F2-65ECFA5E03D5}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" AggregateView=\"TRUE\" DisplayName=\"Merge Documents\" Url=\"/sites/ninja/Shared Documents/Forms/Combine.aspx\" Level=\"1\" BaseViewID=\"7\" ContentTypeID=\"0x\" ToolbarTemplate=\"MergeToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Combine\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>","Method":null,"MobileDefaultView":false,"MobileView":false,"ModerationType":null,"NewDocumentTemplates":null,"OrderedView":false,"Paged":true,"PersonalView":false,"ViewProjectedFields":null,"ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>","ReadOnlyView":false,"RequiresClientIntegration":false,"RowLimit":30,"Scope":0,"ServerRelativePath":{"DecodedUrl":"/sites/ninja/Shared Documents/Forms/Combine.aspx"},"ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/Combine.aspx","StyleId":null,"TabularView":false,"Threaded":false,"Title":"Merge Documents","Toolbar":"","ToolbarTemplateName":"MergeToolBar","ViewType":"HTML","ViewData":null,"VisualizationInfo":null},{"Aggregations":null,"AggregationsStatus":null,"BaseViewId":"50","ColumnWidth":null,"ContentTypeId":{"StringValue":"0x"},"CustomFormatter":null,"DefaultView":false,"DefaultViewForContentType":false,"EditorModified":false,"Formats":null,"Hidden":true,"HtmlSchemaXml":"<View Name=\"{E021E923-0801-4A16-9775-545239356739}\" MobileView=\"TRUE\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"\" Url=\"/sites/ninja/SitePages/Home.aspx\" Level=\"1\" BaseViewID=\"50\" ContentTypeID=\"0x\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">15</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy></Query></View>","Id":"e021e923-0801-4a16-9775-545239356739","ImageUrl":null,"IncludeRootFolder":false,"ViewJoins":null,"JSLink":"clienttemplates.js","ListViewXml":"<View Name=\"{E021E923-0801-4A16-9775-545239356739}\" MobileView=\"TRUE\" Type=\"HTML\"Hidden=\"TRUE\" DisplayName=\"\" Url=\"/sites/ninja/SitePages/Home.aspx\" Level=\"1\" BaseViewID=\"50\" ContentTypeID=\"0x\" ><Query><OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit Paged=\"TRUE\">15</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>","Method":null,"MobileDefaultView":false,"MobileView":true,"ModerationType":null,"NewDocumentTemplates":null,"OrderedView":false,"Paged":true,"PersonalView":false,"ViewProjectedFields":null,"ViewQuery":"<OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy>","ReadOnlyView":false,"RequiresClientIntegration":false,"RowLimit":15,"Scope":0,"ServerRelativePath":{"DecodedUrl":"/sites/ninja/SitePages/Home.aspx"},"ServerRelativeUrl":"/sites/ninja/SitePages/Home.aspx","StyleId":null,"TabularView":true,"Threaded":false,"Title":"","Toolbar":"","ToolbarTemplateName":null,"ViewType":"HTML","ViewData":null,"VisualizationInfo":null}]
           });
         }
       }
@@ -461,18 +136,39 @@ describe(commands.LIST_VIEW_LIST, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith([
           {
-            "StringId": "0x010100260C61709CD8E548948F9BF605F8F54F",
-            "Name": "Document",
-            "Hidden": false,
-            "ReadOnly": false,
-            "Sealed": false
+            "Id":"85907fb0-cda1-43ec-832e-27118c89cf9f",
+            "Title":"All Documents",
+            "DefaultView":true,
+            "Hidden":false,
+            "BaseViewId":"1"
           },
           {
-            "StringId": "0x0120000EAD53EDAD7C6647B0D976EEC953F99E",
-            "Name": "Folder",
-            "Hidden": false,
-            "ReadOnly": false,
-            "Sealed": true
+            "Id":"281e80fd-099b-4eba-b622-a94fa03bf865",
+            "Title":"Relink Documents",
+            "DefaultView":false,
+            "Hidden":true,
+            "BaseViewId":"9"
+          },
+          {
+            "Id":"3d760127-982c-405e-9c93-e1f76e1a1110",
+            "Title":"assetLibTemp",
+            "DefaultView":false,
+            "Hidden":true,
+            "BaseViewId":"40"
+          },
+          {
+            "Id":"1204c10a-978d-46c8-a6f2-65ecfa5e03d5",
+            "Title":"Merge Documents",
+            "DefaultView":false,
+            "Hidden":true,
+            "BaseViewId":"7"
+          },
+          {
+            "Id":"e021e923-0801-4a16-9775-545239356739",
+            "Title":"",
+            "DefaultView":false,
+            "Hidden":true,
+            "BaseViewId":"50"
           }
         ]));
         done();
@@ -491,333 +187,7 @@ describe(commands.LIST_VIEW_LIST, () => {
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
-            "value":[
-              {
-                "__metadata":{
-                  "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'85907fb0-cda1-43ec-832e-27118c89cf9f')",
-                  "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'85907fb0-cda1-43ec-832e-27118c89cf9f')",
-                  "type":"SP.View"
-                },
-                "ViewFields":{
-                  "__deferred": {
-                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'85907fb0-cda1-43ec-832e-27118c89cf9f')/ViewFields"
-                  }
-                },
-                "Aggregations":null,
-                "AggregationsStatus":null,
-                "BaseViewId":"1",
-                "ColumnWidth":null,
-                "ContentTypeId":{
-                  "__metadata":{
-                    "type":"SP.ContentTypeId"
-                  },
-                  "StringValue":"0x"
-                },
-                "CustomFormatter":null,
-                "DefaultView":true,
-                "DefaultViewForContentType":false,
-                "EditorModified":false,
-                "Formats":null,
-                "Hidden":false,
-                "HtmlSchemaXml":"<View Name=\"{85907FB0-CDA1-43EC-832E-27118C89CF9F}\" DefaultView=\"TRUE\" MobileView=\"TRUE\" MobileDefaultView=\"TRUE\" Type=\"HTML\" DisplayName=\"All Documents\" Url=\"/sites/ninja/Shared Documents/Forms/AllItems.aspx\" Level=\"1\" BaseViewID=\"1\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query></View>",
-                "Id":"85907fb0-cda1-43ec-832e-27118c89cf9f",
-                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
-                "IncludeRootFolder":false,
-                "ViewJoins":null,
-                "JSLink":"clienttemplates.js",
-                "ListViewXml":"<View Name=\"{85907FB0-CDA1-43EC-832E-27118C89CF9F}\" DefaultView=\"TRUE\" MobileView=\"TRUE\" MobileDefaultView=\"TRUE\" Type=\"HTML\" DisplayName=\"All Documents\" Url=\"/sites/ninja/Shared Documents/Forms/AllItems.aspx\" Level=\"1\" BaseViewID=\"1\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
-                "Method":null,
-                "MobileDefaultView":true,
-                "MobileView":true,
-                "ModerationType":null,
-                "NewDocumentTemplates":null,
-                "OrderedView":false,
-                "Paged":true,
-                "PersonalView":false,
-                "ViewProjectedFields":null,
-                "ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>",
-                "ReadOnlyView":false,
-                "RequiresClientIntegration":false,
-                "RowLimit":30,
-                "Scope":0,
-                "ServerRelativePath":{
-                  "__metadata": {
-                    "type":"SP.ResourcePath"
-                  },
-                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/AllItems.aspx"
-                },
-                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/AllItems.aspx",
-                "StyleId":null,
-                "TabularView":true,
-                "Threaded":false,
-                "Title":"All Documents",
-                "Toolbar":"",
-                "ToolbarTemplateName":null,
-                "ViewType":"HTML",
-                "ViewData":null,
-                "VisualizationInfo":null
-              },
-              {
-                "__metadata":{
-                  "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'281e80fd-099b-4eba-b622-a94fa03bf865')",
-                  "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'281e80fd-099b-4eba-b622-a94fa03bf865')",
-                  "type":"SP.View"
-                },
-                "ViewFields":{
-                  "__deferred":{
-                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'281e80fd-099b-4eba-b622-a94fa03bf865')/ViewFields"
-                  }
-                },
-                "Aggregations":null,
-                "AggregationsStatus":null,
-                "BaseViewId":"9",
-                "ColumnWidth":null,
-                "ContentTypeId":{
-                  "__metadata":{
-                    "type":"SP.ContentTypeId"
-                  },
-                  "StringValue":"0x"
-                },
-                "CustomFormatter":null,
-                "DefaultView":false,
-                "DefaultViewForContentType":false,
-                "EditorModified":false,
-                "Formats":null,
-                "Hidden":true,
-                "HtmlSchemaXml":"<View Name=\"{281E80FD-099B-4EBA-B622-A94FA03BF865}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" DisplayName=\"Relink Documents\" Url=\"/sites/ninja/Shared Documents/Forms/repair.aspx\" Level=\"1\" BaseViewID=\"9\" ContentTypeID=\"0x\" ToolbarTemplate=\"RelinkToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilenameNoMenu\" /><FieldRef Name=\"RepairDocument\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /><FieldRef Name=\"ContentType\" /><FieldRef Name=\"TemplateUrl\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where></Query></View>",
-                "Id":"281e80fd-099b-4eba-b622-a94fa03bf865",
-                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
-                "IncludeRootFolder":false,
-                "ViewJoins":null,
-                "JSLink":null,
-                "ListViewXml":"<View Name=\"{281E80FD-099B-4EBA-B622-A94FA03BF865}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" DisplayName=\"Relink Documents\" Url=\"/sites/ninja/Shared Documents/Forms/repair.aspx\" Level=\"1\" BaseViewID=\"9\" ContentTypeID=\"0x\" ToolbarTemplate=\"RelinkToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilenameNoMenu\" /><FieldRef Name=\"RepairDocument\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /><FieldRef Name=\"ContentType\" /><FieldRef Name=\"TemplateUrl\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
-                "Method":null,
-                "MobileDefaultView":false,
-                "MobileView":false,
-                "ModerationType":null,
-                "NewDocumentTemplates":null,
-                "OrderedView":false,
-                "Paged":true,
-                "PersonalView":false,
-                "ViewProjectedFields":null,
-                "ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where>",
-                "ReadOnlyView":false,
-                "RequiresClientIntegration":false,
-                "RowLimit":30,
-                "Scope":0,
-                "ServerRelativePath":{
-                  "__metadata":{
-                    "type":"SP.ResourcePath"
-                  },
-                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/repair.aspx"
-                },
-                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/repair.aspx",
-                "StyleId":null,
-                "TabularView":false,
-                "Threaded":false,
-                "Title":"Relink Documents",
-                "Toolbar":"",
-                "ToolbarTemplateName":"RelinkToolBar",
-                "ViewType":"HTML",
-                "ViewData":null,
-                "VisualizationInfo":null
-                },
-                {
-                  "__metadata":{
-                    "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'3d760127-982c-405e-9c93-e1f76e1a1110')",
-                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'3d760127-982c-405e-9c93-e1f76e1a1110')",
-                    "type":"SP.View"
-                  },
-                  "ViewFields":{
-                    "__deferred":{
-                      "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'3d760127-982c-405e-9c93-e1f76e1a1110')/ViewFields"
-                    }
-                  },
-                "Aggregations":null,
-                "AggregationsStatus":null,
-                "BaseViewId":"40",
-                "ColumnWidth":null,
-                "ContentTypeId":{
-                  "__metadata":{
-                    "type":"SP.ContentTypeId"
-                  },
-                  "StringValue":"0x"
-                },
-                "CustomFormatter":null,
-                "DefaultView":false,
-                "DefaultViewForContentType":false,
-                "EditorModified":false,
-                "Formats":null,
-                "Hidden":true,
-                "HtmlSchemaXml":"<View Name=\"{3D760127-982C-405E-9C93-E1F76E1A1110}\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"assetLibTemp\" Url=\"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx\" Level=\"1\" BaseViewID=\"40\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><ViewFields><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit>20</RowLimit><Query><OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy></Query></View>",
-                "Id":"3d760127-982c-405e-9c93-e1f76e1a1110",
-                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
-                "IncludeRootFolder":false,
-                "ViewJoins":null,
-                "JSLink":null,
-                "ListViewXml":"<View Name=\"{3D760127-982C-405E-9C93-E1F76E1A1110}\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"assetLibTemp\" Url=\"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx\" Level=\"1\" BaseViewID=\"40\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy></Query><ViewFields><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit>20</RowLimit><Toolbar Type=\"None\"/></View>",
-                "Method":null,
-                "MobileDefaultView":false,
-                "MobileView":false,
-                "ModerationType":null,
-                "NewDocumentTemplates":null,
-                "OrderedView":false,
-                "Paged":false,
-                "PersonalView":false,
-                "ViewProjectedFields":null,
-                "ViewQuery":"<OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy>",
-                "ReadOnlyView":false,
-                "RequiresClientIntegration":false,
-                "RowLimit":20,
-                "Scope":0,
-                "ServerRelativePath":{
-                  "__metadata":{
-                    "type":"SP.ResourcePath"
-                  },
-                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx"
-                },
-                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx",
-                "StyleId":null,
-                "TabularView":true,
-                "Threaded":false,
-                "Title":"assetLibTemp",
-                "Toolbar":null,
-                "ToolbarTemplateName":null,
-                "ViewType":"HTML",
-                "ViewData":null,
-                "VisualizationInfo":null
-              },
-              {
-                "__metadata":{
-                  "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'1204c10a-978d-46c8-a6f2-65ecfa5e03d5')",
-                  "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'1204c10a-978d-46c8-a6f2-65ecfa5e03d5')",
-                  "type":"SP.View"
-                },
-                "ViewFields":{
-                  "__deferred":{
-                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'1204c10a-978d-46c8-a6f2-65ecfa5e03d5')/ViewFields"
-                  }
-                },
-                "Aggregations":null,
-                "AggregationsStatus":null,
-                "BaseViewId":"7",
-                "ColumnWidth":null,
-                "ContentTypeId":{
-                  "__metadata":{
-                    "type":"SP.ContentTypeId"
-                  },
-                  "StringValue":"0x"
-                },
-                "CustomFormatter":null,
-                "DefaultView":false,
-                "DefaultViewForContentType":false,
-                "EditorModified":false,
-                "Formats":null,
-                "Hidden":true,
-                "HtmlSchemaXml":"<View Name=\"{1204C10A-978D-46C8-A6F2-65ECFA5E03D5}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" AggregateView=\"TRUE\" DisplayName=\"Merge Documents\" Url=\"/sites/ninja/Shared Documents/Forms/Combine.aspx\" Level=\"1\" BaseViewID=\"7\" ContentTypeID=\"0x\" ToolbarTemplate=\"MergeToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Combine\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query></View>",
-                "Id":"1204c10a-978d-46c8-a6f2-65ecfa5e03d5",
-                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
-                "IncludeRootFolder":false,
-                "ViewJoins":null,
-                "JSLink":"clienttemplates.js",
-                "ListViewXml":"<View Name=\"{1204C10A-978D-46C8-A6F2-65ECFA5E03D5}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" AggregateView=\"TRUE\" DisplayName=\"Merge Documents\" Url=\"/sites/ninja/Shared Documents/Forms/Combine.aspx\" Level=\"1\" BaseViewID=\"7\" ContentTypeID=\"0x\" ToolbarTemplate=\"MergeToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Combine\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
-                "Method":null,
-                "MobileDefaultView":false,
-                "MobileView":false,
-                "ModerationType":null,
-                "NewDocumentTemplates":null,
-                "OrderedView":false,
-                "Paged":true,
-                "PersonalView":false,
-                "ViewProjectedFields":null,
-                "ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>",
-                "ReadOnlyView":false,
-                "RequiresClientIntegration":false,
-                "RowLimit":30,
-                "Scope":0,
-                "ServerRelativePath":{
-                  "__metadata":{
-                    "type":"SP.ResourcePath"
-                  },
-                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/Combine.aspx"
-                },
-                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/Combine.aspx",
-                "StyleId":null,
-                "TabularView":false,
-                "Threaded":false,
-                "Title":"Merge Documents",
-                "Toolbar":"",
-                "ToolbarTemplateName":"MergeToolBar",
-                "ViewType":"HTML",
-                "ViewData":null,
-                "VisualizationInfo":null
-                },
-                {
-                  "__metadata":{
-                    "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'e021e923-0801-4a16-9775-545239356739')",
-                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'e021e923-0801-4a16-9775-545239356739')",
-                    "type":"SP.View"
-                  },
-                  "ViewFields":{
-                    "__deferred":{
-                      "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'e021e923-0801-4a16-9775-545239356739')/ViewFields"
-                    }
-                  },
-                  "Aggregations":null,
-                  "AggregationsStatus":null,
-                  "BaseViewId":"50",
-                  "ColumnWidth":null,
-                  "ContentTypeId":{
-                    "__metadata":{
-                      "type":"SP.ContentTypeId"
-                    },
-                    "StringValue":"0x"
-                  },
-                  "CustomFormatter":null,
-                  "DefaultView":false,
-                  "DefaultViewForContentType":false,
-                  "EditorModified":false,
-                  "Formats":null,
-                  "Hidden":true,
-                  "HtmlSchemaXml":"<View Name=\"{E021E923-0801-4A16-9775-545239356739}\" MobileView=\"TRUE\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"\" Url=\"/sites/ninja/SitePages/Home.aspx\" Level=\"1\" BaseViewID=\"50\" ContentTypeID=\"0x\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">15</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy></Query></View>",
-                  "Id":"e021e923-0801-4a16-9775-545239356739",
-                  "ImageUrl":null,
-                  "IncludeRootFolder":false,
-                  "ViewJoins":null,
-                  "JSLink":"clienttemplates.js",
-                  "ListViewXml":"<View Name=\"{E021E923-0801-4A16-9775-545239356739}\" MobileView=\"TRUE\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"\" Url=\"/sites/ninja/SitePages/Home.aspx\" Level=\"1\" BaseViewID=\"50\" ContentTypeID=\"0x\" ><Query><OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit Paged=\"TRUE\">15</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
-                  "Method":null,
-                  "MobileDefaultView":false,
-                  "MobileView":true,
-                  "ModerationType":null,
-                  "NewDocumentTemplates":null,
-                  "OrderedView":false,
-                  "Paged":true,
-                  "PersonalView":false,
-                  "ViewProjectedFields":null,
-                  "ViewQuery":"<OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy>",
-                  "ReadOnlyView":false,
-                  "RequiresClientIntegration":false,
-                  "RowLimit":15,
-                  "Scope":0,
-                  "ServerRelativePath":{
-                    "__metadata":{
-                      "type":"SP.ResourcePath"
-                    },
-                    "DecodedUrl":"/sites/ninja/SitePages/Home.aspx"
-                  },
-                  "ServerRelativeUrl":"/sites/ninja/SitePages/Home.aspx",
-                  "StyleId":null,
-                  "TabularView":true,
-                  "Threaded":false,
-                  "Title":"",
-                  "Toolbar":"",
-                  "ToolbarTemplateName":null,
-                  "ViewType":"HTML",
-                  "ViewData":null,
-                  "VisualizationInfo":null
-              }
-            ]
+            "value": [{"Aggregations":null,"AggregationsStatus":null,"BaseViewId":"1","ColumnWidth":null,"ContentTypeId":{"StringValue":"0x"},"CustomFormatter":null,"DefaultView":true,"DefaultViewForContentType":false,"EditorModified":false,"Formats":null,"Hidden":false,"HtmlSchemaXml":"<View Name=\"{85907FB0-CDA1-43EC-832E-27118C89CF9F}\" DefaultView=\"TRUE\" MobileView=\"TRUE\" MobileDefaultView=\"TRUE\" Type=\"HTML\" DisplayName=\"All Documents\" Url=\"/sites/ninja/Shared Documents/Forms/AllItems.aspx\" Level=\"1\" BaseViewID=\"1\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query></View>","Id":"85907fb0-cda1-43ec-832e-27118c89cf9f","ImageUrl":"/_layouts/15/images/dlicon.png?rev=45","IncludeRootFolder":false,"ViewJoins":null,"JSLink":"clienttemplates.js","ListViewXml":"<View Name=\"{85907FB0-CDA1-43EC-832E-27118C89CF9F}\" DefaultView=\"TRUE\" MobileView=\"TRUE\" MobileDefaultView=\"TRUE\" Type=\"HTML\" DisplayName=\"All Documents\" Url=\"/sites/ninja/Shared Documents/Forms/AllItems.aspx\" Level=\"1\" BaseViewID=\"1\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>","Method":null,"MobileDefaultView":true,"MobileView":true,"ModerationType":null,"NewDocumentTemplates":null,"OrderedView":false,"Paged":true,"PersonalView":false,"ViewProjectedFields":null,"ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>","ReadOnlyView":false,"RequiresClientIntegration":false,"RowLimit":30,"Scope":0,"ServerRelativePath":{"DecodedUrl":"/sites/ninja/Shared Documents/Forms/AllItems.aspx"},"ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/AllItems.aspx","StyleId":null,"TabularView":true,"Threaded":false,"Title":"All Documents","Toolbar":"","ToolbarTemplateName":null,"ViewType":"HTML","ViewData":null,"VisualizationInfo":null},{"Aggregations":null,"AggregationsStatus":null,"BaseViewId":"9","ColumnWidth":null,"ContentTypeId":{"StringValue":"0x"},"CustomFormatter":null,"DefaultView":false,"DefaultViewForContentType":false,"EditorModified":false,"Formats":null,"Hidden":true,"HtmlSchemaXml":"<View Name=\"{281E80FD-099B-4EBA-B622-A94FA03BF865}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" DisplayName=\"Relink Documents\" Url=\"/sites/ninja/Shared Documents/Forms/repair.aspx\" Level=\"1\" BaseViewID=\"9\" ContentTypeID=\"0x\" ToolbarTemplate=\"RelinkToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilenameNoMenu\" /><FieldRef Name=\"RepairDocument\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /><FieldRef Name=\"ContentType\" /><FieldRef Name=\"TemplateUrl\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where></Query></View>","Id":"281e80fd-099b-4eba-b622-a94fa03bf865","ImageUrl":"/_layouts/15/images/dlicon.png?rev=45","IncludeRootFolder":false,"ViewJoins":null,"JSLink":null,"ListViewXml":"<View Name=\"{281E80FD-099B-4EBA-B622-A94FA03BF865}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" DisplayName=\"Relink Documents\" Url=\"/sites/ninja/Shared Documents/Forms/repair.aspx\" Level=\"1\" BaseViewID=\"9\" ContentTypeID=\"0x\" ToolbarTemplate=\"RelinkToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilenameNoMenu\" /><FieldRef Name=\"RepairDocument\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\"/><FieldRef Name=\"ContentType\" /><FieldRef Name=\"TemplateUrl\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>","Method":null,"MobileDefaultView":false,"MobileView":false,"ModerationType":null,"NewDocumentTemplates":null,"OrderedView":false,"Paged":true,"PersonalView":false,"ViewProjectedFields":null,"ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where>","ReadOnlyView":false,"RequiresClientIntegration":false,"RowLimit":30,"Scope":0,"ServerRelativePath":{"DecodedUrl":"/sites/ninja/Shared Documents/Forms/repair.aspx"},"ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/repair.aspx","StyleId":null,"TabularView":false,"Threaded":false,"Title":"Relink Documents","Toolbar":"","ToolbarTemplateName":"RelinkToolBar","ViewType":"HTML","ViewData":null,"VisualizationInfo":null},{"Aggregations":null,"AggregationsStatus":null,"BaseViewId":"40","ColumnWidth":null,"ContentTypeId":{"StringValue":"0x"},"CustomFormatter":null,"DefaultView":false,"DefaultViewForContentType":false,"EditorModified":false,"Formats":null,"Hidden":true,"HtmlSchemaXml":"<View Name=\"{3D760127-982C-405E-9C93-E1F76E1A1110}\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"assetLibTemp\" Url=\"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx\" Level=\"1\" BaseViewID=\"40\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><ViewFields><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit>20</RowLimit><Query><OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy></Query></View>","Id":"3d760127-982c-405e-9c93-e1f76e1a1110","ImageUrl":"/_layouts/15/images/dlicon.png?rev=45","IncludeRootFolder":false,"ViewJoins":null,"JSLink":null,"ListViewXml":"<View Name=\"{3D760127-982C-405E-9C93-E1F76E1A1110}\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"assetLibTemp\" Url=\"/sites/ninja/SharedDocuments/Forms/Thumbnails.aspx\" Level=\"1\" BaseViewID=\"40\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy></Query><ViewFields><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit>20</RowLimit><Toolbar Type=\"None\"/></View>","Method":null,"MobileDefaultView":false,"MobileView":false,"ModerationType":null,"NewDocumentTemplates":null,"OrderedView":false,"Paged":false,"PersonalView":false,"ViewProjectedFields":null,"ViewQuery":"<OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy>","ReadOnlyView":false,"RequiresClientIntegration":false,"RowLimit":20,"Scope":0,"ServerRelativePath":{"DecodedUrl":"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx"},"ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx","StyleId":null,"TabularView":true,"Threaded":false,"Title":"assetLibTemp","Toolbar":null,"ToolbarTemplateName":null,"ViewType":"HTML","ViewData":null,"VisualizationInfo":null},{"Aggregations":null,"AggregationsStatus":null,"BaseViewId":"7","ColumnWidth":null,"ContentTypeId":{"StringValue":"0x"},"CustomFormatter":null,"DefaultView":false,"DefaultViewForContentType":false,"EditorModified":false,"Formats":null,"Hidden":true,"HtmlSchemaXml":"<View Name=\"{1204C10A-978D-46C8-A6F2-65ECFA5E03D5}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" AggregateView=\"TRUE\" DisplayName=\"Merge Documents\" Url=\"/sites/ninja/Shared Documents/Forms/Combine.aspx\" Level=\"1\" BaseViewID=\"7\" ContentTypeID=\"0x\" ToolbarTemplate=\"MergeToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Combine\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query></View>","Id":"1204c10a-978d-46c8-a6f2-65ecfa5e03d5","ImageUrl":"/_layouts/15/images/dlicon.png?rev=45","IncludeRootFolder":false,"ViewJoins":null,"JSLink":"clienttemplates.js","ListViewXml":"<View Name=\"{1204C10A-978D-46C8-A6F2-65ECFA5E03D5}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" AggregateView=\"TRUE\" DisplayName=\"Merge Documents\" Url=\"/sites/ninja/Shared Documents/Forms/Combine.aspx\" Level=\"1\" BaseViewID=\"7\" ContentTypeID=\"0x\" ToolbarTemplate=\"MergeToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Combine\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>","Method":null,"MobileDefaultView":false,"MobileView":false,"ModerationType":null,"NewDocumentTemplates":null,"OrderedView":false,"Paged":true,"PersonalView":false,"ViewProjectedFields":null,"ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>","ReadOnlyView":false,"RequiresClientIntegration":false,"RowLimit":30,"Scope":0,"ServerRelativePath":{"DecodedUrl":"/sites/ninja/Shared Documents/Forms/Combine.aspx"},"ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/Combine.aspx","StyleId":null,"TabularView":false,"Threaded":false,"Title":"Merge Documents","Toolbar":"","ToolbarTemplateName":"MergeToolBar","ViewType":"HTML","ViewData":null,"VisualizationInfo":null},{"Aggregations":null,"AggregationsStatus":null,"BaseViewId":"50","ColumnWidth":null,"ContentTypeId":{"StringValue":"0x"},"CustomFormatter":null,"DefaultView":false,"DefaultViewForContentType":false,"EditorModified":false,"Formats":null,"Hidden":true,"HtmlSchemaXml":"<View Name=\"{E021E923-0801-4A16-9775-545239356739}\" MobileView=\"TRUE\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"\" Url=\"/sites/ninja/SitePages/Home.aspx\" Level=\"1\" BaseViewID=\"50\" ContentTypeID=\"0x\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">15</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy></Query></View>","Id":"e021e923-0801-4a16-9775-545239356739","ImageUrl":null,"IncludeRootFolder":false,"ViewJoins":null,"JSLink":"clienttemplates.js","ListViewXml":"<View Name=\"{E021E923-0801-4A16-9775-545239356739}\" MobileView=\"TRUE\" Type=\"HTML\"Hidden=\"TRUE\" DisplayName=\"\" Url=\"/sites/ninja/SitePages/Home.aspx\" Level=\"1\" BaseViewID=\"50\" ContentTypeID=\"0x\" ><Query><OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit Paged=\"TRUE\">15</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>","Method":null,"MobileDefaultView":false,"MobileView":true,"ModerationType":null,"NewDocumentTemplates":null,"OrderedView":false,"Paged":true,"PersonalView":false,"ViewProjectedFields":null,"ViewQuery":"<OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy>","ReadOnlyView":false,"RequiresClientIntegration":false,"RowLimit":15,"Scope":0,"ServerRelativePath":{"DecodedUrl":"/sites/ninja/SitePages/Home.aspx"},"ServerRelativeUrl":"/sites/ninja/SitePages/Home.aspx","StyleId":null,"TabularView":true,"Threaded":false,"Title":"","Toolbar":"","ToolbarTemplateName":null,"ViewType":"HTML","ViewData":null,"VisualizationInfo":null}]
           });
         }
       }
@@ -832,7 +202,7 @@ describe(commands.LIST_VIEW_LIST, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
-        debug: false,
+        debug: true,
         listTitle: 'Documents',
         webUrl: 'https://contoso.sharepoint.com/sites/ninja'
       }
@@ -840,18 +210,39 @@ describe(commands.LIST_VIEW_LIST, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith([
           {
-            "StringId": "0x010100260C61709CD8E548948F9BF605F8F54F",
-            "Name": "Document",
-            "Hidden": false,
-            "ReadOnly": false,
-            "Sealed": false
+            "Id":"85907fb0-cda1-43ec-832e-27118c89cf9f",
+            "Title":"All Documents",
+            "DefaultView":true,
+            "Hidden":false,
+            "BaseViewId":"1"
           },
           {
-            "StringId": "0x0120000EAD53EDAD7C6647B0D976EEC953F99E",
-            "Name": "Folder",
-            "Hidden": false,
-            "ReadOnly": false,
-            "Sealed": true
+            "Id":"281e80fd-099b-4eba-b622-a94fa03bf865",
+            "Title":"Relink Documents",
+            "DefaultView":false,
+            "Hidden":true,
+            "BaseViewId":"9"
+          },
+          {
+            "Id":"3d760127-982c-405e-9c93-e1f76e1a1110",
+            "Title":"assetLibTemp",
+            "DefaultView":false,
+            "Hidden":true,
+            "BaseViewId":"40"
+          },
+          {
+            "Id":"1204c10a-978d-46c8-a6f2-65ecfa5e03d5",
+            "Title":"Merge Documents",
+            "DefaultView":false,
+            "Hidden":true,
+            "BaseViewId":"7"
+          },
+          {
+            "Id":"e021e923-0801-4a16-9775-545239356739",
+            "Title":"",
+            "DefaultView":false,
+            "Hidden":true,
+            "BaseViewId":"50"
           }
         ]));
         done();
@@ -870,333 +261,7 @@ describe(commands.LIST_VIEW_LIST, () => {
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
-            "value":[
-              {
-                "__metadata":{
-                  "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'85907fb0-cda1-43ec-832e-27118c89cf9f')",
-                  "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'85907fb0-cda1-43ec-832e-27118c89cf9f')",
-                  "type":"SP.View"
-                },
-                "ViewFields":{
-                  "__deferred": {
-                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'85907fb0-cda1-43ec-832e-27118c89cf9f')/ViewFields"
-                  }
-                },
-                "Aggregations":null,
-                "AggregationsStatus":null,
-                "BaseViewId":"1",
-                "ColumnWidth":null,
-                "ContentTypeId":{
-                  "__metadata":{
-                    "type":"SP.ContentTypeId"
-                  },
-                  "StringValue":"0x"
-                },
-                "CustomFormatter":null,
-                "DefaultView":true,
-                "DefaultViewForContentType":false,
-                "EditorModified":false,
-                "Formats":null,
-                "Hidden":false,
-                "HtmlSchemaXml":"<View Name=\"{85907FB0-CDA1-43EC-832E-27118C89CF9F}\" DefaultView=\"TRUE\" MobileView=\"TRUE\" MobileDefaultView=\"TRUE\" Type=\"HTML\" DisplayName=\"All Documents\" Url=\"/sites/ninja/Shared Documents/Forms/AllItems.aspx\" Level=\"1\" BaseViewID=\"1\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query></View>",
-                "Id":"85907fb0-cda1-43ec-832e-27118c89cf9f",
-                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
-                "IncludeRootFolder":false,
-                "ViewJoins":null,
-                "JSLink":"clienttemplates.js",
-                "ListViewXml":"<View Name=\"{85907FB0-CDA1-43EC-832E-27118C89CF9F}\" DefaultView=\"TRUE\" MobileView=\"TRUE\" MobileDefaultView=\"TRUE\" Type=\"HTML\" DisplayName=\"All Documents\" Url=\"/sites/ninja/Shared Documents/Forms/AllItems.aspx\" Level=\"1\" BaseViewID=\"1\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
-                "Method":null,
-                "MobileDefaultView":true,
-                "MobileView":true,
-                "ModerationType":null,
-                "NewDocumentTemplates":null,
-                "OrderedView":false,
-                "Paged":true,
-                "PersonalView":false,
-                "ViewProjectedFields":null,
-                "ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>",
-                "ReadOnlyView":false,
-                "RequiresClientIntegration":false,
-                "RowLimit":30,
-                "Scope":0,
-                "ServerRelativePath":{
-                  "__metadata": {
-                    "type":"SP.ResourcePath"
-                  },
-                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/AllItems.aspx"
-                },
-                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/AllItems.aspx",
-                "StyleId":null,
-                "TabularView":true,
-                "Threaded":false,
-                "Title":"All Documents",
-                "Toolbar":"",
-                "ToolbarTemplateName":null,
-                "ViewType":"HTML",
-                "ViewData":null,
-                "VisualizationInfo":null
-              },
-              {
-                "__metadata":{
-                  "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'281e80fd-099b-4eba-b622-a94fa03bf865')",
-                  "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'281e80fd-099b-4eba-b622-a94fa03bf865')",
-                  "type":"SP.View"
-                },
-                "ViewFields":{
-                  "__deferred":{
-                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'281e80fd-099b-4eba-b622-a94fa03bf865')/ViewFields"
-                  }
-                },
-                "Aggregations":null,
-                "AggregationsStatus":null,
-                "BaseViewId":"9",
-                "ColumnWidth":null,
-                "ContentTypeId":{
-                  "__metadata":{
-                    "type":"SP.ContentTypeId"
-                  },
-                  "StringValue":"0x"
-                },
-                "CustomFormatter":null,
-                "DefaultView":false,
-                "DefaultViewForContentType":false,
-                "EditorModified":false,
-                "Formats":null,
-                "Hidden":true,
-                "HtmlSchemaXml":"<View Name=\"{281E80FD-099B-4EBA-B622-A94FA03BF865}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" DisplayName=\"Relink Documents\" Url=\"/sites/ninja/Shared Documents/Forms/repair.aspx\" Level=\"1\" BaseViewID=\"9\" ContentTypeID=\"0x\" ToolbarTemplate=\"RelinkToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilenameNoMenu\" /><FieldRef Name=\"RepairDocument\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /><FieldRef Name=\"ContentType\" /><FieldRef Name=\"TemplateUrl\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where></Query></View>",
-                "Id":"281e80fd-099b-4eba-b622-a94fa03bf865",
-                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
-                "IncludeRootFolder":false,
-                "ViewJoins":null,
-                "JSLink":null,
-                "ListViewXml":"<View Name=\"{281E80FD-099B-4EBA-B622-A94FA03BF865}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" DisplayName=\"Relink Documents\" Url=\"/sites/ninja/Shared Documents/Forms/repair.aspx\" Level=\"1\" BaseViewID=\"9\" ContentTypeID=\"0x\" ToolbarTemplate=\"RelinkToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilenameNoMenu\" /><FieldRef Name=\"RepairDocument\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /><FieldRef Name=\"ContentType\" /><FieldRef Name=\"TemplateUrl\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
-                "Method":null,
-                "MobileDefaultView":false,
-                "MobileView":false,
-                "ModerationType":null,
-                "NewDocumentTemplates":null,
-                "OrderedView":false,
-                "Paged":true,
-                "PersonalView":false,
-                "ViewProjectedFields":null,
-                "ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where>",
-                "ReadOnlyView":false,
-                "RequiresClientIntegration":false,
-                "RowLimit":30,
-                "Scope":0,
-                "ServerRelativePath":{
-                  "__metadata":{
-                    "type":"SP.ResourcePath"
-                  },
-                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/repair.aspx"
-                },
-                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/repair.aspx",
-                "StyleId":null,
-                "TabularView":false,
-                "Threaded":false,
-                "Title":"Relink Documents",
-                "Toolbar":"",
-                "ToolbarTemplateName":"RelinkToolBar",
-                "ViewType":"HTML",
-                "ViewData":null,
-                "VisualizationInfo":null
-                },
-                {
-                  "__metadata":{
-                    "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'3d760127-982c-405e-9c93-e1f76e1a1110')",
-                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'3d760127-982c-405e-9c93-e1f76e1a1110')",
-                    "type":"SP.View"
-                  },
-                  "ViewFields":{
-                    "__deferred":{
-                      "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'3d760127-982c-405e-9c93-e1f76e1a1110')/ViewFields"
-                    }
-                  },
-                "Aggregations":null,
-                "AggregationsStatus":null,
-                "BaseViewId":"40",
-                "ColumnWidth":null,
-                "ContentTypeId":{
-                  "__metadata":{
-                    "type":"SP.ContentTypeId"
-                  },
-                  "StringValue":"0x"
-                },
-                "CustomFormatter":null,
-                "DefaultView":false,
-                "DefaultViewForContentType":false,
-                "EditorModified":false,
-                "Formats":null,
-                "Hidden":true,
-                "HtmlSchemaXml":"<View Name=\"{3D760127-982C-405E-9C93-E1F76E1A1110}\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"assetLibTemp\" Url=\"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx\" Level=\"1\" BaseViewID=\"40\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><ViewFields><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit>20</RowLimit><Query><OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy></Query></View>",
-                "Id":"3d760127-982c-405e-9c93-e1f76e1a1110",
-                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
-                "IncludeRootFolder":false,
-                "ViewJoins":null,
-                "JSLink":null,
-                "ListViewXml":"<View Name=\"{3D760127-982C-405E-9C93-E1F76E1A1110}\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"assetLibTemp\" Url=\"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx\" Level=\"1\" BaseViewID=\"40\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy></Query><ViewFields><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit>20</RowLimit><Toolbar Type=\"None\"/></View>",
-                "Method":null,
-                "MobileDefaultView":false,
-                "MobileView":false,
-                "ModerationType":null,
-                "NewDocumentTemplates":null,
-                "OrderedView":false,
-                "Paged":false,
-                "PersonalView":false,
-                "ViewProjectedFields":null,
-                "ViewQuery":"<OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy>",
-                "ReadOnlyView":false,
-                "RequiresClientIntegration":false,
-                "RowLimit":20,
-                "Scope":0,
-                "ServerRelativePath":{
-                  "__metadata":{
-                    "type":"SP.ResourcePath"
-                  },
-                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx"
-                },
-                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx",
-                "StyleId":null,
-                "TabularView":true,
-                "Threaded":false,
-                "Title":"assetLibTemp",
-                "Toolbar":null,
-                "ToolbarTemplateName":null,
-                "ViewType":"HTML",
-                "ViewData":null,
-                "VisualizationInfo":null
-              },
-              {
-                "__metadata":{
-                  "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'1204c10a-978d-46c8-a6f2-65ecfa5e03d5')",
-                  "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'1204c10a-978d-46c8-a6f2-65ecfa5e03d5')",
-                  "type":"SP.View"
-                },
-                "ViewFields":{
-                  "__deferred":{
-                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'1204c10a-978d-46c8-a6f2-65ecfa5e03d5')/ViewFields"
-                  }
-                },
-                "Aggregations":null,
-                "AggregationsStatus":null,
-                "BaseViewId":"7",
-                "ColumnWidth":null,
-                "ContentTypeId":{
-                  "__metadata":{
-                    "type":"SP.ContentTypeId"
-                  },
-                  "StringValue":"0x"
-                },
-                "CustomFormatter":null,
-                "DefaultView":false,
-                "DefaultViewForContentType":false,
-                "EditorModified":false,
-                "Formats":null,
-                "Hidden":true,
-                "HtmlSchemaXml":"<View Name=\"{1204C10A-978D-46C8-A6F2-65ECFA5E03D5}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" AggregateView=\"TRUE\" DisplayName=\"Merge Documents\" Url=\"/sites/ninja/Shared Documents/Forms/Combine.aspx\" Level=\"1\" BaseViewID=\"7\" ContentTypeID=\"0x\" ToolbarTemplate=\"MergeToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Combine\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query></View>",
-                "Id":"1204c10a-978d-46c8-a6f2-65ecfa5e03d5",
-                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
-                "IncludeRootFolder":false,
-                "ViewJoins":null,
-                "JSLink":"clienttemplates.js",
-                "ListViewXml":"<View Name=\"{1204C10A-978D-46C8-A6F2-65ECFA5E03D5}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" AggregateView=\"TRUE\" DisplayName=\"Merge Documents\" Url=\"/sites/ninja/Shared Documents/Forms/Combine.aspx\" Level=\"1\" BaseViewID=\"7\" ContentTypeID=\"0x\" ToolbarTemplate=\"MergeToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Combine\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
-                "Method":null,
-                "MobileDefaultView":false,
-                "MobileView":false,
-                "ModerationType":null,
-                "NewDocumentTemplates":null,
-                "OrderedView":false,
-                "Paged":true,
-                "PersonalView":false,
-                "ViewProjectedFields":null,
-                "ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>",
-                "ReadOnlyView":false,
-                "RequiresClientIntegration":false,
-                "RowLimit":30,
-                "Scope":0,
-                "ServerRelativePath":{
-                  "__metadata":{
-                    "type":"SP.ResourcePath"
-                  },
-                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/Combine.aspx"
-                },
-                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/Combine.aspx",
-                "StyleId":null,
-                "TabularView":false,
-                "Threaded":false,
-                "Title":"Merge Documents",
-                "Toolbar":"",
-                "ToolbarTemplateName":"MergeToolBar",
-                "ViewType":"HTML",
-                "ViewData":null,
-                "VisualizationInfo":null
-                },
-                {
-                  "__metadata":{
-                    "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'e021e923-0801-4a16-9775-545239356739')",
-                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'e021e923-0801-4a16-9775-545239356739')",
-                    "type":"SP.View"
-                  },
-                  "ViewFields":{
-                    "__deferred":{
-                      "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'e021e923-0801-4a16-9775-545239356739')/ViewFields"
-                    }
-                  },
-                  "Aggregations":null,
-                  "AggregationsStatus":null,
-                  "BaseViewId":"50",
-                  "ColumnWidth":null,
-                  "ContentTypeId":{
-                    "__metadata":{
-                      "type":"SP.ContentTypeId"
-                    },
-                    "StringValue":"0x"
-                  },
-                  "CustomFormatter":null,
-                  "DefaultView":false,
-                  "DefaultViewForContentType":false,
-                  "EditorModified":false,
-                  "Formats":null,
-                  "Hidden":true,
-                  "HtmlSchemaXml":"<View Name=\"{E021E923-0801-4A16-9775-545239356739}\" MobileView=\"TRUE\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"\" Url=\"/sites/ninja/SitePages/Home.aspx\" Level=\"1\" BaseViewID=\"50\" ContentTypeID=\"0x\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">15</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy></Query></View>",
-                  "Id":"e021e923-0801-4a16-9775-545239356739",
-                  "ImageUrl":null,
-                  "IncludeRootFolder":false,
-                  "ViewJoins":null,
-                  "JSLink":"clienttemplates.js",
-                  "ListViewXml":"<View Name=\"{E021E923-0801-4A16-9775-545239356739}\" MobileView=\"TRUE\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"\" Url=\"/sites/ninja/SitePages/Home.aspx\" Level=\"1\" BaseViewID=\"50\" ContentTypeID=\"0x\" ><Query><OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit Paged=\"TRUE\">15</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
-                  "Method":null,
-                  "MobileDefaultView":false,
-                  "MobileView":true,
-                  "ModerationType":null,
-                  "NewDocumentTemplates":null,
-                  "OrderedView":false,
-                  "Paged":true,
-                  "PersonalView":false,
-                  "ViewProjectedFields":null,
-                  "ViewQuery":"<OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy>",
-                  "ReadOnlyView":false,
-                  "RequiresClientIntegration":false,
-                  "RowLimit":15,
-                  "Scope":0,
-                  "ServerRelativePath":{
-                    "__metadata":{
-                      "type":"SP.ResourcePath"
-                    },
-                    "DecodedUrl":"/sites/ninja/SitePages/Home.aspx"
-                  },
-                  "ServerRelativeUrl":"/sites/ninja/SitePages/Home.aspx",
-                  "StyleId":null,
-                  "TabularView":true,
-                  "Threaded":false,
-                  "Title":"",
-                  "Toolbar":"",
-                  "ToolbarTemplateName":null,
-                  "ViewType":"HTML",
-                  "ViewData":null,
-                  "VisualizationInfo":null
-              }
-            ]
+            "value": [{"Aggregations":null,"AggregationsStatus":null,"BaseViewId":"1","ColumnWidth":null,"ContentTypeId":{"StringValue":"0x"},"CustomFormatter":null,"DefaultView":true,"DefaultViewForContentType":false,"EditorModified":false,"Formats":null,"Hidden":false,"HtmlSchemaXml":"<View Name=\"{85907FB0-CDA1-43EC-832E-27118C89CF9F}\" DefaultView=\"TRUE\" MobileView=\"TRUE\" MobileDefaultView=\"TRUE\" Type=\"HTML\" DisplayName=\"All Documents\" Url=\"/sites/ninja/Shared Documents/Forms/AllItems.aspx\" Level=\"1\" BaseViewID=\"1\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query></View>","Id":"85907fb0-cda1-43ec-832e-27118c89cf9f","ImageUrl":"/_layouts/15/images/dlicon.png?rev=45","IncludeRootFolder":false,"ViewJoins":null,"JSLink":"clienttemplates.js","ListViewXml":"<View Name=\"{85907FB0-CDA1-43EC-832E-27118C89CF9F}\" DefaultView=\"TRUE\" MobileView=\"TRUE\" MobileDefaultView=\"TRUE\" Type=\"HTML\" DisplayName=\"All Documents\" Url=\"/sites/ninja/Shared Documents/Forms/AllItems.aspx\" Level=\"1\" BaseViewID=\"1\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>","Method":null,"MobileDefaultView":true,"MobileView":true,"ModerationType":null,"NewDocumentTemplates":null,"OrderedView":false,"Paged":true,"PersonalView":false,"ViewProjectedFields":null,"ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>","ReadOnlyView":false,"RequiresClientIntegration":false,"RowLimit":30,"Scope":0,"ServerRelativePath":{"DecodedUrl":"/sites/ninja/Shared Documents/Forms/AllItems.aspx"},"ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/AllItems.aspx","StyleId":null,"TabularView":true,"Threaded":false,"Title":"All Documents","Toolbar":"","ToolbarTemplateName":null,"ViewType":"HTML","ViewData":null,"VisualizationInfo":null},{"Aggregations":null,"AggregationsStatus":null,"BaseViewId":"9","ColumnWidth":null,"ContentTypeId":{"StringValue":"0x"},"CustomFormatter":null,"DefaultView":false,"DefaultViewForContentType":false,"EditorModified":false,"Formats":null,"Hidden":true,"HtmlSchemaXml":"<View Name=\"{281E80FD-099B-4EBA-B622-A94FA03BF865}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" DisplayName=\"Relink Documents\" Url=\"/sites/ninja/Shared Documents/Forms/repair.aspx\" Level=\"1\" BaseViewID=\"9\" ContentTypeID=\"0x\" ToolbarTemplate=\"RelinkToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilenameNoMenu\" /><FieldRef Name=\"RepairDocument\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /><FieldRef Name=\"ContentType\" /><FieldRef Name=\"TemplateUrl\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where></Query></View>","Id":"281e80fd-099b-4eba-b622-a94fa03bf865","ImageUrl":"/_layouts/15/images/dlicon.png?rev=45","IncludeRootFolder":false,"ViewJoins":null,"JSLink":null,"ListViewXml":"<View Name=\"{281E80FD-099B-4EBA-B622-A94FA03BF865}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" DisplayName=\"Relink Documents\" Url=\"/sites/ninja/Shared Documents/Forms/repair.aspx\" Level=\"1\" BaseViewID=\"9\" ContentTypeID=\"0x\" ToolbarTemplate=\"RelinkToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilenameNoMenu\" /><FieldRef Name=\"RepairDocument\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\"/><FieldRef Name=\"ContentType\" /><FieldRef Name=\"TemplateUrl\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>","Method":null,"MobileDefaultView":false,"MobileView":false,"ModerationType":null,"NewDocumentTemplates":null,"OrderedView":false,"Paged":true,"PersonalView":false,"ViewProjectedFields":null,"ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where>","ReadOnlyView":false,"RequiresClientIntegration":false,"RowLimit":30,"Scope":0,"ServerRelativePath":{"DecodedUrl":"/sites/ninja/Shared Documents/Forms/repair.aspx"},"ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/repair.aspx","StyleId":null,"TabularView":false,"Threaded":false,"Title":"Relink Documents","Toolbar":"","ToolbarTemplateName":"RelinkToolBar","ViewType":"HTML","ViewData":null,"VisualizationInfo":null},{"Aggregations":null,"AggregationsStatus":null,"BaseViewId":"40","ColumnWidth":null,"ContentTypeId":{"StringValue":"0x"},"CustomFormatter":null,"DefaultView":false,"DefaultViewForContentType":false,"EditorModified":false,"Formats":null,"Hidden":true,"HtmlSchemaXml":"<View Name=\"{3D760127-982C-405E-9C93-E1F76E1A1110}\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"assetLibTemp\" Url=\"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx\" Level=\"1\" BaseViewID=\"40\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><ViewFields><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit>20</RowLimit><Query><OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy></Query></View>","Id":"3d760127-982c-405e-9c93-e1f76e1a1110","ImageUrl":"/_layouts/15/images/dlicon.png?rev=45","IncludeRootFolder":false,"ViewJoins":null,"JSLink":null,"ListViewXml":"<View Name=\"{3D760127-982C-405E-9C93-E1F76E1A1110}\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"assetLibTemp\" Url=\"/sites/ninja/SharedDocuments/Forms/Thumbnails.aspx\" Level=\"1\" BaseViewID=\"40\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy></Query><ViewFields><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit>20</RowLimit><Toolbar Type=\"None\"/></View>","Method":null,"MobileDefaultView":false,"MobileView":false,"ModerationType":null,"NewDocumentTemplates":null,"OrderedView":false,"Paged":false,"PersonalView":false,"ViewProjectedFields":null,"ViewQuery":"<OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy>","ReadOnlyView":false,"RequiresClientIntegration":false,"RowLimit":20,"Scope":0,"ServerRelativePath":{"DecodedUrl":"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx"},"ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx","StyleId":null,"TabularView":true,"Threaded":false,"Title":"assetLibTemp","Toolbar":null,"ToolbarTemplateName":null,"ViewType":"HTML","ViewData":null,"VisualizationInfo":null},{"Aggregations":null,"AggregationsStatus":null,"BaseViewId":"7","ColumnWidth":null,"ContentTypeId":{"StringValue":"0x"},"CustomFormatter":null,"DefaultView":false,"DefaultViewForContentType":false,"EditorModified":false,"Formats":null,"Hidden":true,"HtmlSchemaXml":"<View Name=\"{1204C10A-978D-46C8-A6F2-65ECFA5E03D5}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" AggregateView=\"TRUE\" DisplayName=\"Merge Documents\" Url=\"/sites/ninja/Shared Documents/Forms/Combine.aspx\" Level=\"1\" BaseViewID=\"7\" ContentTypeID=\"0x\" ToolbarTemplate=\"MergeToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Combine\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query></View>","Id":"1204c10a-978d-46c8-a6f2-65ecfa5e03d5","ImageUrl":"/_layouts/15/images/dlicon.png?rev=45","IncludeRootFolder":false,"ViewJoins":null,"JSLink":"clienttemplates.js","ListViewXml":"<View Name=\"{1204C10A-978D-46C8-A6F2-65ECFA5E03D5}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" AggregateView=\"TRUE\" DisplayName=\"Merge Documents\" Url=\"/sites/ninja/Shared Documents/Forms/Combine.aspx\" Level=\"1\" BaseViewID=\"7\" ContentTypeID=\"0x\" ToolbarTemplate=\"MergeToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Combine\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>","Method":null,"MobileDefaultView":false,"MobileView":false,"ModerationType":null,"NewDocumentTemplates":null,"OrderedView":false,"Paged":true,"PersonalView":false,"ViewProjectedFields":null,"ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>","ReadOnlyView":false,"RequiresClientIntegration":false,"RowLimit":30,"Scope":0,"ServerRelativePath":{"DecodedUrl":"/sites/ninja/Shared Documents/Forms/Combine.aspx"},"ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/Combine.aspx","StyleId":null,"TabularView":false,"Threaded":false,"Title":"Merge Documents","Toolbar":"","ToolbarTemplateName":"MergeToolBar","ViewType":"HTML","ViewData":null,"VisualizationInfo":null},{"Aggregations":null,"AggregationsStatus":null,"BaseViewId":"50","ColumnWidth":null,"ContentTypeId":{"StringValue":"0x"},"CustomFormatter":null,"DefaultView":false,"DefaultViewForContentType":false,"EditorModified":false,"Formats":null,"Hidden":true,"HtmlSchemaXml":"<View Name=\"{E021E923-0801-4A16-9775-545239356739}\" MobileView=\"TRUE\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"\" Url=\"/sites/ninja/SitePages/Home.aspx\" Level=\"1\" BaseViewID=\"50\" ContentTypeID=\"0x\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">15</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy></Query></View>","Id":"e021e923-0801-4a16-9775-545239356739","ImageUrl":null,"IncludeRootFolder":false,"ViewJoins":null,"JSLink":"clienttemplates.js","ListViewXml":"<View Name=\"{E021E923-0801-4A16-9775-545239356739}\" MobileView=\"TRUE\" Type=\"HTML\"Hidden=\"TRUE\" DisplayName=\"\" Url=\"/sites/ninja/SitePages/Home.aspx\" Level=\"1\" BaseViewID=\"50\" ContentTypeID=\"0x\" ><Query><OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit Paged=\"TRUE\">15</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>","Method":null,"MobileDefaultView":false,"MobileView":true,"ModerationType":null,"NewDocumentTemplates":null,"OrderedView":false,"Paged":true,"PersonalView":false,"ViewProjectedFields":null,"ViewQuery":"<OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy>","ReadOnlyView":false,"RequiresClientIntegration":false,"RowLimit":15,"Scope":0,"ServerRelativePath":{"DecodedUrl":"/sites/ninja/SitePages/Home.aspx"},"ServerRelativeUrl":"/sites/ninja/SitePages/Home.aspx","StyleId":null,"TabularView":true,"Threaded":false,"Title":"","Toolbar":"","ToolbarTemplateName":null,"ViewType":"HTML","ViewData":null,"VisualizationInfo":null}]
           });
         }
       }
@@ -1219,18 +284,39 @@ describe(commands.LIST_VIEW_LIST, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith([
           {
-            "StringId": "0x010100260C61709CD8E548948F9BF605F8F54F",
-            "Name": "Document",
-            "Hidden": false,
-            "ReadOnly": false,
-            "Sealed": false
+            "Id":"85907fb0-cda1-43ec-832e-27118c89cf9f",
+            "Title":"All Documents",
+            "DefaultView":true,
+            "Hidden":false,
+            "BaseViewId":"1"
           },
           {
-            "StringId": "0x0120000EAD53EDAD7C6647B0D976EEC953F99E",
-            "Name": "Folder",
-            "Hidden": false,
-            "ReadOnly": false,
-            "Sealed": true
+            "Id":"281e80fd-099b-4eba-b622-a94fa03bf865",
+            "Title":"Relink Documents",
+            "DefaultView":false,
+            "Hidden":true,
+            "BaseViewId":"9"
+          },
+          {
+            "Id":"3d760127-982c-405e-9c93-e1f76e1a1110",
+            "Title":"assetLibTemp",
+            "DefaultView":false,
+            "Hidden":true,
+            "BaseViewId":"40"
+          },
+          {
+            "Id":"1204c10a-978d-46c8-a6f2-65ecfa5e03d5",
+            "Title":"Merge Documents",
+            "DefaultView":false,
+            "Hidden":true,
+            "BaseViewId":"7"
+          },
+          {
+            "Id":"e021e923-0801-4a16-9775-545239356739",
+            "Title":"",
+            "DefaultView":false,
+            "Hidden":true,
+            "BaseViewId":"50"
           }
         ]));
         done();
@@ -1249,333 +335,7 @@ describe(commands.LIST_VIEW_LIST, () => {
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
-            "value":[
-              {
-                "__metadata":{
-                  "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'85907fb0-cda1-43ec-832e-27118c89cf9f')",
-                  "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'85907fb0-cda1-43ec-832e-27118c89cf9f')",
-                  "type":"SP.View"
-                },
-                "ViewFields":{
-                  "__deferred": {
-                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'85907fb0-cda1-43ec-832e-27118c89cf9f')/ViewFields"
-                  }
-                },
-                "Aggregations":null,
-                "AggregationsStatus":null,
-                "BaseViewId":"1",
-                "ColumnWidth":null,
-                "ContentTypeId":{
-                  "__metadata":{
-                    "type":"SP.ContentTypeId"
-                  },
-                  "StringValue":"0x"
-                },
-                "CustomFormatter":null,
-                "DefaultView":true,
-                "DefaultViewForContentType":false,
-                "EditorModified":false,
-                "Formats":null,
-                "Hidden":false,
-                "HtmlSchemaXml":"<View Name=\"{85907FB0-CDA1-43EC-832E-27118C89CF9F}\" DefaultView=\"TRUE\" MobileView=\"TRUE\" MobileDefaultView=\"TRUE\" Type=\"HTML\" DisplayName=\"All Documents\" Url=\"/sites/ninja/Shared Documents/Forms/AllItems.aspx\" Level=\"1\" BaseViewID=\"1\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query></View>",
-                "Id":"85907fb0-cda1-43ec-832e-27118c89cf9f",
-                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
-                "IncludeRootFolder":false,
-                "ViewJoins":null,
-                "JSLink":"clienttemplates.js",
-                "ListViewXml":"<View Name=\"{85907FB0-CDA1-43EC-832E-27118C89CF9F}\" DefaultView=\"TRUE\" MobileView=\"TRUE\" MobileDefaultView=\"TRUE\" Type=\"HTML\" DisplayName=\"All Documents\" Url=\"/sites/ninja/Shared Documents/Forms/AllItems.aspx\" Level=\"1\" BaseViewID=\"1\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
-                "Method":null,
-                "MobileDefaultView":true,
-                "MobileView":true,
-                "ModerationType":null,
-                "NewDocumentTemplates":null,
-                "OrderedView":false,
-                "Paged":true,
-                "PersonalView":false,
-                "ViewProjectedFields":null,
-                "ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>",
-                "ReadOnlyView":false,
-                "RequiresClientIntegration":false,
-                "RowLimit":30,
-                "Scope":0,
-                "ServerRelativePath":{
-                  "__metadata": {
-                    "type":"SP.ResourcePath"
-                  },
-                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/AllItems.aspx"
-                },
-                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/AllItems.aspx",
-                "StyleId":null,
-                "TabularView":true,
-                "Threaded":false,
-                "Title":"All Documents",
-                "Toolbar":"",
-                "ToolbarTemplateName":null,
-                "ViewType":"HTML",
-                "ViewData":null,
-                "VisualizationInfo":null
-              },
-              {
-                "__metadata":{
-                  "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'281e80fd-099b-4eba-b622-a94fa03bf865')",
-                  "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'281e80fd-099b-4eba-b622-a94fa03bf865')",
-                  "type":"SP.View"
-                },
-                "ViewFields":{
-                  "__deferred":{
-                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'281e80fd-099b-4eba-b622-a94fa03bf865')/ViewFields"
-                  }
-                },
-                "Aggregations":null,
-                "AggregationsStatus":null,
-                "BaseViewId":"9",
-                "ColumnWidth":null,
-                "ContentTypeId":{
-                  "__metadata":{
-                    "type":"SP.ContentTypeId"
-                  },
-                  "StringValue":"0x"
-                },
-                "CustomFormatter":null,
-                "DefaultView":false,
-                "DefaultViewForContentType":false,
-                "EditorModified":false,
-                "Formats":null,
-                "Hidden":true,
-                "HtmlSchemaXml":"<View Name=\"{281E80FD-099B-4EBA-B622-A94FA03BF865}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" DisplayName=\"Relink Documents\" Url=\"/sites/ninja/Shared Documents/Forms/repair.aspx\" Level=\"1\" BaseViewID=\"9\" ContentTypeID=\"0x\" ToolbarTemplate=\"RelinkToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilenameNoMenu\" /><FieldRef Name=\"RepairDocument\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /><FieldRef Name=\"ContentType\" /><FieldRef Name=\"TemplateUrl\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where></Query></View>",
-                "Id":"281e80fd-099b-4eba-b622-a94fa03bf865",
-                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
-                "IncludeRootFolder":false,
-                "ViewJoins":null,
-                "JSLink":null,
-                "ListViewXml":"<View Name=\"{281E80FD-099B-4EBA-B622-A94FA03BF865}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" DisplayName=\"Relink Documents\" Url=\"/sites/ninja/Shared Documents/Forms/repair.aspx\" Level=\"1\" BaseViewID=\"9\" ContentTypeID=\"0x\" ToolbarTemplate=\"RelinkToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilenameNoMenu\" /><FieldRef Name=\"RepairDocument\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /><FieldRef Name=\"ContentType\" /><FieldRef Name=\"TemplateUrl\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
-                "Method":null,
-                "MobileDefaultView":false,
-                "MobileView":false,
-                "ModerationType":null,
-                "NewDocumentTemplates":null,
-                "OrderedView":false,
-                "Paged":true,
-                "PersonalView":false,
-                "ViewProjectedFields":null,
-                "ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where>",
-                "ReadOnlyView":false,
-                "RequiresClientIntegration":false,
-                "RowLimit":30,
-                "Scope":0,
-                "ServerRelativePath":{
-                  "__metadata":{
-                    "type":"SP.ResourcePath"
-                  },
-                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/repair.aspx"
-                },
-                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/repair.aspx",
-                "StyleId":null,
-                "TabularView":false,
-                "Threaded":false,
-                "Title":"Relink Documents",
-                "Toolbar":"",
-                "ToolbarTemplateName":"RelinkToolBar",
-                "ViewType":"HTML",
-                "ViewData":null,
-                "VisualizationInfo":null
-                },
-                {
-                  "__metadata":{
-                    "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'3d760127-982c-405e-9c93-e1f76e1a1110')",
-                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'3d760127-982c-405e-9c93-e1f76e1a1110')",
-                    "type":"SP.View"
-                  },
-                  "ViewFields":{
-                    "__deferred":{
-                      "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'3d760127-982c-405e-9c93-e1f76e1a1110')/ViewFields"
-                    }
-                  },
-                "Aggregations":null,
-                "AggregationsStatus":null,
-                "BaseViewId":"40",
-                "ColumnWidth":null,
-                "ContentTypeId":{
-                  "__metadata":{
-                    "type":"SP.ContentTypeId"
-                  },
-                  "StringValue":"0x"
-                },
-                "CustomFormatter":null,
-                "DefaultView":false,
-                "DefaultViewForContentType":false,
-                "EditorModified":false,
-                "Formats":null,
-                "Hidden":true,
-                "HtmlSchemaXml":"<View Name=\"{3D760127-982C-405E-9C93-E1F76E1A1110}\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"assetLibTemp\" Url=\"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx\" Level=\"1\" BaseViewID=\"40\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><ViewFields><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit>20</RowLimit><Query><OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy></Query></View>",
-                "Id":"3d760127-982c-405e-9c93-e1f76e1a1110",
-                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
-                "IncludeRootFolder":false,
-                "ViewJoins":null,
-                "JSLink":null,
-                "ListViewXml":"<View Name=\"{3D760127-982C-405E-9C93-E1F76E1A1110}\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"assetLibTemp\" Url=\"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx\" Level=\"1\" BaseViewID=\"40\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy></Query><ViewFields><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit>20</RowLimit><Toolbar Type=\"None\"/></View>",
-                "Method":null,
-                "MobileDefaultView":false,
-                "MobileView":false,
-                "ModerationType":null,
-                "NewDocumentTemplates":null,
-                "OrderedView":false,
-                "Paged":false,
-                "PersonalView":false,
-                "ViewProjectedFields":null,
-                "ViewQuery":"<OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy>",
-                "ReadOnlyView":false,
-                "RequiresClientIntegration":false,
-                "RowLimit":20,
-                "Scope":0,
-                "ServerRelativePath":{
-                  "__metadata":{
-                    "type":"SP.ResourcePath"
-                  },
-                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx"
-                },
-                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx",
-                "StyleId":null,
-                "TabularView":true,
-                "Threaded":false,
-                "Title":"assetLibTemp",
-                "Toolbar":null,
-                "ToolbarTemplateName":null,
-                "ViewType":"HTML",
-                "ViewData":null,
-                "VisualizationInfo":null
-              },
-              {
-                "__metadata":{
-                  "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'1204c10a-978d-46c8-a6f2-65ecfa5e03d5')",
-                  "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'1204c10a-978d-46c8-a6f2-65ecfa5e03d5')",
-                  "type":"SP.View"
-                },
-                "ViewFields":{
-                  "__deferred":{
-                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'1204c10a-978d-46c8-a6f2-65ecfa5e03d5')/ViewFields"
-                  }
-                },
-                "Aggregations":null,
-                "AggregationsStatus":null,
-                "BaseViewId":"7",
-                "ColumnWidth":null,
-                "ContentTypeId":{
-                  "__metadata":{
-                    "type":"SP.ContentTypeId"
-                  },
-                  "StringValue":"0x"
-                },
-                "CustomFormatter":null,
-                "DefaultView":false,
-                "DefaultViewForContentType":false,
-                "EditorModified":false,
-                "Formats":null,
-                "Hidden":true,
-                "HtmlSchemaXml":"<View Name=\"{1204C10A-978D-46C8-A6F2-65ECFA5E03D5}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" AggregateView=\"TRUE\" DisplayName=\"Merge Documents\" Url=\"/sites/ninja/Shared Documents/Forms/Combine.aspx\" Level=\"1\" BaseViewID=\"7\" ContentTypeID=\"0x\" ToolbarTemplate=\"MergeToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Combine\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query></View>",
-                "Id":"1204c10a-978d-46c8-a6f2-65ecfa5e03d5",
-                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
-                "IncludeRootFolder":false,
-                "ViewJoins":null,
-                "JSLink":"clienttemplates.js",
-                "ListViewXml":"<View Name=\"{1204C10A-978D-46C8-A6F2-65ECFA5E03D5}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" AggregateView=\"TRUE\" DisplayName=\"Merge Documents\" Url=\"/sites/ninja/Shared Documents/Forms/Combine.aspx\" Level=\"1\" BaseViewID=\"7\" ContentTypeID=\"0x\" ToolbarTemplate=\"MergeToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Combine\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
-                "Method":null,
-                "MobileDefaultView":false,
-                "MobileView":false,
-                "ModerationType":null,
-                "NewDocumentTemplates":null,
-                "OrderedView":false,
-                "Paged":true,
-                "PersonalView":false,
-                "ViewProjectedFields":null,
-                "ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>",
-                "ReadOnlyView":false,
-                "RequiresClientIntegration":false,
-                "RowLimit":30,
-                "Scope":0,
-                "ServerRelativePath":{
-                  "__metadata":{
-                    "type":"SP.ResourcePath"
-                  },
-                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/Combine.aspx"
-                },
-                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/Combine.aspx",
-                "StyleId":null,
-                "TabularView":false,
-                "Threaded":false,
-                "Title":"Merge Documents",
-                "Toolbar":"",
-                "ToolbarTemplateName":"MergeToolBar",
-                "ViewType":"HTML",
-                "ViewData":null,
-                "VisualizationInfo":null
-                },
-                {
-                  "__metadata":{
-                    "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'e021e923-0801-4a16-9775-545239356739')",
-                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'e021e923-0801-4a16-9775-545239356739')",
-                    "type":"SP.View"
-                  },
-                  "ViewFields":{
-                    "__deferred":{
-                      "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'e021e923-0801-4a16-9775-545239356739')/ViewFields"
-                    }
-                  },
-                  "Aggregations":null,
-                  "AggregationsStatus":null,
-                  "BaseViewId":"50",
-                  "ColumnWidth":null,
-                  "ContentTypeId":{
-                    "__metadata":{
-                      "type":"SP.ContentTypeId"
-                    },
-                    "StringValue":"0x"
-                  },
-                  "CustomFormatter":null,
-                  "DefaultView":false,
-                  "DefaultViewForContentType":false,
-                  "EditorModified":false,
-                  "Formats":null,
-                  "Hidden":true,
-                  "HtmlSchemaXml":"<View Name=\"{E021E923-0801-4A16-9775-545239356739}\" MobileView=\"TRUE\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"\" Url=\"/sites/ninja/SitePages/Home.aspx\" Level=\"1\" BaseViewID=\"50\" ContentTypeID=\"0x\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">15</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy></Query></View>",
-                  "Id":"e021e923-0801-4a16-9775-545239356739",
-                  "ImageUrl":null,
-                  "IncludeRootFolder":false,
-                  "ViewJoins":null,
-                  "JSLink":"clienttemplates.js",
-                  "ListViewXml":"<View Name=\"{E021E923-0801-4A16-9775-545239356739}\" MobileView=\"TRUE\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"\" Url=\"/sites/ninja/SitePages/Home.aspx\" Level=\"1\" BaseViewID=\"50\" ContentTypeID=\"0x\" ><Query><OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit Paged=\"TRUE\">15</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
-                  "Method":null,
-                  "MobileDefaultView":false,
-                  "MobileView":true,
-                  "ModerationType":null,
-                  "NewDocumentTemplates":null,
-                  "OrderedView":false,
-                  "Paged":true,
-                  "PersonalView":false,
-                  "ViewProjectedFields":null,
-                  "ViewQuery":"<OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy>",
-                  "ReadOnlyView":false,
-                  "RequiresClientIntegration":false,
-                  "RowLimit":15,
-                  "Scope":0,
-                  "ServerRelativePath":{
-                    "__metadata":{
-                      "type":"SP.ResourcePath"
-                    },
-                    "DecodedUrl":"/sites/ninja/SitePages/Home.aspx"
-                  },
-                  "ServerRelativeUrl":"/sites/ninja/SitePages/Home.aspx",
-                  "StyleId":null,
-                  "TabularView":true,
-                  "Threaded":false,
-                  "Title":"",
-                  "Toolbar":"",
-                  "ToolbarTemplateName":null,
-                  "ViewType":"HTML",
-                  "ViewData":null,
-                  "VisualizationInfo":null
-              }
-            ]
+            "value": [{"Aggregations":null,"AggregationsStatus":null,"BaseViewId":"1","ColumnWidth":null,"ContentTypeId":{"StringValue":"0x"},"CustomFormatter":null,"DefaultView":true,"DefaultViewForContentType":false,"EditorModified":false,"Formats":null,"Hidden":false,"HtmlSchemaXml":"<View Name=\"{85907FB0-CDA1-43EC-832E-27118C89CF9F}\" DefaultView=\"TRUE\" MobileView=\"TRUE\" MobileDefaultView=\"TRUE\" Type=\"HTML\" DisplayName=\"All Documents\" Url=\"/sites/ninja/Shared Documents/Forms/AllItems.aspx\" Level=\"1\" BaseViewID=\"1\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query></View>","Id":"85907fb0-cda1-43ec-832e-27118c89cf9f","ImageUrl":"/_layouts/15/images/dlicon.png?rev=45","IncludeRootFolder":false,"ViewJoins":null,"JSLink":"clienttemplates.js","ListViewXml":"<View Name=\"{85907FB0-CDA1-43EC-832E-27118C89CF9F}\" DefaultView=\"TRUE\" MobileView=\"TRUE\" MobileDefaultView=\"TRUE\" Type=\"HTML\" DisplayName=\"All Documents\" Url=\"/sites/ninja/Shared Documents/Forms/AllItems.aspx\" Level=\"1\" BaseViewID=\"1\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>","Method":null,"MobileDefaultView":true,"MobileView":true,"ModerationType":null,"NewDocumentTemplates":null,"OrderedView":false,"Paged":true,"PersonalView":false,"ViewProjectedFields":null,"ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>","ReadOnlyView":false,"RequiresClientIntegration":false,"RowLimit":30,"Scope":0,"ServerRelativePath":{"DecodedUrl":"/sites/ninja/Shared Documents/Forms/AllItems.aspx"},"ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/AllItems.aspx","StyleId":null,"TabularView":true,"Threaded":false,"Title":"All Documents","Toolbar":"","ToolbarTemplateName":null,"ViewType":"HTML","ViewData":null,"VisualizationInfo":null},{"Aggregations":null,"AggregationsStatus":null,"BaseViewId":"9","ColumnWidth":null,"ContentTypeId":{"StringValue":"0x"},"CustomFormatter":null,"DefaultView":false,"DefaultViewForContentType":false,"EditorModified":false,"Formats":null,"Hidden":true,"HtmlSchemaXml":"<View Name=\"{281E80FD-099B-4EBA-B622-A94FA03BF865}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" DisplayName=\"Relink Documents\" Url=\"/sites/ninja/Shared Documents/Forms/repair.aspx\" Level=\"1\" BaseViewID=\"9\" ContentTypeID=\"0x\" ToolbarTemplate=\"RelinkToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilenameNoMenu\" /><FieldRef Name=\"RepairDocument\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /><FieldRef Name=\"ContentType\" /><FieldRef Name=\"TemplateUrl\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where></Query></View>","Id":"281e80fd-099b-4eba-b622-a94fa03bf865","ImageUrl":"/_layouts/15/images/dlicon.png?rev=45","IncludeRootFolder":false,"ViewJoins":null,"JSLink":null,"ListViewXml":"<View Name=\"{281E80FD-099B-4EBA-B622-A94FA03BF865}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" DisplayName=\"Relink Documents\" Url=\"/sites/ninja/Shared Documents/Forms/repair.aspx\" Level=\"1\" BaseViewID=\"9\" ContentTypeID=\"0x\" ToolbarTemplate=\"RelinkToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilenameNoMenu\" /><FieldRef Name=\"RepairDocument\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\"/><FieldRef Name=\"ContentType\" /><FieldRef Name=\"TemplateUrl\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>","Method":null,"MobileDefaultView":false,"MobileView":false,"ModerationType":null,"NewDocumentTemplates":null,"OrderedView":false,"Paged":true,"PersonalView":false,"ViewProjectedFields":null,"ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where>","ReadOnlyView":false,"RequiresClientIntegration":false,"RowLimit":30,"Scope":0,"ServerRelativePath":{"DecodedUrl":"/sites/ninja/Shared Documents/Forms/repair.aspx"},"ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/repair.aspx","StyleId":null,"TabularView":false,"Threaded":false,"Title":"Relink Documents","Toolbar":"","ToolbarTemplateName":"RelinkToolBar","ViewType":"HTML","ViewData":null,"VisualizationInfo":null},{"Aggregations":null,"AggregationsStatus":null,"BaseViewId":"40","ColumnWidth":null,"ContentTypeId":{"StringValue":"0x"},"CustomFormatter":null,"DefaultView":false,"DefaultViewForContentType":false,"EditorModified":false,"Formats":null,"Hidden":true,"HtmlSchemaXml":"<View Name=\"{3D760127-982C-405E-9C93-E1F76E1A1110}\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"assetLibTemp\" Url=\"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx\" Level=\"1\" BaseViewID=\"40\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><ViewFields><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit>20</RowLimit><Query><OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy></Query></View>","Id":"3d760127-982c-405e-9c93-e1f76e1a1110","ImageUrl":"/_layouts/15/images/dlicon.png?rev=45","IncludeRootFolder":false,"ViewJoins":null,"JSLink":null,"ListViewXml":"<View Name=\"{3D760127-982C-405E-9C93-E1F76E1A1110}\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"assetLibTemp\" Url=\"/sites/ninja/SharedDocuments/Forms/Thumbnails.aspx\" Level=\"1\" BaseViewID=\"40\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy></Query><ViewFields><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit>20</RowLimit><Toolbar Type=\"None\"/></View>","Method":null,"MobileDefaultView":false,"MobileView":false,"ModerationType":null,"NewDocumentTemplates":null,"OrderedView":false,"Paged":false,"PersonalView":false,"ViewProjectedFields":null,"ViewQuery":"<OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy>","ReadOnlyView":false,"RequiresClientIntegration":false,"RowLimit":20,"Scope":0,"ServerRelativePath":{"DecodedUrl":"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx"},"ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx","StyleId":null,"TabularView":true,"Threaded":false,"Title":"assetLibTemp","Toolbar":null,"ToolbarTemplateName":null,"ViewType":"HTML","ViewData":null,"VisualizationInfo":null},{"Aggregations":null,"AggregationsStatus":null,"BaseViewId":"7","ColumnWidth":null,"ContentTypeId":{"StringValue":"0x"},"CustomFormatter":null,"DefaultView":false,"DefaultViewForContentType":false,"EditorModified":false,"Formats":null,"Hidden":true,"HtmlSchemaXml":"<View Name=\"{1204C10A-978D-46C8-A6F2-65ECFA5E03D5}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" AggregateView=\"TRUE\" DisplayName=\"Merge Documents\" Url=\"/sites/ninja/Shared Documents/Forms/Combine.aspx\" Level=\"1\" BaseViewID=\"7\" ContentTypeID=\"0x\" ToolbarTemplate=\"MergeToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Combine\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query></View>","Id":"1204c10a-978d-46c8-a6f2-65ecfa5e03d5","ImageUrl":"/_layouts/15/images/dlicon.png?rev=45","IncludeRootFolder":false,"ViewJoins":null,"JSLink":"clienttemplates.js","ListViewXml":"<View Name=\"{1204C10A-978D-46C8-A6F2-65ECFA5E03D5}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" AggregateView=\"TRUE\" DisplayName=\"Merge Documents\" Url=\"/sites/ninja/Shared Documents/Forms/Combine.aspx\" Level=\"1\" BaseViewID=\"7\" ContentTypeID=\"0x\" ToolbarTemplate=\"MergeToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Combine\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>","Method":null,"MobileDefaultView":false,"MobileView":false,"ModerationType":null,"NewDocumentTemplates":null,"OrderedView":false,"Paged":true,"PersonalView":false,"ViewProjectedFields":null,"ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>","ReadOnlyView":false,"RequiresClientIntegration":false,"RowLimit":30,"Scope":0,"ServerRelativePath":{"DecodedUrl":"/sites/ninja/Shared Documents/Forms/Combine.aspx"},"ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/Combine.aspx","StyleId":null,"TabularView":false,"Threaded":false,"Title":"Merge Documents","Toolbar":"","ToolbarTemplateName":"MergeToolBar","ViewType":"HTML","ViewData":null,"VisualizationInfo":null},{"Aggregations":null,"AggregationsStatus":null,"BaseViewId":"50","ColumnWidth":null,"ContentTypeId":{"StringValue":"0x"},"CustomFormatter":null,"DefaultView":false,"DefaultViewForContentType":false,"EditorModified":false,"Formats":null,"Hidden":true,"HtmlSchemaXml":"<View Name=\"{E021E923-0801-4A16-9775-545239356739}\" MobileView=\"TRUE\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"\" Url=\"/sites/ninja/SitePages/Home.aspx\" Level=\"1\" BaseViewID=\"50\" ContentTypeID=\"0x\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">15</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy></Query></View>","Id":"e021e923-0801-4a16-9775-545239356739","ImageUrl":null,"IncludeRootFolder":false,"ViewJoins":null,"JSLink":"clienttemplates.js","ListViewXml":"<View Name=\"{E021E923-0801-4A16-9775-545239356739}\" MobileView=\"TRUE\" Type=\"HTML\"Hidden=\"TRUE\" DisplayName=\"\" Url=\"/sites/ninja/SitePages/Home.aspx\" Level=\"1\" BaseViewID=\"50\" ContentTypeID=\"0x\" ><Query><OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit Paged=\"TRUE\">15</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>","Method":null,"MobileDefaultView":false,"MobileView":true,"ModerationType":null,"NewDocumentTemplates":null,"OrderedView":false,"Paged":true,"PersonalView":false,"ViewProjectedFields":null,"ViewQuery":"<OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy>","ReadOnlyView":false,"RequiresClientIntegration":false,"RowLimit":15,"Scope":0,"ServerRelativePath":{"DecodedUrl":"/sites/ninja/SitePages/Home.aspx"},"ServerRelativeUrl":"/sites/ninja/SitePages/Home.aspx","StyleId":null,"TabularView":true,"Threaded":false,"Title":"","Toolbar":"","ToolbarTemplateName":null,"ViewType":"HTML","ViewData":null,"VisualizationInfo":null}]
           });
         }
       }
@@ -1598,18 +358,39 @@ describe(commands.LIST_VIEW_LIST, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith([
           {
-            "StringId": "0x010100260C61709CD8E548948F9BF605F8F54F",
-            "Name": "Document",
-            "Hidden": false,
-            "ReadOnly": false,
-            "Sealed": false
+            "Id":"85907fb0-cda1-43ec-832e-27118c89cf9f",
+            "Title":"All Documents",
+            "DefaultView":true,
+            "Hidden":false,
+            "BaseViewId":"1"
           },
           {
-            "StringId": "0x0120000EAD53EDAD7C6647B0D976EEC953F99E",
-            "Name": "Folder",
-            "Hidden": false,
-            "ReadOnly": false,
-            "Sealed": true
+            "Id":"281e80fd-099b-4eba-b622-a94fa03bf865",
+            "Title":"Relink Documents",
+            "DefaultView":false,
+            "Hidden":true,
+            "BaseViewId":"9"
+          },
+          {
+            "Id":"3d760127-982c-405e-9c93-e1f76e1a1110",
+            "Title":"assetLibTemp",
+            "DefaultView":false,
+            "Hidden":true,
+            "BaseViewId":"40"
+          },
+          {
+            "Id":"1204c10a-978d-46c8-a6f2-65ecfa5e03d5",
+            "Title":"Merge Documents",
+            "DefaultView":false,
+            "Hidden":true,
+            "BaseViewId":"7"
+          },
+          {
+            "Id":"e021e923-0801-4a16-9775-545239356739",
+            "Title":"",
+            "DefaultView":false,
+            "Hidden":true,
+            "BaseViewId":"50"
           }
         ]));
         done();
@@ -1628,333 +409,7 @@ describe(commands.LIST_VIEW_LIST, () => {
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
-            "value":[
-              {
-                "__metadata":{
-                  "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'85907fb0-cda1-43ec-832e-27118c89cf9f')",
-                  "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'85907fb0-cda1-43ec-832e-27118c89cf9f')",
-                  "type":"SP.View"
-                },
-                "ViewFields":{
-                  "__deferred": {
-                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'85907fb0-cda1-43ec-832e-27118c89cf9f')/ViewFields"
-                  }
-                },
-                "Aggregations":null,
-                "AggregationsStatus":null,
-                "BaseViewId":"1",
-                "ColumnWidth":null,
-                "ContentTypeId":{
-                  "__metadata":{
-                    "type":"SP.ContentTypeId"
-                  },
-                  "StringValue":"0x"
-                },
-                "CustomFormatter":null,
-                "DefaultView":true,
-                "DefaultViewForContentType":false,
-                "EditorModified":false,
-                "Formats":null,
-                "Hidden":false,
-                "HtmlSchemaXml":"<View Name=\"{85907FB0-CDA1-43EC-832E-27118C89CF9F}\" DefaultView=\"TRUE\" MobileView=\"TRUE\" MobileDefaultView=\"TRUE\" Type=\"HTML\" DisplayName=\"All Documents\" Url=\"/sites/ninja/Shared Documents/Forms/AllItems.aspx\" Level=\"1\" BaseViewID=\"1\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query></View>",
-                "Id":"85907fb0-cda1-43ec-832e-27118c89cf9f",
-                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
-                "IncludeRootFolder":false,
-                "ViewJoins":null,
-                "JSLink":"clienttemplates.js",
-                "ListViewXml":"<View Name=\"{85907FB0-CDA1-43EC-832E-27118C89CF9F}\" DefaultView=\"TRUE\" MobileView=\"TRUE\" MobileDefaultView=\"TRUE\" Type=\"HTML\" DisplayName=\"All Documents\" Url=\"/sites/ninja/Shared Documents/Forms/AllItems.aspx\" Level=\"1\" BaseViewID=\"1\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
-                "Method":null,
-                "MobileDefaultView":true,
-                "MobileView":true,
-                "ModerationType":null,
-                "NewDocumentTemplates":null,
-                "OrderedView":false,
-                "Paged":true,
-                "PersonalView":false,
-                "ViewProjectedFields":null,
-                "ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>",
-                "ReadOnlyView":false,
-                "RequiresClientIntegration":false,
-                "RowLimit":30,
-                "Scope":0,
-                "ServerRelativePath":{
-                  "__metadata": {
-                    "type":"SP.ResourcePath"
-                  },
-                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/AllItems.aspx"
-                },
-                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/AllItems.aspx",
-                "StyleId":null,
-                "TabularView":true,
-                "Threaded":false,
-                "Title":"All Documents",
-                "Toolbar":"",
-                "ToolbarTemplateName":null,
-                "ViewType":"HTML",
-                "ViewData":null,
-                "VisualizationInfo":null
-              },
-              {
-                "__metadata":{
-                  "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'281e80fd-099b-4eba-b622-a94fa03bf865')",
-                  "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'281e80fd-099b-4eba-b622-a94fa03bf865')",
-                  "type":"SP.View"
-                },
-                "ViewFields":{
-                  "__deferred":{
-                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'281e80fd-099b-4eba-b622-a94fa03bf865')/ViewFields"
-                  }
-                },
-                "Aggregations":null,
-                "AggregationsStatus":null,
-                "BaseViewId":"9",
-                "ColumnWidth":null,
-                "ContentTypeId":{
-                  "__metadata":{
-                    "type":"SP.ContentTypeId"
-                  },
-                  "StringValue":"0x"
-                },
-                "CustomFormatter":null,
-                "DefaultView":false,
-                "DefaultViewForContentType":false,
-                "EditorModified":false,
-                "Formats":null,
-                "Hidden":true,
-                "HtmlSchemaXml":"<View Name=\"{281E80FD-099B-4EBA-B622-A94FA03BF865}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" DisplayName=\"Relink Documents\" Url=\"/sites/ninja/Shared Documents/Forms/repair.aspx\" Level=\"1\" BaseViewID=\"9\" ContentTypeID=\"0x\" ToolbarTemplate=\"RelinkToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilenameNoMenu\" /><FieldRef Name=\"RepairDocument\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /><FieldRef Name=\"ContentType\" /><FieldRef Name=\"TemplateUrl\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where></Query></View>",
-                "Id":"281e80fd-099b-4eba-b622-a94fa03bf865",
-                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
-                "IncludeRootFolder":false,
-                "ViewJoins":null,
-                "JSLink":null,
-                "ListViewXml":"<View Name=\"{281E80FD-099B-4EBA-B622-A94FA03BF865}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" DisplayName=\"Relink Documents\" Url=\"/sites/ninja/Shared Documents/Forms/repair.aspx\" Level=\"1\" BaseViewID=\"9\" ContentTypeID=\"0x\" ToolbarTemplate=\"RelinkToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilenameNoMenu\" /><FieldRef Name=\"RepairDocument\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /><FieldRef Name=\"ContentType\" /><FieldRef Name=\"TemplateUrl\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
-                "Method":null,
-                "MobileDefaultView":false,
-                "MobileView":false,
-                "ModerationType":null,
-                "NewDocumentTemplates":null,
-                "OrderedView":false,
-                "Paged":true,
-                "PersonalView":false,
-                "ViewProjectedFields":null,
-                "ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where>",
-                "ReadOnlyView":false,
-                "RequiresClientIntegration":false,
-                "RowLimit":30,
-                "Scope":0,
-                "ServerRelativePath":{
-                  "__metadata":{
-                    "type":"SP.ResourcePath"
-                  },
-                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/repair.aspx"
-                },
-                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/repair.aspx",
-                "StyleId":null,
-                "TabularView":false,
-                "Threaded":false,
-                "Title":"Relink Documents",
-                "Toolbar":"",
-                "ToolbarTemplateName":"RelinkToolBar",
-                "ViewType":"HTML",
-                "ViewData":null,
-                "VisualizationInfo":null
-                },
-                {
-                  "__metadata":{
-                    "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'3d760127-982c-405e-9c93-e1f76e1a1110')",
-                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'3d760127-982c-405e-9c93-e1f76e1a1110')",
-                    "type":"SP.View"
-                  },
-                  "ViewFields":{
-                    "__deferred":{
-                      "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'3d760127-982c-405e-9c93-e1f76e1a1110')/ViewFields"
-                    }
-                  },
-                "Aggregations":null,
-                "AggregationsStatus":null,
-                "BaseViewId":"40",
-                "ColumnWidth":null,
-                "ContentTypeId":{
-                  "__metadata":{
-                    "type":"SP.ContentTypeId"
-                  },
-                  "StringValue":"0x"
-                },
-                "CustomFormatter":null,
-                "DefaultView":false,
-                "DefaultViewForContentType":false,
-                "EditorModified":false,
-                "Formats":null,
-                "Hidden":true,
-                "HtmlSchemaXml":"<View Name=\"{3D760127-982C-405E-9C93-E1F76E1A1110}\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"assetLibTemp\" Url=\"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx\" Level=\"1\" BaseViewID=\"40\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><ViewFields><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit>20</RowLimit><Query><OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy></Query></View>",
-                "Id":"3d760127-982c-405e-9c93-e1f76e1a1110",
-                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
-                "IncludeRootFolder":false,
-                "ViewJoins":null,
-                "JSLink":null,
-                "ListViewXml":"<View Name=\"{3D760127-982C-405E-9C93-E1F76E1A1110}\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"assetLibTemp\" Url=\"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx\" Level=\"1\" BaseViewID=\"40\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy></Query><ViewFields><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit>20</RowLimit><Toolbar Type=\"None\"/></View>",
-                "Method":null,
-                "MobileDefaultView":false,
-                "MobileView":false,
-                "ModerationType":null,
-                "NewDocumentTemplates":null,
-                "OrderedView":false,
-                "Paged":false,
-                "PersonalView":false,
-                "ViewProjectedFields":null,
-                "ViewQuery":"<OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy>",
-                "ReadOnlyView":false,
-                "RequiresClientIntegration":false,
-                "RowLimit":20,
-                "Scope":0,
-                "ServerRelativePath":{
-                  "__metadata":{
-                    "type":"SP.ResourcePath"
-                  },
-                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx"
-                },
-                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx",
-                "StyleId":null,
-                "TabularView":true,
-                "Threaded":false,
-                "Title":"assetLibTemp",
-                "Toolbar":null,
-                "ToolbarTemplateName":null,
-                "ViewType":"HTML",
-                "ViewData":null,
-                "VisualizationInfo":null
-              },
-              {
-                "__metadata":{
-                  "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'1204c10a-978d-46c8-a6f2-65ecfa5e03d5')",
-                  "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'1204c10a-978d-46c8-a6f2-65ecfa5e03d5')",
-                  "type":"SP.View"
-                },
-                "ViewFields":{
-                  "__deferred":{
-                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'1204c10a-978d-46c8-a6f2-65ecfa5e03d5')/ViewFields"
-                  }
-                },
-                "Aggregations":null,
-                "AggregationsStatus":null,
-                "BaseViewId":"7",
-                "ColumnWidth":null,
-                "ContentTypeId":{
-                  "__metadata":{
-                    "type":"SP.ContentTypeId"
-                  },
-                  "StringValue":"0x"
-                },
-                "CustomFormatter":null,
-                "DefaultView":false,
-                "DefaultViewForContentType":false,
-                "EditorModified":false,
-                "Formats":null,
-                "Hidden":true,
-                "HtmlSchemaXml":"<View Name=\"{1204C10A-978D-46C8-A6F2-65ECFA5E03D5}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" AggregateView=\"TRUE\" DisplayName=\"Merge Documents\" Url=\"/sites/ninja/Shared Documents/Forms/Combine.aspx\" Level=\"1\" BaseViewID=\"7\" ContentTypeID=\"0x\" ToolbarTemplate=\"MergeToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Combine\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query></View>",
-                "Id":"1204c10a-978d-46c8-a6f2-65ecfa5e03d5",
-                "ImageUrl":"/_layouts/15/images/dlicon.png?rev=45",
-                "IncludeRootFolder":false,
-                "ViewJoins":null,
-                "JSLink":"clienttemplates.js",
-                "ListViewXml":"<View Name=\"{1204C10A-978D-46C8-A6F2-65ECFA5E03D5}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" AggregateView=\"TRUE\" DisplayName=\"Merge Documents\" Url=\"/sites/ninja/Shared Documents/Forms/Combine.aspx\" Level=\"1\" BaseViewID=\"7\" ContentTypeID=\"0x\" ToolbarTemplate=\"MergeToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Combine\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
-                "Method":null,
-                "MobileDefaultView":false,
-                "MobileView":false,
-                "ModerationType":null,
-                "NewDocumentTemplates":null,
-                "OrderedView":false,
-                "Paged":true,
-                "PersonalView":false,
-                "ViewProjectedFields":null,
-                "ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>",
-                "ReadOnlyView":false,
-                "RequiresClientIntegration":false,
-                "RowLimit":30,
-                "Scope":0,
-                "ServerRelativePath":{
-                  "__metadata":{
-                    "type":"SP.ResourcePath"
-                  },
-                  "DecodedUrl":"/sites/ninja/Shared Documents/Forms/Combine.aspx"
-                },
-                "ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/Combine.aspx",
-                "StyleId":null,
-                "TabularView":false,
-                "Threaded":false,
-                "Title":"Merge Documents",
-                "Toolbar":"",
-                "ToolbarTemplateName":"MergeToolBar",
-                "ViewType":"HTML",
-                "ViewData":null,
-                "VisualizationInfo":null
-                },
-                {
-                  "__metadata":{
-                    "id":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'e021e923-0801-4a16-9775-545239356739')",
-                    "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'e021e923-0801-4a16-9775-545239356739')",
-                    "type":"SP.View"
-                  },
-                  "ViewFields":{
-                    "__deferred":{
-                      "uri":"https://contoso.sharepoint.com/sites/ninja/_api/Web/Lists(guid'1f187321-f086-4d3d-8523-517e94cc9df9')/Views(guid'e021e923-0801-4a16-9775-545239356739')/ViewFields"
-                    }
-                  },
-                  "Aggregations":null,
-                  "AggregationsStatus":null,
-                  "BaseViewId":"50",
-                  "ColumnWidth":null,
-                  "ContentTypeId":{
-                    "__metadata":{
-                      "type":"SP.ContentTypeId"
-                    },
-                    "StringValue":"0x"
-                  },
-                  "CustomFormatter":null,
-                  "DefaultView":false,
-                  "DefaultViewForContentType":false,
-                  "EditorModified":false,
-                  "Formats":null,
-                  "Hidden":true,
-                  "HtmlSchemaXml":"<View Name=\"{E021E923-0801-4A16-9775-545239356739}\" MobileView=\"TRUE\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"\" Url=\"/sites/ninja/SitePages/Home.aspx\" Level=\"1\" BaseViewID=\"50\" ContentTypeID=\"0x\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">15</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy></Query></View>",
-                  "Id":"e021e923-0801-4a16-9775-545239356739",
-                  "ImageUrl":null,
-                  "IncludeRootFolder":false,
-                  "ViewJoins":null,
-                  "JSLink":"clienttemplates.js",
-                  "ListViewXml":"<View Name=\"{E021E923-0801-4A16-9775-545239356739}\" MobileView=\"TRUE\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"\" Url=\"/sites/ninja/SitePages/Home.aspx\" Level=\"1\" BaseViewID=\"50\" ContentTypeID=\"0x\" ><Query><OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit Paged=\"TRUE\">15</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>",
-                  "Method":null,
-                  "MobileDefaultView":false,
-                  "MobileView":true,
-                  "ModerationType":null,
-                  "NewDocumentTemplates":null,
-                  "OrderedView":false,
-                  "Paged":true,
-                  "PersonalView":false,
-                  "ViewProjectedFields":null,
-                  "ViewQuery":"<OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy>",
-                  "ReadOnlyView":false,
-                  "RequiresClientIntegration":false,
-                  "RowLimit":15,
-                  "Scope":0,
-                  "ServerRelativePath":{
-                    "__metadata":{
-                      "type":"SP.ResourcePath"
-                    },
-                    "DecodedUrl":"/sites/ninja/SitePages/Home.aspx"
-                  },
-                  "ServerRelativeUrl":"/sites/ninja/SitePages/Home.aspx",
-                  "StyleId":null,
-                  "TabularView":true,
-                  "Threaded":false,
-                  "Title":"",
-                  "Toolbar":"",
-                  "ToolbarTemplateName":null,
-                  "ViewType":"HTML",
-                  "ViewData":null,
-                  "VisualizationInfo":null
-              }
-            ]
+            "value": [{"Aggregations":null,"AggregationsStatus":null,"BaseViewId":"1","ColumnWidth":null,"ContentTypeId":{"StringValue":"0x"},"CustomFormatter":null,"DefaultView":true,"DefaultViewForContentType":false,"EditorModified":false,"Formats":null,"Hidden":false,"HtmlSchemaXml":"<View Name=\"{85907FB0-CDA1-43EC-832E-27118C89CF9F}\" DefaultView=\"TRUE\" MobileView=\"TRUE\" MobileDefaultView=\"TRUE\" Type=\"HTML\" DisplayName=\"All Documents\" Url=\"/sites/ninja/Shared Documents/Forms/AllItems.aspx\" Level=\"1\" BaseViewID=\"1\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query></View>","Id":"85907fb0-cda1-43ec-832e-27118c89cf9f","ImageUrl":"/_layouts/15/images/dlicon.png?rev=45","IncludeRootFolder":false,"ViewJoins":null,"JSLink":"clienttemplates.js","ListViewXml":"<View Name=\"{85907FB0-CDA1-43EC-832E-27118C89CF9F}\" DefaultView=\"TRUE\" MobileView=\"TRUE\" MobileDefaultView=\"TRUE\" Type=\"HTML\" DisplayName=\"All Documents\" Url=\"/sites/ninja/Shared Documents/Forms/AllItems.aspx\" Level=\"1\" BaseViewID=\"1\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>","Method":null,"MobileDefaultView":true,"MobileView":true,"ModerationType":null,"NewDocumentTemplates":null,"OrderedView":false,"Paged":true,"PersonalView":false,"ViewProjectedFields":null,"ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>","ReadOnlyView":false,"RequiresClientIntegration":false,"RowLimit":30,"Scope":0,"ServerRelativePath":{"DecodedUrl":"/sites/ninja/Shared Documents/Forms/AllItems.aspx"},"ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/AllItems.aspx","StyleId":null,"TabularView":true,"Threaded":false,"Title":"All Documents","Toolbar":"","ToolbarTemplateName":null,"ViewType":"HTML","ViewData":null,"VisualizationInfo":null},{"Aggregations":null,"AggregationsStatus":null,"BaseViewId":"9","ColumnWidth":null,"ContentTypeId":{"StringValue":"0x"},"CustomFormatter":null,"DefaultView":false,"DefaultViewForContentType":false,"EditorModified":false,"Formats":null,"Hidden":true,"HtmlSchemaXml":"<View Name=\"{281E80FD-099B-4EBA-B622-A94FA03BF865}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" DisplayName=\"Relink Documents\" Url=\"/sites/ninja/Shared Documents/Forms/repair.aspx\" Level=\"1\" BaseViewID=\"9\" ContentTypeID=\"0x\" ToolbarTemplate=\"RelinkToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilenameNoMenu\" /><FieldRef Name=\"RepairDocument\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /><FieldRef Name=\"ContentType\" /><FieldRef Name=\"TemplateUrl\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where></Query></View>","Id":"281e80fd-099b-4eba-b622-a94fa03bf865","ImageUrl":"/_layouts/15/images/dlicon.png?rev=45","IncludeRootFolder":false,"ViewJoins":null,"JSLink":null,"ListViewXml":"<View Name=\"{281E80FD-099B-4EBA-B622-A94FA03BF865}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" DisplayName=\"Relink Documents\" Url=\"/sites/ninja/Shared Documents/Forms/repair.aspx\" Level=\"1\" BaseViewID=\"9\" ContentTypeID=\"0x\" ToolbarTemplate=\"RelinkToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilenameNoMenu\" /><FieldRef Name=\"RepairDocument\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\"/><FieldRef Name=\"ContentType\" /><FieldRef Name=\"TemplateUrl\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>","Method":null,"MobileDefaultView":false,"MobileView":false,"ModerationType":null,"NewDocumentTemplates":null,"OrderedView":false,"Paged":true,"PersonalView":false,"ViewProjectedFields":null,"ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where>","ReadOnlyView":false,"RequiresClientIntegration":false,"RowLimit":30,"Scope":0,"ServerRelativePath":{"DecodedUrl":"/sites/ninja/Shared Documents/Forms/repair.aspx"},"ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/repair.aspx","StyleId":null,"TabularView":false,"Threaded":false,"Title":"Relink Documents","Toolbar":"","ToolbarTemplateName":"RelinkToolBar","ViewType":"HTML","ViewData":null,"VisualizationInfo":null},{"Aggregations":null,"AggregationsStatus":null,"BaseViewId":"40","ColumnWidth":null,"ContentTypeId":{"StringValue":"0x"},"CustomFormatter":null,"DefaultView":false,"DefaultViewForContentType":false,"EditorModified":false,"Formats":null,"Hidden":true,"HtmlSchemaXml":"<View Name=\"{3D760127-982C-405E-9C93-E1F76E1A1110}\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"assetLibTemp\" Url=\"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx\" Level=\"1\" BaseViewID=\"40\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><ViewFields><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit>20</RowLimit><Query><OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy></Query></View>","Id":"3d760127-982c-405e-9c93-e1f76e1a1110","ImageUrl":"/_layouts/15/images/dlicon.png?rev=45","IncludeRootFolder":false,"ViewJoins":null,"JSLink":null,"ListViewXml":"<View Name=\"{3D760127-982C-405E-9C93-E1F76E1A1110}\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"assetLibTemp\" Url=\"/sites/ninja/SharedDocuments/Forms/Thumbnails.aspx\" Level=\"1\" BaseViewID=\"40\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy></Query><ViewFields><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit>20</RowLimit><Toolbar Type=\"None\"/></View>","Method":null,"MobileDefaultView":false,"MobileView":false,"ModerationType":null,"NewDocumentTemplates":null,"OrderedView":false,"Paged":false,"PersonalView":false,"ViewProjectedFields":null,"ViewQuery":"<OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy>","ReadOnlyView":false,"RequiresClientIntegration":false,"RowLimit":20,"Scope":0,"ServerRelativePath":{"DecodedUrl":"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx"},"ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx","StyleId":null,"TabularView":true,"Threaded":false,"Title":"assetLibTemp","Toolbar":null,"ToolbarTemplateName":null,"ViewType":"HTML","ViewData":null,"VisualizationInfo":null},{"Aggregations":null,"AggregationsStatus":null,"BaseViewId":"7","ColumnWidth":null,"ContentTypeId":{"StringValue":"0x"},"CustomFormatter":null,"DefaultView":false,"DefaultViewForContentType":false,"EditorModified":false,"Formats":null,"Hidden":true,"HtmlSchemaXml":"<View Name=\"{1204C10A-978D-46C8-A6F2-65ECFA5E03D5}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" AggregateView=\"TRUE\" DisplayName=\"Merge Documents\" Url=\"/sites/ninja/Shared Documents/Forms/Combine.aspx\" Level=\"1\" BaseViewID=\"7\" ContentTypeID=\"0x\" ToolbarTemplate=\"MergeToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Combine\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query></View>","Id":"1204c10a-978d-46c8-a6f2-65ecfa5e03d5","ImageUrl":"/_layouts/15/images/dlicon.png?rev=45","IncludeRootFolder":false,"ViewJoins":null,"JSLink":"clienttemplates.js","ListViewXml":"<View Name=\"{1204C10A-978D-46C8-A6F2-65ECFA5E03D5}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" AggregateView=\"TRUE\" DisplayName=\"Merge Documents\" Url=\"/sites/ninja/Shared Documents/Forms/Combine.aspx\" Level=\"1\" BaseViewID=\"7\" ContentTypeID=\"0x\" ToolbarTemplate=\"MergeToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Combine\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>","Method":null,"MobileDefaultView":false,"MobileView":false,"ModerationType":null,"NewDocumentTemplates":null,"OrderedView":false,"Paged":true,"PersonalView":false,"ViewProjectedFields":null,"ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>","ReadOnlyView":false,"RequiresClientIntegration":false,"RowLimit":30,"Scope":0,"ServerRelativePath":{"DecodedUrl":"/sites/ninja/Shared Documents/Forms/Combine.aspx"},"ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/Combine.aspx","StyleId":null,"TabularView":false,"Threaded":false,"Title":"Merge Documents","Toolbar":"","ToolbarTemplateName":"MergeToolBar","ViewType":"HTML","ViewData":null,"VisualizationInfo":null},{"Aggregations":null,"AggregationsStatus":null,"BaseViewId":"50","ColumnWidth":null,"ContentTypeId":{"StringValue":"0x"},"CustomFormatter":null,"DefaultView":false,"DefaultViewForContentType":false,"EditorModified":false,"Formats":null,"Hidden":true,"HtmlSchemaXml":"<View Name=\"{E021E923-0801-4A16-9775-545239356739}\" MobileView=\"TRUE\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"\" Url=\"/sites/ninja/SitePages/Home.aspx\" Level=\"1\" BaseViewID=\"50\" ContentTypeID=\"0x\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">15</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy></Query></View>","Id":"e021e923-0801-4a16-9775-545239356739","ImageUrl":null,"IncludeRootFolder":false,"ViewJoins":null,"JSLink":"clienttemplates.js","ListViewXml":"<View Name=\"{E021E923-0801-4A16-9775-545239356739}\" MobileView=\"TRUE\" Type=\"HTML\"Hidden=\"TRUE\" DisplayName=\"\" Url=\"/sites/ninja/SitePages/Home.aspx\" Level=\"1\" BaseViewID=\"50\" ContentTypeID=\"0x\" ><Query><OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit Paged=\"TRUE\">15</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>","Method":null,"MobileDefaultView":false,"MobileView":true,"ModerationType":null,"NewDocumentTemplates":null,"OrderedView":false,"Paged":true,"PersonalView":false,"ViewProjectedFields":null,"ViewQuery":"<OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy>","ReadOnlyView":false,"RequiresClientIntegration":false,"RowLimit":15,"Scope":0,"ServerRelativePath":{"DecodedUrl":"/sites/ninja/SitePages/Home.aspx"},"ServerRelativeUrl":"/sites/ninja/SitePages/Home.aspx","StyleId":null,"TabularView":true,"Threaded":false,"Title":"","Toolbar":"","ToolbarTemplateName":null,"ViewType":"HTML","ViewData":null,"VisualizationInfo":null}]
           });
         }
       }
@@ -1976,60 +431,7 @@ describe(commands.LIST_VIEW_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
-          {
-            "Description": "Create a new document.",
-            "DisplayFormTemplateName": "DocumentLibraryForm",
-            "DisplayFormUrl": "",
-            "DocumentTemplate": "/Shared Documents/Forms/template.dotx",
-            "DocumentTemplateUrl": "/Shared Documents/Forms/template.dotx",
-            "EditFormTemplateName": "DocumentLibraryForm",
-            "EditFormUrl": "",
-            "Group": "Document Content Types",
-            "Hidden": false,
-            "Id": {
-              "StringValue": "0x010100260C61709CD8E548948F9BF605F8F54F"
-            },
-            "JSLink": "",
-            "MobileDisplayFormUrl": "",
-            "MobileEditFormUrl": "",
-            "MobileNewFormUrl": "",
-            "Name": "Document",
-            "NewFormTemplateName": "DocumentLibraryForm",
-            "NewFormUrl": "",
-            "ReadOnly": false,
-            "SchemaXml": "<ContentType ID=\"0x010100260C61709CD8E548948F9BF605F8F54F\" Name=\"Document\" Group=\"Document Content Types\" Description=\"Create a new document.\" V2ListTemplateName=\"doclib\" Version=\"0\" DelayActivateTemplateBinding=\"GROUP,SPSPERS,SITEPAGEPUBLISHING\" FeatureId=\"{695b6570-a48b-4a8e-8ea5-26ea7fc1d162}\"><Fields><Field ID=\"{c042a256-787d-4a6f-8a8a-cf6ab767f12d}\" Type=\"Computed\" DisplayName=\"Content Type\" Name=\"ContentType\" DisplaceOnUpgrade=\"TRUE\" RenderXMLUsingPattern=\"TRUE\" Sortable=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"ContentType\" Group=\"_Hidden\" PITarget=\"MicrosoftWindowsSharePointServices\" PIAttribute=\"ContentTypeID\" FromBaseType=\"TRUE\"><FieldRefs><FieldRef Name=\"ContentTypeId\"/></FieldRefs><DisplayPattern><MapToContentType><Column Name=\"ContentTypeId\"/></MapToContentType></DisplayPattern></Field><Field ID=\"{5f47e085-2150-41dc-b661-442f3027f552}\" ReadOnly=\"TRUE\" Type=\"Computed\" Name=\"SelectFilename\" DisplayName=\"Select\" Hidden=\"TRUE\" CanToggleHidden=\"TRUE\" Sortable=\"FALSE\" Filterable=\"FALSE\" AuthoringInfo=\"(web part connection)\" HeaderImage=\"blank.gif\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"SelectFilename\" FromBaseType=\"TRUE\"><FieldRefs><FieldRef Name=\"ID\"/></FieldRefs><DisplayPattern><IfEqual><Expr1><GetVar Name=\"SelectedID\"/></Expr1><Expr2><Column Name=\"ID\"/></Expr2><Then><HTML><![CDATA[<img align=\"absmiddle\" style=\"cursor: pointer\" src=\"/_layouts/15/images/rbsel.gif?rev=44\" alt=\"]]></HTML><HTML>Selected</HTML><HTML><![CDATA[\"/>]]></HTML></Then><Else><HTML><![CDATA[<a href=\"javascript:SelectField(']]></HTML><GetVar Name=\"View\"/><HTML><![CDATA[',']]></HTML><ScriptQuote NotAddingQuote=\"TRUE\"><Column Name=\"ID\"/></ScriptQuote><HTML><![CDATA[');return false;\" onclick=\"javascript:SelectField(']]></HTML><GetVar Name=\"View\"/><HTML><![CDATA[',']]></HTML><ScriptQuote NotAddingQuote=\"TRUE\"><Column Name=\"ID\"/></ScriptQuote><HTML><![CDATA[');return false;\" target=\"_self\">]]></HTML><HTML><![CDATA[<img border=\"0\" align=\"absmiddle\" style=\"cursor: pointer\" src=\"/_layouts/15/images/rbunsel.gif?rev=44\"  alt=\"]]></HTML><HTML>Normal</HTML><HTML><![CDATA[\"/>]]></HTML><HTML><![CDATA[</a>]]></HTML></Else></IfEqual></DisplayPattern></Field><Field ID=\"{8553196d-ec8d-4564-9861-3dbe931050c8}\" ShowInFileDlg=\"FALSE\" ShowInVersionHistory=\"FALSE\" Type=\"File\" Name=\"FileLeafRef\" DisplayName=\"Name\" AuthoringInfo=\"(for use in forms)\" List=\"Docs\" FieldRef=\"ID\" ShowField=\"LeafName\" JoinColName=\"DoclibRowId\" JoinRowOrdinal=\"0\" JoinType=\"INNER\" Required=\"TRUE\" NoCustomize=\"TRUE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"FileLeafRef\" FromBaseType=\"TRUE\"/><Field ID=\"{8c06beca-0777-48f7-91c7-6da68bc07b69}\" ColName=\"tp_Created\" RowOrdinal=\"0\" ReadOnly=\"TRUE\" Type=\"DateTime\" Name=\"Created\" DisplayName=\"Created\" StorageTZ=\"TRUE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"Created\" FromBaseType=\"TRUE\" Hidden=\"TRUE\"/><Field ID=\"{fa564e0f-0c70-4ab9-b863-0177e6ddd247}\" Type=\"Text\" Name=\"Title\" ShowInNewForm=\"FALSE\" ShowInFileDlg=\"FALSE\" DisplayName=\"Title\" Sealed=\"TRUE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"Title\" ColName=\"nvarchar8\" Required=\"FALSE\" ShowInEditForm=\"TRUE\"/><Field ID=\"{28cf69c5-fa48-462a-b5cd-27b6f9d2bd5f}\" ColName=\"tp_Modified\" RowOrdinal=\"0\" ReadOnly=\"TRUE\" Type=\"DateTime\" Name=\"Modified\" DisplayName=\"Modified\" StorageTZ=\"TRUE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"Modified\" FromBaseType=\"TRUE\" Hidden=\"TRUE\"/><Field ID=\"{822c78e3-1ea9-4943-b449-57863ad33ca9}\" ReadOnly=\"TRUE\" Hidden=\"FALSE\" Type=\"Text\" Name=\"Modified_x0020_By\" DisplayName=\"Document Modified By\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"Modified_x0020_By\" FromBaseType=\"TRUE\" ColName=\"nvarchar1\"/><Field ID=\"{4dd7e525-8d6b-4cb4-9d3e-44ee25f973eb}\" ReadOnly=\"TRUE\" Hidden=\"FALSE\" Type=\"Text\" Name=\"Created_x0020_By\" DisplayName=\"Document Created By\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"Created_x0020_By\" FromBaseType=\"TRUE\" ColName=\"nvarchar2\"/></Fields><XmlDocuments><XmlDocument NamespaceURI=\"http://schemas.microsoft.com/sharepoint/v3/contenttype/forms\"><FormTemplates xmlns=\"http://schemas.microsoft.com/sharepoint/v3/contenttype/forms\"><Display>DocumentLibraryForm</Display><Edit>DocumentLibraryForm</Edit><New>DocumentLibraryForm</New></FormTemplates></XmlDocument></XmlDocuments><Folder TargetName=\"Forms/Document\"/></ContentType>",
-            "Scope": "/Shared Documents",
-            "Sealed": false,
-            "StringId": "0x010100260C61709CD8E548948F9BF605F8F54F"
-          },
-          {
-            "Description": "Create a new folder.",
-            "DisplayFormTemplateName": "ListForm",
-            "DisplayFormUrl": "",
-            "DocumentTemplate": "",
-            "DocumentTemplateUrl": "",
-            "EditFormTemplateName": "ListForm",
-            "EditFormUrl": "",
-            "Group": "Folder Content Types",
-            "Hidden": false,
-            "Id": {
-              "StringValue": "0x0120000EAD53EDAD7C6647B0D976EEC953F99E"
-            },
-            "JSLink": "",
-            "MobileDisplayFormUrl": "",
-            "MobileEditFormUrl": "",
-            "MobileNewFormUrl": "",
-            "Name": "Folder",
-            "NewFormTemplateName": "ListForm",
-            "NewFormUrl": "",
-            "ReadOnly": false,
-            "SchemaXml": "<ContentType ID=\"0x0120000EAD53EDAD7C6647B0D976EEC953F99E\" Name=\"Folder\" Group=\"Folder Content Types\" Description=\"Create a new folder.\" Sealed=\"TRUE\" Version=\"0\" DelayActivateTemplateBinding=\"GROUP,SPSPERS,SITEPAGEPUBLISHING\" FeatureId=\"{695b6570-a48b-4a8e-8ea5-26ea7fc1d162}\"><Fields><Field ID=\"{c042a256-787d-4a6f-8a8a-cf6ab767f12d}\" Type=\"Computed\" DisplayName=\"Content Type\" Name=\"ContentType\" DisplaceOnUpgrade=\"TRUE\" RenderXMLUsingPattern=\"TRUE\" Sortable=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"ContentType\" Group=\"_Hidden\" PITarget=\"MicrosoftWindowsSharePointServices\" PIAttribute=\"ContentTypeID\" FromBaseType=\"TRUE\"><FieldRefs><FieldRef Name=\"ContentTypeId\"/></FieldRefs><DisplayPattern><MapToContentType><Column Name=\"ContentTypeId\"/></MapToContentType></DisplayPattern></Field><Field ID=\"{fa564e0f-0c70-4ab9-b863-0177e6ddd247}\" Type=\"Text\" Name=\"Title\" ShowInNewForm=\"FALSE\" ShowInFileDlg=\"FALSE\" DisplayName=\"Title\" Sealed=\"TRUE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"Title\" ColName=\"nvarchar8\" Required=\"FALSE\" Hidden=\"TRUE\"/><Field ID=\"{8553196d-ec8d-4564-9861-3dbe931050c8}\" ShowInFileDlg=\"FALSE\" ShowInVersionHistory=\"FALSE\" Type=\"File\" Name=\"FileLeafRef\" DisplayName=\"Name\" AuthoringInfo=\"(for use in forms)\" List=\"Docs\" FieldRef=\"ID\" ShowField=\"LeafName\" JoinColName=\"DoclibRowId\" JoinRowOrdinal=\"0\" JoinType=\"INNER\" Required=\"TRUE\" NoCustomize=\"TRUE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"FileLeafRef\" FromBaseType=\"TRUE\" Hidden=\"FALSE\"/><Field ID=\"{b824e17e-a1b3-426e-aecf-f0184d900485}\" Name=\"ItemChildCount\" DisplaceOnUpgrade=\"TRUE\" ReadOnly=\"TRUE\" ShowInFileDlg=\"FALSE\" Type=\"Lookup\" DisplayName=\"Item Child Count\" List=\"Docs\" FieldRef=\"ID\" ShowField=\"ItemChildCount\" JoinColName=\"DoclibRowId\" JoinRowOrdinal=\"0\" JoinType=\"INNER\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"ItemChildCount\" FromBaseType=\"TRUE\"/><Field ID=\"{960ff01f-2b6d-4f1b-9c3f-e19ad8927341}\" Name=\"FolderChildCount\" DisplaceOnUpgrade=\"TRUE\" ReadOnly=\"TRUE\" ShowInFileDlg=\"FALSE\" Type=\"Lookup\" DisplayName=\"Folder Child Count\" List=\"Docs\" FieldRef=\"ID\" ShowField=\"FolderChildCount\" JoinColName=\"DoclibRowId\" JoinRowOrdinal=\"0\" JoinType=\"INNER\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"FolderChildCount\" FromBaseType=\"TRUE\"/></Fields><XmlDocuments><XmlDocument NamespaceURI=\"http://schemas.microsoft.com/sharepoint/v3/contenttype/forms\"><FormTemplates xmlns=\"http://schemas.microsoft.com/sharepoint/v3/contenttype/forms\"><Display>ListForm</Display><Edit>ListForm</Edit><New>ListForm</New></FormTemplates></XmlDocument></XmlDocuments></ContentType>",
-            "Scope": "/Shared Documents",
-            "Sealed": true,
-            "StringId": "0x0120000EAD53EDAD7C6647B0D976EEC953F99E"
-          }
-        ]));
+        assert(cmdInstanceLogSpy.calledWith([{"Aggregations":null,"AggregationsStatus":null,"BaseViewId":"1","ColumnWidth":null,"ContentTypeId":{"StringValue":"0x"},"CustomFormatter":null,"DefaultView":true,"DefaultViewForContentType":false,"EditorModified":false,"Formats":null,"Hidden":false,"HtmlSchemaXml":"<View Name=\"{85907FB0-CDA1-43EC-832E-27118C89CF9F}\" DefaultView=\"TRUE\" MobileView=\"TRUE\" MobileDefaultView=\"TRUE\" Type=\"HTML\" DisplayName=\"All Documents\" Url=\"/sites/ninja/Shared Documents/Forms/AllItems.aspx\" Level=\"1\" BaseViewID=\"1\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query></View>","Id":"85907fb0-cda1-43ec-832e-27118c89cf9f","ImageUrl":"/_layouts/15/images/dlicon.png?rev=45","IncludeRootFolder":false,"ViewJoins":null,"JSLink":"clienttemplates.js","ListViewXml":"<View Name=\"{85907FB0-CDA1-43EC-832E-27118C89CF9F}\" DefaultView=\"TRUE\" MobileView=\"TRUE\" MobileDefaultView=\"TRUE\" Type=\"HTML\" DisplayName=\"All Documents\" Url=\"/sites/ninja/Shared Documents/Forms/AllItems.aspx\" Level=\"1\" BaseViewID=\"1\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>","Method":null,"MobileDefaultView":true,"MobileView":true,"ModerationType":null,"NewDocumentTemplates":null,"OrderedView":false,"Paged":true,"PersonalView":false,"ViewProjectedFields":null,"ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>","ReadOnlyView":false,"RequiresClientIntegration":false,"RowLimit":30,"Scope":0,"ServerRelativePath":{"DecodedUrl":"/sites/ninja/Shared Documents/Forms/AllItems.aspx"},"ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/AllItems.aspx","StyleId":null,"TabularView":true,"Threaded":false,"Title":"All Documents","Toolbar":"","ToolbarTemplateName":null,"ViewType":"HTML","ViewData":null,"VisualizationInfo":null},{"Aggregations":null,"AggregationsStatus":null,"BaseViewId":"9","ColumnWidth":null,"ContentTypeId":{"StringValue":"0x"},"CustomFormatter":null,"DefaultView":false,"DefaultViewForContentType":false,"EditorModified":false,"Formats":null,"Hidden":true,"HtmlSchemaXml":"<View Name=\"{281E80FD-099B-4EBA-B622-A94FA03BF865}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" DisplayName=\"Relink Documents\" Url=\"/sites/ninja/Shared Documents/Forms/repair.aspx\" Level=\"1\" BaseViewID=\"9\" ContentTypeID=\"0x\" ToolbarTemplate=\"RelinkToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilenameNoMenu\" /><FieldRef Name=\"RepairDocument\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /><FieldRef Name=\"ContentType\" /><FieldRef Name=\"TemplateUrl\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where></Query></View>","Id":"281e80fd-099b-4eba-b622-a94fa03bf865","ImageUrl":"/_layouts/15/images/dlicon.png?rev=45","IncludeRootFolder":false,"ViewJoins":null,"JSLink":null,"ListViewXml":"<View Name=\"{281E80FD-099B-4EBA-B622-A94FA03BF865}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" DisplayName=\"Relink Documents\" Url=\"/sites/ninja/Shared Documents/Forms/repair.aspx\" Level=\"1\" BaseViewID=\"9\" ContentTypeID=\"0x\" ToolbarTemplate=\"RelinkToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilenameNoMenu\" /><FieldRef Name=\"RepairDocument\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\"/><FieldRef Name=\"ContentType\" /><FieldRef Name=\"TemplateUrl\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>","Method":null,"MobileDefaultView":false,"MobileView":false,"ModerationType":null,"NewDocumentTemplates":null,"OrderedView":false,"Paged":true,"PersonalView":false,"ViewProjectedFields":null,"ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy><Where><Neq><FieldRef Name=\"xd_Signature\" /><Value Type=\"Boolean\">1</Value></Neq></Where>","ReadOnlyView":false,"RequiresClientIntegration":false,"RowLimit":30,"Scope":0,"ServerRelativePath":{"DecodedUrl":"/sites/ninja/Shared Documents/Forms/repair.aspx"},"ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/repair.aspx","StyleId":null,"TabularView":false,"Threaded":false,"Title":"Relink Documents","Toolbar":"","ToolbarTemplateName":"RelinkToolBar","ViewType":"HTML","ViewData":null,"VisualizationInfo":null},{"Aggregations":null,"AggregationsStatus":null,"BaseViewId":"40","ColumnWidth":null,"ContentTypeId":{"StringValue":"0x"},"CustomFormatter":null,"DefaultView":false,"DefaultViewForContentType":false,"EditorModified":false,"Formats":null,"Hidden":true,"HtmlSchemaXml":"<View Name=\"{3D760127-982C-405E-9C93-E1F76E1A1110}\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"assetLibTemp\" Url=\"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx\" Level=\"1\" BaseViewID=\"40\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><ViewFields><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit>20</RowLimit><Query><OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy></Query></View>","Id":"3d760127-982c-405e-9c93-e1f76e1a1110","ImageUrl":"/_layouts/15/images/dlicon.png?rev=45","IncludeRootFolder":false,"ViewJoins":null,"JSLink":null,"ListViewXml":"<View Name=\"{3D760127-982C-405E-9C93-E1F76E1A1110}\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"assetLibTemp\" Url=\"/sites/ninja/SharedDocuments/Forms/Thumbnails.aspx\" Level=\"1\" BaseViewID=\"40\" ContentTypeID=\"0x\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy></Query><ViewFields><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit>20</RowLimit><Toolbar Type=\"None\"/></View>","Method":null,"MobileDefaultView":false,"MobileView":false,"ModerationType":null,"NewDocumentTemplates":null,"OrderedView":false,"Paged":false,"PersonalView":false,"ViewProjectedFields":null,"ViewQuery":"<OrderBy><FieldRef Name=\"LinkFilename\" /></OrderBy>","ReadOnlyView":false,"RequiresClientIntegration":false,"RowLimit":20,"Scope":0,"ServerRelativePath":{"DecodedUrl":"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx"},"ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/Thumbnails.aspx","StyleId":null,"TabularView":true,"Threaded":false,"Title":"assetLibTemp","Toolbar":null,"ToolbarTemplateName":null,"ViewType":"HTML","ViewData":null,"VisualizationInfo":null},{"Aggregations":null,"AggregationsStatus":null,"BaseViewId":"7","ColumnWidth":null,"ContentTypeId":{"StringValue":"0x"},"CustomFormatter":null,"DefaultView":false,"DefaultViewForContentType":false,"EditorModified":false,"Formats":null,"Hidden":true,"HtmlSchemaXml":"<View Name=\"{1204C10A-978D-46C8-A6F2-65ECFA5E03D5}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" AggregateView=\"TRUE\" DisplayName=\"Merge Documents\" Url=\"/sites/ninja/Shared Documents/Forms/Combine.aspx\" Level=\"1\" BaseViewID=\"7\" ContentTypeID=\"0x\" ToolbarTemplate=\"MergeToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">30</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Combine\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query></View>","Id":"1204c10a-978d-46c8-a6f2-65ecfa5e03d5","ImageUrl":"/_layouts/15/images/dlicon.png?rev=45","IncludeRootFolder":false,"ViewJoins":null,"JSLink":"clienttemplates.js","ListViewXml":"<View Name=\"{1204C10A-978D-46C8-A6F2-65ECFA5E03D5}\" Type=\"HTML\" Hidden=\"TRUE\" TabularView=\"FALSE\" AggregateView=\"TRUE\" DisplayName=\"Merge Documents\" Url=\"/sites/ninja/Shared Documents/Forms/Combine.aspx\" Level=\"1\" BaseViewID=\"7\" ContentTypeID=\"0x\" ToolbarTemplate=\"MergeToolBar\" ImageUrl=\"/_layouts/15/images/dlicon.png?rev=45\" ><Query><OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /><FieldRef Name=\"Combine\" /><FieldRef Name=\"Modified\" /><FieldRef Name=\"Editor\" /></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>","Method":null,"MobileDefaultView":false,"MobileView":false,"ModerationType":null,"NewDocumentTemplates":null,"OrderedView":false,"Paged":true,"PersonalView":false,"ViewProjectedFields":null,"ViewQuery":"<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>","ReadOnlyView":false,"RequiresClientIntegration":false,"RowLimit":30,"Scope":0,"ServerRelativePath":{"DecodedUrl":"/sites/ninja/Shared Documents/Forms/Combine.aspx"},"ServerRelativeUrl":"/sites/ninja/Shared Documents/Forms/Combine.aspx","StyleId":null,"TabularView":false,"Threaded":false,"Title":"Merge Documents","Toolbar":"","ToolbarTemplateName":"MergeToolBar","ViewType":"HTML","ViewData":null,"VisualizationInfo":null},{"Aggregations":null,"AggregationsStatus":null,"BaseViewId":"50","ColumnWidth":null,"ContentTypeId":{"StringValue":"0x"},"CustomFormatter":null,"DefaultView":false,"DefaultViewForContentType":false,"EditorModified":false,"Formats":null,"Hidden":true,"HtmlSchemaXml":"<View Name=\"{E021E923-0801-4A16-9775-545239356739}\" MobileView=\"TRUE\" Type=\"HTML\" Hidden=\"TRUE\" DisplayName=\"\" Url=\"/sites/ninja/SitePages/Home.aspx\" Level=\"1\" BaseViewID=\"50\" ContentTypeID=\"0x\"><XslLink Default=\"TRUE\">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged=\"TRUE\">15</RowLimit><Toolbar Type=\"Standard\" /><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /></ViewFields><ParameterBindings><ParameterBinding Name=\"NoAnnouncements\" Location=\"Resource(wss,noitemsinview_doclibrary)\" /><ParameterBinding Name=\"NoAnnouncementsHowTo\" Location=\"Resource(wss,noitemsinview_doclibrary_howto2)\" /></ParameterBindings><Query><OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy></Query></View>","Id":"e021e923-0801-4a16-9775-545239356739","ImageUrl":null,"IncludeRootFolder":false,"ViewJoins":null,"JSLink":"clienttemplates.js","ListViewXml":"<View Name=\"{E021E923-0801-4A16-9775-545239356739}\" MobileView=\"TRUE\" Type=\"HTML\"Hidden=\"TRUE\" DisplayName=\"\" Url=\"/sites/ninja/SitePages/Home.aspx\" Level=\"1\" BaseViewID=\"50\" ContentTypeID=\"0x\" ><Query><OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy></Query><ViewFields><FieldRef Name=\"DocIcon\" /><FieldRef Name=\"LinkFilename\" /></ViewFields><RowLimit Paged=\"TRUE\">15</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default=\"TRUE\">main.xsl</XslLink><Toolbar Type=\"Standard\"/></View>","Method":null,"MobileDefaultView":false,"MobileView":true,"ModerationType":null,"NewDocumentTemplates":null,"OrderedView":false,"Paged":true,"PersonalView":false,"ViewProjectedFields":null,"ViewQuery":"<OrderBy><FieldRef Name=\"Modified\" Ascending=\"FALSE\" /></OrderBy>","ReadOnlyView":false,"RequiresClientIntegration":false,"RowLimit":15,"Scope":0,"ServerRelativePath":{"DecodedUrl":"/sites/ninja/SitePages/Home.aspx"},"ServerRelativeUrl":"/sites/ninja/SitePages/Home.aspx","StyleId":null,"TabularView":true,"Threaded":false,"Title":"","Toolbar":"","ToolbarTemplateName":null,"ViewType":"HTML","ViewData":null,"VisualizationInfo":null}]));
         done();
       }
       catch (e) {

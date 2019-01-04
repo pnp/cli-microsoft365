@@ -29,8 +29,14 @@ To gets all list views for target list, you have to first log in to a SharePoint
 
 ## Examples
 
-Gets all list views for target list
+List all views for a list with title *Documents* located in site *https://contoso.sharepoint.com/sites/project-x*
 
 ```sh
-spo list view get --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'My List'
+spo list view list --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents
+```
+
+List all views for a list with ID *0cd891ef-afce-4e55-b836-fce03286cccf* located in site *https://contoso.sharepoint.com/sites/project-x*
+
+```sh
+spo list view list --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf
 ```

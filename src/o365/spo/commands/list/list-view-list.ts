@@ -10,7 +10,6 @@ import {
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import { Auth } from '../../../../Auth';
-import { ContextInfo } from '../../spo';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -25,16 +24,12 @@ interface Options extends GlobalOptions {
 }
 
 class SpoListViewListCommand extends SpoCommand {
-  public allowUnknownOptions(): boolean | undefined {
-    return true;
-  }
-
   public get name(): string {
     return commands.LIST_VIEW_LIST;
   }
 
   public get description(): string {
-    return 'Gets existing list view';
+    return 'Lists Views configured on the list';
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -47,11 +42,6 @@ class SpoListViewListCommand extends SpoCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
     let siteAccessToken: string = '';
-    const baseRestUrl: string = `${args.options.webUrl}/_api/web/lists`;
-    const listRestUrl: string = args.options.listId ?
-      `(guid'${encodeURIComponent(args.options.listId)}')`
-      : `/getByTitle('${encodeURIComponent(args.options.listTitle as string)}')`;
-    const viewRestUrl: string = `/views`;
 
     if (this.debug) {
       cmd.log(`Retrieving access token for ${resource}...`);
@@ -63,20 +53,25 @@ class SpoListViewListCommand extends SpoCommand {
         siteAccessToken = accessToken;
 
         if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
+          cmd.log(`Retrieved access token ${accessToken}. Retrieving information about views...`);
         }
 
-        return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
-      })
-      .then((res: ContextInfo): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
+        if (this.verbose) {
+          const list: string = args.options.listId ? encodeURIComponent(args.options.listId as string) : encodeURIComponent(args.options.listTitle as string);
+          cmd.log(`Retrieving views information for list ${list} in site at ${args.options.webUrl}...`);
+        }
+
+        let requestUrl: string = '';
+
+        if (args.options.listId) {
+          requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.listId)}')/views`;
+        }
+        else {
+          requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.listTitle as string)}')/views`;
         }
 
         const requestOptions: any = {
-          url: `${baseRestUrl}${listRestUrl}${viewRestUrl}`,
+          url: requestUrl,
           method: 'GET',
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${siteAccessToken}`,
@@ -93,15 +88,30 @@ class SpoListViewListCommand extends SpoCommand {
 
         return request.get(requestOptions);
       })
-      .then((rawRes: any): void => {
-        // request doesn't return any content
+      .then((res: any): void => {
+        if (this.debug) {
+          cmd.log('Response:');
+          cmd.log(res);
+          cmd.log('');
+        }
 
-        if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+        if (args.options.output === 'json') {
+          cmd.log(res.value);
+        }
+        else {
+          cmd.log(res.value.map((vw: any) => {
+            return {
+              Id: vw.Id,
+              Title: vw.Title,
+              DefaultView: vw.DefaultView,
+              Hidden: vw.Hidden,
+              BaseViewId: vw.BaseViewId
+            };
+          }));
         }
 
         cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
 
   public options(): CommandOption[] {
@@ -111,12 +121,12 @@ class SpoListViewListCommand extends SpoCommand {
         description: 'URL of the site where the list is located'
       },
       {
-        option: '--listId [listId]',
-        description: 'ID of the list where the view is located. Specify listTitle or listId but not both'
+        option: '-l, --listId [listId]',
+        description: 'ID of the list for which to list configured views. Specify listId or listTitle but not both'
       },
       {
-        option: '--listTitle [listTitle]',
-        description: 'Title of the list where the view is located. Specify listTitle or listId but not both'
+        option: '-t, --listTitle [listTitle]',
+        description: 'Title of the list for which to list configured views. Specify listId or listTitle but not both'
       }
     ];
 
@@ -135,17 +145,18 @@ class SpoListViewListCommand extends SpoCommand {
         return isValidSharePointUrl;
       }
 
-      if (!args.options.listId && !args.options.listTitle) {
-        return `Specify listId or listTitle`;
+      if (args.options.listId) {
+        if (!Utils.isValidGuid(args.options.listId)) {
+          return `${args.options.listId} is not a valid GUID`;
+        }
       }
 
       if (args.options.listId && args.options.listTitle) {
-        return `Specify listId or listTitle but not both`;
+        return 'Specify listId or listTitle, but not both';
       }
 
-      if (args.options.listId &&
-        !Utils.isValidGuid(args.options.listId)) {
-        return `${args.options.listId} in option listId is not a valid GUID`;
+      if (!args.options.listId && !args.options.listTitle) {
+        return 'Specify listId or listTitle, one is required';
       }
 
       return true;
@@ -167,10 +178,13 @@ class SpoListViewListCommand extends SpoCommand {
 
   Examples:
 
-    Gets all list views for target list
-      ${chalk.grey(config.delimiter)} ${commands.LIST_VIEW_LIST} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'My List'
+      List all views for a list with title ${chalk.grey('Documents')} located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
+      ${chalk.grey(config.delimiter)} ${commands.LIST_VIEW_LIST} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents
+
+      List all views for a list with ID ${chalk.grey('0cd891ef-afce-4e55-b836-fce03286cccf')} located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
+      ${chalk.grey(config.delimiter)} ${commands.LIST_VIEW_LIST} --webUrl https://contoso.sharepoint.com/sites/project-x --listId 1f187321-f086-4d3d-8523-517e94cc9df9
     `);
   }
 }
 
-module.exports = new SpoListViewListCommand();
+module.exports = new SpoListViewListCommand(); 
