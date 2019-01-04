@@ -418,7 +418,7 @@ Remove-PnPTermGroup|SharePointPnPPowerShellOnline|
 Remove-PnPUnifiedGroup|SharePointPnPPowerShellOnline|[graph o365group remove](../cmd/graph/o365group/o365group-remove.md)
 Remove-PnPUser|SharePointPnPPowerShellOnline|
 Remove-PnPUserFromGroup|SharePointPnPPowerShellOnline|
-Remove-PnPView|SharePointPnPPowerShellOnline|
+Remove-PnPView|SharePointPnPPowerShellOnline|[spo list view remove](../cmd/spo/list/list-view-remove.md)
 Remove-PnPWeb|SharePointPnPPowerShellOnline|[spo web remove](../cmd/spo/web/web-remove.md)
 Remove-PnPWebhookSubscription|SharePointPnPPowerShellOnline|[spo list webhook remove](../cmd/spo/list/list-webhook-remove.md)
 Remove-PnPWebPart|SharePointPnPPowerShellOnline|
