@@ -30,16 +30,9 @@ class TeamsUserListCommand extends GraphItemsListCommand<GroupUser> {
     return 'Lists users of the specified Microsoft Teams team';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    return telemetryProps;
-  }
-
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     this.getOwners(cmd, args.options.teamId)
       .then((): Promise<any> => {
-        cmd.log(args.options.role);
-
         if (args.options.role != "Owner") {
 
           return this.getMembersAndGuests(cmd, args.options.teamId)
@@ -64,11 +57,7 @@ class TeamsUserListCommand extends GraphItemsListCommand<GroupUser> {
           this.items = this.items.filter(i => i.userType === args.options.role)
         }
 
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(this.items);
-          cmd.log('');
-        }
+        cmd.log(this.items);
 
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
