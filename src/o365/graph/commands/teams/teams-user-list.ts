@@ -7,7 +7,7 @@ import {
 } from '../../../../Command';
 import { GraphItemsListCommand } from '../GraphItemsListCommand';
 import Utils from '../../../../Utils';
-import { GroupUser } from '../o365Group/GroupUser';
+import { GroupUser } from '../o365group/GroupUser';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
