@@ -1,0 +1,234 @@
+import auth from '../../SpoAuth';
+import config from '../../../../config';
+import commands from '../../commands';
+import GlobalOptions from '../../../../GlobalOptions';
+import * as request from 'request-promise-native';
+import {
+  CommandOption,
+  CommandValidate
+} from '../../../../Command';
+import SpoCommand from '../../SpoCommand';
+import Utils from '../../../../Utils';
+import { Auth } from '../../../../Auth';
+
+const vorpal: Vorpal = require('../../../../vorpal-init');
+
+interface CommandArgs {
+  options: Options;
+}
+
+interface Options extends GlobalOptions {
+  webUrl: string;
+  listId?: string;
+  listTitle?: string;
+  viewId?: string;
+  viewTitle?: string;
+  confirm?: boolean;
+}
+
+class SpoListViewRemoveCommand extends SpoCommand {
+  public get name(): string {
+    return commands.LIST_VIEW_REMOVE;
+  }
+
+  public get description(): string {
+    return 'Deletes a view from a list';
+  }
+
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.listId = typeof args.options.listId !== 'undefined';
+    telemetryProps.listTitle = typeof args.options.listTitle !== 'undefined';
+    telemetryProps.confirm = (!(!args.options.confirm)).toString();
+    return telemetryProps;
+  }
+
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
+    let siteAccessToken: string = '';
+
+    const removeViewFromList: () => void = (): void => {
+      if (this.debug) {
+        cmd.log(`Retrieving access token for ${resource}...`);
+      }
+
+      auth
+        .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
+        .then((accessToken: string): request.RequestPromise => {
+          siteAccessToken = accessToken;
+
+          if (this.debug) {
+            cmd.log(`Retrieved access token ${accessToken}.`);
+          }
+
+          if (this.verbose) {
+            const list: string = args.options.listId ? encodeURIComponent(args.options.listId as string) : encodeURIComponent(args.options.listTitle as string);
+            cmd.log(`Removing content type ${args.options.viewId || args.options.viewTitle} from list ${list} in site at ${args.options.webUrl}...`);
+          }
+
+          let requestUrl: string = '';
+
+          if (args.options.listId) {
+            if (args.options.viewId) {
+              requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.listId)}')/views(guid'${encodeURIComponent(args.options.viewId)}')`;
+            } else {
+              requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.listId)}')/views/GetByTitle('${encodeURIComponent(args.options.viewTitle as string)}')`;
+            }
+          }
+          else {
+            if (args.options.viewId) {
+              requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.listTitle as string)}')/views(guid'${encodeURIComponent(args.options.viewId)}')`;
+            } else {
+              requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.listTitle as string)}')/views/GetByTitle('${encodeURIComponent(args.options.viewTitle as string)}')`;
+            }
+          }
+
+          const requestOptions: any = {
+            url: requestUrl,
+            headers: Utils.getRequestHeaders({
+              authorization: `Bearer ${siteAccessToken}`,
+              'X-HTTP-Method': 'DELETE',
+              'If-Match': '*',
+              'accept': 'application/json;odata=nometadata'
+            }),
+            json: true
+          };
+
+          if (this.debug) {
+            cmd.log('Executing web request...');
+            cmd.log(requestOptions);
+            cmd.log('');
+          }
+
+          return request.post(requestOptions);
+        })
+        .then((): void => {
+          // REST post call doesn't return anything
+          cb();
+        }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+    };
+
+    if (args.options.confirm) {
+      removeViewFromList();
+    }
+    else {
+      cmd.prompt({
+        type: 'confirm',
+        name: 'continue',
+        default: false,
+        message: `Are you sure you want to remove the view ${args.options.viewId || args.options.viewTitle} from the list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}?`,
+      }, (result: { continue: boolean }): void => {
+        if (!result.continue) {
+          cb();
+        }
+        else {
+          removeViewFromList();
+        }
+      });
+    }
+  }
+
+  public options(): CommandOption[] {
+    const options: CommandOption[] = [
+      {
+        option: '-u, --webUrl <webUrl>',
+        description: 'URL of the site where the list is located'
+      },
+      {
+        option: '-l, --listId [listId]',
+        description: 'ID of the list from which to remove the view. Specify listId or listTitle but not both'
+      },
+      {
+        option: '-t, --listTitle [listTitle]',
+        description: 'Title of the list from which to remove the view. Specify listId or listTitle but not both'
+      },
+      {
+        option: '--viewId <viewId>',
+        description: 'ID of the view to remove from the list'
+      },
+      {
+        option: '--viewTitle <viewTitle>',
+        description: 'ID of the view to remove from the list'
+      },
+      {
+        option: '--confirm',
+        description: 'Don\'t prompt for confirming removing the view from the list'
+      }
+    ];
+
+    const parentOptions: CommandOption[] = super.options();
+    return options.concat(parentOptions);
+  }
+
+  public validate(): CommandValidate {
+    return (args: CommandArgs): boolean | string => {
+      if (!args.options.webUrl) {
+        return 'Required parameter webUrl missing';
+      }
+
+      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+      if (isValidSharePointUrl !== true) {
+        return isValidSharePointUrl;
+      }
+
+      if (args.options.listId) {
+        if (!Utils.isValidGuid(args.options.listId)) {
+          return `${args.options.listId} is not a valid GUID`;
+        }
+      }
+
+      if (args.options.viewId) {
+        if (!Utils.isValidGuid(args.options.viewId)) {
+          return `${args.options.viewId} is not a valid GUID`;
+        }
+      }
+
+      if (args.options.listId && args.options.listTitle) {
+        return 'Specify listId or listTitle, but not both';
+      }
+
+      if (!args.options.listId && !args.options.listTitle) {
+        return 'Specify listId or listTitle, one is required';
+      }
+
+      if (args.options.viewId && args.options.viewTitle) {
+        return 'Specify viewId or viewTitle, but not both';
+      }
+
+      if (!args.options.viewId && !args.options.viewTitle) {
+        return 'Specify viewId or viewTitle, one is required';
+      }
+
+      return true;
+    };
+  }
+
+  public commandHelp(args: {}, log: (help: string) => void): void {
+    const chalk = vorpal.chalk;
+    log(vorpal.find(this.name).helpInformation());
+    log(
+      `  ${chalk.yellow('Important:')} before using this command, log in to SharePoint,
+    using the ${chalk.blue(commands.LOGIN)} command.
+  
+  Remarks:
+  
+    To remove view from a list, you have to first log in to SharePoint
+    using the ${chalk.blue(commands.LOGIN)} command,
+    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
+        
+  Examples:
+  
+    Remove view with ID ${chalk.grey('3d760127-982c-405e-9c93-e1f76e1a1110')}
+    from the list with ID ${chalk.grey('1f187321-f086-4d3d-8523-517e94cc9df9')}
+    located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
+      ${chalk.grey(config.delimiter)} ${commands.LIST_VIEW_REMOVE} --webUrl https://contoso.sharepoint.com/sites/project-x --listId 1f187321-f086-4d3d-8523-517e94cc9df9 --viewId 3d760127-982c-405e-9c93-e1f76e1a1110
+
+    Remove view with ID ${chalk.grey('3d760127-982c-405e-9c93-e1f76e1a1110')}
+    from the list with title ${chalk.grey('Documents')}
+    located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
+      ${chalk.grey(config.delimiter)} ${commands.LIST_VIEW_REMOVE} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --viewId 3d760127-982c-405e-9c93-e1f76e1a1110
+      `);
+  }
+}
+
+module.exports = new SpoListViewRemoveCommand();
