@@ -63,25 +63,14 @@ class SpoListViewRemoveCommand extends SpoCommand {
 
           if (this.verbose) {
             const list: string = args.options.listId ? encodeURIComponent(args.options.listId as string) : encodeURIComponent(args.options.listTitle as string);
-            cmd.log(`Removing content type ${args.options.viewId || args.options.viewTitle} from list ${list} in site at ${args.options.webUrl}...`);
+            cmd.log(`Removing view ${args.options.viewId || args.options.viewTitle} from list ${list} in site at ${args.options.webUrl}...`);
           }
 
           let requestUrl: string = '';
+          let listSelector = args.options.listId ? `(guid'${encodeURIComponent(args.options.listId)}')` : `/GetByTitle('${encodeURIComponent(args.options.listTitle as string)}')`;
+          let viewSelector = args.options.viewId ? `(guid'${encodeURIComponent(args.options.viewId)}')` : `/GetByTitle('${encodeURIComponent(args.options.viewTitle as string)}')`;
 
-          if (args.options.listId) {
-            if (args.options.viewId) {
-              requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.listId)}')/views(guid'${encodeURIComponent(args.options.viewId)}')`;
-            } else {
-              requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.listId)}')/views/GetByTitle('${encodeURIComponent(args.options.viewTitle as string)}')`;
-            }
-          }
-          else {
-            if (args.options.viewId) {
-              requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.listTitle as string)}')/views(guid'${encodeURIComponent(args.options.viewId)}')`;
-            } else {
-              requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.listTitle as string)}')/views/GetByTitle('${encodeURIComponent(args.options.viewTitle as string)}')`;
-            }
-          }
+          requestUrl = `${args.options.webUrl}/_api/web/lists${listSelector}/views${viewSelector}`;
 
           const requestOptions: any = {
             url: requestUrl,
