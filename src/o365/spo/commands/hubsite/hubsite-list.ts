@@ -20,6 +20,8 @@ interface Options extends GlobalOptions {
 }
 
 class SpoHubSiteListCommand extends SpoCommand {
+  private batchSize: number = 30;
+
   public get name(): string {
     return `${commands.HUBSITE_LIST}`;
   }
@@ -34,7 +36,7 @@ class SpoHubSiteListCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void, listQueryBatchSize: number = 30): void {
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     let hubSites: HubSite[];
 
     auth
@@ -61,7 +63,7 @@ class SpoHubSiteListCommand extends SpoCommand {
 
         return request.get(requestOptions);
       })
-      .then((res: { value: HubSite[] }): Promise<any[]> => {
+      .then((res: { value: HubSite[] }): Promise<any[]|void>=> {
         if (this.debug) {
           cmd.log('Response:');
           cmd.log(res);
@@ -71,7 +73,7 @@ class SpoHubSiteListCommand extends SpoCommand {
         hubSites = res.value;
 
         if (args.options.includeAssociatedSites !== true) {
-          return Promise.resolve([]);
+          return Promise.resolve();
         } else {
           if (this.debug) {
             cmd.log('Retrieving associated sites...');
@@ -88,7 +90,7 @@ class SpoHubSiteListCommand extends SpoCommand {
           json: true,
           body: {
             parameters: {
-              ViewXml: "<View><Query><Where><And><And><IsNull><FieldRef Name=\"TimeDeleted\"/></IsNull><Neq><FieldRef Name=\"State\"/><Value Type='Integer'>0</Value></Neq></And><Neq><FieldRef Name=\"HubSiteId\"/><Value Type='Text'>{00000000-0000-0000-0000-000000000000}</Value></Neq></And></Where><OrderBy><FieldRef Name='Title' Ascending='true' /></OrderBy></Query><ViewFields><FieldRef Name=\"Title\"/><FieldRef Name=\"SiteUrl\"/><FieldRef Name=\"SiteId\"/><FieldRef Name=\"HubSiteId\"/></ViewFields><RowLimit Paged=\"TRUE\">" + listQueryBatchSize + "</RowLimit></View>",
+              ViewXml: "<View><Query><Where><And><And><IsNull><FieldRef Name=\"TimeDeleted\"/></IsNull><Neq><FieldRef Name=\"State\"/><Value Type='Integer'>0</Value></Neq></And><Neq><FieldRef Name=\"HubSiteId\"/><Value Type='Text'>{00000000-0000-0000-0000-000000000000}</Value></Neq></And></Where><OrderBy><FieldRef Name='Title' Ascending='true' /></OrderBy></Query><ViewFields><FieldRef Name=\"Title\"/><FieldRef Name=\"SiteUrl\"/><FieldRef Name=\"SiteId\"/><FieldRef Name=\"HubSiteId\"/></ViewFields><RowLimit Paged=\"TRUE\">" + this.batchSize + "</RowLimit></View>",
               DatesInUtc: true
             }
           }
@@ -101,21 +103,22 @@ class SpoHubSiteListCommand extends SpoCommand {
         }
 
         if (this.debug || this.verbose) {
-          cmd.log(`Will retrieve associated sites (including the hub sites) in batches of ${listQueryBatchSize}`);
+          cmd.log(`Will retrieve associated sites (including the hub sites) in batches of ${this.batchSize}`);
         }
-        const getSites = async (reqOptions: any, nonPagedUrl: string, sites: any[]): Promise<any> => {
-          try {
+        const getSites = async (reqOptions: any, nonPagedUrl: string, sites: any[] = [], batchNumber: number = 0): Promise<any> => {
             const res: QueryListResult = await request.post(requestOptions);
-            const retreivedSites = sites.concat(res.Row);
+            batchNumber++;
+            const retreivedSites = res.Row.length > 0 ? sites.concat(res.Row) : sites;
             if (this.debug || this.verbose) {
-              cmd.log(`Retrieved ${res.Row.length} sites`);
+              cmd.log(res);
+              cmd.log(`Retrieved ${res.Row.length} sites in batch ${batchNumber}`);
             }
             if (!!res.NextHref) {
               reqOptions.url = nonPagedUrl + res.NextHref;
               if (this.debug) {
                 cmd.log(`Url for next batch of sites: ${reqOptions.url}`);
               }
-              return getSites(reqOptions, nonPagedUrl, retreivedSites);
+              return getSites(reqOptions, nonPagedUrl, retreivedSites, batchNumber);
             }
             else {
               if (this.debug || this.verbose) {
@@ -123,15 +126,11 @@ class SpoHubSiteListCommand extends SpoCommand {
               }
               return retreivedSites;
             }
-          }
-          catch (error) {
-            Promise.reject(new Error(error));
-          }
         }
 
-        return getSites(requestOptions, requestOptions.url, []);
+        return getSites(requestOptions, requestOptions.url);
       })
-      .then((res: any[]): void => {
+      .then((res: any[]|void): void => {
         if (this.debug) {
           cmd.log('Response:');
           cmd.log(res);
