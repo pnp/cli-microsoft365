@@ -6,11 +6,15 @@
 
 **SharePoint Online:**
 
+- [spo feature list](../cmd/spo/feature/feature-list.md) - lists Features activated in the specified site or site collection [#677](https://github.com/pnp/office365-cli/issues/677)
 - [spo file move](../cmd/spo/file/file-move.md) - moves a file to another location [#671](https://github.com/pnp/office365-cli/issues/671)
+- [spo list view list](../cmd/spo/list/list-view-list.md) - lists views configured on the specified list [#732](https://github.com/pnp/office365-cli/issues/732)
+- [spo list view remove](../cmd/spo/list/list-view-remove.md) - deletes the specified view from the list [#731](https://github.com/pnp/office365-cli/issues/731)
 
 **Microsoft Graph:**
 
 - [graph teams message list](../cmd/graph/teams/teams-message-list.md) - lists all messages from a channel in a Microsoft Teams team [#588](https://github.com/pnp/office365-cli/issues/588)
+- [graph teams user list](../cmd/graph/teams/teams-user-list.md) - lists users for the specified Microsoft Teams team [#689](https://github.com/pnp/office365-cli/issues/689)
 
 ### Changes
 
@@ -20,6 +24,7 @@
 - renamed 'graph teams channel message get' to 'graph teams message get'
 - extended 'spo folder copy' with support for schema mismatch [#706](https://github.com/pnp/office365-cli/pull/706)
 - extended 'spo file copy' with support for schema mismatch [#705](https://github.com/pnp/office365-cli/pull/705)
+- updated showing scope in 'spo customaction list' [#742](https://github.com/pnp/office365-cli/issues/742)
 
 ## [v1.12.0](https://github.com/pnp/office365-cli/releases/tag/v1.12.0)
 
