@@ -37,7 +37,6 @@ class GraphTeamsUserAddCommand extends GraphItemsListCommand<GroupUser> {
     return telemetryProps;
   }
 
-  // Todo implement
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
