@@ -159,10 +159,10 @@ class GraphTeamsUserAddCommand extends GraphItemsListCommand<GroupUser> {
   Examples:
   
     Add a new member to the specified team 
-      ${chalk.grey(config.delimiter)} ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --userName anne.matthews@contoso.onmicrosoft.com
+      ${chalk.grey(config.delimiter)} ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com'
 
     Add a new owner to the specified team 
-      ${chalk.grey(config.delimiter)} ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --userName anne.matthews@contoso.onmicrosoft.com --role Owner 
+      ${chalk.grey(config.delimiter)} ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner 
 `);
   }
 }
