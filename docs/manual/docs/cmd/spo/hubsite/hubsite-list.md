@@ -16,7 +16,7 @@ spo hubsite list [options]
 Option|Description
 ------|-----------
 `--help`|output usage information
-`-i, --includeAssociatedSites`|Include the associated sites in the result
+`-i, --includeAssociatedSites`|Include the associated sites in the result (only in JSON output)
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
@@ -38,10 +38,10 @@ List hub sites in the current tenant
 spo hubsite list
 ```
 
-List hub sites, including their associated sites, in the current tenant
+List hub sites, including their associated sites, in the current tenant. Associated site info is only shown in JSON output.
 
 ```sh
-spo hubsite list --includeAssociatedSites
+spo hubsite list --includeAssociatedSites --output json
 ```
 
 ## More information

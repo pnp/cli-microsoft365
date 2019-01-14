@@ -30,6 +30,11 @@ class SpoHubSiteListCommand extends SpoCommand {
     return 'Lists hub sites in the current tenant';
   }
 
+  constructor() {
+    super()/* istanbul ignore next */;
+    this.batchSize = 30;
+  }
+
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.classifications = args.options.includeAssociatedSites === true;
@@ -72,7 +77,7 @@ class SpoHubSiteListCommand extends SpoCommand {
 
         hubSites = res.value;
 
-        if (args.options.includeAssociatedSites !== true) {
+        if (args.options.includeAssociatedSites !== true || args.options.output !== 'json') {
           return Promise.resolve();
         } else {
           if (this.debug) {
@@ -158,16 +163,6 @@ class SpoHubSiteListCommand extends SpoCommand {
         if (args.options.output === 'json') {
           cmd.log(hubSites);
         }
-        else if (args.options.includeAssociatedSites === true) {
-          cmd.log(hubSites.map(h => {
-            return {
-              ID: h.ID,
-              SiteUrl: h.SiteUrl,
-              Title: h.Title,
-              AssociatedSites: h.AssociatedSites.map(a => a.Title)
-            };
-          }));
-        }
         else {
           cmd.log(hubSites.map(h => {
             return {
@@ -190,7 +185,7 @@ class SpoHubSiteListCommand extends SpoCommand {
     const options: CommandOption[] = [
       {
         option: '-i, --includeAssociatedSites',
-        description: `Include the associated sites in the result`
+        description: `Include the associated sites in the result (only in JSON output)`
       }
     ];
 
@@ -224,8 +219,8 @@ class SpoHubSiteListCommand extends SpoCommand {
     List hub sites in the current tenant
       ${chalk.grey(config.delimiter)} ${this.name}
 
-    List hub sites, including their associated sites, in the current tenant
-      ${chalk.grey(config.delimiter)} ${this.name} --includeAssociatedSites
+    List hub sites, including their associated sites, in the current tenant. Associated site info is only shown in JSON output.
+      ${chalk.grey(config.delimiter)} ${this.name} --includeAssociatedSites --output json
 
   More information:
 

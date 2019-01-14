@@ -286,7 +286,7 @@ describe(commands.HUBSITE_LIST, () => {
     });
   });
 
-  it('lists hub sites including their associated sites', (done) => {
+  it('does not list associated sites allong the hub sites, if the includeAssociatedSites option is provided, if the output is TEXT', (done) => {
     sinon.stub(request, 'get').resolves({
       value: [
         {
@@ -433,13 +433,11 @@ describe(commands.HUBSITE_LIST, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith([
           {
-            "AssociatedSites": ["North", "South"],
             "ID": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
             "SiteUrl": "https://contoso.sharepoint.com/sites/Sales",
             "Title": "Sales"
           },
           {
-            "AssociatedSites": ["Europe", "Asia", "America"],
             "ID": "b2c94ca1-0957-4bdd-b549-b7d365edc10f",
             "SiteUrl": "https://contoso.sharepoint.com/sites/travelprograms",
             "Title": "Travel Programs"
