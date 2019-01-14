@@ -314,4 +314,20 @@ export default class Utils {
 
     return folderWebRelativePath.replace('//', '/');
   }
+
+  /**
+   * Returns the absolute URL according to a Web URL and the server relative URL of a folder
+   * @param webUrl The full URL of a web
+   * @param serverRelativeUrl The server relative URL of a folder
+   * @example
+   * // returns "https://contoso.sharepoint.com/sites/team1/Lists/MyList"
+   * Utils.getAbsoluteUrl("https://contoso.sharepoint.com/sites/team1/", "/sites/team1/Lists/MyList");
+   */
+  public static getAbsoluteUrl(webUrl: string, serverRelativeUrl: string) : string {
+    const tenantUrl: string = `${url.parse(webUrl).protocol}//${url.parse(webUrl).hostname}`;
+    if (serverRelativeUrl[0] != '/') {
+      serverRelativeUrl = `/${serverRelativeUrl}`;
+    }
+    return `${tenantUrl}${serverRelativeUrl}`;
+  }
 }
