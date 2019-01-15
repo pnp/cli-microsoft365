@@ -18,7 +18,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   teamId: string;
   userName: string;
-  // todo add --confirm option 
+  confirm?: boolean;
 }
 
 class GraphTeamsUserRemoveCommand extends GraphCommand {
@@ -27,70 +27,89 @@ class GraphTeamsUserRemoveCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Removes user from the specified Microsoft Teams team';
+    return 'Removes a specified user from the specified Microsoft Teams team';
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    // todo: check track confirm?
+    telemetryProps.confirm = (!(!args.options.confirm)).toString();
     return telemetryProps;
   }
 
-  // todo: implement confirmation
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((): request.RequestPromise => {
-        const requestOptions: any = {
-          url: `${auth.service.resource}/v1.0/users/${encodeURIComponent(args.options.userName)}/id`,
-          headers: Utils.getRequestHeaders({
-            authorization: `Bearer ${auth.service.accessToken}`,
-            accept: 'application/json;odata.metadata=none'
-          }),
-          json: true
-        };
+    const removeUser: () => void = (): void => {
+      auth
+        .ensureAccessToken(auth.service.resource, cmd, this.debug)
+        .then((): request.RequestPromise => {
+          const requestOptions: any = {
+            url: `${auth.service.resource}/v1.0/users/${encodeURIComponent(args.options.userName)}/id`,
+            headers: Utils.getRequestHeaders({
+              authorization: `Bearer ${auth.service.accessToken}`,
+              accept: 'application/json;odata.metadata=none'
+            }),
+            json: true
+          };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
+          if (this.debug) {
+            cmd.log('Executing web request...');
+            cmd.log(requestOptions);
+            cmd.log('');
+          }
+
+          return request.get(requestOptions);
+        })
+        .then((res: { value: string; }): request.RequestPromise => {
+          if (this.debug) {
+            cmd.log('Response:')
+            cmd.log(res);
+            cmd.log('');
+          }
+
+          const endpoint: string = `${auth.service.resource}/v1.0/groups/${args.options.teamId}/members/${res.value}/$ref`;
+
+          const requestOptions: any = {
+            url: endpoint,
+            headers: Utils.getRequestHeaders({
+              authorization: `Bearer ${auth.service.accessToken}`,
+              'accept': 'application/json;odata.metadata=none'
+            }),
+          };
+
+          if (this.debug) {
+            cmd.log('Executing web request...');
+            cmd.log(requestOptions);
+            cmd.log('');
+          }
+
+          return request.delete(requestOptions);
+        })
+        .then((): void => {
+          if (this.verbose) {
+            cmd.log(vorpal.chalk.green('DONE'));
+          }
+
+          cb();
+        }, (err: any) => this.handleRejectedODataJsonPromise(err, cmd, cb));
+    };
+
+    if (args.options.confirm) {
+      removeUser();
+    }
+    else {
+      cmd.prompt({
+        type: 'confirm',
+        name: 'continue',
+        default: false,
+        message: `Are you sure you want to remove ${args.options.userName} from the team ${args.options.teamId}?`,
+      }, (result: { continue: boolean }): void => {
+        if (!result.continue) {
+          cb();
         }
-
-        return request.get(requestOptions);
-      })
-      .then((res: { value: string; }): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log('Response:')
-          cmd.log(res);
-          cmd.log('');
+        else {
+          removeUser();
         }
-
-        const endpoint: string = `${auth.service.resource}/v1.0/groups/${args.options.teamId}/members/${res}/$ref`;
-
-        const requestOptions: any = {
-          url: endpoint,
-          headers: Utils.getRequestHeaders({
-            authorization: `Bearer ${auth.service.accessToken}`,
-            'accept': 'application/json;odata.metadata=none'
-          }),
-          json: true,
-        };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
-        return request.delete(requestOptions);
-      })
-      .then((): void => {
-        if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      });
+    }
   }
 
   public options(): CommandOption[] {
@@ -102,6 +121,10 @@ class GraphTeamsUserRemoveCommand extends GraphCommand {
       {
         option: '-n, --userName <userName>',
         description: 'User\'s UPN (user principal name, eg. johndoe@example.com)'
+      },
+      {
+        option: '--confirm',
+        description: 'Don\'t prompt for confirming removing user from the specified team'
       }
     ];
 
@@ -150,7 +173,7 @@ class GraphTeamsUserRemoveCommand extends GraphCommand {
 
     Removes user from the specified team without confirmation
       ${chalk.grey(config.delimiter)} ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --confirm 
-`);
+  `);
   }
 }
 
