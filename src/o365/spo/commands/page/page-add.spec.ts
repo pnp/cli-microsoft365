@@ -999,7 +999,7 @@ describe(commands.PAGE_ADD, () => {
   });
 
   it('fails validation if webUrl is not a valid SharePoint URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { name: 'page.aspx', webUrl: 'https://foo.com' } });
+    const actual = (command.validate() as CommandValidate)({ options: { name: 'page.aspx', webUrl: 'http://foo' } });
     assert.notEqual(actual, true);
   });
 

@@ -1217,7 +1217,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         pageName: 'page.aspx',
-        webUrl: 'https://foo.com',
+        webUrl: 'http://foo',
         text: 'Hello world'
       }
     });
