@@ -159,7 +159,7 @@ class GraphTeamsUserRemoveCommand extends GraphCommand {
         
   Remarks:
 
-    To remove a user to the specified Microsoft Teams team, you have to first
+    To remove a user from the specified Microsoft Teams team, you have to first
     log in to the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
     eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
 
