@@ -220,7 +220,7 @@ describe(commands.SITE_CLASSIC_REMOVE, () => {
   it('fails validation if the url is not a valid SharePoint url', () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
-        url: 'https://contoso.com'
+        url: 'http://contoso'
       }
     });
     assert.notEqual(actual, true);

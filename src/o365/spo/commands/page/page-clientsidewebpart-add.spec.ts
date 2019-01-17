@@ -2327,7 +2327,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         pageName: 'page.aspx',
-        webUrl: 'https://foo.com',
+        webUrl: 'http://foo',
         webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1'
       }
     });

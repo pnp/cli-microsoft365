@@ -188,7 +188,7 @@ describe(commands.LOGIN, () => {
   });
 
   it('rejects invalid SharePoint Online URL', () => {
-    const url = 'https://contoso.com';
+    const url = 'http://contoso';
     const actual = (command.validate() as CommandValidate)({ url: url, options: {} });
     assert.equal(actual, `${url} is not a valid SharePoint Online site URL`);
   });

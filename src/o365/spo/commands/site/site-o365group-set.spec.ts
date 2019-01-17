@@ -461,7 +461,7 @@ describe(commands.SITE_O365GROUP_SET, () => {
   });
 
   it('fails validation if siteUrl is not a SharePoint URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { siteUrl: 'https://contoso.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } });
+    const actual = (command.validate() as CommandValidate)({ options: { siteUrl: 'http://contoso/sites/team-a', alias: 'team-a', displayName: 'Team A' } });
     assert.notEqual(actual, true);
   });
 

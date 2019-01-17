@@ -369,7 +369,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
         name: 'page.aspx',
         order: 1,
         sectionTemplate: 'OneColumn',
-        webUrl: 'https://notasharepointurl.com'
+        webUrl: 'http://notasharepointurl'
       }
     });
     assert.notEqual(actual, true);

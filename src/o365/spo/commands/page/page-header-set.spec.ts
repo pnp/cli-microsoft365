@@ -682,7 +682,7 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('fails validation if webUrl is not a valid SharePoint URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { pageName: 'page.aspx', webUrl: 'https://foo.com' } });
+    const actual = (command.validate() as CommandValidate)({ options: { pageName: 'page.aspx', webUrl: 'http://foo' } });
     assert.notEqual(actual, true);
   });
 
