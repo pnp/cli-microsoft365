@@ -34,7 +34,7 @@ class SpoListViewFieldRemoveCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Removes the field with the specified field title or ID from the target view';
+    return 'Removes the specified field from list view';
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -155,19 +155,19 @@ class SpoListViewFieldRemoveCommand extends SpoCommand {
       },
       {
         option: '--listId [listId]',
-        description: 'The list ID where located the view. Specify listId or listTitle but not both'
+        description: 'ID of the list where the view is located. Specify listTitle or listId but not bothThe list ID where located the view. Specify listId or listTitle but not both'
       },
       {
         option: '--listTitle [listTitle]',
-        description: 'The list title where located the view. Specify listId or listTitle but not both'
+        description: 'Title of the list where the view is located. Specify listTitle or listId but not both'
       },
       {
         option: '--viewId [viewId]',
-        description: 'The view ID where to remove the field. Specify viewId or viewTitle but not both'
+        description: 'ID of the view to update. Specify viewTitle or viewId but not both'
       },
       {
         option: '--viewTitle [viewTitle]',
-        description: 'The view title where to remove the field. Specify viewId or viewTitle but not both'
+        description: 'Title of the view to update. Specify viewTitle or viewId but not both'
       },
       {
         option: '--fieldId [fieldId]',
