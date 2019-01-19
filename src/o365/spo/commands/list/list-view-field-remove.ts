@@ -52,6 +52,7 @@ class SpoListViewFieldRemoveCommand extends SpoCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
     let siteAccessToken: string = '';
+    const listSelector = args.options.listId ? `(guid'${encodeURIComponent(args.options.listId)}')` : `/GetByTitle('${encodeURIComponent(args.options.listTitle as string)}')`;
 
     const removeFieldFromView: () => void = (): void => {
       if (this.debug) {
@@ -67,18 +68,16 @@ class SpoListViewFieldRemoveCommand extends SpoCommand {
           }
 
           if (this.verbose) {
-            cmd.log(`Removing field ${args.options.fieldId || args.options.fieldTitle}...`);
+            cmd.log(`Getting field ${args.options.fieldId || args.options.fieldTitle}...`);
           }
 
           /* Preparing REST API resquest parameters */
-          const listSelector = args.options.listId ? `(guid'${encodeURIComponent(args.options.listId)}')` : `/GetByTitle('${encodeURIComponent(args.options.listTitle as string)}')`;
-          const viewSelector = args.options.viewId ? `('${encodeURIComponent(args.options.viewId)}')` : `/GetByTitle('${encodeURIComponent(args.options.viewTitle as string)}')`;
-          const fieldSelector = args.options.fieldId ? `('${encodeURIComponent(args.options.fieldId)}')` : `('${encodeURIComponent(args.options.fieldTitle as string)}')`;
+          
+          const fieldSelector = args.options.fieldId ? `/getbyid('${encodeURIComponent(args.options.fieldId)}')` : `/getbyinternalnameortitle('${encodeURIComponent(args.options.fieldTitle as string)}')`;
+          const getRequestUrl: string = `${args.options.webUrl}/_api/web/lists${listSelector}/fields${fieldSelector}`;
 
-          const requestUrl: string = `${args.options.webUrl}/_api/web/lists${listSelector}/views${viewSelector}/viewfields/removeviewfield${fieldSelector}`;
-
-          const requestOptions: any = {
-            url: requestUrl,
+          const getRequestOptions: any = {
+            url: getRequestUrl,
             headers: Utils.getRequestHeaders({
               authorization: `Bearer ${siteAccessToken}`,
               'accept': 'application/json;odata=nometadata'
@@ -88,14 +87,42 @@ class SpoListViewFieldRemoveCommand extends SpoCommand {
 
           if (this.debug) {
             cmd.log('Executing web request...');
-            cmd.log(requestOptions);
+            cmd.log(getRequestOptions);
             cmd.log('');
           }
 
-          return request.post(requestOptions);
+          return request.get(getRequestOptions);
+        })
+        .then((field: any): request.RequestPromise => {
+          if (this.debug) {
+            cmd.log(field);
+          }
+
+          if (this.verbose) {
+            cmd.log(`Removing field ${args.options.fieldId || args.options.fieldTitle} from view ${args.options.viewId || args.options.viewTitle}...`);
+          }
+
+          const viewSelector = args.options.viewId ? `('${encodeURIComponent(args.options.viewId)}')` : `/GetByTitle('${encodeURIComponent(args.options.viewTitle as string)}')`;
+          const postRequestUrl: string = `${args.options.webUrl}/_api/web/lists${listSelector}/views${viewSelector}/viewfields/removeviewfield('${field.InternalName}')`;
+
+          const postRequestOptions: any = {
+            url: postRequestUrl,
+            headers: Utils.getRequestHeaders({
+              authorization: `Bearer ${siteAccessToken}`,
+              'accept': 'application/json;odata=nometadata'
+            }),
+            json: true
+          };
+
+          if (this.debug) {
+            cmd.log('Executing web request...');
+            cmd.log(postRequestOptions);
+            cmd.log('');
+          }
+
+          return request.post(postRequestOptions);
         })
         .then((): void => {
-          // REST post call doesn't return anything
           cb();
         }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
     };
