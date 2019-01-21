@@ -42,6 +42,8 @@ nav:
         - customaction set: 'cmd/spo/customaction/customaction-set.md'
       - externaluser:
         - externaluser list: 'cmd/spo/externaluser/externaluser-list.md'
+      - feature:
+        - feature list: 'cmd/spo/feature/feature-list.md'
       - field:
         - field add: 'cmd/spo/field/field-add.md'
         - field get: 'cmd/spo/field/field-get.md'
@@ -53,6 +55,7 @@ nav:
         - file copy: 'cmd/spo/file/file-copy.md'
         - file get: 'cmd/spo/file/file-get.md'
         - file list: 'cmd/spo/file/file-list.md'
+        - file move: 'cmd/spo/file/file-move.md'
         - file remove: 'cmd/spo/file/file-remove.md'
       - folder:
         - folder add: 'cmd/spo/folder/folder-add.md'
@@ -86,6 +89,8 @@ nav:
         - list contenttype add: 'cmd/spo/list/list-contenttype-add.md'
         - list contenttype list: 'cmd/spo/list/list-contenttype-list.md'
         - list contenttype remove: 'cmd/spo/list/list-contenttype-remove.md'
+        - list view list: 'cmd/spo/list/list-view-list.md'
+        - list view remove: 'cmd/spo/list/list-view-remove.md'
         - list view set: 'cmd/spo/list/list-view-set.md'
         - list webhook add: 'cmd/spo/list/list-webhook-add.md'
         - list webhook get: 'cmd/spo/list/list-webhook-get.md'
@@ -224,7 +229,10 @@ nav:
       - teams:
         - teams list: 'cmd/graph/teams/teams-list.md'
         - teams channel add: 'cmd/graph/teams/teams-channel-add.md'
-        - teams channel message get: 'cmd/graph/teams/teams-channel-message-get.md'
+        - teams message get: 'cmd/graph/teams/teams-message-get.md'
+        - teams message list: 'cmd/graph/teams/teams-message-list.md'
+        - teams user add: 'cmd/graph/teams/teams-user-add.md'
+        - teams user list: 'cmd/graph/teams/teams-user-list.md'
       - user:
         - user get: 'cmd/graph/user/user-get.md'
         - user list: 'cmd/graph/user/user-list.md'

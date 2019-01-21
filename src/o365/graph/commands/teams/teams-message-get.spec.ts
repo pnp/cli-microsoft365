@@ -3,13 +3,13 @@ import Command, { CommandError, CommandOption, CommandValidate } from '../../../
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../GraphAuth';
-const command: Command = require('./teams-channel-message-get');
+const command: Command = require('./teams-message-get');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import Utils from '../../../../Utils';
 import { Service } from '../../../../Auth';
 
-describe(commands.TEAMS_CHANNEL_MESSAGE_GET, () => {
+describe(commands.TEAMS_MESSAGE_GET, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
@@ -29,6 +29,9 @@ describe(commands.TEAMS_CHANNEL_MESSAGE_GET, () => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: commands.TEAMS_MESSAGE_GET
+      },
       log: (msg: string) => {
         log.push(msg);
       }
@@ -55,7 +58,7 @@ describe(commands.TEAMS_CHANNEL_MESSAGE_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.TEAMS_CHANNEL_MESSAGE_GET), true);
+    assert.equal(command.name.startsWith(commands.TEAMS_MESSAGE_GET), true);
   });
 
   it('has a description', () => {
@@ -79,7 +82,7 @@ describe(commands.TEAMS_CHANNEL_MESSAGE_GET, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, () => {
       try {
-        assert.equal(telemetry.name, commands.TEAMS_CHANNEL_MESSAGE_GET);
+        assert.equal(telemetry.name, commands.TEAMS_MESSAGE_GET);
         done();
       }
       catch (e) {
@@ -103,6 +106,10 @@ describe(commands.TEAMS_CHANNEL_MESSAGE_GET, () => {
     });
   });
 
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notEqual(typeof alias, 'undefined');
+  });
 
   it('has help referring to the right command', () => {
     const cmd: any = {
@@ -113,7 +120,7 @@ describe(commands.TEAMS_CHANNEL_MESSAGE_GET, () => {
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
     cmd.help({}, () => { });
-    assert(find.calledWith(commands.TEAMS_CHANNEL_MESSAGE_GET));
+    assert(find.calledWith(commands.TEAMS_MESSAGE_GET));
   });
 
   it('has help with examples', () => {

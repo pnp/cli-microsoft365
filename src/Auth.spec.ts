@@ -424,6 +424,76 @@ describe('Auth', () => {
     });
   });
 
+  it('retrieves token using certificate flow when authType certificate specified ', (done) => {
+    const ensureAccessTokenWithCertificate = sinon.stub((auth as any).authCtx, 'acquireTokenWithClientCertificate').callsArgWith(4, undefined, {});
+    sinon.stub(auth as any, 'setServiceConnectionInfo').callsFake(() => Promise.resolve());
+
+    auth.service.authType = AuthType.Certificate;
+    auth.ensureAccessToken(resource, stdout, false).then((accessToken) => {
+      try {
+        assert(ensureAccessTokenWithCertificate.called);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    }, (err) => {
+      done(err);
+    });
+  });
+
+  it('retrieves token using certificate flow when authType certificate specified (debug)', (done) => {
+    const ensureAccessTokenWithCertificate = sinon.stub((auth as any).authCtx, 'acquireTokenWithClientCertificate').callsArgWith(4, undefined, {});
+    sinon.stub(auth as any, 'setServiceConnectionInfo').callsFake(() => Promise.resolve());
+
+    auth.service.authType = AuthType.Certificate;
+    auth.ensureAccessToken(resource, stdout, true).then((accessToken) => {
+      try {
+        assert(ensureAccessTokenWithCertificate.called);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    }, (err) => {
+      done(err);
+    });
+  });
+
+  it('handles error when retrieving token using certificate flow failed', (done) => {
+    sinon.stub((auth as any).authCtx, 'acquireTokenWithClientCertificate').callsArgWith(4, { message: 'An error has occurred' }, undefined);
+
+    auth.service.authType = AuthType.Certificate;
+    auth.ensureAccessToken(resource, stdout).then((accessToken) => {
+      done('Got access token');
+    }, (err) => {
+      try {
+        assert.equal(err, 'An error has occurred');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('logs error when retrieving token using certificate flow failed in debug mode', (done) => {
+    sinon.stub((auth as any).authCtx, 'acquireTokenWithClientCertificate').callsArgWith(4, { message: 'An error has occurred' }, { error_description: 'An error has occurred' });
+
+    auth.service.authType = AuthType.Certificate;
+    auth.ensureAccessToken(resource, stdout, true).then((accessToken) => {
+      done('Got access token');
+    }, (err) => {
+      try {
+        assert(stdoutLogSpy.calledWith({ error_description: 'An error has occurred' }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('returns access token if persisting connection fails', (done) => {
     sinon.stub((auth as any).authCtx, 'acquireUserCode').callsArgWith(3, undefined, {});
     sinon.stub((auth as any).authCtx, 'acquireTokenWithDeviceCode').callsArgWith(3, undefined, {});
@@ -476,6 +546,25 @@ describe('Auth', () => {
     auth.getAccessTokenWithResponse(resource, 'ref', stdout, true).then((tokenResponse) => {
       try {
         assert(tokenResponse.accessToken, 'abc');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    }, (err) => {
+      done(err);
+    });
+  });
+
+  it('gets access token using refresh token for the specified resource (debug)', (done) => {
+    sinon.stub(auth as any, 'ensureAccessTokenWithCertificate').callsFake(() => Promise.resolve({
+      accessToken: 'acc'
+    }));
+
+    auth.service.authType = AuthType.Certificate;
+    auth.getAccessTokenWithResponse(resource, '', stdout, true).then((tokenResponse) => {
+      try {
+        assert(tokenResponse.accessToken, 'acc');
         done();
       }
       catch (e) {

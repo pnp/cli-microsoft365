@@ -8,6 +8,7 @@ const command: Command = require('./listitem-add');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import Utils from '../../../../Utils';
+import { FolderExtensions } from '../folder/FolderExtensions';
 
 describe(commands.LISTITEM_ADD, () => {
 
@@ -16,14 +17,12 @@ describe(commands.LISTITEM_ADD, () => {
   let cmdInstance: any;
   let trackEvent: any;
   let telemetry: any;
+  let ensureFolderStub: sinon.SinonStub;
 
   const expectedTitle = `List Item 1`;
 
   const expectedId = 147;
   let actualId = 0;
-
-  const expectedFolder = 'InsideFolder1/InsideFolder2/DelayedFolder/Folder2';
-  let actualFolderCreated = '';
 
   const expectedContentType = 'Item';
   let actualContentType = '';
@@ -32,12 +31,6 @@ describe(commands.LISTITEM_ADD, () => {
     if (opts.url.indexOf('/common/oauth2/token') > -1) {
       return Promise.resolve('abc');
     }
-
-    if (opts.url.indexOf('/_api/contextinfo') > -1) {
-      return Promise.resolve({
-        FormDigestValue: 'abc'
-      });
-    }
     if (opts.url.indexOf('AddValidateUpdateItemUsingPath') > -1) {
 
       const bodyString = JSON.stringify(opts.body);
@@ -45,13 +38,6 @@ describe(commands.LISTITEM_ADD, () => {
       actualContentType = ctMatch ? ctMatch[1] : "";
       if (bodyString.indexOf("fail adding me") > -1) return Promise.resolve({ value: [] })
       return Promise.resolve({ value: [ { FieldName: "Id", FieldValue: expectedId }] });
-
-    }
-    if (opts.url.indexOf('AddSubFolderUsingPath') > -1) {
-
-      actualFolderCreated = opts.url.match(/@a2='([^']+)'/i)[1];
-      if (actualFolderCreated != "Folder2") return Promise.resolve();
-      else return Promise.reject("mock failed folder creation");
 
     }
     return Promise.reject('Invalid request');
@@ -80,24 +66,6 @@ describe(commands.LISTITEM_ADD, () => {
         }
       );
     }
-    if (opts.url.indexOf('GetFolderByServerRelativePath') > -1) {
-
-      if (opts.url.indexOf('InsideFolder2') > -1) {
-        // mock InsideFolder2 or Folder2 needs creating
-        let promise = new Promise((resolve, reject) => {
-
-          if (opts.url.indexOf('DelayedFolder') + 15 >= opts.url.length) {
-            setTimeout(() => { 
-              reject('')
-            }, 10)
-          } else {
-            reject('');
-          }
-        });
-        return promise;
-      }
-      return Promise.resolve('');
-    }
     return Promise.reject('Invalid request');
   }
   
@@ -108,7 +76,7 @@ describe(commands.LISTITEM_ADD, () => {
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
       telemetry = t;
     });
-
+    ensureFolderStub = sinon.stub(FolderExtensions.prototype, 'ensureFolder').resolves();
   });
 
   beforeEach(() => {
@@ -126,7 +94,8 @@ describe(commands.LISTITEM_ADD, () => {
   afterEach(() => {
     Utils.restore([
       vorpal.find,
-      request.post
+      request.post,
+      request.get
     ]);
   });
 
@@ -134,7 +103,8 @@ describe(commands.LISTITEM_ADD, () => {
     Utils.restore([
       appInsights.trackEvent,
       auth.getAccessToken,
-      auth.restoreAuth
+      auth.restoreAuth,
+      FolderExtensions.prototype.ensureFolder
     ]);
   });
 
@@ -391,8 +361,7 @@ describe(commands.LISTITEM_ADD, () => {
 
   });
 
-  it('creates a folder when list item is added with a folder specified that is at the root of the list', (done) => {
-
+  it('should call ensure folder when folder arg specified', (done) => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -401,34 +370,30 @@ describe(commands.LISTITEM_ADD, () => {
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
 
-    let options: any = { 
-      debug: false, 
-      listTitle: 'Demo List', 
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
-      Title: expectedTitle,
-      contentType: expectedContentType,
-      folder: "InsideFolder2"
-    }
-
-    cmdInstance.action({ options: options }, () => {
+    cmdInstance.action({
+      options: {
+        debug: false, 
+        listTitle: 'Demo List', 
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
+        Title: expectedTitle,
+        contentType: expectedContentType,
+        folder: "InsideFolder2"
+      }
+    }, () => {
 
       try {
-        assert("InsideFolder2" == actualFolderCreated);
+        assert.equal(ensureFolderStub.lastCall.args[0], 'https://contoso.sharepoint.com/sites/project-x');
+        assert.equal(ensureFolderStub.lastCall.args[1], '/sites/project-xxx/Lists/Demo%20List/InsideFolder2');
+        assert.equal(ensureFolderStub.lastCall.args[2], 'ABC');
         done();
       }
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.get);
-        Utils.restore(request.post);
-      }
     });
-    
   });
 
-  it('creates a folder when list item is added with a folder specified that has one level deep folder to be created', (done) => {
-
+  it('should call ensure folder when folder arg specified (debug)', (done) => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -437,106 +402,59 @@ describe(commands.LISTITEM_ADD, () => {
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
 
-    let options: any = { 
-      debug: false, 
-      listTitle: 'Demo List', 
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
-      Title: expectedTitle,
-      contentType: expectedContentType,
-      folder: expectedFolder
-    }
-
-    cmdInstance.action({ options: options }, () => {
+    cmdInstance.action({
+      options: {
+        debug: true, 
+        listTitle: 'Demo List', 
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
+        Title: expectedTitle,
+        contentType: expectedContentType,
+        folder: "InsideFolder2/Folder3"
+      }
+    }, () => {
 
       try {
-        assert(expectedFolder.substr(expectedFolder.lastIndexOf('/') + 1) == actualFolderCreated);
+        assert.equal(ensureFolderStub.lastCall.args[0], 'https://contoso.sharepoint.com/sites/project-x');
+        assert.equal(ensureFolderStub.lastCall.args[1], '/sites/project-xxx/Lists/Demo%20List/InsideFolder2/Folder3');
+        assert.equal(ensureFolderStub.lastCall.args[2], 'ABC');
         done();
       }
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.get);
-        Utils.restore(request.post);
-      }
     });
-    
   });
 
-  it('creates a folder when list item is added with a folder specified that has two levels deep folders to be created', (done) => {
-
+  it('should not have end \'/\' in the folder path when FolderPath.DecodedUrl ', (done) => {
     sinon.stub(request, 'get').callsFake(getFakes);
-    sinon.stub(request, 'post').callsFake(postFakes);
-
-    //let ensureFolderSpy = sinon.stub((command as any), 'ensureFolder');
+    const postStubs = sinon.stub(request, 'post').callsFake(postFakes);
 
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
 
-    let options: any = { 
-      debug: true, 
-      listTitle: 'Demo List', 
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
-      Title: expectedTitle,
-      folder: expectedFolder + "/Folder3"
-    }
-
-    cmdInstance.action({ options: options }, () => {
+    cmdInstance.action({
+      options: {
+        debug: true, 
+        listTitle: 'Demo List', 
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
+        Title: expectedTitle,
+        contentType: expectedContentType,
+        folder: "InsideFolder2/Folder3/"
+      }
+    }, () => {
 
       try {
-        assert("Folder3" == actualFolderCreated);
+        const addValidateUpdateItemUsingPathRequest = postStubs.getCall(postStubs.callCount - 1).args[0];
+        const info = addValidateUpdateItemUsingPathRequest.body.listItemCreateInfo;
+        assert.equal(info.FolderPath.DecodedUrl, '/sites/project-xxx/Lists/Demo%20List/InsideFolder2/Folder3');
         done();
       }
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.get);
-        Utils.restore(request.post);
-      }
     });
-    
-  });
-
-  it('doesn\'t create a folder when the folder already exists', (done) => {
-
-    actualFolderCreated = '';
-
-    sinon.stub(request, 'get').callsFake(getFakes);
-    sinon.stub(request, 'post').callsFake(postFakes);
-
-    //let ensureFolderSpy = sinon.stub((command as any), 'ensureFolder');
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
-    let options: any = { 
-      debug: false, 
-      listTitle: 'Demo List', 
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
-      Title: expectedTitle,
-      folder: "Folder3"
-    }
-
-    cmdInstance.action({ options: options }, () => {
-
-      try {
-        assert(actualFolderCreated != "Folder3");
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        Utils.restore(request.get);
-        Utils.restore(request.post);
-      }
-    });
-    
   });
 
   it('has help referring to the right command', () => {

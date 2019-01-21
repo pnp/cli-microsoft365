@@ -19,8 +19,10 @@ Option|Description
 `-t, --title <title>`|Site title
 `-d, --description [description]`|Site description
 `-c, --classification [classification]`|Site classification
+`-l, --lcid [lcid]`|Site language in the LCID format, eg. _1033_ for _en-US_
 `--isPublic`|Determines if the associated group is public or not (applies only to team sites)
-`--allowFileSharingForGuestUsers`|Determines whether it's allowed to share file with guests (applies only to communication sites)
+`--shareByEmailEnabled`|Determines whether it's allowed to share file with guests (applies only to communication sites)
+`--allowFileSharingForGuestUsers`|(deprecated. Use `shareByEmailEnabled` instead) Determines whether it's allowed to share file with guests (applies only to communication sites)
 `--siteDesign [siteDesign]`|Type of communication site to create. Allowed values `Topic|Showcase|Blank`, default `Topic`. When creating a communication site, specify either `siteDesign` or `siteDesignId` (applies only to communication sites)
 `--siteDesignId [siteDesignId]`|Id of the custom site design to use to create the site. When creating a communication site, specify either `siteDesign` or `siteDesignId` (applies only to communication sites)
 `-o, --output [output]`|Output type. `json|text`. Default `text`
@@ -45,13 +47,19 @@ spo site add --alias team1 --title Team 1
 Create modern team site with description and classification
 
 ```sh
-spo site add --type TeamSite -a team1 -t Team 1 --description Site of team 1 --classification LBI
+spo site add --type TeamSite --alias team1 --title Team 1 --description Site of team 1 --classification LBI
 ```
 
 Create modern team site with public group
 
 ```sh
-spo site add --type TeamSite -a team1 -t Team 1 --isPublic
+spo site add --type TeamSite --alias team1 --title Team 1 --isPublic
+```
+
+Create modern team site using the Dutch language
+
+```sh
+spo site add --alias team1 --title Team 1 --lcid 1043
 ```
 
 Create communication site using the Topic design
@@ -63,19 +71,19 @@ spo site add --type CommunicationSite --url https://contoso.sharepoint.com/sites
 Create communication site using the Showcase design
 
 ```sh
-spo site add --type CommunicationSite -u https://contoso.sharepoint.com/sites/marketing -t Marketing --siteDesign Showcase
+spo site add --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing --siteDesign Showcase
 ```
 
 Create communication site using a custom site design
 
 ```sh
-spo site add --type CommunicationSite -u https://contoso.sharepoint.com/sites/marketing -t Marketing --siteDesignId 99f410fe-dd79-4b9d-8531-f2270c9c621c
+spo site add --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing --siteDesignId 99f410fe-dd79-4b9d-8531-f2270c9c621c
 ```
 
 Create communication site using the Blank design with description and classification
 
 ```sh
-spo site add --type CommunicationSite -u https://contoso.sharepoint.com/sites/marketing -t Marketing -d Site of the marketing department -c MBI --siteDesign Blank
+spo site add --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing --description Site of the marketing department --classification MBI --siteDesign Blank
 ```
 
 ## More information
