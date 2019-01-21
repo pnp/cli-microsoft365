@@ -20,11 +20,58 @@ describe(commands.LIST_VIEW_FIELD_REMOVE, () => {
   let stubAllGetRequests: any = (getField = null) => {
 
     return sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('getbyinternalnameortitle') > -1 || opts.url.indexOf('getbyid') > -1) {
-        if (getField) {
-          return getField;
-        }
-        return Promise.resolve({});
+      if (opts.url.indexOf('/fields/getbyinternalnameortitle') > -1 || opts.url.indexOf('/fields/getbyid') > -1) {
+        return Promise.resolve({
+          "AllowDisplay": true,
+          "AllowMultipleValues": false,
+          "AutoIndexed": false,
+          "CanBeDeleted": false,
+          "ClientSideComponentId": "00000000-0000-0000-0000-000000000000",
+          "ClientSideComponentProperties": null,
+          "CustomFormatter": null,
+          "DefaultFormula": null,
+          "DefaultValue": null,
+          "DependentLookupInternalNames": [],
+          "Description": "",
+          "Direction": "none",
+          "EnforceUniqueValues": false,
+          "EntityPropertyName": "Author",
+          "FieldTypeKind": 20,
+          "Filterable": true,
+          "FromBaseType": true,
+          "Group": "Custom Columns",
+          "Hidden": false,
+          "Id": "1df5e554-ec7e-46a6-901d-d85a3881cb18",
+          "Indexed": false,
+          "InternalName": "Author",
+          "IsDependentLookup": false,
+          "IsRelationship": false,
+          "JSLink": "clienttemplates.js",
+          "LookupField": "",
+          "LookupList": "{f978b511-305d-45e9-a7e7-f234a67e956d}",
+          "LookupWebId": "c0950f14-23ce-4778-977a-9df11b866ede",
+          "PinnedToFiltersPane": false,
+          "Presence": true,
+          "PrimaryFieldId": null,
+          "ReadOnlyField": true,
+          "RelationshipDeleteBehavior": 0,
+          "Required": false,
+          "SchemaXml": "<Field ID=\"{1df5e554-ec7e-46a6-901d-d85a3881cb18}\" ColName=\"tp_Author\" RowOrdinal=\"0\" ReadOnly=\"TRUE\" Type=\"User\" List=\"UserInfo\" Name=\"Author\" DisplayName=\"Created By\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"Author\" FromBaseType\"TRUE\" />",
+          "Scope": "/sites/ninja/Shared Documents",
+          "Sealed": false,
+          "SelectionGroup": 0,
+          "SelectionMode": 1,
+          "ShowInFiltersPane": 0,
+          "Sortable": true,
+          "StaticName": "Author",
+          "Title": "Created By",
+          "TypeAsString": "User",
+          "TypeDisplayName": "Person or Group",
+          "TypeShortDescription": "Person or Group",
+          "UnlimitedLengthInDocumentLibrary": false,
+          "ValidationFormula": null,
+          "ValidationMessage": null
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -368,7 +415,7 @@ describe(commands.LIST_VIEW_FIELD_REMOVE, () => {
 
   it('removes the field by title from viewTitle and listTitle when prompt confirmed', (done) => {
     stubAllGetRequests();
-
+    
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -414,7 +461,7 @@ describe(commands.LIST_VIEW_FIELD_REMOVE, () => {
 
   it('removes the field by title from viewTitle and listId when prompt confirmed (debug)', (done) => {
     stubAllGetRequests();
-
+    
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -460,7 +507,7 @@ describe(commands.LIST_VIEW_FIELD_REMOVE, () => {
 
   it('removes the field by title from viewTitle and listId when prompt confirmed', (done) => {
     stubAllGetRequests();
-
+    
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -506,7 +553,7 @@ describe(commands.LIST_VIEW_FIELD_REMOVE, () => {
 
   it('removes the field by title from viewId and listId when prompt confirmed (debug)', (done) => {
     stubAllGetRequests();
-
+    
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -552,7 +599,7 @@ describe(commands.LIST_VIEW_FIELD_REMOVE, () => {
 
   it('removes the field by title from viewId and listId when prompt confirmed', (done) => {
     stubAllGetRequests();
-
+    
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -596,11 +643,9 @@ describe(commands.LIST_VIEW_FIELD_REMOVE, () => {
     });
   });
 
-
-  //-----
   it('removes the field by id from viewId and listTitle when prompt confirmed (debug)', (done) => {
     stubAllGetRequests();
-
+    
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -646,7 +691,7 @@ describe(commands.LIST_VIEW_FIELD_REMOVE, () => {
 
   it('removes the field by id from viewId and listTitle when prompt confirmed', (done) => {
     stubAllGetRequests();
-
+    
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -692,7 +737,7 @@ describe(commands.LIST_VIEW_FIELD_REMOVE, () => {
 
   it('removes the field by id from viewTitle and listTitle when prompt confirmed (debug)', (done) => {
     stubAllGetRequests();
-
+    
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -738,7 +783,7 @@ describe(commands.LIST_VIEW_FIELD_REMOVE, () => {
 
   it('removes the field by id from viewTitle and listTitle when prompt confirmed', (done) => {
     stubAllGetRequests();
-
+    
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -784,7 +829,7 @@ describe(commands.LIST_VIEW_FIELD_REMOVE, () => {
 
   it('removes the field by id from viewTitle and listId when prompt confirmed (debug)', (done) => {
     stubAllGetRequests();
-
+    
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -830,7 +875,7 @@ describe(commands.LIST_VIEW_FIELD_REMOVE, () => {
 
   it('removes the field by id from viewTitle and listId when prompt confirmed', (done) => {
     stubAllGetRequests();
-
+    
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -876,7 +921,7 @@ describe(commands.LIST_VIEW_FIELD_REMOVE, () => {
 
   it('removes the field by id from viewId and listId when prompt confirmed (debug)', (done) => {
     stubAllGetRequests();
-
+    
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -922,7 +967,7 @@ describe(commands.LIST_VIEW_FIELD_REMOVE, () => {
 
   it('removes the field by id from viewId and listId when prompt confirmed', (done) => {
     stubAllGetRequests();
-
+    
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -965,7 +1010,6 @@ describe(commands.LIST_VIEW_FIELD_REMOVE, () => {
       }
     });
   });
-  //-----
 
   it('uses correct API url when list id option is passed', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
