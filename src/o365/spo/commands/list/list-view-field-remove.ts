@@ -159,7 +159,7 @@ class SpoListViewFieldRemoveCommand extends SpoCommand {
       },
       {
         option: '--listId [listId]',
-        description: 'ID of the list where the view is located. Specify listTitle or listId but not bothThe list ID where located the view. Specify listId or listTitle but not both'
+        description: 'ID of the list where the view is located. Specify listTitle or listId but not both'
       },
       {
         option: '--listTitle [listTitle]',
