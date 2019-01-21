@@ -345,8 +345,13 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
       catch { }
     }
 
-    // Add the WebPart to to appropriate location
-    column.addControl(webPart);
+    // Add the WebPart to the appropriate location
+    if (typeof args.options.order === 'undefined') {
+      column.addControl(webPart);
+    }
+    else {
+      column.insertControl(webPart, args.options.order - 1);
+    }
   }
 
   private saveClientSidePage(

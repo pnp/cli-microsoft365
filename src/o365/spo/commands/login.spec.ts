@@ -9,6 +9,7 @@ import * as request from 'request-promise-native';
 import config from '../../../config';
 import Utils from '../../../Utils';
 import { AuthType } from '../../../Auth';
+import * as fs from 'fs';
 
 describe(commands.LOGIN, () => {
   let vorpal: Vorpal;
@@ -74,7 +75,9 @@ describe(commands.LOGIN, () => {
   afterEach(() => {
     Utils.restore([
       vorpal.find,
-      auth.cancel
+      auth.cancel,
+      fs.existsSync,
+      fs.readFileSync
     ]);
   });
 
@@ -190,7 +193,7 @@ describe(commands.LOGIN, () => {
     assert.equal(actual, `${url} is not a valid SharePoint Online site URL`);
   });
 
-  it('logs in to AAD Graph using username and password when authType password set', (done) => {
+  it('logs in to a regular SharePoint site using username and password when authType password set', (done) => {
     auth.site = new Site();
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, authType: 'password', userName: 'user', password: 'password' }, url: 'https://contoso.sharepoint.com' }, () => {
@@ -198,6 +201,24 @@ describe(commands.LOGIN, () => {
         assert.equal(auth.service.authType, AuthType.Password, 'Incorrect authType set');
         assert.equal(auth.service.userName, 'user', 'Incorrect user name set');
         assert.equal(auth.service.password, 'password', 'Incorrect password set');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('logs in to a regular SharePoint site using certificate when authType certificate set', (done) => {
+    sinon.stub(fs, 'readFileSync').callsFake(() => 'certificate');
+
+    auth.site = new Site();
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, authType: 'certificate', certificateFile: 'certificateFile', thumbprint: 'thumbprint' }, url: 'https://contoso.sharepoint.com' }, () => {
+      try {
+        assert.equal(auth.service.authType, AuthType.Certificate, 'Incorrect authType set');
+        assert.equal(auth.service.certificate, 'certificate', 'Incorrect certificate set');
+        assert.equal(auth.service.thumbprint, 'thumbprint', 'Incorrect thumbprint set');
         done();
       }
       catch (e) {
@@ -264,6 +285,23 @@ describe(commands.LOGIN, () => {
     assert.notEqual(actual, true);
   });
 
+  it('fails validation if authType is set to certificate and certificateFile not specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { authType: 'certificate', thumbprint: 'thumbprint' }, url: 'https://contoso.sharepoint.com' });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation if authType is set to certificate and certificateFile does not exist', () => {
+    sinon.stub(fs, 'existsSync').callsFake(() => false);
+    const actual = (command.validate() as CommandValidate)({ options: { authType: 'certificate', certificateFile: 'certificate', thumbprint: 'thumbprint' }, url: 'https://contoso.sharepoint.com' });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation if authType is set to certificate and thumbprint not specified', () => {
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    const actual = (command.validate() as CommandValidate)({ options: { authType: 'certificate', certificateFile: 'certificate' }, url: 'https://contoso.sharepoint.com' });
+    assert.notEqual(actual, true);
+  });
+
   it('passes validation if authType is set to password and userName and password specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { authType: 'password', userName: 'user', password: 'password' }, url: 'https://contoso.sharepoint.com' });
     assert.equal(actual, true);
@@ -276,6 +314,12 @@ describe(commands.LOGIN, () => {
 
   it('passes validation if authType is not set and userName and password not specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { }, url: 'https://contoso.sharepoint.com' });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation if authType is set to certificate and certificateFile and thumbprint are specified', () => {
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    const actual = (command.validate() as CommandValidate)({ options: { authType: 'certificate', certificateFile: 'certificate', thumbprint: 'thumbprint' }, url: 'https://contoso.sharepoint.com' });
     assert.equal(actual, true);
   });
 

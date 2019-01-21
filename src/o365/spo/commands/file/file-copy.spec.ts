@@ -21,7 +21,7 @@ describe(commands.FILE_COPY, () => {
     getRequestDigestForSite = null,
     recycleFile = null,
     createCopyJobs = null,
-    getCopyJobProgress = null
+    waitForJobResult = null
   ) => {
     return sinon.stub(request, 'post').callsFake((opts) => {
 
@@ -56,8 +56,8 @@ describe(commands.FILE_COPY, () => {
       }
 
       if (opts.url.indexOf('/_api/site/GetCopyJobProgress') > -1) {
-        if (getCopyJobProgress) {
-          return getCopyJobProgress;
+        if (waitForJobResult) {
+          return waitForJobResult;
         }
         return Promise.resolve({
           JobState: 0,
@@ -404,12 +404,12 @@ describe(commands.FILE_COPY, () => {
     });
   });
 
-  it('should show error when getCopyJobProgress rejects with JobError', (done) => {
-    const getCopyJobProgress = new Promise<any>((resolve, reject) => {
+  it('should show error when waitForJobResult rejects with JobError', (done) => {
+    const waitForJobResult = new Promise<any>((resolve, reject) => {
       const log = JSON.stringify({ Event: 'JobError', Message: 'error1' });
       return resolve({ Logs: [log] });
     });
-    stubAllPostRequests(null, null, null, null, getCopyJobProgress);
+    stubAllPostRequests(null, null, null, null, waitForJobResult);
     stubAllGetRequests();
 
     auth.site = new Site();
@@ -436,12 +436,12 @@ describe(commands.FILE_COPY, () => {
     });
   });
 
-  it('should show error when getCopyJobProgress rejects with JobFatalError', (done) => {
-    const getCopyJobProgress = new Promise<any>((resolve, reject) => {
+  it('should show error when waitForJobResult rejects with JobFatalError', (done) => {
+    const waitForJobResult = new Promise<any>((resolve, reject) => {
       const log = JSON.stringify({ Event: 'JobFatalError', Message: 'error2' });
       return resolve({ JobState: 0, Logs: [log] });
     });
-    stubAllPostRequests(null, null, null, null, getCopyJobProgress);
+    stubAllPostRequests(null, null, null, null, waitForJobResult);
     stubAllGetRequests();
 
     auth.site = new Site();
@@ -468,7 +468,7 @@ describe(commands.FILE_COPY, () => {
     });
   });
 
-  it('should setTimeout when getCopyJobProgress JobState is not 0', (done) => {
+  it('should setTimeout when waitForJobResult JobState is not 0', (done) => {
     const postRequests = sinon.stub(request, 'post');
     postRequests.onFirstCall().resolves({
       JobState: 4,
@@ -496,12 +496,12 @@ describe(commands.FILE_COPY, () => {
     };
 
     try {
-      (command as any).getCopyJobProgress(jobProgressOptions, cmdInstance).then((resp: any) => {
+      (command as any).waitForJobResult(jobProgressOptions, cmdInstance).then((resp: any) => {
         assert(resp === undefined);
         postRequests.restore();
         done();
       }, (e: any) => {
-        assert.fail('getCopyJobProgress couldn\'t resolve.');
+        assert.fail('waitForJobResult couldn\'t resolve.');
         postRequests.restore();
         done();
       });
@@ -511,7 +511,7 @@ describe(commands.FILE_COPY, () => {
     }
   });
 
-  it('should setTimeout when getCopyJobProgress reject, but retry limit not reached', (done) => {
+  it('should setTimeout when waitForJobResult reject, but retry limit not reached', (done) => {
     const postRequests = sinon.stub(request, 'post');
     // GetCopyJobProgress reject
     postRequests.onFirstCall().rejects('error');
@@ -537,12 +537,12 @@ describe(commands.FILE_COPY, () => {
     };
 
     try {
-      (command as any).getCopyJobProgress(jobProgressOptions, cmdInstance).then((resp: any) => {
+      (command as any).waitForJobResult(jobProgressOptions, cmdInstance).then((resp: any) => {
         assert(resp === undefined);
         postRequests.restore();
         done();
       }, (e: any) => {
-        assert.fail('getCopyJobProgress couldn\'t resolve.');
+        assert.fail('waitForJobResult couldn\'t resolve.');
         postRequests.restore();
         done();
       });
@@ -552,7 +552,7 @@ describe(commands.FILE_COPY, () => {
     }
   });
 
-  it('should show error when getCopyJobProgress reject and retry limit reached', (done) => {
+  it('should show error when waitForJobResult reject and retry limit reached', (done) => {
     const postRequests = sinon.stub(request, 'post');
     postRequests.onFirstCall().rejects('error');
     postRequests.onSecondCall().rejects('error');
@@ -577,8 +577,8 @@ describe(commands.FILE_COPY, () => {
     };
 
     try {
-      (command as any).getCopyJobProgress(jobProgressOptions, cmdInstance).then((resp: any) => {
-        assert.fail('getCopyJobProgress shouldn\'t resolve, but reject.');
+      (command as any).waitForJobResult(jobProgressOptions, cmdInstance).then((resp: any) => {
+        assert.fail('waitForJobResult shouldn\'t resolve, but reject.');
         postRequests.restore();
         done();
       }, (e: any) => {
@@ -592,7 +592,7 @@ describe(commands.FILE_COPY, () => {
     }
   });
 
-  it('should getCopyJobProgress timeout', (done) => {
+  it('should waitForJobResult timeout', (done) => {
     const postRequests = sinon.stub(request, 'post');
     // GetCopyJobProgress #1 JobState = 4
     postRequests.onFirstCall().resolves({
@@ -621,8 +621,8 @@ describe(commands.FILE_COPY, () => {
     };
 
     try {
-      (command as any).getCopyJobProgress(jobProgressOptions, cmdInstance).then((resp: any) => {
-        assert.fail('getCopyJobProgress shouldn\'t resolve, but reject.');
+      (command as any).waitForJobResult(jobProgressOptions, cmdInstance).then((resp: any) => {
+        assert.fail('waitForJobResult shouldn\'t resolve, but reject.');
         postRequests.restore();
         done();
       }, (e: any) => {
@@ -636,19 +636,156 @@ describe(commands.FILE_COPY, () => {
     }
   });
 
-  it('should combine url with baseUrl that last char is /', () => {
-    const actual = (command as any).urlCombine('https://contoso.com/', 'sites/abc');
-    assert.equal(actual, 'https://contoso.com/sites/abc');
+  it('should complete successfully where baseUrl has a trailing /', (done) => {
+    let actual: string = '';
+    const expected: string = JSON.stringify({
+      exportObjectUris: [
+        'https://contoso.sharepoint.com/sites/team-a/library/file1.pdf'
+      ],
+      destinationUri: 'https://contoso.sharepoint.com/sites/team-b/library2',
+      options: {
+        'AllowSchemaMismatch': false,
+        'IgnoreVersionHistory': true
+      }
+    });
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      actual = JSON.stringify(opts.body);
+      if (
+        opts.body.exportObjectUris[0] === 'https://contoso.sharepoint.com/sites/team-a/library/file1.pdf' &&
+        opts.body.destinationUri === 'https://contoso.sharepoint.com/sites/team-b/library2' &&
+        opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/site/CreateCopyJobs'
+      ) {
+        return Promise.resolve();
+
+      }
+      return Promise.reject('Invalid request');
+
+    });
+    stubAllGetRequests();
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    cmdInstance.action({
+      options: {
+        webUrl: 'https://contoso.sharepoint.com/sites/team-a/',
+        sourceUrl: 'library/file1.pdf',
+        targetUrl: 'sites/team-b/library2'
+      }
+    }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 
-  it('should combine url with relativeUrl that last char is /', () => {
-    const actual = (command as any).urlCombine('https://contoso.com', 'sites/abc/');
-    assert.equal(actual, 'https://contoso.com/sites/abc');
+  it('should complete successfully where sourceUrl and targetUrl has a trailing /', (done) => {
+    let actual: string = '';
+    const expected: string = JSON.stringify({
+      exportObjectUris: [
+        'https://contoso.sharepoint.com/sites/team-a/library/file1.pdf'
+      ],
+      destinationUri: 'https://contoso.sharepoint.com/sites/team-b/library2',
+      options: {
+        'AllowSchemaMismatch': false,
+        'IgnoreVersionHistory': true
+      }
+    });
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      actual = JSON.stringify(opts.body);
+      if (
+        opts.body.exportObjectUris[0] === 'https://contoso.sharepoint.com/sites/team-a/library/file1.pdf' &&
+        opts.body.destinationUri === 'https://contoso.sharepoint.com/sites/team-b/library2' &&
+        opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/site/CreateCopyJobs'
+      ) {
+        return Promise.resolve();
+
+      }
+      return Promise.reject('Invalid request');
+
+    });
+
+    stubAllGetRequests();
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    cmdInstance.action({
+      options: {
+        webUrl: 'https://contoso.sharepoint.com/sites/team-a/',
+        sourceUrl: 'library/file1.pdf/',
+        targetUrl: 'sites/team-b/library2/'
+      }
+    }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 
-  it('should combine url with relativeUrl that first char is /', () => {
-    const actual = (command as any).urlCombine('https://contoso.com/', '/sites/abc/');
-    assert.equal(actual, 'https://contoso.com/sites/abc');
+  it('should complete successfully where sourceUrl and targetUrl has a beginning /', (done) => {
+    let actual: string = '';
+    const expected: string = JSON.stringify({
+      exportObjectUris: [
+        'https://contoso.sharepoint.com/sites/team-a/library/file1.pdf'
+      ],
+      destinationUri: 'https://contoso.sharepoint.com/sites/team-b/library2',
+      options: {
+        'AllowSchemaMismatch': false,
+        'IgnoreVersionHistory': true
+      }
+    });
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      actual = JSON.stringify(opts.body);
+      if (
+        opts.body.exportObjectUris[0] === 'https://contoso.sharepoint.com/sites/team-a/library/file1.pdf' &&
+        opts.body.destinationUri === 'https://contoso.sharepoint.com/sites/team-b/library2' &&
+        opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/site/CreateCopyJobs'
+      ) {
+        return Promise.resolve();
+
+      }
+      return Promise.reject('Invalid request');
+
+    });
+
+    stubAllGetRequests();
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    cmdInstance.action({
+      options: {
+        webUrl: 'https://contoso.sharepoint.com/sites/team-a/',
+        sourceUrl: '/library/file1.pdf/',
+        targetUrl: '/sites/team-b/library2/'
+      }
+    }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 
   it('supports debug mode', () => {

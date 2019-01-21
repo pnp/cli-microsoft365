@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
   url: string;
 }
 
-class SiteAppCatalogAddCommand extends SpoCommand {
+class SpoSiteAppCatalogAddCommand extends SpoCommand {
   public get name(): string {
     return commands.SITE_APPCATALOG_ADD;
   }
@@ -131,20 +131,26 @@ class SiteAppCatalogAddCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online tenant admin site,
-      using the ${chalk.blue(commands.LOGIN)} command.
+      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online
+    tenant admin site, using the ${chalk.blue(commands.LOGIN)} command.
    
   Remarks:
 
-  To create a site collection app catalog, you have to first log in to a tenant admin site using the
-    ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso-admin.sharepoint.com`)}.
+    To create a site collection app catalog, you have to first log in
+    to a tenant admin site using the ${chalk.blue(commands.LOGIN)} command,
+    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso-admin.sharepoint.com`)}.
 
   Examples:
   
     Add a site collection app catalog to the specified site
       ${chalk.grey(config.delimiter)} ${commands.SITE_APPCATALOG_ADD} --url https://contoso.sharepoint.com/sites/site
+
+  More information:
+    
+    Use the site collection app catalog
+      https://docs.microsoft.com/en-us/sharepoint/dev/general-development/site-collection-app-catalog
     `);
   }
 }
 
-module.exports = new SiteAppCatalogAddCommand();
+module.exports = new SpoSiteAppCatalogAddCommand();

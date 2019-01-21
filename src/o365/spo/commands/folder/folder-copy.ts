@@ -22,6 +22,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   sourceUrl: string;
   targetUrl: string;
+  allowSchemaMismatch?: boolean;
 }
 
 interface JobProgressOptions {
@@ -61,7 +62,8 @@ class SpoFolderCopyCommand extends SpoCommand {
     const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
     let siteAccessToken: string = '';
     const webUrl: string = args.options.webUrl;
-    const tenantUrl: string = `${url.parse(webUrl).protocol}//${url.parse(webUrl).hostname}`;
+    const parsedUrl: url.UrlWithStringQuery = url.parse(webUrl);
+    const tenantUrl: string = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
 
     if (this.debug) {
       cmd.log(`Retrieving access token for ${resource}...`);
@@ -77,7 +79,8 @@ class SpoFolderCopyCommand extends SpoCommand {
         siteAccessToken = accessToken;
 
         const sourceAbsoluteUrl: string = this.urlCombine(webUrl, args.options.sourceUrl);
-        const requestUrl: string = `${webUrl}/_api/site/CreateCopyJobs`;
+        const allowSchemaMismatch: boolean = args.options.allowSchemaMismatch || false;
+        const requestUrl: string = this.urlCombine(webUrl, '/_api/site/CreateCopyJobs');
         const requestOptions: any = {
           url: requestUrl,
           headers: Utils.getRequestHeaders({
@@ -87,7 +90,10 @@ class SpoFolderCopyCommand extends SpoCommand {
           body: {
             exportObjectUris: [sourceAbsoluteUrl],
             destinationUri: this.urlCombine(tenantUrl, args.options.targetUrl),
-            options: { "IgnoreVersionHistory": true }
+            options: {
+              "AllowSchemaMismatch": allowSchemaMismatch,
+              "IgnoreVersionHistory": true
+            }
           },
           json: true
         };
@@ -114,9 +120,9 @@ class SpoFolderCopyCommand extends SpoCommand {
           progressRetryAttempts: 5
         }
 
-        return this.getCopyJobProgress(jobProgressOptions, cmd);
+        return this.waitForJobResult(jobProgressOptions, cmd);
       })
-      .then((resp: any): void => {
+      .then((): void => {
         if (this.verbose) {
           cmd.log('DONE');
         }
@@ -129,7 +135,7 @@ class SpoFolderCopyCommand extends SpoCommand {
    * A polling function that awaits the 
    * Azure queued copy job to return JobStatus = 0 meaning it is done with the task.
    */
-  private getCopyJobProgress(opts: JobProgressOptions, cmd: CommandInstance):
+  private waitForJobResult(opts: JobProgressOptions, cmd: CommandInstance):
     Promise<void> {
 
     let pollCount: number = 0;
@@ -149,7 +155,7 @@ class SpoFolderCopyCommand extends SpoCommand {
       };
 
       if (this.debug) {
-        cmd.log('getCopyJobProgress request...');
+        cmd.log('waitForJobResult request...');
         cmd.log(requestOptions);
       }
 
@@ -157,7 +163,7 @@ class SpoFolderCopyCommand extends SpoCommand {
         retryAttemptsCount = 0; // clear retry on promise success 
 
         if (this.debug) {
-          cmd.log('getCopyJobProgress response...');
+          cmd.log('waitForJobResult response...');
           cmd.log(resp);
         }
 
@@ -192,7 +198,7 @@ class SpoFolderCopyCommand extends SpoCommand {
           setTimeout(checkCondition, opts.progressPollInterval, resolve, reject);
         }
         else {
-          reject(new Error('getCopyJobProgress timed out'));
+          reject(new Error('waitForJobResult timed out'));
         }
       },
         (error: any) => {
@@ -214,8 +220,7 @@ class SpoFolderCopyCommand extends SpoCommand {
   }
 
   /**
-   * Combines base and relative url 
-   * considering any missing slashes
+   * Combines base and relative url considering any missing slashes
    * @param baseUrl https://contoso.com
    * @param relativeUrl sites/abc
    */
@@ -251,6 +256,10 @@ class SpoFolderCopyCommand extends SpoCommand {
       {
         option: '-t, --targetUrl <targetUrl>',
         description: 'Server-relative URL where to copy the folder'
+      },
+      {
+        option: '--allowSchemaMismatch',
+        description: 'Ignores any missing fields in the target document library and copies the folder anyway'
       }
     ];
 
@@ -306,6 +315,9 @@ class SpoFolderCopyCommand extends SpoCommand {
     Copies folder from a document library to another site in the same site
     collection
       ${chalk.grey(config.delimiter)} ${commands.FOLDER_COPY} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFolder --targetUrl /sites/test1/HRDocuments/
+      
+    Copy folder to a document library in another site collection. Will ignore any missing fields in the target destination and copy anyway
+      ${chalk.grey(config.delimiter)} ${commands.FILE_COPY} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFolder --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
 
   More information:
 
