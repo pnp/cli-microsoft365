@@ -24,8 +24,10 @@ interface Options extends GlobalOptions {
   description?: string;
   classification?: string;
   isPublic?: boolean;
+  lcid?: number;
   url?: string;
   allowFileSharingForGuestUsers?: boolean;
+  shareByEmailEnabled?: boolean;
   siteDesign?: string;
   siteDesignId?: string;
 }
@@ -38,7 +40,7 @@ interface CreateGroupExResponse {
   SiteUrl: string;
 }
 
-class SiteAddCommand extends SpoCommand {
+class SpoSiteAddCommand extends SpoCommand {
   public get name(): string {
     return commands.SITE_ADD;
   }
@@ -58,9 +60,11 @@ class SiteAddCommand extends SpoCommand {
     telemetryProps.description = (!(!args.options.description)).toString();
     telemetryProps.classification = (!(!args.options.classification)).toString();
     telemetryProps.isPublic = args.options.isPublic || false;
+    telemetryProps.lcid = args.options.lcid;
 
     if (!isTeamSite) {
       telemetryProps.allowFileSharingForGuestUsers = args.options.allowFileSharingForGuestUsers || false;
+      telemetryProps.shareByEmailEnabled = args.options.shareByEmailEnabled || false;
       telemetryProps.siteDesign = args.options.siteDesign;
       telemetryProps.siteDesignId = (!(!args.options.siteDesignId)).toString();
     }
@@ -73,6 +77,10 @@ class SiteAddCommand extends SpoCommand {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
       .then((accessToken: string): request.RequestPromise => {
+        if (args.options.allowFileSharingForGuestUsers && this.verbose) {
+          cmd.log(vorpal.chalk.yellow(`Option 'allowFileSharingForGuestUsers' is deprecated. Please use 'shareByEmailEnabled' instead`));
+        }
+
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}`);
         }
@@ -105,6 +113,10 @@ class SiteAddCommand extends SpoCommand {
               }
             }
           };
+
+          if (args.options.lcid) {
+            requestOptions.body.optionalParams.CreationOptions.results.push(`SPSiteLanguage:${args.options.lcid}`);
+          }
         }
         else {
           let siteDesignId: string = '';
@@ -131,7 +143,7 @@ class SiteAddCommand extends SpoCommand {
           }
 
           requestOptions = {
-            url: `${auth.site.url}/_api/sitepages/communicationsite/create`,
+            url: `${auth.site.url}/_api/SPSiteManager/Create`,
             headers: Utils.getRequestHeaders({
               authorization: `Bearer ${auth.service.accessToken}`,
               'content-type': 'application/json;odata=nometadata',
@@ -142,13 +154,18 @@ class SiteAddCommand extends SpoCommand {
               request: {
                 Title: args.options.title,
                 Url: args.options.url,
-                AllowFileSharingForGuestUsers: args.options.allowFileSharingForGuestUsers,
+                ShareByEmailEnabled: args.options.shareByEmailEnabled || args.options.allowFileSharingForGuestUsers,
                 Description: args.options.description || '',
                 Classification: args.options.classification || '',
+                WebTemplate: 'SITEPAGEPUBLISHING#0',
                 SiteDesignId: siteDesignId
               }
             }
           };
+
+          if (args.options.lcid) {
+            requestOptions.body.request.Lcid = args.options.lcid;
+          }
         }
 
         if (this.debug) {
@@ -216,12 +233,20 @@ class SiteAddCommand extends SpoCommand {
         description: 'Site classification'
       },
       {
+        option: '-l, --lcid [lcid]',
+        description: 'Site language in the LCID format, eg. 1033 for en-US'
+      },
+      {
         option: '--isPublic',
         description: 'Determines if the associated group is public or not (applies only to team sites)'
       },
       {
-        option: '--allowFileSharingForGuestUsers',
+        option: '--shareByEmailEnabled',
         description: 'Determines whether it\'s allowed to share file with guests (applies only to communication sites)'
+      },
+      {
+        option: '--allowFileSharingForGuestUsers',
+        description: `(deprecated. Use 'shareByEmailEnabled' instead) Determines whether it\'s allowed to share file with guests (applies only to communication sites)`
       },
       {
         option: '--siteDesign [siteDesign]',
@@ -290,6 +315,16 @@ class SiteAddCommand extends SpoCommand {
         }
       }
 
+      if (args.options.lcid) {
+        if (isNaN(args.options.lcid)) {
+          return `${args.options.lcid} is not a number`;
+        }
+
+        if (args.options.lcid < 0) {
+          return `LCID must be greater than 0 (${args.options.lcid})`;
+        }
+      }
+
       return true;
     };
   }
@@ -312,22 +347,25 @@ class SiteAddCommand extends SpoCommand {
       ${chalk.grey(config.delimiter)} ${commands.SITE_ADD} --alias team1 --title Team 1
 
     Create modern team site with description and classification
-      ${chalk.grey(config.delimiter)} ${commands.SITE_ADD} --type TeamSite -a team1 -t Team 1 --description Site of team 1 --classification LBI
+      ${chalk.grey(config.delimiter)} ${commands.SITE_ADD} --type TeamSite --alias team1 --title Team 1 --description Site of team 1 --classification LBI
 
     Create modern team site with public group
-      ${chalk.grey(config.delimiter)} ${commands.SITE_ADD} --type TeamSite -a team1 -t Team 1 --isPublic
+      ${chalk.grey(config.delimiter)} ${commands.SITE_ADD} --type TeamSite --alias team1 --title Team 1 --isPublic
+
+    Create modern team site using the Dutch language
+      ${chalk.grey(config.delimiter)} ${commands.SITE_ADD} --alias team1 --title Team 1 --lcid 1043
 
     Create communication site using the Topic design
       ${chalk.grey(config.delimiter)} ${commands.SITE_ADD} --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing
 
     Create communication site using the Showcase design
-      ${chalk.grey(config.delimiter)} ${commands.SITE_ADD} --type CommunicationSite -u https://contoso.sharepoint.com/sites/marketing -t Marketing --siteDesign Showcase
+      ${chalk.grey(config.delimiter)} ${commands.SITE_ADD} --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing --siteDesign Showcase
 
     Create communication site using a custom site design
-      ${chalk.grey(config.delimiter)} ${commands.SITE_ADD} --type CommunicationSite -u https://contoso.sharepoint.com/sites/marketing -t Marketing --siteDesignId 99f410fe-dd79-4b9d-8531-f2270c9c621c
+      ${chalk.grey(config.delimiter)} ${commands.SITE_ADD} --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing --siteDesignId 99f410fe-dd79-4b9d-8531-f2270c9c621c
 
     Create communication site using the Blank design with description and classification
-      ${chalk.grey(config.delimiter)} ${commands.SITE_ADD} --type CommunicationSite -u https://contoso.sharepoint.com/sites/marketing -t Marketing -d Site of the marketing department -c MBI --siteDesign Blank
+      ${chalk.grey(config.delimiter)} ${commands.SITE_ADD} --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing --description Site of the marketing department --classification MBI --siteDesign Blank
   
   More information
     
@@ -337,4 +375,4 @@ class SiteAddCommand extends SpoCommand {
   }
 }
 
-module.exports = new SiteAddCommand();
+module.exports = new SpoSiteAddCommand();

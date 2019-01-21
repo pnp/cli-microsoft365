@@ -357,10 +357,37 @@ describe(commands.SITE_ADD, () => {
     });
   });
 
+  it('creates modern team site with the specified language', (done) => {
+    const expected = true;
+    let actual = false;
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
+        actual = opts.body.optionalParams.CreationOptions.results.indexOf('SPSiteLanguage:1033') > -1;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, type: 'TeamSite', lcid: 1033 } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('correctly handles error when modern team site with the specified alias already exists', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
-        return Promise.resolve({ ErrorMessage: 'The group alias already exists.'});
+        return Promise.resolve({ ErrorMessage: 'The group alias already exists.' });
       }
 
       return Promise.reject('Invalid request');
@@ -403,7 +430,7 @@ describe(commands.SITE_ADD, () => {
 
   it('creates communication site using the correct endpoint', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/sitepages/communicationsite/create`) > -1) {
+      if (opts.url.indexOf(`/_api/SPSiteManager/Create`) > -1) {
         return Promise.resolve({ SiteStatus: 2, SiteUrl: "https://contoso.sharepoint.com/sites/marketing" });
       }
 
@@ -426,7 +453,7 @@ describe(commands.SITE_ADD, () => {
     const expected = 'Marketing';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/sitepages/communicationsite/create`) > -1) {
+      if (opts.url.indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.body.request.Title;
         return Promise.resolve({});
       }
@@ -453,7 +480,7 @@ describe(commands.SITE_ADD, () => {
     const expected = 'https://contoso.sharepoint.com/sites/marketing';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/sitepages/communicationsite/create`) > -1) {
+      if (opts.url.indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.body.request.Url;
         return Promise.resolve({});
       }
@@ -476,12 +503,12 @@ describe(commands.SITE_ADD, () => {
     });
   });
 
-  it('enabled sharing files with external users in communication site when allowFileSharingForGuestUsers specified', (done) => {
+  it('enables sharing files with external users in communication site when allowFileSharingForGuestUsers specified', (done) => {
     const expected = true;
     let actual = false;
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/sitepages/communicationsite/create`) > -1) {
-        actual = opts.body.request.AllowFileSharingForGuestUsers;
+      if (opts.url.indexOf(`/_api/SPSiteManager/Create`) > -1) {
+        actual = opts.body.request.ShareByEmailEnabled;
         return Promise.resolve({});
       }
 
@@ -503,12 +530,59 @@ describe(commands.SITE_ADD, () => {
     });
   });
 
-  it('sets sharing files with external users in communication site to undefined when allowFileSharingForGuestUsers not specified', (done) => {
+  it('enables sharing files with external users in communication site when shareByEmailEnabled specified', (done) => {
+    const expected = true;
+    let actual = false;
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/SPSiteManager/Create`) > -1) {
+        actual = opts.body.request.ShareByEmailEnabled;
+        return Promise.resolve({});
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', shareByEmailEnabled: true } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('shows deprecation warning when allowFileSharingForGuestUsers used in verbose mode', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      return Promise.resolve({});
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { verbose: true, type: 'CommunicationSite', allowFileSharingForGuestUsers: true } }, () => {
+      try {
+        assert(log.find(l => l.indexOf(`Option 'allowFileSharingForGuestUsers' is deprecated`) > -1));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets sharing files with external users in communication site to undefined when allowFileSharingForGuestUsers and shareByEmailEnabled not specified', (done) => {
     const expected = undefined;
     let actual = false;
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/sitepages/communicationsite/create`) > -1) {
-        actual = opts.body.request.AllowFileSharingForGuestUsers;
+      if (opts.url.indexOf(`/_api/SPSiteManager/Create`) > -1) {
+        actual = opts.body.request.ShareByEmailEnabled;
         return Promise.resolve({});
       }
 
@@ -534,7 +608,7 @@ describe(commands.SITE_ADD, () => {
     const expected = 'Site for the marketing department';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/sitepages/communicationsite/create`) > -1) {
+      if (opts.url.indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.body.request.Description;
         return Promise.resolve({});
       }
@@ -561,7 +635,7 @@ describe(commands.SITE_ADD, () => {
     const expected = '';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/sitepages/communicationsite/create`) > -1) {
+      if (opts.url.indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.body.request.Description;
         return Promise.resolve({});
       }
@@ -588,7 +662,7 @@ describe(commands.SITE_ADD, () => {
     const expected = 'LBI';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/sitepages/communicationsite/create`) > -1) {
+      if (opts.url.indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.body.request.Classification;
         return Promise.resolve({});
       }
@@ -642,7 +716,7 @@ describe(commands.SITE_ADD, () => {
     const expected = '00000000-0000-0000-0000-000000000000';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/sitepages/communicationsite/create`) > -1) {
+      if (opts.url.indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.body.request.SiteDesignId;
         return Promise.resolve({});
       }
@@ -669,7 +743,7 @@ describe(commands.SITE_ADD, () => {
     const expected = '6142d2a0-63a5-4ba0-aede-d9fefca2c767';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/sitepages/communicationsite/create`) > -1) {
+      if (opts.url.indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.body.request.SiteDesignId;
         return Promise.resolve({});
       }
@@ -696,7 +770,7 @@ describe(commands.SITE_ADD, () => {
     const expected = 'f6cc5403-0d63-442e-96c0-285923709ffc';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/sitepages/communicationsite/create`) > -1) {
+      if (opts.url.indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.body.request.SiteDesignId;
         return Promise.resolve({});
       }
@@ -723,7 +797,7 @@ describe(commands.SITE_ADD, () => {
     const expected = '00000000-0000-0000-0000-000000000000';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/sitepages/communicationsite/create`) > -1) {
+      if (opts.url.indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.body.request.SiteDesignId;
         return Promise.resolve({});
       }
@@ -750,7 +824,7 @@ describe(commands.SITE_ADD, () => {
     const expected = '92398ab7-45c7-486b-81fa-54da2ee0738a';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/sitepages/communicationsite/create`) > -1) {
+      if (opts.url.indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.body.request.SiteDesignId;
         return Promise.resolve({});
       }
@@ -763,6 +837,33 @@ describe(commands.SITE_ADD, () => {
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', siteDesignId: expected } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('creates communication site using the specified language', (done) => {
+    const expected = 1033;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/SPSiteManager/Create`) > -1) {
+        actual = opts.body.request.Lcid;
+        return Promise.resolve({});
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', lcid: expected } }, () => {
       try {
         assert.equal(actual, expected);
         done();
@@ -872,10 +973,21 @@ describe(commands.SITE_ADD, () => {
     assert(false);
   });
 
-  it('supports specifying if the communication site allows sharing files with guest users', () => {
+  it('supports specifying if the communication site allows sharing files with guest users (deprecated)', () => {
     const options = (command.options() as CommandOption[]);
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--allowFileSharingForGuestUsers') > -1) {
+        assert(true);
+        return;
+      }
+    }
+    assert(false);
+  });
+
+  it('supports specifying if the communication site allows sharing files with guest users', () => {
+    const options = (command.options() as CommandOption[]);
+    for (let i = 0; i < options.length; i++) {
+      if (options[i].option.indexOf('--shareByEmailEnabled') > -1) {
         assert(true);
         return;
       }
@@ -898,6 +1010,17 @@ describe(commands.SITE_ADD, () => {
     const options = (command.options() as CommandOption[]);
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--siteDesignId') > -1) {
+        assert(true);
+        return;
+      }
+    }
+    assert(false);
+  });
+
+  it('supports specifying site language', () => {
+    const options = (command.options() as CommandOption[]);
+    for (let i = 0; i < options.length; i++) {
+      if (options[i].option.indexOf('--lcid') > -1) {
         assert(true);
         return;
       }
@@ -930,6 +1053,18 @@ describe(commands.SITE_ADD, () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         type: 'CommunicationSite',
+        title: 'Marketing',
+        url: 'https://contoso.sharepoint.com/sites/marketing'
+      }
+    });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation when lcid is valid', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        type: 'CommunicationSite',
+        lcid: 1033,
         title: 'Marketing',
         url: 'https://contoso.sharepoint.com/sites/marketing'
       }
@@ -1078,6 +1213,30 @@ describe(commands.SITE_ADD, () => {
         url: 'https://contoso.sharepoint.com/sites/marketing',
         siteDesign: 'Topic',
         siteDesignId: '92398ab7-45c7-486b-81fa-54da2ee0738a'
+      }
+    });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation when lcid is not a number', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        type: 'CommunicationSite',
+        title: 'Marketing',
+        url: 'https://contoso.sharepoint.com/sites/marketing',
+        lcid: 'a'
+      }
+    });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation when lcid is less than 0', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        type: 'CommunicationSite',
+        title: 'Marketing',
+        url: 'https://contoso.sharepoint.com/sites/marketing',
+        lcid: -1
       }
     });
     assert.notEqual(actual, true);

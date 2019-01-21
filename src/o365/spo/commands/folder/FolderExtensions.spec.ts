@@ -18,7 +18,7 @@ describe('FolderExtensions', () => {
   ) => {
     return sinon.stub(request, 'post').callsFake((opts) => {
 
-      if (opts.url.indexOf('/_api/web/folders') > -1) {
+      if (opts.url.indexOf('/_api/web/GetFolderByServerRelativePath') > -1) {
         if (folderAddResp) {
           return folderAddResp;
         } else {
@@ -65,163 +65,163 @@ describe('FolderExtensions', () => {
     ]);
   });
 
-  it('should reject if wrong url param', (done) => { 
+  it('should reject if wrong url param', (done) => {
 
     folderExtensions = new FolderExtensions(cmdInstance, true);
 
     folderExtensions.ensureFolder("abc", "abc", "abc")
-    .then(res => {
-      
-      done('Sould reject, not resolve');
-      
-    },  (err:any) => {
-      
-      assert.equal(err, 'webFullUrl is not a valid URL');
-      done();
-    });
+      .then(res => {
+
+        done('Sould reject, not resolve');
+
+      }, (err: any) => {
+
+        assert.equal(err, 'webFullUrl is not a valid URL');
+        done();
+      });
   });
 
-  it('should reject if empty folder param', (done) => { 
+  it('should reject if empty folder param', (done) => {
 
     folderExtensions = new FolderExtensions(cmdInstance, true);
 
     folderExtensions.ensureFolder("https://contoso.sharepoint.com", "", "abc")
-    .then(res => {
-      
-      done('Sould reject, not resolve');
+      .then(res => {
 
-    },  (err:any) => {
-      
-      assert.equal(err, 'folderToEnsure cannot be empty');
-      done();
-    });
+        done('Sould reject, not resolve');
+
+      }, (err: any) => {
+
+        assert.equal(err, 'folderToEnsure cannot be empty');
+        done();
+      });
   });
 
-  it('should reject if empty siteAccessToken param', (done) => { 
+  it('should reject if empty siteAccessToken param', (done) => {
 
     folderExtensions = new FolderExtensions(cmdInstance, true);
 
     folderExtensions.ensureFolder("https://contoso.sharepoint.com", "abc", "")
-    .then(res => {
-      
-      done('Sould reject, not resolve');
-      
-    },  (err:any) => {
-      
-      assert.equal(err, 'siteAccessToken cannot be empty');
-      done();
-    });
+      .then(res => {
+
+        done('Sould reject, not resolve');
+
+      }, (err: any) => {
+
+        assert.equal(err, 'siteAccessToken cannot be empty');
+        done();
+      });
   });
 
   it('should handle folder creation faliure', (done) => {
-    
+
     const folderDoesNotExistErrorResp: any = new Promise<any>((resolve, reject) => {
-      return reject(JSON.stringify({"odata.error":{"code":"-2130575338, Microsoft.SharePoint.SPException","message":{"lang":"en-US","value":"Error: Not found."}}}));
+      return reject(JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not found." } } }));
     });
 
-    const expectedError = JSON.stringify({"odata.error":{"code":"-2130575338, Microsoft.SharePoint.SPException","message":{"lang":"en-US","value":"Error: Cannot create folder."}}});
+    const expectedError = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Cannot create folder." } } });
 
     const folderCreationErrorResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedError);
     });
 
     stubGetResponses(folderDoesNotExistErrorResp);
-    stubPostResponses(folderCreationErrorResp); 
+    stubPostResponses(folderCreationErrorResp);
 
     folderExtensions = new FolderExtensions(cmdInstance, false);
 
     folderExtensions.ensureFolder("https://contoso.sharepoint.com", "abc", "abc")
-    .then(res => {
-      done('Should not resolve, but reject');
-    },  (err:any) => {
-      
-      assert.equal(JSON.stringify(err), JSON.stringify(expectedError));
-      done();
-    });
+      .then(res => {
+        done('Should not resolve, but reject');
+      }, (err: any) => {
+
+        assert.equal(JSON.stringify(err), JSON.stringify(expectedError));
+        done();
+      });
   });
 
   it('should handle folder creation faliure (debug)', (done) => {
-    
+
     const folderDoesNotExistErrorResp: any = new Promise<any>((resolve, reject) => {
-      return reject(JSON.stringify({"odata.error":{"code":"-2130575338, Microsoft.SharePoint.SPException","message":{"lang":"en-US","value":"Error: Not found."}}}));
+      return reject(JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not found." } } }));
     });
 
-    const expectedError = JSON.stringify({"odata.error":{"code":"-2130575338, Microsoft.SharePoint.SPException","message":{"lang":"en-US","value":"Error: Cannot create folder."}}});
+    const expectedError = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Cannot create folder." } } });
 
     const folderCreationErrorResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedError);
     });
 
     stubGetResponses(folderDoesNotExistErrorResp);
-    stubPostResponses(folderCreationErrorResp); 
+    stubPostResponses(folderCreationErrorResp);
 
     folderExtensions = new FolderExtensions(cmdInstance, true);
 
     folderExtensions.ensureFolder("https://contoso.sharepoint.com", "abc", "abc")
-    .then(res => {
-      done('Should not resolve, but reject');
-    },  (err:any) => {
-      
-      assert.equal(JSON.stringify(err), JSON.stringify(expectedError));
-      done();
-    });
+      .then(res => {
+        done('Should not resolve, but reject');
+      }, (err: any) => {
+
+        assert.equal(JSON.stringify(err), JSON.stringify(expectedError));
+        done();
+      });
   });
 
   it('should succeed in adding folder if it does not exist (debug)', (done) => {
     const folderDoesNotExistErrorResp: any = new Promise<any>((resolve, reject) => {
-      return reject(JSON.stringify({"odata.error":{"code":"-2130575338, Microsoft.SharePoint.SPException","message":{"lang":"en-US","value":"Error: Not found."}}}));
+      return reject(JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not found." } } }));
     });
     stubGetResponses(folderDoesNotExistErrorResp);
     stubPostResponses();
-    
+
     folderExtensions = new FolderExtensions(cmdInstance, true);
 
     folderExtensions.ensureFolder("https://contoso.sharepoint.com", "abc", "abc")
-    .then(res => {
-      
-      assert.equal(cmdInstanceLogSpy.lastCall.args[0], 'All sub-folders exist');
-      done();
+      .then(res => {
 
-    },  (err:any) => {
-      done(err);
-    });
+        assert.equal(cmdInstanceLogSpy.lastCall.args[0], 'All sub-folders exist');
+        done();
+
+      }, (err: any) => {
+        done(err);
+      });
   });
 
   it('should succeed in adding folder if it does not exist', (done) => {
     const folderDoesNotExistErrorResp: any = new Promise<any>((resolve, reject) => {
-      return reject(JSON.stringify({"odata.error":{"code":"-2130575338, Microsoft.SharePoint.SPException","message":{"lang":"en-US","value":"Error: Not found."}}}));
+      return reject(JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not found." } } }));
     });
     stubGetResponses(folderDoesNotExistErrorResp);
     stubPostResponses();
-    
+
     folderExtensions = new FolderExtensions(cmdInstance, false);
 
     folderExtensions.ensureFolder("https://contoso.sharepoint.com", "abc", "abc")
-    .then(res => {
-      
-      assert.equal(cmdInstanceLogSpy.notCalled, true);
-      done();
+      .then(res => {
 
-    },  (err:any) => {
-      done(err);
-    });
+        assert.equal(cmdInstanceLogSpy.notCalled, true);
+        done();
+
+      }, (err: any) => {
+        done(err);
+      });
   });
 
   it('should succeed if all folders exist (debug)', (done) => {
     stubPostResponses();
     stubGetResponses();
-    
+
     folderExtensions = new FolderExtensions(cmdInstance, true);
 
     folderExtensions.ensureFolder("https://contoso.sharepoint.com", "abc", "abc")
-    .then(res => {
-      
-      assert.equal(cmdInstanceLogSpy.called, true);
-      done();
+      .then(res => {
 
-    },  (err:any) => {
-      done(err);
-    });
+        assert.equal(cmdInstanceLogSpy.called, true);
+        done();
+
+      }, (err: any) => {
+        done(err);
+      });
   });
 
   it('should succeed if all folders exist', (done) => {
@@ -231,49 +231,130 @@ describe('FolderExtensions', () => {
     folderExtensions = new FolderExtensions(cmdInstance, false);
 
     folderExtensions.ensureFolder("https://contoso.sharepoint.com", "abc", "abc")
-    .then(res => {
-      
-      assert.equal(cmdInstanceLogSpy.called, false);
-      done();
+      .then(res => {
 
-    },  (err:any) => {
-      done(err);
-    });
+        assert.equal(cmdInstanceLogSpy.called, false);
+        done();
+
+      }, (err: any) => {
+        done(err);
+      });
   });
 
-  it('should remove end / from folder path', (done) => { 
-    stubPostResponses();
-    stubGetResponses();
-
-    folderExtensions = new FolderExtensions(cmdInstance, true);
-
-    folderExtensions.ensureFolder("https://contoso.sharepoint.com", "folder1/folder2/", "abc")
-    .then(res => {
-      
-      assert.equal(cmdInstanceLogSpy.calledWith('folder1/folder2'), true);
-      done();
-      
-    },  (err:any) => {
-      
-      done(err);
+  it('should have the correct url when calling AddSubFolderUsingPath (POST)', (done) => {
+    const postStubs: sinon.SinonStub = stubPostResponses();
+    const folderDoesNotExistErrorResp: any = new Promise<any>((resolve, reject) => {
+      return reject(JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not found." } } }));
     });
-  });
+    stubGetResponses(folderDoesNotExistErrorResp);
 
-  it('should remove end / from folder path', (done) => { 
-    stubPostResponses();
-    stubGetResponses();
-    
     folderExtensions = new FolderExtensions(cmdInstance, true);
 
     folderExtensions.ensureFolder("https://contoso.sharepoint.com", "/folder2/folder3", "abc")
-    .then(res => {
-      
-      assert.equal(cmdInstanceLogSpy.calledWith('folder2/folder3'), true);
-      done();
-      
-    },  (err:any) => {
-      
-      done(err);
+      .then(res => {
+
+        assert.equal(postStubs.lastCall.args[0].url, 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Ffolder2%27&@a2=%27folder3%27');
+        done();
+      }, (err: any) => {
+
+        done(err);
+      });
+  });
+
+  it('should have the correct url including uppercase letters when calling AddSubFolderUsingPath', (done) => {
+    const postStubs: sinon.SinonStub = stubPostResponses();
+    const folderDoesNotExistErrorResp: any = new Promise<any>((resolve, reject) => {
+      return reject(JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not found." } } }));
     });
+    stubGetResponses(folderDoesNotExistErrorResp);
+
+    folderExtensions = new FolderExtensions(cmdInstance, true);
+
+    folderExtensions.ensureFolder("https://contoso.sharepoint.com/sites/Site1", "/folder2/folder3", "abc")
+      .then(res => {
+        assert.equal(postStubs.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%2Ffolder2%27&@a2=%27folder3%27');
+        done();
+      }, (err: any) => {
+
+        done(err);
+      });
+  });
+
+  it('should call two times AddSubFolderUsingPath when folderUrl is folder2/folder3', (done) => {
+    const postStubs: sinon.SinonStub = stubPostResponses();
+    const folderDoesNotExistErrorResp: any = new Promise<any>((resolve, reject) => {
+      return reject(JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not found." } } }));
+    });
+    stubGetResponses(folderDoesNotExistErrorResp);
+
+    folderExtensions = new FolderExtensions(cmdInstance, true);
+
+    folderExtensions.ensureFolder("https://contoso.sharepoint.com/sites/Site1", "/folder2/folder3", "abc")
+      .then(res => {
+        assert.equal(postStubs.getCall(0).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%27&@a2=%27folder2%27');
+        assert.equal(postStubs.getCall(1).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%2Ffolder2%27&@a2=%27folder3%27');
+        done();
+      }, (err: any) => {
+
+        done(err);
+      });
+  });
+
+  it('should handle end slashes in the command options for webUrl and for folder', (done) => {
+    const postStubs: sinon.SinonStub = stubPostResponses();
+    const folderDoesNotExistErrorResp: any = new Promise<any>((resolve, reject) => {
+      return reject(JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not found." } } }));
+    });
+    stubGetResponses(folderDoesNotExistErrorResp);
+
+    folderExtensions = new FolderExtensions(cmdInstance, true);
+
+    folderExtensions.ensureFolder("https://contoso.sharepoint.com/sites/Site1/", "/folder2/folder3/", "abc")
+      .then(res => {
+        assert.equal(postStubs.getCall(0).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%27&@a2=%27folder2%27');
+        assert.equal(postStubs.getCall(1).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%2Ffolder2%27&@a2=%27folder3%27');
+        done();
+      }, (err: any) => {
+
+        done(err);
+      });
+  });
+
+  it('should have the correct url when folder option has uppercase letters when calling AddSubFolderUsingPath', (done) => {
+    const postStubs: sinon.SinonStub = stubPostResponses();
+    const folderDoesNotExistErrorResp: any = new Promise<any>((resolve, reject) => {
+      return reject(JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not found." } } }));
+    });
+    stubGetResponses(folderDoesNotExistErrorResp);
+
+    folderExtensions = new FolderExtensions(cmdInstance, true);
+
+    folderExtensions.ensureFolder("https://contoso.sharepoint.com/sites/site1/", "PnP1/Folder2/", "abc")
+      .then(res => {
+        assert.equal(postStubs.getCall(0).args[0].url, 'https://contoso.sharepoint.com/sites/site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2Fsite1%27&@a2=%27PnP1%27');
+        assert.equal(postStubs.getCall(1).args[0].url, 'https://contoso.sharepoint.com/sites/site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2Fsite1%2FPnP1%27&@a2=%27Folder2%27');
+        done();
+      }, (err: any) => {
+
+        done(err);
+      });
+  });
+
+
+  it('should call GetFolderByServerRelativeUrl with the correct url OData values', (done) => {
+    stubPostResponses();
+    const getStubs: sinon.SinonStub = stubGetResponses();
+
+    folderExtensions = new FolderExtensions(cmdInstance, true);
+
+    folderExtensions.ensureFolder("https://contoso.sharepoint.com/sites/Site1", "/folder2/folder3", "abc")
+      .then(res => {
+        assert.equal(getStubs.getCall(0).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativeUrl(\'%2Fsites%2FSite1%2Ffolder2\')');
+        assert.equal(getStubs.getCall(1).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativeUrl(\'%2Fsites%2FSite1%2Ffolder2%2Ffolder3\')');
+        done();
+      }, (err: any) => {
+
+        done(err);
+      });
   });
 });

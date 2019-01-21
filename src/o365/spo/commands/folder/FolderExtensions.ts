@@ -10,36 +10,36 @@ export class FolderExtensions {
   public constructor(private cmd: CommandInstance, private debug: boolean) {
   }
 
+  /**
+   * Ensures the folder path exists
+   * @param webFullUrl web full url e.g. https://contoso.sharepoint.com/sites/site1
+   * @param folderToEnsure web relative or server relative folder path e.g. /Documents/MyFolder or /sites/site1/Documents/MyFolder
+   * @param siteAccessToken a valid access token for the site specified in the webFullUrl param
+   */
   public ensureFolder(webFullUrl: string, folderToEnsure: string, siteAccessToken: string): Promise<void> {
 
     const webUrl = url.parse(webFullUrl);
-    if(!webUrl.protocol || !webUrl.hostname) {
+    if (!webUrl.protocol || !webUrl.hostname) {
       return Promise.reject('webFullUrl is not a valid URL');
     }
 
-    if(!folderToEnsure){
+    if (!folderToEnsure) {
       return Promise.reject('folderToEnsure cannot be empty');
     }
 
-    if(!siteAccessToken){
+    if (!siteAccessToken) {
       return Promise.reject('siteAccessToken cannot be empty');
     }
 
-    // remove the end '/' in the folder path
-    if (folderToEnsure[folderToEnsure.length - 1] === '/') {
-      folderToEnsure = folderToEnsure.substring(0, folderToEnsure.length - 1);
+    // remove last '/' of webFullUrl if exists
+    const webFullUrlLastCharPos: number = webFullUrl.length - 1;
+
+    if (webFullUrl.length > 1 &&
+      webFullUrl[webFullUrlLastCharPos] === '/') {
+      webFullUrl = webFullUrl.substring(0, webFullUrlLastCharPos);
     }
 
-    const tenantUrl: string = `${url.parse(webFullUrl).protocol}//${url.parse(webFullUrl).hostname}`;
-    const webRelativePath: string = webFullUrl.replace(tenantUrl, '');
-
-    // remove the web relative path from the folder path
-    folderToEnsure = folderToEnsure.replace(webRelativePath, '')
-
-    // remove the leading '/' so we are left with e.g. Shared%20Documents/22/54/55
-    if (folderToEnsure[0] === '/') {
-      folderToEnsure = folderToEnsure.substring(1);
-    }
+    folderToEnsure = Utils.getWebRelativePath(webFullUrl, folderToEnsure);
 
     if (this.debug) {
       this.cmd.log(`folderToEnsure`);
@@ -47,10 +47,18 @@ export class FolderExtensions {
       this.cmd.log('');
     }
 
-    // build array of folders e.g. ["Shared%20Documents","22","54","55"]
-    let folders: string[] = folderToEnsure.split('/');
     let nextFolder: string = '';
+    let prevFolder: string = '';
     let folderIndex: number = 0;
+
+    // build array of folders e.g. ["Shared%20Documents","22","54","55"]
+    let folders: string[] = folderToEnsure.substring(1).split('/');
+
+    if (this.debug) {
+      this.cmd.log('folders to process');
+      this.cmd.log(JSON.stringify(folders));
+      this.cmd.log('');
+    }
 
     // recursive function
     const checkOrAddFolder = (resolve: () => void, reject: (error: any) => void): void => {
@@ -65,8 +73,9 @@ export class FolderExtensions {
       }
 
       // append the next sub-folder to the folder path and check if it exists
+      prevFolder = nextFolder;
       nextFolder += `/${folders[folderIndex]}`;
-      const folderServerRelativeUrl = `${webRelativePath}${nextFolder}`;
+      const folderServerRelativeUrl = Utils.getServerRelativePath(webFullUrl, nextFolder);
 
       const requestOptions: any = {
         url: `${webFullUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderServerRelativeUrl)}')`,
@@ -94,17 +103,14 @@ export class FolderExtensions {
           folderIndex++;
           checkOrAddFolder(resolve, reject);
         })
-        .catch((err: any) => {
-          
+        .catch(() => {
+          const prevFolderServerRelativeUrl: string = Utils.getServerRelativePath(webFullUrl, prevFolder);
           const requestOptions: any = {
-            url: `${webFullUrl}/_api/web/folders`,
+            url: `${webFullUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27${encodeURIComponent(prevFolderServerRelativeUrl)}%27&@a2=%27${encodeURIComponent(folders[folderIndex])}%27`,
             headers: Utils.getRequestHeaders({
               authorization: `Bearer ${siteAccessToken}`,
-              'accept': 'application/json;odata=nometadata',
+              'accept': 'application/json;odata=nometadata'
             }),
-            body: {
-              'ServerRelativeUrl': folderServerRelativeUrl
-            },
             json: true
           };
 
@@ -132,7 +138,7 @@ export class FolderExtensions {
                 this.cmd.log(`Could not create sub-folder ${folderServerRelativeUrl}`);
               }
 
-              reject(err); 
+              reject(err);
             });
         });
     }

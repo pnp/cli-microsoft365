@@ -12,6 +12,7 @@ import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import { Auth } from '../../../../Auth';
 import { ListItemInstance } from './ListItemInstance';
+import { FolderExtensions } from '../folder/FolderExtensions';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -66,7 +67,8 @@ class SpoListItemAddCommand extends SpoCommand {
       `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(listIdArgument)}')`
       : `${args.options.webUrl}/_api/web/lists/getByTitle('${encodeURIComponent(listTitleArgument)}')`);
     let contentTypeName: string = '';
-    let listRootFolder: string = '';
+    let targetFolderServerRelativeUrl: string = '';
+    const folderExtensions: FolderExtensions = new FolderExtensions(cmd, this.debug);
 
     if (this.debug) {
       cmd.log(`Retrieving access token for ${resource}...`);
@@ -138,7 +140,6 @@ class SpoListItemAddCommand extends SpoCommand {
           }
         }
 
-        const folderArgument = args.options.folder || '';
         if (args.options.folder) {
           if (this.debug) {
             cmd.log('setting up folder lookup response ...');
@@ -166,16 +167,9 @@ class SpoListItemAddCommand extends SpoCommand {
                 cmd.log(rootFolderResponse);
               }
 
-              listRootFolder = rootFolderResponse["ServerRelativeUrl"];
-
-              return this
-                .ensureFolder(args, siteAccessToken, cmd, rootFolderResponse, folderArgument)
-                .then(ensureFolderResponse => {
-                  if (this.debug) {
-                    cmd.log('ensure folder response...');
-                    cmd.log(ensureFolderResponse);
-                  }
-                });
+              targetFolderServerRelativeUrl = Utils.getServerRelativePath(rootFolderResponse["ServerRelativeUrl"], args.options.folder);
+                        
+              return folderExtensions.ensureFolder(args.options.webUrl, targetFolderServerRelativeUrl, siteAccessToken);
             });
         }
         else {
@@ -183,6 +177,11 @@ class SpoListItemAddCommand extends SpoCommand {
         }
       })
       .then((response: any): request.RequestPromise => {
+        if (this.debug) {
+          cmd.log('Ensure folder response...');
+          cmd.log(response);
+        }
+
         if (this.verbose) {
           cmd.log(`Creating item in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
         }
@@ -194,7 +193,7 @@ class SpoListItemAddCommand extends SpoCommand {
         if (args.options.folder) {
           requestBody.listItemCreateInfo = {
             FolderPath: {
-              DecodedUrl: `${(listRootFolder + '/' + args.options.folder).replace(/\/\//g, '/')}`
+              DecodedUrl: targetFolderServerRelativeUrl
             }
           };
         }
@@ -409,141 +408,6 @@ class SpoListItemAddCommand extends SpoCommand {
     });
 
     return requestBody;
-  }
-
-  private ensureFolder(args: CommandArgs, siteAccessToken: string, cmd: CommandInstance, rootFolder: any, folderToEnsure: string) {
-    const rootFolderPath: string = rootFolder['ServerRelativeUrl']
-    const childFolderNames: string[] = folderToEnsure.split('/');
-
-    const checkFoldersPromise: (request.RequestPromise | Promise<void>)[] = [];
-    const checkedFolders: string[] = [];
-    const createFolders: any[] = [];
-
-    for (let folderIndex: number = 0; folderIndex < childFolderNames.length; folderIndex++) {
-      const folderName: string = childFolderNames[folderIndex];
-      const parentFolders: string[] = folderIndex > 0 ? childFolderNames.slice(0, folderIndex) : []
-      const requestOptions: any = {
-        url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativePath(decodedurl='${(rootFolderPath + '/' + parentFolders.join('/') + '/' + folderName).replace(/\/\//g, "/")}')`,
-        headers: Utils.getRequestHeaders({
-          authorization: `Bearer ${siteAccessToken}`,
-          'accept': 'application/json;odata=nometadata'
-        }),
-        json: true
-      };
-
-      if (this.debug) {
-        cmd.log('Setting up promise with web request to check folder...');
-        cmd.log(requestOptions);
-        cmd.log('');
-      }
-
-      checkFoldersPromise.push(new Promise((resolve: () => void, reject: (error: any) => void): void => {
-        request.get(requestOptions)
-          .then((response: any): void => {
-            if (this.debug) {
-              cmd.log(`Folder ${folderName} found with response...`);
-              cmd.log(response);
-            }
-
-            checkedFolders.push(folderName);
-            resolve();
-          })
-          .catch((): void => {
-            createFolders.push({
-              folderName: folderName,
-              parentFolder: `${rootFolderPath}${(parentFolders.length > 0 ? '/' : '')}${parentFolders.join('/')}`
-            });
-            resolve();
-          });
-      }));
-    }
-
-    return Promise.all(checkFoldersPromise).then((): Promise<void> => {
-      const sortedFolders: any[] = createFolders.sort((cf1, cf2) => {
-        if (cf1.parentFolder > cf2.parentFolder) {
-          return 1;
-        }
-
-        return -1;
-      })
-
-      if (this.debug) {
-        cmd.log(`Folders found:`);
-        cmd.log(checkedFolders);
-        cmd.log(`Folders to create (sorted):`);
-        cmd.log(createFolders);
-        cmd.log('');
-      }
-
-      const createFolderPromises: any[] = [];
-
-      for (let i: number = 0; i < sortedFolders.length; i++) {
-        // Below path is used by the modern UI
-        const createFolderOptions: any = {
-          url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1='${(encodeURIComponent(sortedFolders[i].parentFolder))}'&@a2='${encodeURIComponent((sortedFolders[i].folderName))}'`,
-          headers: Utils.getRequestHeaders({
-            authorization: `Bearer ${siteAccessToken}`,
-            'accept': 'application/json;odata=nometadata'
-          }),
-          json: true
-        }
-
-        if (this.debug) {
-          cmd.log('Setting up promise to create folder request...');
-          cmd.log(createFolderOptions);
-          cmd.log('');
-        }
-
-        createFolderPromises.push(request.post(createFolderOptions));
-      }
-
-      let counter: number = 0;
-      return new Promise((resolve: () => void, reject: (error: any) => void): void => {
-        const recurse: () => void = () => {
-          if (this.debug) {
-            cmd.log(`Executing create folder promise ${counter}`);
-          }
-
-          createFolderPromises[counter]
-            .then((response: any): void => {
-              if (this.debug) {
-                cmd.log(`Create folder promise ${counter} executed with response:`);
-                cmd.log(response);
-              }
-              counter++;
-              if (counter < createFolderPromises.length) {
-                recurse();
-              }
-              else {
-                resolve();
-              }
-            })
-            .catch((response: any) => {
-              if (this.debug) {
-                cmd.log(`Error executing create folder promise ${counter}:`);
-                cmd.log(response);
-                cmd.log('');
-              }
-
-              counter++;
-
-              if (counter < createFolderPromises.length) {
-                recurse();
-              }
-              else {
-                resolve();
-              }
-            });
-        }
-
-        if (createFolderPromises.length > 0) {
-          recurse();
-        }
-        else {
-          resolve();
-        }
-      });
-    });
   }
 }
 

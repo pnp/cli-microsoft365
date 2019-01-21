@@ -1,6 +1,6 @@
 {
   "name": "@pnp/office365-cli",
-  "version": "1.12.0",
+  "version": "1.13.0",
   "description": "Manage Microsoft Office 365 and SharePoint Framework projects on any platform",
   "license": "MIT",
   "main": "./dist/index.js",
@@ -64,7 +64,8 @@
     "Romano, Rodrigo <rodrigo@rodrigoromano.net>",
     "Schot, Albert-Jan <appie@digiwijs.nl>",
     "Schouten, Robert <robert.schouten@wortell.nl>",
-    "Sitaraman, Rajesh <rajesh.sitaraman@outlook.com",
+    "Sitaraman, Rajesh <rajesh.sitaraman@outlook.com>",
+    "Sittler, Laurent <laurent.sittler@lsonline.fr>",
     "Skelly, Pete <peteskelly@gmail.com>",
     "Svenson, Mikael <miksvenson@gmail.com>",
     "Wilen, Wictor <wictor@wictorwilen.se>",
