@@ -1864,7 +1864,7 @@ describe(commands.SITE_CLASSIC_ADD, () => {
   it('fails validation if the url is not a valid SharePoint url', () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
-        url: 'https://contoso.com', title: 'Team', timeZone: 4, owner: 'admin@contoso.com'
+        url: 'http://contoso', title: 'Team', timeZone: 4, owner: 'admin@contoso.com'
       }
     });
     assert.notEqual(actual, true);
