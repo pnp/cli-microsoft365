@@ -25,6 +25,7 @@ interface Options extends GlobalOptions {
   viewTitle?: string;
   fieldId?: string;
   fieldTitle?: string;
+  fieldPosition: number;
 }
 
 class SpoListViewFieldAddCommand extends SpoCommand {
@@ -44,13 +45,17 @@ class SpoListViewFieldAddCommand extends SpoCommand {
     telemetryProps.viewTitle = typeof args.options.viewTitle !== 'undefined';
     telemetryProps.fieldId = typeof args.options.fieldId !== 'undefined';
     telemetryProps.fieldTitle = typeof args.options.fieldTitle !== 'undefined';
+    telemetryProps.fieldPosition = typeof args.options.fieldPosition !== 'undefined';
     return telemetryProps;
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
     let siteAccessToken: string = '';
+    
     const listSelector: string = args.options.listId ? `(guid'${encodeURIComponent(args.options.listId)}')` : `/GetByTitle('${encodeURIComponent(args.options.listTitle as string)}')`;
+    let viewSelector: string = '';
+    let currentField: any;
 
     if (this.debug) {
       cmd.log(`Retrieving access token for ${resource}...`);
@@ -80,7 +85,10 @@ class SpoListViewFieldAddCommand extends SpoCommand {
           cmd.log(`Adding the field ${args.options.fieldId || args.options.fieldTitle} to the view ${args.options.viewId || args.options.viewTitle}...`);
         }
 
-        const viewSelector = args.options.viewId ? `('${encodeURIComponent(args.options.viewId)}')` : `/GetByTitle('${encodeURIComponent(args.options.viewTitle as string)}')`;
+        /* Current field backup */
+        currentField = field;
+
+        viewSelector = args.options.viewId ? `('${encodeURIComponent(args.options.viewId)}')` : `/GetByTitle('${encodeURIComponent(args.options.viewTitle as string)}')`;
         const postRequestUrl: string = `${args.options.webUrl}/_api/web/lists${listSelector}/views${viewSelector}/viewfields/addviewfield('${field.InternalName}')`;
 
         const postRequestOptions: any = {
@@ -99,6 +107,18 @@ class SpoListViewFieldAddCommand extends SpoCommand {
         }
 
         return request.post(postRequestOptions);
+      })
+      .then((): request.RequestPromise | void => {
+        if (args.options.fieldPosition !== undefined) {
+          if (this.verbose) {
+            cmd.log(`Moving the field ${args.options.fieldId || args.options.fieldTitle} to the position ${args.options.fieldPosition} from view ${args.options.viewId || args.options.viewTitle}...`);
+          }
+
+          return this.moveField(args.options, currentField, listSelector, viewSelector, siteAccessToken, cmd, this.debug);
+        }
+        if (this.debug) {
+          cmd.log(`No field position.`);
+        }
       })
       .then((r: any): void => {
         // REST post call doesn't return anything
@@ -127,6 +147,28 @@ class SpoListViewFieldAddCommand extends SpoCommand {
     }
 
     return request.get(requestOptions);
+  }
+
+  protected moveField(options: any, field: any, listSelector: string, viewSelector: string, siteAccessToken: string, cmd: CommandInstance, debug: boolean): request.RequestPromise {
+    const moveRequestUrl: string = `${options.webUrl}/_api/web/lists${listSelector}/views${viewSelector}/viewfields/moveviewfieldto`;
+
+    const moveRequestOptions: any = {
+      url: moveRequestUrl,
+      headers: Utils.getRequestHeaders({
+        authorization: `Bearer ${siteAccessToken}`,
+        'accept': 'application/json;odata=nometadata'
+      }),
+      body: { 'field': field.InternalName, 'index': options.fieldPosition },
+      json: true
+    };
+
+    if (debug) {
+      cmd.log('Executing web request...');
+      cmd.log(moveRequestOptions);
+      cmd.log('');
+    }
+
+    return request.post(moveRequestOptions);
   }
 
   public options(): CommandOption[] {
@@ -158,6 +200,10 @@ class SpoListViewFieldAddCommand extends SpoCommand {
       {
         option: '--fieldTitle [fieldTitle]',
         description: 'The case-sensitive internal name or display name of the field to add. Specify fieldId or fieldTitle but not both'
+      },
+      {
+        option: '--fieldPosition [fieldPosition]',
+        description: 'The zero-based index of the position for the field'
       }
     ];
 
@@ -237,11 +283,14 @@ class SpoListViewFieldAddCommand extends SpoCommand {
         
   Examples:
   
-    Add field with ID ${chalk.grey('330f29c5-5c4c-465f-9f4b-7903020ae1ce')} from view with ID ${chalk.grey('3d760127-982c-405e-9c93-e1f76e1a1110')} from the list with ID ${chalk.grey('1f187321-f086-4d3d-8523-517e94cc9df9')} located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
+    Add field with ID ${chalk.grey('330f29c5-5c4c-465f-9f4b-7903020ae1ce')} to view with ID ${chalk.grey('3d760127-982c-405e-9c93-e1f76e1a1110')} from the list with ID ${chalk.grey('1f187321-f086-4d3d-8523-517e94cc9df9')} located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
       ${chalk.grey(config.delimiter)} ${commands.LIST_VIEW_FIELD_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --fieldId 330f29c5-5c4c-465f-9f4b-7903020ae1ce --listId 1f187321-f086-4d3d-8523-517e94cc9df9 --viewId 3d760127-982c-405e-9c93-e1f76e1a1110
 
-    Add field with title ${chalk.grey('Custom field')} from  view with title ${chalk.grey('Custom view')} from the list with title ${chalk.grey('Documents')} located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
+    Add field with title ${chalk.grey('Custom field')} to view with title ${chalk.grey('Custom view')} from the list with title ${chalk.grey('Documents')} located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
       ${chalk.grey(config.delimiter)} ${commands.LIST_VIEW_FIELD_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --fieldTitle 'Custom field' --listTitle Documents --viewTitle 'Custom view'
+    
+    Add field with title ${chalk.grey('Custom field')} at the position 0 to view with title ${chalk.grey('Custom view')} from the list with title ${chalk.grey('Documents')} located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
+      ${chalk.grey(config.delimiter)} ${commands.LIST_VIEW_FIELD_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --fieldTitle 'Custom field' --listTitle Documents --viewTitle 'Custom view' --fieldPosition 0
       `);
   }
 }

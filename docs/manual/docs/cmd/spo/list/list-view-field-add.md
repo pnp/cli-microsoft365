@@ -20,6 +20,7 @@ Option|Description
 `--viewTitle [viewTitle]`|Title of the view to update. Specify `viewTitle` or `viewId` but not both
 `--fieldId [fieldId]`|ID of the field to add. Specify fieldId or fieldTitle but not both
 `--fieldTitle [fieldTitle]`|The **case-sensitive** internal name or display name of the field to add. Specify fieldId or fieldTitle but not both
+`--fieldPosition [fieldPosition]`|The zero-based index of the position for the field
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
@@ -43,4 +44,11 @@ Add field with title _Custom field_ to view with title _All Documents_ from the 
 
 ```sh
 spo list view field add --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --viewTitle 'All Documents' --fieldTitle 'Custom field'
+```
+
+
+Add field with title _Custom field_ with at the position _0_ to view with title _All Documents_ from the list with title _Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
+
+```sh
+spo list view field add --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --viewTitle 'All Documents' --fieldTitle 'Custom field' --fieldPosition 0
 ```
