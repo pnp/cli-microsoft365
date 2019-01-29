@@ -2,18 +2,27 @@ import auth from '../../SpoAuth';
 import config from '../../../../config';
 import * as request from 'request-promise-native';
 import commands from '../../commands';
+import { CommandOption } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import GlobalOptions from '../../../../GlobalOptions';
 import { HubSite } from './HubSite';
+import { QueryListResult } from './QueryListResult';
+import { AssociatedSite } from './AssociatedSite';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
 interface CommandArgs {
-  options: GlobalOptions;
+  options: Options;
+}
+
+interface Options extends GlobalOptions {
+  includeAssociatedSites?: boolean;
 }
 
 class SpoHubSiteListCommand extends SpoCommand {
+  private batchSize: number = 30;
+
   public get name(): string {
     return `${commands.HUBSITE_LIST}`;
   }
@@ -22,7 +31,20 @@ class SpoHubSiteListCommand extends SpoCommand {
     return 'Lists hub sites in the current tenant';
   }
 
+  constructor() {
+    super()/* istanbul ignore next */;
+    this.batchSize = 30;
+  }
+
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.includeAssociatedSites = args.options.includeAssociatedSites === true;
+    return telemetryProps;
+  }
+
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    let hubSites: HubSite[];
+
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
       .then((accessToken: string): request.RequestPromise => {
@@ -47,18 +69,108 @@ class SpoHubSiteListCommand extends SpoCommand {
 
         return request.get(requestOptions);
       })
-      .then((res: { value: HubSite[] }): void => {
+      .then((res: { value: HubSite[] }): Promise<any[] | void> => {
         if (this.debug) {
           cmd.log('Response:');
           cmd.log(res);
           cmd.log('');
         }
 
-        if (args.options.output === 'json') {
-          cmd.log(res.value);
+        hubSites = res.value;
+
+        if (args.options.includeAssociatedSites !== true || args.options.output !== 'json') {
+          return Promise.resolve();
         }
         else {
-          cmd.log(res.value.map(h => {
+          if (this.debug) {
+            cmd.log('Retrieving associated sites...');
+            cmd.log('');
+          }
+        }
+
+        const requestOptions: any = {
+          url: `${auth.site.url}/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/RenderListDataAsStream`,
+          headers: Utils.getRequestHeaders({
+            authorization: `Bearer ${auth.service.accessToken}`,
+            accept: 'application/json;odata=nometadata'
+          }),
+          json: true,
+          body: {
+            parameters: {
+              ViewXml: "<View><Query><Where><And><And><IsNull><FieldRef Name=\"TimeDeleted\"/></IsNull><Neq><FieldRef Name=\"State\"/><Value Type='Integer'>0</Value></Neq></And><Neq><FieldRef Name=\"HubSiteId\"/><Value Type='Text'>{00000000-0000-0000-0000-000000000000}</Value></Neq></And></Where><OrderBy><FieldRef Name='Title' Ascending='true' /></OrderBy></Query><ViewFields><FieldRef Name=\"Title\"/><FieldRef Name=\"SiteUrl\"/><FieldRef Name=\"SiteId\"/><FieldRef Name=\"HubSiteId\"/></ViewFields><RowLimit Paged=\"TRUE\">" + this.batchSize + "</RowLimit></View>",
+              DatesInUtc: true
+            }
+          }
+        };
+
+        if (this.debug) {
+          cmd.log('Executing web request...');
+          cmd.log(requestOptions);
+          cmd.log('');
+        }
+
+        if (this.debug || this.verbose) {
+          cmd.log(`Will retrieve associated sites (including the hub sites) in batches of ${this.batchSize}`);
+        }
+        const getSites = async (reqOptions: any, nonPagedUrl: string, sites: AssociatedSite[] = [], batchNumber: number = 0): Promise<AssociatedSite[]> => {
+          const res: QueryListResult = await request.post(requestOptions);
+          batchNumber++;
+          const retrievedSites: AssociatedSite[] = res.Row.length > 0 ? sites.concat(res.Row) : sites;
+
+          if (this.debug || this.verbose) {
+            cmd.log(res);
+            cmd.log(`Retrieved ${res.Row.length} sites in batch ${batchNumber}`);
+          }
+
+          if (!!res.NextHref) {
+            reqOptions.url = nonPagedUrl + res.NextHref;
+            if (this.debug) {
+              cmd.log(`Url for next batch of sites: ${reqOptions.url}`);
+            }
+
+            return getSites(reqOptions, nonPagedUrl, retrievedSites, batchNumber);
+          }
+          else {
+            if (this.debug || this.verbose) {
+              cmd.log(`Retrieved ${retrievedSites.length} sites in total`);
+            }
+
+            return retrievedSites;
+          }
+        }
+
+        return getSites(requestOptions, requestOptions.url);
+      })
+      .then((res: AssociatedSite[] | void): void => {
+        if (this.debug) {
+          cmd.log('Response:');
+          cmd.log(res);
+          cmd.log('');
+        }
+
+        if (res) {
+          hubSites.forEach(h => {
+            const filteredSites = res.filter(f => {
+              // Only include sites of which the Site Id is not the same as the
+              // Hub Site ID (as this site is the actual hub site) and of which the
+              // Hub Site ID matches the ID of the Hub
+              return f.SiteId !== f.HubSiteId
+                && (f.HubSiteId as string).toUpperCase() == `{${h.ID.toUpperCase()}}`;
+            });
+            h.AssociatedSites = filteredSites.map(a => {
+              return {
+                Title: a.Title,
+                SiteUrl: a.SiteUrl
+              }
+            })
+          });
+        };
+
+        if (args.options.output === 'json') {
+          cmd.log(hubSites);
+        }
+        else {
+          cmd.log(hubSites.map(h => {
             return {
               ID: h.ID,
               SiteUrl: h.SiteUrl,
@@ -73,6 +185,18 @@ class SpoHubSiteListCommand extends SpoCommand {
 
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+  }
+
+  public options(): CommandOption[] {
+    const options: CommandOption[] = [
+      {
+        option: '-i, --includeAssociatedSites',
+        description: `Include the associated sites in the result (only in JSON output)`
+      }
+    ];
+
+    const parentOptions: CommandOption[] = super.options();
+    return options.concat(parentOptions);
   }
 
   public commandHelp(args: {}, log: (help: string) => void): void {
@@ -100,6 +224,9 @@ class SpoHubSiteListCommand extends SpoCommand {
   
     List hub sites in the current tenant
       ${chalk.grey(config.delimiter)} ${this.name}
+
+    List hub sites, including their associated sites, in the current tenant. Associated site info is only shown in JSON output.
+      ${chalk.grey(config.delimiter)} ${this.name} --includeAssociatedSites --output json
 
   More information:
 

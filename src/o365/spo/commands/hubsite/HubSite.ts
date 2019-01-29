@@ -1,4 +1,7 @@
+import { AssociatedSite } from './AssociatedSite';
+
 export interface HubSite {
+  AssociatedSites?: AssociatedSite[];
   Description: string;
   ID: string;
   LogoUrl: string;

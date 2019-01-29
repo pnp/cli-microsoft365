@@ -9,6 +9,8 @@
 - [spo feature list](../cmd/spo/feature/feature-list.md) - lists Features activated in the specified site or site collection [#677](https://github.com/pnp/office365-cli/issues/677)
 - [spo file move](../cmd/spo/file/file-move.md) - moves a file to another location [#671](https://github.com/pnp/office365-cli/issues/671)
 - [spo list view list](../cmd/spo/list/list-view-list.md) - lists views configured on the specified list [#732](https://github.com/pnp/office365-cli/issues/732)
+- [spo list sitescript get](../cmd/spo/list/list-sitescript-get.md) - extracts a site script from a SharePoint list [#713](https://github.com/pnp/office365-cli/issues/713)
+- [spo list view get](../cmd/spo/list/list-view-get.md) - gets information about specific list view [#730](https://github.com/pnp/office365-cli/issues/730)
 - [spo list view remove](../cmd/spo/list/list-view-remove.md) - deletes the specified view from the list [#731](https://github.com/pnp/office365-cli/issues/731)
 
 **Microsoft Graph:**
@@ -26,6 +28,8 @@
 - extended 'spo folder copy' with support for schema mismatch [#706](https://github.com/pnp/office365-cli/pull/706)
 - extended 'spo file copy' with support for schema mismatch [#705](https://github.com/pnp/office365-cli/pull/705)
 - updated showing scope in 'spo customaction list' [#742](https://github.com/pnp/office365-cli/issues/742)
+- extended 'spo hubsite list' with info about associated sites [#709](https://github.com/pnp/office365-cli/pull/709)
+- added support for SPO-D URLs solving [#759](https://github.com/pnp/office365-cli/pull/759)
 
 ## [v1.12.0](https://github.com/pnp/office365-cli/releases/tag/v1.12.0)
 

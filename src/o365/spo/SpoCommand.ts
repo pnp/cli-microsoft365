@@ -72,8 +72,7 @@ export default abstract class SpoCommand extends Command {
       return false;
     }
 
-    if (url.indexOf('https://') !== 0 ||
-      url.indexOf('.sharepoint.com') === -1) {
+    if (url.indexOf('https://') !== 0) {
       return `${url} is not a valid SharePoint Online site URL`;
     }
     else {
