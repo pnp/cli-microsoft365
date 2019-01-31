@@ -292,6 +292,7 @@ Get-PnPSiteCollectionAdmin|SharePointPnPPowerShellOnline|
 Get-PnPSiteCollectionTermStore|SharePointPnPPowerShellOnline|
 Get-PnPSiteDesign|SharePointPnPPowerShellOnline|[spo sitedesign get](../cmd/spo/sitedesign/sitedesign-get.md), [spo sitedesign list](../cmd/spo/sitedesign/sitedesign-list.md)
 Get-PnPSiteDesignRights|SharePointPnPPowerShellOnline|[spo sitedesign rights list](../cmd/spo/sitedesign/sitedesign-rights-list.md)
+Get-PnPSiteDesignRun|SharePointPnPPowerShellOnline|[spo sitedesign run list](../cmd/spo/sitedesign/sitedesign-run-list.md)
 Get-PnPSitePolicy|SharePointPnPPowerShellOnline|
 Get-PnPSiteScript|SharePointPnPPowerShellOnline|[spo sitescript get](../cmd/spo/sitescript/sitescript-get.md), [spo sitescript list](../cmd/spo/sitescript/sitescript-list.md)
 Get-PnPSiteSearchQueryResults|SharePointPnPPowerShellOnline|
