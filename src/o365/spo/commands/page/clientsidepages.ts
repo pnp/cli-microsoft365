@@ -816,7 +816,9 @@ export class ClientSideWebpart extends ClientSidePart {
     public webPartId = "",
     protected htmlProperties = "",
     protected serverProcessedContent: ServerProcessedContent | null = null,
-    protected canvasDataVersion: string | null = "1.0") {
+    protected canvasDataVersion: string | null = "1.0",
+    protected dynamicDataPaths: TypedHash<any> | null = {},
+    protected dynamicDataValues: TypedHash<any> | null = {}) {
     super(3, "1.0");
   }
 
@@ -897,6 +899,14 @@ export class ClientSideWebpart extends ClientSidePart {
       this.serverProcessedContent = webPartData.serverProcessedContent;
     }
 
+    if (typeof webPartData.dynamicDataPaths !== "undefined") {
+      this.dynamicDataPaths = webPartData.dynamicDataPaths;
+    }
+
+    if (typeof webPartData.dynamicDataValues !== "undefined") {
+      this.dynamicDataValues = webPartData.dynamicDataValues;
+    }
+
     // get our html properties
     const htmlProps = getBoundedDivMarkup(html, /<div\b[^>]*data-sp-htmlproperties[^>]*?>/i, markup => {
       return markup.replace(/^<div\b[^>]*data-sp-htmlproperties[^>]*?>/i, "").replace(/<\/div>$/i, "");
@@ -972,6 +982,22 @@ export class ClientSideWebpart extends ClientSidePart {
       this.serverProcessedContent = null;
     }
 
+    if (typeof props.webPartData !== "undefined" && typeof props.webPartData.dynamicDataPaths !== "undefined") {
+      this.dynamicDataPaths = props.webPartData.dynamicDataPaths;
+    } else if (typeof props.dynamicDataPaths !== "undefined") {
+      this.dynamicDataPaths = props.dynamicDataPaths;
+    } else {
+      this.dynamicDataPaths = null;
+    }
+
+    if (typeof props.webPartData !== "undefined" && typeof props.webPartData.dynamicDataValues !== "undefined") {
+      this.dynamicDataValues = props.webPartData.dynamicDataValues;
+    } else if (typeof props.dynamicDataValues !== "undefined") {
+      this.dynamicDataValues = props.dynamicDataValues;
+    } else {
+      this.dynamicDataValues = null;
+    }
+
     if (typeof props.webPartData !== "undefined" && typeof props.webPartData.properties !== "undefined") {
       return props.webPartData.properties;
     } else if (typeof props.properties !== "undefined") {
@@ -979,6 +1005,7 @@ export class ClientSideWebpart extends ClientSidePart {
     } else {
       return props;
     }
+
   }
 }
 
@@ -1070,6 +1097,8 @@ export interface ClientSideWebpartData {
   properties: any;
   title: string;
   serverProcessedContent?: ServerProcessedContent;
+  dynamicDataPaths?: TypedHash<string>;
+  dynamicDataValues?: TypedHash<string>;
 }
 
 export module ClientSideWebpartPropertyTypes {
