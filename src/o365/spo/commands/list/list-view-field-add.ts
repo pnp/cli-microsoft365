@@ -110,11 +110,33 @@ class SpoListViewFieldAddCommand extends SpoCommand {
       })
       .then((): request.RequestPromise | void => {
         if (args.options.fieldPosition !== undefined) {
+          if (this.debug) {
+            cmd.log(`moveField request...`);
+            cmd.log(args.options.fieldPosition);
+          }
+
           if (this.verbose) {
             cmd.log(`Moving the field ${args.options.fieldId || args.options.fieldTitle} to the position ${args.options.fieldPosition} from view ${args.options.viewId || args.options.viewTitle}...`);
           }
+          const moveRequestUrl: string = `${args.options.webUrl}/_api/web/lists${listSelector}/views${viewSelector}/viewfields/moveviewfieldto`;
 
-          return this.moveField(args.options, currentField, listSelector, viewSelector, siteAccessToken, cmd, this.debug);
+          const moveRequestOptions: any = {
+            url: moveRequestUrl,
+            headers: Utils.getRequestHeaders({
+              authorization: `Bearer ${siteAccessToken}`,
+              'accept': 'application/json;odata=nometadata'
+            }),
+            body: { 'field': currentField.InternalName, 'index': args.options.fieldPosition },
+            json: true
+          };
+
+          if (this.debug) {
+            cmd.log('Executing web request...');
+            cmd.log(moveRequestOptions);
+            cmd.log('');
+          }
+
+          return request.post(moveRequestOptions);
         }
         if (this.debug) {
           cmd.log(`No field position.`);
@@ -147,28 +169,6 @@ class SpoListViewFieldAddCommand extends SpoCommand {
     }
 
     return request.get(requestOptions);
-  }
-
-  protected moveField(options: any, field: any, listSelector: string, viewSelector: string, siteAccessToken: string, cmd: CommandInstance, debug: boolean): request.RequestPromise {
-    const moveRequestUrl: string = `${options.webUrl}/_api/web/lists${listSelector}/views${viewSelector}/viewfields/moveviewfieldto`;
-
-    const moveRequestOptions: any = {
-      url: moveRequestUrl,
-      headers: Utils.getRequestHeaders({
-        authorization: `Bearer ${siteAccessToken}`,
-        'accept': 'application/json;odata=nometadata'
-      }),
-      body: { 'field': field.InternalName, 'index': options.fieldPosition },
-      json: true
-    };
-
-    if (debug) {
-      cmd.log('Executing web request...');
-      cmd.log(moveRequestOptions);
-      cmd.log('');
-    }
-
-    return request.post(moveRequestOptions);
   }
 
   public options(): CommandOption[] {
