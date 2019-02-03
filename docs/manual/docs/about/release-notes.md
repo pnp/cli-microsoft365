@@ -1,5 +1,15 @@
 # Release notes
 
+## [v1.14.0](https://github.com/pnp/office365-cli/releases/tag/v1.14.0)
+
+### New commands
+
+**SharePoint Online:**
+
+- [spo list view field remove](../cmd/spo/list/list-view-field-remove.md) - removes the specified field from list view [#736](https://github.com/pnp/office365-cli/issues/736)
+- [spo sitedesign run list](../cmd/spo/sitedesign/sitedesign-run-list.md) - lists information about site designs applied to the specified site [#779](https://github.com/pnp/office365-cli/issues/779)
+- [spo sitedesign run status get](../cmd/spo/sitedesign/sitedesign-run-status-get.md) - gets information about the site scripts executed for the specified site design [#780](https://github.com/pnp/office365-cli/issues/780)
+
 ## [v1.13.0](https://github.com/pnp/office365-cli/releases/tag/v1.13.0)
 
 ### New commands
