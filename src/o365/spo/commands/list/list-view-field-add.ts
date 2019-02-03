@@ -109,7 +109,7 @@ class SpoListViewFieldAddCommand extends SpoCommand {
         return request.post(postRequestOptions);
       })
       .then((): request.RequestPromise | void => {
-        if (args.options.fieldPosition) {
+        if (args.options.fieldPosition !== undefined) {
           if (this.debug) {
             cmd.log(`moveField request...`);
             cmd.log(args.options.fieldPosition);
