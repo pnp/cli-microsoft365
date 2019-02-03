@@ -94,6 +94,7 @@ nav:
         - list view list: 'cmd/spo/list/list-view-list.md'
         - list view remove: 'cmd/spo/list/list-view-remove.md'
         - list view set: 'cmd/spo/list/list-view-set.md'
+        - list view field remove: 'cmd/spo/list/list-view-field-remove.md'
         - list webhook add: 'cmd/spo/list/list-webhook-add.md'
         - list webhook get: 'cmd/spo/list/list-webhook-get.md'
         - list webhook list: 'cmd/spo/list/list-webhook-list.md'
