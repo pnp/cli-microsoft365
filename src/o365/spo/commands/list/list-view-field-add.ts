@@ -142,15 +142,15 @@ class SpoListViewFieldAddCommand extends SpoCommand {
           cmd.log(`No field position.`);
         }
       })
-      .then((r: any): void => {
+      .then((): void => {
         // REST post call doesn't return anything
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
 
   }
 
-  protected getField(options: any, listSelector: string, siteAccessToken: string, cmd: CommandInstance, debug: boolean): request.RequestPromise {
-    const fieldSelector = options.fieldId ? `/getbyid('${encodeURIComponent(options.fieldId)}')` : `/getbyinternalnameortitle('${encodeURIComponent(options.fieldTitle as string)}')`;
+  private getField(options: Options, listSelector: string, siteAccessToken: string, cmd: CommandInstance, debug: boolean): request.RequestPromise {
+    const fieldSelector: string = options.fieldId ? `/getbyid('${encodeURIComponent(options.fieldId)}')` : `/getbyinternalnameortitle('${encodeURIComponent(options.fieldTitle as string)}')`;
     const getRequestUrl: string = `${options.webUrl}/_api/web/lists${listSelector}/fields${fieldSelector}`;
 
     const requestOptions: any = {
@@ -179,27 +179,27 @@ class SpoListViewFieldAddCommand extends SpoCommand {
       },
       {
         option: '--listId [listId]',
-        description: 'ID of the list where the view is located. Specify listTitle or listId but not both'
+        description: 'ID of the list where the view is located. Specify `listTitle` or `listId` but not both'
       },
       {
         option: '--listTitle [listTitle]',
-        description: 'Title of the list where the view is located. Specify listTitle or listId but not both'
+        description: 'Title of the list where the view is located. Specify `listTitle` or `listId` but not both'
       },
       {
         option: '--viewId [viewId]',
-        description: 'ID of the view to update. Specify viewTitle or viewId but not both'
+        description: 'ID of the view to update. Specify `viewTitle` or `viewId` but not both'
       },
       {
         option: '--viewTitle [viewTitle]',
-        description: 'Title of the view to update. Specify viewTitle or viewId but not both'
+        description: 'Title of the view to update. Specify `viewTitle` or `viewId` but not both'
       },
       {
         option: '--fieldId [fieldId]',
-        description: 'ID of the field to add. Specify fieldId or fieldTitle but not both'
+        description: 'ID of the field to add. Specify `fieldId` or `fieldTitle` but not both'
       },
       {
         option: '--fieldTitle [fieldTitle]',
-        description: 'The case-sensitive internal name or display name of the field to add. Specify fieldId or fieldTitle but not both'
+        description: 'The case-sensitive internal name or display name of the field to add. Specify `fieldId` or `fieldTitle` but not both'
       },
       {
         option: '--fieldPosition [fieldPosition]',
@@ -240,6 +240,12 @@ class SpoListViewFieldAddCommand extends SpoCommand {
         }
       }
 
+      if (args.options.fieldPosition !== undefined) {
+        if (!isNaN(args.options.fieldPosition)) {
+          return `${args.options.fieldPosition} is not a Number`;
+        }
+      }
+
       if (args.options.listId && args.options.listTitle) {
         return 'Specify listId or listTitle, but not both';
       }
@@ -277,7 +283,7 @@ class SpoListViewFieldAddCommand extends SpoCommand {
   
   Remarks:
   
-    To remove field from a list view, you have to first log in to SharePoint
+    To add the specified field to list view, you have to first log in to SharePoint
     using the ${chalk.blue(commands.LOGIN)} command,
     eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
         
@@ -286,11 +292,11 @@ class SpoListViewFieldAddCommand extends SpoCommand {
     Add field with ID ${chalk.grey('330f29c5-5c4c-465f-9f4b-7903020ae1ce')} to view with ID ${chalk.grey('3d760127-982c-405e-9c93-e1f76e1a1110')} from the list with ID ${chalk.grey('1f187321-f086-4d3d-8523-517e94cc9df9')} located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
       ${chalk.grey(config.delimiter)} ${commands.LIST_VIEW_FIELD_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --fieldId 330f29c5-5c4c-465f-9f4b-7903020ae1ce --listId 1f187321-f086-4d3d-8523-517e94cc9df9 --viewId 3d760127-982c-405e-9c93-e1f76e1a1110
 
-    Add field with title ${chalk.grey('Custom field')} to view with title ${chalk.grey('Custom view')} from the list with title ${chalk.grey('Documents')} located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LIST_VIEW_FIELD_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --fieldTitle 'Custom field' --listTitle Documents --viewTitle 'Custom view'
+    Add field with title ${chalk.grey('Custom field')} to view with title ${chalk.grey('All Documents')} from the list with title ${chalk.grey('Documents')} located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
+      ${chalk.grey(config.delimiter)} ${commands.LIST_VIEW_FIELD_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --fieldTitle 'Custom field' --listTitle Documents --viewTitle 'All Documents'
     
-    Add field with title ${chalk.grey('Custom field')} at the position 0 to view with title ${chalk.grey('Custom view')} from the list with title ${chalk.grey('Documents')} located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LIST_VIEW_FIELD_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --fieldTitle 'Custom field' --listTitle Documents --viewTitle 'Custom view' --fieldPosition 0
+    Add field with title ${chalk.grey('Custom field')} at the position ${chalk.grey('0')} to view with title ${chalk.grey('All Documents')} from the list with title ${chalk.grey('Documents')} located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
+      ${chalk.grey(config.delimiter)} ${commands.LIST_VIEW_FIELD_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --fieldTitle 'Custom field' --listTitle Documents --viewTitle 'All Documents' --fieldPosition 0
       `);
   }
 }

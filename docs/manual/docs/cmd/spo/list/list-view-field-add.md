@@ -30,7 +30,7 @@ Option|Description
 
 ## Remarks
 
-To update a list view, you have to first log in to a SharePoint Online site using the [spo login](../login.md) command, eg. `spo login https://contoso.sharepoint.com`.
+To add the specified field to list view, you have to first log in to a SharePoint Online site using the [spo login](../login.md) command, eg. `spo login https://contoso.sharepoint.com`.
 
 ## Examples
 
@@ -47,7 +47,7 @@ spo list view field add --webUrl https://contoso.sharepoint.com/sites/project-x 
 ```
 
 
-Add field with title _Custom field_ with at the position _0_ to view with title _All Documents_ from the list with title _Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
+Add field with title _Custom field_ at the position _0_ to view with title _All Documents_ from the list with title _Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
 spo list view field add --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --viewTitle 'All Documents' --fieldTitle 'Custom field' --fieldPosition 0
