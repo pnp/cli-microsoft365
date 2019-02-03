@@ -25,16 +25,16 @@ interface Options extends GlobalOptions {
   viewTitle?: string;
   fieldId?: string;
   fieldTitle?: string;
-  fieldPosition?: string;
+  confirm?: boolean;
 }
 
-class SpoListViewFieldAddCommand extends SpoCommand {
+class SpoListViewFieldRemoveCommand extends SpoCommand {
   public get name(): string {
-    return commands.LIST_VIEW_FIELD_ADD;
+    return commands.LIST_VIEW_FIELD_REMOVE;
   }
 
   public get description(): string {
-    return 'Add the specified field to list view';
+    return 'Removes the specified field from list view';
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -45,108 +45,88 @@ class SpoListViewFieldAddCommand extends SpoCommand {
     telemetryProps.viewTitle = typeof args.options.viewTitle !== 'undefined';
     telemetryProps.fieldId = typeof args.options.fieldId !== 'undefined';
     telemetryProps.fieldTitle = typeof args.options.fieldTitle !== 'undefined';
-    telemetryProps.fieldPosition = typeof args.options.fieldPosition !== 'undefined';
+    telemetryProps.confirm = (!(!args.options.confirm)).toString();
     return telemetryProps;
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
     let siteAccessToken: string = '';
-    
     const listSelector: string = args.options.listId ? `(guid'${encodeURIComponent(args.options.listId)}')` : `/GetByTitle('${encodeURIComponent(args.options.listTitle as string)}')`;
-    let viewSelector: string = '';
-    let currentField: any;
 
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
-    }
+    const removeFieldFromView: () => void = (): void => {
+      if (this.debug) {
+        cmd.log(`Retrieving access token for ${resource}...`);
+      }
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
-        siteAccessToken = accessToken;
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}.`);
-        }
-
-        if (this.verbose) {
-          cmd.log(`Getting field ${args.options.fieldId || args.options.fieldTitle}...`);
-        }
-
-        return this.getField(args.options, listSelector, siteAccessToken, cmd, this.debug);
-      })
-      .then((field: any): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log(`getField response...`);
-          cmd.log(field);
-        }
-
-        if (this.verbose) {
-          cmd.log(`Adding the field ${args.options.fieldId || args.options.fieldTitle} to the view ${args.options.viewId || args.options.viewTitle}...`);
-        }
-
-        /* Current field backup */
-        currentField = field;
-
-        viewSelector = args.options.viewId ? `('${encodeURIComponent(args.options.viewId)}')` : `/GetByTitle('${encodeURIComponent(args.options.viewTitle as string)}')`;
-        const postRequestUrl: string = `${args.options.webUrl}/_api/web/lists${listSelector}/views${viewSelector}/viewfields/addviewfield('${field.InternalName}')`;
-
-        const postRequestOptions: any = {
-          url: postRequestUrl,
-          headers: Utils.getRequestHeaders({
-            authorization: `Bearer ${siteAccessToken}`,
-            'accept': 'application/json;odata=nometadata'
-          }),
-          json: true
-        };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(postRequestOptions);
-          cmd.log('');
-        }
-
-        return request.post(postRequestOptions);
-      })
-      .then((): request.RequestPromise | void => {
-        if (args.options.fieldPosition) {
+      auth
+        .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
+        .then((accessToken: string): request.RequestPromise => {
+          siteAccessToken = accessToken;
           if (this.debug) {
-            cmd.log(`moveField request...`);
-            cmd.log(args.options.fieldPosition);
+            cmd.log(`Retrieved access token ${accessToken}.`);
           }
 
           if (this.verbose) {
-            cmd.log(`Moving the field ${args.options.fieldId || args.options.fieldTitle} to the position ${args.options.fieldPosition} from view ${args.options.viewId || args.options.viewTitle}...`);
+            cmd.log(`Getting field ${args.options.fieldId || args.options.fieldTitle}...`);
           }
-          const moveRequestUrl: string = `${args.options.webUrl}/_api/web/lists${listSelector}/views${viewSelector}/viewfields/moveviewfieldto`;
 
-          const moveRequestOptions: any = {
-            url: moveRequestUrl,
+          return this.getField(args.options, listSelector, siteAccessToken, cmd, this.debug);
+        })
+        .then((field: { InternalName: string; }): request.RequestPromise => {
+          if (this.debug) {
+            cmd.log(`getField response...`);
+            cmd.log(field);
+          }
+
+          if (this.verbose) {
+            cmd.log(`Removing field ${args.options.fieldId || args.options.fieldTitle} from view ${args.options.viewId || args.options.viewTitle}...`);
+          }
+
+          const viewSelector: string = args.options.viewId ? `('${encodeURIComponent(args.options.viewId)}')` : `/GetByTitle('${encodeURIComponent(args.options.viewTitle as string)}')`;
+          const postRequestUrl: string = `${args.options.webUrl}/_api/web/lists${listSelector}/views${viewSelector}/viewfields/removeviewfield('${field.InternalName}')`;
+
+          const postRequestOptions: any = {
+            url: postRequestUrl,
             headers: Utils.getRequestHeaders({
               authorization: `Bearer ${siteAccessToken}`,
               'accept': 'application/json;odata=nometadata'
             }),
-            body: { 'field': currentField.InternalName, 'index': args.options.fieldPosition },
             json: true
           };
 
           if (this.debug) {
             cmd.log('Executing web request...');
-            cmd.log(moveRequestOptions);
+            cmd.log(postRequestOptions);
             cmd.log('');
           }
 
-          return request.post(moveRequestOptions);
-        }
-        if (this.debug) {
-          cmd.log(`No field position.`);
-        }
-      })
-      .then((): void => {
-        // REST post call doesn't return anything
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+          return request.post(postRequestOptions);
+        })
+        .then((): void => {
+          // REST post call doesn't return anything
+          cb();
+        }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+    };
 
+    if (args.options.confirm) {
+      removeFieldFromView();
+    }
+    else {
+      cmd.prompt({
+        type: 'confirm',
+        name: 'continue',
+        default: false,
+        message: `Are you sure you want to remove the field ${args.options.fieldId || args.options.fieldTitle} from the view ${args.options.viewId || args.options.viewTitle} from list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}?`,
+      }, (result: { continue: boolean }): void => {
+        if (!result.continue) {
+          cb();
+        }
+        else {
+          removeFieldFromView();
+        }
+      });
+    }
   }
 
   private getField(options: Options, listSelector: string, siteAccessToken: string, cmd: CommandInstance, debug: boolean): request.RequestPromise {
@@ -179,31 +159,31 @@ class SpoListViewFieldAddCommand extends SpoCommand {
       },
       {
         option: '--listId [listId]',
-        description: 'ID of the list where the view is located. Specify `listTitle` or `listId` but not both'
+        description: 'ID of the list where the view is located. Specify listTitle or listId but not both'
       },
       {
         option: '--listTitle [listTitle]',
-        description: 'Title of the list where the view is located. Specify `listTitle` or `listId` but not both'
+        description: 'Title of the list where the view is located. Specify listTitle or listId but not both'
       },
       {
         option: '--viewId [viewId]',
-        description: 'ID of the view to update. Specify `viewTitle` or `viewId` but not both'
+        description: 'ID of the view to update. Specify viewTitle or viewId but not both'
       },
       {
         option: '--viewTitle [viewTitle]',
-        description: 'Title of the view to update. Specify `viewTitle` or `viewId` but not both'
+        description: 'Title of the view to update. Specify viewTitle or viewId but not both'
       },
       {
         option: '--fieldId [fieldId]',
-        description: 'ID of the field to add. Specify `fieldId` or `fieldTitle` but not both'
+        description: 'ID of the field to remove. Specify fieldId or fieldTitle but not both'
       },
       {
         option: '--fieldTitle [fieldTitle]',
-        description: 'The case-sensitive internal name or display name of the field to add. Specify `fieldId` or `fieldTitle` but not both'
+        description: 'The case-sensitive internal name or display name of the field to remove. Specify fieldId or fieldTitle but not both'
       },
       {
-        option: '--fieldPosition [fieldPosition]',
-        description: 'The zero-based index of the position for the field'
+        option: '--confirm',
+        description: 'Don\'t prompt for confirming removing the field from the view'
       }
     ];
 
@@ -237,13 +217,6 @@ class SpoListViewFieldAddCommand extends SpoCommand {
       if (args.options.fieldId) {
         if (!Utils.isValidGuid(args.options.fieldId)) {
           return `${args.options.viewId} is not a valid GUID`;
-        }
-      }
-
-      if (args.options.fieldPosition) {
-        const position: number = parseInt(args.options.fieldPosition);
-        if (isNaN(position)) {
-          return `${args.options.fieldPosition} is not a number`;
         }
       }
 
@@ -284,22 +257,24 @@ class SpoListViewFieldAddCommand extends SpoCommand {
   
   Remarks:
   
-    To add the specified field to list view, you have to first log in to SharePoint
+    To remove field from a list view, you have to first log in to SharePoint
     using the ${chalk.blue(commands.LOGIN)} command,
     eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
         
   Examples:
   
-    Add field with ID ${chalk.grey('330f29c5-5c4c-465f-9f4b-7903020ae1ce')} to view with ID ${chalk.grey('3d760127-982c-405e-9c93-e1f76e1a1110')} from the list with ID ${chalk.grey('1f187321-f086-4d3d-8523-517e94cc9df9')} located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LIST_VIEW_FIELD_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --fieldId 330f29c5-5c4c-465f-9f4b-7903020ae1ce --listId 1f187321-f086-4d3d-8523-517e94cc9df9 --viewId 3d760127-982c-405e-9c93-e1f76e1a1110
-
-    Add field with title ${chalk.grey('Custom field')} to view with title ${chalk.grey('All Documents')} from the list with title ${chalk.grey('Documents')} located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LIST_VIEW_FIELD_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --fieldTitle 'Custom field' --listTitle Documents --viewTitle 'All Documents'
-    
-    Add field with title ${chalk.grey('Custom field')} at the position ${chalk.grey('0')} to view with title ${chalk.grey('All Documents')} from the list with title ${chalk.grey('Documents')} located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LIST_VIEW_FIELD_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --fieldTitle 'Custom field' --listTitle Documents --viewTitle 'All Documents' --fieldPosition 0
+    Remove field with ID ${chalk.grey('330f29c5-5c4c-465f-9f4b-7903020ae1ce')} from view
+    with ID ${chalk.grey('3d760127-982c-405e-9c93-e1f76e1a1110')} from the list
+    with ID ${chalk.grey('1f187321-f086-4d3d-8523-517e94cc9df9')} located in site
+    ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
+      ${chalk.grey(config.delimiter)} ${commands.LIST_VIEW_FIELD_REMOVE} --webUrl https://contoso.sharepoint.com/sites/project-x --fieldId 330f29c5-5c4c-465f-9f4b-7903020ae1ce --listId 1f187321-f086-4d3d-8523-517e94cc9df9 --viewId 3d760127-982c-405e-9c93-e1f76e1a1110
+      
+    Remove field with title ${chalk.grey('Custom field')} from view with title ${chalk.grey('Custom view')}
+    from the list with title ${chalk.grey('Documents')} located in site
+    ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
+      ${chalk.grey(config.delimiter)} ${commands.LIST_VIEW_FIELD_REMOVE} --webUrl https://contoso.sharepoint.com/sites/project-x --fieldTitle 'Custom field' --listTitle Documents --viewTitle 'Custom view'
       `);
   }
 }
 
-module.exports = new SpoListViewFieldAddCommand();
+module.exports = new SpoListViewFieldRemoveCommand();

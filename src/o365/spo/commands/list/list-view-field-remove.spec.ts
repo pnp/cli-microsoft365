@@ -3,18 +3,20 @@ import Command, { CommandValidate, CommandOption, CommandError } from '../../../
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
-const command: Command = require('./list-view-field-add');
+const command: Command = require('./list-view-field-remove');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import Utils from '../../../../Utils';
 
-describe(commands.LIST_VIEW_FIELD_ADD, () => {
+describe(commands.LIST_VIEW_FIELD_REMOVE, () => {
   let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
   let trackEvent: any;
   let telemetry: any;
   let requests: any[];
+  let promptOptions: any;
+
   let stubAllGetRequests: any = (getField = null) => {
 
     return sinon.stub(request, 'get').callsFake((opts) => {
@@ -90,6 +92,10 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     cmdInstance = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      prompt: (options: any, cb: (result: { continue: boolean }) => void) => {
+        promptOptions = options;
+        cb({ continue: false });
       }
     };
     auth.site = new Site();
@@ -114,7 +120,7 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.LIST_VIEW_FIELD_ADD), true);
+    assert.equal(command.name.startsWith(commands.LIST_VIEW_FIELD_REMOVE), true);
   });
 
   it('has a description', () => {
@@ -138,7 +144,7 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, () => {
       try {
-        assert.equal(telemetry.name, commands.LIST_VIEW_FIELD_ADD);
+        assert.equal(telemetry.name, commands.LIST_VIEW_FIELD_REMOVE);
         done();
       }
       catch (e) {
@@ -162,13 +168,120 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     });
   });
 
-  it('add the field by title to viewId and listTitle (debug)', (done) => {
+  it('prompts before removing field from list view when confirmation argument not passed (list title, view id, field title)', (done) => {
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', fieldTitle: 'Created By' } }, () => {
+      let promptIssued = false;
+
+      if (promptOptions && promptOptions.type === 'confirm') {
+        promptIssued = true;
+      }
+
+      try {
+        assert(promptIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('prompts before removing field from list view when confirmation argument not passed (list title, view title, field title)', (done) => {
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewTitle: 'My view', fieldTitle: 'Created By' } }, () => {
+      let promptIssued = false;
+
+      if (promptOptions && promptOptions.type === 'confirm') {
+        promptIssued = true;
+      }
+
+      try {
+        assert(promptIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('prompts before removing field from list view when confirmation argument not passed (list id, view id, field title)', (done) => {
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', fieldTitle: 'Created By' } }, () => {
+      let promptIssued = false;
+
+      if (promptOptions && promptOptions.type === 'confirm') {
+        promptIssued = true;
+      }
+
+      try {
+        assert(promptIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('prompts before removing field from list view when confirmation argument not passed (list id, view title, field title)', (done) => {
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewTitle: 'My view', fieldTitle: 'Created By' } }, () => {
+      let promptIssued = false;
+
+      if (promptOptions && promptOptions.type === 'confirm') {
+        promptIssued = true;
+      }
+
+      try {
+        assert(promptIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('aborts removing field by title from list view when prompt not confirmed', (done) => {
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: false });
+    };
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', fieldTitle: 'Created By' } }, () => {
+      try {
+        assert(requests.length === 0);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('removes the field by title from viewId and listTitle when prompt confirmed (debug)', (done) => {
     stubAllGetRequests();
 
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/addviewfield('Author')`) > -1) {
+      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/removeviewfield('Author')`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers.accept &&
@@ -176,6 +289,7 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
           return Promise.resolve();
         }
       }
+
       return Promise.reject('Invalid request');
     });
 
@@ -183,11 +297,13 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
     cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', fieldTitle: 'Created By' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web/lists/GetByTitle('Documents')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/addviewfield('`) > -1 &&
+        if (r.url.indexOf(`/_api/web/lists/GetByTitle('Documents')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/removeviewfield('`) > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
           r.headers.accept &&
@@ -205,13 +321,13 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     });
   });
 
-  it('add the field by title to viewId and listTitle', (done) => {
+  it('removes the field by title from viewId and listTitle when prompt confirmed', (done) => {
     stubAllGetRequests();
 
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/addviewfield('Author')`) > -1) {
+      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/removeviewfield('Author')`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers.accept &&
@@ -227,11 +343,13 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', fieldTitle: 'Created By' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web/lists/GetByTitle('Documents')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/addviewfield('`) > -1 &&
+        if (r.url.indexOf(`/_api/web/lists/GetByTitle('Documents')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/removeviewfield('`) > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
           r.headers.accept &&
@@ -249,13 +367,13 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     });
   });
 
-  it('add the field by title from viewTitle and listTitle (debug)', (done) => {
+  it('removes the field by title from viewTitle and listTitle when prompt confirmed (debug)', (done) => {
     stubAllGetRequests();
 
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/views/GetByTitle('All Documents')/viewfields/addviewfield('Author')`) > -1) {
+      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/views/GetByTitle('All Documents')/viewfields/removeviewfield('Author')`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers.accept &&
@@ -271,11 +389,13 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
     cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewTitle: 'MyView', fieldTitle: 'Created By' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web/lists/GetByTitle('Documents')/views/GetByTitle('MyView')/viewfields/addviewfield('`) > -1 &&
+        if (r.url.indexOf(`/_api/web/lists/GetByTitle('Documents')/views/GetByTitle('MyView')/viewfields/removeviewfield('`) > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
           r.headers.accept &&
@@ -293,13 +413,13 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     });
   });
 
-  it('add the field by title from viewTitle and listTitle', (done) => {
+  it('removes the field by title from viewTitle and listTitle when prompt confirmed', (done) => {
     stubAllGetRequests();
-    
+
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/views/GetByTitle('MyView')/viewfields/addviewfield('Author')`) > -1) {
+      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/views/GetByTitle('MyView')/viewfields/removeviewfield('Author')`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers.accept &&
@@ -315,11 +435,13 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewTitle: 'MyView', fieldTitle: 'Created By' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web/lists/GetByTitle('Documents')/views/GetByTitle('MyView')/viewfields/addviewfield('`) > -1 &&
+        if (r.url.indexOf(`/_api/web/lists/GetByTitle('Documents')/views/GetByTitle('MyView')/viewfields/removeviewfield('`) > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
           r.headers.accept &&
@@ -337,13 +459,13 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     });
   });
 
-  it('add the field by title from viewTitle and listId (debug)', (done) => {
+  it('removes the field by title from viewTitle and listId when prompt confirmed (debug)', (done) => {
     stubAllGetRequests();
-    
+
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views/GetByTitle('MyView')/viewfields/addviewfield('Author')`) > -1) {
+      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views/GetByTitle('MyView')/viewfields/removeviewfield('Author')`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers.accept &&
@@ -359,11 +481,13 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
     cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewTitle: 'MyView', fieldTitle: 'Created By' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views/GetByTitle('MyView')/viewfields/addviewfield('`) > -1 &&
+        if (r.url.indexOf(`/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views/GetByTitle('MyView')/viewfields/removeviewfield('`) > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
           r.headers.accept &&
@@ -381,13 +505,13 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     });
   });
 
-  it('add the field by title from viewTitle and listId', (done) => {
+  it('removes the field by title from viewTitle and listId when prompt confirmed', (done) => {
     stubAllGetRequests();
-    
+
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views/GetByTitle('MyView')/viewfields/addviewfield('Author')`) > -1) {
+      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views/GetByTitle('MyView')/viewfields/removeviewfield('Author')`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers.accept &&
@@ -403,11 +527,13 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewTitle: 'MyView', fieldTitle: 'Created By' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views/GetByTitle('MyView')/viewfields/addviewfield('`) > -1 &&
+        if (r.url.indexOf(`/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views/GetByTitle('MyView')/viewfields/removeviewfield('`) > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
           r.headers.accept &&
@@ -425,13 +551,13 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     });
   });
 
-  it('add the field by title to viewId and listId (debug)', (done) => {
+  it('removes the field by title from viewId and listId when prompt confirmed (debug)', (done) => {
     stubAllGetRequests();
-    
+
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/addviewfield('Author')`) > -1) {
+      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/removeviewfield('Author')`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers.accept &&
@@ -447,11 +573,13 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
     cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', fieldTitle: 'Created By' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/addviewfield('`) > -1 &&
+        if (r.url.indexOf(`/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/removeviewfield('`) > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
           r.headers.accept &&
@@ -469,13 +597,13 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     });
   });
 
-  it('add the field by title to viewId and listId', (done) => {
+  it('removes the field by title from viewId and listId when prompt confirmed', (done) => {
     stubAllGetRequests();
-    
+
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/addviewfield('Author')`) > -1) {
+      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/removeviewfield('Author')`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers.accept &&
@@ -491,11 +619,13 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', fieldTitle: 'Created By' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/addviewfield('`) > -1 &&
+        if (r.url.indexOf(`/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/removeviewfield('`) > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
           r.headers.accept &&
@@ -513,13 +643,13 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     });
   });
 
-  it('add the field by id to viewId and listTitle (debug)', (done) => {
+  it('removes the field by id from viewId and listTitle when prompt confirmed (debug)', (done) => {
     stubAllGetRequests();
-    
+
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/addviewfield('Author')`) > -1) {
+      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/removeviewfield('Author')`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers.accept &&
@@ -535,11 +665,13 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
     cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', fieldId: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web/lists/GetByTitle('Documents')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/addviewfield('`) > -1 &&
+        if (r.url.indexOf(`/_api/web/lists/GetByTitle('Documents')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/removeviewfield('`) > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
           r.headers.accept &&
@@ -557,13 +689,13 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     });
   });
 
-  it('add the field by id to viewId and listTitle', (done) => {
+  it('removes the field by id from viewId and listTitle when prompt confirmed', (done) => {
     stubAllGetRequests();
-    
+
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/addviewfield('Author')`) > -1) {
+      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/removeviewfield('Author')`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers.accept &&
@@ -579,11 +711,13 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', fieldId: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web/lists/GetByTitle('Documents')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/addviewfield('`) > -1 &&
+        if (r.url.indexOf(`/_api/web/lists/GetByTitle('Documents')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/removeviewfield('`) > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
           r.headers.accept &&
@@ -601,13 +735,13 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     });
   });
 
-  it('add the field by id from viewTitle and listTitle (debug)', (done) => {
+  it('removes the field by id from viewTitle and listTitle when prompt confirmed (debug)', (done) => {
     stubAllGetRequests();
-    
+
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/views/GetByTitle('All Documents')/viewfields/addviewfield('Author')`) > -1) {
+      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/views/GetByTitle('All Documents')/viewfields/removeviewfield('Author')`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers.accept &&
@@ -623,11 +757,13 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
     cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewTitle: 'MyView', fieldId: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web/lists/GetByTitle('Documents')/views/GetByTitle('MyView')/viewfields/addviewfield('`) > -1 &&
+        if (r.url.indexOf(`/_api/web/lists/GetByTitle('Documents')/views/GetByTitle('MyView')/viewfields/removeviewfield('`) > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
           r.headers.accept &&
@@ -645,13 +781,13 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     });
   });
 
-  it('add the field by id from viewTitle and listTitle', (done) => {
+  it('removes the field by id from viewTitle and listTitle when prompt confirmed', (done) => {
     stubAllGetRequests();
-    
+
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/views/GetByTitle('MyView')/viewfields/addviewfield('Author')`) > -1) {
+      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/views/GetByTitle('MyView')/viewfields/removeviewfield('Author')`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers.accept &&
@@ -667,11 +803,13 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewTitle: 'MyView', fieldId: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web/lists/GetByTitle('Documents')/views/GetByTitle('MyView')/viewfields/addviewfield('`) > -1 &&
+        if (r.url.indexOf(`/_api/web/lists/GetByTitle('Documents')/views/GetByTitle('MyView')/viewfields/removeviewfield('`) > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
           r.headers.accept &&
@@ -689,13 +827,13 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     });
   });
 
-  it('add the field by id from viewTitle and listId (debug)', (done) => {
+  it('removes the field by id from viewTitle and listId when prompt confirmed (debug)', (done) => {
     stubAllGetRequests();
-    
+
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views/GetByTitle('MyView')/viewfields/addviewfield('Author')`) > -1) {
+      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views/GetByTitle('MyView')/viewfields/removeviewfield('Author')`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers.accept &&
@@ -711,11 +849,13 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
     cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewTitle: 'MyView', fieldId: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views/GetByTitle('MyView')/viewfields/addviewfield('`) > -1 &&
+        if (r.url.indexOf(`/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views/GetByTitle('MyView')/viewfields/removeviewfield('`) > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
           r.headers.accept &&
@@ -733,13 +873,13 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     });
   });
 
-  it('add the field by id from viewTitle and listId', (done) => {
+  it('removes the field by id from viewTitle and listId when prompt confirmed', (done) => {
     stubAllGetRequests();
-    
+
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views/GetByTitle('MyView')/viewfields/addviewfield('Author')`) > -1) {
+      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views/GetByTitle('MyView')/viewfields/removeviewfield('Author')`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers.accept &&
@@ -755,11 +895,13 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewTitle: 'MyView', fieldId: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views/GetByTitle('MyView')/viewfields/addviewfield('`) > -1 &&
+        if (r.url.indexOf(`/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views/GetByTitle('MyView')/viewfields/removeviewfield('`) > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
           r.headers.accept &&
@@ -777,13 +919,13 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     });
   });
 
-  it('add the field by id to viewId and listId (debug)', (done) => {
+  it('removes the field by id from viewId and listId when prompt confirmed (debug)', (done) => {
     stubAllGetRequests();
-    
+
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/addviewfield('Author')`) > -1) {
+      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/removeviewfield('Author')`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers.accept &&
@@ -799,11 +941,13 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
     cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', fieldId: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/addviewfield('`) > -1 &&
+        if (r.url.indexOf(`/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/removeviewfield('`) > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
           r.headers.accept &&
@@ -821,12 +965,13 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     });
   });
 
-  it('add the field by id to viewId and listId', (done) => {
+  it('removes the field by id from viewId and listId when prompt confirmed', (done) => {
     stubAllGetRequests();
-    
+
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/addviewfield('Author')`) > -1) {
+
+      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/removeviewfield('Author')`) > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers.accept &&
@@ -842,183 +987,13 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', fieldId: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/addviewfield('`) > -1 &&
-          r.headers.authorization &&
-          r.headers.authorization.indexOf('Bearer ') === 0 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('move the field by title to the position index to viewId of listTitle (debug)', (done) => {
-    stubAllGetRequests();
-
-    sinon.stub(request, 'post').callsFake((opts) => {
-      requests.push(opts);
-      if (opts.url.indexOf(`/viewfields/addviewfield('Author')`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve();
-        }
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
-    cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', fieldTitle: 'Created By', fieldPosition: 1 } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/viewfields/moveviewfieldto`) > -1 &&
-          r.headers.authorization &&
-          r.headers.authorization.indexOf('Bearer ') === 0 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('move the field by title to the position index to viewId of listTitle', (done) => {
-    stubAllGetRequests();
-
-    sinon.stub(request, 'post').callsFake((opts) => {
-      requests.push(opts);
-      if (opts.url.indexOf(`/viewfields/addviewfield('Author')`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve();
-        }
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', fieldTitle: 'Created By', fieldPosition: 1 } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/viewfields/moveviewfieldto`) > -1 &&
-          r.headers.authorization &&
-          r.headers.authorization.indexOf('Bearer ') === 0 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('move the field by title to the position index to viewTitle of listId (debug)', (done) => {
-    stubAllGetRequests();
-
-    sinon.stub(request, 'post').callsFake((opts) => {
-      requests.push(opts);
-      if (opts.url.indexOf(`/viewfields/addviewfield('Author')`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve();
-        }
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
-    cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewTitle: 'MyView', fieldTitle: 'Created By', fieldPosition: 1 } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/viewfields/moveviewfieldto`) > -1 &&
-          r.headers.authorization &&
-          r.headers.authorization.indexOf('Bearer ') === 0 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('move the field by title to the position index to viewTitle of listId', (done) => {
-    stubAllGetRequests();
-
-    sinon.stub(request, 'post').callsFake((opts) => {
-      requests.push(opts);
-      if (opts.url.indexOf(`/viewfields/addviewfield('Author')`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve();
-        }
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewTitle: 'MyView', fieldTitle: 'Created By', fieldPosition: 1 } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/viewfields/moveviewfieldto`) > -1 &&
+        if (r.url.indexOf(`/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/removeviewfield('`) > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
           r.headers.accept &&
@@ -1203,16 +1178,6 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     assert.notEqual(actual, true);
   });
 
-  it('fails validation if the fieldPosition option is defined and is not a valid number', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', fieldId: '330f29c5-5c4c-465f-9f4b-7903020ae1ce', fieldPosition: 'abc' } });
-    assert.notEqual(actual, true);
-  });
-
-  it('passes validation if the fieldPosition option is defined and is a valid number', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', fieldId: '330f29c5-5c4c-465f-9f4b-7903020ae1ce', fieldPosition: 1 } });
-    assert(actual);
-  });
-
   it('has help referring to the right command', () => {
     const cmd: any = {
       log: (msg: string) => { },
@@ -1222,7 +1187,7 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
     cmd.help({}, () => { });
-    assert(find.calledWith(commands.LIST_VIEW_FIELD_ADD));
+    assert(find.calledWith(commands.LIST_VIEW_FIELD_REMOVE));
   });
 
   it('has help with examples', () => {
