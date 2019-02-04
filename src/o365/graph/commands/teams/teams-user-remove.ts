@@ -37,6 +37,8 @@ class GraphTeamsUserRemoveCommand extends GraphCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    let userId = '';
+
     const removeUser: () => void = (): void => {
       auth
         .ensureAccessToken(auth.service.resource, cmd, this.debug)
@@ -65,7 +67,37 @@ class GraphTeamsUserRemoveCommand extends GraphCommand {
             cmd.log('');
           }
 
-          const endpoint: string = `${auth.service.resource}/v1.0/groups/${args.options.teamId}/members/${res.value}/$ref`;
+          userId = res.value;
+
+          const requestOptions: any = {
+            url: `${auth.service.resource}/v1.0/groups/${args.options.teamId}/owners?$select=id,displayName,userPrincipalName,userType`,
+            headers: Utils.getRequestHeaders({
+              authorization: `Bearer ${auth.service.accessToken}`,
+              accept: 'application/json;odata.metadata=none'
+            }),
+            json: true
+          };
+
+          if (this.debug) {
+            cmd.log('Executing web request...');
+            cmd.log(requestOptions);
+            cmd.log('');
+          }
+
+          return request.get(requestOptions);
+
+        })
+        .then((res: any): Promise<void> | request.RequestPromise => {
+
+          if (this.debug) {
+            cmd.log('Response:')
+            cmd.log(res);
+            cmd.log('');
+          }
+
+          const userIsOwner = (res.value.filter((i: any) => i.userPrincipalName === args.options.userName).length > 0);
+
+          const endpoint: string = `${auth.service.resource}/v1.0/groups/${args.options.teamId}/${userIsOwner ? 'owners' : 'members'}/${userId}/$ref`;
 
           const requestOptions: any = {
             url: endpoint,

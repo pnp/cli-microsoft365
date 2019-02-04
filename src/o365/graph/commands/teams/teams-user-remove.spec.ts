@@ -224,21 +224,30 @@ describe(commands.TEAMS_USER_REMOVE, () => {
     });
   });
 
-  it('removes the specified user from the specified team when prompt confirmed', (done) => {
+  it('removes the specified owner from owners endpoint of the specified team when prompt confirmed', (done) => {
     let memberDeleteCallIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
+      console.log(opts);
+
       if (opts.url === `https://graph.microsoft.com/v1.0/users/anne.matthews%40contoso.onmicrosoft.com/id`) {
         return Promise.resolve({
           "value": "00000000-0000-0000-0000-000000000001"
         });
       }
 
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners?$select=id,displayName,userPrincipalName,userType`) {
+        return Promise.resolve({
+          "value": [{ "id": "00000000-0000-0000-0000-000000000000", "displayName": "Anne Matthews", "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com", "userType": "Member" }]
+        });
+      }
+
       return Promise.reject('Invalid request');
     });
 
+
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/members/00000000-0000-0000-0000-000000000001/$ref`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners/00000000-0000-0000-0000-000000000001/$ref`) {
         memberDeleteCallIssued = true;
       }
     });
@@ -261,13 +270,19 @@ describe(commands.TEAMS_USER_REMOVE, () => {
     });
   });
 
-  it('removes the specified user from the specified team when prompt confirmed (debug)', (done) => {
+  it('removes the specified user from the members specified team when prompt confirmed (debug)', (done) => {
     let memberDeleteCallIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/anne.matthews%40contoso.onmicrosoft.com/id`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/karl.matteson%40contoso.onmicrosoft.com/id`) {
         return Promise.resolve({
-          "value": "00000000-0000-0000-0000-000000000001"
+          "value": "00000000-0000-0000-0000-000000000002"
+        });
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners?$select=id,displayName,userPrincipalName,userType`) {
+        return Promise.resolve({
+          "value": [{ "id": "00000000-0000-0000-0000-000000000000", "displayName": "Anne Matthews", "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com", "userType": "Member" }]
         });
       }
 
@@ -275,7 +290,7 @@ describe(commands.TEAMS_USER_REMOVE, () => {
     });
 
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/members/00000000-0000-0000-0000-000000000001/$ref`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/members/00000000-0000-0000-0000-000000000002/$ref`) {
         memberDeleteCallIssued = true;
       }
     });
@@ -287,7 +302,7 @@ describe(commands.TEAMS_USER_REMOVE, () => {
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     };
-    cmdInstance.action({ options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } }, () => {
+    cmdInstance.action({ options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000", userName: "karl.matteson@contoso.onmicrosoft.com" } }, () => {
       try {
         assert(memberDeleteCallIssued);
         done();
