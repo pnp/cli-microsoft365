@@ -243,6 +243,7 @@ nav:
         - teams user add: 'cmd/graph/teams/teams-user-add.md'
         - teams user list: 'cmd/graph/teams/teams-user-list.md'
         - teams user remove: 'cmd/graph/teams/teams-user-remove.md'
+        - teams user set: 'cmd/graph/teams/teams-user-set.md'
       - user:
         - user get: 'cmd/graph/user/user-get.md'
         - user list: 'cmd/graph/user/user-list.md'
