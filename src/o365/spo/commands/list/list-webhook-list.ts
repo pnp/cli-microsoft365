@@ -145,20 +145,20 @@ class SpoListWebhookListCommand extends SpoCommand {
         description: `URL of the site where the list to retrieve webhooks for is located`
       },
       {
-        option: '-i, --id [id]',
-        description: `(deprecated. Use 'listId' instead) ID of the list to retrieve all webhooks for. Specify either id or title but not both`
-      },
-      {
-        option: '-t, --title [title]',
-        description: `(deprecated. Use 'listTitle' instead) Title of the list to retrieve all webhooks for. Specify either id or title but not both`
-      },
-      {
         option: '--listId [listId]',
         description: `ID of the list to retrieve all webhooks for. Specify either id or title but not both`
       },
       {
         option: '--listTitle [listTitle]',
         description: `Title of the list to retrieve all webhooks for. Specify either id or title but not both`
+      },
+      {
+        option: '-i, --id [id]',
+        description: `(deprecated. Use 'listId' instead) ID of the list to retrieve all webhooks for. Specify either id or title but not both`
+      },
+      {
+        option: '-t, --title [title]',
+        description: `(deprecated. Use 'listTitle' instead) Title of the list to retrieve all webhooks for. Specify either id or title but not both`
       }
     ];
 
