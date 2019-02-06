@@ -82,6 +82,14 @@ export class Page {
       (control as any).controlType = this.getControlTypeDisplayName((control as any).controlType);
     }
 
+    if (!control.dynamicDataPaths) {
+      delete control.dynamicDataPaths;
+    }
+
+    if (!control.dynamicDataValues) {
+      delete control.dynamicDataValues;
+    }
+
     return control;
   }
 

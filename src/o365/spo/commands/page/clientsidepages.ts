@@ -607,7 +607,9 @@ export abstract class CanvasControl {
     public column: CanvasColumn | null = null,
     public order = 1,
     public id: string | undefined = getGUID(),
-    public controlData: ClientSideControlData | null = null) { }
+    public controlData: ClientSideControlData | null = null,
+    public dynamicDataPaths: any = null,
+    public dynamicDataValues: any = null) { }
 
   /**
    * Value of the control's "data-sp-controldata" attribute
@@ -817,8 +819,8 @@ export class ClientSideWebpart extends ClientSidePart {
     protected htmlProperties = "",
     protected serverProcessedContent: ServerProcessedContent | null = null,
     protected canvasDataVersion: string | null = "1.0",
-    protected dynamicDataPaths: TypedHash<any> | null = {},
-    protected dynamicDataValues: TypedHash<any> | null = {}) {
+    public dynamicDataPaths: any = "",
+    public dynamicDataValues: any = "") {
     super(3, "1.0");
   }
 
@@ -852,15 +854,23 @@ export class ClientSideWebpart extends ClientSidePart {
     this.order = index;
 
     // will form the value of the data-sp-webpartdata attribute
-    const data = {
+    let data = {
       dataVersion: this.dataVersion,
       description: this.description,
       id: this.webPartId,
       instanceId: this.id,
       properties: this.propertieJson,
       serverProcessedContent: this.serverProcessedContent,
-      title: this.title,
+      title: this.title
     };
+
+    if (this.dynamicDataPaths) {
+      (data as any)['dynamicDataPaths'] = this.dynamicDataPaths;
+    }
+
+    if (this.dynamicDataValues) {
+      (data as any)['dynamicDataValues'] = this.dynamicDataValues;
+    }
 
     const html: string[] = [];
 
@@ -879,11 +889,14 @@ export class ClientSideWebpart extends ClientSidePart {
     html.push("</div>");
     html.push("</div>");
 
+    console.log(html.join(""));
+
     return html.join("");
   }
 
   public fromHtml(html: string): void {
 
+    
     super.fromHtml(html);
 
     const webPartData = ClientSidePage.escapedStringToJson<ClientSideWebpartData>(getAttrValueFromString(html, "data-sp-webpartdata"));
@@ -902,7 +915,7 @@ export class ClientSideWebpart extends ClientSidePart {
     if (typeof webPartData.dynamicDataPaths !== "undefined") {
       this.dynamicDataPaths = webPartData.dynamicDataPaths;
     }
-
+    
     if (typeof webPartData.dynamicDataValues !== "undefined") {
       this.dynamicDataValues = webPartData.dynamicDataValues;
     }
@@ -1097,8 +1110,8 @@ export interface ClientSideWebpartData {
   properties: any;
   title: string;
   serverProcessedContent?: ServerProcessedContent;
-  dynamicDataPaths?: TypedHash<string>;
-  dynamicDataValues?: TypedHash<string>;
+  dynamicDataPaths?: any;
+  dynamicDataValues?: any;
 }
 
 export module ClientSideWebpartPropertyTypes {
