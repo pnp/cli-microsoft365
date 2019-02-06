@@ -51,11 +51,32 @@ class GraphTeamsUserSetCommand extends GraphItemsListCommand<GroupUser> {
           ))
         );
 
-        // Todo implement logic 
-        if (args.options.role) {
-          this.items = this.items.filter(i => i.userType === args.options.role)
+        if (this.debug) {
+          cmd.log('Team owners and members:')
+          cmd.log(this.items);
+          cmd.log('');
         }
 
+        if (this.items.filter(i => i.userPrincipalName.toLocaleLowerCase() === args.options.userName.toLocaleLowerCase()).length <= 0) {
+          // Todo implement correct log
+          throw new Error("Provided user is no owner or member in the provided team.");
+        }
+
+        if (args.options.role == "Owner") {
+          // check if user is member && construct post
+        }
+
+        if (args.options.role == "Member") {
+          // check if user is owner && construct post
+        }
+
+        // Todo implement debug stuff
+        // execute post 
+
+      })
+      .then((): void => {
+
+        // Todo: Log correct stuff? 
         cmd.log(this.items);
 
         if (this.verbose) {
