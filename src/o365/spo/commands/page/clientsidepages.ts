@@ -889,8 +889,6 @@ export class ClientSideWebpart extends ClientSidePart {
     html.push("</div>");
     html.push("</div>");
 
-    console.log(html.join(""));
-
     return html.join("");
   }
 
