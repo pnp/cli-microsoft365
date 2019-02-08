@@ -218,7 +218,7 @@ Copy-PnPFile|SharePointPnPPowerShellOnline|[spo file copy](../cmd/spo/file/file-
 Copy-PnPItemProxy|SharePointPnPPowerShellOnline|
 Deny-PnPTenantServicePrincipalPermissionRequest|SharePointPnPPowerShellOnline|[spo serviceprincipal permissionrequest deny](../cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-deny.md)
 Disable-PnPFeature|SharePointPnPPowerShellOnline|
-Disable-PnPInPlaceRecordsManagementForSite|SharePointPnPPowerShellOnline|
+Disable-PnPInPlaceRecordsManagementForSite|SharePointPnPPowerShellOnline|[spo site inplacerecordsmanagement set](../cmd/spo/site/site-inplacerecordsmanagement-set.md)
 Disable-PnPResponsiveUI|SharePointPnPPowerShellOnline|
 Disable-PnPSiteClassification|SharePointPnPPowerShellOnline|[graph siteclassification disable](../cmd/graph/siteclassification/siteclassification-disable.md)
 Disable-PnPTenantServicePrincipal|SharePointPnPPowerShellOnline|[spo serviceprincipal set](../cmd/spo/serviceprincipal/serviceprincipal-set.md)
@@ -464,8 +464,8 @@ Set-PnPHomePage|SharePointPnPPowerShellOnline|
 Set-PnPHubSite|SharePointPnPPowerShellOnline|[spo hubsite set](../cmd/spo/hubsite/hubsite-set.md)
 Set-PnPIndexedProperties|SharePointPnPPowerShellOnline|
 Set-PnPInformationRightsManagement|SharePointPnPPowerShellOnline|
-Set-PnPInPlaceRecordsManagement|SharePointPnPPowerShellOnline|
-Set-PnPLabel|SharePointPnPPowerShellOnline|
+Set-PnPInPlaceRecordsManagement|SharePointPnPPowerShellOnline|[spo site inplacerecordsmanagement set](../cmd/spo/site/site-inplacerecordsmanagement-set.md)
+Set-PnPLabel|SharePointPnPPowerShellOnline|[spo list label set](../cmd/spo/list/list-label-set.md)
 Set-PnPList|SharePointPnPPowerShellOnline|[spo list set](../cmd/spo/list/list-set.md)
 Set-PnPListItem|SharePointPnPPowerShellOnline|[spo listitem set](../cmd/spo/listitem/listitem-set.md)
 Set-PnPListItemAsRecord|SharePointPnPPowerShellOnline|

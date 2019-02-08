@@ -128,6 +128,7 @@ export default {
   SITE_CLASSIC_REMOVE: `${prefix} site classic remove`,
   SITE_GET: `${prefix} site get`,
   SITE_LIST: `${prefix} site list`,
+  SITE_INPLACERECORDSMANAGEMENT_SET: `${prefix} site inplacerecordsmanagement set`,
   SITE_O365GROUP_SET: `${prefix} site o365group set`,
   SITE_SET: `${prefix} site set`,
   SITEDESIGN_ADD: `${prefix} sitedesign add`,
