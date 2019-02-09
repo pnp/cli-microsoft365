@@ -20,6 +20,8 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   webUrl: string;
   id?: string;
+  listTitle?: string;
+  listId?: string;
   title?: string;
 }
 
@@ -35,6 +37,8 @@ class SpoListWebhookListCommand extends SpoCommand {
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.id = (!(!args.options.id)).toString();
+    telemetryProps.listId = (!(!args.options.listId)).toString();
+    telemetryProps.listTitle = (!(!args.options.listTitle)).toString();
     telemetryProps.title = (!(!args.options.title)).toString();
     return telemetryProps;
   }
@@ -52,12 +56,20 @@ class SpoListWebhookListCommand extends SpoCommand {
       .then((accessToken: string): request.RequestPromise => {
         siteAccessToken = accessToken;
 
+        if (args.options.title && this.verbose) {
+          cmd.log(vorpal.chalk.yellow(`Option 'title' is deprecated. Please use 'listTitle' instead`));
+        }
+
+        if (args.options.id && this.verbose) {
+          cmd.log(vorpal.chalk.yellow(`Option 'id' is deprecated. Please use 'listId' instead`));
+        }
+
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}. Retrieving information about webhooks...`);
         }
 
         if (this.verbose) {
-          const list: string = args.options.id ? encodeURIComponent(args.options.id as string) : encodeURIComponent(args.options.title as string);
+          const list: string = args.options.id ? encodeURIComponent(args.options.id as string) : (args.options.listId ? encodeURIComponent(args.options.listId as string) : (args.options.title ? encodeURIComponent(args.options.title as string) : encodeURIComponent(args.options.listTitle as string)));
           cmd.log(`Retrieving webhook information for list ${list} in site at ${args.options.webUrl}...`);
         }
 
@@ -65,6 +77,12 @@ class SpoListWebhookListCommand extends SpoCommand {
 
         if (args.options.id) {
           requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.id)}')/Subscriptions`;
+        }
+        else if (args.options.listId) {
+          requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.listId)}')/Subscriptions`;
+        }
+        else if (args.options.listTitle) {
+          requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.listTitle as string)}')/Subscriptions`;
         }
         else {
           requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.title as string)}')/Subscriptions`;
@@ -124,15 +142,23 @@ class SpoListWebhookListCommand extends SpoCommand {
     const options: CommandOption[] = [
       {
         option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the list to retrieve webhooks for is located'
+        description: `URL of the site where the list to retrieve webhooks for is located`
       },
       {
-        option: '-i, --id [id]',
-        description: 'ID of the list to retrieve all webhooks for. Specify either id or title but not both'
+        option: '-i, --listId [listId]',
+        description: `ID of the list to retrieve all webhooks for. Specify either listId or listTitle but not both`
       },
       {
-        option: '-t, --title [title]',
-        description: 'Title of the list to retrieve all webhooks for. Specify either id or title but not both'
+        option: '-t, --listTitle [listTitle]',
+        description: `Title of the list to retrieve all webhooks for. Specify either listId or listTitle but not both`
+      },
+      {
+        option: '--id [id]',
+        description: `(deprecated. Use 'listId' instead) ID of the list to retrieve all webhooks for. Specify either id or title but not both`
+      },
+      {
+        option: '--title [title]',
+        description: `(deprecated. Use 'listTitle' instead) Title of the list to retrieve all webhooks for. Specify either id or title but not both`
       }
     ];
 
@@ -157,12 +183,24 @@ class SpoListWebhookListCommand extends SpoCommand {
         }
       }
 
+      if (args.options.listId) {
+        if (!Utils.isValidGuid(args.options.listId)) {
+          return `${args.options.listId} is not a valid GUID`;
+        }
+      }
+
       if (args.options.id && args.options.title) {
         return 'Specify id or title, but not both';
       }
 
+      if (args.options.listId && args.options.listTitle) {
+        return 'Specify listId or listTitle, but not both';
+      }
+
       if (!args.options.id && !args.options.title) {
-        return 'Specify id or title, one is required';
+        if (!args.options.listId && !args.options.listTitle) {
+          return 'Specify listId or listTitle, one is required';
+        }
       }
 
       return true;
@@ -186,11 +224,11 @@ class SpoListWebhookListCommand extends SpoCommand {
   
     List all webhooks for a list with ID ${chalk.grey('0cd891ef-afce-4e55-b836-fce03286cccf')}
     located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LIST_WEBHOOK_LIST} --webUrl https://contoso.sharepoint.com/sites/project-x --id 0cd891ef-afce-4e55-b836-fce03286cccf
+      ${chalk.grey(config.delimiter)} ${commands.LIST_WEBHOOK_LIST} --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf
 
     List all webhooks for a list with title ${chalk.grey('Documents')} located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LIST_WEBHOOK_LIST} --webUrl https://contoso.sharepoint.com/sites/project-x --title Documents
+      ${chalk.grey(config.delimiter)} ${commands.LIST_WEBHOOK_LIST} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents
       `);
   }
 }

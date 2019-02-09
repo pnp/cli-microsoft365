@@ -14,8 +14,10 @@ Option|Description
 ------|-----------
 `--help`|output usage information
 `-u, --webUrl <webUrl>`|URL of the site where the list to retrieve webhooks for is located
-`-i, --id [id]`|ID of the list to retrieve all webhooks for. Specify either `id` or `title` but not both
-`-t, --title [title]`|Title of the list to retrieve all webhooks for. Specify either `id` or `title` but not both
+`-i, --listId [listId]`|ID of the list to retrieve all webhooks for. Specify either `listId` or `listTitle` but not both
+`-t, --listTitle [listTitle]`|Title of the list to retrieve all webhooks for. Specify either `listId` or `listTitle` but not both
+`--id [id]`|(deprecated. Use `listId` instead) ID of the list to retrieve all webhooks for. Specify either `id` or `title` but not both
+`--title [title]`|(deprecated. Use `listTitle` instead) Title of the list to retrieve all webhooks for. Specify either `id` or `title` but not both
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
@@ -32,11 +34,11 @@ To list all webhooks for a list, you have to first log in to SharePoint using th
 List all webhooks for a list with ID _0cd891ef-afce-4e55-b836-fce03286cccf_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list webhook list --webUrl https://contoso.sharepoint.com/sites/project-x --id 0cd891ef-afce-4e55-b836-fce03286cccf
+spo list webhook list --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf
 ```
 
 List all webhooks for a list with title _Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list webhook list --webUrl https://contoso.sharepoint.com/sites/project-x --title Documents
+spo list webhook list --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents
 ```
