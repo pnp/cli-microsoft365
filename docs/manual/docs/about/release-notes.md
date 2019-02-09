@@ -6,9 +6,23 @@
 
 **SharePoint Online:**
 
+- [spo list view field add](../cmd/spo/list/list-view-field-add.md) - adds the specified field to list view [#735](https://github.com/pnp/office365-cli/issues/735)
 - [spo list view field remove](../cmd/spo/list/list-view-field-remove.md) - removes the specified field from list view [#736](https://github.com/pnp/office365-cli/issues/736)
 - [spo sitedesign run list](../cmd/spo/sitedesign/sitedesign-run-list.md) - lists information about site designs applied to the specified site [#779](https://github.com/pnp/office365-cli/issues/779)
 - [spo sitedesign run status get](../cmd/spo/sitedesign/sitedesign-run-status-get.md) - gets information about the site scripts executed for the specified site design [#780](https://github.com/pnp/office365-cli/issues/780)
+- [spo sitedesign task list](../cmd/spo/sitedesign/sitedesign-task-list.md) - lists site designs scheduled for execution on the specified site [#781](https://github.com/pnp/office365-cli/issues/781)
+
+**Microsoft Graph:**
+
+- [graph teams user remove](../cmd/graph/teams/teams-user-remove.md) - removes the specified user from the specified Microsoft Teams team [#757](https://github.com/pnp/office365-cli/issues/757)
+
+### Changes
+
+- updated 'spo list webhook list' parameters [#747](https://github.com/pnp/office365-cli/issues/747)
+- updated 'azmgmt flow list' to support paged content [#776](https://github.com/pnp/office365-cli/issues/776)
+- added fieldTitle, listId and listUrl options to 'spo file get' [#754](https://github.com/pnp/office365-cli/issues/754)
+- extended 'spo sitedesign apply' with large site designs [#714](https://github.com/pnp/office365-cli/issues/714)
+- added support for dynamic data [#751](https://github.com/pnp/office365-cli/issues/751)
 
 ## [v1.13.0](https://github.com/pnp/office365-cli/releases/tag/v1.13.0)
 
