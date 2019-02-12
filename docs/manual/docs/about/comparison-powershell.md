@@ -270,7 +270,7 @@ Get-PnPIndexedPropertyKeys|SharePointPnPPowerShellOnline|
 Get-PnPInformationRightsManagement|SharePointPnPPowerShellOnline|
 Get-PnPInPlaceRecordsManagement|SharePointPnPPowerShellOnline|
 Get-PnPJavaScriptLink|SharePointPnPPowerShellOnline|
-Get-PnPLabel|SharePointPnPPowerShellOnline|
+Get-PnPLabel|SharePointPnPPowerShellOnline|[spo list label get](../cmd/spo/list/list-label-get.md)
 Get-PnPList|SharePointPnPPowerShellOnline|[spo list get](../cmd/spo/list/list-get.md), [spo list list](../cmd/spo/list/list-list.md)
 Get-PnPListItem|SharePointPnPPowerShellOnline|[spo listitem get](../cmd/spo/listitem/listitem-get.md), [spo listitem list](../cmd/spo/listitem/listitem-list.md)
 Get-PnPListRecordDeclaration|SharePointPnPPowerShellOnline|
