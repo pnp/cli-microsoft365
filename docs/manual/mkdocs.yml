@@ -167,6 +167,7 @@ nav:
         - sitedesign rights revoke: 'cmd/spo/sitedesign/sitedesign-rights-revoke.md'
         - sitedesign run list: 'cmd/spo/sitedesign/sitedesign-run-list.md'
         - sitedesign run status get: 'cmd/spo/sitedesign/sitedesign-run-status-get.md'
+        - sitedesign task get: 'cmd/spo/sitedesign/sitedesign-task-get.md'
         - sitedesign task list: 'cmd/spo/sitedesign/sitedesign-task-list.md'
       - sitescript:
         - sitescript add: 'cmd/spo/sitescript/sitescript-add.md'

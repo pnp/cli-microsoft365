@@ -141,6 +141,7 @@ export default {
   SITEDESIGN_RIGHTS_REVOKE: `${prefix} sitedesign rights revoke`,
   SITEDESIGN_RUN_LIST: `${prefix} sitedesign run list`,
   SITEDESIGN_RUN_STATUS_GET: `${prefix} sitedesign run status get`,
+  SITEDESIGN_TASK_GET: `${prefix} sitedesign task get`,
   SITEDESIGN_TASK_LIST: `${prefix} sitedesign task list`,
   SITESCRIPT_ADD: `${prefix} sitescript add`,
   SITESCRIPT_GET: `${prefix} sitescript get`,
