@@ -28,7 +28,7 @@ class GraphTeamsUserSetCommand extends GraphItemsListCommand<GroupUser> {
   }
 
   public get description(): string {
-    return 'Promote or demote members ander owners for the specified Microsoft Teams team';
+    return 'Promote or demote the specified member or owner for the specified Microsoft Teams team';
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
