@@ -8,6 +8,7 @@ import {
 import { GraphItemsListCommand } from '../GraphItemsListCommand';
 import Utils from '../../../../Utils';
 import { GroupUser } from '../o365group/GroupUser';
+import * as request from 'request-promise-native';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -36,14 +37,15 @@ class GraphTeamsUserSetCommand extends GraphItemsListCommand<GroupUser> {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
 
     this
       .getOwners(cmd, args.options.teamId)
       .then((): Promise<void> => {
         return this.getMembersAndGuests(cmd, args.options.teamId);
       })
-      .then((): void => {
+      .then((): request.RequestPromise | void => {
+
         // Filter out duplicate added values for owners (as they are returned as members as well)
         this.items = this.items.filter((groupUser, index, self) =>
           index === self.findIndex((t) => (
@@ -58,27 +60,65 @@ class GraphTeamsUserSetCommand extends GraphItemsListCommand<GroupUser> {
         }
 
         if (this.items.filter(i => i.userPrincipalName.toLocaleLowerCase() === args.options.userName.toLocaleLowerCase()).length <= 0) {
-          // Todo implement correct log
-          throw new Error("Provided user is no owner or member in the provided team.");
+          throw new Error("The specified user is no owner or member in the specified team, please use the teams user add to add new users.");
         }
 
-        if (args.options.role == "Owner") {
-          // check if user is member && construct post
+        if (args.options.role === "Owner") {
+          const foundMember = this.items.find(e => e.userPrincipalName.toLocaleLowerCase() === args.options.userName.toLocaleLowerCase() && e.userType === 'Member');
+
+          if (foundMember !== undefined) {
+            const endpoint: string = `${auth.service.resource}/v1.0/groups/${args.options.teamId}/owners/$ref`;
+
+            const requestOptions: any = {
+              url: endpoint,
+              headers: Utils.getRequestHeaders({
+                authorization: `Bearer ${auth.service.accessToken}`,
+                'accept': 'application/json;odata.metadata=none'
+              }),
+              json: true,
+              body: { "@odata.id": "https://graph.microsoft.com/v1.0/directoryObjects/" + foundMember.id }
+            };
+
+            if (this.debug) {
+              cmd.log('Executing web request...');
+              cmd.log(requestOptions);
+              cmd.log('');
+            }
+
+            return request.post(requestOptions);
+          }
+          else {
+            throw new Error("The specified user is already an owner in the specified team, and thus cannot be promoted.");
+          }
         }
+        else {
+          const foundOwner = this.items.find(e => e.userPrincipalName.toLocaleLowerCase() === args.options.userName.toLocaleLowerCase() && e.userType === 'Owner');
 
-        if (args.options.role == "Member") {
-          // check if user is owner && construct post
+          if (foundOwner !== undefined) {
+            const endpoint: string = `${auth.service.resource}/v1.0/groups/${args.options.teamId}/owners/${foundOwner.id}/$ref`;
+
+            const requestOptions: any = {
+              url: endpoint,
+              headers: Utils.getRequestHeaders({
+                authorization: `Bearer ${auth.service.accessToken}`,
+                'accept': 'application/json;odata.metadata=none'
+              }),
+            };
+
+            if (this.debug) {
+              cmd.log('Executing web request...');
+              cmd.log(requestOptions);
+              cmd.log('');
+            }
+
+            return request.delete(requestOptions);
+          }
+          else {
+            throw new Error("The specified user is already an member in the specified team, and thus cannot be demoted.");
+          }
         }
-
-        // Todo implement debug stuff
-        // execute post 
-
       })
       .then((): void => {
-
-        // Todo: Log correct stuff? 
-        cmd.log(this.items);
-
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
         }
@@ -142,9 +182,7 @@ class GraphTeamsUserSetCommand extends GraphItemsListCommand<GroupUser> {
 
       if (!args.options.role) {
         return 'Required parameter role missing';
-      }
-
-      if (args.options.role) {
+      } else {
         if (['Owner', 'Member'].indexOf(args.options.role) === -1) {
           return `${args.options.role} is not a valid role value. Allowed values Owner|Member`;
         }
@@ -163,22 +201,16 @@ class GraphTeamsUserSetCommand extends GraphItemsListCommand<GroupUser> {
         
   Remarks:
 
-    To promote or demoete members and owners in the specified Microsoft Teams team, you have to first
+    To promote or demote members and owners in the specified Microsoft Teams team, you have to first
     log in to the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
     eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
 
   Examples:
-  
-  // TODO: Provide samples 
+    Promote the specified member to Owner  
+      ${chalk.grey(config.delimiter)} ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner
 
-    Promote a member to Owner users and their role in the specified team 
-      ${chalk.grey(config.delimiter)} ${this.name} --teamId '00000000-0000-0000-0000-000000000000'
-
-    List all owners and their role in the specified team 
-      ${chalk.grey(config.delimiter)} ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --role Owner 
-
-    List all guests and their role in the specified team 
-      ${chalk.grey(config.delimiter)} ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --role Guest
+    Demote the specified member to Member  
+      ${chalk.grey(config.delimiter)} ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Member
 `);
   }
 }
