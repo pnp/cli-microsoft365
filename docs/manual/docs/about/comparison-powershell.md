@@ -8,6 +8,7 @@ Add-SPOGeoAdministrator|Microsoft.Online.SharePoint.PowerShell|
 Add-SPOHubSiteAssociation|Microsoft.Online.SharePoint.PowerShell|[spo hubsite connect](../cmd/spo/hubsite/hubsite-connect.md)
 Add-SPOSiteCollectionAppCatalog|Microsoft.Online.SharePoint.PowerShell|[spo site appcatalog add](../cmd/spo/site/site-appcatalog-add.md)
 Add-SPOSiteDesign|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign add](../cmd/spo/sitedesign/sitedesign-add.md)
+Add-SPOSiteDesignTask|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign apply](../cmd/spo/sitedesign/sitedesign-apply.md)
 Add-SPOSiteScript|Microsoft.Online.SharePoint.PowerShell|[spo sitescript add](../cmd/spo/sitescript/sitescript-add.md)
 Add-SPOTenantCdnOrigin|Microsoft.Online.SharePoint.PowerShell|[spo cdn origin add](../cmd/spo/cdn/cdn-origin-add.md)
 Add-SPOTenantCentralAssetRepositoryLibrary|Microsoft.Online.SharePoint.PowerShell|
@@ -188,6 +189,7 @@ Add-PnPSiteClassification|SharePointPnPPowerShellOnline|
 Add-PnPSiteCollectionAdmin|SharePointPnPPowerShellOnline|
 Add-PnPSiteCollectionAppCatalog|SharePointPnPPowerShellOnline|[spo site appcatalog add](../cmd/spo/site/site-appcatalog-add.md)
 Add-PnPSiteDesign|SharePointPnPPowerShellOnline|[spo sitedesign add](../cmd/spo/sitedesign/sitedesign-add.md)
+Add-PnPSiteDesignTask|SharePointPnPPowerShellOnline|[spo sitedesign apply](../cmd/spo/sitedesign/sitedesign-apply.md)
 Add-PnPSiteScript|SharePointPnPPowerShellOnline|[spo sitescript add](../cmd/spo/sitescript/sitescript-add.md)
 Add-PnPStoredCredential|SharePointPnPPowerShellOnline|
 Add-PnPTenantTheme|SharePointPnPPowerShellOnline|[spo theme set](../cmd/spo/theme/theme-set.md)
@@ -294,6 +296,7 @@ Get-PnPSiteDesign|SharePointPnPPowerShellOnline|[spo sitedesign get](../cmd/spo/
 Get-PnPSiteDesignRights|SharePointPnPPowerShellOnline|[spo sitedesign rights list](../cmd/spo/sitedesign/sitedesign-rights-list.md)
 Get-PnPSiteDesignRun|SharePointPnPPowerShellOnline|[spo sitedesign run list](../cmd/spo/sitedesign/sitedesign-run-list.md)
 Get-PnPSiteDesignRunStatus|SharePointPnPPowerShellOnline|[spo sitedesign run status get](../cmd/spo/sitedesign/sitedesign-run-status-get.md)
+Get-PnPSiteDesignTask|SharePointPnPPowerShellOnline|[spo sitedesign task list](../cmd/spo/sitedesign/sitedesign-task-list.md)
 Get-PnPSitePolicy|SharePointPnPPowerShellOnline|
 Get-PnPSiteScript|SharePointPnPPowerShellOnline|[spo sitescript get](../cmd/spo/sitescript/sitescript-get.md), [spo sitescript list](../cmd/spo/sitescript/sitescript-list.md)
 Get-PnPSiteSearchQueryResults|SharePointPnPPowerShellOnline|

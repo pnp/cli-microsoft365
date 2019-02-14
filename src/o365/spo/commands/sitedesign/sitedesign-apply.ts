@@ -16,6 +16,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
+  asTask: boolean;
   id: string;
   webUrl: string;
 }
@@ -27,6 +28,12 @@ class SpoSiteDesignApplyCommand extends SpoCommand {
 
   public get description(): string {
     return 'Applies a site design to an existing site collection';
+  }
+
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.asTask = args.options.asTask || false;
+    return telemetryProps;
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
@@ -43,7 +50,7 @@ class SpoSiteDesignApplyCommand extends SpoCommand {
         };
 
         const requestOptions: any = {
-          url: `${auth.site.url}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.ApplySiteDesign`,
+          url: `${auth.site.url}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.${args.options.asTask ? 'AddSiteDesignTask' : 'ApplySiteDesign'}`,
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${auth.service.accessToken}`,
             'content-type': 'application/json;charset=utf-8',
@@ -68,6 +75,13 @@ class SpoSiteDesignApplyCommand extends SpoCommand {
           cmd.log('');
         }
 
+        if (res.value) {
+          cmd.log(res.value);
+        }
+        else {
+          cmd.log(res);
+        }
+
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
         }
@@ -86,6 +100,10 @@ class SpoSiteDesignApplyCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>',
         description: 'The URL of the site to apply the site design to'
       },
+      {
+        option: '--asTask',
+        description: 'Apply site design as task. Required for large site designs'
+      }
     ];
 
     const parentOptions: CommandOption[] = super.options();
@@ -97,7 +115,7 @@ class SpoSiteDesignApplyCommand extends SpoCommand {
       if (!args.options.id) {
         return 'Required parameter id missing';
       }
-      
+
       if (!Utils.isValidGuid(args.options.id)) {
         return `${args.options.id} is not a valid GUID`;
       }
@@ -134,6 +152,9 @@ class SpoSiteDesignApplyCommand extends SpoCommand {
     Apply the site design with ID ${chalk.grey('9b142c22-037f-4a7f-9017-e9d8c0e34b98')}
     to the site collection ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
       ${chalk.grey(config.delimiter)} ${this.name} --id 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --webUrl https://contoso.sharepoint.com/sites/project-x
+
+    Apply large site design to the specified site
+      ${chalk.grey(config.delimiter)} ${this.name} --id 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --webUrl https://contoso.sharepoint.com/sites/project-x --asTask
 
   More information:
 

@@ -331,7 +331,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
       }
 
       try {
-        const webPartData: { dataVersion?: string; properties?: any; serverProcessedContent?: ServerProcessedContent } = JSON.parse(args.options.webPartData);
+        const webPartData: { dataVersion?: string; properties?: any; serverProcessedContent?: ServerProcessedContent; dynamicDataPaths?: any; dynamicDataValues?: any; } = JSON.parse(args.options.webPartData);
         if (webPartData.dataVersion) {
           webPart.dataVersion = webPartData.dataVersion;
         }
@@ -340,6 +340,12 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
         }
         if (webPartData.serverProcessedContent) {
           (webPart as any).serverProcessedContent = webPartData.serverProcessedContent;
+        }
+        if (webPartData.dynamicDataPaths) {
+          webPart.dynamicDataPaths = webPartData.dynamicDataPaths;
+        }
+        if (webPartData.dynamicDataValues) {
+          webPart.dynamicDataValues = webPartData.dynamicDataValues;
         }
       }
       catch { }
