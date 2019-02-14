@@ -13,7 +13,6 @@ describe(commands.TEAMS_USER_SET, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
-  //todo remove; let cmdInstanceLogSpy: sinon.SinonSpy;
   let trackEvent: any;
   let telemetry: any;
 
@@ -33,7 +32,6 @@ describe(commands.TEAMS_USER_SET, () => {
         log.push(msg);
       }
     };
-    //todo remove cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
     auth.service = new Service();
     telemetry = null;
     (command as any).items = [];
