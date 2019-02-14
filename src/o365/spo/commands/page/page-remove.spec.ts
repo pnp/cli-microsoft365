@@ -412,7 +412,7 @@ describe(commands.PAGE_REMOVE, () => {
 
 	it('fails validation if webUrl is not a valid SharePoint URL', () => {
 		const actual = (command.validate() as CommandValidate)({
-			options: { name: 'page.aspx', webUrl: 'https://foo.com' }
+			options: { name: 'page.aspx', webUrl: 'http://foo' }
 		});
 		assert.notEqual(actual, true);
 	});

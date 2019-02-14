@@ -712,6 +712,26 @@ describe('Utils', () => {
     assert.equal(actual, '/Shared Documents/MyFolder');
   });
 
+  it('should get absolute URL of a folder using webUrl and the folder server relative url', () => {
+    const actual = Utils.getAbsoluteUrl('https://contoso.sharepoint.com/sites/team1', '/sites/team1/Shared Documents/MyFolder');
+    assert.equal(actual, 'https://contoso.sharepoint.com/sites/team1/Shared Documents/MyFolder');
+  });
+
+  it('should handle the server relative url starting by / or not while getting absolute URL of a folder', () => {
+    const actual = Utils.getAbsoluteUrl('https://contoso.sharepoint.com/sites/team1', 'sites/team1/Shared Documents/MyFolder');
+    assert.equal(actual, 'https://contoso.sharepoint.com/sites/team1/Shared Documents/MyFolder');
+  });
+
+  it('should handle the presence of an ending / on the web url while getting absolute URL of a folder', () => {
+    const actual = Utils.getAbsoluteUrl('https://contoso.sharepoint.com/sites/team1/', 'sites/team1/Shared Documents/MyFolder');
+    assert.equal(actual, 'https://contoso.sharepoint.com/sites/team1/Shared Documents/MyFolder');
+  });
+
+  it('should properly concatenate URL parts even with ending and starting / to each while getting absolute URL of a folder', () => {
+    const actual = Utils.getAbsoluteUrl('https://contoso.sharepoint.com/sites/team1/', '/sites/team1/Shared Documents/MyFolder');
+    assert.equal(actual, 'https://contoso.sharepoint.com/sites/team1/Shared Documents/MyFolder');
+  });
+
   it('shows app display name as connected-as for app-only auth', () => {
     const jwt = JSON.stringify({
       app_displayname: 'Office 365 CLI Contoso'

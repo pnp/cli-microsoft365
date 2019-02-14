@@ -26,7 +26,7 @@ export class Site extends Service {
   public isTenantAdminSite(): boolean {
     return this.url !== null &&
       this.url !== undefined &&
-      this.url.indexOf('-admin.sharepoint.com') > -1;
+      this.url.indexOf('-admin.') > -1;
   }
 }
 

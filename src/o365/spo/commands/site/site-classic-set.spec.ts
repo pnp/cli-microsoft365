@@ -1415,7 +1415,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
   it('fails validation if the url is not a valid SharePoint url', () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
-        url: 'https://contoso.com', title: 'Team'
+        url: 'http://contoso', title: 'Team'
       }
     });
     assert.notEqual(actual, true);

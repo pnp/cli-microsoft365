@@ -52,7 +52,7 @@ Get-SPOSiteDesignRights|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign r
 Get-SPOSiteGroup|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOSiteRenameState|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOSiteScript|Microsoft.Online.SharePoint.PowerShell|[spo sitescript get](../cmd/spo/sitescript/sitescript-get.md), [spo sitescript list](../cmd/spo/sitescript/sitescript-list.md)
-Get-SPOSiteScriptFromList|Microsoft.Online.SharePoint.PowerShell|
+Get-SPOSiteScriptFromList|Microsoft.Online.SharePoint.PowerShell|[spo list sitescript get](../cmd/spo/list/list-sitescript-get.md)
 Get-SPOStorageEntity|Microsoft.Online.SharePoint.PowerShell|[spo storageentity get](../cmd/spo/storageentity/storageentity-get.md), [spo storageentity list](../cmd/spo/storageentity/storageentity-list.md)
 Get-SPOTenant|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOTenantCdnEnabled|Microsoft.Online.SharePoint.PowerShell|[spo cdn get](../cmd/spo/cdn/cdn-get.md)
@@ -292,6 +292,8 @@ Get-PnPSiteCollectionAdmin|SharePointPnPPowerShellOnline|
 Get-PnPSiteCollectionTermStore|SharePointPnPPowerShellOnline|
 Get-PnPSiteDesign|SharePointPnPPowerShellOnline|[spo sitedesign get](../cmd/spo/sitedesign/sitedesign-get.md), [spo sitedesign list](../cmd/spo/sitedesign/sitedesign-list.md)
 Get-PnPSiteDesignRights|SharePointPnPPowerShellOnline|[spo sitedesign rights list](../cmd/spo/sitedesign/sitedesign-rights-list.md)
+Get-PnPSiteDesignRun|SharePointPnPPowerShellOnline|[spo sitedesign run list](../cmd/spo/sitedesign/sitedesign-run-list.md)
+Get-PnPSiteDesignRunStatus|SharePointPnPPowerShellOnline|[spo sitedesign run status get](../cmd/spo/sitedesign/sitedesign-run-status-get.md)
 Get-PnPSitePolicy|SharePointPnPPowerShellOnline|
 Get-PnPSiteScript|SharePointPnPPowerShellOnline|[spo sitescript get](../cmd/spo/sitescript/sitescript-get.md), [spo sitescript list](../cmd/spo/sitescript/sitescript-list.md)
 Get-PnPSiteSearchQueryResults|SharePointPnPPowerShellOnline|
@@ -322,7 +324,7 @@ Get-PnPUnifiedGroupOwners|SharePointPnPPowerShellOnline|
 Get-PnPUPABulkImportStatus|SharePointPnPPowerShellOnline|
 Get-PnPUser|SharePointPnPPowerShellOnline|
 Get-PnPUserProfileProperty|SharePointPnPPowerShellOnline|
-Get-PnPView|SharePointPnPPowerShellOnline|[spo list view list](../cmd/spo/list/list-view-list.md)
+Get-PnPView|SharePointPnPPowerShellOnline|[spo list view get](../cmd/spo/list/list-view-get.md), [spo list view list](../cmd/spo/list/list-view-list.md)
 Get-PnPWeb|SharePointPnPPowerShellOnline|[spo web get](../cmd/spo/web/web-get.md), [spo web list](../cmd/spo/web/web-list.md)
 Get-PnPWebhookSubscriptions|SharePointPnPPowerShellOnline|[spo list webhook get](../cmd/spo/list/list-webhook-get.md), [spo list webhook list](../cmd/spo/list/list-webhook-list.md)
 Get-PnPWebPart|SharePointPnPPowerShellOnline|
