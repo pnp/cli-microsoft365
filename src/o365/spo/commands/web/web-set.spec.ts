@@ -231,13 +231,10 @@ describe(commands.WEB_SET, () => {
     });
   });
 
-  it('updates all properties', (done) => {
+  it('sets site header to compact', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (JSON.stringify(opts.body) === JSON.stringify({
-        Title: 'New title',
-        Description: 'New description',
-        SiteLogoUrl: 'image.png',
-        QuickLaunchEnabled: true
+        HeaderLayout: 2
       })) {
         return Promise.resolve();
       }
@@ -249,7 +246,221 @@ describe(commands.WEB_SET, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', title: 'New title', description: 'New description', siteLogoUrl: 'image.png', quickLaunchEnabled: 'true' } }, () => {
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerLayout: 'compact' } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets site header to standard', (done) => {
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (JSON.stringify(opts.body) === JSON.stringify({
+        HeaderLayout: 1
+      })) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerLayout: 'standard' } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets site header emphasis to 0', (done) => {
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (JSON.stringify(opts.body) === JSON.stringify({
+        HeaderEmphasis: 0
+      })) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 0 } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets site header emphasis to 1', (done) => {
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (JSON.stringify(opts.body) === JSON.stringify({
+        HeaderEmphasis: 1
+      })) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 1 } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets site header emphasis to 2', (done) => {
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (JSON.stringify(opts.body) === JSON.stringify({
+        HeaderEmphasis: 2
+      })) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 2 } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets site header emphasis to 3', (done) => {
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (JSON.stringify(opts.body) === JSON.stringify({
+        HeaderEmphasis: 3
+      })) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 3 } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets site menu mode to megamenu', (done) => {
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (JSON.stringify(opts.body) === JSON.stringify({
+        MegaMenuEnabled: true
+      })) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', megaMenuEnabled: 'true' } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets site menu mode to cascading', (done) => {
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (JSON.stringify(opts.body) === JSON.stringify({
+        MegaMenuEnabled: false
+      })) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', megaMenuEnabled: 'false' } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('updates all properties', (done) => {
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (JSON.stringify(opts.body) === JSON.stringify({
+        Title: 'New title',
+        Description: 'New description',
+        SiteLogoUrl: 'image.png',
+        QuickLaunchEnabled: true,
+        HeaderEmphasis: 2,
+        HeaderLayout: 2,
+        MegaMenuEnabled: true
+      })) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', title: 'New title', description: 'New description', siteLogoUrl: 'image.png', quickLaunchEnabled: 'true', headerLayout: 'compact', headerEmphasis: 1, megaMenuEnabled: 'true' } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
         done();
@@ -334,6 +545,66 @@ describe(commands.WEB_SET, () => {
 
   it('passes validation when the webUrl is a valid SharePoint URL', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', quickLaunchEnabled: 'true' } });
+    assert.equal(actual, true);
+  });
+
+  it('fails validation if headerLayout is invalid', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerLayout: 'invalid' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('passes validation if headerLayout is set to standard', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerLayout: 'standard' } });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation if headerLayout is set to compact', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerLayout: 'compact' } });
+    assert.equal(actual, true);
+  });
+
+  it('fails validation if headerEmphasis is not a number', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 'abc' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation if headerEmphasis is out of bounds', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 4 } });
+    assert.notEqual(actual, true);
+  });
+
+  it('passes validation if headerEmphasis is 0', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 0 } });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation if headerEmphasis is 1', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 1 } });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation if headerEmphasis is 2', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 2 } });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation if headerEmphasis is 3', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 3 } });
+    assert.equal(actual, true);
+  });
+
+  it('fails validation if megaMenuEnabled is not a valid boolean', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', megaMenuEnabled: 'invalid' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('passes validation if megaMenuEnabled is set to true', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', megaMenuEnabled: 'true' } });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation if megaMenuEnabled is set to false', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', megaMenuEnabled: 'false' } });
     assert.equal(actual, true);
   });
 
