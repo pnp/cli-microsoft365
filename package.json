@@ -68,8 +68,9 @@
     "Sittler, Laurent <laurent.sittler@lsonline.fr>",
     "Skelly, Pete <peteskelly@gmail.com>",
     "Svenson, Mikael <miksvenson@gmail.com>",
+    "van Hunen, Erwin <erwin.van.hunen@outlook.com>",
     "Wilen, Wictor <wictor@wictorwilen.se>",
-    "van Hunen, Erwin <erwin.van.hunen@outlook.com>"
+    "Williams, Rabia <rabia.williams@engagesq.com>"
   ],
   "dependencies": {
     "adal-node": "^0.1.28",
