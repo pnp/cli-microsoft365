@@ -25,6 +25,7 @@ export default {
   STATUS: `${prefix} status`,
   TEAMS_LIST: `${prefix} teams list`,
   TEAMS_CHANNEL_ADD: `${prefix} teams channel add`,
+  TEAMS_CHANNEL_LIST:`${prefix} teams channel list`,
   TEAMS_CHANNEL_MESSAGE_GET: `${prefix} teams channel message get`,
   TEAMS_MESSAGE_GET: `${prefix} teams message get`,
   TEAMS_MESSAGE_LIST: `${prefix} teams message list`,

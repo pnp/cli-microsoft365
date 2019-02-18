@@ -614,7 +614,7 @@ Add-TeamUser|MicrosoftTeams|[graph teams user add](../cmd/graph/teams/teams-user
 Connect-MicrosoftTeams|MicrosoftTeams|[graph login](../cmd/graph/login.md)
 Disconnect-MicrosoftTeams|MicrosoftTeams|[graph logout](../cmd/graph/logout.md)
 Get-Team|MicrosoftTeams|[graph teams list](../cmd/graph/teams/teams-list.md)
-Get-TeamChannel|MicrosoftTeams|
+Get-TeamChannel|MicrosoftTeams|[graph teams channel list](../cmd/graph/teams/teams-channel-list.md)
 Get-TeamFunSettings|MicrosoftTeams|
 Get-TeamGuestSettings|MicrosoftTeams|
 Get-TeamHelp|MicrosoftTeams|
