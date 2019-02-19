@@ -1,6 +1,6 @@
-# Comparison to SharePoint PowerShell
+# Comparison to SharePoint and Office 365 PowerShell
 
-Following table lists the different Office 365 CLI commands and how they map to SharePoint Online Management Shell and PnP PowerShell cmdlets.
+Following table lists the different Office 365 CLI commands and how they map to PowerShell cmdlets for SharePoint and Office 365.
 
 PowerShell Cmdlet|Source|Office 365 CLI command
 -----------------|------|----------------------
@@ -513,3 +513,123 @@ Unpublish-PnPApp|SharePointPnPPowerShellOnline|[spo app retract](../cmd/spo/app/
 Unregister-PnPHubSite|SharePointPnPPowerShellOnline|[spo hubsite unregister](../cmd/spo/hubsite/hubsite-unregister.md)
 Update-PnPApp|SharePointPnPPowerShellOnline|[spo app upgrade](../cmd/spo/app/app-upgrade.md)
 Update-PnPSiteClassification|SharePointPnPPowerShellOnline|[graph siteclassification set](../cmd/graph/siteclassification/siteclassification-set.md)
+Approve-FlowApprovalRequest|Microsoft.PowerApps.PowerShell|
+Deny-FlowApprovalRequest|Microsoft.PowerApps.PowerShell|
+Disable-Flow|Microsoft.PowerApps.PowerShell|
+Enable-Flow|Microsoft.PowerApps.PowerShell|
+Get-Flow|Microsoft.PowerApps.PowerShell|[azmgmt flow list](../cmd/azmgmt/flow/flow-list.md), [azmgmt flow get](../cmd/azmgmt/flow/flow-get.md)
+Get-FlowApproval|Microsoft.PowerApps.PowerShell|
+Get-FlowApprovalRequest|Microsoft.PowerApps.PowerShell|
+Get-FlowEnvironment|Microsoft.PowerApps.PowerShell|[azmgmt flow environment list](../cmd/azmgmt/flow/flow-environment-list.md), [azmgmt flow environment get](../cmd/azmgmt/flow/flow-environment-get.md)
+Get-FlowOwnerRole|Microsoft.PowerApps.PowerShell|
+Get-FlowRun|Microsoft.PowerApps.PowerShell|[azmgmt flow run list](../cmd/azmgmt/flow/flow-run-list.md), [azmgmt flow run get](../cmd/azmgmt/flow/flow-run-get.md)
+Get-PowerApp|Microsoft.PowerApps.PowerShell|
+Get-PowerAppConnection|Microsoft.PowerApps.PowerShell|
+Get-PowerAppConnectionRoleAssignment|Microsoft.PowerApps.PowerShell|
+Get-PowerAppConnector|Microsoft.PowerApps.PowerShell|
+Get-PowerAppConnectorRoleAssignment|Microsoft.PowerApps.PowerShell|
+Get-PowerAppEnvironment|Microsoft.PowerApps.PowerShell|
+Get-PowerAppRoleAssignment|Microsoft.PowerApps.PowerShell|
+Get-PowerAppsNotification|Microsoft.PowerApps.PowerShell|
+Get-PowerAppVersion|Microsoft.PowerApps.PowerShell|
+Publish-PowerApp|Microsoft.PowerApps.PowerShell|
+Remove-Flow|Microsoft.PowerApps.PowerShell|
+Remove-FlowOwnerRole|Microsoft.PowerApps.PowerShell|
+Remove-PowerApp|Microsoft.PowerApps.PowerShell|
+Remove-PowerAppConnection|Microsoft.PowerApps.PowerShell|
+Remove-PowerAppConnectionRoleAssignment|Microsoft.PowerApps.PowerShell|
+Remove-PowerAppConnector|Microsoft.PowerApps.PowerShell|
+Remove-PowerAppConnectorRoleAssignment|Microsoft.PowerApps.PowerShell|
+Remove-PowerAppRoleAssignment|Microsoft.PowerApps.PowerShell|
+Restore-PowerAppVersion|Microsoft.PowerApps.PowerShell|
+Set-FlowOwnerRole|Microsoft.PowerApps.PowerShell|
+Set-PowerAppConnectionRoleAssignment|Microsoft.PowerApps.PowerShell|
+Set-PowerAppConnectorRoleAssignment|Microsoft.PowerApps.PowerShell|
+Set-PowerAppDisplayName|Microsoft.PowerApps.PowerShell|
+Set-PowerAppRoleAssignment|Microsoft.PowerApps.PowerShell|
+Add-ConnectorToBusinessDataGroup|Microsoft.PowerApps.Administration.PowerShell|
+Add-CustomConnectorToPolicy|Microsoft.PowerApps.Administration.PowerShell|
+Add-PowerAppsAccount|Microsoft.PowerApps.Administration.PowerShell|
+Clear-AdminPowerAppApisToBypassConsent|Microsoft.PowerApps.Administration.PowerShell|
+Clear-AdminPowerAppAsFeatured|Microsoft.PowerApps.Administration.PowerShell|
+Clear-AdminPowerAppAsHero|Microsoft.PowerApps.Administration.PowerShell|
+Disable-AdminFlow|Microsoft.PowerApps.Administration.PowerShell|
+Enable-AdminFlow|Microsoft.PowerApps.Administration.PowerShell|
+Get-AdminDlpPolicy|Microsoft.PowerApps.Administration.PowerShell|
+Get-AdminFlow|Microsoft.PowerApps.Administration.PowerShell|
+Get-AdminFlowOwnerRole|Microsoft.PowerApps.Administration.PowerShell|
+Get-AdminFlowUserDetails|Microsoft.PowerApps.Administration.PowerShell|
+Get-AdminPowerApp|Microsoft.PowerApps.Administration.PowerShell|
+Get-AdminPowerAppCdsDatabaseCurrencies|Microsoft.PowerApps.Administration.PowerShell|
+Get-AdminPowerAppCdsDatabaseLanguages|Microsoft.PowerApps.Administration.PowerShell|
+Get-AdminPowerAppConnection|Microsoft.PowerApps.Administration.PowerShell|
+Get-AdminPowerAppConnectionReferences|Microsoft.PowerApps.Administration.PowerShell|
+Get-AdminPowerAppConnectionRoleAssignment|Microsoft.PowerApps.Administration.PowerShell|
+Get-AdminPowerAppConnector|Microsoft.PowerApps.Administration.PowerShell|
+Get-AdminPowerAppConnectorRoleAssignment|Microsoft.PowerApps.Administration.PowerShell|
+Get-AdminPowerAppEnvironment|Microsoft.PowerApps.Administration.PowerShell|
+Get-AdminPowerAppEnvironmentLocations|Microsoft.PowerApps.Administration.PowerShell|
+Get-AdminPowerAppEnvironmentRoleAssignment|Microsoft.PowerApps.Administration.PowerShell|
+Get-AdminPowerAppRoleAssignment|Microsoft.PowerApps.Administration.PowerShell|
+Get-AdminPowerAppsUserDetails|Microsoft.PowerApps.Administration.PowerShell|
+Get-JwtToken|Microsoft.PowerApps.Administration.PowerShell|
+Get-TenantDetailsFromGraph|Microsoft.PowerApps.Administration.PowerShell|
+Get-UsersOrGroupsFromGraph|Microsoft.PowerApps.Administration.PowerShell|
+InvokeApi|Microsoft.PowerApps.Administration.PowerShell|
+New-AdminDlpPolicy|Microsoft.PowerApps.Administration.PowerShell|
+New-AdminPowerAppCdsDatabase|Microsoft.PowerApps.Administration.PowerShell|
+New-AdminPowerAppEnvironment|Microsoft.PowerApps.Administration.PowerShell|
+Remove-AdminDlpPolicy|Microsoft.PowerApps.Administration.PowerShell|
+Remove-AdminFlow|Microsoft.PowerApps.Administration.PowerShell|
+Remove-AdminFlowApprovals|Microsoft.PowerApps.Administration.PowerShell|
+Remove-AdminFlowOwnerRole|Microsoft.PowerApps.Administration.PowerShell|
+Remove-AdminFlowUserDetails|Microsoft.PowerApps.Administration.PowerShell|
+Remove-AdminPowerApp|Microsoft.PowerApps.Administration.PowerShell|
+Remove-AdminPowerAppConnection|Microsoft.PowerApps.Administration.PowerShell|
+Remove-AdminPowerAppConnectionRoleAssignment|Microsoft.PowerApps.Administration.PowerShell|
+Remove-AdminPowerAppConnector|Microsoft.PowerApps.Administration.PowerShell|
+Remove-AdminPowerAppConnectorRoleAssignment|Microsoft.PowerApps.Administration.PowerShell|
+Remove-AdminPowerAppEnvironment|Microsoft.PowerApps.Administration.PowerShell|
+Remove-AdminPowerAppEnvironmentRoleAssignment|Microsoft.PowerApps.Administration.PowerShell|
+Remove-AdminPowerAppRoleAssignment|Microsoft.PowerApps.Administration.PowerShell|
+Remove-ConnectorFromBusinessDataGroup|Microsoft.PowerApps.Administration.PowerShell|
+Remove-CustomConnectorFromPolicy|Microsoft.PowerApps.Administration.PowerShell|
+Remove-LegacyCDSDatabase|Microsoft.PowerApps.Administration.PowerShell|
+Remove-PowerAppsAccount|Microsoft.PowerApps.Administration.PowerShell|
+ReplaceMacro|Microsoft.PowerApps.Administration.PowerShell|
+Select-CurrentEnvironment|Microsoft.PowerApps.Administration.PowerShell|
+Set-AdminDlpPolicy|Microsoft.PowerApps.Administration.PowerShell|
+Set-AdminFlowOwnerRole|Microsoft.PowerApps.Administration.PowerShell|
+Set-AdminPowerAppApisToBypassConsent|Microsoft.PowerApps.Administration.PowerShell|
+Set-AdminPowerAppAsFeatured|Microsoft.PowerApps.Administration.PowerShell|
+Set-AdminPowerAppAsHero|Microsoft.PowerApps.Administration.PowerShell|
+Set-AdminPowerAppConnectionRoleAssignment|Microsoft.PowerApps.Administration.PowerShell|
+Set-AdminPowerAppConnectorRoleAssignment|Microsoft.PowerApps.Administration.PowerShell|
+Set-AdminPowerAppEnvironmentDisplayName|Microsoft.PowerApps.Administration.PowerShell|
+Set-AdminPowerAppEnvironmentRoleAssignment|Microsoft.PowerApps.Administration.PowerShell|
+Set-AdminPowerAppOwner|Microsoft.PowerApps.Administration.PowerShell|
+Set-AdminPowerAppRoleAssignment|Microsoft.PowerApps.Administration.PowerShell|
+Test-PowerAppsAccount|Microsoft.PowerApps.Administration.PowerShell|
+Add-TeamUser|MicrosoftTeams|[graph teams user add](../cmd/graph/teams/teams-user-add.md)
+Connect-MicrosoftTeams|MicrosoftTeams|[graph login](../cmd/graph/login.md)
+Disconnect-MicrosoftTeams|MicrosoftTeams|[graph logout](../cmd/graph/logout.md)
+Get-Team|MicrosoftTeams|[graph teams list](../cmd/graph/teams/teams-list.md)
+Get-TeamChannel|MicrosoftTeams|
+Get-TeamFunSettings|MicrosoftTeams|
+Get-TeamGuestSettings|MicrosoftTeams|
+Get-TeamHelp|MicrosoftTeams|
+Get-TeamMemberSettings|MicrosoftTeams|
+Get-TeamMessagingSettings|MicrosoftTeams|
+Get-TeamUser|MicrosoftTeams|[graph teams user list](../cmd/graph/teams/teams-user-list.md)
+New-Team|MicrosoftTeams|
+New-TeamChannel|MicrosoftTeams|[graph teams channel add](../cmd/graph/teams/teams-channel-add.md)
+Remove-Team|MicrosoftTeams|
+Remove-TeamChannel|MicrosoftTeams|
+Remove-TeamUser|MicrosoftTeams|[graph teams user remove](../cmd/graph/teams/teams-user-remove.md)
+Set-Team|MicrosoftTeams|
+Set-TeamChannel|MicrosoftTeams|
+Set-TeamFunSettings|MicrosoftTeams|
+Set-TeamGuestSettings|MicrosoftTeams|
+Set-TeamMemberSettings|MicrosoftTeams|
+Set-TeamMessagingSettings|MicrosoftTeams|
+Set-TeamPicture|MicrosoftTeams|

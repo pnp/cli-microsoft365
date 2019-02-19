@@ -279,7 +279,7 @@ nav:
     - 'Communication with Office 365': 'concepts/communicating-o365.md'
   - About:
     - 'Why this CLI': 'about/why-cli.md'
-    - 'Comparison to SharePoint PowerShell': 'about/comparison-powershell.md'
+    - 'Comparison to SharePoint and Office 365 PowerShell': 'about/comparison-powershell.md'
     - 'Release notes': 'about/release-notes.md'
     - License: 'about/license.md'
 theme:
