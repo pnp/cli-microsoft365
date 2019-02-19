@@ -113,7 +113,7 @@ class GraphO365SiteClassificationGetCommand extends GraphCommand {
           siteClassificationsSettings.DefaultClassification = defaultClassification[0].value;
         }
 
-        cmd.log(siteClassificationsSettings);
+        cmd.log(JSON.parse(JSON.stringify(siteClassificationsSettings)));
 
         cb();
       }, (err: any) => this.handleRejectedODataJsonPromise(err, cmd, cb));
