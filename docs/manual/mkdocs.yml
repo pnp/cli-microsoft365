@@ -90,6 +90,7 @@ nav:
         - list contenttype list: 'cmd/spo/list/list-contenttype-list.md'
         - list contenttype remove: 'cmd/spo/list/list-contenttype-remove.md'
         - list label get: 'cmd/spo/list/list-label-get.md'
+        - list label set: 'cmd/spo/list/list-label-set.md'
         - list sitescript get: 'cmd/spo/list/list-sitescript-get.md'
         - list view get: 'cmd/spo/list/list-view-get.md'
         - list view list: 'cmd/spo/list/list-view-list.md'
