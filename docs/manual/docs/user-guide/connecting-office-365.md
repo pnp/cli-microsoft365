@@ -14,22 +14,22 @@ Office 365 CLI offers you a number of ways to log in to Office 365 services in y
 
 #### Log in using the default device code flow
 
-The default way to log in to an Office 365 service using the Office 365 CLI is through the device code flow. To log in to an Office 365 service, use the `<service> login` command for that service. For example, to log in to SharePoint Online, execute:
+The default way to log in to an Office 365 service using the Office 365 CLI is through the device code flow. To log in to an Office 365 service, use the `<service> connect` command for that service. For example, to log in to SharePoint Online, execute:
 
 ```sh
-spo login https://contoso.sharepoint.com
+spo connect https://contoso.sharepoint.com
 ```
 
 To log in to Azure AD, which uses a fixed URL, execute:
 
 ```sh
-aad login
+aad connect
 ```
 
 !!! tip
-    If the service uses a fixed URL, such as Azure AD or Microsoft Graph, you will execute the `login` command without any arguments, for example `aad login`. However, when logging in to other services that require a URL, such as SharePoint, you will execute the `login` command with the URL to which the CLI should log in to, for example: `spo login https://contoso.sharepoint.com`. For more information on logging in to each service, refer to the help of the `login` command for that service.
+    If the service uses a fixed URL, such as Azure AD or Microsoft Graph, you will execute the `connect` command without any arguments, for example `aad connect`. However, when logging in to other services that require a URL, such as SharePoint, you will execute the `connect` command with the URL to which the CLI should log in to, for example: `spo connect https://contoso.sharepoint.com`. For more information on logging in to each service, refer to the help of the `connect` command for that service.
 
-After executing the `login` command, you will be prompted to navigate to _https://aka.ms/devicelogin_ in your web browser and enter the login code presented to you by the Office 365 CLI in the command line. After entering the code, you will see the prompt that you are about to authenticate the _PnP Office 365 Management Shell_ application to access your tenant on your behalf.
+After executing the `connect` command, you will be prompted to navigate to _https://aka.ms/devicelogin_ in your web browser and enter the login code presented to you by the Office 365 CLI in the command line. After entering the code, you will see the prompt that you are about to authenticate the _PnP Office 365 Management Shell_ application to access your tenant on your behalf.
 
 [![Signing in to Azure Active Directory](../images/login.png)](../images/login.png)
 
@@ -46,13 +46,13 @@ An alternative way to log in to an Office 365 service in the Office 365 CLI is b
 To log in to SharePoint Online using your user name and password, execute:
 
 ```sh
-spo login https://contoso.sharepoint.com --authType password --userName user@contoso.com --password pass@word1
+spo connect https://contoso.sharepoint.com --authType password --userName user@contoso.com --password pass@word1
 ```
 
 To log in to Azure AD using your user name and password, execute:
 
 ```sh
-aad login --authType password --userName user@contoso.com --password pass@word1
+aad connect --authType password --userName user@contoso.com --password pass@word1
 ```
 
 Using credentials to log in to Office 365 is convenient in automation scenarios where you cannot authenticate interactively. The downside of this way of authenticating is, that it doesn't allow you to use any of the advanced security features that Azure AD offers. If your account for example uses multi-factor authentication, logging in to Office 365 using credentials will fail.
@@ -64,18 +64,18 @@ Generally, you should use the default device code flow. If you need to use a non
 
 #### Log in using a certificate
 
-Another way to log in to an Office 365 service in the Office 365 CLI is by using a certificate. To use this authentication method, set the `OFFICE365CLI_AADAADAPPID` environment variable to the ID of the Azure AD application that you want to use to authenticate the Office 365 CLI and the `OFFICE365CLI_TENANT` environment variable to the ID of your Azure AD directory. When calling the login command, set the `authType` option to `certificate`, specify the path to the certificate private key using the `certificateFile` option and specify the certificate thumbprint using the `thumbprint` option.
+Another way to log in to an Office 365 service in the Office 365 CLI is by using a certificate. To use this authentication method, set the `OFFICE365CLI_AADAADAPPID` environment variable to the ID of the Azure AD application that you want to use to authenticate the Office 365 CLI and the `OFFICE365CLI_TENANT` environment variable to the ID of your Azure AD directory. When calling the connect command, set the `authType` option to `certificate`, specify the path to the certificate private key using the `certificateFile` option and specify the certificate thumbprint using the `thumbprint` option.
 
 To log in to SharePoint Online using a certificate, execute:
 
 ```sh
-spo login https://contoso-admin.sharepoint.com --authType certificate --certificateFile /Users/user/dev/localhost.pfx --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1
+spo connect https://contoso-admin.sharepoint.com --authType certificate --certificateFile /Users/user/dev/localhost.pfx --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1
 ```
 
 To log in to Azure AD using a certificate, execute:
 
 ```sh
-aad login --authType certificate --certificateFile /Users/user/dev/localhost.pfx --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1
+aad connect --authType certificate --certificateFile /Users/user/dev/localhost.pfx --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1
 ```
 
 Logging in to Office 365 using a certificate is convenient for automation scenarios where you cannot authenticate interactively but also don't want to use credentials.
@@ -104,10 +104,10 @@ If you're logged in to Office 365 using a certificate, the `<service> status` co
 
 ### Log out from an Office 365 service
 
-To log out from an Office 365 service, use the `<service> logout` command for that service. For example, to log out from SharePoint Online, execute:
+To log out from an Office 365 service, use the `<service> disconnect` command for that service. For example, to log out from SharePoint Online, execute:
 
 ```sh
-spo logout
+spo disconnect
 ```
 
 !!! tip
