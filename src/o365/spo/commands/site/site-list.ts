@@ -18,6 +18,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   type?: string;
   filter?: string;
+  deleted?: boolean;
 }
 
 class SiteListCommand extends SpoCommand {
@@ -37,6 +38,7 @@ class SiteListCommand extends SpoCommand {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.siteType = args.options.type || 'TeamSite';
     telemetryProps.filter = (!(!args.options.filter)).toString();
+    telemetryProps.deleted = args.options.deleted;
     return telemetryProps;
   }
 
@@ -134,6 +136,10 @@ class SiteListCommand extends SpoCommand {
       {
         option: '-f, --filter [filter]',
         description: 'filter to apply when retrieving sites'
+      },
+      {
+        option: '--deleted [deleted]',
+        description: 'show the deleted site collections'
       }
     ];
 
