@@ -1,0 +1,48 @@
+# spo mail send
+
+Send an email from SharePoint
+
+## Usage
+
+```sh
+spo mail send [options]
+```
+
+## Options
+
+Option|Description
+------|-----------
+`--help`|output usage information
+`--to <to>`|Recipient's email address (separate recipients by comma)
+`--subject <subject>`|Subject of the email
+`--body <body>`|Content of the email
+`--from [from]`|Sender's email address
+`--cc [cc]`|Email addresses to which a carbon copy (CC) of the email is sent (separate addresses by comma)
+`--bcc [bcc]`|Email addresses that receive a copy of the mail but are not listed as recipients of the message (separate addresses by comma)
+`--additionalHeaders [additionalHeaders]`|Add additional headers informations
+`-o, --output [output]`|Output type. `json|text`. Default `text`
+`--verbose`|Runs command with verbose logging
+`--debug`|Runs command with debug logging
+
+!!! important
+    Before using this command, log in to a SharePoint Online site, using the [spo login](../login.md) command.
+
+## Remarks
+
+To send an email, you have to first log in to a SharePoint Online site using the [spo login](../login.md) command, eg. `spo login https://contoso.sharepoint.com`.
+
+All recipients (internal and external) have to have access to the target SharePoint site.
+
+## Examples
+
+Send an email to _user@contoso.com_
+
+```sh
+spo mail send --to 'user@contoso.com' --subject 'Email send via Office365-CLI' --body '<h1>Office365-CLI</h1>Email send via <b>cmdlet</b>.'
+```
+
+Send an email to multiples addresses
+
+```sh
+spo mail send --to 'user1@contoso.com,user2@contoso.com' --subject 'Email send via Office365-CLI' --body '<h1>Office365-CLI</h1>Email send via <b>cmdlet</b>.' --cc 'user3@contoso.com' --bcc 'user4@contoso.com'
+```
