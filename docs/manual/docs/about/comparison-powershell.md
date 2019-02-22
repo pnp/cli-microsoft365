@@ -442,7 +442,7 @@ Revoke-PnPSiteDesignRights|SharePointPnPPowerShellOnline|[spo sitedesign rights 
 Revoke-PnPTenantServicePrincipalPermission|SharePointPnPPowerShellOnline|[spo serviceprincipal grant revoke](../cmd/spo/serviceprincipal/serviceprincipal-grant-revoke.md)
 Save-PnPProvisioningHierarchy|SharePointPnPPowerShellOnline|
 Save-PnPProvisioningTemplate|SharePointPnPPowerShellOnline|
-Send-PnPMail|SharePointPnPPowerShellOnline|
+Send-PnPMail|SharePointPnPPowerShellOnline|[spo mail send](../cmd/spo/mail/mail-send.md)
 Set-PnPAppSideLoading|SharePointPnPPowerShellOnline|
 Set-PnPAuditing|SharePointPnPPowerShellOnline|
 Set-PnPAvailablePageLayouts|SharePointPnPPowerShellOnline|

@@ -112,6 +112,8 @@ nav:
         - listitem set: 'cmd/spo/listitem/listitem-set.md'
         - listitem record declare: 'cmd/spo/listitem/listitem-record-declare.md'
         - listitem record undeclare: 'cmd/spo/listitem/listitem-record-undeclare.md'
+      - mail:
+        - mail send: 'cmd/spo/mail/mail-send.md'
       - navigation:
         - navigation node add: 'cmd/spo/navigation/navigation-node-add.md'
         - navigation node list: 'cmd/spo/navigation/navigation-node-list.md'

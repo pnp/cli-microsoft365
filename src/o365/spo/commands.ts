@@ -93,6 +93,7 @@ export default {
   LISTITEM_SET: `${prefix} listitem set`,
   LOGIN: `${prefix} login`,
   LOGOUT: `${prefix} logout`,
+  MAIL_SEND: `${prefix} mail send`,
   NAVIGATION_NODE_ADD: `${prefix} navigation node add`,
   NAVIGATION_NODE_LIST: `${prefix} navigation node list`,
   NAVIGATION_NODE_REMOVE: `${prefix} navigation node remove`,
