@@ -183,6 +183,7 @@ export default {
   WEB_CLIENTSIDEWEBPART_LIST: `${prefix} web clientsidewebpart list`,
   WEB_GET: `${prefix} web get`,
   WEB_LIST: `${prefix} web list`,
+  WEB_REINDEX: `${prefix} web reindex`,
   WEB_REMOVE: `${prefix} web remove`,
   WEB_SET: `${prefix} web set`
 };

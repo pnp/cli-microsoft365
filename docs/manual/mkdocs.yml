@@ -207,6 +207,7 @@ nav:
         - web clientsidewebpart list: 'cmd/spo/web/web-clientsidewebpart-list.md'
         - web get: 'cmd/spo/web/web-get.md'
         - web list: 'cmd/spo/web/web-list.md'
+        - web reindex: 'cmd/spo/web/web-reindex.md'
         - web remove: 'cmd/spo/web/web-remove.md'
         - web set: 'cmd/spo/web/web-set.md'
     - SharePoint Framework (spfx):
