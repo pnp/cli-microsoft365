@@ -7,12 +7,10 @@ import {
   CommandOption,
   CommandValidate
 } from '../../../../Command';
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
+import { ContextInfo } from '../../spo';
 import { Auth } from '../../../../Auth';
 import { SpoPropertyBagBaseCommand } from './propertybag-base';
 import GlobalOptions from '../../../../GlobalOptions';
-import Utils from '../../../../Utils';
-import { BasePermissions, PermissionKind } from '../../common/base-permissions';
 import { ClientSvc, IdentityResponse } from '../../common/ClientSvc';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -102,7 +100,7 @@ class SpoPropertyBagSetCommand extends SpoPropertyBagBaseCommand {
           cmd.log('');
         }
 
-        return this.setProperty(identityResp, args.options);
+        return this.setProperty(identityResp, args.options, cmd);
       })
       .then((res: any): void => {
         if (this.debug) {
@@ -119,51 +117,12 @@ class SpoPropertyBagSetCommand extends SpoPropertyBagBaseCommand {
       }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
   }
 
-  private setProperty(identityResp: IdentityResponse, options: Options): Promise<any> {
-    let objectType: string = 'AllProperties';
-    if (options.folder) {
-      objectType = 'Properties';
-    }
-
-    const requestOptions: any = {
-      url: `${options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
-      headers: Utils.getRequestHeaders({
-        authorization: `Bearer ${this.siteAccessToken}`,
-        'X-RequestDigest': this.formDigestValue
-      }),
-      body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetFieldValue" Id="206" ObjectPathId="205"><Parameters><Parameter Type="String">${Utils.escapeXml(options.key)}</Parameter><Parameter Type="String">${Utils.escapeXml(options.value)}</Parameter></Parameters></Method><Method Name="Update" Id="207" ObjectPathId="198" /></Actions><ObjectPaths><Property Id="205" ParentId="198" Name="${objectType}" /><Identity Id="198" Name="${identityResp.objectIdentity}" /></ObjectPaths></Request>`
-    };
-
-    return new Promise<any>((resolve: any, reject: any): void => {
-      request.post(requestOptions).then((res: any): void => {
-        const json: ClientSvcResponse = JSON.parse(res);
-        const contents: ClientSvcResponseContents = json.find(x => { return x['ErrorInfo']; });
-        if (contents && contents.ErrorInfo) {
-          reject(contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error');
-        }
-        else {
-          resolve(res);
-        }
-      }, (err: any): void => { reject(err); })
-    });
+  private setProperty(identityResp: IdentityResponse, options: Options, cmd: CommandInstance): Promise<any> {
+    return SpoPropertyBagBaseCommand.setProperty(options.key, options.value, options.webUrl, this.formDigestValue, this.siteAccessToken, identityResp, cmd, this.debug, options.folder);
   }
 
-  /**
-   * Detects if the site in question has no script enabled or not. Detection is done
-   * by verifying if the AddAndCustomizePages permission is missing
-   * Note: Can later be moved as common method if required for other cli checks.
-   * @param webIdentityResp web object identity response returned from client.svc/ProcessQuery. Has format like <GUID>|<GUID>:site:<GUID>:web:<GUID>
-   * @param options command options
-   * @param cmd command instance
-   */
   private isNoScriptSite(webIdentityResp: IdentityResponse, options: Options, clientSvcCommons: ClientSvc): Promise<boolean> {
-    return new Promise<boolean>((resolve: (isNoScriptSite: boolean) => void, reject: (error: any) => void): void => {
-      clientSvcCommons.getEffectiveBasePermissions(webIdentityResp.objectIdentity, options.webUrl, this.siteAccessToken, this.formDigestValue)
-        .then((basePermissionsResp: BasePermissions): void => {
-          resolve(basePermissionsResp.has(PermissionKind.AddAndCustomizePages) === false);
-        })
-        .catch(err => reject(err));
-    });
+    return SpoPropertyBagBaseCommand.isNoScriptSite(options.webUrl, this.formDigestValue, this.siteAccessToken, webIdentityResp, clientSvcCommons);
   }
 
   public options(): CommandOption[] {

@@ -3,7 +3,8 @@ import Utils from '../../../../Utils';
 import { ClientSvcResponseContents, ClientSvcResponse } from "../../spo";
 import config from '../../../../config';
 import SpoCommand from '../../SpoCommand';
-import { IdentityResponse } from '../../common/ClientSvc';
+import { IdentityResponse, ClientSvc } from '../../common/ClientSvc';
+import { BasePermissions, PermissionKind } from '../../common/base-permissions';
 
 export interface Property {
   key: string;
@@ -169,5 +170,58 @@ export abstract class SpoPropertyBagBaseCommand extends SpoCommand {
     }
 
     return { key: objKey, value: objValue } as Property;
+  }
+
+  public static setProperty(name: string, value: string, webUrl: string, formDigest: string, accessToken: string, identityResp: IdentityResponse, cmd: CommandInstance, debug: boolean, folder?: string): Promise<any> {
+    let objectType: string = 'AllProperties';
+    if (folder) {
+      objectType = 'Properties';
+    }
+
+    const requestOptions: any = {
+      url: `${webUrl}/_vti_bin/client.svc/ProcessQuery`,
+      headers: Utils.getRequestHeaders({
+        authorization: `Bearer ${accessToken}`,
+        'X-RequestDigest': formDigest
+      }),
+      body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetFieldValue" Id="206" ObjectPathId="205"><Parameters><Parameter Type="String">${Utils.escapeXml(name)}</Parameter><Parameter Type="String">${Utils.escapeXml(value)}</Parameter></Parameters></Method><Method Name="Update" Id="207" ObjectPathId="198" /></Actions><ObjectPaths><Property Id="205" ParentId="198" Name="${objectType}" /><Identity Id="198" Name="${identityResp.objectIdentity}" /></ObjectPaths></Request>`
+    };
+
+    return new Promise<any>((resolve: any, reject: any): void => {
+      if (debug) {
+        cmd.log('Executing web request...');
+        cmd.log(requestOptions);
+        cmd.log('');
+      }
+      
+      request.post(requestOptions).then((res: any): void => {
+        const json: ClientSvcResponse = JSON.parse(res);
+        const contents: ClientSvcResponseContents = json.find(x => { return x['ErrorInfo']; });
+        if (contents && contents.ErrorInfo) {
+          reject(contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error');
+        }
+        else {
+          resolve(res);
+        }
+      }, (err: any): void => { reject(err); })
+    });
+  }
+
+  /**
+   * Detects if the site in question has no script enabled or not. Detection is done
+   * by verifying if the AddAndCustomizePages permission is missing
+   * Note: Can later be moved as common method if required for other cli checks.
+   * @param webIdentityResp web object identity response returned from client.svc/ProcessQuery. Has format like <GUID>|<GUID>:site:<GUID>:web:<GUID>
+   * @param options command options
+   * @param cmd command instance
+   */
+  public static isNoScriptSite(webUrl: string, formDigest: string, accessToken: string, webIdentityResp: IdentityResponse, clientSvcCommons: ClientSvc): Promise<boolean> {
+    return new Promise<boolean>((resolve: (isNoScriptSite: boolean) => void, reject: (error: any) => void): void => {
+      clientSvcCommons.getEffectiveBasePermissions(webIdentityResp.objectIdentity, webUrl, accessToken, formDigest)
+        .then((basePermissionsResp: BasePermissions): void => {
+          resolve(basePermissionsResp.has(PermissionKind.AddAndCustomizePages) === false);
+        })
+        .catch(err => reject(err));
+    });
   }
 }
