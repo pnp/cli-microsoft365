@@ -37,11 +37,7 @@ class GraphTeamsChannelListCommand extends GraphItemsListCommand<Channel>{
           cmd.log(this.items.map(m => {
             return {
               id: m.id,
-              displayName: m.displayName,
-              description: m.description,
-              isFavoriteByDefault:m.isFavoriteByDefault,
-              email:m.email,
-              webUrl:m.webUrl
+              displayName: m.displayName
             }
           }));
         }
