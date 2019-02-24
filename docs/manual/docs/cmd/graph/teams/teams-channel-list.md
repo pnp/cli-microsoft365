@@ -1,4 +1,4 @@
-#graph teams channel list
+# graph teams channel list
 
 List the channels in a specified Microsoft Teams team
 
