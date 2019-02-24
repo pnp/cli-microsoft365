@@ -7,8 +7,10 @@
 **SharePoint Online:**
 
 - [spo list label get](../cmd/spo/list/list-label-get.md) - gets label set on the specified list [#773](https://github.com/pnp/office365-cli/issues/773)
+- [spo list label set](../cmd/spo/list/list-label-set.md) - sets classification label on the specified list [#772](https://github.com/pnp/office365-cli/issues/772)
 - [spo list view field add](../cmd/spo/list/list-view-field-add.md) - adds the specified field to list view [#735](https://github.com/pnp/office365-cli/issues/735)
 - [spo list view field remove](../cmd/spo/list/list-view-field-remove.md) - removes the specified field from list view [#736](https://github.com/pnp/office365-cli/issues/736)
+- [spo site inplacerecordsmanagement set](../cmd/spo/site/site-inplacerecordsmanagement-set.md) - activates or deactivates in-place records management for a site collection [#774](https://github.com/pnp/office365-cli/issues/774)
 - [spo sitedesign run list](../cmd/spo/sitedesign/sitedesign-run-list.md) - lists information about site designs applied to the specified site [#779](https://github.com/pnp/office365-cli/issues/779)
 - [spo sitedesign run status get](../cmd/spo/sitedesign/sitedesign-run-status-get.md) - gets information about the site scripts executed for the specified site design [#780](https://github.com/pnp/office365-cli/issues/780)
 - [spo sitedesign task get](../cmd/spo/sitedesign/sitedesign-task-get.md) - gets information about the specified site design scheduled for execution [#782](https://github.com/pnp/office365-cli/issues/782)
@@ -16,6 +18,7 @@
 
 **Microsoft Graph:**
 
+- [graph teams channel list](../cmd/graph/teams/teams-channel-list.md) - lists channels in the specified Microsoft Teams team [#586](https://github.com/pnp/office365-cli/issues/586)
 - [graph teams user remove](../cmd/graph/teams/teams-user-remove.md) - removes the specified user from the specified Microsoft Teams team [#757](https://github.com/pnp/office365-cli/issues/757)
 - [graph teams user set](../cmd/graph/teams/teams-user-set.md) - updates role of the specified user in the given Microsoft Teams team [#760](https://github.com/pnp/office365-cli/issues/760)
 
