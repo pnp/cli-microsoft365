@@ -25,6 +25,7 @@ export default {
   STATUS: `${prefix} status`,
   TEAMS_APP_LIST: `${prefix} teams app list`,
   TEAMS_APP_PUBLISH: `${prefix} teams app publish`,
+  TEAMS_APP_REMOVE: `${prefix} teams app remove`,
   TEAMS_APP_UPDATE: `${prefix} teams app update`,
   TEAMS_LIST: `${prefix} teams list`,
   TEAMS_CHANNEL_ADD: `${prefix} teams channel add`,

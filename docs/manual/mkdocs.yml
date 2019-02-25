@@ -240,6 +240,7 @@ nav:
       - teams:
         - teams app list: 'cmd/graph/teams/teams-app-list.md'
         - teams app publish: 'cmd/graph/teams/teams-app-publish.md'
+        - teams app remove: 'cmd/graph/teams/teams-app-remove.md'
         - teams app update: 'cmd/graph/teams/teams-app-update.md'
         - teams list: 'cmd/graph/teams/teams-list.md'
         - teams channel add: 'cmd/graph/teams/teams-channel-add.md'
