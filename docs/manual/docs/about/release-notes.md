@@ -18,6 +18,10 @@
 
 **Microsoft Graph:**
 
+- [graph teams app list](../cmd/graph/teams/teams-app-list.md) - lists apps from the Microsoft Teams app catalog [#826](https://github.com/pnp/office365-cli/issues/826)
+- [graph teams app publish](../cmd/graph/teams/teams-app-publish.md) - publishes Teams app to the organization's app catalog [#824](https://github.com/pnp/office365-cli/issues/824)
+- [graph teams app remove](../cmd/graph/teams/teams-app-remove.md) - removes a Teams app from the organization's app catalog [#825](https://github.com/pnp/office365-cli/issues/825)
+- [graph teams app update](../cmd/graph/teams/teams-app-update.md) - updates Teams app in the organization's app catalog [#827](https://github.com/pnp/office365-cli/issues/827)
 - [graph teams channel list](../cmd/graph/teams/teams-channel-list.md) - lists channels in the specified Microsoft Teams team [#586](https://github.com/pnp/office365-cli/issues/586)
 - [graph teams user remove](../cmd/graph/teams/teams-user-remove.md) - removes the specified user from the specified Microsoft Teams team [#757](https://github.com/pnp/office365-cli/issues/757)
 - [graph teams user set](../cmd/graph/teams/teams-user-set.md) - updates role of the specified user in the given Microsoft Teams team [#760](https://github.com/pnp/office365-cli/issues/760)
