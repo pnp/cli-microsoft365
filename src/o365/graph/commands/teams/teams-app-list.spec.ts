@@ -207,6 +207,46 @@ describe(commands.TEAMS_APP_LIST, () => {
     });
   });
 
+  it('lists all properties for output json', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/appCatalogs/teamsApps?$filter=distributionMethod eq 'organization'`) {
+        return Promise.resolve({
+          "value": [
+            {
+              "id": "7131a36d-bb5f-46b8-bb40-0b199a3fad74",
+              "externalId": "4f0cd7c8-995e-4868-812d-d1d402a81eca",
+              "displayName": "WsInfo",
+              "distributionMethod": "organization"
+            }
+          ]
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.service = new Service();
+    auth.service.connected = true;
+    auth.service.resource = 'https://graph.microsoft.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { output: 'json', debug: false } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith([
+          {
+            "id": "7131a36d-bb5f-46b8-bb40-0b199a3fad74",
+            "externalId": "4f0cd7c8-995e-4868-812d-d1d402a81eca",
+            "displayName": "WsInfo",
+            "distributionMethod": "organization"
+          }
+        ]));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('supports debug mode', () => {
     const options = (command.options() as CommandOption[]);
     let containsOption = false;
