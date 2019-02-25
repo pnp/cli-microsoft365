@@ -23,6 +23,8 @@ export default {
   SITECLASSIFICATION_GET: `${prefix} siteclassification get`,
   SITECLASSIFICATION_SET: `${prefix} siteclassification set`,
   STATUS: `${prefix} status`,
+  MYCOMMAND: `${prefix} mycommand`,
+  TEAMS_APP_LIST: `${prefix} teams app list`,
   TEAMS_LIST: `${prefix} teams list`,
   TEAMS_CHANNEL_ADD: `${prefix} teams channel add`,
   TEAMS_CHANNEL_LIST:`${prefix} teams channel list`,
