@@ -124,7 +124,7 @@ class TeamsAppUpdateCommand extends GraphItemsListCommand<Team> {
   Examples:
 
     Update the Teams app with ID ${chalk.grey('83cece1e-938d-44a1-8b86-918cf6151957')}
-      ${chalk.grey(config.delimiter)} ${this.name} --filePath ./teams-manifest.zip
+      ${chalk.grey(config.delimiter)} ${this.name} --id 83cece1e-938d-44a1-8b86-918cf6151957
 `);
   }
 }
