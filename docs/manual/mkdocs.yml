@@ -238,6 +238,7 @@ nav:
         - siteclassification get: 'cmd/graph/siteclassification/siteclassification-get.md'
         - siteclassification set: 'cmd/graph/siteclassification/siteclassification-set.md'
       - teams:
+        - teams app list: 'cmd/graph/teams/teams-app-list.md'
         - teams app publish: 'cmd/graph/teams/teams-app-publish.md'
         - teams app update: 'cmd/graph/teams/teams-app-update.md'
         - teams list: 'cmd/graph/teams/teams-list.md'
