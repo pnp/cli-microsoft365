@@ -20,6 +20,7 @@ export default {
   CONNECT: `${prefix} connect`,
   CONTENTTYPE_ADD: `${prefix} contenttype add`,
   CONTENTTYPE_GET: `${prefix} contenttype get`,
+  CONTENTTYPE_FIELD_REMOVE: `${prefix} contenttype field remove`,
   CONTENTTYPE_FIELD_SET: `${prefix} contenttype field set`,
   CUSTOMACTION_ADD: `${prefix} customaction add`,
   CUSTOMACTION_CLEAR: `${prefix} customaction clear`,
