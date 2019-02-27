@@ -630,6 +630,6 @@ Set-Team|MicrosoftTeams|
 Set-TeamChannel|MicrosoftTeams|
 Set-TeamFunSettings|MicrosoftTeams|
 Set-TeamGuestSettings|MicrosoftTeams|
-Set-TeamMemberSettings|MicrosoftTeams|
+Set-TeamMemberSettings|MicrosoftTeams|[graph teams membersettings set](../cmd/graph/teams/teams-membersettings-set.md)
 Set-TeamMessagingSettings|MicrosoftTeams|
 Set-TeamPicture|MicrosoftTeams|
