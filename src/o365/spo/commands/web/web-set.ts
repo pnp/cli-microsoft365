@@ -18,6 +18,9 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   description?: string;
+  headerEmphasis?: number;
+  headerLayout?: string;
+  megaMenuEnabled?: string;
   quickLaunchEnabled?: string;
   siteLogoUrl?: string;
   title?: string;
@@ -36,6 +39,9 @@ class SpoWebSetCommand extends SpoCommand {
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.description = typeof args.options.description !== 'undefined';
+    telemetryProps.headerEmphasis = typeof args.options.headerEmphasis !== 'undefined';
+    telemetryProps.headerLayout = typeof args.options.headerLayout !== 'undefined';
+    telemetryProps.megaMenuEnabled = typeof args.options.megaMenuEnabled !== 'undefined';
     telemetryProps.siteLogoUrl = typeof args.options.siteLogoUrl !== 'undefined';
     telemetryProps.title = typeof args.options.title !== 'undefined';
     telemetryProps.quickLaunchEnabled = typeof args.options.quickLaunchEnabled !== 'undefined';
@@ -64,6 +70,15 @@ class SpoWebSetCommand extends SpoCommand {
         }
         if (typeof args.options.quickLaunchEnabled !== 'undefined') {
           payload.QuickLaunchEnabled = args.options.quickLaunchEnabled === 'true';
+        }
+        if (typeof args.options.headerEmphasis !== 'undefined') {
+          payload.HeaderEmphasis = args.options.headerEmphasis;
+        }
+        if (typeof args.options.headerLayout !== 'undefined') {
+          payload.HeaderLayout = args.options.headerLayout === 'standard' ? 1 : 2;
+        }
+        if (typeof args.options.megaMenuEnabled !== 'undefined') {
+          payload.MegaMenuEnabled = args.options.megaMenuEnabled === 'true';
         }
 
         const requestOptions: any = {
@@ -125,6 +140,21 @@ class SpoWebSetCommand extends SpoCommand {
       {
         option: '--quickLaunchEnabled [quickLaunchEnabled]',
         description: 'Set to true to enable quick launch and to false to disable it'
+      },
+      {
+        option: '--headerLayout [headerLayout]',
+        description: 'Configures the site header. Allowed values standard|compact',
+        autocomplete: ['standard', 'compact']
+      },
+      {
+        option: '--headerEmphasis [headerEmphasis]',
+        description: 'Configures the site header background. Allowed values 0|1|2|3',
+        autocomplete: ['0', '1', '2', '3']
+      },
+      {
+        option: '--megaMenuEnabled [megaMenuEnabled]',
+        description: 'Set to \'true\' to change the menu style to megamenu. Set to \'false\' to use the cascading menu style',
+        autocomplete: ['true', 'false']
       }
     ];
 
@@ -148,6 +178,28 @@ class SpoWebSetCommand extends SpoCommand {
         if (args.options.quickLaunchEnabled !== 'true' &&
           args.options.quickLaunchEnabled !== 'false') {
           return `${args.options.quickLaunchEnabled} is not a valid boolean value`;
+        }
+      }
+
+      if (typeof args.options.headerEmphasis !== 'undefined') {
+        if (isNaN(args.options.headerEmphasis)) {
+          return `${args.options.headerEmphasis} is not a number`;
+        }
+
+        if ([0, 1, 2, 3].indexOf(args.options.headerEmphasis) < 0) {
+          return `${args.options.headerEmphasis} is not a valid value for headerEmphasis. Allowed values are 0|1|2|3`;
+        }
+      }
+
+      if (typeof args.options.headerLayout !== 'undefined') {
+        if (['standard', 'compact'].indexOf(args.options.headerLayout) < 0) {
+          return `${args.options.headerLayout} is not a valid value for headerLayout. Allowed values are standard|compact`;
+        }
+      }
+
+      if (typeof args.options.megaMenuEnabled !== 'undefined') {
+        if (['true', 'false'].indexOf(args.options.megaMenuEnabled) < 0) {
+          return `${args.options.megaMenuEnabled} is not a valid boolean value`;
         }
       }
 
@@ -175,6 +227,15 @@ class SpoWebSetCommand extends SpoCommand {
 
     Hide quick launch on the subsite
       ${chalk.grey(config.delimiter)} ${commands.WEB_SET} --webUrl https://contoso.sharepoint.com/sites/team-a --quickLaunchEnabled false
+
+    Set site header layout to compact
+      ${chalk.grey(config.delimiter)} ${commands.WEB_SET} --webUrl https://contoso.sharepoint.com/sites/team-a --headerLayout compact
+
+    Set site header color to primary theme backround color
+      ${chalk.grey(config.delimiter)} ${commands.WEB_SET} --webUrl https://contoso.sharepoint.com/sites/team-a --headerEmphasis 0
+
+    Enable megamenu in the site
+      ${chalk.grey(config.delimiter)} ${commands.WEB_SET} --webUrl https://contoso.sharepoint.com/sites/team-a --megaMenuEnabled true
   ` );
   }
 }

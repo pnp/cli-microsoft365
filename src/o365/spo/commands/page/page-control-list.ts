@@ -52,6 +52,16 @@ class SpoPageControlListCommand extends SpoCommand {
         // remove the column property to be able to serialize the array to JSON
         controls.forEach(c => delete c.column);
 
+        // remove the dynamicDataValues and dynamicDataPaths properties if they are null
+        controls.forEach(c => {
+          if (!c.dynamicDataPaths) {
+            delete c.dynamicDataPaths
+          }
+          if (!c.dynamicDataValues) {
+            delete c.dynamicDataValues
+          }
+        });
+
         if (args.options.output === 'json') {
           // drop the information about original classes from clientsidepages.ts
           cmd.log(JSON.parse(JSON.stringify(controls)));

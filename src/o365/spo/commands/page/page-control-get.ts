@@ -50,7 +50,7 @@ class SpoPageControlGetCommand extends SpoCommand {
         if (control) {
           const isJSONOutput = args.options.output === 'json';
 
-          cmd.log(Page.getControlsInformation(control, isJSONOutput));
+          cmd.log(JSON.parse(JSON.stringify(Page.getControlsInformation(control, isJSONOutput))));
 
           if (this.verbose) {
             cmd.log(vorpal.chalk.green('DONE'));

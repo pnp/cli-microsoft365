@@ -607,7 +607,9 @@ export abstract class CanvasControl {
     public column: CanvasColumn | null = null,
     public order = 1,
     public id: string | undefined = getGUID(),
-    public controlData: ClientSideControlData | null = null) { }
+    public controlData: ClientSideControlData | null = null,
+    public dynamicDataPaths: any = null,
+    public dynamicDataValues: any = null) { }
 
   /**
    * Value of the control's "data-sp-controldata" attribute
@@ -816,7 +818,9 @@ export class ClientSideWebpart extends ClientSidePart {
     public webPartId = "",
     protected htmlProperties = "",
     protected serverProcessedContent: ServerProcessedContent | null = null,
-    protected canvasDataVersion: string | null = "1.0") {
+    protected canvasDataVersion: string | null = "1.0",
+    public dynamicDataPaths: any = "",
+    public dynamicDataValues: any = "") {
     super(3, "1.0");
   }
 
@@ -857,8 +861,16 @@ export class ClientSideWebpart extends ClientSidePart {
       instanceId: this.id,
       properties: this.propertieJson,
       serverProcessedContent: this.serverProcessedContent,
-      title: this.title,
+      title: this.title
     };
+
+    if (this.dynamicDataPaths) {
+      (data as any)['dynamicDataPaths'] = this.dynamicDataPaths;
+    }
+
+    if (this.dynamicDataValues) {
+      (data as any)['dynamicDataValues'] = this.dynamicDataValues;
+    }
 
     const html: string[] = [];
 
@@ -881,7 +893,7 @@ export class ClientSideWebpart extends ClientSidePart {
   }
 
   public fromHtml(html: string): void {
-
+    
     super.fromHtml(html);
 
     const webPartData = ClientSidePage.escapedStringToJson<ClientSideWebpartData>(getAttrValueFromString(html, "data-sp-webpartdata"));
@@ -895,6 +907,14 @@ export class ClientSideWebpart extends ClientSidePart {
 
     if (typeof webPartData.serverProcessedContent !== "undefined") {
       this.serverProcessedContent = webPartData.serverProcessedContent;
+    }
+
+    if (typeof webPartData.dynamicDataPaths !== "undefined") {
+      this.dynamicDataPaths = webPartData.dynamicDataPaths;
+    }
+    
+    if (typeof webPartData.dynamicDataValues !== "undefined") {
+      this.dynamicDataValues = webPartData.dynamicDataValues;
     }
 
     // get our html properties
@@ -972,6 +992,22 @@ export class ClientSideWebpart extends ClientSidePart {
       this.serverProcessedContent = null;
     }
 
+    if (typeof props.webPartData !== "undefined" && typeof props.webPartData.dynamicDataPaths !== "undefined") {
+      this.dynamicDataPaths = props.webPartData.dynamicDataPaths;
+    } else if (typeof props.dynamicDataPaths !== "undefined") {
+      this.dynamicDataPaths = props.dynamicDataPaths;
+    } else {
+      this.dynamicDataPaths = null;
+    }
+
+    if (typeof props.webPartData !== "undefined" && typeof props.webPartData.dynamicDataValues !== "undefined") {
+      this.dynamicDataValues = props.webPartData.dynamicDataValues;
+    } else if (typeof props.dynamicDataValues !== "undefined") {
+      this.dynamicDataValues = props.dynamicDataValues;
+    } else {
+      this.dynamicDataValues = null;
+    }
+
     if (typeof props.webPartData !== "undefined" && typeof props.webPartData.properties !== "undefined") {
       return props.webPartData.properties;
     } else if (typeof props.properties !== "undefined") {
@@ -979,6 +1015,7 @@ export class ClientSideWebpart extends ClientSidePart {
     } else {
       return props;
     }
+
   }
 }
 
@@ -1070,6 +1107,8 @@ export interface ClientSideWebpartData {
   properties: any;
   title: string;
   serverProcessedContent?: ServerProcessedContent;
+  dynamicDataPaths?: any;
+  dynamicDataValues?: any;
 }
 
 export module ClientSideWebpartPropertyTypes {

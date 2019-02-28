@@ -18,8 +18,11 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   webUrl: string;
+  listId?: string;
   listTitle?: string;
-  id: string;
+  listUrl?: string;
+  id?: string;
+  fieldTitle?: string;
 }
 
 class SpoFieldGetCommand extends SpoCommand {
@@ -28,7 +31,17 @@ class SpoFieldGetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Retrieves information about the specified list or site column';
+    return 'Retrieves information about the specified list- or site column';
+  }
+
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.listId = typeof args.options.listId !== 'undefined';
+    telemetryProps.listTitle = typeof args.options.listTitle !== 'undefined';
+    telemetryProps.listUrl = typeof args.options.listUrl !== 'undefined';
+    telemetryProps.id = typeof args.options.id !== 'undefined';
+    telemetryProps.fieldTitle = typeof args.options.fieldTitle !== 'undefined';
+    return telemetryProps;
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
@@ -41,11 +54,33 @@ class SpoFieldGetCommand extends SpoCommand {
         siteAccessToken = accessToken;
 
         if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving information about the field ${args.options.id}...`);
+          cmd.log(`Retrieved access token ${accessToken}.`);
+        }
+
+        let listRestUrl: string = '';
+
+        if (args.options.listId) {
+          listRestUrl = `lists(guid'${encodeURIComponent(args.options.listId)}')/`;
+        }
+        else if (args.options.listTitle) {
+          listRestUrl = `lists/getByTitle('${encodeURIComponent(args.options.listTitle as string)}')/`;
+        }
+        else if (args.options.listUrl) {
+          const listServerRelativeUrl: string = Utils.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+
+          listRestUrl = `GetList('${encodeURIComponent(listServerRelativeUrl)}')/`;
+        }
+
+        let fieldRestUrl: string = '';
+        if (args.options.id) {
+          fieldRestUrl = `/getbyid('${encodeURIComponent(args.options.id)}')`;
+        }
+        else {
+          fieldRestUrl = `/getbyinternalnameortitle('${encodeURIComponent(args.options.fieldTitle as string)}')`;
         }
 
         const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/${(args.options.listTitle ? `lists/getByTitle('${encodeURIComponent(args.options.listTitle)}')/` : '')}fields('${args.options.id}')`,
+          url: `${args.options.webUrl}/_api/web/${listRestUrl}fields${fieldRestUrl}`,
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata'
@@ -86,11 +121,23 @@ class SpoFieldGetCommand extends SpoCommand {
       },
       {
         option: '-l, --listTitle [listTitle]',
-        description: 'Title of the list where the field is located(if it is a list column)'
+        description: 'Title of the list where the field is located. Specify only one of listTitle, listId or listUrl'
       },
       {
-        option: '-i, --id <id>',
-        description: 'The ID of the field to retrieve'
+        option: '--listId [listId]',
+        description: 'ID of the list where the field is located. Specify only one of listTitle, listId or listUrl'
+      },
+      {
+        option: '--listUrl [listUrl]',
+        description: 'Server- or web-relative URL of the list where the field is located. Specify only one of listTitle, listId or listUrl'
+      },
+      {
+        option: '-i, --id [id]',
+        description: 'The ID of the field to retrieve. Specify id or fieldTitle but not both'
+      },
+      {
+        option: '--fieldTitle [fieldTitle]',
+        description: 'The display name (case-sensitive) of the field to retrieve. Specify id or fieldTitle but not both'
       }
     ];
 
@@ -109,12 +156,16 @@ class SpoFieldGetCommand extends SpoCommand {
         return isValidSharePointUrl;
       }
 
-      if (!args.options.id) {
-        return 'Required parameter id missing';
+      if (!args.options.id && !args.options.fieldTitle) {
+        return 'Specify id or fieldTitle, one is required';
       }
 
-      if (!Utils.isValidGuid(args.options.id)) {
+      if (args.options.id && !Utils.isValidGuid(args.options.id)) {
         return `${args.options.id} is not a valid GUID`;
+      }
+
+      if (args.options.listId && !Utils.isValidGuid(args.options.listId)) {
+        return `${args.options.listId} is not a valid GUID`;
       }
 
       return true;
@@ -138,11 +189,14 @@ class SpoFieldGetCommand extends SpoCommand {
 
   Examples:
   
-    Retrieve site column
+    Retrieves site column by id located in site ${chalk.grey('https://contoso.sharepoint.com/sites/contoso-sales')}
       ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --id 5ee2dd25-d941-455a-9bdb-7f2c54aed11b
     
-    Retrieve list column
+    Retrieves list column by id located in site ${chalk.grey('https://contoso.sharepoint.com/sites/contoso-sales')}. Retrieves the list by its title
       ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listTitle Events --id 5ee2dd25-d941-455a-9bdb-7f2c54aed11b
+
+    Retrieves list column by display name located in site ${chalk.grey('https://contoso.sharepoint.com/sites/contoso-sales')}. Retrieves the list by its url
+      ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listUrl 'Lists/Events' --fieldTitle 'Title'
 `);
   }
 }

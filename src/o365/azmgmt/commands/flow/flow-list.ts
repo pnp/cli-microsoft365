@@ -6,9 +6,7 @@ import {
   CommandOption,
   CommandValidate
 } from '../../../../Command';
-import * as request from 'request-promise-native';
-import Utils from '../../../../Utils';
-import AzmgmtCommand from '../../AzmgmtCommand';
+import { AzmgmtItemsListCommand } from '../../AzmgmtItemsListCommand';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -21,7 +19,7 @@ interface Options extends GlobalOptions {
   asAdmin: boolean;
 }
 
-class AzmgmtFlowListCommand extends AzmgmtCommand {
+class AzmgmtFlowListCommand extends AzmgmtItemsListCommand<{ name: string, properties: { displayName: string } }> {
   public get name(): string {
     return commands.FLOW_LIST;
   }
@@ -37,47 +35,17 @@ class AzmgmtFlowListCommand extends AzmgmtCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}.`);
-        }
+    const url: string = `${auth.service.resource}providers/Microsoft.ProcessSimple${args.options.asAdmin ? '/scopes/admin' : ''}/environments/${encodeURIComponent(args.options.environment)}/flows?api-version=2016-11-01`;
 
-        if (this.verbose) {
-          cmd.log(`Retrieving information about Microsoft Flows in the environment ${args.options.environment}...`);
-        }
-
-        const requestOptions: any = {
-          url: `${auth.service.resource}providers/Microsoft.ProcessSimple${args.options.asAdmin ? '/scopes/admin' : ''}/environments/${encodeURIComponent(args.options.environment)}/flows?api-version=2016-11-01`,
-          headers: Utils.getRequestHeaders({
-            authorization: `Bearer ${accessToken}`,
-            accept: 'application/json'
-          }),
-          json: true
-        };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
-        return request.get(requestOptions);
-      })
-      .then((res: { value: [{ name: string, properties: { displayName: string } }] }): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
-        if (res.value && res.value.length > 0) {
+    this
+      .getAllItems(url, cmd, true)
+      .then((): void => {
+        if (this.items.length > 0) {
           if (args.options.output === 'json') {
-            cmd.log(res.value);
+            cmd.log(this.items);
           }
           else {
-            cmd.log(res.value.map(f => {
+            cmd.log(this.items.map(f => {
               return {
                 name: f.name,
                 displayName: f.properties.displayName

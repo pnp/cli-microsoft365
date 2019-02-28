@@ -1,6 +1,6 @@
 # spo field get
 
-Retrieves information about the specified list or site column
+Retrieves information about the specified list- or site column
 
 ## Usage
 
@@ -14,8 +14,11 @@ Option|Description
 ------|-----------
 `--help`|output usage information
 `-u, --webUrl <webUrl>`|Absolute URL of the site where the field is located
-`-l, --listTitle [listTitle]`|Title of the list where the field is located(if it is a list column)
-`-i, --id <id>`|The ID of the field to retrieve
+`-l, --listTitle [listTitle]`|Title of the list where the field is located. Specify only one of listTitle, listId or listUrl
+`--listId [listId]`|ID of the list where the field is located. Specify only one of listTitle, listId or listUrl
+`--listUrl [listUrl]`|Server- or web-relative URL of the list where the field is located. Specify only one of listTitle, listId or listUrl
+`-i, --id [id]`|The ID of the field to retrieve. Specify id or fieldTitle but not both
+`--fieldTitle [fieldTitle]`|The display name (case-sensitive) of the field to retrieve. Specify id or fieldTitle but not both
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
@@ -29,14 +32,20 @@ To retrieve information about a field, you have to first log in to a SharePoint 
 
 ## Examples
 
-Retrieve site column
+Retrieves site column by id located in site _https://contoso.sharepoint.com/sites/contoso-sales_
 
 ```sh
 spo field get --webUrl https://contoso.sharepoint.com/sites/contoso-sales --id 5ee2dd25-d941-455a-9bdb-7f2c54aed11b
 ```
 
-Retrieve list column
+Retrieves list column by id located in site _https://contoso.sharepoint.com/sites/contoso-sales_. Retrieves the list by its title
 
 ```sh
 spo field get --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listTitle Events --id 5ee2dd25-d941-455a-9bdb-7f2c54aed11b
+```
+
+Retrieves list column by display name located in site _https://contoso.sharepoint.com/sites/contoso-sales_. Retrieves the list by its url
+
+```sh
+spo field get --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listUrl 'Lists/Events' --fieldTitle 'Title'
 ```
