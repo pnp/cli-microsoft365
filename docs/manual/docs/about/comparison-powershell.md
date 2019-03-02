@@ -468,7 +468,7 @@ Set-PnPInPlaceRecordsManagement|SharePointPnPPowerShellOnline|[spo site inplacer
 Set-PnPLabel|SharePointPnPPowerShellOnline|[spo list label set](../cmd/spo/list/list-label-set.md)
 Set-PnPList|SharePointPnPPowerShellOnline|[spo list set](../cmd/spo/list/list-set.md)
 Set-PnPListItem|SharePointPnPPowerShellOnline|[spo listitem set](../cmd/spo/listitem/listitem-set.md)
-Set-PnPListItemAsRecord|SharePointPnPPowerShellOnline|
+Set-PnPListItemAsRecord|SharePointPnPPowerShellOnline|[spo listitem record declare](../cmd/spo/listitem/listitem-record-declare.md)
 Set-PnPListItemPermission|SharePointPnPPowerShellOnline|
 Set-PnPListPermission|SharePointPnPPowerShellOnline|
 Set-PnPListRecordDeclaration|SharePointPnPPowerShellOnline|

@@ -110,6 +110,7 @@ nav:
         - listitem list: 'cmd/spo/listitem/listitem-list.md'
         - listitem remove: 'cmd/spo/listitem/listitem-remove.md'
         - listitem set: 'cmd/spo/listitem/listitem-set.md'
+        - listitem record declare: 'cmd/spo/listitem/listitem-record-declare.md'
         - listitem record undeclare: 'cmd/spo/listitem/listitem-record-undeclare.md'
       - navigation:
         - navigation node add: 'cmd/spo/navigation/navigation-node-add.md'

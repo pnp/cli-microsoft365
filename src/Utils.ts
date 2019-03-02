@@ -65,6 +65,13 @@ export default class Utils {
     return guidRegEx.test(guid);
   }
 
+  public static isValidISODate(date: string): boolean {
+    const dateRegEx: RegExp = new RegExp(
+      /^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/i
+    );
+    return dateRegEx.test(date);
+  }
+
   public static isValidBoolean(value: string): boolean {
     return value.toLowerCase() === 'true' || value.toLowerCase() === 'false'
   }

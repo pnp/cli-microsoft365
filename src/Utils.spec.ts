@@ -7,6 +7,37 @@ import { CommandError } from './Command';
 import * as os from 'os';
 
 describe('Utils', () => {
+
+  it('isValidISODate returns true if value is in ISO Date format with - seperator', () => {
+    const result = Utils.isValidISODate("2019-03-22");
+    assert.equal(result, true);
+  });
+
+  it('isValidISODate returns true if value is in ISO Date format with . seperator', () => {
+    const result = Utils.isValidISODate("2019.03.22");
+    assert.equal(result, true);
+  });
+
+  it('isValidISODate returns true if value is in ISO Date format with / seperator', () => {
+    const result = Utils.isValidISODate("2019/03/22");
+    assert.equal(result, true);
+  });
+
+  it('isValidISODate returns false if value is blank', () => {
+    const result = Utils.isValidISODate("");
+    assert.equal(result, false);
+  });
+
+  it('isValidISODate returns false if value is not in ISO Date format', () => {
+    const result = Utils.isValidISODate("22-03-2019");
+    assert.equal(result, false);
+  });
+
+  it('isValidISODate returns false if alpha characters are passed', () => {
+    const result = Utils.isValidISODate("sharing is caring");
+    assert.equal(result, false);
+  });
+
   it('isValidGuid returns true if valid guid', () => {
     const result = Utils.isValidGuid('b2307a39-e878-458b-bc90-03bc578531d6');
     assert.equal(result, true);
