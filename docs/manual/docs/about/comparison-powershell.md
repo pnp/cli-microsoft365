@@ -205,7 +205,7 @@ Add-PnPWorkflowSubscription|SharePointPnPPowerShellOnline|
 Apply-PnPProvisioningHierarchy|SharePointPnPPowerShellOnline|
 Apply-PnPProvisioningTemplate|SharePointPnPPowerShellOnline|
 Approve-PnPTenantServicePrincipalPermissionRequest|SharePointPnPPowerShellOnline|[spo serviceprincipal permissionrequest approve](../cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-approve.md)
-Clear-PnPListItemAsRecord|SharePointPnPPowerShellOnline|
+Clear-PnPListItemAsRecord|SharePointPnPPowerShellOnline|[spo listitem record undeclare](../cmd/spo/listitem/listitem-record-undeclare.md)
 Clear-PnPRecycleBinItem|SharePointPnPPowerShellOnline|
 Clear-PnPTenantRecycleBinItem|SharePointPnPPowerShellOnline|
 Connect-PnPHubSite|SharePointPnPPowerShellOnline|[spo hubsite connect](../cmd/spo/hubsite/hubsite-connect.md)
