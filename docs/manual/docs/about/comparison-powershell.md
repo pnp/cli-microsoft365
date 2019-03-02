@@ -629,7 +629,7 @@ Remove-TeamUser|MicrosoftTeams|[graph teams user remove](../cmd/graph/teams/team
 Set-Team|MicrosoftTeams|
 Set-TeamChannel|MicrosoftTeams|
 Set-TeamFunSettings|MicrosoftTeams|
-Set-TeamGuestSettings|MicrosoftTeams|
+Set-TeamGuestSettings|MicrosoftTeams|[graph teams guestsettings set](../cmd/graph/teams/teams-guestsettings-set.md)
 Set-TeamMemberSettings|MicrosoftTeams|[graph teams membersettings set](../cmd/graph/teams/teams-membersettings-set.md)
 Set-TeamMessagingSettings|MicrosoftTeams|
 Set-TeamPicture|MicrosoftTeams|

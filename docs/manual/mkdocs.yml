@@ -251,6 +251,7 @@ nav:
         - teams channel list: 'cmd/graph/teams/teams-channel-list.md'
         - teams funsettings list: 'cmd/graph/teams/teams-funsettings-list.md'
         - teams guestsettings list: 'cmd/graph/teams/teams-guestsettings-list.md'
+        - teams guestsettings set: 'cmd/graph/teams/teams-guestsettings-set.md'
         - teams membersettings list: 'cmd/graph/teams/teams-membersettings-list.md'
         - teams membersettings set: 'cmd/graph/teams/teams-membersettings-set.md'
         - teams message get: 'cmd/graph/teams/teams-message-get.md'

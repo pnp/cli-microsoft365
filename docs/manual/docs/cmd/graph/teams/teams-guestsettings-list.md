@@ -5,7 +5,7 @@ Lists guest settings for a Microsoft Teams team
 ## Usage
 
 ```sh
-teams guestsettings list [options]
+graph teams guestsettings list [options]
 ```
 
 ## Options
