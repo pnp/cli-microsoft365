@@ -86,6 +86,7 @@ export default {
   LISTITEM_ADD: `${prefix} listitem add`,
   LISTITEM_GET: `${prefix} listitem get`,
   LISTITEM_LIST: `${prefix} listitem list`,
+  LISTITEM_RECORD_UNDECLARE: `${prefix} listitem record undeclare`,
   LISTITEM_REMOVE: `${prefix} listitem remove`,
   LISTITEM_SET: `${prefix} listitem set`,
   LOGIN: `${prefix} login`,
