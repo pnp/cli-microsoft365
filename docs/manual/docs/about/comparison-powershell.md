@@ -616,7 +616,7 @@ Disconnect-MicrosoftTeams|MicrosoftTeams|[graph logout](../cmd/graph/logout.md)
 Get-Team|MicrosoftTeams|[graph teams list](../cmd/graph/teams/teams-list.md)
 Get-TeamChannel|MicrosoftTeams|[graph teams channel list](../cmd/graph/teams/teams-channel-list.md)
 Get-TeamFunSettings|MicrosoftTeams|[graph teams funsettings list](../cmd/graph/teams/teams-funsettings-list.md)
-Get-TeamGuestSettings|MicrosoftTeams|
+Get-TeamGuestSettings|MicrosoftTeams|[graph teams guestsettings list](../cmd/graph/teams/teams-guestsettings-list.md)
 Get-TeamHelp|MicrosoftTeams|
 Get-TeamMemberSettings|MicrosoftTeams|[graph teams membersettings list](../cmd/graph/teams/teams-membersettings-list.md)
 Get-TeamMessagingSettings|MicrosoftTeams|[graph teams messagingsettings list](../cmd/graph/teams/teams-messagingsettings-list.md)

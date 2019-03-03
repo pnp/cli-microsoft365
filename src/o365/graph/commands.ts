@@ -32,6 +32,7 @@ export default {
   TEAMS_CHANNEL_LIST:`${prefix} teams channel list`,
   TEAMS_CHANNEL_MESSAGE_GET: `${prefix} teams channel message get`,
   TEAMS_FUNSETTINGS_LIST: `${prefix} teams funsettings list`,
+  TEAMS_GUESTSETTINGS_LIST: `${prefix} teams guestsettings list`,
   TEAMS_MEMBERSETTINGS_LIST: `${prefix} teams membersettings list`,
   TEAMS_MEMBERSETTINGS_SET: `${prefix} teams membersettings set`,
   TEAMS_MESSAGE_GET: `${prefix} teams message get`,

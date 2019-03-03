@@ -5,4 +5,5 @@ export interface Team {
   isArchived: boolean | undefined;
   messagingSettings?: any;
   memberSettings?: any;
+  guestSettings?: any;
 }
