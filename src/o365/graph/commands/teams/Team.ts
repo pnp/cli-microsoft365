@@ -10,4 +10,11 @@ export interface Team {
     allowTeamMentions: boolean,
     allowChannelMentions: boolean
   }
+  memberSettings?: {
+    allowCreateUpdateChannels: boolean,
+    allowDeleteChannels: boolean,
+    allowAddRemoveApps: boolean,
+    allowCreateUpdateRemoveTabs: boolean,
+    allowCreateUpdateRemoveConnectors: boolean
+  }
 }
