@@ -1,5 +1,5 @@
 import commands from '../../commands';
-import Command, { CommandValidate, CommandOption, CommandError, CommandTypes } from '../../../../Command';
+import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
@@ -201,7 +201,7 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
     });
 
   });
-  it('correctly undeclares list item as a record', (done) => {
+  it('correctly undeclares list item as a record when listTitle is passes', (done) => {
 
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
@@ -217,10 +217,41 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
       debug: true,
       listTitle: 'Demo List',
       id: 47,
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x'
     }
+    cmdInstance.action({ options: options }, () => {
 
+      try {
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+
+  });
+  it('correctly undeclares list item as a record when listId is passed', (done) => {
+
+    sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'post').callsFake(postFakes);
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    command.allowUnknownOptions();
+
+    let options: any = {
+      debug: true,
+      listId: '770fe148-1d72-480e-8cde-f9d3832798b6',
+      id: 47,
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x'
+    }
     cmdInstance.action({ options: options }, () => {
 
       try {
@@ -270,11 +301,6 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
     });
 
   });
-  it('configures command types', () => {
-    assert.notEqual(typeof command.types(), 'undefined', 'command types undefined');
-    assert.notEqual((command.types() as CommandTypes).string, 'undefined', 'command string types undefined');
-  });
-
   it('supports debug mode', () => {
     const options = (command.options() as CommandOption[]);
     let containsDebugOption = false;

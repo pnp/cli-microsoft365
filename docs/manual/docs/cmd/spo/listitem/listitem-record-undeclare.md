@@ -1,6 +1,6 @@
 # spo listitem record undeclare 
 
-Undeclares  listitem  as a record
+Undeclares listitem as a record
 
 ## Usage
 
