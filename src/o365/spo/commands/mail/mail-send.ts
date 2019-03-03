@@ -74,7 +74,7 @@ class SpoMailSendCommand extends SpoCommand {
         }
 
         const params = {
-          properties: this.extend(this.metadata("SP.Utilities.EmailProperties"), {
+          properties: this.extend({ "__metadata": { "type": "SP.Utilities.EmailProperties" } }, {
             Body: args.options.body,
             Subject: args.options.subject,
           }),
@@ -95,6 +95,7 @@ class SpoMailSendCommand extends SpoCommand {
             cmd.log(`Mail will send from: ${args.options.from}...`);
           }
         }
+
 
         if (args.options.cc && args.options.cc.length > 0) {
           params.properties = this.extend(params.properties, {
@@ -148,20 +149,9 @@ class SpoMailSendCommand extends SpoCommand {
       }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
   }
 
-  private objectDefinedNotNull(obj: any): boolean {
-    return typeof obj !== "undefined" && obj !== null;
-  }
-
-  private metadata(type: string) {
-    return {
-      "__metadata": { "type": type },
-    };
-  }
-
-  private extend<T extends TypedHash<any> = any, S extends TypedHash<any> = any>(target: T, source: S, noOverwrite = false,
+  private extend<T extends TypedHash<any> = any, S extends TypedHash<any> = any>(target: T, source: S, noOverwrite = false, 
     filter: (propName: string) => boolean = () => true): T & S {
-
-    if (!this.objectDefinedNotNull(source)) {
+    if (typeof source === 'undefined' || source === null) {
       return <T & S>target;
     }
 

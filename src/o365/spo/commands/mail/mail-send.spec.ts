@@ -50,7 +50,9 @@ describe(commands.MAIL_SEND, () => {
     Utils.restore([
       appInsights.trackEvent,
       auth.getAccessToken,
-      auth.restoreAuth
+      auth.restoreAuth,
+      auth.ensureAccessToken,
+      (command as any).getRequestDigest
     ]);
   });
 
@@ -105,17 +107,17 @@ describe(commands.MAIL_SEND, () => {
 
   it('Send an email to one recipient (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      console.log('stub);')
-      console.log(opts);
-      if (opts.url.indexOf(`/_api/contextinfo`) > -1) {
+      requests.push(opts);
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0 &&
-          opts.headers.binaryStringRequestBody &&
-          opts.body) {
+          opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({ FormDigestValue: 'abc' });
         }
+      }
+      if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
+        return Promise.resolve();
       }
 
       return Promise.reject('Invalid request');
@@ -125,16 +127,15 @@ describe(commands.MAIL_SEND, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email' } }, () => {
+    cmdInstance.action({ options: { debug: true, to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', verbose: true } }, () => {
       let correctRequestIssued = false;
-      console.log(requests);
+
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0 &&
-          r.headers.binaryStringRequestBody &&
+          r.headers.Accept &&
+          r.headers.Accept.indexOf('application/json') === 0 &&
           r.body) {
           correctRequestIssued = true;
         }
@@ -152,17 +153,17 @@ describe(commands.MAIL_SEND, () => {
 
   it('Send an email to one recipient', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      console.log('stub);')
-      console.log(opts);
-      if (opts.url.indexOf(`/_api/contextinfo`) > -1) {
+      requests.push(opts);
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
         if (opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0 &&
-          opts.headers.binaryStringRequestBody &&
-          opts.body) {
+          opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({ FormDigestValue: 'abc' });
         }
+      }
+      if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
+        return Promise.resolve();
       }
 
       return Promise.reject('Invalid request');
@@ -178,9 +179,458 @@ describe(commands.MAIL_SEND, () => {
         if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0 &&
-          r.headers.binaryStringRequestBody &&
+          r.headers.Accept &&
+          r.headers.Accept.indexOf('application/json') === 0 &&
+          r.body) {
+          correctRequestIssued = true;
+        }
+      });
+
+      try {
+        assert(correctRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('Send an email to one recipient and from someone (debug)', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve({ FormDigestValue: 'abc' });
+        }
+      }
+      if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: true, to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', from: 'someone@contoso.com', verbose: true } }, () => {
+      let correctRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.headers.Accept &&
+          r.headers.Accept.indexOf('application/json') === 0 &&
+          r.body) {
+          correctRequestIssued = true;
+        }
+      });
+
+      try {
+        assert(correctRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('Send an email to one recipient and from someone', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve({ FormDigestValue: 'abc' });
+        }
+      }
+      if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', from: 'someone@contoso.com' } }, () => {
+      let correctRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.headers.Accept &&
+          r.headers.Accept.indexOf('application/json') === 0 &&
+          r.body) {
+          correctRequestIssued = true;
+        }
+      });
+
+      try {
+        assert(correctRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('Send an email to one recipient and from some peoples (debug)', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve({ FormDigestValue: 'abc' });
+        }
+      }
+      if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: true, to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', from: 'user@contoso.com,someone@consotos.com', verbose: true } }, () => {
+      let correctRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.headers.Accept &&
+          r.headers.Accept.indexOf('application/json') === 0 &&
+          r.body) {
+          correctRequestIssued = true;
+        }
+      });
+
+      try {
+        assert(correctRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('Send an email to one recipient and from some peoples', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve({ FormDigestValue: 'abc' });
+        }
+      }
+      if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', from: 'user@contoso.com,someone@consotos.com' } }, () => {
+      let correctRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.headers.Accept &&
+          r.headers.Accept.indexOf('application/json') === 0 &&
+          r.body) {
+          correctRequestIssued = true;
+        }
+      });
+
+      try {
+        assert(correctRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('Send an email to one recipient and CC someone (debug)', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve({ FormDigestValue: 'abc' });
+        }
+      }
+      if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: true, to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', cc: 'someone@contoso.com', verbose: true } }, () => {
+      let correctRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.headers.Accept &&
+          r.headers.Accept.indexOf('application/json') === 0 &&
+          r.body) {
+          correctRequestIssued = true;
+        }
+      });
+
+      try {
+        assert(correctRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('Send an email to one recipient and CC someone', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve({ FormDigestValue: 'abc' });
+        }
+      }
+      if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', cc: 'someone@contoso.com' } }, () => {
+      let correctRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.headers.Accept &&
+          r.headers.Accept.indexOf('application/json') === 0 &&
+          r.body) {
+          correctRequestIssued = true;
+        }
+      });
+
+      try {
+        assert(correctRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('Send an email to one recipient and BCC someone (debug)', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve({ FormDigestValue: 'abc' });
+        }
+      }
+      if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: true, to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', bcc: 'someone@contoso.com', verbose: true } }, () => {
+      let correctRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.headers.Accept &&
+          r.headers.Accept.indexOf('application/json') === 0 &&
+          r.body) {
+          correctRequestIssued = true;
+        }
+      });
+
+      try {
+        assert(correctRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('Send an email to one recipient and BCC someone', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve({ FormDigestValue: 'abc' });
+        }
+      }
+      if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', bcc: 'someone@contoso.com' } }, () => {
+      let correctRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.headers.Accept &&
+          r.headers.Accept.indexOf('application/json') === 0 &&
+          r.body) {
+          correctRequestIssued = true;
+        }
+      });
+
+      try {
+        assert(correctRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('Send an email to one recipient with additional header (debug)', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve({ FormDigestValue: 'abc' });
+        }
+      }
+      if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: true, to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', additionalHeaders: '{"X-Custom": "My Custom Header Value"}', verbose: true } }, () => {
+      let correctRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.headers.Accept &&
+          r.headers.Accept.indexOf('application/json') === 0 &&
+          r.body) {
+          correctRequestIssued = true;
+        }
+      });
+
+      try {
+        assert(correctRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('Send an email to one recipient with additional header', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve({ FormDigestValue: 'abc' });
+        }
+      }
+      if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', additionalHeaders: '{"X-Custom": "My Custom Header Value"}' } }, () => {
+      let correctRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.headers.Accept &&
+          r.headers.Accept.indexOf('application/json') === 0 &&
           r.body) {
           correctRequestIssued = true;
         }
@@ -219,6 +669,52 @@ describe(commands.MAIL_SEND, () => {
 
   it('fails validation if the \'body\' option not specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { to: 'user@contoso.com', subject: 'Subject of the email' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('Should extend an object with odd fields', () => {
+    const o1 = { title: "thing" };
+    const o2 = { desc: "another" };
+
+    const actual = (command as any).extend(o1, o2);
+    assert(actual);
+  });
+
+  it("Should extend an object with even fields", () => {
+    const o1 = { desc: "another", title: "thing" };
+    const o2 = { bob: "sam", sara: "wendy" };
+    const actual = (command as any).extend(o1, o2);
+    assert(actual);
+  });
+
+  it("Should overwrite fields", () => {
+    const o1 = { title: "thing" };
+    const o2 = { title: "new" };
+    const actual = (command as any).extend(o1, o2);
+    assert(actual);
+  });
+
+  it("Should not overwrite fields", () => {
+    const o1 = { title: "thing" };
+    const o2 = { title: "new" };
+    const actual = (command as any).extend(o1, o2, true);
+    assert(actual);
+  });
+
+  it("Should field fields", () => {
+      const o1 = { title: "thing" };
+      const o2 = { bob: "new", sara: "wendy" };
+      const actual = (command as any).extend(o1, o2, false, (name:any) => name !== "bob");
+      assert(actual);
+  });
+
+  it('fails extend if null and overwrite define to true', () => {
+    const actual = (command as any).extend({ To: { results: ['user@contoso.com'] } }, null, true);
+    assert.notEqual(actual, true);
+  });
+
+  it('fails extend if null, overwrite define to true and filter', () => {
+    const actual = (command as any).extend({ To: { results: ['user@contoso.com'] } }, null, true, null);
     assert.notEqual(actual, true);
   });
 
@@ -262,8 +758,8 @@ describe(commands.MAIL_SEND, () => {
   });
 
   it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.getAccessToken);
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
+    Utils.restore(auth.ensureAccessToken);
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
 
     auth.site = new Site();
     auth.site.connected = true;
