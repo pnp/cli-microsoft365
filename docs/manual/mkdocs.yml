@@ -251,6 +251,7 @@ nav:
         - teams membersettings set: 'cmd/graph/teams/teams-membersettings-set.md'
         - teams message get: 'cmd/graph/teams/teams-message-get.md'
         - teams message list: 'cmd/graph/teams/teams-message-list.md'
+        - teams messagingsettings list: 'cmd/graph/teams/teams-messagingsettings-list.md'
         - teams user add: 'cmd/graph/teams/teams-user-add.md'
         - teams user list: 'cmd/graph/teams/teams-user-list.md'
         - teams user remove: 'cmd/graph/teams/teams-user-remove.md'

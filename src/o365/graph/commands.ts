@@ -35,6 +35,7 @@ export default {
   TEAMS_MEMBERSETTINGS_SET: `${prefix} teams membersettings set`,
   TEAMS_MESSAGE_GET: `${prefix} teams message get`,
   TEAMS_MESSAGE_LIST: `${prefix} teams message list`,
+  TEAMS_MESSAGINGSETTINGS_LIST: `${prefix} teams messagingsettings list`,
   TEAMS_USER_ADD: `${prefix} teams user add`,
   TEAMS_USER_LIST: `${prefix} teams user list`,
   TEAMS_USER_REMOVE: `${prefix} teams user remove`,

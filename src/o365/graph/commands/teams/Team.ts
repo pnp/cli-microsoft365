@@ -3,4 +3,5 @@ export interface Team {
   displayName: string;
   description: string;
   isArchived: boolean | undefined;
+  messagingSettings?: any;
 }
