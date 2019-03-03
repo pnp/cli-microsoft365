@@ -618,7 +618,7 @@ Get-TeamChannel|MicrosoftTeams|[graph teams channel list](../cmd/graph/teams/tea
 Get-TeamFunSettings|MicrosoftTeams|[graph teams funsettings list](../cmd/graph/teams/teams-funsettings-list.md)
 Get-TeamGuestSettings|MicrosoftTeams|
 Get-TeamHelp|MicrosoftTeams|
-Get-TeamMemberSettings|MicrosoftTeams|
+Get-TeamMemberSettings|MicrosoftTeams|[graph teams membersettings list](../cmd/graph/teams/teams-membersettings-list.md)
 Get-TeamMessagingSettings|MicrosoftTeams|[graph teams messagingsettings list](../cmd/graph/teams/teams-messagingsettings-list.md)
 Get-TeamUser|MicrosoftTeams|[graph teams user list](../cmd/graph/teams/teams-user-list.md)
 New-Team|MicrosoftTeams|

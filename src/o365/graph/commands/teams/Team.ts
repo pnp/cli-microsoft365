@@ -4,4 +4,5 @@ export interface Team {
   description: string;
   isArchived: boolean | undefined;
   messagingSettings?: any;
+  memberSettings?: any;
 }
