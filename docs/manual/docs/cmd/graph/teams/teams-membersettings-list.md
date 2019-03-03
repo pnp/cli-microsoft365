@@ -23,7 +23,7 @@ Option|Description
 
 ## Remarks
 
-To get membersettings settings for a Microsoft Team, you have to first log in to the Microsoft Graph using the [graph login](../login.md) command, eg. `graph login`.
+To get member settings for a Microsoft Team, you have to first log in to the Microsoft Graph using the [graph login](../login.md) command, eg. `graph login`.
 
 ## Examples
 

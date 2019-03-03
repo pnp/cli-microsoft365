@@ -16,5 +16,9 @@ export interface Team {
     allowAddRemoveApps: boolean,
     allowCreateUpdateRemoveTabs: boolean,
     allowCreateUpdateRemoveConnectors: boolean
+  },
+  guestSettings?: {
+    allowCreateUpdateChannels: boolean,
+    allowDeleteChannels: boolean
   }
 }
