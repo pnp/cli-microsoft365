@@ -65,6 +65,18 @@ export default class Utils {
     return guidRegEx.test(guid);
   }
 
+  public static isPositiveInt(positiveInt: string): boolean {
+    const postitiveIntRegEx = new RegExp(/^-{0,1}\d+$/);
+    return postitiveIntRegEx.test(positiveInt);
+  }
+
+  public static isValidISODate(date: string): boolean {
+    const dateRegEx: RegExp = new RegExp(
+      /^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/i
+    );
+    return dateRegEx.test(date);
+  }
+
   public static isValidBoolean(value: string): boolean {
     return value.toLowerCase() === 'true' || value.toLowerCase() === 'false'
   }
@@ -323,7 +335,7 @@ export default class Utils {
    * // returns "https://contoso.sharepoint.com/sites/team1/Lists/MyList"
    * Utils.getAbsoluteUrl("https://contoso.sharepoint.com/sites/team1/", "/sites/team1/Lists/MyList");
    */
-  public static getAbsoluteUrl(webUrl: string, serverRelativeUrl: string) : string {
+  public static getAbsoluteUrl(webUrl: string, serverRelativeUrl: string): string {
     const uri: url.UrlWithStringQuery = url.parse(webUrl);
     const tenantUrl: string = `${uri.protocol}//${uri.hostname}`;
     if (serverRelativeUrl[0] !== '/') {
