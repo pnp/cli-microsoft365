@@ -3,4 +3,11 @@ export interface Team {
   displayName: string;
   description: string;
   isArchived: boolean | undefined;
+  messagingSettings?: {
+    allowUserEditMessages: boolean,
+    allowUserDeleteMessages: boolean,
+    allowOwnerDeleteMessages: boolean,
+    allowTeamMentions: boolean,
+    allowChannelMentions: boolean
+  }
 }
