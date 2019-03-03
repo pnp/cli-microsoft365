@@ -27,10 +27,6 @@ interface Options extends GlobalOptions {
   additionalHeaders?: string;
 }
 
-interface TypedHash<T> {
-  [key: string]: T;
-}
-
 class SpoMailSendCommand extends SpoCommand {
   public get name(): string {
     return commands.MAIL_SEND;
@@ -73,52 +69,40 @@ class SpoMailSendCommand extends SpoCommand {
           cmd.log('');
         }
 
-        const params = {
-          properties: this.extend({ "__metadata": { "type": "SP.Utilities.EmailProperties" } }, {
-            Body: args.options.body,
-            Subject: args.options.subject,
-          }),
-        };
+        const params: any = {};
+        params.properties = {};
+        params.properties.__metadata = { "type": "SP.Utilities.EmailProperties" };
+        params.properties.Body = args.options.body;
+        params.properties.Subject = args.options.subject
 
-        params.properties = this.extend(params.properties, {
-          To: { results: args.options.to.replace(/\s+/g, '').split(',') },
-        });
+        params.properties.To = { results: args.options.to.replace(/\s+/g, '').split(',') };
         if (this.verbose) {
           cmd.log(`List of recipients: ${args.options.to}...`);
         }
 
         if (args.options.from && args.options.from.length > 0) {
-          params.properties = this.extend(params.properties, {
-            From: args.options.from,
-          });
+          params.properties.From = args.options.from;
           if (this.verbose) {
             cmd.log(`Mail will send from: ${args.options.from}...`);
           }
         }
 
-
         if (args.options.cc && args.options.cc.length > 0) {
-          params.properties = this.extend(params.properties, {
-            CC: { results: args.options.cc.replace(/\s+/g, '').split(',') },
-          });
+          params.properties.CC = { results: args.options.cc.replace(/\s+/g, '').split(',') };
           if (this.verbose) {
             cmd.log(`List of addresses to which a carbon copy: ${args.options.cc}...`);
           }
         }
 
         if (args.options.bcc && args.options.bcc.length > 0) {
-          params.properties = this.extend(params.properties, {
-            BCC: { results: args.options.bcc.replace(/\s+/g, '').split(',') },
-          });
+          params.properties.BCC = { results: args.options.bcc.replace(/\s+/g, '').split(',') };
           if (this.verbose) {
             cmd.log(`List of addresses that receive a copy of the mail but are not listed as recipients: ${args.options.bcc}...`);
           }
         }
 
         if (args.options.additionalHeaders) {
-          params.properties = this.extend(params.properties, {
-            AdditionalHeaders: args.options.additionalHeaders,
-          });
+          params.properties.AdditionalHeaders = args.options.additionalHeaders;
           if (this.verbose) {
             cmd.log(`Additional headers informaitons: ${args.options.additionalHeaders}...`);
           }
@@ -147,26 +131,6 @@ class SpoMailSendCommand extends SpoCommand {
         // REST post call doesn't return anything
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
-  }
-
-  private extend<T extends TypedHash<any> = any, S extends TypedHash<any> = any>(target: T, source: S, noOverwrite = false, 
-    filter: (propName: string) => boolean = () => true): T & S {
-    if (typeof source === 'undefined' || source === null) {
-      return <T & S>target;
-    }
-
-    // ensure we don't overwrite things we don't want overwritten
-    const check: (o: any, i: string) => Boolean = noOverwrite ? (o, i) => !(i in o) : () => true;
-
-    // final filter we will use
-    const f = (v: string) => check(target, v) && filter(v);
-
-    return Object.getOwnPropertyNames(source)
-      .filter(f)
-      .reduce((t: any, v: string) => {
-        t[v] = source[v];
-        return t;
-      }, target);
   }
 
   public options(): CommandOption[] {

@@ -7,6 +7,7 @@ const command: Command = require('./mail-send');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import Utils from '../../../../Utils';
+import { truncate } from 'fs';
 
 describe(commands.MAIL_SEND, () => {
   let vorpal: Vorpal;
@@ -127,9 +128,8 @@ describe(commands.MAIL_SEND, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', verbose: true } }, () => {
+    cmdInstance.action({ options: { debug: truncate, to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email' } }, () => {
       let correctRequestIssued = false;
-
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
           r.headers.authorization &&
@@ -657,6 +657,17 @@ describe(commands.MAIL_SEND, () => {
     assert(containsDebugOption);
   });
 
+  it('supports verbose mode', () => {
+    const options = command.options() as CommandOption[];
+    let containsOption = false;
+    options.forEach((o) => {
+      if (o.option === '--verbose') {
+        containsOption = true;
+      }
+    });
+    assert(containsOption);
+  });
+
   it('fails validation if the \'to\' option not specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { subject: 'Subject of the email', body: 'Content of the email' } });
     assert.notEqual(actual, true);
@@ -669,52 +680,6 @@ describe(commands.MAIL_SEND, () => {
 
   it('fails validation if the \'body\' option not specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { to: 'user@contoso.com', subject: 'Subject of the email' } });
-    assert.notEqual(actual, true);
-  });
-
-  it('Should extend an object with odd fields', () => {
-    const o1 = { title: "thing" };
-    const o2 = { desc: "another" };
-
-    const actual = (command as any).extend(o1, o2);
-    assert(actual);
-  });
-
-  it("Should extend an object with even fields", () => {
-    const o1 = { desc: "another", title: "thing" };
-    const o2 = { bob: "sam", sara: "wendy" };
-    const actual = (command as any).extend(o1, o2);
-    assert(actual);
-  });
-
-  it("Should overwrite fields", () => {
-    const o1 = { title: "thing" };
-    const o2 = { title: "new" };
-    const actual = (command as any).extend(o1, o2);
-    assert(actual);
-  });
-
-  it("Should not overwrite fields", () => {
-    const o1 = { title: "thing" };
-    const o2 = { title: "new" };
-    const actual = (command as any).extend(o1, o2, true);
-    assert(actual);
-  });
-
-  it("Should field fields", () => {
-      const o1 = { title: "thing" };
-      const o2 = { bob: "new", sara: "wendy" };
-      const actual = (command as any).extend(o1, o2, false, (name:any) => name !== "bob");
-      assert(actual);
-  });
-
-  it('fails extend if null and overwrite define to true', () => {
-    const actual = (command as any).extend({ To: { results: ['user@contoso.com'] } }, null, true);
-    assert.notEqual(actual, true);
-  });
-
-  it('fails extend if null, overwrite define to true and filter', () => {
-    const actual = (command as any).extend({ To: { results: ['user@contoso.com'] } }, null, true, null);
     assert.notEqual(actual, true);
   });
 
