@@ -143,7 +143,7 @@ class SpfxProjectUpgradeCommand extends Command {
     });
 
     // flatten
-    const findingsToReport: FindingToReport[] = [].concat.apply([], findings.map(f => {
+    const findingsToReport: FindingToReport[] = ([] as FindingToReport[]).concat.apply([], findings.map(f => {
       return f.occurrences.map(o => {
         return {
           description: f.description,

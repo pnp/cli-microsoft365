@@ -90,6 +90,7 @@ nav:
         - list contenttype list: 'cmd/spo/list/list-contenttype-list.md'
         - list contenttype remove: 'cmd/spo/list/list-contenttype-remove.md'
         - list label get: 'cmd/spo/list/list-label-get.md'
+        - list label set: 'cmd/spo/list/list-label-set.md'
         - list sitescript get: 'cmd/spo/list/list-sitescript-get.md'
         - list view get: 'cmd/spo/list/list-view-get.md'
         - list view list: 'cmd/spo/list/list-view-list.md'
@@ -156,6 +157,7 @@ nav:
         - site classic list: 'cmd/spo/site/site-classic-list.md'
         - site classic remove: 'cmd/spo/site/site-classic-remove.md'
         - site classic set: 'cmd/spo/site/site-classic-set.md'
+        - site inplacerecordsmanagement set: 'cmd/spo/site/site-inplacerecordsmanagement-set.md'
         - site o365group set: 'cmd/spo/site/site-o365group-set.md'
       - sitedesign:
         - sitedesign add: 'cmd/spo/sitedesign/sitedesign-add.md'
@@ -238,8 +240,13 @@ nav:
         - siteclassification get: 'cmd/graph/siteclassification/siteclassification-get.md'
         - siteclassification set: 'cmd/graph/siteclassification/siteclassification-set.md'
       - teams:
+        - teams app list: 'cmd/graph/teams/teams-app-list.md'
+        - teams app publish: 'cmd/graph/teams/teams-app-publish.md'
+        - teams app remove: 'cmd/graph/teams/teams-app-remove.md'
+        - teams app update: 'cmd/graph/teams/teams-app-update.md'
         - teams list: 'cmd/graph/teams/teams-list.md'
         - teams channel add: 'cmd/graph/teams/teams-channel-add.md'
+        - teams channel list: 'cmd/graph/teams/teams-channel-list.md'
         - teams message get: 'cmd/graph/teams/teams-message-get.md'
         - teams message list: 'cmd/graph/teams/teams-message-list.md'
         - teams user add: 'cmd/graph/teams/teams-user-add.md'
@@ -280,7 +287,7 @@ nav:
     - 'Communication with Office 365': 'concepts/communicating-o365.md'
   - About:
     - 'Why this CLI': 'about/why-cli.md'
-    - 'Comparison to SharePoint PowerShell': 'about/comparison-powershell.md'
+    - 'Comparison to SharePoint and Office 365 PowerShell': 'about/comparison-powershell.md'
     - 'Release notes': 'about/release-notes.md'
     - License: 'about/license.md'
 theme:
