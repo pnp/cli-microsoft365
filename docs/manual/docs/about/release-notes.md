@@ -1,5 +1,18 @@
 # Release notes
 
+## [v1.15.0](https://github.com/pnp/office365-cli/releases/tag/v1.15.0)
+
+### New commands
+
+**SharePoint Online:**
+
+- [spo web reindex](../cmd/spo/web/web-reindex.md) - requests reindexing the specified subsite [#822](https://github.com/pnp/office365-cli/issues/822)
+
+**Microsoft Graph:**
+
+- [graph teams funsettings list](../cmd/graph/teams/teams-funsettings-list.md) - lists fun settings for the specified Microsoft Teams team [#809](https://github.com/pnp/office365-cli/issues/809)
+- [graph teams membersettings set](../cmd/graph/teams/teams-membersettings-set.md) - updates member settings of a Microsoft Teams team [#819](https://github.com/pnp/office365-cli/issues/819)
+
 ## [v1.14.0](https://github.com/pnp/office365-cli/releases/tag/v1.14.0)
 
 ### New commands
