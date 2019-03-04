@@ -16,16 +16,16 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   role?: string;
-  teamId: string;
+  groupId: string;
 }
 
-class GraphTeamsUserListCommand extends GraphUsersListCommand<GroupUser> {
+class GraphO365GroupUserListCommand extends GraphUsersListCommand<GroupUser> {
   public get name(): string {
-    return `${commands.TEAMS_USER_LIST}`;
+    return `${commands.O365GROUP_USER_LIST}`;
   }
 
   public get description(): string {
-    return 'Lists users for the specified Microsoft Teams team';
+    return 'Lists users for the specified Office 365 Group';
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -36,13 +36,13 @@ class GraphTeamsUserListCommand extends GraphUsersListCommand<GroupUser> {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     this
-      .getOwners(cmd, args.options.teamId)
+      .getOwners(cmd, args.options.groupId)
       .then((): Promise<void> => {
         if (args.options.role === 'Owner') {
           return Promise.resolve();
         }
 
-        return this.getMembersAndGuests(cmd, args.options.teamId);
+        return this.getMembersAndGuests(cmd, args.options.groupId);
       })
       .then((): void => {
         if (args.options.role) {
@@ -62,8 +62,8 @@ class GraphTeamsUserListCommand extends GraphUsersListCommand<GroupUser> {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --teamId <teamId>',
-        description: 'The ID of the team for which to list users'
+        option: '-i, --groupId <groupId>',
+        description: 'The ID of the group for which to list users'
       },
       {
         option: '-r, --role [type]',
@@ -78,12 +78,12 @@ class GraphTeamsUserListCommand extends GraphUsersListCommand<GroupUser> {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.teamId) {
-        return 'Required parameter teamId missing';
+      if (!args.options.groupId) {
+        return 'Required parameter groupId missing';
       }
 
-      if (!Utils.isValidGuid(args.options.teamId as string)) {
-        return `${args.options.teamId} is not a valid GUID`;
+      if (!Utils.isValidGuid(args.options.groupId as string)) {
+        return `${args.options.groupId} is not a valid GUID`;
       }
 
       if (args.options.role) {
@@ -105,22 +105,22 @@ class GraphTeamsUserListCommand extends GraphUsersListCommand<GroupUser> {
         
   Remarks:
 
-    To list users in the specified Microsoft Teams team, you have to first
+    To list users in the specified Office 365 Group, you have to first
     log in to the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
     eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
 
   Examples:
   
-    List all users and their role in the specified team 
-      ${chalk.grey(config.delimiter)} ${this.name} --teamId '00000000-0000-0000-0000-000000000000'
+    List all users and their role in the specified Office 365 group 
+      ${chalk.grey(config.delimiter)} ${this.name} --groupId '00000000-0000-0000-0000-000000000000'
 
-    List all owners and their role in the specified team 
-      ${chalk.grey(config.delimiter)} ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --role Owner 
+    List all owners and their role in the specified Office 365 group 
+      ${chalk.grey(config.delimiter)} ${this.name} --groupId '00000000-0000-0000-0000-000000000000' --role Owner 
 
-    List all guests and their role in the specified team 
-      ${chalk.grey(config.delimiter)} ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --role Guest
+    List all guests and their role in the specified Office 365 group 
+      ${chalk.grey(config.delimiter)} ${this.name} --groupId '00000000-0000-0000-0000-000000000000' --role Guest
 `);
   }
 }
 
-module.exports = new GraphTeamsUserListCommand();
+module.exports = new GraphO365GroupUserListCommand();

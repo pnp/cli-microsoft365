@@ -5,7 +5,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandOption, CommandValidate
 } from '../../../../Command';
-import { GraphItemsListCommand } from '../GraphItemsListCommand';
+import { GraphUsersListCommand } from '../GraphUsersListCommand';
 import Utils from '../../../../Utils';
 import { GroupUser } from '../o365group/GroupUser';
 import * as request from 'request-promise-native';
@@ -22,7 +22,7 @@ interface Options extends GlobalOptions {
   userName: string;
 }
 
-class GraphTeamsUserSetCommand extends GraphItemsListCommand<GroupUser> {
+class GraphTeamsUserSetCommand extends GraphUsersListCommand<GroupUser> {
   public get name(): string {
     return `${commands.TEAMS_USER_SET}`;
   }
@@ -39,18 +39,8 @@ class GraphTeamsUserSetCommand extends GraphItemsListCommand<GroupUser> {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     this
-      .getOwners(cmd, args.options.teamId)
-      .then((): Promise<void> => {
-        return this.getMembersAndGuests(cmd, args.options.teamId);
-      })
+      .getGroupUsers(cmd, args.options.teamId)
       .then((): request.RequestPromise | void => {
-        // Filter out duplicate added values for owners (as they are returned as members as well)
-        this.items = this.items.filter((groupUser, index, self) =>
-          index === self.findIndex((t) => (
-            t.id === groupUser.id && t.displayName === groupUser.displayName
-          ))
-        );
-
         if (this.debug) {
           cmd.log('Team owners and members:')
           cmd.log(this.items);
@@ -123,23 +113,6 @@ class GraphTeamsUserSetCommand extends GraphItemsListCommand<GroupUser> {
 
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
-  }
-
-  private getOwners(cmd: CommandInstance, teamId: string): Promise<void> {
-    const endpoint: string = `${auth.service.resource}/v1.0/groups/${teamId}/owners?$select=id,displayName,userPrincipalName,userType`;
-
-    return this.getAllItems(endpoint, cmd, true).then((): void => {
-      // Currently there is a bug in the Microsoft Graph that returns Owners as
-      // userType 'member'. We therefore update all returned user as owner  
-      for (var i in this.items) {
-        this.items[i].userType = 'Owner';
-      }
-    });
-  }
-
-  private getMembersAndGuests(cmd: CommandInstance, teamId: string): Promise<void> {
-    const endpoint: string = `${auth.service.resource}/v1.0/groups/${teamId}/members?$select=id,displayName,userPrincipalName,userType`;
-    return this.getAllItems(endpoint, cmd, false);
   }
 
   public options(): CommandOption[] {
