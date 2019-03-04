@@ -5,18 +5,7 @@ import * as request from 'request-promise-native';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import { CommandOption, CommandValidate, CommandError } from '../../../../Command';
-import GlobalOptions from '../../../../GlobalOptions';
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
-import { SPOSitePropertiesEnumerable } from './SPOSitePropertiesEnumerable';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
-
-interface CommandArgs {
-  options: Options;
-}
-
-interface Options extends GlobalOptions {
-  type?: string;
+import GlobalOptions from '../../../../GlobalOptions'; import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo'; import { SPOSitePropertiesEnumerable } from './SPOSitePropertiesEnumerable'; const vorpal: Vorpal = require('../../../../vorpal-init'); interface CommandArgs { options: Options; } interface Options extends GlobalOptions { type?: string;
   filter?: string;
   deleted?: boolean;
 }
@@ -64,7 +53,14 @@ class SiteListCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          cmd.log(`Retrieving list of site collections...`);
+          cmd.log(`Retrieving list of ${args.options.deleted ? 'deleted ' : ' '}site collections...`);
+        }
+
+        let query: string;
+        if (args.options.deleted) {
+          query = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="32" ObjectPathId="31" /><ObjectPath Id="34" ObjectPathId="33" /><Query Id="35" ObjectPathId="33"><Query SelectAllProperties="true"><Properties><Property Name="NextStartIndexFromSharePoint" ScalarProperty="true" /></Properties></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="31" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="33" ParentId="31" Name="GetDeletedSitePropertiesFromSharePoint"><Parameters><Parameter Type="Null" /></Parameters></Method></ObjectPaths></Request>`;
+        } else {
+          query = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1" /><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="3" ParentId="1" Name="GetSitePropertiesFromSharePointByFilters"><Parameters><Parameter TypeId="{b92aeee2-c92c-4b67-abcc-024e471bc140}"><Property Name="Filter" Type="String">${Utils.escapeXml(args.options.filter || '')}</Property><Property Name="IncludeDetail" Type="Boolean">false</Property><Property Name="IncludePersonalSite" Type="Enum">0</Property><Property Name="StartIndex" Type="String">${startIndex}</Property><Property Name="Template" Type="String">${webTemplate}</Property></Parameter></Parameters></Method></ObjectPaths></Request>`;
         }
 
         const requestOptions: any = {
@@ -73,7 +69,7 @@ class SiteListCommand extends SpoCommand {
             authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': res.FormDigestValue
           }),
-          body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1" /><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="3" ParentId="1" Name="GetSitePropertiesFromSharePointByFilters"><Parameters><Parameter TypeId="{b92aeee2-c92c-4b67-abcc-024e471bc140}"><Property Name="Filter" Type="String">${Utils.escapeXml(args.options.filter || '')}</Property><Property Name="IncludeDetail" Type="Boolean">false</Property><Property Name="IncludePersonalSite" Type="Enum">0</Property><Property Name="StartIndex" Type="String">${startIndex}</Property><Property Name="Template" Type="String">${webTemplate}</Property></Parameter></Parameters></Method></ObjectPaths></Request>`
+          body: query
         };
 
         if (this.debug) {
@@ -98,32 +94,51 @@ class SiteListCommand extends SpoCommand {
           return;
         }
         else {
-          const sites: SPOSitePropertiesEnumerable = json[json.length - 1];
+          const sites: SPOSitePropertiesEnumerable  = json[json.length - 1];
           if (args.options.output === 'json') {
             cmd.log(sites._Child_Items_);
           }
           else {
-            cmd.log(sites._Child_Items_.map(s => {
-              return {
-                Title: s.Title,
-                Url: s.Url
-              };
-            }).sort((a, b) => {
-              const urlA = a.Url.toUpperCase();
-              const urlB = b.Url.toUpperCase();
-              if (urlA < urlB) {
-                return -1;
-              }
-              if (urlA > urlB) {
-                return 1;
-              }
-
-              return 0;
-            }));
+            cmd.log(this.formatSiteInfo(cmd, sites, args.options.deleted));
           }
         }
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+  }
+
+  public formatSiteInfo(cmd: CommandInstance, sites: SPOSitePropertiesEnumerable, deletedSites: boolean = false) {
+    return sites._Child_Items_.map(s => {
+      if (deletedSites) {
+        const dateChunks: number[] = (s.DeletionTime as string)
+        .replace('/Date(', '')
+        .replace(')/', '')
+        .split(',')
+        .map(s => {
+          return parseInt(s);
+        })
+        return {
+          Url: s.Url,
+          DeletionTime: new Date(dateChunks[0], dateChunks[1], dateChunks[2], dateChunks[3], dateChunks[4], dateChunks[5], dateChunks[6]).toISOString(),
+          DaysRemaining: s.DaysRemaining
+        }
+      } else {
+        return {
+          Title: s.Title,
+          Url: s.Url,
+        } 
+      }
+    }).sort((a, b) => {
+      const urlA = a.Url.toUpperCase();
+      const urlB = b.Url.toUpperCase();
+      if (urlA < urlB) {
+        return -1;
+      }
+      if (urlA > urlB) {
+        return 1;
+      }
+
+      return 0;
+     });
   }
 
   public options(): CommandOption[] {
@@ -139,7 +154,7 @@ class SiteListCommand extends SpoCommand {
       },
       {
         option: '--deleted [deleted]',
-        description: 'show the deleted site collections'
+        description: 'show the deleted site collections. Cannot be used in combination with type or filter.'
       }
     ];
 
@@ -149,6 +164,10 @@ class SiteListCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
+      if (args.options.deleted && (args.options.type || args.options.filter)) {
+        return `Deleted cannot be used in combination with type or filter.`;
+      }
+
       if (args.options.type) {
         if (args.options.type !== 'TeamSite' &&
           args.options.type !== 'CommunicationSite') {
@@ -195,6 +214,9 @@ class SiteListCommand extends SpoCommand {
 
     List all modern team sites that contain 'project' in the URL
       ${chalk.grey(config.delimiter)} ${commands.SITE_LIST} --type TeamSite --filter "Url -like 'project'"
+      
+    List all deleted sites
+      ${chalk.grey(config.delimiter)} ${commands.SITE_LIST} --deleted
 `);
   }
 }

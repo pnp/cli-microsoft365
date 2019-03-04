@@ -1,7 +1,7 @@
-import { SiteProperties } from './SiteProperties';
+import { AllSiteTypeProperties } from './AllSiteTypeProperties';
 
 export interface SPOSitePropertiesEnumerable {
-  _Child_Items_: SiteProperties[];
+  _Child_Items_: AllSiteTypeProperties[]; 
   NextStartIndex: number;
   NextStartIndexFromSharePoint: string;
 }
