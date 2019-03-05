@@ -7,7 +7,6 @@ const command: Command = require('./mail-send');
 import * as assert from 'assert';
 import * as request from 'request-promise-native';
 import Utils from '../../../../Utils';
-import { truncate } from 'fs';
 
 describe(commands.MAIL_SEND, () => {
   let vorpal: Vorpal;
@@ -128,7 +127,7 @@ describe(commands.MAIL_SEND, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: truncate, to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email' } }, () => {
+    cmdInstance.action({ options: { debug: true, to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
