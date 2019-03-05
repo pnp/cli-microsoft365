@@ -18,6 +18,7 @@ export interface Manifest {
   }[];
   requiresCustomScript?: boolean;
   safeWithCustomScriptDisabled?: boolean;
+  supportedHosts?: string[];
   version?: string;
 }
 
