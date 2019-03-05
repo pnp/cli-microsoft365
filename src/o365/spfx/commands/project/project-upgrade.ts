@@ -47,7 +47,8 @@ class SpfxProjectUpgradeCommand extends Command {
     '1.5.1',
     '1.6.0',
     '1.7.0',
-    '1.7.1'
+    '1.7.1',
+    '1.8.0'
   ];
 
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
@@ -602,7 +603,7 @@ ${f.resolution}
 
     Using this command you can upgrade SharePoint Framework projects built using
     versions: 1.0.0, 1.0.1, 1.0.2, 1.1.0, 1.1.1, 1.1.3, 1.2.0, 1.3.0, 1.3.1,
-    1.3.2, 1.3.4, 1.4.0, 1.4.1, 1.5.0, 1.5.1, 1.6.0 and 1.7.0.
+    1.3.2, 1.3.4, 1.4.0, 1.4.1, 1.5.0, 1.5.1, 1.6.0, 1.7.0 and 1.7.1.
 
   Examples:
   
