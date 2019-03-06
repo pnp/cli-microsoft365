@@ -55,7 +55,8 @@ class GraphTeamsAppPublishCommand extends GraphCommand {
 
         return request.post(requestOptions);
       })
-      .then((res: { id: string; }): void => {
+      .then((res: { id: string; }): Promise<{ id: string; }> => {
+
         if (this.debug) {
           cmd.log('Response:');
           cmd.log(res);
@@ -63,8 +64,15 @@ class GraphTeamsAppPublishCommand extends GraphCommand {
         }
 
         if (res && res.id) {
-          cmd.log(res.id);
-        }
+
+          return Promise.resolve(res);
+        } 
+
+        return Promise.reject('Server returned response 200 (OK), but app id was not returned.');
+      })
+      .then((res: { id: string; }): void => {
+
+        cmd.log(res.id);
 
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));

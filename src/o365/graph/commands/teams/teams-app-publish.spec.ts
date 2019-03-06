@@ -221,6 +221,37 @@ describe(commands.TEAMS_APP_PUBLISH, () => {
     });
   });
 
+  it('fails the command if no id was returned by the REST response', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/appCatalogs/teamsApps`) {
+        return Promise.resolve({
+          "externalId": "b5561ec9-8cab-4aa3-8aa2-d8d7172e4311",
+          "name": "Test App",
+          "version": "1.0.0",
+          "distributionMethod": "organization"
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(fs, 'readFileSync').callsFake(() => '123');
+
+    auth.service = new Service();
+    auth.service.connected = true;
+    auth.service.resource = 'https://graph.microsoft.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: true, filePath: 'teamsapp.zip' } }, (err?: any) => {
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Server returned response 200 (OK), but app id was not returned.')));
+
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('supports debug mode', () => {
     const options = (command.options() as CommandOption[]);
     let containsOption = false;
