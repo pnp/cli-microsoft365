@@ -1347,7 +1347,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.0', output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[0];
-      assert.equal(findings.length, 14);
+      assert.equal(findings.length, 15);
     });
   });
 
@@ -1357,7 +1357,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.0', output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[0];
-      assert.equal(findings.length, 17);
+      assert.equal(findings.length, 18);
     });
   });
 
@@ -1367,7 +1367,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.0', output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[0];
-      assert.equal(findings.length, 14);
+      assert.equal(findings.length, 15);
     });
   });
 
@@ -1377,7 +1377,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.0', output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[0];
-      assert.equal(findings.length, 18);
+      assert.equal(findings.length, 19);
     });
   });
 
@@ -1387,7 +1387,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.0', output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[0];
-      assert.equal(findings.length, 18);
+      assert.equal(findings.length, 19);
     });
   });
 
@@ -1397,7 +1397,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.0', output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[0];
-      assert.equal(findings.length, 22);
+      assert.equal(findings.length, 23);
     });
   });
   //#endregion
@@ -1409,7 +1409,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.1', output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[0];
-      assert.equal(findings.length, 11);
+      assert.equal(findings.length, 12);
     });
   });
 
@@ -1419,7 +1419,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.1', output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[0];
-      assert.equal(findings.length, 11);
+      assert.equal(findings.length, 12);
     });
   });
 
@@ -1429,7 +1429,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.1', output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[0];
-      assert.equal(findings.length, 11);
+      assert.equal(findings.length, 12);
     });
   });
 
@@ -1439,7 +1439,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.1', output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[0];
-      assert.equal(findings.length, 11);
+      assert.equal(findings.length, 12);
     });
   });
 
@@ -1449,7 +1449,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.1', output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[0];
-      assert.equal(findings.length, 11);
+      assert.equal(findings.length, 12);
     });
   });
 
@@ -1459,7 +1459,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.1', output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[0];
-      assert.equal(findings.length, 12);
+      assert.equal(findings.length, 13);
     });
   });
   //#endregion

@@ -7,6 +7,6 @@ export class FN002009_DEVDEP_microsoft_sp_tslint_rules extends DependencyRule {
   }
 
   get id(): string {
-    return 'FN002003';
+    return 'FN002009';
   }
 }
