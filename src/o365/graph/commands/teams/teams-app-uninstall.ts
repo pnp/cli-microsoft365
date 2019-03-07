@@ -18,33 +18,28 @@ interface Options extends GlobalOptions {
   teamId: string;
 }
 
-class GraphTeamsAppInstallCommand extends GraphCommand {
+class GraphTeamsAppUninstallCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.TEAMS_APP_INSTALL}`;
+    return `${commands.TEAMS_APP_UNINSTALL}`;
   }
 
   public get description(): string {
-    return 'Install an app from the catalog to a Microsoft Team';
+    return 'Uninstall an app from a Microsoft Team';
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const endpoint: string = `${auth.service.resource}/v1.0/`
-
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
       .then((): request.RequestPromise => {
 
         const requestOptions: any = {
-          url: `${endpoint}/teams/${args.options.teamId}/installedApps`,
+          url: `${auth.service.resource}/v1.0/teams/${args.options.teamId}/installedApps/${args.options.appId}`,
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${auth.service.accessToken}`,
             'content-type': 'application/json;odata=nometadata',
             'accept': 'application/json;odata.metadata=none'
           }),
-          json: true,
-          body: {
-            'teamsApp@odata.bind': `${endpoint}/appCatalogs/teamsApps/${args.options.appId}`
-          }
+          json: true
         };
 
         if (this.debug) {
@@ -53,12 +48,13 @@ class GraphTeamsAppInstallCommand extends GraphCommand {
           cmd.log('');
         }
 
-        return request.post(requestOptions);
+        return request.delete(requestOptions);
       })
       .then((res: any): void => {
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
         }
+
         cb();
       }, (res: any): void => this.handleRejectedODataJsonPromise(res, cmd, cb));
   }
@@ -67,11 +63,11 @@ class GraphTeamsAppInstallCommand extends GraphCommand {
     const options: CommandOption[] = [
       {
         option: '--appId <appId>',
-        description: 'The id of the app from the app catalog'
+        description: 'The unique id of the app instance installed in the Team'
       },
       {
         option: '--teamId <teamId>',
-        description: 'The id of the Team to which the app has to be installed'
+        description: 'The id of the Team from which the app has to be uninstalled'
       }
     ];
 
@@ -83,10 +79,6 @@ class GraphTeamsAppInstallCommand extends GraphCommand {
     return (args: CommandArgs): boolean | string => {
       if (!args.options.appId) {
         return 'Required parameter appId missing';
-      }
-
-      if (!Utils.isValidGuid(args.options.appId)) {
-        return `${args.options.appId} is not a valid GUID`;
       }
 
       if (!args.options.teamId) {
@@ -110,16 +102,16 @@ class GraphTeamsAppInstallCommand extends GraphCommand {
         
   Remarks:
 
-    To install an app to a Team, you have to first log in to
+    To uninstall an app from a Team, you have to first log in to
     the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
     eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
 
   Examples:
 
-    Install an app from the catalog to a Microsoft Team
-      ${chalk.grey(config.delimiter)} ${this.name} --appId 4440558e-8c73-4597-abc7-3644a64c4bce --teamId 2609af39-7775-4f94-a3dc-0dd67657e900
+    Uninstall an app from a Microsoft Team
+      ${chalk.grey(config.delimiter)} ${this.name} --appId YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY= --teamId 2609af39-7775-4f94-a3dc-0dd67657e900
 `);
   }
 }
 
-module.exports = new GraphTeamsAppInstallCommand();
+module.exports = new GraphTeamsAppUninstallCommand();
