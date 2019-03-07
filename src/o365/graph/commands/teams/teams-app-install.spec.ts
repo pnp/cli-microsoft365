@@ -146,16 +146,17 @@ describe(commands.TEAMS_APP_INSTALL, () => {
   });
 
   it('adds app from the catalog to a Microsoft Team', (done) => {
-    let appInstalledInTeam = false;
 
     sinon.stub(request, 'post').callsFake((opts) => {
+      
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/c527a470-a882-481c-981c-ee6efaba85c7/installedApps` &&
-        JSON.stringify(opts.body) === `{
+        JSON.stringify(opts.body) == `{
           "teamsApp@odata.bind": "https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/4440558e-8c73-4597-abc7-3644a64c4bce"
         }`) {
-        appInstalledInTeam = true;
+
+        return Promise.resolve();
       }
-      //return Promise.reject('Invalid request');
+      return Promise.reject('Invalid request');
     });
 
     auth.service = new Service();
@@ -169,9 +170,7 @@ describe(commands.TEAMS_APP_INSTALL, () => {
       }
     }, () => {
       try {
-        assert(appInstalledInTeam);
-
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(cmdInstanceLogSpy.notCalled);
 
         done();
       }
