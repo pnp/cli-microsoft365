@@ -69,6 +69,15 @@ export default class Utils {
     return value.toLowerCase() === 'true' || value.toLowerCase() === 'false'
   }
 
+  public static isValidJsonString(value: string): boolean {
+    try {
+      JSON.parse(value);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
   public static logOutput(stdout: any): any {
     // what comes in, should be an array
     // if it's not, return as-is
@@ -323,7 +332,7 @@ export default class Utils {
    * // returns "https://contoso.sharepoint.com/sites/team1/Lists/MyList"
    * Utils.getAbsoluteUrl("https://contoso.sharepoint.com/sites/team1/", "/sites/team1/Lists/MyList");
    */
-  public static getAbsoluteUrl(webUrl: string, serverRelativeUrl: string) : string {
+  public static getAbsoluteUrl(webUrl: string, serverRelativeUrl: string): string {
     const uri: url.UrlWithStringQuery = url.parse(webUrl);
     const tenantUrl: string = `${uri.protocol}//${uri.hostname}`;
     if (serverRelativeUrl[0] !== '/') {
