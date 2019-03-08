@@ -106,7 +106,7 @@ describe(commands.TEAMS_APP_UNINSTALL, () => {
   it('fails validation if the teamId is not a valid guid.', (done) => {
     const actual = (command.validate() as CommandValidate)({
       options: {
-        teamId: 'test-c49b-4fd4-8223-28f0ac3a6402'
+        teamId: '123456789'
       }
     });
     assert.notEqual(actual, true);
