@@ -106,7 +106,7 @@ describe(commands.TEAMS_APP_INSTALL, () => {
   it('fails validation if the teamId is not a valid guid.', (done) => {
     const actual = (command.validate() as CommandValidate)({
       options: {
-        teamId: '61703ac8a-c49b-4fd4-8223-28f0ac3a6402'
+        teamId: 'test-c49b-4fd4-8223-28f0ac3a6402'
       }
     });
     assert.notEqual(actual, true);
@@ -127,7 +127,7 @@ describe(commands.TEAMS_APP_INSTALL, () => {
   it('fails validation if the appId is not a valid guid.', (done) => {
     const actual = (command.validate() as CommandValidate)({
       options: {
-        appId: '61703ac8a-c49b-4fd4-8223-28f0ac3a6402'
+        appId: 'not-c49b-4fd4-8223-28f0ac3a6402'
       }
     });
     assert.notEqual(actual, true);
@@ -180,7 +180,41 @@ describe(commands.TEAMS_APP_INSTALL, () => {
     });
   });
 
+  it('adds app from the catalog to a Microsoft Team (debug)', (done) => {
 
+    sinon.stub(request, 'post').callsFake((opts) => {
+      
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/c527a470-a882-481c-981c-ee6efaba85c7/installedApps` &&
+        JSON.stringify(opts.body) == `{
+          "teamsApp@odata.bind": "https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/4440558e-8c73-4597-abc7-3644a64c4bce"
+        }`) {
+
+        return Promise.resolve();
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    auth.service = new Service();
+    auth.service.connected = true;
+    auth.service.resource = 'https://graph.microsoft.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',
+        appId: '4440558e-8c73-4597-abc7-3644a64c4bce',
+        debug: true
+      }
+    }, () => {
+      try {
+        assert(cmdInstanceLogSpy.called);
+
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
 
   it('supports debug mode', () => {
     const options = (command.options() as CommandOption[]);

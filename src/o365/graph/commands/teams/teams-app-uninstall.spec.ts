@@ -166,6 +166,38 @@ describe(commands.TEAMS_APP_UNINSTALL, () => {
     });
   });
 
+  it('uninstalls app from a Microsoft Team (debug)', (done) => {
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/c527a470-a882-481c-981c-ee6efaba85c7/installedApps/YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=`){
+
+        return Promise.resolve();
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    auth.service = new Service();
+    auth.service.connected = true;
+    auth.service.resource = 'https://graph.microsoft.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        debug: true,
+        teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',
+        appId: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY='
+      }
+    }, () => {
+      try {
+        assert(cmdInstanceLogSpy.called);
+
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
 
 
   it('supports debug mode', () => {
