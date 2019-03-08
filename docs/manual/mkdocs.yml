@@ -236,6 +236,8 @@ nav:
         - o365group remove: 'cmd/graph/o365group/o365group-remove.md'
         - o365group restore: 'cmd/graph/o365group/o365group-restore.md'
         - o365group set: 'cmd/graph/o365group/o365group-set.md'
+      - schemaextension:
+        - schemaextension add: 'cmd/graph/schemaextension/schemaextension-add.md'
       - siteclassification:
         - siteclassification disable: 'cmd/graph/siteclassification/siteclassification-disable.md'
         - siteclassification enable: 'cmd/graph/siteclassification/siteclassification-enable.md'

@@ -323,7 +323,7 @@ export default class Utils {
    * // returns "https://contoso.sharepoint.com/sites/team1/Lists/MyList"
    * Utils.getAbsoluteUrl("https://contoso.sharepoint.com/sites/team1/", "/sites/team1/Lists/MyList");
    */
-  public static getAbsoluteUrl(webUrl: string, serverRelativeUrl: string) : string {
+  public static getAbsoluteUrl(webUrl: string, serverRelativeUrl: string): string {
     const uri: url.UrlWithStringQuery = url.parse(webUrl);
     const tenantUrl: string = `${uri.protocol}//${uri.hostname}`;
     if (serverRelativeUrl[0] !== '/') {
