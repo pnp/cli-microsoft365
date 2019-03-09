@@ -149,10 +149,10 @@ class GraphTeamsAddCommand extends GraphCommand {
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
 
-      if (args.options.groupId && (args.options.name || args.options.description) {
+      if (args.options.groupId && (args.options.name || args.options.description)) {
         return `Please specify either a groupId or Name`;
       }
-      
+
       if (args.options.groupId && !Utils.isValidGuid(args.options.groupId as string)) {
         return `${args.options.groupId} is not a valid GUID`;
       }

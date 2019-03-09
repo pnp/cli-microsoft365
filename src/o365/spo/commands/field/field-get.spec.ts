@@ -103,7 +103,7 @@ describe(commands.FIELD_GET, () => {
 
   it('gets information about a site column', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/fields('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
+      if (opts.url.indexOf(`/_api/web/fields/getbyid('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
         return Promise.resolve({
           "AutoIndexed": false,
           "CanBeDeleted": true,
@@ -205,7 +205,7 @@ describe(commands.FIELD_GET, () => {
 
   it('gets information about a list column', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists/getByTitle('Documents')/fields('03e45e84-1992-4d42-9116-26f756012634')`) > -1) {
+      if (opts.url.indexOf(`/_api/web/lists/getByTitle('Documents')/fields/getbyid('03e45e84-1992-4d42-9116-26f756012634')`) > -1) {
         return Promise.resolve({
           "AutoIndexed": false,
           "CanBeDeleted": false,
@@ -299,9 +299,113 @@ describe(commands.FIELD_GET, () => {
     });
   });
 
+  it('should call the correct GET url when id and list url specified', (done) => {
+    const getStub = sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        return Promise.resolve({
+          "Id": "03e45e84-1992-4d42-9116-26f756012634"
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', id: '03e45e84-1992-4d42-9116-26f756012634', listUrl: 'Lists/Events' } }, () => {
+      try {
+        assert.equal(getStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/portal/_api/web/GetList(\'%2Fsites%2Fportal%2FLists%2FEvents\')/fields/getbyid(\'03e45e84-1992-4d42-9116-26f756012634\')');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('should call the correct GET url when field title and list title specified (verbose)', (done) => {
+    const getStub = sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        return Promise.resolve({
+          "Id": "03e45e84-1992-4d42-9116-26f756012634"
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', fieldTitle: 'Title', listTitle: 'Documents' } }, () => {
+      try {
+        assert.equal(getStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle(\'Documents\')/fields/getbyinternalnameortitle(\'Title\')');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('should call the correct GET url when field title and list title specified', (done) => {
+    const getStub = sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        return Promise.resolve({
+          "Id": "03e45e84-1992-4d42-9116-26f756012634"
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', fieldTitle: 'Title', listTitle: 'Documents' } }, () => {
+      try {
+        assert.equal(getStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle(\'Documents\')/fields/getbyinternalnameortitle(\'Title\')');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('should call the correct GET url when field title and list url specified', (done) => {
+    const getStub = sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+        return Promise.resolve({
+          "Id": "03e45e84-1992-4d42-9116-26f756012634"
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', fieldTitle: 'Title', listId: '03e45e84-1992-4d42-9116-26f756012634' } }, () => {
+      try {
+        assert.equal(getStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/portal/_api/web/lists(guid\'03e45e84-1992-4d42-9116-26f756012634\')/fields/getbyinternalnameortitle(\'Title\')');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('correctly handles site column not found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/fields('03e45e84-1992-4d42-9116-26f756012634')`) > -1) {
+      if (opts.url.indexOf(`/_api/web/fields/getbyid('03e45e84-1992-4d42-9116-26f756012634')`) > -1) {
         return Promise.reject({
           error: {
             "odata.error": {
@@ -335,7 +439,7 @@ describe(commands.FIELD_GET, () => {
 
   it('correctly handles list column not found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists/getByTitle('Documents')/fields('03e45e84-1992-4d42-9116-26f756012634')`) > -1) {
+      if (opts.url.indexOf(`/_api/web/lists/getByTitle('Documents')/fields/getbyid('03e45e84-1992-4d42-9116-26f756012634')`) > -1) {
         return Promise.reject({
           error: {
             "odata.error": {
@@ -369,7 +473,7 @@ describe(commands.FIELD_GET, () => {
 
   it('correctly handles list not found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists/getByTitle('Documents')/fields('03e45e84-1992-4d42-9116-26f756012634')`) > -1) {
+      if (opts.url.indexOf(`/_api/web/lists/getByTitle('Documents')/fields/getbyid('03e45e84-1992-4d42-9116-26f756012634')`) > -1) {
         return Promise.reject({
           error: {
             "odata.error": {
@@ -429,6 +533,11 @@ describe(commands.FIELD_GET, () => {
 
   it('fails validation if the field ID is not a valid GUID', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', id: 'abc' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation if the list ID is not a valid GUID', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', id: '03e45e84-1992-4d42-9116-26f756012634', listId: 'abc' } });
     assert.notEqual(actual, true);
   });
 
