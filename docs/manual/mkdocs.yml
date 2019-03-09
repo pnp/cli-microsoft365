@@ -245,6 +245,7 @@ nav:
         - siteclassification get: 'cmd/graph/siteclassification/siteclassification-get.md'
         - siteclassification set: 'cmd/graph/siteclassification/siteclassification-set.md'
       - teams:
+        - teams add: 'cmd/graph/teams/teams-add.md'
         - teams list: 'cmd/graph/teams/teams-list.md'
         - teams app install: 'cmd/graph/teams/teams-app-install.md'
         - teams app list: 'cmd/graph/teams/teams-app-list.md'

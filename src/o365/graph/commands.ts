@@ -24,6 +24,7 @@ export default {
   SITECLASSIFICATION_GET: `${prefix} siteclassification get`,
   SITECLASSIFICATION_SET: `${prefix} siteclassification set`,
   STATUS: `${prefix} status`,
+  TEAMS_ADD: `${prefix} teams add`,
   TEAMS_APP_INSTALL: `${prefix} teams app install`,
   TEAMS_APP_LIST: `${prefix} teams app list`,
   TEAMS_APP_PUBLISH: `${prefix} teams app publish`,
