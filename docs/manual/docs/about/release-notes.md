@@ -6,12 +6,22 @@
 
 **SharePoint Online:**
 
+- [spo field remove](../cmd/spo/field/field-remove.md) - removes the specified list- or site column [#738](https://github.com/pnp/office365-cli/issues/738)
+- [spo listitem record undeclare](../cmd/spo/listitem/listitem-record-undeclare.md) - undeclares list item as a record [#770](https://github.com/pnp/office365-cli/issues/770)
 - [spo web reindex](../cmd/spo/web/web-reindex.md) - requests reindexing the specified subsite [#822](https://github.com/pnp/office365-cli/issues/822)
 
 **Microsoft Graph:**
 
+- [graph teams app install](../cmd/graph/teams/teams-app-install.md) - installs an app from the catalog to a Microsoft Teams team [#842](https://github.com/pnp/office365-cli/issues/842)
 - [graph teams funsettings list](../cmd/graph/teams/teams-funsettings-list.md) - lists fun settings for the specified Microsoft Teams team [#809](https://github.com/pnp/office365-cli/issues/809)
+- [graph teams guestsettings list](../cmd/graph/teams/teams-guestsettings-list.md) - lists guests settings for a Microsoft Teams team [#810](https://github.com/pnp/office365-cli/issues/810)
+- [graph teams membersettings list](../cmd/graph/teams/teams-membersettings-list.md) - lists member settings for a Microsoft Teams team [#811](https://github.com/pnp/office365-cli/issues/811)
 - [graph teams membersettings set](../cmd/graph/teams/teams-membersettings-set.md) - updates member settings of a Microsoft Teams team [#819](https://github.com/pnp/office365-cli/issues/819)
+- [graph teams messagingsettings list](../cmd/graph/teams/teams-messagingsettings-list.md) - lists messaging settings for a Microsoft Teams team [#812](https://github.com/pnp/office365-cli/issues/812)
+
+### Changes
+
+- fixed ID of the FN002009 SPFx project upgrade rule [#854](https://github.com/pnp/office365-cli/issues/854)
 
 ## [v1.14.0](https://github.com/pnp/office365-cli/releases/tag/v1.14.0)
 
