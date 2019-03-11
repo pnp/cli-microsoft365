@@ -286,7 +286,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/lists/getByTitle('Site Pages')/items(${pageItemId})`,
+          url: `${args.options.webUrl}/_api/web/lists/SitePages/items(${pageItemId})`,
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata',
