@@ -1,5 +1,5 @@
 import commands from '../../commands';
-import Command, { CommandOption, CommandError } from '../../../../Command';
+import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../GraphAuth';
@@ -203,6 +203,92 @@ describe(commands.TEAMS_APP_LIST, () => {
     });
   });
 
+  it('lists organization\'s apps installed in a team', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/6f6fd3f7-9ba5-4488-bbe6-a789004d0d55/installedApps?$expand=teamsApp&$filter=teamsApp/distributionMethod eq 'organization'`) {
+        return Promise.resolve({
+          "value": [{
+            "id": "NmY2ZmQzZjctOWJhNS00NDg4LWJiZTYtYTc4OTAwNGQwZDU1IyNiOGNjZjNmNC04NGVlLTRlNjItODJkMC1iZjZiZjk1YmRiODM=", "teamsApp": { "id": "b8ccf3f4-84ee-4e62-82d0-bf6bf95bdb83", "externalId": "912e9d76-1794-414f-82fd-e5b60fab731b", "displayName": "HelloWorld", "distributionMethod": "organization" }
+          }]
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.service = new Service();
+    auth.service.connected = true;
+    auth.service.resource = 'https://graph.microsoft.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55' } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith([
+          {
+            "id": "NmY2ZmQzZjctOWJhNS00NDg4LWJiZTYtYTc4OTAwNGQwZDU1IyNiOGNjZjNmNC04NGVlLTRlNjItODJkMC1iZjZiZjk1YmRiODM=",
+            "displayName": "HelloWorld",
+            "distributionMethod": "organization"
+          }
+        ]));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('lists all apps installed in a team', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/6f6fd3f7-9ba5-4488-bbe6-a789004d0d55/installedApps?$expand=teamsApp`) {
+        return Promise.resolve({
+          "value": [
+            {
+              "id": "NmY2ZmQzZjctOWJhNS00NDg4LWJiZTYtYTc4OTAwNGQwZDU1IyNiOGNjZjNmNC04NGVlLTRlNjItODJkMC1iZjZiZjk1YmRiODM=", "teamsApp": { "id": "b8ccf3f4-84ee-4e62-82d0-bf6bf95bdb83", "externalId": "912e9d76-1794-414f-82fd-e5b60fab731b", "displayName": "HelloWorld", "distributionMethod": "organization" }
+            },
+            {
+              "id": "NmY2ZmQzZjctOWJhNS00NDg4LWJiZTYtYTc4OTAwNGQwZDU1IyMwZDgyMGVjZC1kZWYyLTQyOTctYWRhZC03ODA1NmNkZTdjNzg=", "teamsApp": { "id": "0d820ecd-def2-4297-adad-78056cde7c78", "externalId": null, "displayName": "OneNote", "distributionMethod": "store" }
+            },
+            {
+              "id": "NmY2ZmQzZjctOWJhNS00NDg4LWJiZTYtYTc4OTAwNGQwZDU1IyMxNGQ2OTYyZC02ZWViLTRmNDgtODg5MC1kZTU1NDU0YmIxMzY=", "teamsApp": { "id": "14d6962d-6eeb-4f48-8890-de55454bb136", "externalId": null, "displayName": "Activity", "distributionMethod": "store" }
+            }
+          ]
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.service = new Service();
+    auth.service.connected = true;
+    auth.service.resource = 'https://graph.microsoft.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55', all: true } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith([
+          {
+            "id": "NmY2ZmQzZjctOWJhNS00NDg4LWJiZTYtYTc4OTAwNGQwZDU1IyNiOGNjZjNmNC04NGVlLTRlNjItODJkMC1iZjZiZjk1YmRiODM=",
+            "displayName": "HelloWorld",
+            "distributionMethod": "organization"
+          },
+          {
+            "id": "NmY2ZmQzZjctOWJhNS00NDg4LWJiZTYtYTc4OTAwNGQwZDU1IyMwZDgyMGVjZC1kZWYyLTQyOTctYWRhZC03ODA1NmNkZTdjNzg=",
+            "displayName": "OneNote",
+            "distributionMethod": "store"
+          },
+          {
+            "id": "NmY2ZmQzZjctOWJhNS00NDg4LWJiZTYtYTc4OTAwNGQwZDU1IyMxNGQ2OTYyZC02ZWViLTRmNDgtODg5MC1kZTU1NDU0YmIxMzY=",
+            "displayName": "Activity",
+            "distributionMethod": "store"
+          }
+        ]));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('lists all properties for output json', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/appCatalogs/teamsApps?$filter=distributionMethod eq 'organization'`) {
@@ -241,6 +327,32 @@ describe(commands.TEAMS_APP_LIST, () => {
         done(e);
       }
     });
+  });
+
+  it('fails validation if the teamId is not a valid GUID', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        teamId: 'invalid'
+      }
+    });
+    assert.notEqual(actual, true);
+  });
+
+  it('passes validation if the teamId is not specified', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+      }
+    });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation when the teamId is a valid GUID', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55'
+      }
+    });
+    assert.equal(actual, true);
   });
 
   it('supports debug mode', () => {
