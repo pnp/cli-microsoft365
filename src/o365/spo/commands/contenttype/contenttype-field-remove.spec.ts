@@ -360,6 +360,11 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
           "Id": WEB_ID
         });
       }
+      if (opts.url.indexOf(`/_api/lists/GetByTitle('${LIST_TITLE}')?$select=Id`) > -1) {
+        return Promise.resolve({
+          "Id": LIST_ID
+        });
+      }
 
       return Promise.reject('Invalid request');
     });
@@ -408,6 +413,11 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       if (opts.url.indexOf(`_api/web?$select=Id`) > -1) {
         return Promise.resolve({
           "Id": WEB_ID
+        });
+      }
+      if (opts.url.indexOf(`/_api/lists/GetByTitle('${LIST_TITLE}')?$select=Id`) > -1) {
+        return Promise.resolve({
+          "Id": LIST_ID
         });
       }
 

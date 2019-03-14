@@ -142,7 +142,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
         }
       })
       .then((res: { Id: string }) => {
-        if (args.options.listTitle) {
+        if (res) {
           this.listId = res.Id;
 
           if (this.debug) {
