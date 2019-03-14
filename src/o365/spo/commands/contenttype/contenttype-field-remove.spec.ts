@@ -11,8 +11,11 @@ import Utils from '../../../../Utils';
 const WEB_URL = 'https://contoso.sharepoint.com';
 const FIELD_LINK_ID = "5ee2dd25-d941-455a-9bdb-7f2c54aed11b";
 const CONTENT_TYPE_ID = "0x0100558D85B7216F6A489A499DB361E1AE2F";
+const LIST_CONTENT_TYPE_ID = "0x0100CA0FA0F5DAEF784494B9C6020C3020A60062F089A38C867747942DB2C3FC50FF6A";
+const LIST_ID = "8c7a0fcd-9d64-4634-85ea-ce2b37b2ec0c";
 const WEB_ID = "d1b7a30d-7c22-4c54-a686-f1c298ced3c7";
 const SITE_ID = "50720268-eff5-48e0-835e-de588b007927";
+const LIST_TITLE = "TEST";
 
 describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
   let vorpal: Vorpal;
@@ -45,6 +48,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     (command as any).requestDigest = '';
     (command as any).webId = '';
     (command as any).siteId = '';
+    (command as any).listId = '';
     (command as any).fieldLinkId = '';
   });
 
@@ -344,6 +348,106 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     });
   });
 
+  it('removes the field link from list content type', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf(`_api/site?$select=Id`) > -1) {
+        return Promise.resolve({
+          "Id": SITE_ID
+        });
+      }
+      if (opts.url.indexOf(`_api/web?$select=Id`) > -1) {
+        return Promise.resolve({
+          "Id": WEB_ID
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        const expectedBody = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName=".NET Library" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="18" ObjectPathId="17" /><ObjectPath Id="20" ObjectPathId="19" /><Method Name="DeleteObject" Id="21" ObjectPathId="19" /><Method Name="Update" Id="22" ObjectPathId="15"><Parameters><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Property Id="17" ParentId="15" Name="FieldLinks" /><Method Id="19" ParentId="17" Name="GetById"><Parameters><Parameter Type="Guid">{${FIELD_LINK_ID}}</Parameter></Parameters></Method><Identity Id="15" Name="09eec89e-709b-0000-558c-c222dcaf9162|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${SITE_ID}:web:${WEB_ID}:list:${LIST_ID}:contenttype:${LIST_CONTENT_TYPE_ID}" /></ObjectPaths></Request>`;
+
+        if (opts.body === expectedBody) {
+          return Promise.resolve(`[
+              {
+                "SchemaVersion": "15.0.0.0",
+                "LibraryVersion": "16.0.7911.1206",
+                "ErrorInfo": null,
+                "TraceCorrelationId": "73557d9e-007f-0000-22fb-89971360c85c"
+              }
+            ]`);
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = WEB_URL;
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID, updateChildContentTypes: false } }, (err?: any) => {
+      try {
+        assert(cmdInstanceLogSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+  it('removes the field link from list content type (debug)', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf(`_api/site?$select=Id`) > -1) {
+        return Promise.resolve({
+          "Id": SITE_ID
+        });
+      }
+      if (opts.url.indexOf(`_api/web?$select=Id`) > -1) {
+        return Promise.resolve({
+          "Id": WEB_ID
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        const expectedBody = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName=".NET Library" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="18" ObjectPathId="17" /><ObjectPath Id="20" ObjectPathId="19" /><Method Name="DeleteObject" Id="21" ObjectPathId="19" /><Method Name="Update" Id="22" ObjectPathId="15"><Parameters><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Property Id="17" ParentId="15" Name="FieldLinks" /><Method Id="19" ParentId="17" Name="GetById"><Parameters><Parameter Type="Guid">{${FIELD_LINK_ID}}</Parameter></Parameters></Method><Identity Id="15" Name="09eec89e-709b-0000-558c-c222dcaf9162|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${SITE_ID}:web:${WEB_ID}:list:${LIST_ID}:contenttype:${LIST_CONTENT_TYPE_ID}" /></ObjectPaths></Request>`;
+
+        if (opts.body === expectedBody) {
+          return Promise.resolve(`[
+              {
+                "SchemaVersion": "15.0.0.0",
+                "LibraryVersion": "16.0.7911.1206",
+                "ErrorInfo": null,
+                "TraceCorrelationId": "73557d9e-007f-0000-22fb-89971360c85c"
+              }
+            ]`);
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = WEB_URL;
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID, updateChildContentTypes: false } }, (err?: any) => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
   
   it('handles error when remove the field link from web content type with update child content types', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -467,7 +571,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
   });
 
   it('passes validation', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { fieldLinkId: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID, webUrl: WEB_URL, debug: true } });
+    const actual = (command.validate() as CommandValidate)({ options: { listId: LIST_ID, fieldLinkId: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID, webUrl: WEB_URL, debug: true } });
     assert.equal(actual, true);
   });
   
