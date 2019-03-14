@@ -35,9 +35,9 @@ interface Options extends GlobalOptions {
 }
 
 class SpoContentTypeFieldRemoveCommand extends SpoCommand {
-  private requestDigest: string = "";
-  private webId: string = "";
-  private siteId: string = "";
+  private requestDigest: string = '';
+  private webId: string = '';
+  private siteId: string = '';
   private siteAccessToken: string = '';
 
   public get name(): string {
@@ -50,7 +50,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
 
   public types(): CommandTypes | undefined {
     return {
-      string: ['i', 'contentTypeId', 'f', 'fieldId']
+      string: ['i', 'contentTypeId', 'f', 'fieldLinkId']
     };
   }
 
@@ -91,7 +91,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
           cmd.log(`Get WebId required by ProcessQuery endpoint.`);
         }
 
-        // GET SiteId
+        // GET WebId
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web?$select=Id`,
           headers: Utils.getRequestHeaders({
@@ -116,10 +116,16 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
           cmd.log(`WebId: ${this.webId}`);
         }
 
-        return this.ensureRequestDigest(args.options.webUrl, this.siteAccessToken, cmd);
+        return this.getRequestDigestForSite(args.options.webUrl, this.siteAccessToken, cmd, this.debug)
       })
-      .then(() => {
-        const updateChildContentTypes = args.options.listTitle ? args.options.updateChildContentTypes == true : false;
+      .then((res: ContextInfo) => {
+        if (this.debug) {
+          cmd.log(`Form digest='${res.FormDigestValue}`);
+          cmd.log('');
+        }
+        this.requestDigest = res.FormDigestValue;
+
+        const updateChildContentTypes = args.options.listTitle ? false : args.options.updateChildContentTypes;
 
         if (this.debug) {
           let additionalLog = args.options.listTitle ? `; ListTitle='${args.options.listTitle}'` : ` ; UpdateChildContentTypes='${updateChildContentTypes}`;
@@ -144,7 +150,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
 
         return request.post(requestOptions);
       })
-      .then((res: string): void => {
+      .then((res: any): void => {
         if (this.debug) {
           cmd.log('Response:');
           cmd.log(res);
@@ -155,23 +161,14 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
         const response: ClientSvcResponseContents = json[0];
         if (response.ErrorInfo) {
           cb(new CommandError(response.ErrorInfo.ErrorMessage));
+          return;
         }
-        else {
-          if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
-          }
-          cb();
+        if (this.verbose) {
+          cmd.log(vorpal.chalk.green('DONE'));
         }
+        cb();
       }, (error: any): void => {
-        if (error === 'DONE') {
-          if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
-          }
-          cb();
-        }
-        else {
-          this.handleRejectedODataJsonPromise(error, cmd, cb);
-        }
+        this.handleRejectedODataJsonPromise(error, cmd, cb);
       });
   }
 
@@ -181,57 +178,6 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
     telemetryProps.fieldLinkId = (!(!args.options.fieldLinkId)).toString();
     return telemetryProps;
   }
-
-  /**
-   * Apparently - the REST API for removal of the field link doesn't work. Fallback to ProcessQueryx
-   * @param cmd 
-   * @param args 
-   * @param cb 
-   */
-  // public commandActionREST(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-  //   const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-  //   let siteAccessToken: string = '';
-
-  //   auth
-  //     .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-  //     .then((accessToken: string): request.RequestPromise => {
-  //       siteAccessToken = accessToken;
-
-  //       if (this.debug) {
-  //         cmd.log(`Get all field links for ContentType. CTId='${args.options.contentTypeId}' ${args.options.listTitle ? ` ; ListTitle='${args.options.listTitle}'` : ""}`);
-  //       }
-
-  //       const requestOptions: any = {
-  //         url: `${args.options.webUrl}/_api/web/${(args.options.listTitle ? `lists/getByTitle('${encodeURIComponent(args.options.listTitle)}')/` : '')}contenttypes('${encodeURIComponent(args.options.contentTypeId)}')/fieldlinks('${encodeURIComponent(args.options.fieldLinkId)}')/DeleteObject`,
-  //         headers: Utils.getRequestHeaders({
-  //           authorization: `Bearer ${siteAccessToken}`,
-  //           accept: 'application/json;odata=nometadata'
-  //         }),
-  //         json: true
-  //       }
-
-  //       if (this.debug) {
-  //         cmd.log('Executing web request...');
-  //         cmd.log(requestOptions);
-  //         cmd.log('');
-  //       }
-
-  //       return request.post(requestOptions);
-  //     })
-  //     .then((result: any) => {
-  //       if (this.debug) {
-  //         cmd.log('Response:');
-  //         cmd.log(result);
-  //         cmd.log('');
-  //       }
-
-  //       cmd.log(result);
-
-  //       if (this.verbose) {
-  //         cmd.log(vorpal.chalk.green('DONE'));
-  //       }
-  //     }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
-  // }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
@@ -248,7 +194,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
         description: 'The ID of the content type to process'
       },
       {
-        option: '-f, --fieldId <id>',
+        option: '-f, --fieldLinkId <id>',
         description: 'The ID of the field to remove'
       },
       {
@@ -261,37 +207,6 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  private ensureRequestDigest(siteUrl: string, siteAccessToken: string, cmd: CommandInstance): Promise<void> {
-    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      if (this.requestDigest) {
-        if (this.debug) {
-          cmd.log('Request digest already present');
-        }
-        resolve();
-        return;
-      }
-
-      if (this.debug) {
-        cmd.log('Retrieving request digest...');
-      }
-
-      this
-        .getRequestDigestForSite(siteUrl, siteAccessToken, cmd, this.debug)
-        .then((res: ContextInfo): void => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
-          }
-
-          this.requestDigest = res.FormDigestValue;
-          resolve();
-        }, (error: any): void => {
-          reject(error);
-        });
-    });
-  }
-
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
       if (!args.options.contentTypeId) {
@@ -301,7 +216,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
       if (!args.options.webUrl) {
         return 'Required parameter webUrl missing';
       }
-      
+
       if (!args.options.fieldLinkId) {
         return 'Required parameter fieldLinkId missing';
       }
@@ -313,7 +228,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
       return true;
     };
   }
-  
+
   public commandHelp(args: {}, log: (help: string) => void): void {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
