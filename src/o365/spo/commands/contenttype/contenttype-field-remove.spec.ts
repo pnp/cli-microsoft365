@@ -438,7 +438,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     auth.site.connected = true;
     auth.site.url = WEB_URL;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID, updateChildContentTypes: false } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: true, webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID, updateChildContentTypes: false } }, (err?: any) => {
       try {
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
         done();
