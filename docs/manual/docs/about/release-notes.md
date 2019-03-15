@@ -22,6 +22,8 @@
 ### Changes
 
 - fixed ID of the FN002009 SPFx project upgrade rule [#854](https://github.com/pnp/office365-cli/issues/854)
+- fixed issue with updating the header of non-en-US pages [#851](https://github.com/pnp/office365-cli/issues/851)
+- added support for upgrading projects built using SharePoint Framework v1.7.1 [#848](https://github.com/pnp/office365-cli/issues/848)
 
 ## [v1.14.0](https://github.com/pnp/office365-cli/releases/tag/v1.14.0)
 
