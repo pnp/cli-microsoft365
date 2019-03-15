@@ -240,7 +240,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
         description: 'The ID of the field to remove'
       },
       {
-        option: '-c, --updateChild <updateChildContentTypes>',
+        option: '-c, --updateChildContentTypes <updateChildContentTypes>',
         description: 'Update child content types'
       }
     ];
@@ -291,6 +291,14 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
     Remove fieldLink with ID ${chalk.grey('2c1ba4c4-cd9b-4417-832f-92a34bc34b2a')} from content type with ID ${chalk.grey('0x0100CA0FA0F5DAEF784494B9C6020C3020A6')}
     from web with Url ${chalk.grey('https://contoso.sharepoint.com')}
       ${chalk.grey(config.delimiter)} ${this.name}  -i "0x0100CA0FA0F5DAEF784494B9C6020C3020A6" -f "880d2f46-fccb-43ca-9def-f88e722cef80" -u https://contoso.sharepoint.com
+
+    Remove fieldLink with ID ${chalk.grey('2c1ba4c4-cd9b-4417-832f-92a34bc34b2a')} from content type with ID ${chalk.grey('0x0100CA0FA0F5DAEF784494B9C6020C3020A6')}
+    from web with Url ${chalk.grey('https://contoso.sharepoint.com')} with child content types update
+      ${chalk.grey(config.delimiter)} ${this.name}  -i "0x0100CA0FA0F5DAEF784494B9C6020C3020A6" -f "880d2f46-fccb-43ca-9def-f88e722cef80" -u https://contoso.sharepoint.com -updateChildContentTypes true
+
+    Remove fieldLink with ID ${chalk.grey('2c1ba4c4-cd9b-4417-832f-92a34bc34b2a')} from list content type with ID ${chalk.grey('0x0100CA0FA0F5DAEF784494B9C6020C3020A6')}
+    from web with Url ${chalk.grey('https://contoso.sharepoint.com')} 
+      ${chalk.grey(config.delimiter)} ${this.name}  -i "0x0100CA0FA0F5DAEF784494B9C6020C3020A60062F089A38C867747942DB2C3FC50FF6A" -f "880d2f46-fccb-43ca-9def-f88e722cef80" -u https://contoso.sharepoint.com -listTitle "Documents"
 
 `);
   }
