@@ -91,6 +91,7 @@ describe(commands.SITE_LIST, () => {
   });
 
   it('aborts when not logged in to a SharePoint site', (done) => {
+    // some fine commengts explaing all: 42
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = command.action();
@@ -499,6 +500,164 @@ describe(commands.SITE_LIST, () => {
         done(e);
       }
     });
+  });
+
+  it('retrieves list of sites in recycle bin when deleted specified', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (`<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="32" ObjectPathId="31" /><ObjectPath Id="34" ObjectPathId="33" /><Query Id="35" ObjectPathId="33"><Query SelectAllProperties="true"><Properties><Property Name="NextStartIndexFromSharePoint" ScalarProperty="true" /></Properties></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="31" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="33" ParentId="31" Name="GetDeletedSitePropertiesFromSharePoint"><Parameters><Parameter Type="Null" /></Parameters></Method></ObjectPaths></Request>`) {
+          return Promise.resolve(JSON.stringify(
+            [{
+              "SchemaVersion": "15.0.0.0",
+              "LibraryVersion": "16.0.8706.1213",
+              "ErrorInfo": null,
+              "TraceCorrelationId": "4255c99e-90cd-0000-60b9-ddc963ea4223"
+            }, 32, {
+              "IsNull": false
+            }, 34, {
+              "IsNull": false
+            }, 35, {
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SPODeletedSitePropertiesEnumerable",
+              "NextStartIndex": -1,
+              "NextStartIndexFromSharePoint": null,
+              "_Child_Items_": [{
+                "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties",
+                "_ObjectIdentity_": "4255c99e-90cd-0000-60b9-ddc963ea4223|908bed80-a04a-4433-b4a0-883d9847d110:0acf1d97-fe55-40a7-9b63-7aff8d24784e\\nDeletedSiteProperties\\nhttps%3a%2f%2fbloemium.sharepoint.com%2fsites%2fgarbage-only",
+                "DaysRemaining": 76,
+                "DeletionTime": "\/Date(2019,1,27,21,26,55,7)\/",
+                "SiteId": "\/Guid(75d8f9df-2a45-40f2-893e-22e30e5419be)\/",
+                "Status": "Recycled",
+                "StorageMaximumLevel": 26214400,
+                "Url": "https:\u002f\u002fbloemium.sharepoint.com\u002fsites\u002fgarbage-only",
+                "UserCodeMaximumLevel": 300
+              }, {
+                "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties",
+                "_ObjectIdentity_": "4255c99e-90cd-0000-60b9-ddc963ea4223|908bed80-a04a-4433-b4a0-883d9847d110:0acf1d97-fe55-40a7-9b63-7aff8d24784e\\nDeletedSiteProperties\\nhttps%3a%2f%2fbloemium.sharepoint.com%2fsites%2fthrow-away",
+                "DaysRemaining": 74,
+                "DeletionTime": "\/Date(2019,1,25,19,26,41,767)\/",
+                "SiteId": "\/Guid(de8edfa0-6671-4ad1-a702-ea1705693995)\/",
+                "Status": "Recycled",
+                "StorageMaximumLevel": 26214400,
+                "Url": "https:\u002f\u002fbloemium.sharepoint.com\u002fsites\u002fthrow-away",
+                "UserCodeMaximumLevel": 300
+              }]
+            }]
+          ));
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { deleted: true } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith([
+          {
+            Url: 'https://bloemium.sharepoint.com/sites/garbage-only',
+            DeletionTime: '2019-02-27T20:26:55.007Z',
+            DaysRemaining: 76
+          },
+          {
+            Url: 'https://bloemium.sharepoint.com/sites/throw-away',
+            DeletionTime: '2019-02-25T18:26:41.767Z',
+            DaysRemaining: 74
+          }
+        ]))
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('retrieves list of sites in recycle bin when deleted specified (verbose)', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (`<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="32" ObjectPathId="31" /><ObjectPath Id="34" ObjectPathId="33" /><Query Id="35" ObjectPathId="33"><Query SelectAllProperties="true"><Properties><Property Name="NextStartIndexFromSharePoint" ScalarProperty="true" /></Properties></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="31" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="33" ParentId="31" Name="GetDeletedSitePropertiesFromSharePoint"><Parameters><Parameter Type="Null" /></Parameters></Method></ObjectPaths></Request>`) {
+          return Promise.resolve(JSON.stringify(
+            [{
+              "SchemaVersion": "15.0.0.0",
+              "LibraryVersion": "16.0.8706.1213",
+              "ErrorInfo": null,
+              "TraceCorrelationId": "4255c99e-90cd-0000-60b9-ddc963ea4223"
+            }, 32, {
+              "IsNull": false
+            }, 34, {
+              "IsNull": false
+            }, 35, {
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SPODeletedSitePropertiesEnumerable",
+              "NextStartIndex": -1,
+              "NextStartIndexFromSharePoint": null,
+              "_Child_Items_": [{
+                "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties",
+                "_ObjectIdentity_": "4255c99e-90cd-0000-60b9-ddc963ea4223|908bed80-a04a-4433-b4a0-883d9847d110:0acf1d97-fe55-40a7-9b63-7aff8d24784e\\nDeletedSiteProperties\\nhttps%3a%2f%2fbloemium.sharepoint.com%2fsites%2fgarbage-only",
+                "DaysRemaining": 76,
+                "DeletionTime": "\/Date(2019,1,27,21,26,55,7)\/",
+                "SiteId": "\/Guid(75d8f9df-2a45-40f2-893e-22e30e5419be)\/",
+                "Status": "Recycled",
+                "StorageMaximumLevel": 26214400,
+                "Url": "https:\u002f\u002fbloemium.sharepoint.com\u002fsites\u002fgarbage-only",
+                "UserCodeMaximumLevel": 300
+              }, {
+                "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties",
+                "_ObjectIdentity_": "4255c99e-90cd-0000-60b9-ddc963ea4223|908bed80-a04a-4433-b4a0-883d9847d110:0acf1d97-fe55-40a7-9b63-7aff8d24784e\\nDeletedSiteProperties\\nhttps%3a%2f%2fbloemium.sharepoint.com%2fsites%2fthrow-away",
+                "DaysRemaining": 74,
+                "DeletionTime": "\/Date(2019,1,25,19,26,41,767)\/",
+                "SiteId": "\/Guid(de8edfa0-6671-4ad1-a702-ea1705693995)\/",
+                "Status": "Recycled",
+                "StorageMaximumLevel": 26214400,
+                "Url": "https:\u002f\u002fbloemium.sharepoint.com\u002fsites\u002fthrow-away",
+                "UserCodeMaximumLevel": 300
+              }]
+            }]
+          ));
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { deleted: true, verbose: true } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith([
+          {
+            Url: 'https://bloemium.sharepoint.com/sites/garbage-only',
+            DeletionTime: '2019-02-27T20:26:55.007Z',
+            DaysRemaining: 76
+          },
+          {
+            Url: 'https://bloemium.sharepoint.com/sites/throw-away',
+            DeletionTime: '2019-02-25T18:26:41.767Z',
+            DaysRemaining: 74
+          }
+        ]))
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  })
+
+  it('does not allow to specify type in combination with deleted option', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { debug: false, type: 'CommunicationSite', deleted: true } });
+    assert.notEqual(actual, true);
+  });
+
+  it('does not allow to specify filter in combination with deleted option', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { debug: false, filter: "url -like 'mtest'", deleted: true } });
+    assert.notEqual(actual, true);
   });
 
   it('escapes XML in the filter', (done) => {

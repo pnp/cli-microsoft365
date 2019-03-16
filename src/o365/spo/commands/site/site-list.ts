@@ -53,7 +53,7 @@ class SiteListCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          cmd.log(`Retrieving list of ${args.options.deleted ? 'deleted ' : ' '}site collections...`);
+          cmd.log(`Retrieving list of ${args.options.deleted ? 'deleted ' : ''}site collections...`);
         }
 
         let query: string;
