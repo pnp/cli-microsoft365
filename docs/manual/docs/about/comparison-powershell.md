@@ -627,7 +627,7 @@ Remove-Team|MicrosoftTeams|
 Remove-TeamChannel|MicrosoftTeams|
 Remove-TeamUser|MicrosoftTeams|[graph teams user remove](../cmd/graph/teams/teams-user-remove.md)
 Set-Team|MicrosoftTeams|
-Set-TeamChannel|MicrosoftTeams|
+Set-TeamChannel|MicrosoftTeams|[graph teams channel set](../cmd/graph/teams/teams-channel-set.md)
 Set-TeamFunSettings|MicrosoftTeams|
 Set-TeamGuestSettings|MicrosoftTeams|[graph teams guestsettings set](../cmd/graph/teams/teams-guestsettings-set.md)
 Set-TeamMemberSettings|MicrosoftTeams|[graph teams membersettings set](../cmd/graph/teams/teams-membersettings-set.md)
