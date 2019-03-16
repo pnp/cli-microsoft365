@@ -516,30 +516,14 @@ describe(commands.SITE_LIST, () => {
             }, 34, {
               "IsNull": false
             }, 35, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SPODeletedSitePropertiesEnumerable",
-              "NextStartIndex": -1,
-              "NextStartIndexFromSharePoint": null,
-              "_Child_Items_": [{
-                "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties",
-                "_ObjectIdentity_": "4255c99e-90cd-0000-60b9-ddc963ea4223|908bed80-a04a-4433-b4a0-883d9847d110:0acf1d97-fe55-40a7-9b63-7aff8d24784e\\nDeletedSiteProperties\\nhttps%3a%2f%2fbloemium.sharepoint.com%2fsites%2fgarbage-only",
-                "DaysRemaining": 76,
-                "DeletionTime": "\/Date(2019,1,27,21,26,55,7)\/",
-                "SiteId": "\/Guid(75d8f9df-2a45-40f2-893e-22e30e5419be)\/",
-                "Status": "Recycled",
-                "StorageMaximumLevel": 26214400,
-                "Url": "https:\u002f\u002fbloemium.sharepoint.com\u002fsites\u002fgarbage-only",
-                "UserCodeMaximumLevel": 300
-              }, {
-                "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties",
-                "_ObjectIdentity_": "4255c99e-90cd-0000-60b9-ddc963ea4223|908bed80-a04a-4433-b4a0-883d9847d110:0acf1d97-fe55-40a7-9b63-7aff8d24784e\\nDeletedSiteProperties\\nhttps%3a%2f%2fbloemium.sharepoint.com%2fsites%2fthrow-away",
-                "DaysRemaining": 74,
-                "DeletionTime": "\/Date(2019,1,25,19,26,41,767)\/",
-                "SiteId": "\/Guid(de8edfa0-6671-4ad1-a702-ea1705693995)\/",
-                "Status": "Recycled",
-                "StorageMaximumLevel": 26214400,
-                "Url": "https:\u002f\u002fbloemium.sharepoint.com\u002fsites\u002fthrow-away",
-                "UserCodeMaximumLevel": 300
-              }]
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SPODeletedSitePropertiesEnumerable", "NextStartIndex": -1, "NextStartIndexFromSharePoint": null, "_Child_Items_": [
+                {
+                  "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties","_ObjectIdentity_": "4255c99e-90cd-0000-60b9-ddc963ea4223|908bed80-a04a-4433-b4a0-883d9847d110:0acf1d97-fe55-40a7-9b63-7aff8d24784e\nDeletedSiteProperties\nhttps%3a%2f%2fbloemium.sharepoint.com%2fsites%2fgarbage-only","DaysRemaining": 76,"DeletionTime": "\/Date(2019,1,27,21,26,55,7)\/","SiteId": "\/Guid(75d8f9df-2a45-40f2-893e-22e30e5419be)\/","Status": "Recycled","StorageMaximumLevel": 26214400,"Url": "https:\u002f\u002fbloemium.sharepoint.com\u002fsites\u002fgarbage-only","UserCodeMaximumLevel": 300
+                },
+                {
+                  "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties","_ObjectIdentity_": "4255c99e-90cd-0000-60b9-ddc963ea4223|908bed80-a04a-4433-b4a0-883d9847d110:0acf1d97-fe55-40a7-9b63-7aff8d24784e\nDeletedSiteProperties\nhttps%3a%2f%2fbloemium.sharepoint.com%2fsites%2fthrow-away","DaysRemaining": 74,"DeletionTime": "\/Date(2019,1,25,19,26,41,767)\/","SiteId": "\/Guid(de8edfa0-6671-4ad1-a702-ea1705693995)\/","Status": "Recycled","StorageMaximumLevel": 26214400,"Url": "https:\u002f\u002fbloemium.sharepoint.com\u002fsites\u002fthrow-away","UserCodeMaximumLevel": 300
+                }
+              ]
             }]
           ));
         }
@@ -590,30 +574,14 @@ describe(commands.SITE_LIST, () => {
             }, 34, {
               "IsNull": false
             }, 35, {
-              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SPODeletedSitePropertiesEnumerable",
-              "NextStartIndex": -1,
-              "NextStartIndexFromSharePoint": null,
-              "_Child_Items_": [{
-                "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties",
-                "_ObjectIdentity_": "4255c99e-90cd-0000-60b9-ddc963ea4223|908bed80-a04a-4433-b4a0-883d9847d110:0acf1d97-fe55-40a7-9b63-7aff8d24784e\\nDeletedSiteProperties\\nhttps%3a%2f%2fbloemium.sharepoint.com%2fsites%2fgarbage-only",
-                "DaysRemaining": 76,
-                "DeletionTime": "\/Date(2019,1,27,21,26,55,7)\/",
-                "SiteId": "\/Guid(75d8f9df-2a45-40f2-893e-22e30e5419be)\/",
-                "Status": "Recycled",
-                "StorageMaximumLevel": 26214400,
-                "Url": "https:\u002f\u002fbloemium.sharepoint.com\u002fsites\u002fgarbage-only",
-                "UserCodeMaximumLevel": 300
-              }, {
-                "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties",
-                "_ObjectIdentity_": "4255c99e-90cd-0000-60b9-ddc963ea4223|908bed80-a04a-4433-b4a0-883d9847d110:0acf1d97-fe55-40a7-9b63-7aff8d24784e\\nDeletedSiteProperties\\nhttps%3a%2f%2fbloemium.sharepoint.com%2fsites%2fthrow-away",
-                "DaysRemaining": 74,
-                "DeletionTime": "\/Date(2019,1,25,19,26,41,767)\/",
-                "SiteId": "\/Guid(de8edfa0-6671-4ad1-a702-ea1705693995)\/",
-                "Status": "Recycled",
-                "StorageMaximumLevel": 26214400,
-                "Url": "https:\u002f\u002fbloemium.sharepoint.com\u002fsites\u002fthrow-away",
-                "UserCodeMaximumLevel": 300
-              }]
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SPODeletedSitePropertiesEnumerable", "NextStartIndex": -1, "NextStartIndexFromSharePoint": null, "_Child_Items_": [
+                {
+                  "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties","_ObjectIdentity_": "4255c99e-90cd-0000-60b9-ddc963ea4223|908bed80-a04a-4433-b4a0-883d9847d110:0acf1d97-fe55-40a7-9b63-7aff8d24784e\nDeletedSiteProperties\nhttps%3a%2f%2fbloemium.sharepoint.com%2fsites%2fgarbage-only","DaysRemaining": 76,"DeletionTime": "\/Date(2019,1,27,21,26,55,7)\/","SiteId": "\/Guid(75d8f9df-2a45-40f2-893e-22e30e5419be)\/","Status": "Recycled","StorageMaximumLevel": 26214400,"Url": "https:\u002f\u002fbloemium.sharepoint.com\u002fsites\u002fgarbage-only","UserCodeMaximumLevel": 300
+                },
+                {
+                  "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties","_ObjectIdentity_": "4255c99e-90cd-0000-60b9-ddc963ea4223|908bed80-a04a-4433-b4a0-883d9847d110:0acf1d97-fe55-40a7-9b63-7aff8d24784e\nDeletedSiteProperties\nhttps%3a%2f%2fbloemium.sharepoint.com%2fsites%2fthrow-away","DaysRemaining": 74,"DeletionTime": "\/Date(2019,1,25,19,26,41,767)\/","SiteId": "\/Guid(de8edfa0-6671-4ad1-a702-ea1705693995)\/","Status": "Recycled","StorageMaximumLevel": 26214400,"Url": "https:\u002f\u002fbloemium.sharepoint.com\u002fsites\u002fthrow-away","UserCodeMaximumLevel": 300
+                }
+              ]
             }]
           ));
         }
@@ -655,7 +623,7 @@ describe(commands.SITE_LIST, () => {
   });
 
   it('does not allow to specify filter in combination with deleted option', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { debug: false, filter: "url -like 'mtest'", deleted: true } });
+    const actual = (command.validate() as CommandValidate)({ options: { debug: false, filter: "url -like 'delete'", deleted: true } });
     assert.notEqual(actual, true);
   });
 
