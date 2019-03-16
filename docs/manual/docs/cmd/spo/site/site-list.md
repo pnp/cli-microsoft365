@@ -15,6 +15,7 @@ Option|Description
 `--help`|output usage information
 `--type [type]`|type of modern sites to list. Allowed values `TeamSite|CommunicationSite`, default `TeamSite`
 `-f, --filter [filter]`|filter to apply when retrieving sites
+`--deleted [deleted]`|show the deleted site collections. Cannot be used in combination with type or filter
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
@@ -27,6 +28,8 @@ Option|Description
 To list modern sites, you have to first log in to a tenant admin site using the [spo login](../login.md) command, eg. `spo login https://contoso-admin.sharepoint.com`. If you are logged in to a different site and will try to list the available sites, you will get an error.
 
 Using the `-f, --filter` option you can specify which sites you want to retrieve. For example, to get sites with _project_ in their URL, use `Url -like 'project'` as the filter.
+
+By providing the `--deleted` option the command will list all site collections that are currently in the recycle bin.
 
 When using the text output type (default), the command lists only the values of the `Title`, and `Url` properties of the site. When setting the output type to JSON, all available properties are included in the command output.
 
@@ -54,4 +57,10 @@ List all modern team sites that contain _project_ in the URL
 
 ```sh
 spo site list --type TeamSite --filter "Url -like 'project'"
+```
+
+List all deleted sites
+
+```sh
+spo site list --deleted
 ```

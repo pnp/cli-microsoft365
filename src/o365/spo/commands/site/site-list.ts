@@ -154,7 +154,7 @@ class SiteListCommand extends SpoCommand {
       },
       {
         option: '--deleted [deleted]',
-        description: 'show the deleted site collections. Cannot be used in combination with type or filter.'
+        description: 'show the deleted site collections. Cannot be used in combination with type or filter'
       }
     ];
 
@@ -196,6 +196,8 @@ class SiteListCommand extends SpoCommand {
     Using the ${chalk.blue('-f, --filter')} option you can specify which sites you want to retrieve.
     For example, to get sites with ${chalk.grey('project')} in their URL, use ${chalk.grey("Url -like 'project'")}
     as the filter.
+
+    By providing the ${chalk.blue('--deleted')} option the command will list all site collections that are currently in the recycle bin.
 
     When using the text output type (default), the command lists only the values
     of the ${chalk.grey('Title')}, and ${chalk.grey('Url')} properties of the site. When setting the output type to JSON,

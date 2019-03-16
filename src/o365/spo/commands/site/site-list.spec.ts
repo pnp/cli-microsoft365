@@ -91,7 +91,6 @@ describe(commands.SITE_LIST, () => {
   });
 
   it('aborts when not logged in to a SharePoint site', (done) => {
-    // some fine commengts explaing all: 42
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = command.action();
