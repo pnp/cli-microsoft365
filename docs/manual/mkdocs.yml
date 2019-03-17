@@ -157,6 +157,7 @@ nav:
         - site classic list: 'cmd/spo/site/site-classic-list.md'
         - site classic remove: 'cmd/spo/site/site-classic-remove.md'
         - site classic set: 'cmd/spo/site/site-classic-set.md'
+        - site groupify: 'cmd/spo/site/site-o365group-set.md'
         - site inplacerecordsmanagement set: 'cmd/spo/site/site-inplacerecordsmanagement-set.md'
         - site o365group set: 'cmd/spo/site/site-o365group-set.md'
       - sitedesign:

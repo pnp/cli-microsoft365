@@ -11,6 +11,12 @@ Connects site collection to an Office 365 Group
 spo site o365group set [options]
 ```
 
+## Alias
+
+```sh
+spo site groupify
+```
+
 ## Options
 
 Option|Description
