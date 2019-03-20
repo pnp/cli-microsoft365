@@ -9,7 +9,7 @@ import * as request from 'request-promise-native';
 import Utils from '../../../../Utils';
 import { Service } from '../../../../Auth';
 
-describe(commands.TEAMS_USER_ADD, () => {
+describe(commands.O365GROUP_USER_ADD, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
@@ -410,7 +410,7 @@ describe(commands.TEAMS_USER_ADD, () => {
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
     cmd.help({}, () => { });
-    assert(find.calledWith(commands.TEAMS_USER_ADD));
+    assert(find.calledWith(commands.O365GROUP_USER_ADD));
   });
 
   it('has help with examples', () => {
