@@ -100,11 +100,11 @@ class GraphO365GroupUserListCommand extends GraphItemsListCommand<GroupUser> {
     const options: CommandOption[] = [
       {
         option: "-i, --groupId [groupId]",
-        description: "The ID of the Office 365 group or team for which to list users"
+        description: "The ID of the Office 365 group for which to list users"
       },
       {
         option: "--teamdId [teamdId]",
-        description: "The ID of the Office 365 group or team for which to list users"
+        description: "The ID of the Teams team for which to list users"
       },
       {
         option: "-r, --role [type]",
@@ -170,10 +170,10 @@ class GraphO365GroupUserListCommand extends GraphItemsListCommand<GroupUser> {
     List all guests and their role in the specified Office 365 group
       ${chalk.grey(config.delimiter)} ${this.name} --groupId '00000000-0000-0000-0000-000000000000' --role Guest
 
-    List all users and their role in the specified team
+    List all users and their role in the specified Microsoft Teams team
       ${chalk.grey(config.delimiter)} ${this.alias} --teamId '00000000-0000-0000-0000-000000000000'
 
-    List all owners and their role in the specified team
+    List all owners and their role in the specified Microsoft Teams team
       ${chalk.grey(config.delimiter)} ${this.alias} --teamId '00000000-0000-0000-0000-000000000000' --role Owner
 
 `);
