@@ -610,7 +610,7 @@ Set-AdminPowerAppEnvironmentRoleAssignment|Microsoft.PowerApps.Administration.Po
 Set-AdminPowerAppOwner|Microsoft.PowerApps.Administration.PowerShell|
 Set-AdminPowerAppRoleAssignment|Microsoft.PowerApps.Administration.PowerShell|
 Test-PowerAppsAccount|Microsoft.PowerApps.Administration.PowerShell|
-Add-TeamUser|MicrosoftTeams|[graph teams user add](../cmd/graph/teams/teams-user-add.md)
+Add-TeamUser|MicrosoftTeams|[graph teams user add](../cmd/graph/o365group/o365group-user-add.md)
 Connect-MicrosoftTeams|MicrosoftTeams|[graph login](../cmd/graph/login.md)
 Disconnect-MicrosoftTeams|MicrosoftTeams|[graph logout](../cmd/graph/logout.md)
 Get-Team|MicrosoftTeams|[graph teams list](../cmd/graph/teams/teams-list.md)
