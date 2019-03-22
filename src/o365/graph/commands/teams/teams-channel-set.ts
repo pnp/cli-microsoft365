@@ -41,7 +41,7 @@ class GraphTeamsChannelSetCommand extends GraphCommand{
     .ensureAccessToken(auth.service.resource, cmd, this.debug)
     .then((): request.RequestPromise => {
     const getrequestOptions: any = {
-      url: `${auth.service.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels?$filter=displayName eq '${encodeURIComponent(args.options.channelName as string)}'`,
+      url: `${auth.service.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels?$filter=displayName eq '${encodeURIComponent(args.options.channelName)}'`,
       headers: Utils.getRequestHeaders({
         authorization: `Bearer ${auth.service.accessToken}`,
         accept: 'application/json;odata.metadata=none'
@@ -55,13 +55,17 @@ class GraphTeamsChannelSetCommand extends GraphCommand{
     }
     return request.get(getrequestOptions);
   })
-  .then((res:{ value: Channel[] }): request.RequestPromise => {
-      let channelId: string = '';
-      if (this.debug) {
-        cmd.log('Response:');
-        cmd.log(res);
-        cmd.log('');
-      }
+  .then((res:{ value: Channel[]}): request.RequestPromise=> {
+    let channelId: string = '';
+    if (this.debug) {
+      cmd.log('Response:');
+      cmd.log(res);
+      cmd.log('');
+    }
+    const channelItem: Channel | undefined =res.value[0];
+    if (!channelItem) {
+      throw new Error(`The specified channel does not exist in the Microsoft Teams team`);
+    }
        channelId = res.value[0].id;
        const body: any = this.mapRequestBody(args.options);
        const requestOptions: any = {

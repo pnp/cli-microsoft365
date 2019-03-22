@@ -145,6 +145,36 @@ describe(commands.TEAMS_CHANNEL_SET, () => {
     assert.notEqual(actual, true);
     done();
   });
+  it('fails to patch channel updates for the Microsoft Teams team when channel does not exists', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf(`channels?$filter=displayName eq 'Latest'`) > -1) {   
+         return Promise.resolve({value:[]});
+      }
+      return Promise.reject('Invalid request');
+    });
+    auth.service = new Service();
+    auth.service.connected = true;
+    auth.service.resource = 'https://graph.microsoft.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        debug: true,
+        teamId: '00000000-0000-0000-0000-000000000000',
+        channelName: 'Latest',
+        newChannelName: 'New Review',
+        description: 'New Review'
+      }
+    }, (err?: any) => {
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`The specified channel does not exist in the Microsoft Teams team`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('correctly patches channel updates for the Microsoft Teams team', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`channels?$filter=displayName eq 'Review'`) > -1) {
