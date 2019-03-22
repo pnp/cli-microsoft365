@@ -15,8 +15,8 @@ Option|Description
 `--help`| output usage information
 `-i, --teamId <teamId>`|The ID of the team for which to update channel 
 `--channelName <channelName>`|The name of the channel that needs to be updated
-`--newChannelName <newChannelName>`|The new name of the channel
-`--description <description>`|The description of the channel
+`--newChannelName [newChannelName]`|The new name of the channel
+`--description [description]`|The description of the channel
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

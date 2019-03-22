@@ -5,7 +5,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandOption, CommandValidate
 } from '../../../../Command';
-import { GraphItemsListCommand } from '../GraphItemsListCommand';
+import GraphCommand from '../../GraphCommand';
 import Utils from '../../../../Utils';
 import * as request from 'request-promise-native';
 import { Channel } from './Channel';
@@ -18,10 +18,10 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   teamId: string;
   channelName: string;
-  newChannelName: string;
-  description: string
+  newChannelName?: string;
+  description?: string
 }
-class GraphTeamsChannelSetCommand extends GraphItemsListCommand<Channel>{
+class GraphTeamsChannelSetCommand extends GraphCommand{
   public get name(): string {
     return `${commands.TEAMS_CHANNEL_SET}`;
   }
@@ -31,41 +31,47 @@ class GraphTeamsChannelSetCommand extends GraphItemsListCommand<Channel>{
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.role = args.options.teamId;
+    telemetryProps.newChannelName = typeof args.options.newChannelName !== 'undefined';
+    telemetryProps.description = typeof args.options.description !== 'undefined';
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    let channelId: string = '';
-    const endpoint: string = `${auth.service.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels`;
-    this.getAllItems(endpoint, cmd, true)
-      .then((): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log('Channels in current Microsoft Teams team')
-          cmd.log(this.items);
-          cmd.log('');
-        }
-        const channelItem: Channel | undefined = this.items.find(c => c.displayName && c.id ? (c.displayName.toLowerCase() === args.options.channelName.toLowerCase()) : false);
-        if (channelItem) {
-          if (this.debug) {
-            cmd.log('The specified channel to be updated')
-            cmd.log(channelItem);
-            cmd.log('');
-          }
-          channelId = channelItem.id;
-        }
-        else {
-          throw new Error(`The specified channel does not exist in the Microsoft Teams team`);
-        }
-        const endpoint: string = `${auth.service.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels/${channelId}`;
-        const requestOptions: any = {
-          url: endpoint,
+   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    auth
+    .ensureAccessToken(auth.service.resource, cmd, this.debug)
+    .then((): request.RequestPromise => {
+    const getrequestOptions: any = {
+      url: `${auth.service.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels?$filter=displayName eq '${encodeURIComponent(args.options.channelName as string)}'`,
+      headers: Utils.getRequestHeaders({
+        authorization: `Bearer ${auth.service.accessToken}`,
+        accept: 'application/json;odata.metadata=none'
+      }),
+      json: true
+    }
+    if (this.debug) {
+      cmd.log('Executing web request...');
+      cmd.log(getrequestOptions);
+      cmd.log('');
+    }
+    return request.get(getrequestOptions);
+  })
+  .then((res:{ value: Channel[] }): request.RequestPromise => {
+      let channelId: string = '';
+      if (this.debug) {
+        cmd.log('Response:');
+        cmd.log(res);
+        cmd.log('');
+      }
+       channelId = res.value[0].id;
+       const body: any = this.mapRequestBody(args.options);
+       const requestOptions: any = {
+          url: `${auth.service.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels/${channelId}`,
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${auth.service.accessToken}`,
             'accept': 'application/json;odata.metadata=none'
           }),
           json: true,
-          body: { "description": args.options.description, "displayName": args.options.newChannelName }
+          body: body
         };
         if (this.debug) {
           cmd.log('Executing web request...');
@@ -77,8 +83,9 @@ class GraphTeamsChannelSetCommand extends GraphItemsListCommand<Channel>{
       .then((): void => {
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
-        } cb();
-      }, (err: any) => this.handleRejectedPromise(err, cmd, cb));
+        }
+        cb();
+      }, (err: any) => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
 
   public options(): CommandOption[] {
@@ -92,11 +99,11 @@ class GraphTeamsChannelSetCommand extends GraphItemsListCommand<Channel>{
         description: 'The name of the channel that needs to be updated'
       },
       {
-        option: '--newChannelName <newChannelName>',
+        option: '--newChannelName [newChannelName]',
         description: 'The new name of the channel'
       },
       {
-        option: '--description <description>',
+        option: '--description [description]',
         description: 'The description of the channel'
       }
     ];
@@ -117,11 +124,18 @@ class GraphTeamsChannelSetCommand extends GraphItemsListCommand<Channel>{
       if (args.options.channelName.toLowerCase() === "general") {
         return 'General channel cannot be patched';
       }
-      if (!args.options.newChannelName) {
-        return 'Required parameter newChannelName missing';
-      }
       return true;
     };
+  }
+  private mapRequestBody(options: Options): any {
+    const requestBody: any = {};
+    if (options.newChannelName) {
+      requestBody.displayName = options.newChannelName;
+    }
+    if (options.description) {
+      requestBody.description = options.description;
+    }
+    return requestBody;
   }
   public commandHelp(args: {}, log: (help: string) => void): void {
     const chalk = vorpal.chalk;
@@ -132,7 +146,7 @@ class GraphTeamsChannelSetCommand extends GraphItemsListCommand<Channel>{
         
   Remarks:
 
-  Updates properties of a specified channel in the given Microsoft Teams team,
+    Updates properties of a specified channel in the given Microsoft Teams team,
     you have to first log in to the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
     eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
 

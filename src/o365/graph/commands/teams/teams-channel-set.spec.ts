@@ -15,7 +15,7 @@ describe(commands.TEAMS_CHANNEL_SET, () => {
   let cmdInstance: any;
   let trackEvent: any;
   let telemetry: any;
-
+  let cmdInstanceLogSpy: sinon.SinonSpy;
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
@@ -32,6 +32,7 @@ describe(commands.TEAMS_CHANNEL_SET, () => {
         log.push(msg);
       }
     };
+    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
     auth.service = new Service('https://graph.microsoft.com');
     telemetry = null;
     (command as any).items = [];
@@ -132,17 +133,6 @@ describe(commands.TEAMS_CHANNEL_SET, () => {
     assert.notEqual(actual, true);
     done();
   });
-  it('fails validation when no newChannelName is specified', (done) => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        channelName: 'Reviews',
-        description: 'this is a new description'
-      }
-    });
-    assert.notEqual(actual, true);
-    done();
-  });
   it('fails validation when channelName is General', (done) => {
     const actual = (command.validate() as CommandValidate)({
       options: {
@@ -155,22 +145,24 @@ describe(commands.TEAMS_CHANNEL_SET, () => {
     assert.notEqual(actual, true);
     done();
   });
-
   it('correctly patches channel updates for the Microsoft Teams team', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels`) {
+      if (opts.url.indexOf(`channels?$filter=displayName eq 'Review'`) > -1) {
         return Promise.resolve({
-          value: [
-            { "id": "19:3b9de2fb06f145609c42ede0d5d305fb@thread.skype", "displayName": "General", "description": "New group for Policy Doco" },
-            { "id": "19:a3a51b130bb34dba9712ef9675bbb504@thread.skype", "displayName": "Discussion", "description": "This is a channel for Discussion for the document Policy Doco.docx " },
-            { "id": "19:01740d80914145dca1a47f3f7ea1f78d@thread.skype", "displayName": "bla", "description": "This is a channel for Review for the document Policy Doco.docx " }]
+          value:
+            [
+              {
+                "id": "19:8a53185a51ac44a3aef27397c3dfebfc@thread.skype",
+                "displayName": "Review",
+                "description": "Updated by CLI"
+              }]
         });
       }
       return Promise.reject('Invalid request');
     });
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:01740d80914145dca1a47f3f7ea1f78d@thread.skype` &&
-        JSON.stringify(opts.body) === `{"description":"new social","displayName":"bla2"}`
+      if ((opts.url.indexOf(`channels/19:8a53185a51ac44a3aef27397c3dfebfc@thread.skype`) > -1) &&
+        JSON.stringify(opts.body) === JSON.stringify({ displayName: "New Review", description: "New Review" })
       ) {
         return Promise.resolve({});
       }
@@ -185,13 +177,13 @@ describe(commands.TEAMS_CHANNEL_SET, () => {
       options: {
         debug: false,
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelName: "bla",
-        newChannelName: "bla2",
-        description: "new social"
+        channelName: 'Review',
+        newChannelName: 'New Review',
+        description: 'New Review'
       }
     }, (err?: any) => {
       try {
-        assert(true);
+        assert(cmdInstanceLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -202,19 +194,22 @@ describe(commands.TEAMS_CHANNEL_SET, () => {
 
   it('correctly patches channel updates for the Microsoft Teams team (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels`) {
+      if (opts.url.indexOf(`channels?$filter=displayName eq 'Review'`) > -1) {
         return Promise.resolve({
-          value: [
-            { "id": "19:3b9de2fb06f145609c42ede0d5d305fb@thread.skype", "displayName": "General", "description": "New group for Policy Doco" },
-            { "id": "19:a3a51b130bb34dba9712ef9675bbb504@thread.skype", "displayName": "Discussion", "description": "This is a channel for Discussion for the document Policy Doco.docx " },
-            { "id": "19:01740d80914145dca1a47f3f7ea1f78d@thread.skype", "displayName": "bla", "description": "This is a channel for Review for the document Policy Doco.docx " }]
+          value:
+            [
+              {
+                "id": "19:8a53185a51ac44a3aef27397c3dfebfc@thread.skype",
+                "displayName": "Review",
+                "description": "Updated by CLI"
+              }]
         });
       }
       return Promise.reject('Invalid request');
     });
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:01740d80914145dca1a47f3f7ea1f78d@thread.skype` &&
-        JSON.stringify(opts.body) === `{"description":"new social","displayName":"bla2"}`
+      if ((opts.url.indexOf(`channels/19:8a53185a51ac44a3aef27397c3dfebfc@thread.skype`) > -1) &&
+        JSON.stringify(opts.body) === JSON.stringify({ displayName: "New Review" })
       ) {
         return Promise.resolve({});
       }
@@ -229,86 +224,12 @@ describe(commands.TEAMS_CHANNEL_SET, () => {
       options: {
         debug: true,
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelName: "bla",
-        newChannelName: "bla2",
-        description: "new social"
+        channelName: 'Review',
+        newChannelName: 'New Review'
       }
     }, (err?: any) => {
       try {
-        assert(true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-  it('fails to patch channel updates for the Microsoft Teams team when channel does not exists', (done) => {
-
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels`) {
-        return Promise.resolve({
-          "value": [
-            { "id": "19:3b9de2fb06f145609c42ede0d5d305fb@thread.skype", "displayName": "General", "description": "New group for Policy Doco" },
-            { "id": "19:a3a51b130bb34dba9712ef9675bbb504@thread.skype", "displayName": "Discussion", "description": "This is a channel for Discussion for the document Policy Doco.docx " },
-            { "id": "19:01740d80914145dca1a47f3f7ea1f78d@thread.skype", "displayName": "Test", "description": "This is a channel for Review for the document Policy Doco.docx " }]
-        });
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        debug: true,
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelName: "bla",
-        newChannelName: "bla2",
-        description: "new social"
-      }
-    }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`The specified channel does not exist in the Microsoft Teams team`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-  it('fails to patch channel updates for the Microsoft Teams team when channel information is incorrect', (done) => {
-
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels`) {
-        return Promise.resolve({
-          "value": [
-            { "id1": "19:3b9de2fb06f145609c42ede0d5d305fb@thread.skype", "displayName1": "General", "description": "New group for Policy Doco" },
-            { "id1": "19:a3a51b130bb34dba9712ef9675bbb504@thread.skype", "displayName1": "Discussion", "description": "This is a channel for Discussion for the document Policy Doco.docx " },
-            { "id1": "19:01740d80914145dca1a47f3f7ea1f78d@thread.skype", "displayName1": "Test", "description": "This is a channel for Review for the document Policy Doco.docx " }]
-        });
-      }
-      return Promise.reject('Invalid request');
-
-    });
-
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        debug: true,
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelName: "bla",
-        newChannelName: "bla2",
-        description: "new social"
-      }
-    }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`The specified channel does not exist in the Microsoft Teams team`)));
+        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
         done();
       }
       catch (e) {
