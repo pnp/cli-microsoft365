@@ -1,5 +1,19 @@
 # Release notes
 
+## [v1.16.0](https://github.com/pnp/office365-cli/releases/tag/v1.16.0)
+
+### New commands
+
+**Microsoft Graph:**
+
+- [graph teams channel set](../cmd/graph/teams/teams-channel-set.md) - updates properties of the specified channel in the given Microsoft Teams team [#816](https://github.com/pnp/office365-cli/issues/816)
+- [graph teams guestsettings set](../cmd/graph/teams/teams-guestsettings-set.md) - updates guest settings of a Microsoft Teams team [#818](https://github.com/pnp/office365-cli/issues/818)
+
+### Changes
+
+- extended 'graph teams app list' [#859](https://github.com/pnp/office365-cli/issues/859)
+- added 'spo site groupify' alias [#873](https://github.com/pnp/office365-cli/issues/873)
+
 ## [v1.15.0](https://github.com/pnp/office365-cli/releases/tag/v1.15.0)
 
 ### New commands
