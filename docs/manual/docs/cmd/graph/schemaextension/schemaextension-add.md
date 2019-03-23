@@ -15,16 +15,15 @@ Option|Description
 `--help`|output usage information
 `-i, --id <id>`|The unique identifier for the schema extension definition
 `-d, --description [description]`|Description of the schema extension
-`-o, --owner <owner>`|The Id of the Azure AD application that is the owner of the schema extension
+`--owner <owner>`|The Id of the Azure AD application that is the owner of the schema extension
 `-t, --targetTypes <types>`|Comma-separated list of Microsoft Graph resource types the schema extension targets
 `-p, --properties`|The collection of property names and types that make up the schema extension definition formatted as a JSON string
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
-
 !!! important
-  Before using this command, log in to the Microsoft Graph, using the [graph login](../login.md) command.
+    Before using this command, log in to the Microsoft Graph, using the [graph login](../login.md) command.
 
 ## Remarks
 
@@ -32,23 +31,15 @@ To create a schema extension, you have to first log in to the Microsoft Graph us
 
 To create a schema extension, you have to specify a unique ID for the schema extension
 You can assign a value in one of two ways:
-    - Concatenate the name of one of your verified domains with a name for the schema extension to form a unique string in this format, {domainName}_{schemaName}.
-    As an example, contoso_mySchema. 
-    NOTE: Only verified domains under the following top-level domains are supported: .com,.net, .gov, .edu or .org.
-    - Provide a schema name, and let Microsoft Graph use that schema name to complete the id assignment in this format: ext{8-random-alphanumeric-chars}_{schema-name}.
-    An example would be extkvbmkofy_mySchema.
-    This property cannot be changed after creation.
+- Concatenate the name of one of your verified domains with a name for the schema extension to form a unique string in this format, {domainName}_{schemaName}. As an example, contoso_mySchema. NOTE: Only verified domains under the following top-level domains are supported: .com,.net, .gov, .edu or .org.
+- Provide a schema name, and let Microsoft Graph use that schema name to complete the id assignment in this format: ext{8-random-alphanumeric-chars}_{schema-name}. An example would be extkvbmkofy_mySchema. This property cannot be changed after creation.
 
 The schema extension owner is the Id of the Azure AD application that is the owner of the schema extension.
-It must be specified, otherwise, Micrsoft Graph will return an 'Unauthorized' error 
-Once set, this property is read-only and cannot be changed.
+It must be specified, otherwise, Micrsoft Graph will return an 'Unauthorized' error. Once set, this property is read-only and cannot be changed.
 
-The target types are the set of Microsoft Graph resource types (that support schema extensions) that this schema extension definition can be applied to
-This option is specified as a comma-separated list
+The target types are the set of Microsoft Graph resource types (that support schema extensions) that this schema extension definition can be applied to. This option is specified as a comma-separated list
 
-When specifying the JSON string of properties on Windows, you
-have to escape double quotes in a specific way. Considering the following
-value for the _properties_ option: {"Foo":"Bar"},
+When specifying the JSON string of properties on Windows, you have to escape double quotes in a specific way. Considering the following value for the _properties_ option: {"Foo":"Bar"},
 you should specify the value as \`"{""Foo"":""Bar""}"\`.
 In addition, when using PowerShell, you should use the --% argument.
 

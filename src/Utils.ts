@@ -5,6 +5,11 @@ const vorpal: Vorpal = require('./vorpal-init');
 import { CommandError } from './Command';
 import * as url from 'url';
 
+export interface IValidJsonCheckResult {
+  isValid: boolean;
+  parsedObject: any;
+}
+
 export default class Utils {
   public static escapeXml(s: any | undefined) {
     if (!s) {
@@ -69,12 +74,19 @@ export default class Utils {
     return value.toLowerCase() === 'true' || value.toLowerCase() === 'false'
   }
 
-  public static isValidJsonString(value: string): boolean {
+
+  public static isValidJsonString(value: string): IValidJsonCheckResult {
     try {
-      JSON.parse(value);
-      return true;
+      const parsed = JSON.parse(value);
+      return {
+        isValid: true,
+        parsedObject: parsed
+      };
     } catch (error) {
-      return false;
+      return {
+        isValid: false,
+        parsedObject: null
+      };
     }
   }
 

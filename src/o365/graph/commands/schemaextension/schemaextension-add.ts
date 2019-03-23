@@ -32,16 +32,6 @@ class GraphSchemaExtensionAdd extends GraphCommand {
     return 'Creates a Microsoft Graph schema extension';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.id = args.options.id;
-    telemetryProps.description = args.options.description;
-    telemetryProps.owner = args.options.owner;
-    telemetryProps.targetTypes = args.options.targetTypes;
-    telemetryProps.properties = args.options.properties;
-    return telemetryProps;
-  }
-
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
@@ -50,9 +40,8 @@ class GraphSchemaExtensionAdd extends GraphCommand {
           cmd.log(`Adding schema extension with id '${args.options.id}'...`);
         }
 
-        const targetTypes = args.options.targetTypes.split(',').map(t => t.trim());
-        let properties: any = null;
-        properties = JSON.parse(args.options.properties);
+        const targetTypes: string[] = args.options.targetTypes.split(',').map(t => t.trim());
+        let properties: any = JSON.parse(args.options.properties);
 
         const requestOptions: any = {
           url: `${auth.service.resource}/v1.0/schemaExtensions`,
@@ -107,7 +96,7 @@ class GraphSchemaExtensionAdd extends GraphCommand {
         description: 'Description of the schema extension'
       },
       {
-        option: '-o, --owner <owner>',
+        option: '--owner <owner>',
         description: `The Id of the Azure AD application that is the owner of the schema extension`
       },
       {
@@ -146,10 +135,6 @@ class GraphSchemaExtensionAdd extends GraphCommand {
         return 'Required option targetTypes is missing';
       }
 
-      if (!Utils.isValidJsonString(args.options.properties)) {
-        return `The specified value for properties option '${args.options.properties}' is not a valid JSON string`;
-      }
-
       if (!this._validatePropertiesStringValue(args.options.properties)) {
         return `The specified value for properties option '${args.options.properties}' is not a valid properties definition`;
       }
@@ -159,8 +144,13 @@ class GraphSchemaExtensionAdd extends GraphCommand {
   }
 
   private _validatePropertiesStringValue(properties: string): boolean {
-    let props = JSON.parse(properties);
-    return this._validateProperties(props);
+    
+    const checkValidJson = Utils.isValidJsonString(properties);
+    if (!checkValidJson.isValid) {
+      return false;
+    }
+
+    return this._validateProperties(checkValidJson.parsedObject);
   }
 
   private _validateProperties(properties: any): boolean {

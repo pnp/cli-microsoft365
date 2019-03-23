@@ -29,12 +29,12 @@ describe('Utils', () => {
 
   it('isValidJsonString returns true if valid JSON string', () => {
     const result = Utils.isValidJsonString('{"foo":"bar"}');
-    assert(result == true);
+    assert(result.isValid);
   });
 
   it('isValidJsonString returns false if invalid JSON string', () => {
     const result = Utils.isValidJsonString('foo');
-    assert(result == false);
+    assert(!result.isValid);
   });
 
   it('adds User-Agent string to undefined headers', () => {
