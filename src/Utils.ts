@@ -65,9 +65,19 @@ export default class Utils {
     return guidRegEx.test(guid);
   }
 
-  public static isPositiveInt(positiveInt: string): boolean {
-    const postitiveIntRegEx = new RegExp(/^-{0,1}\d+$/);
-    return postitiveIntRegEx.test(positiveInt);
+  public static isPositiveInt(val: string): boolean {
+    // we are looking for a positive integer, first we want to weed out ""
+    // (empty strings) as these are cast to 0
+    if (val === "")
+      return false;
+
+    // Credit to https://stackoverflow.com/questions/23437476/in-typescript-how-to-check-if-a-string-is-numeric/23440948#23440948
+    // for inspiration 
+    let positiveIntVal = Number(val);
+    if (isNaN(positiveIntVal))
+      return false;
+
+    return positiveIntVal >= 0;
   }
 
   public static isValidISODate(date: string): boolean {

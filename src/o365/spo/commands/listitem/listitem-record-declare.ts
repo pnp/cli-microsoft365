@@ -33,11 +33,7 @@ interface Options extends GlobalOptions {
   date?: string;
 }
 
-class SpoListItemDeclareRecord extends SpoCommand {
-
-  public allowUnknownOptions(): boolean | undefined {
-    return true;
-  }
+class SpoListItemRecordDeclareCommand extends SpoCommand {
 
   public get name(): string {
     return commands.LISTITEM_RECORD_DECLARE;
@@ -51,7 +47,6 @@ class SpoListItemDeclareRecord extends SpoCommand {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.listId = typeof args.options.listId !== "undefined";
     telemetryProps.listTitle = typeof args.options.listTitle !== "undefined";
-    telemetryProps.id = typeof args.options.id !== "undefined";
     telemetryProps.date = typeof args.options.date !== "undefined";
     return telemetryProps;
   }
@@ -186,7 +181,7 @@ class SpoListItemDeclareRecord extends SpoCommand {
   protected generateDeclareRecordRequestBody(webIdentity: string, listId: string, id: string, date: string): string {
 
     let requestBody = "";
-    if (date.length == 10) {
+    if (date.length === 10) {
       requestBody = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><StaticMethod TypeId="{ea8e1356-5910-4e69-bc05-d0c30ed657fc}" Name="DeclareItemAsRecordWithDeclarationDate" Id="48"><Parameters><Parameter ObjectPathId="21" /><Parameter Type="DateTime">${date}</Parameter></Parameters></StaticMethod></Actions><ObjectPaths><Identity Id="21" Name="${webIdentity}:list:${listId}:item:${id},1" /></ObjectPaths></Request>`;
     }
     else {
@@ -200,25 +195,25 @@ class SpoListItemDeclareRecord extends SpoCommand {
     const options: CommandOption[] = [
       {
         option: "-u, --webUrl <webUrl>",
-        description: "URL of the site where the item should be added"
+        description: "The URL of the site where the list is located"
       },
       {
         option: "-l, --listId [listId]",
         description:
-          "ID of the list where the item should be added. Specify listId or listTitle but not both"
+          "The ID of the list where the item is located. Specify listId or listTitle but not both"
       },
       {
         option: "-t, --listTitle [listTitle]",
         description:
-          "Title of the list where the item should be added. Specify listId or listTitle but not both"
+          "The title of the list where the item is located. Specify listId or listTitle but not both"
       },
       {
-        option: "-i, --id [id]",
-        description: "ID of the list item to declare as a record"
+        option: "-i, --id <id>",
+        description: "The ID of the list item to declare as record"
       },
       {
         option: "-d, --date [date]",
-        description: "Record declaration date"
+        description: "Record declaration date in ISO format (e.g. 2019-12-31)"
       }
     ];
 
@@ -262,7 +257,7 @@ class SpoListItemDeclareRecord extends SpoCommand {
       }
 
       if (args.options.id && !Utils.isPositiveInt(args.options.id)) {
-        return `Specify id for item to declare as a record`;
+        return `${args.options.id} in parameter Id is not a valid number.`;
       }
 
       if (args.options.date && !Utils.isValidISODate(args.options.date)) {
@@ -288,22 +283,22 @@ class SpoListItemDeclareRecord extends SpoCommand {
   Examples:
   
     Declare a document with id ${chalk.grey("1")} as a record in list with
-    title ${chalk.grey("Demo List")} in site ${chalk.grey("https://contoso.sharepoint.com/sites/project-x")}
+    title ${chalk.grey("Demo List")} located in site ${chalk.grey("https://contoso.sharepoint.com/sites/project-x")}
       ${chalk.grey(config.delimiter)} ${commands.LISTITEM_RECORD_DECLARE} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle "Demo List" --id 1
 
     Declare a document with id ${chalk.grey("1")} as a record in list with
-    id ${chalk.grey("ea8e1109-2013-1a69-bc05-1403201257fc")} in site ${chalk.grey("https://contoso.sharepoint.com/sites/project-x")}
+    id ${chalk.grey("ea8e1109-2013-1a69-bc05-1403201257fc")} located in site ${chalk.grey("https://contoso.sharepoint.com/sites/project-x")}
       ${chalk.grey(config.delimiter)} ${commands.LISTITEM_RECORD_DECLARE} --webUrl https://contoso.sharepoint.com/sites/project-x --listId ea8e1109-2013-1a69-bc05-1403201257fc --id 1
   
-    Declare a document with id ${chalk.grey("1")} as a record with record declaration date ${chalk.grey("15 August 1976")} in list with
-    title ${chalk.grey("Demo List")} in site ${chalk.grey("https://contoso.sharepoint.com/sites/project-x")}
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_RECORD_DECLARE} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle "Demo List" --id 1 --date 1976-08-15
+    Declare a document with id ${chalk.grey("1")} as a record with record declaration date ${chalk.grey("14 March 2012")} in list with
+    title ${chalk.grey("Demo List")} located in site ${chalk.grey("https://contoso.sharepoint.com/sites/project-x")}
+      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_RECORD_DECLARE} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle "Demo List" --id 1 --date 2012-03-14
 
-    Declare a document with id ${chalk.grey("1")} as a record with record declaration date ${chalk.grey("15 August 1976")} in list with
-    id ${chalk.grey("ea8e1356-5910-abc9-bc05-2408198057fc")} in site ${chalk.grey("https://contoso.sharepoint.com/sites/project-x")}
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_RECORD_DECLARE} --webUrl https://contoso.sharepoint.com/sites/project-x --listId ea8e1356-5910-abc9-bc05-2408198057fc --id 1 --date 1976-08-15
+    Declare a document with id ${chalk.grey("1")} as a record with record declaration date ${chalk.grey("11 September 2013")} in list with
+    id ${chalk.grey("ea8e1356-5910-abc9-bc05-2408198057fc")} located in site ${chalk.grey("https://contoso.sharepoint.com/sites/project-x")}
+      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_RECORD_DECLARE} --webUrl https://contoso.sharepoint.com/sites/project-x --listId ea8e1356-5910-abc9-bc05-2408198057fc --id 1 --date 2013-09-11
    `
     );
   }
 }
-module.exports = new SpoListItemDeclareRecord();
+module.exports = new SpoListItemRecordDeclareCommand();
