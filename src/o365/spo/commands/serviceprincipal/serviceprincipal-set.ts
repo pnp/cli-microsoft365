@@ -1,7 +1,7 @@
 import auth from '../../SpoAuth';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import config from '../../../../config';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
@@ -10,7 +10,6 @@ import {
   CommandError
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import Utils from '../../../../Utils';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -52,48 +51,30 @@ class SpoServicePrincipalSetCommand extends SpoCommand {
     const toggleServicePrincipal: () => void = (): void => {
       auth
         .ensureAccessToken(auth.service.resource, cmd, this.debug)
-        .then((accessToken: string): request.RequestPromise => {
+        .then((accessToken: string): Promise<ContextInfo> => {
           if (this.debug) {
             cmd.log(`Retrieved access token ${accessToken}. Getting request digest...`);
           }
 
           return this.getRequestDigest(cmd, this.debug);
         })
-        .then((res: ContextInfo): request.RequestPromise => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
-          }
-
+        .then((res: ContextInfo): Promise<string> => {
           if (this.verbose) {
             cmd.log(`${(enabled ? 'Enabling' : 'Disabling')} service principal...`);
           }
 
           const requestOptions: any = {
             url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${auth.service.accessToken}`,
               'X-RequestDigest': res.FormDigestValue
-            }),
+            },
             body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="28" ObjectPathId="27" /><SetProperty Id="29" ObjectPathId="27" Name="AccountEnabled"><Parameter Type="Boolean">${enabled}</Parameter></SetProperty><Method Name="Update" Id="30" ObjectPathId="27" /><Query Id="31" ObjectPathId="27"><Query SelectAllProperties="true"><Properties><Property Name="AccountEnabled" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="27" TypeId="{104e8f06-1e00-4675-99c6-1b9b504ed8d8}" /></ObjectPaths></Request>`
           };
-
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
 
           return request.post(requestOptions);
         })
         .then((res: string): void => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
-          }
-
           const json: ClientSvcResponse = JSON.parse(res);
           const response: ClientSvcResponseContents = json[0];
           if (response.ErrorInfo) {

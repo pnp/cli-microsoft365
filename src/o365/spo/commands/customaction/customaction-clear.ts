@@ -1,6 +1,6 @@
 import auth from '../../SpoAuth';
 import config from '../../../../config';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
@@ -8,7 +8,6 @@ import {
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import Utils from '../../../../Utils';
 import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -50,7 +49,7 @@ class SpoCustomActionClearCommand extends SpoCommand {
 
       auth
         .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-        .then((accessToken: string): request.RequestPromise | Promise<void> => {
+        .then((accessToken: string): Promise<void> => {
           siteAccessToken = accessToken;
 
           if (this.debug) {
@@ -63,13 +62,7 @@ class SpoCustomActionClearCommand extends SpoCommand {
 
           return this.clearAllScopes(args.options, siteAccessToken, cmd);
         })
-        .then((response: any): void => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(JSON.stringify(response));
-            cmd.log('');
-          }
-
+        .then((): void => {
           if (this.verbose) {
             cmd.log(vorpal.chalk.green('DONE'));
           }
@@ -97,21 +90,15 @@ class SpoCustomActionClearCommand extends SpoCommand {
     }
   }
 
-  private clearScopedCustomActions(options: Options, siteAccessToken: string, cmd: CommandInstance): request.RequestPromise {
+  private clearScopedCustomActions(options: Options, siteAccessToken: string, cmd: CommandInstance): Promise<void> {
     const requestOptions: any = {
       url: `${options.url}/_api/${options.scope}/UserCustomActions/clear`,
-      headers: Utils.getRequestHeaders({
+      headers: {
         authorization: `Bearer ${siteAccessToken}`,
         accept: 'application/json;odata=nometadata'
-      }),
+      },
       json: true
     };
-
-    if (this.debug) {
-      cmd.log('Executing web request...');
-      cmd.log(JSON.stringify(requestOptions));
-      cmd.log('');
-    }
 
     return request.post(requestOptions);
   }
@@ -126,23 +113,11 @@ class SpoCustomActionClearCommand extends SpoCommand {
 
       this
         .clearScopedCustomActions(options, siteAccessToken, cmd)
-        .then((webResult: any): request.RequestPromise => {
-          if (this.debug) {
-            cmd.log('clearScopedCustomActions with scope of web result...');
-            cmd.log(JSON.stringify(webResult));
-            cmd.log('');
-          }
-
+        .then((): Promise<void> => {
           options.scope = "Site";
           return this.clearScopedCustomActions(options, siteAccessToken, cmd);
         })
-        .then((siteResult: any): void => {
-          if (this.debug) {
-            cmd.log('clearScopedCustomActions with scope of site result...');
-            cmd.log(JSON.stringify(siteResult));
-            cmd.log('');
-          }
-
+        .then((): void => {
           return resolve();
         }, (err: any): void => {
           reject(err);

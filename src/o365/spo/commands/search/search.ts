@@ -1,7 +1,7 @@
 import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandOption,
@@ -117,33 +117,20 @@ class SpoSearchCommand extends SpoCommand {
   }
 
   private executeSearchQuery(cmd: CommandInstance, args: CommandArgs, accessToken: string, webUrl: string, resultSet: SearchResult[], startRow: number): Promise<SearchResult[]> {
-    return ((): request.RequestPromise => {
+    return ((): Promise<SearchResult> => {
       const requestUrl: string = this.getRequestUrl(webUrl, cmd, args, startRow);
       const requestOptions: any = {
         url: requestUrl,
-        headers: Utils.getRequestHeaders({
+        headers: {
           authorization: `Bearer ${accessToken}`,
           'accept': 'application/json;odata=nometadata'
-        }),
+        },
         json: true
       };
-
-      if (this.debug) {
-        cmd.log('Executing web request...');
-        cmd.log(requestOptions);
-        cmd.log('');
-      }
 
       return request.get(requestOptions);
     })()
       .then((searchResult: SearchResult): SearchResult => {
-        if (this.debug) {
-          cmd.log(`${searchResult.PrimaryQueryResult.RelevantResults.TotalRowsIncludingDuplicates} Results found (including duplicates) :`);
-          cmd.log('');
-          cmd.log(searchResult);
-          cmd.log('');
-        }
-
         resultSet.push(searchResult);
 
         return searchResult;

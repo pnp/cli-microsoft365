@@ -5,7 +5,7 @@ import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
 const command: Command = require('./cdn-origin-add');
 import * as assert from 'assert';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import config from '../../../../config';
 import Utils from '../../../../Utils';
 
@@ -269,17 +269,9 @@ describe(commands.CDN_ORIGIN_ADD, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, origin: '*/cdn', type: 'Public' } }, () => {
-      let correctErrorReported = false;
-      log.forEach(l => {
-        if (l && typeof l === 'string' &&
-          l.indexOf('The library is already registered as a CDN origin.') > -1) {
-          correctErrorReported = true;
-        }
-      });
-
+    cmdInstance.action({ options: { debug: true, origin: '*/cdn', type: 'Public' } }, (err?: any) => {
       try {
-        assert(correctErrorReported);
+        assert.equal(err.message, 'The library is already registered as a CDN origin.');
         done();
       }
       catch (e) {

@@ -1,7 +1,7 @@
 import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import { CommandOption, CommandValidate, CommandCancel } from '../../../../Command';
@@ -135,7 +135,7 @@ class SpoSiteClassicRemoveCommand extends SpoCommand {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       this
         .ensureFormDigest(cmd, this.context, this.debug)
-        .then((res: FormDigestInfo): request.RequestPromise => {
+        .then((res: FormDigestInfo): Promise<string> => {
           this.context = res;
 
           if (this.verbose) {
@@ -144,28 +144,16 @@ class SpoSiteClassicRemoveCommand extends SpoCommand {
 
           const requestOptions: any = {
             url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${auth.service.accessToken}`,
               'X-RequestDigest': this.context.FormDigestValue
-            }),
+            },
             body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="55" ObjectPathId="54"/><ObjectPath Id="57" ObjectPathId="56"/><Query Id="58" ObjectPathId="54"><Query SelectAllProperties="true"><Properties/></Query></Query><Query Id="59" ObjectPathId="56"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true"/><Property Name="PollingInterval" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="54" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="56" ParentId="54" Name="RemoveSite"><Parameters><Parameter Type="String">${Utils.escapeXml(url)}</Parameter></Parameters></Method></ObjectPaths></Request>`
           };
-
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
 
           return request.post(requestOptions);
         })
         .then((res: string): void => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
-          }
-
           const json: ClientSvcResponse = JSON.parse(res);
           const response: ClientSvcResponseContents = json[0];
           if (response.ErrorInfo) {
@@ -191,7 +179,7 @@ class SpoSiteClassicRemoveCommand extends SpoCommand {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       this
         .ensureFormDigest(cmd, this.context, this.debug)
-        .then((res: FormDigestInfo): request.RequestPromise => {
+        .then((res: FormDigestInfo): Promise<string> => {
           this.context = res;
           if (this.verbose) {
             cmd.log(`Deleting site ${url} from the recycle bin...`);
@@ -199,28 +187,16 @@ class SpoSiteClassicRemoveCommand extends SpoCommand {
 
           const requestOptions: any = {
             url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${auth.service.accessToken}`,
               'X-RequestDigest': this.context.FormDigestValue
-            }),
+            },
             body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="185" ObjectPathId="184" /><Query Id="186" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Method Id="184" ParentId="175" Name="RemoveDeletedSite"><Parameters><Parameter Type="String">${Utils.escapeXml(url)}</Parameter></Parameters></Method><Constructor Id="175" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
           };
-
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
 
           return request.post(requestOptions);
         })
         .then((res: string): void => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
-          }
-
           const json: ClientSvcResponse = JSON.parse(res);
           const response: ClientSvcResponseContents = json[0];
           if (response.ErrorInfo) {

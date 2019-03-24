@@ -2,13 +2,12 @@ import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import Utils from '../../../../Utils';
 import { Auth } from '../../../../Auth';
 import { SpoPropertyBagBaseCommand } from '../propertybag/propertybag-base';
 import { ContextInfo } from '../../spo';
@@ -53,7 +52,7 @@ class SpoWebReindexCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<ContextInfo> => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
         }
@@ -83,13 +82,13 @@ class SpoWebReindexCommand extends SpoCommand {
 
         return SpoPropertyBagBaseCommand.isNoScriptSite(args.options.webUrl, requestDigest, siteAccessToken, webIdentityResp, clientSvcCommons);
       })
-      .then((isNoScriptSite: boolean): request.RequestPromise | Promise<void> => {
+      .then((isNoScriptSite: boolean): Promise<{ vti_x005f_searchversion?: number }> => {
         if (isNoScriptSite) {
           if (this.verbose) {
             cmd.log(`Site is a no-script site. Reindexing lists instead...`);
           }
 
-          return this.reindexLists(args.options.webUrl, requestDigest, siteAccessToken, cmd, webIdentityResp, clientSvcCommons);
+          return this.reindexLists(args.options.webUrl, requestDigest, siteAccessToken, cmd, webIdentityResp, clientSvcCommons) as any;
         }
 
         if (this.verbose) {
@@ -98,40 +97,22 @@ class SpoWebReindexCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/allproperties`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata'
-          }),
+          },
           json: true
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.get(requestOptions);
       })
       .then((webProperties: { vti_x005f_searchversion?: number }): Promise<any> => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(webProperties);
-          cmd.log('');
-        }
-
         let searchVersion: number = webProperties.vti_x005f_searchversion || 0;
         searchVersion++;
 
         return SpoPropertyBagBaseCommand.setProperty('vti_searchversion', searchVersion.toString(), args.options.webUrl, requestDigest, siteAccessToken, webIdentityResp, cmd, this.debug);
       })
-      .then((res: any): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(JSON.stringify(res));
-          cmd.log('');
-        }
-
+      .then((): void => {
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
         }
@@ -153,25 +134,19 @@ class SpoWebReindexCommand extends SpoCommand {
 
   private reindexLists(webUrl: string, requestDigest: string, siteAccessToken: string, cmd: CommandInstance, webIdentityResp: IdentityResponse, clientSvcCommons: ClientSvc): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      ((): request.RequestPromise => {
+      ((): Promise<{ value: { NoCrawl: boolean; Title: string; RootFolder: { Properties: any; ServerRelativeUrl: string; } }[] }> => {
         if (this.debug) {
           cmd.log(`Retrieving information about lists...`);
         }
 
         const requestOptions: any = {
           url: `${webUrl}/_api/web/lists?$select=NoCrawl,Title,RootFolder/Properties,RootFolder/ServerRelativeUrl&$expand=RootFolder/Properties`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata'
-          }),
+          },
           json: true
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.get(requestOptions);
       })()

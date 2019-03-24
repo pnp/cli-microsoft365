@@ -1,9 +1,8 @@
 import auth from '../../SpoAuth';
 import config from '../../../../config';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import commands from '../../commands';
 import SpoCommand from '../../SpoCommand';
-import Utils from '../../../../Utils';
 import { ContextInfo } from '../../spo';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -20,7 +19,7 @@ class SpoSiteScriptListCommand extends SpoCommand {
   public commandAction(cmd: CommandInstance, args: {}, cb: () => void): void {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<ContextInfo> => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
         }
@@ -31,38 +30,20 @@ class SpoSiteScriptListCommand extends SpoCommand {
 
         return this.getRequestDigest(cmd, this.debug);
       })
-      .then((res: ContextInfo): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log('Response:')
-          cmd.log(res);
-          cmd.log('');
-        }
-
+      .then((res: ContextInfo): Promise<{ value: any[] }> => {
         const requestOptions: any = {
           url: `${auth.site.url}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteScripts'`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': res.FormDigestValue,
             accept: 'application/json;odata=nometadata'
-          }),
+          },
           json: true
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.post(requestOptions);
       })
       .then((res: { value: any[] }): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
         if (res.value && res.value.length > 0) {
           cmd.log(res.value);
         }

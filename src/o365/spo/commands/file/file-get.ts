@@ -2,7 +2,7 @@ import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate
@@ -60,7 +60,7 @@ class SpoFileGetCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<string> => {
         siteAccessToken = accessToken;
 
         if (this.debug) {
@@ -90,29 +90,17 @@ class SpoFileGetCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: requestUrl + options,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata'
-          }),
+          },
           encoding: null, // Set encoding to null, otherwise binary data will be encoded to utf8 and binary data is corrupt 
           json: true
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return request.get(requestOptions);
       })
       .then((file: string): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(file);
-          cmd.log('');
-        }
-
         if (args.options.asString) {
           cmd.log(file.toString());
         }

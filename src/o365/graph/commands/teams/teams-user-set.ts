@@ -8,7 +8,7 @@ import {
 import { GraphItemsListCommand } from '../GraphItemsListCommand';
 import Utils from '../../../../Utils';
 import { GroupUser } from '../o365group/GroupUser';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -43,7 +43,7 @@ class GraphTeamsUserSetCommand extends GraphItemsListCommand<GroupUser> {
       .then((): Promise<void> => {
         return this.getMembersAndGuests(cmd, args.options.teamId);
       })
-      .then((): request.RequestPromise | void => {
+      .then((): Promise<void> | void => {
         // Filter out duplicate added values for owners (as they are returned as members as well)
         this.items = this.items.filter((groupUser, index, self) =>
           index === self.findIndex((t) => (
@@ -69,19 +69,13 @@ class GraphTeamsUserSetCommand extends GraphItemsListCommand<GroupUser> {
 
             const requestOptions: any = {
               url: endpoint,
-              headers: Utils.getRequestHeaders({
+              headers: {
                 authorization: `Bearer ${auth.service.accessToken}`,
                 'accept': 'application/json;odata.metadata=none'
-              }),
+              },
               json: true,
               body: { "@odata.id": "https://graph.microsoft.com/v1.0/directoryObjects/" + foundMember.id }
             };
-
-            if (this.debug) {
-              cmd.log('Executing web request...');
-              cmd.log(requestOptions);
-              cmd.log('');
-            }
 
             return request.post(requestOptions);
           }
@@ -97,17 +91,11 @@ class GraphTeamsUserSetCommand extends GraphItemsListCommand<GroupUser> {
 
             const requestOptions: any = {
               url: endpoint,
-              headers: Utils.getRequestHeaders({
+              headers: {
                 authorization: `Bearer ${auth.service.accessToken}`,
                 'accept': 'application/json;odata.metadata=none'
-              }),
+              },
             };
-
-            if (this.debug) {
-              cmd.log('Executing web request...');
-              cmd.log(requestOptions);
-              cmd.log('');
-            }
 
             return request.delete(requestOptions);
           }

@@ -1,4 +1,4 @@
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
 import { ClientSvcResponseContents, ClientSvcResponse } from "../../spo";
 import config from '../../../../config';
@@ -36,7 +36,7 @@ export abstract class SpoPropertyBagBaseCommand extends SpoCommand {
    * Gets property bag for a folder or site rootFolder of a site where return type is "_ObjectType_\":\"SP.Folder\".
    * This method is executed when folder option is specified. PnP PowerShell behaves the same way.
    */
-  protected getFolderPropertyBag(identityResp: IdentityResponse, webUrl: string, folder: string, cmd: CommandInstance): Promise<Object> {
+  protected getFolderPropertyBag(identityResp: IdentityResponse, webUrl: string, folder: string, cmd: CommandInstance): Promise<any> {
     let serverRelativeUrl: string = folder;
     if (identityResp.serverRelativeUrl !== '/') {
       serverRelativeUrl = `${identityResp.serverRelativeUrl}${serverRelativeUrl}`
@@ -44,45 +44,35 @@ export abstract class SpoPropertyBagBaseCommand extends SpoCommand {
 
     const requestOptions: any = {
       url: `${webUrl}/_vti_bin/client.svc/ProcessQuery`,
-      headers: Utils.getRequestHeaders({
+      headers: {
         authorization: `Bearer ${this.siteAccessToken}`,
         'X-RequestDigest': this.formDigestValue
-      }),
+      },
       body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /><Query Id="12" ObjectPathId="9"><Query SelectAllProperties="false"><Properties><Property Name="Properties" SelectAll="true"><Query SelectAllProperties="false"><Properties /></Query></Property></Properties></Query></Query></Actions><ObjectPaths><Method Id="9" ParentId="5" Name="GetFolderByServerRelativeUrl"><Parameters><Parameter Type="String">${serverRelativeUrl}</Parameter></Parameters></Method><Identity Id="5" Name="${identityResp.objectIdentity}" /></ObjectPaths></Request>`
     };
 
-    if (this.debug) {
-      cmd.log('Request:');
-      cmd.log(JSON.stringify(requestOptions));
-      cmd.log('');
-    }
-
     return new Promise<Object>((resolve: any, reject: any) => {
+      return request
+        .post<string>(requestOptions)
+        .then((res: string) => {
+          if (this.debug) {
+            cmd.log('Attempt to get Properties key values');
+          }
 
-      return request.post(requestOptions).then((res: any) => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(JSON.stringify(res));
-          cmd.log('');
+          const json: ClientSvcResponse = JSON.parse(res);
 
-          cmd.log('Attempt to get Properties key values');
-        }
+          const contents: ClientSvcResponseContents = json.find(x => { return x['ErrorInfo']; });
+          if (contents && contents.ErrorInfo) {
+            return reject(contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error');
+          }
 
-        const json: ClientSvcResponse = JSON.parse(res);
+          const propertiesObj = json.find(x => { return x['Properties'] });
+          if (propertiesObj) {
+            return resolve(propertiesObj['Properties']);
+          }
 
-        const contents: ClientSvcResponseContents = json.find(x => { return x['ErrorInfo']; });
-        if (contents && contents.ErrorInfo) {
-          return reject(contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error');
-        }
-
-        const propertiesObj = json.find(x => { return x['Properties'] });
-        if (propertiesObj) {
-          return resolve(propertiesObj['Properties']);
-        }
-
-        reject('Cannot proceed. Properties not found'); // this is not suppose to happen
-
-      }, (err: any): void => { reject(err); })
+          reject('Cannot proceed. Properties not found'); // this is not suppose to happen
+        }, (err: any): void => { reject(err); })
     });
   }
 
@@ -90,29 +80,19 @@ export abstract class SpoPropertyBagBaseCommand extends SpoCommand {
    * Gets property bag for site or sitecollection where return type is "_ObjectType_\":\"SP.Web\".
    * This method is executed when no folder specified. PnP PowerShell behaves the same way.
    */
-  protected getWebPropertyBag(identityResp: IdentityResponse, webUrl: string, cmd: CommandInstance): Promise<Object> {
+  protected getWebPropertyBag(identityResp: IdentityResponse, webUrl: string, cmd: CommandInstance): Promise<any> {
     const requestOptions: any = {
       url: `${webUrl}/_vti_bin/client.svc/ProcessQuery`,
-      headers: Utils.getRequestHeaders({
+      headers: {
         authorization: `Bearer ${this.siteAccessToken}`,
         'X-RequestDigest': this.formDigestValue
-      }),
+      },
       body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="97" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="ServerRelativeUrl" ScalarProperty="true" /><Property Name="AllProperties" SelectAll="true"><Query SelectAllProperties="false"><Properties /></Query></Property></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="${identityResp.objectIdentity}" /></ObjectPaths></Request>`
     };
-
-    if (this.debug) {
-      cmd.log('Request:');
-      cmd.log(JSON.stringify(requestOptions));
-      cmd.log('');
-    }
 
     return new Promise<Object>((resolve: any, reject: any): void => {
       request.post(requestOptions).then((res: any) => {
         if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(JSON.stringify(res));
-          cmd.log('');
-
           cmd.log('Attempt to get AllProperties key values');
         }
 
@@ -180,20 +160,14 @@ export abstract class SpoPropertyBagBaseCommand extends SpoCommand {
 
     const requestOptions: any = {
       url: `${webUrl}/_vti_bin/client.svc/ProcessQuery`,
-      headers: Utils.getRequestHeaders({
+      headers: {
         authorization: `Bearer ${accessToken}`,
         'X-RequestDigest': formDigest
-      }),
+      },
       body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetFieldValue" Id="206" ObjectPathId="205"><Parameters><Parameter Type="String">${Utils.escapeXml(name)}</Parameter><Parameter Type="String">${Utils.escapeXml(value)}</Parameter></Parameters></Method><Method Name="Update" Id="207" ObjectPathId="198" /></Actions><ObjectPaths><Property Id="205" ParentId="198" Name="${objectType}" /><Identity Id="198" Name="${identityResp.objectIdentity}" /></ObjectPaths></Request>`
     };
 
     return new Promise<any>((resolve: any, reject: any): void => {
-      if (debug) {
-        cmd.log('Executing web request...');
-        cmd.log(requestOptions);
-        cmd.log('');
-      }
-      
       request.post(requestOptions).then((res: any): void => {
         const json: ClientSvcResponse = JSON.parse(res);
         const contents: ClientSvcResponseContents = json.find(x => { return x['ErrorInfo']; });

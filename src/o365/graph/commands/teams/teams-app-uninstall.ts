@@ -1,4 +1,4 @@
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import auth from '../../GraphAuth';
 import Utils from '../../../../Utils';
 import config from '../../../../config';
@@ -32,20 +32,14 @@ class GraphTeamsAppUninstallCommand extends GraphCommand {
     const uninstallApp: () => void = (): void => {
       auth
         .ensureAccessToken(auth.service.resource, cmd, this.debug)
-        .then((): request.RequestPromise => {
+        .then((): Promise<{}> => {
           const requestOptions: any = {
             url: `${auth.service.resource}/v1.0/teams/${args.options.teamId}/installedApps/${args.options.appId}`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${auth.service.accessToken}`,
               accept: 'application/json;odata.metadata=none'
-            })
+            }
           };
-
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
 
           return request.delete(requestOptions);
         })

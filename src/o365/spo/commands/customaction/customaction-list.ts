@@ -1,7 +1,7 @@
 import auth from '../../SpoAuth';
 import { Auth } from '../../../../Auth';
 import config from '../../../../config';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
@@ -9,8 +9,6 @@ import {
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import { ContextInfo } from '../../spo';
-import Utils from '../../../../Utils';
 import { CustomAction } from './customaction';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -46,21 +44,10 @@ class SpoCustomActionListCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<CustomAction[]> => {
         siteAccessToken = accessToken;
 
         if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
-
-        return this.getRequestDigestForSite(args.options.url, accessToken, cmd, this.debug);
-      })
-      .then((contextResponse: ContextInfo): Promise<CustomAction[]> => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(JSON.stringify(contextResponse));
-          cmd.log('');
-
           cmd.log(`Attempt to get custom actions list with scope: ${scope}`);
           cmd.log('');
         }
@@ -71,12 +58,6 @@ class SpoCustomActionListCommand extends SpoCommand {
         return this.searchAllScopes(args.options, siteAccessToken, cmd);
       })
       .then((customActions: CustomAction[]): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(customActions);
-          cmd.log('');
-        }
-
         if (customActions.length === 0) {
           if (this.verbose) {
             cmd.log(`Custom actions not found`);
@@ -104,21 +85,16 @@ class SpoCustomActionListCommand extends SpoCommand {
   private getCustomActions(options: Options, accessToken: string, cmd: CommandInstance): Promise<CustomAction[]> {
     const requestOptions: any = {
       url: `${options.url}/_api/${options.scope}/UserCustomActions`,
-      headers: Utils.getRequestHeaders({
+      headers: {
         authorization: `Bearer ${accessToken}`,
         accept: 'application/json;odata=nometadata'
-      }),
+      },
       json: true
     };
 
-    if (this.debug) {
-      cmd.log('Executing web request...');
-      cmd.log(JSON.stringify(requestOptions));
-      cmd.log('');
-    }
-
     return new Promise<CustomAction[]>((resolve: (list: CustomAction[]) => void, reject: (error: any) => void): void => {
-      request.get(requestOptions)
+      request
+        .get<{ value: CustomAction[]; }>(requestOptions)
         .then((response: { value: CustomAction[] }) => {
           resolve(response.value);
         })
@@ -140,12 +116,6 @@ class SpoCustomActionListCommand extends SpoCommand {
       this
         .getCustomActions(options, accessToken, cmd)
         .then((customActions: CustomAction[]): Promise<CustomAction[]> => {
-          if (this.debug) {
-            cmd.log('getCustomActions with scope of web. Result...');
-            cmd.log(JSON.stringify(customActions));
-            cmd.log('');
-          }
-
           webCustomActions = customActions;
 
           options.scope = "Site";
@@ -153,12 +123,6 @@ class SpoCustomActionListCommand extends SpoCommand {
           return this.getCustomActions(options, accessToken, cmd);
         })
         .then((siteCustomActions: CustomAction[]): void => {
-          if (this.debug) {
-            cmd.log('getCustomActions with scope of site. Result...');
-            cmd.log(JSON.stringify(siteCustomActions));
-            cmd.log('');
-          }
-
           resolve(siteCustomActions.concat(webCustomActions));
         }, (err: any): void => {
           reject(err);

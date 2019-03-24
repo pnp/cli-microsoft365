@@ -5,7 +5,7 @@ import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
 const command: Command = require('./list-view-field-add');
 import * as assert from 'assert';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.LIST_VIEW_FIELD_ADD, () => {
@@ -15,7 +15,7 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
   let trackEvent: any;
   let telemetry: any;
   let requests: any[];
-  let stubAllGetRequests: any = (getField = null) => {
+  let stubAllGetRequests: any = (getField: any = null) => {
 
     return sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf('/fields/getbyinternalnameortitle') > -1 || opts.url.indexOf('/fields/getbyid') > -1) {

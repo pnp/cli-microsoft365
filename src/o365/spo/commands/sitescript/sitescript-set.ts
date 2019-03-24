@@ -1,6 +1,6 @@
 import auth from '../../SpoAuth';
 import config from '../../../../config';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import commands from '../../commands';
 import {
   CommandOption, CommandValidate
@@ -45,7 +45,7 @@ class SpoSiteScriptSetCommand extends SpoCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<ContextInfo> => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
         }
@@ -56,13 +56,7 @@ class SpoSiteScriptSetCommand extends SpoCommand {
 
         return this.getRequestDigest(cmd, this.debug);
       })
-      .then((res: ContextInfo): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log('Response:')
-          cmd.log(res);
-          cmd.log('');
-        }
-
+      .then((res: ContextInfo): Promise<any> => {
         const updateInfo: any = {
           Id: args.options.id
         };
@@ -81,31 +75,19 @@ class SpoSiteScriptSetCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${auth.site.url}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteScript`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': res.FormDigestValue,
             'content-type': 'application/json;charset=utf-8',
             accept: 'application/json;odata=nometadata'
-          }),
+          },
           body: { updateInfo: updateInfo },
           json: true
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return request.post(requestOptions);
       })
       .then((res: any): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
         cmd.log(res);
 
         if (this.verbose) {

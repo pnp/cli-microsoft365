@@ -1,13 +1,12 @@
 import auth from '../../SpoAuth';
 import { ContextInfo } from '../../spo';
 import config from '../../../../config';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import commands from '../../commands';
 import {
   CommandOption, CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import Utils from '../../../../Utils';
 import GlobalOptions from '../../../../GlobalOptions';
 import { Auth } from '../../../../Auth';
 
@@ -44,7 +43,7 @@ class SpoHubSiteDisconnectCommand extends SpoCommand {
 
       auth
         .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-        .then((accessToken: string): request.RequestPromise => {
+        .then((accessToken: string): Promise<ContextInfo> => {
           siteAccessToken = accessToken;
 
           if (this.debug) {
@@ -57,42 +56,24 @@ class SpoHubSiteDisconnectCommand extends SpoCommand {
 
           return this.getRequestDigestForSite(args.options.url, siteAccessToken, cmd, this.debug);
         })
-        .then((res: ContextInfo): request.RequestPromise => {
-          if (this.debug) {
-            cmd.log('Response:')
-            cmd.log(res);
-            cmd.log('');
-          }
-
+        .then((res: ContextInfo): Promise<void> => {
           if (this.verbose) {
             cmd.log(`Disconnecting site collection ${args.options.url} from its hubsite...`);
           }
 
           const requestOptions: any = {
             url: `${args.options.url}/_api/site/JoinHubSite('00000000-0000-0000-0000-000000000000')`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${siteAccessToken}`,
               'X-RequestDigest': res.FormDigestValue,
               accept: 'application/json;odata=nometadata'
-            }),
+            },
             json: true
           };
 
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
-
           return request.post(requestOptions);
         })
-        .then((res: any): void => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
-          }
-
+        .then((): void => {
           if (this.verbose) {
             cmd.log(vorpal.chalk.green('DONE'));
           }

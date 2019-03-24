@@ -5,7 +5,7 @@ import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
 const command: Command = require('./storageentity-remove');
 import * as assert from 'assert';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import config from '../../../../config';
 import Utils from '../../../../Utils';
 
@@ -285,17 +285,9 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     };
-    cmdInstance.action({ options: { debug: true, key: 'nonexistentproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }}, () => {
-      let errorCorrectlyReported = false;
-      log.forEach(l => {
-        if (l && typeof l === 'string' &&
-          l.indexOf('File Not Found.') > -1) {
-          errorCorrectlyReported = true;
-        }
-      });
-
+    cmdInstance.action({ options: { debug: true, key: 'nonexistentproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }}, (err?: any) => {
       try {
-        assert(errorCorrectlyReported);
+        assert.equal(err.message, 'File Not Found.');
         done();
       }
       catch (e) {

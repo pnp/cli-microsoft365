@@ -5,7 +5,7 @@ import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
 const command: Command = require('./cdn-origin-remove');
 import * as assert from 'assert';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import config from '../../../../config';
 import Utils from '../../../../Utils';
 
@@ -366,19 +366,9 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    };
-    cmdInstance.action({ options: { debug: true, origin: '*/cdn' } }, () => {
-      let genericErrorHandled = false;
-      log.forEach(l => {
-        if (l && typeof l === 'string' && l.indexOf('An error has occurred') > -1) {
-          genericErrorHandled = true;
-        }
-      });
-
+    cmdInstance.action({ options: { debug: true, origin: '*/cdn', confirm: true } }, (err?: any) => {
       try {
-        assert(genericErrorHandled);
+        assert.equal(err.message, 'An error has occurred');
         done();
       }
       catch (e) {

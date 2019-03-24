@@ -2,9 +2,8 @@ import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import SpoCommand from '../../SpoCommand';
-import Utils from '../../../../Utils';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -28,7 +27,7 @@ class SpoThemeListCommand extends SpoCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<any> => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}`);
         }
@@ -39,28 +38,16 @@ class SpoThemeListCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${auth.site.url}/_api/thememanager/GetTenantThemingOptions`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${accessToken}`,
             'accept': 'application/json;odata=nometadata'
-          }),
+          },
           json: true
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.post(requestOptions);
       })
       .then((rawRes: any): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(rawRes);
-          cmd.log('');
-        }
-
         const themePreviews: any[] = rawRes.themePreviews;
         if (themePreviews && themePreviews.length > 0) {
           if (args.options.output === 'json') {

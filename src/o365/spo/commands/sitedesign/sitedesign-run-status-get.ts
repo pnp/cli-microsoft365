@@ -1,6 +1,6 @@
 import auth from '../../SpoAuth';
 import config from '../../../../config';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import commands from '../../commands';
 import {
   CommandOption, CommandValidate
@@ -36,7 +36,7 @@ class SpoSiteDesignRunStatusGetCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<{ value: SiteScriptActionStatus[] }> => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}. Retrieving site designs applied to the site...`);
         }
@@ -47,30 +47,18 @@ class SpoSiteDesignRunStatusGetCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignRunStatus`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${accessToken}`,
             accept: 'application/json;odata=nometadata',
             'content-type': 'application/json;odata=nometadata'
-          }),
+          },
           body: body,
           json: true
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return request.post(requestOptions);
       })
       .then((res: { value: SiteScriptActionStatus[] }): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
         if (args.options.output === 'json') {
           cmd.log(res.value);
         }

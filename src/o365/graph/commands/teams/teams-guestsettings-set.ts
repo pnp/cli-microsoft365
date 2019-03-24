@@ -6,7 +6,7 @@ import {
   CommandOption, CommandValidate
 } from '../../../../Command';
 import Utils from '../../../../Utils';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import GraphCommand from '../../GraphCommand';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -46,7 +46,7 @@ class GraphTeamsGuestSettingsSetCommand extends GraphCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((): request.RequestPromise => {
+      .then((): Promise<{}> => {
         const body: any = {
           guestSettings: {}
         };
@@ -58,19 +58,13 @@ class GraphTeamsGuestSettingsSetCommand extends GraphCommand {
 
         const requestOptions: any = {
           url: `${auth.service.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${auth.service.accessToken}`,
             accept: 'application/json;odata.metadata=none'
-          }),
+          },
           body: body,
           json: true
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.patch(requestOptions);
       })

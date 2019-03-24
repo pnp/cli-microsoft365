@@ -2,7 +2,7 @@ import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate,
@@ -70,15 +70,8 @@ class SpoListItemSetCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise | Promise<any> => {
+      .then((accessToken: string): Promise<any> => {
         siteAccessToken = accessToken;
-
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}.`);
-          cmd.log(``);
-          cmd.log(`auth object:`);
-          cmd.log(auth);
-        }
 
         if (args.options.systemUpdate) {
           if (this.verbose) {
@@ -87,35 +80,22 @@ class SpoListItemSetCommand extends SpoCommand {
 
           const listRequestOptions: any = {
             url: `${listRestUrl}/id`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${siteAccessToken}`,
               'accept': 'application/json;odata=nometadata'
-            }),
+            },
             json: true
           };
 
-          if (this.debug) {
-            cmd.log('Executing web request for list id...');
-            cmd.log(listRequestOptions);
-            cmd.log('');
-          }
-
           return request.get(listRequestOptions)
-
         }
         else {
           return Promise.resolve();
         }
       })
-      .then((dataReturned: any): request.RequestPromise | Promise<void> => {
+      .then((dataReturned: any): Promise<void> => {
         if (dataReturned) {
           environmentListId = dataReturned.value;
-
-          if (this.debug) {
-            cmd.log(`data returned[0]:`);
-            cmd.log(dataReturned);
-            cmd.log(`Retrieved list id ${environmentListId}.`);
-          }
         }
 
         if (args.options.contentType) {
@@ -125,18 +105,12 @@ class SpoListItemSetCommand extends SpoCommand {
 
           const requestOptions: any = {
             url: `${listRestUrl}/contenttypes?$select=Name,Id`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${siteAccessToken}`,
               'accept': 'application/json;odata=nometadata'
-            }),
+            },
             json: true
           };
-
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
 
           return request.get(requestOptions);
         }
@@ -144,7 +118,7 @@ class SpoListItemSetCommand extends SpoCommand {
           return Promise.resolve();
         }
       })
-      .then((response: any): request.RequestPromise | Promise<void> => {
+      .then((response: any): Promise<ContextInfo> => {
         if (args.options.contentType) {
           if (this.debug) {
             cmd.log('content type lookup response...');
@@ -187,16 +161,10 @@ class SpoListItemSetCommand extends SpoCommand {
           return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
         }
         else {
-          return Promise.resolve();
+          return Promise.resolve(undefined as any);
         }
       })
       .then((res: ContextInfo): Promise<string> => {
-        if (this.debug) {
-          cmd.log('Response:')
-          cmd.log(res);
-          cmd.log('');
-        }
-
         if (this.verbose) {
           cmd.log(`Updating item in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
         }
@@ -208,7 +176,7 @@ class SpoListItemSetCommand extends SpoCommand {
         }
 
         return Promise.resolve('');
-      }).then((objectIdentity: string): request.RequestPromise => {
+      }).then((objectIdentity: string): Promise<any> => {
         const additionalContentType: string = (args.options.systemUpdate && args.options.contentType && contentTypeName !== '') ? `
               <Parameters>
                 <Parameter Type="String">ContentType</Parameter>
@@ -244,59 +212,38 @@ class SpoListItemSetCommand extends SpoCommand {
 
         const requestOptions: any = args.options.systemUpdate ? {
           url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'Content-Type': 'text/xml',
             'X-RequestDigest': formDigestValue,
-          }),
+          },
           body: requestBody
         } : {
             url: `${listRestUrl}/items(${args.options.id})/ValidateUpdateListItem()`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${siteAccessToken}`,
               'accept': 'application/json;odata=nometadata'
-            }),
+            },
             body: requestBody,
             json: true
           };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-          cmd.log('Body:');
-          cmd.log(requestBody);
-          cmd.log('');
-        }
-
         return request.post(requestOptions);
       })
-      .then((response: any): request.RequestPromise | Promise<void> => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(response);
-          cmd.log('');
-        }
-
+      .then((response: any): Promise<any> => {
         let itemId: number = 0;
 
         if (args.options.systemUpdate) {
-
           if (response.indexOf("ErrorMessage") > -1) {
             return Promise.reject(`Error occurred in systemUpdate operation - ${response}`);
           }
           else {
             itemId = Number(args.options.id);
           }
-
         }
         else {
           // Response is from /ValidateUpdateListItem POST call, perform get on updated item to get all field values
           const returnedData: any = response.value;
-          if (this.debug) {
-            cmd.log(`Returned data:`)
-            cmd.log(returnedData)
-          }
 
           if (!returnedData[0].ItemId) {
             return Promise.reject(`Item didn't update successfully`)
@@ -308,18 +255,12 @@ class SpoListItemSetCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${listRestUrl}/items(${itemId})`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata'
-          }),
+          },
           json: true
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.get(requestOptions);
       })
@@ -496,20 +437,16 @@ class SpoListItemSetCommand extends SpoCommand {
   protected requestObjectIdentity(webUrl: string, cmd: CommandInstance, formDigestValue: string, siteAccessToken: string): Promise<string> {
     const requestOptions: any = {
       url: `${webUrl}/_vti_bin/client.svc/ProcessQuery`,
-      headers: Utils.getRequestHeaders({
+      headers: {
         authorization: `Bearer ${siteAccessToken}`,
         'X-RequestDigest': formDigestValue
-      }),
+      },
       body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="1" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="ServerRelativeUrl" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Property Id="5" ParentId="3" Name="Web" /><StaticProperty Id="3" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /></ObjectPaths></Request>`
     };
 
     return new Promise<string>((resolve: any, reject: any): void => {
       request.post(requestOptions).then((res: any) => {
         if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(JSON.stringify(res));
-          cmd.log('');
-
           cmd.log('Attempt to get _ObjectIdentity_ key values');
         }
 

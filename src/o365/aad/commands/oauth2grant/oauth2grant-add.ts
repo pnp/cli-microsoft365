@@ -2,7 +2,7 @@ import auth from '../../AadAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate
@@ -34,7 +34,7 @@ class Oauth2GrantAddCommand extends AadCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<{}> => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}. Granting the specified service principal OAuth2 permissions...`);
         }
@@ -45,10 +45,10 @@ class Oauth2GrantAddCommand extends AadCommand {
 
         const requestOptions: any = {
           url: `${auth.service.resource}/myorganization/oauth2PermissionGrants?api-version=1.6`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${accessToken}`,
             'content-type': 'application/json'
-          }),
+          },
           json: true,
           body: {
             "odata.type": "Microsoft.DirectoryServices.OAuth2PermissionGrant",
@@ -62,21 +62,9 @@ class Oauth2GrantAddCommand extends AadCommand {
           }
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return request.post(requestOptions);
       })
       .then((res: any): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(JSON.stringify(res, null, 2));
-          cmd.log('');
-        }
-
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
         }

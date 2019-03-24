@@ -5,7 +5,7 @@ import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
 const command: Command = require('./listitem-record-undeclare');
 import * as assert from 'assert';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.LISTITEM_RECORD_UNDECLARE, () => {

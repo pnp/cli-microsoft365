@@ -3,7 +3,7 @@ import { Auth } from '../../../../Auth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate
@@ -63,7 +63,7 @@ class SpoAppRemoveCommand extends SpoAppBaseCommand {
           const resource: string = Auth.getResourceFromUrl(appCatalogSiteUrl);
           return auth.getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug);
         })
-        .then((accessToken: string): request.RequestPromise => {
+        .then((accessToken: string): Promise<void> => {
           siteAccessToken = accessToken;
 
           if (this.debug) {
@@ -72,17 +72,11 @@ class SpoAppRemoveCommand extends SpoAppBaseCommand {
 
           const requestOptions: any = {
             url: `${appCatalogSiteUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${encodeURIComponent(args.options.id)}')/remove`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${siteAccessToken}`,
               accept: 'application/json;odata=nometadata'
-            })
+            }
           };
-
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
 
           return request.post(requestOptions);
         })

@@ -1,7 +1,7 @@
 import auth from '../../SpoAuth';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import config from '../../../../config';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
@@ -47,20 +47,14 @@ class SpoTermGroupGetCommand extends SpoCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<ContextInfo> => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
         }
 
         return this.getRequestDigest(cmd, this.debug);
       })
-      .then((res: ContextInfo): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
+      .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
           cmd.log(`Retrieving taxonomy term groups...`);
         }
@@ -69,28 +63,16 @@ class SpoTermGroupGetCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': res.FormDigestValue
-          }),
+          },
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="25" ObjectPathId="24" /><ObjectIdentityQuery Id="26" ObjectPathId="24" /><ObjectPath Id="28" ObjectPathId="27" /><ObjectIdentityQuery Id="29" ObjectPathId="27" /><ObjectPath Id="31" ObjectPathId="30" /><ObjectPath Id="33" ObjectPathId="32" /><ObjectIdentityQuery Id="34" ObjectPathId="32" /><Query Id="35" ObjectPathId="32"><Query SelectAllProperties="true"><Properties><Property Name="Name" ScalarProperty="true" /><Property Name="Id" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><StaticMethod Id="24" Name="GetTaxonomySession" TypeId="{981cbc68-9edc-4f8d-872f-71146fcbb84f}" /><Method Id="27" ParentId="24" Name="GetDefaultSiteCollectionTermStore" /><Property Id="30" ParentId="27" Name="Groups" />${query}</ObjectPaths></Request>`
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.post(requestOptions);
       })
       .then((res: string): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
         const json: ClientSvcResponse = JSON.parse(res);
         const response: ClientSvcResponseContents = json[0];
         if (response.ErrorInfo) {

@@ -5,7 +5,7 @@ import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
 const command: Command = require('./file-add');
 import * as assert from 'assert';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
 import * as fs from 'fs';
 import { FolderExtensions } from '../folder/FolderExtensions';
@@ -20,13 +20,13 @@ describe(commands.FILE_ADD, () => {
   let ensureFolderStub: sinon.SinonStub;
 
   let stubPostResponses: any = (
-    checkoutResp = null,
-    fileAddResp = null,
-    validateUpdateListItemResp = null,
-    approveResp = null,
-    publishResp = null,
-    undoCheckOut = null,
-    checkinResp = null
+    checkoutResp: any = null,
+    fileAddResp: any = null,
+    validateUpdateListItemResp: any = null,
+    approveResp: any = null,
+    publishResp: any = null,
+    undoCheckOut: any = null,
+    checkinResp: any = null
   ) => {
     return sinon.stub(request, 'post').callsFake((opts) => {
 
@@ -97,10 +97,10 @@ describe(commands.FILE_ADD, () => {
   }
 
   let stubGetResponses: any = (
-    getFolderByServerRelativeUrlResp = null,
-    getFileResp = null,
-    parentListResp = null,
-    getContentTypesResp = null
+    getFolderByServerRelativeUrlResp: any = null,
+    getFileResp: any = null,
+    parentListResp: any = null,
+    getContentTypesResp: any = null
   ) => {
     return sinon.stub(request, 'get').callsFake((opts) => {
 

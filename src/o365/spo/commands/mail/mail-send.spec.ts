@@ -5,7 +5,7 @@ import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
 const command: Command = require('./mail-send');
 import * as assert from 'assert';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.MAIL_SEND, () => {
@@ -118,7 +118,6 @@ describe(commands.MAIL_SEND, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email' } }, () => {
       let correctRequestIssued = false;
-      console.log(requests);
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
           r.headers.authorization &&

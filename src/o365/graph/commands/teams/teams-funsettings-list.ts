@@ -5,7 +5,7 @@ import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import { CommandOption, CommandValidate } from '../../../../Command';
 import GraphCommand from '../../GraphCommand';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -29,31 +29,19 @@ class GraphTeamsFunSettingsListCommand extends GraphCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((): request.RequestPromise => {
+      .then((): Promise<{ funSettings: any; }> => {
         const requestOptions: any = {
           url: `${auth.service.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}?$select=funSettings`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${auth.service.accessToken}`,
             accept: 'application/json;odata.metadata=none'
-          }),
+          },
           json: true
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.get(requestOptions);
       })
       .then((res: { funSettings: any }): void => {
-        if (this.debug) {
-          cmd.log('Response:')
-          cmd.log(res);
-          cmd.log('');
-        }
-
         cmd.log(res.funSettings);
 
         if (this.verbose) {

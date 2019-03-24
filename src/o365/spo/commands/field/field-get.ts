@@ -1,6 +1,6 @@
 import auth from '../../SpoAuth';
 import config from '../../../../config';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import commands from '../../commands';
 import {
   CommandOption, CommandValidate
@@ -50,7 +50,7 @@ class SpoFieldGetCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<{}> => {
         siteAccessToken = accessToken;
 
         if (this.debug) {
@@ -81,18 +81,12 @@ class SpoFieldGetCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/${listRestUrl}fields${fieldRestUrl}`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata'
-          }),
+          },
           json: true
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.get(requestOptions);
       })

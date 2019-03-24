@@ -1,7 +1,6 @@
 import Command, { CommandAction, CommandError } from '../../Command';
 import auth from './SpoAuth';
-import * as request from 'request-promise-native';
-import Utils from '../../Utils';
+import request from '../../request';
 import { SpoOperation } from './commands/site/SpoOperation';
 import config from '../../config';
 import { FormDigestInfo, ClientSvcResponse, ClientSvcResponseContents } from './spo';
@@ -23,7 +22,7 @@ export default abstract class SpoCommand extends Command {
       auth
         .restoreAuth()
         .then((): void => {
-          cmd.initAction(args);
+          cmd.initAction(args, this);
 
           if (!auth.site.connected) {
             cb(new CommandError('Log in to a SharePoint Online site first'));
@@ -44,25 +43,19 @@ export default abstract class SpoCommand extends Command {
     }
   }
 
-  protected getRequestDigest(cmd: CommandInstance, debug: boolean): request.RequestPromise {
+  protected getRequestDigest(cmd: CommandInstance, debug: boolean): Promise<FormDigestInfo> {
     return this.getRequestDigestForSite(auth.site.url, auth.site.accessToken, cmd, debug);
   }
 
-  protected getRequestDigestForSite(siteUrl: string, accessToken: string, cmd: CommandInstance, debug: boolean): request.RequestPromise {
+  protected getRequestDigestForSite(siteUrl: string, accessToken: string, cmd: CommandInstance, debug: boolean): Promise<FormDigestInfo> {
     const requestOptions: any = {
       url: `${siteUrl}/_api/contextinfo`,
-      headers: Utils.getRequestHeaders({
+      headers: {
         authorization: `Bearer ${accessToken}`,
         accept: 'application/json;odata=nometadata'
-      }),
+      },
       json: true
     };
-
-    if (debug) {
-      cmd.log('Executing web request...');
-      cmd.log(requestOptions);
-      cmd.log('');
-    }
 
     return request.post(requestOptions);
   }
@@ -94,12 +87,6 @@ export default abstract class SpoCommand extends Command {
       this
         .getRequestDigest(cmd, debug)
         .then((res: FormDigestInfo): void => {
-          if (debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
-          }
-
           const now: Date = new Date();
           now.setSeconds(now.getSeconds() + res.FormDigestTimeoutSeconds - 5);
           context = {
@@ -132,7 +119,7 @@ export default abstract class SpoCommand extends Command {
   protected waitUntilFinished(operationId: string, resolve: () => void, reject: (error: any) => void, accessToken: string, cmd: CommandInstance, currentContext: FormDigestInfo, dots?: string, timeout?: NodeJS.Timer): void {
     this
       .ensureFormDigest(cmd, currentContext, this.debug)
-      .then((res: FormDigestInfo): request.RequestPromise => {
+      .then((res: FormDigestInfo): Promise<string> => {
         currentContext = res;
 
         if (this.debug) {
@@ -146,28 +133,16 @@ export default abstract class SpoCommand extends Command {
 
         const requestOptions: any = {
           url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': currentContext.FormDigestValue
-          }),
+          },
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="188" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="184" Name="${operationId.replace(/\\n/g, '&#xA;').replace(/"/g, '')}" /></ObjectPaths></Request>`
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.post(requestOptions);
       })
       .then((res: string): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
         const json: ClientSvcResponse = JSON.parse(res);
         const response: ClientSvcResponseContents = json[0];
         if (response.ErrorInfo) {

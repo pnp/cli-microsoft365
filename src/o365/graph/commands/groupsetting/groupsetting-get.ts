@@ -1,7 +1,7 @@
 import auth from '../../GraphAuth';
 import config from '../../../../config';
 import commands from '../../commands';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandOption, CommandValidate
@@ -31,31 +31,19 @@ class GraphGroupSettingGetCommand extends GraphCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((): request.RequestPromise => {
+      .then((): Promise<{}> => {
         const requestOptions: any = {
           url: `${auth.service.resource}/v1.0/groupSettings/${args.options.id}`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${auth.service.accessToken}`,
             accept: 'application/json;odata.metadata=none'
-          }),
+          },
           json: true
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.get(requestOptions);
       })
       .then((res: any): void => {
-        if (this.debug) {
-          cmd.log('Response:')
-          cmd.log(res);
-          cmd.log('');
-        }
-
         cmd.log(res);
 
         if (this.verbose) {

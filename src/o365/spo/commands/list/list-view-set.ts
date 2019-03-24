@@ -2,7 +2,7 @@ import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate
@@ -63,7 +63,7 @@ class SpoListViewSetCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<ContextInfo> => {
         siteAccessToken = accessToken;
 
         if (this.debug) {
@@ -72,34 +72,22 @@ class SpoListViewSetCommand extends SpoCommand {
 
         return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
       })
-      .then((res: ContextInfo): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
+      .then((res: ContextInfo): Promise<void> => {
         const requestOptions: any = {
           url: `${baseRestUrl}${listRestUrl}${viewRestUrl}`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'X-RequestDigest': res.FormDigestValue,
             'content-type': 'application/json;odata=nometadata',
             accept: 'application/json;odata=nometadata'
-          }),
+          },
           json: true,
           body: this.getPayload(args.options)
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return request.patch(requestOptions);
       })
-      .then((rawRes: any): void => {
+      .then((): void => {
         // request doesn't return any content
 
         if (this.verbose) {

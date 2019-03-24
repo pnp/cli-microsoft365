@@ -5,7 +5,7 @@ import appInsights from '../../../../appInsights';
 import auth from '../../GraphAuth';
 const command: Command = require('./groupsetting-set');
 import * as assert from 'assert';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
 import { Service } from '../../../../Auth';
 
@@ -184,13 +184,15 @@ describe(commands.GROUPSETTING_SET, () => {
     auth.service.connected = true;
     auth.service.resource = 'https://graph.microsoft.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: {
-      debug: false,
-      id: 'c391b57d-5783-4c53-9236-cefb5c6ef323',
-      UsageGuidelinesUrl: 'https://contoso.sharepoint.com/sites/compliance',
-      ClassificationList: 'HBI, MBI, LBI, GDPR',
-      DefaultClassification: 'MBI'
-    }}, () => {
+    cmdInstance.action({
+      options: {
+        debug: false,
+        id: 'c391b57d-5783-4c53-9236-cefb5c6ef323',
+        UsageGuidelinesUrl: 'https://contoso.sharepoint.com/sites/compliance',
+        ClassificationList: 'HBI, MBI, LBI, GDPR',
+        DefaultClassification: 'MBI'
+      }
+    }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
         done();
@@ -202,6 +204,7 @@ describe(commands.GROUPSETTING_SET, () => {
   });
 
   it('updates group setting (debug)', (done) => {
+    let settingsUpdated: boolean = false;
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings/c391b57d-5783-4c53-9236-cefb5c6ef323`) {
         return Promise.resolve({
@@ -271,6 +274,7 @@ describe(commands.GROUPSETTING_SET, () => {
             }
           ]
         })) {
+        settingsUpdated = true;
         return Promise.resolve({
           displayName: null,
           id: 'c391b57d-5783-4c53-9236-cefb5c6ef323',
@@ -286,20 +290,17 @@ describe(commands.GROUPSETTING_SET, () => {
     auth.service.connected = true;
     auth.service.resource = 'https://graph.microsoft.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: {
-      debug: true,
-      id: 'c391b57d-5783-4c53-9236-cefb5c6ef323',
-      UsageGuidelinesUrl: 'https://contoso.sharepoint.com/sites/compliance',
-      ClassificationList: 'HBI, MBI, LBI, GDPR',
-      DefaultClassification: 'MBI'
-    }}, () => {
+    cmdInstance.action({
+      options: {
+        debug: true,
+        id: 'c391b57d-5783-4c53-9236-cefb5c6ef323',
+        UsageGuidelinesUrl: 'https://contoso.sharepoint.com/sites/compliance',
+        ClassificationList: 'HBI, MBI, LBI, GDPR',
+        DefaultClassification: 'MBI'
+      }
+    }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
-          displayName: null,
-          id: 'c391b57d-5783-4c53-9236-cefb5c6ef323',
-          templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b',
-          values: [{ "name": "UsageGuidelinesUrl", "value": "https://contoso.sharepoint.com/sites/compliance" }, { "name": "ClassificationList", "value": "HBI, MBI, LBI, GDPR" }, { "name": "DefaultClassification", "value": "MBI" }, { "name": "CustomBlockedWordsList", "value": "" }, { "name": "EnableMSStandardBlockedWords", "value": "false" }, { "name": "ClassificationDescriptions", "value": "" }, { "name": "PrefixSuffixNamingRequirement", "value": "" }, { "name": "AllowGuestsToBeGroupOwner", "value": "false" }, { "name": "AllowGuestsToAccessGroups", "value": "true" }, { "name": "GuestUsageGuidelinesUrl", "value": "" }, { "name": "GroupCreationAllowedGroupId", "value": "" }, { "name": "AllowToAddGuests", "value": "true" }, { "name": "EnableGroupCreation", "value": "true" }]
-        }));
+        assert(settingsUpdated);
         done();
       }
       catch (e) {

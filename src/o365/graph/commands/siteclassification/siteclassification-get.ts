@@ -1,9 +1,8 @@
 import auth from '../../GraphAuth';
 import config from '../../../../config';
 import commands from '../../commands';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import GlobalOptions from '../../../../GlobalOptions';
-import Utils from '../../../../Utils';
 import GraphCommand from '../../GraphCommand';
 import { DirectorySettingTemplatesRsp } from './DirectorySettingTemplatesRsp';
 import { DirectorySetting } from './DirectorySetting';
@@ -32,31 +31,19 @@ class GraphO365SiteClassificationGetCommand extends GraphCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((): request.RequestPromise => {
+      .then((): Promise<DirectorySettingTemplatesRsp> => {
         const requestOptions: any = {
           url: `${auth.service.resource}/beta/settings`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${auth.service.accessToken}`,
             accept: 'application/json;odata.metadata=none'
-          }),
+          },
           json: true
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.get(requestOptions);
       })
       .then((res: DirectorySettingTemplatesRsp): void => {
-        if (this.debug) {
-          cmd.log('Response:')
-          cmd.log(res);
-          cmd.log('');
-        }
-
         if (res.value.length == 0) {
           cb(new CommandError('Site classification is not enabled.'));
           return;

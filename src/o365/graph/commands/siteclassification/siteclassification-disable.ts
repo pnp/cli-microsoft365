@@ -1,12 +1,11 @@
 import auth from '../../GraphAuth';
 import config from '../../../../config';
 import commands from '../../commands';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandOption
 } from '../../../../Command';
-import Utils from '../../../../Utils';
 import GraphCommand from '../../GraphCommand';
 import { DirectorySetting } from './DirectorySetting';
 import { DirectorySettingTemplatesRsp } from './DirectorySettingTemplatesRsp';
@@ -40,31 +39,19 @@ class GraphSiteClassificationDisableCommand extends GraphCommand {
     const disableSiteClassification: () => void = (): void => {
       auth
         .ensureAccessToken(auth.service.resource, cmd, this.debug)
-        .then((): request.RequestPromise => {
+        .then((): Promise<DirectorySettingTemplatesRsp> => {
           const requestOptions: any = {
             url: `${auth.service.resource}/beta/settings`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${auth.service.accessToken}`,
               accept: 'application/json;odata.metadata=none'
-            }),
+            },
             json: true
           };
 
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
-
           return request.get(requestOptions);
         })
-        .then((res: DirectorySettingTemplatesRsp): request.RequestPromise | Promise<void> => {
-          if (this.debug) {
-            cmd.log('Response:')
-            cmd.log(res);
-            cmd.log('');
-          }
-
+        .then((res: DirectorySettingTemplatesRsp): Promise<void> => {
           if (res.value.length === 0) {
             return Promise.reject('Site classification is not enabled.');
           }
@@ -84,29 +71,17 @@ class GraphSiteClassificationDisableCommand extends GraphCommand {
 
           const requestOptions: any = {
             url: `${auth.service.resource}/beta/settings/` + unifiedGroupSetting[0].id,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${auth.service.accessToken}`,
               accept: 'application/json;odata.metadata=none',
               'content-type': 'application/json'
-            }),
+            },
             json: true,
           };
-
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
 
           return request.delete(requestOptions);
         })
         .then((res: any): void => {
-          if (this.debug) {
-            cmd.log('Response:')
-            cmd.log(res);
-            cmd.log('');
-          }
-
           if (this.verbose) {
             cmd.log(vorpal.chalk.green('DONE'));
           }

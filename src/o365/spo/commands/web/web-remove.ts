@@ -1,8 +1,7 @@
 import auth from '../../SpoAuth';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import config from '../../../../config';
 import commands from '../../commands';
-import Utils from '../../../../Utils';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandOption,
@@ -46,26 +45,20 @@ class SpoWebAddCommand extends SpoCommand {
 
       auth
         .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-        .then((accessToken: string): request.RequestPromise => {
+        .then((accessToken: string): Promise<void> => {
           if (this.debug) {
             cmd.log(`Retrieved access token ${accessToken}. Deleting subsite ${args.options.webUrl}...`);
           }
 
           const requestOptions: any = {
             url: `${encodeURI(args.options.webUrl)}/_api/web`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${accessToken}`,
               accept: 'application/json;odata=nometadata',
               'X-HTTP-Method': 'DELETE'
-            }),
+            },
             json: true
           };
-
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
 
           if (this.verbose) {
             cmd.log(`Deleting subsite ${args.options.webUrl} ...`);
@@ -73,13 +66,7 @@ class SpoWebAddCommand extends SpoCommand {
 
           return request.post(requestOptions)
         })
-        .then((res: any): void => {
-          if (this.debug) {
-            cmd.log('Response:')
-            cmd.log(res.statusCode);
-            cmd.log('');
-          }
-
+        .then((): void => {
           if (this.verbose) {
             cmd.log(vorpal.chalk.green('DONE'));
           }

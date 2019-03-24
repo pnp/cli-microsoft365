@@ -1,6 +1,6 @@
 import auth from '../../SpoAuth';
 import config from '../../../../config';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
@@ -8,7 +8,6 @@ import {
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import Utils from '../../../../Utils';
 import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -52,7 +51,7 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<any> => {
         siteAccessToken = accessToken;
 
         if (this.debug) {
@@ -69,11 +68,11 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/navigation/${nodesCollection}`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata',
             'content-type': 'application/json;odata=nometadata'
-          }),
+          },
           body: {
             Title: args.options.title,
             Url: args.options.url,
@@ -82,21 +81,9 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
           json: true
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return request.post(requestOptions);
       })
       .then((res: any): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
         cmd.log(res);
 
         if (this.verbose) {

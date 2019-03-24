@@ -6,11 +6,10 @@ import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
 const command: Command = require('./listitem-record-declare');
 import * as assert from 'assert';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.LISTITEM_RECORD_DECLARE, () => {
-
   let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
@@ -322,18 +321,9 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
       webUrl: `https://alreadydeclared.sharepoint.com/sites/project-y/`,
     };
 
-    cmdInstance.action({ options: options }, () => {
-
-      let correctErrorReported = false;
-      log.forEach(l => {
-        if (l && typeof l === 'string' &&
-          l.indexOf('This item has already been declared a record') > -1) {
-          correctErrorReported = true;
-        }
-      });
-
+    cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert(correctErrorReported);
+        assert.equal(err.message, 'This item has already been declared a record.');
         done();
       }
       catch (e) {

@@ -1,7 +1,7 @@
 import auth from '../../GraphAuth';
 import config from '../../../../config';
 import commands from '../../commands';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandOption, CommandValidate
@@ -36,42 +36,30 @@ class GraphGroupSettingSetCommand extends GraphCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((): request.RequestPromise => {
+      .then((): Promise<GroupSetting> => {
         if (this.verbose) {
           cmd.log(`Retrieving group setting with id '${args.options.id}'...`);
         }
 
         const requestOptions: any = {
           url: `${auth.service.resource}/v1.0/groupSettings/${args.options.id}`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${auth.service.accessToken}`,
             accept: 'application/json;odata.metadata=none'
-          }),
+          },
           json: true
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return request.get(requestOptions);
       })
-      .then((groupSetting: GroupSetting): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log('Response:')
-          cmd.log(groupSetting);
-          cmd.log('');
-        }
-
+      .then((groupSetting: GroupSetting): Promise<{}> => {
         const requestOptions: any = {
           url: `${auth.service.resource}/v1.0/groupSettings/${args.options.id}`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${auth.service.accessToken}`,
             accept: 'application/json;odata.metadata=none',
             'content-type': 'application/json'
-          }),
+          },
           body: {
             displayName: groupSetting.displayName,
             templateId: groupSetting.templateId,
@@ -80,21 +68,9 @@ class GraphGroupSettingSetCommand extends GraphCommand {
           json: true
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return request.patch(requestOptions);
       })
       .then((res: any): void => {
-        if (this.debug) {
-          cmd.log('Response:')
-          cmd.log(res);
-          cmd.log('');
-        }
-
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
         }

@@ -6,8 +6,7 @@ import {
   CommandOption,
   CommandValidate
 } from '../../../../Command';
-import * as request from 'request-promise-native';
-import Utils from '../../../../Utils';
+import request from '../../../../request';
 import AzmgmtCommand from '../../AzmgmtCommand';
 import * as os from 'os';
 
@@ -34,7 +33,7 @@ class AzmgmtFlowRunListCommand extends AzmgmtCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<{ value: [{ name: string, properties: { startTime: string, status: string } }] }> => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}.`);
         }
@@ -45,28 +44,16 @@ class AzmgmtFlowRunListCommand extends AzmgmtCommand {
 
         const requestOptions: any = {
           url: `${auth.service.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.flow)}/runs?api-version=2016-11-01`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${accessToken}`,
             accept: 'application/json'
-          }),
+          },
           json: true
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.get(requestOptions);
       })
       .then((res: { value: [{ name: string, properties: { startTime: string, status: string } }] }): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
         if (res.value && res.value.length > 0) {
           if (args.options.output === 'json') {
             cmd.log(res.value);

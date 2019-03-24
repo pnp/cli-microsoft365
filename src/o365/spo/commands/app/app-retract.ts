@@ -3,7 +3,7 @@ import { Auth } from '../../../../Auth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate
@@ -59,7 +59,7 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
           const resource: string = Auth.getResourceFromUrl(appCatalogSiteUrl);
           return auth.getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug);
         })
-        .then((accessToken: string): request.RequestPromise => {
+        .then((accessToken: string): Promise<void> => {
 
           siteAccessToken = accessToken;
 
@@ -73,27 +73,15 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
 
           const requestOptions: any = {
             url: `${appCatalogSiteUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${encodeURIComponent(args.options.id)}')/retract`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${siteAccessToken}`,
               accept: 'application/json;odata=nometadata'
-            })
+            }
           };
-
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
 
           return request.post(requestOptions);
         })
-        .then((res: string): void => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
-          }
-
+        .then((): void => {
           if (this.verbose) {
             cmd.log(vorpal.chalk.green('DONE'));
           }

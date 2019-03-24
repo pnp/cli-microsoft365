@@ -5,7 +5,7 @@ import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
 const command: Command = require('./theme-list');
 import * as assert from 'assert';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.THEME_LIST, () => {
@@ -231,7 +231,7 @@ describe(commands.THEME_LIST, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, verbose: true, output: 'json' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(expected), 'Invalid request');
+        assert(cmdInstanceLogSpy.calledWith(expected.themePreviews), 'Invalid request');
         done();
       }
       catch (e) {
@@ -265,7 +265,7 @@ describe(commands.THEME_LIST, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, verbose: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(expected), 'Invalid request');
+        assert(cmdInstanceLogSpy.calledWith('No themes found'), 'Invalid request');
         done();
       }
       catch (e) {

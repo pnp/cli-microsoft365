@@ -1,12 +1,11 @@
 import auth from '../../GraphAuth';
 import config from '../../../../config';
 import commands from '../../commands';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandOption, CommandValidate
 } from '../../../../Command';
-import Utils from '../../../../Utils';
 import GraphCommand from '../../GraphCommand';
 import { DirectorySetting, UpdateDirectorySetting } from './DirectorySetting';
 import { DirectorySettingValue } from './DirectorySettingValue';
@@ -45,25 +44,19 @@ class GraphSiteClassificationUpdateCommand extends GraphCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((): request.RequestPromise => {
+      .then((): Promise<{ value: DirectorySetting[]; }> => {
         const requestOptions: any = {
           url: `${auth.service.resource}/beta/settings`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${auth.service.accessToken}`,
             accept: 'application/json;odata.metadata=none'
-          }),
+          },
           json: true
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return request.get(requestOptions);
       })
-      .then((res: { value: DirectorySetting[]; }): request.RequestPromise | Promise<void> => {
+      .then((res: { value: DirectorySetting[]; }): Promise<void> => {
         const unifiedGroupSetting: DirectorySetting[] = res.value.filter((directorySetting: DirectorySetting): boolean => {
           return directorySetting.displayName === 'Group.Unified';
         });
@@ -144,36 +137,18 @@ class GraphSiteClassificationUpdateCommand extends GraphCommand {
 
         const requestOptions: any = {
           url: `${auth.service.resource}/beta/settings/${unifiedGroupSetting[0].id}`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${auth.service.accessToken}`,
             accept: 'application/json;odata.metadata=none',
             'content-type': 'application/json'
-          }),
+          },
           json: true,
           body: updatedDirSettings,
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
-        if (this.verbose) {
-          cmd.log('The updated classification settings will be:');
-          cmd.log(updatedDirSettings);
-          cmd.log('');
-        }
-
         return request.patch(requestOptions);
       })
       .then((res: any): void => {
-        if (this.debug) {
-          cmd.log('Response:')
-          cmd.log(res);
-          cmd.log('');
-        }
-
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
         }

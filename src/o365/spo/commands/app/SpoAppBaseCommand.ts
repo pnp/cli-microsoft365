@@ -1,7 +1,6 @@
 import SpoCommand from '../../SpoCommand';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
-import Utils from '../../../../Utils';
+import request from '../../../../request';
 
 interface CommandArgs {
   options: Options;
@@ -25,28 +24,16 @@ export abstract class SpoAppBaseCommand extends SpoCommand {
 
       const requestOptions: any = {
         url: `${authSiteUrl}/_api/SP_TenantSettings_Current`,
-        headers: Utils.getRequestHeaders({
+        headers: {
           authorization: `Bearer ${accessToken}`,
           accept: 'application/json;odata=nometadata'
-        }),
+        },
         json: true
       };
-
-      if (this.debug) {
-        cmd.log('Executing web request...');
-        cmd.log(requestOptions);
-        cmd.log('');
-      }
 
       request
         .get(requestOptions)
         .then((res: { CorporateCatalogUrl?: string }) => {
-          if (this.debug) {
-            cmd.log('Tenant App catalog response...');
-            cmd.log(res);
-            cmd.log('');
-          }
-
           if (res.CorporateCatalogUrl) {
             return resolve(res.CorporateCatalogUrl);
           }

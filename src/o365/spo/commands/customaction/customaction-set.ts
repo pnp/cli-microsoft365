@@ -1,6 +1,6 @@
 import auth from '../../SpoAuth';
 import config from '../../../../config';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
@@ -8,7 +8,6 @@ import {
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import { ContextInfo } from '../../spo';
 import Utils from '../../../../Utils';
 import { CustomAction } from './customaction';
 import { Auth } from '../../../../Auth';
@@ -96,16 +95,9 @@ class SpoCustomActionSetCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<CustomAction | undefined> => {
         siteAccessToken = accessToken;
 
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
-
-        return this.getRequestDigestForSite(args.options.url, siteAccessToken, cmd, this.debug);
-      })
-      .then((contextResponse: ContextInfo): request.RequestPromise | Promise<CustomAction | undefined> => {
         if (!args.options.scope) {
           args.options.scope = 'All';
         }
@@ -117,11 +109,6 @@ class SpoCustomActionSetCommand extends SpoCommand {
         return this.searchAllScopes(args.options, siteAccessToken, cmd);
       })
       .then((customAction: CustomAction | undefined): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(customAction);
-          cmd.log('');
-        }
         if (this.verbose) {
           if (customAction && customAction["odata.null"] === true) {
             cmd.log(`Custom action with id ${args.options.id} not found`);
@@ -346,25 +333,19 @@ class SpoCustomActionSetCommand extends SpoCommand {
       `);
   }
 
-  private updateCustomAction(options: Options, siteAccessToken: string, cmd: CommandInstance): request.RequestPromise {
+  private updateCustomAction(options: Options, siteAccessToken: string, cmd: CommandInstance): Promise<undefined> {
     const requestBody: any = this.mapRequestBody(options);
 
     const requestOptions: any = {
       url: `${options.url}/_api/${options.scope}/UserCustomActions('${encodeURIComponent(options.id)}')`,
-      headers: Utils.getRequestHeaders({
+      headers: {
         authorization: `Bearer ${siteAccessToken}`,
         accept: 'application/json;odata=nometadata',
         'X-HTTP-Method': 'MERGE'
-      }),
+      },
       body: requestBody,
       json: true
     };
-
-    if (this.debug) {
-      cmd.log('Executing web request...');
-      cmd.log(requestOptions);
-      cmd.log('');
-    }
 
     return request.post(requestOptions);
   }
@@ -381,12 +362,6 @@ class SpoCustomActionSetCommand extends SpoCommand {
       this
         .updateCustomAction(options, siteAccessToken, cmd)
         .then((webResult: CustomAction | undefined): void => {
-          if (this.debug) {
-            cmd.log('updateCustomAction with scope of web result...');
-            cmd.log(JSON.stringify(webResult));
-            cmd.log('');
-          }
-
           if (webResult === undefined || webResult["odata.null"] !== true) {
             return resolve(webResult);
           }
@@ -395,11 +370,6 @@ class SpoCustomActionSetCommand extends SpoCommand {
           this
             .updateCustomAction(options, siteAccessToken, cmd)
             .then((siteResult: CustomAction | undefined): void => {
-              if (this.debug) {
-                cmd.log('updateCustomAction with scope of site result...');
-                cmd.log(JSON.stringify(siteResult));
-                cmd.log('');
-              }
               return resolve(siteResult);
             }, (err: any): void => {
               reject(err);

@@ -6,7 +6,7 @@ import {
   CommandOption, CommandValidate
 } from '../../../../Command';
 import Utils from '../../../../Utils';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import GraphCommand from '../../GraphCommand';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -42,74 +42,44 @@ class GraphTeamsUserRemoveCommand extends GraphCommand {
     const removeUser: () => void = (): void => {
       auth
         .ensureAccessToken(auth.service.resource, cmd, this.debug)
-        .then((): request.RequestPromise => {
+        .then((): Promise<{ value: string; }> => {
           const requestOptions: any = {
             url: `${auth.service.resource}/v1.0/users/${encodeURIComponent(args.options.userName)}/id`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${auth.service.accessToken}`,
               accept: 'application/json;odata.metadata=none'
-            }),
+            },
             json: true
           };
 
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
-
           return request.get(requestOptions);
         })
-        .then((res: { value: string; }): request.RequestPromise => {
-          if (this.debug) {
-            cmd.log('Response:')
-            cmd.log(res);
-            cmd.log('');
-          }
-
+        .then((res: { value: string; }): Promise<{}> => {
           userId = res.value;
 
           const requestOptions: any = {
             url: `${auth.service.resource}/v1.0/groups/${args.options.teamId}/owners?$select=id,displayName,userPrincipalName,userType`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${auth.service.accessToken}`,
               accept: 'application/json;odata.metadata=none'
-            }),
+            },
             json: true
           };
 
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
-
           return request.get(requestOptions);
         })
-        .then((res: any): Promise<void> | request.RequestPromise => {
-          if (this.debug) {
-            cmd.log('Response:')
-            cmd.log(res);
-            cmd.log('');
-          }
-
+        .then((res: any): Promise<void> => {
           const userIsOwner: boolean = (res.value.filter((i: any) => i.userPrincipalName === args.options.userName).length > 0);
 
           const endpoint: string = `${auth.service.resource}/v1.0/groups/${args.options.teamId}/${userIsOwner ? 'owners' : 'members'}/${userId}/$ref`;
 
           const requestOptions: any = {
             url: endpoint,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${auth.service.accessToken}`,
               'accept': 'application/json;odata.metadata=none'
-            }),
+            },
           };
-
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
 
           return request.delete(requestOptions);
         })

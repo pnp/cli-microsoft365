@@ -2,7 +2,7 @@ import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate
@@ -60,15 +60,8 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise | Promise<{ value: string; }> => {
+      .then((accessToken: string): Promise<{ value: string; }> => {
         siteAccessToken = accessToken;
-
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}.`);
-          cmd.log(``);
-          cmd.log(`auth object:`);
-          cmd.log(auth);
-        }
 
         if (typeof args.options.listId !== 'undefined') {
           return Promise.resolve({ value: args.options.listId });
@@ -79,28 +72,16 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
         }
         const listRequestOptions: any = {
           url: `${listRestUrl}/id`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata'
-          }),
+          },
           json: true
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request for list id...');
-          cmd.log(listRequestOptions);
-          cmd.log('');
-        }
-
         return request.get(listRequestOptions);
       })
-      .then((res: { value: string }): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log(`Response:`);
-          cmd.log(res);
-          cmd.log('');
-        }
-
+      .then((res: { value: string }): Promise<ContextInfo> => {
         environmentListId = res.value;
 
         if (this.debug) {
@@ -110,42 +91,24 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
         return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
       })
       .then((res: ContextInfo): Promise<IdentityResponse> => {
-        if (this.debug) {
-          cmd.log('Response:')
-          cmd.log(res);
-          cmd.log('');
-        }
-
         formDigestValue = res.FormDigestValue;
 
         return clientSvcCommons.getCurrentWebIdentity(args.options.webUrl, siteAccessToken, formDigestValue);
       })
-      .then((objectIdentity: IdentityResponse): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(JSON.stringify(objectIdentity));
-          cmd.log('');
-        }
-
+      .then((objectIdentity: IdentityResponse): Promise<void> => {
         if (this.verbose) {
           cmd.log(`Undeclare list item as a record in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
         }
 
         const requestOptions: any = {
           url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'Content-Type': 'text/xml',
             'X-RequestDigest': formDigestValue,
-          }),
+          },
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><StaticMethod TypeId="{ea8e1356-5910-4e69-bc05-d0c30ed657fc}" Name="UndeclareItemAsRecord" Id="53"><Parameters><Parameter ObjectPathId="49" /></Parameters></StaticMethod></Actions><ObjectPaths><Identity Id="49" Name="${objectIdentity.objectIdentity}:list:${environmentListId}:item:${args.options.id},1" /></ObjectPaths></Request>`
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.post(requestOptions);
       })

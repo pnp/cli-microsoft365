@@ -5,7 +5,7 @@ import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
 const command: Command = require('./customaction-set');
 import * as assert from 'assert';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.CUSTOMACTION_SET, () => {
@@ -561,7 +561,7 @@ describe(commands.CUSTOMACTION_SET, () => {
     cmdInstance.action({ options: options }, () => {
 
       try {
-        assert(postRequestSpy.calledTwice === true, 'postRequestSpy.calledOnce');
+        assert(postRequestSpy.calledOnce === true, 'postRequestSpy.calledOnce');
         assert(updateCustomActionSpy.calledWith({
           id: 'b2307a39-e878-458b-bc90-03bc578531d6',
           url: 'https://contoso.sharepoint.com',
@@ -609,7 +609,7 @@ describe(commands.CUSTOMACTION_SET, () => {
     cmdInstance.action({ options: options }, () => {
 
       try {
-        assert(postRequestSpy.calledTwice === true, 'postRequestSpy.calledOnce');
+        assert(postRequestSpy.calledOnce === true, 'postRequestSpy.calledOnce');
         assert(updateCustomActionSpy.calledWith(
           {
             id: 'b2307a39-e878-458b-bc90-03bc578531d6',
@@ -660,8 +660,8 @@ describe(commands.CUSTOMACTION_SET, () => {
     }, () => {
 
       try {
-        assert(postRequestSpy.calledTwice === true);
-        assert(updateCustomActionSpy.calledOnce === true);
+        assert(postRequestSpy.calledOnce === true, 'postRequest');
+        assert(updateCustomActionSpy.calledOnce === true, 'updateCustomAction');
         done();
       }
       catch (e) {
@@ -705,10 +705,9 @@ describe(commands.CUSTOMACTION_SET, () => {
         url: 'https://contoso.sharepoint.com'
       }
     }, () => {
-
       try {
-        assert(postRequestSpy.calledThrice === true);
-        assert(updateCustomActionSpy.calledTwice === true);
+        assert(postRequestSpy.calledTwice === true, 'postRequest');
+        assert(updateCustomActionSpy.calledTwice === true, 'updateCustomAction');
         done();
       }
       catch (e) {

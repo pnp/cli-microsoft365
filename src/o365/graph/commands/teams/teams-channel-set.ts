@@ -7,7 +7,7 @@ import {
 } from '../../../../Command';
 import GraphCommand from '../../GraphCommand';
 import Utils from '../../../../Utils';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import { Channel } from './Channel';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -41,31 +41,19 @@ class GraphTeamsChannelSetCommand extends GraphCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((): request.RequestPromise => {
+      .then((): Promise<{ value: Channel[]; }> => {
         const requestOptions: any = {
           url: `${auth.service.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels?$filter=displayName eq '${encodeURIComponent(args.options.channelName)}'`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${auth.service.accessToken}`,
             accept: 'application/json;odata.metadata=none'
-          }),
+          },
           json: true
-        }
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
         }
 
         return request.get(requestOptions);
       })
-      .then((res: { value: Channel[] }): request.RequestPromise | Promise<void> => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
+      .then((res: { value: Channel[] }): Promise<void> => {
         const channelItem: Channel | undefined = res.value[0];
 
         if (!channelItem) {
@@ -76,19 +64,13 @@ class GraphTeamsChannelSetCommand extends GraphCommand {
         const body: any = this.mapRequestBody(args.options);
         const requestOptions: any = {
           url: `${auth.service.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels/${channelId}`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${auth.service.accessToken}`,
             'accept': 'application/json;odata.metadata=none'
-          }),
+          },
           json: true,
           body: body
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.patch(requestOptions);
       })

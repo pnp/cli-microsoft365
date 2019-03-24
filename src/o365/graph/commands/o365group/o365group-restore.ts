@@ -2,7 +2,7 @@ import auth from '../../GraphAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate
@@ -39,7 +39,7 @@ class GraphO365GroupRestoreCommand extends GraphCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise | Promise<void> => {
+      .then((accessToken: string): Promise<void> => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}.`);
         }
@@ -50,17 +50,11 @@ class GraphO365GroupRestoreCommand extends GraphCommand {
 
         const requestOptions: any = {
           url: `${auth.service.resource}/v1.0/directory/deleteditems/${args.options.id}/restore/`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${accessToken}`,
             'accept': 'application/json;odata.metadata=none'
-          }),
+          },
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.post(requestOptions);
       })

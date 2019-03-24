@@ -7,7 +7,7 @@ import {
 } from '../../../../Command';
 import Utils from '../../../../Utils';
 import GraphCommand from '../../GraphCommand';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
 interface CommandArgs {
@@ -40,7 +40,7 @@ class GraphTeamsAddCommand extends GraphCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((): request.RequestPromise => {
+      .then((): Promise<{}> => {
         return args.options.groupId ? this.createTeamForGroup(cmd, args) :
           this.createTeam(cmd, args);
       })
@@ -61,15 +61,15 @@ class GraphTeamsAddCommand extends GraphCommand {
       });
   }
 
-  private createTeam(cmd: CommandInstance, args: CommandArgs): request.RequestPromise {
+  private createTeam(cmd: CommandInstance, args: CommandArgs): Promise<{}> {
     const requestOptions: any = {
       url: `${auth.service.resource}/beta/teams`,
       resolveWithFullResponse: true,
-      headers: Utils.getRequestHeaders({
+      headers: {
         authorization: `Bearer ${auth.service.accessToken}`,
         accept: 'application/json;odata.metadata=none',
         'content-type': 'application/json;odata.metadata=none'
-      }),
+      },
       body: {
         'template@odata.bind': 'https://graph.microsoft.com/beta/teamsTemplates/standard',
         displayName: args.options.name,
@@ -78,33 +78,21 @@ class GraphTeamsAddCommand extends GraphCommand {
       json: true
     };
 
-    if (this.debug) {
-      cmd.log('Executing web request...');
-      cmd.log(requestOptions);
-      cmd.log('');
-    }
-
     return request.post(requestOptions);
   }
 
-  private createTeamForGroup(cmd: CommandInstance, args: CommandArgs): request.RequestPromise {
+  private createTeamForGroup(cmd: CommandInstance, args: CommandArgs): Promise<{}> {
     const requestOptions: any = {
       url: `${auth.service.resource}/beta/groups/${args.options.groupId}/team`,
       resolveWithFullResponse: true,
-      headers: Utils.getRequestHeaders({
+      headers: {
         authorization: `Bearer ${auth.service.accessToken}`,
         accept: 'application/json;odata.metadata=none',
         'content-type': 'application/json;odata.metadata=none'
-      }),
+      },
       body: {},
       json: true
     };
-
-    if (this.debug) {
-      cmd.log('Executing web request...');
-      cmd.log(requestOptions);
-      cmd.log('');
-    }
 
     return request.put(requestOptions);
   }

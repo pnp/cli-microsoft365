@@ -2,13 +2,12 @@ import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import Utils from '../../../../Utils';
 import { WebPropertiesCollection } from "./WebPropertiesCollection";
 import { Auth } from '../../../../Auth';
 
@@ -40,7 +39,7 @@ class SpoWebGetCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<WebPropertiesCollection> => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}.`);
         }
@@ -51,27 +50,16 @@ class SpoWebGetCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${accessToken}`,
             'accept': 'application/json;odata=nometadata'
-          }),
+          },
           json: true
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.get(requestOptions);
       })
       .then((webProperties: WebPropertiesCollection): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(webProperties);
-          cmd.log('');
-        }
         cmd.log(webProperties);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));

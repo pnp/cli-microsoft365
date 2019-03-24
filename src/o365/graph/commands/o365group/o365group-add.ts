@@ -2,14 +2,13 @@ import auth from '../../GraphAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import * as fs from 'fs';
 import * as path from 'path';
 import {
   CommandOption,
   CommandValidate
 } from '../../../../Command';
-import Utils from '../../../../Utils';
 import GraphCommand from '../../GraphCommand';
 import { Group } from './Group';
 
@@ -45,7 +44,7 @@ class GraphO365GroupAddCommand extends GraphCommand {
 
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<Group> => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}.`);
         }
@@ -56,10 +55,10 @@ class GraphO365GroupAddCommand extends GraphCommand {
 
         const requestOptions: any = {
           url: `${auth.service.resource}/v1.0/groups`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${accessToken}`,
             'accept': 'application/json;odata.metadata=none'
-          }),
+          },
           json: true,
           body: {
             description: args.options.description,
@@ -74,21 +73,9 @@ class GraphO365GroupAddCommand extends GraphCommand {
           }
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return request.post(requestOptions);
       })
       .then((res: Group): Promise<void> => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
         group = res;
 
         if (!args.options.logoPath) {
@@ -106,10 +93,10 @@ class GraphO365GroupAddCommand extends GraphCommand {
 
         const requestOptions: any = {
           url: `${auth.service.resource}/v1.0/groups/${group.id}/photo/$value`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${auth.service.accessToken}`,
             'content-type': this.getImageContentType(fullPath)
-          }),
+          },
           body: fs.readFileSync(fullPath)
         };
 
@@ -117,13 +104,13 @@ class GraphO365GroupAddCommand extends GraphCommand {
           this.setGroupLogo(requestOptions, GraphO365GroupAddCommand.numRepeat, resolve, reject, cmd);
         });
       })
-      .then((): request.RequestPromise | Promise<void> => {
+      .then((): Promise<{ value: { id: string; }[] }> => {
         if (!args.options.owners) {
           if (this.debug) {
             cmd.log('Owners not set. Skipping');
           }
 
-          return Promise.resolve();
+          return Promise.resolve(undefined as any);
         }
 
         const owners: string[] = args.options.owners.split(',').map(o => o.trim());
@@ -134,18 +121,12 @@ class GraphO365GroupAddCommand extends GraphCommand {
 
         const requestOptions: any = {
           url: `${auth.service.resource}/v1.0/users?$filter=${owners.map(o => `userPrincipalName eq '${o}'`).join(' or ')}&$select=id`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${auth.service.accessToken}`,
             'content-type': 'application/json'
-          }),
+          },
           json: true
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.get(requestOptions);
       })
@@ -156,23 +137,23 @@ class GraphO365GroupAddCommand extends GraphCommand {
 
         return Promise.all(res.value.map(u => request.post({
           url: `${auth.service.resource}/v1.0/groups/${group.id}/owners/$ref`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${auth.service.accessToken}`,
             'content-type': 'application/json'
-          }),
+          },
           json: true,
           body: {
             "@odata.id": `https://graph.microsoft.com/v1.0/users/${u.id}`
           }
         })));
       })
-      .then((): request.RequestPromise | Promise<void> => {
+      .then((): Promise<{ value: { id: string; }[] }> => {
         if (!args.options.members) {
           if (this.debug) {
             cmd.log('Members not set. Skipping');
           }
 
-          return Promise.resolve();
+          return Promise.resolve(undefined as any);
         }
 
         const members: string[] = args.options.members.split(',').map(o => o.trim());
@@ -183,18 +164,12 @@ class GraphO365GroupAddCommand extends GraphCommand {
 
         const requestOptions: any = {
           url: `${auth.service.resource}/v1.0/users?$filter=${members.map(o => `userPrincipalName eq '${o}'`).join(' or ')}&$select=id`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${auth.service.accessToken}`,
             'content-type': 'application/json'
-          }),
+          },
           json: true
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.get(requestOptions);
       })
@@ -205,10 +180,10 @@ class GraphO365GroupAddCommand extends GraphCommand {
 
         return Promise.all(res.value.map(u => request.post({
           url: `${auth.service.resource}/v1.0/groups/${group.id}/members/$ref`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${auth.service.accessToken}`,
             'content-type': 'application/json'
-          }),
+          },
           json: true,
           body: {
             "@odata.id": `https://graph.microsoft.com/v1.0/users/${u.id}`
@@ -227,29 +202,11 @@ class GraphO365GroupAddCommand extends GraphCommand {
   }
 
   private setGroupLogo(requestOptions: any, retryLeft: number, resolve: () => void, reject: (err: any) => void, cmd: CommandInstance): void {
-    if (this.debug) {
-      cmd.log('Executing web request...');
-      cmd.log(requestOptions);
-      cmd.log('');
-    }
-
     request
       .put(requestOptions)
       .then((res: any): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
         resolve();
       }, (err: any): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(err);
-          cmd.log('');
-        }
-
         if (--retryLeft > 0) {
           setTimeout(() => {
             this.setGroupLogo(requestOptions, retryLeft, resolve, reject, cmd);

@@ -2,7 +2,7 @@ import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate
@@ -61,7 +61,7 @@ class SpoListViewFieldRemoveCommand extends SpoCommand {
 
       auth
         .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-        .then((accessToken: string): request.RequestPromise => {
+        .then((accessToken: string): Promise<{ InternalName: string; }> => {
           siteAccessToken = accessToken;
           if (this.debug) {
             cmd.log(`Retrieved access token ${accessToken}.`);
@@ -73,12 +73,7 @@ class SpoListViewFieldRemoveCommand extends SpoCommand {
 
           return this.getField(args.options, listSelector, siteAccessToken, cmd, this.debug);
         })
-        .then((field: { InternalName: string; }): request.RequestPromise => {
-          if (this.debug) {
-            cmd.log(`getField response...`);
-            cmd.log(field);
-          }
-
+        .then((field: { InternalName: string; }): Promise<void> => {
           if (this.verbose) {
             cmd.log(`Removing field ${args.options.fieldId || args.options.fieldTitle} from view ${args.options.viewId || args.options.viewTitle}...`);
           }
@@ -88,18 +83,12 @@ class SpoListViewFieldRemoveCommand extends SpoCommand {
 
           const postRequestOptions: any = {
             url: postRequestUrl,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${siteAccessToken}`,
               'accept': 'application/json;odata=nometadata'
-            }),
+            },
             json: true
           };
-
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(postRequestOptions);
-            cmd.log('');
-          }
 
           return request.post(postRequestOptions);
         })
@@ -129,24 +118,18 @@ class SpoListViewFieldRemoveCommand extends SpoCommand {
     }
   }
 
-  private getField(options: Options, listSelector: string, siteAccessToken: string, cmd: CommandInstance, debug: boolean): request.RequestPromise {
+  private getField(options: Options, listSelector: string, siteAccessToken: string, cmd: CommandInstance, debug: boolean): Promise<{ InternalName: string; }> {
     const fieldSelector: string = options.fieldId ? `/getbyid('${encodeURIComponent(options.fieldId)}')` : `/getbyinternalnameortitle('${encodeURIComponent(options.fieldTitle as string)}')`;
     const getRequestUrl: string = `${options.webUrl}/_api/web/lists${listSelector}/fields${fieldSelector}`;
 
     const requestOptions: any = {
       url: getRequestUrl,
-      headers: Utils.getRequestHeaders({
+      headers: {
         authorization: `Bearer ${siteAccessToken}`,
         'accept': 'application/json;odata=nometadata'
-      }),
+      },
       json: true
     };
-
-    if (debug) {
-      cmd.log('Executing web request...');
-      cmd.log(requestOptions);
-      cmd.log('');
-    }
 
     return request.get(requestOptions);
   }

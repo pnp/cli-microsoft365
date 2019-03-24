@@ -1,7 +1,7 @@
 import auth from '../../SpoAuth';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import config from '../../../../config';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
@@ -55,7 +55,7 @@ class SpoSiteSetCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise | Promise<{ Id: string }> => {
+      .then((accessToken: string): Promise<{ Id: string }> => {
         siteAccessToken = accessToken;
 
         if (this.debug) {
@@ -68,29 +68,17 @@ class SpoSiteSetCommand extends SpoCommand {
         else {
           const requestOptions: any = {
             url: `${args.options.url}/_api/site?$select=Id`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${siteAccessToken}`,
               accept: 'application/json;odata=nometadata'
-            }),
+            },
             json: true
           };
-
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
 
           return request.get(requestOptions);
         }
       })
-      .then((res: { Id: string }): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log('Response:')
-          cmd.log(res);
-          cmd.log('');
-        }
-
+      .then((res: { Id: string }): Promise<ContextInfo> => {
         siteId = res.Id;
 
         if (this.verbose) {
@@ -99,13 +87,7 @@ class SpoSiteSetCommand extends SpoCommand {
 
         return this.getRequestDigestForSite(args.options.url, siteAccessToken, cmd, this.debug);
       })
-      .then((res: ContextInfo): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log('Response:')
-          cmd.log(res);
-          cmd.log('');
-        }
-
+      .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
           cmd.log(`Updating site ${args.options.url} properties...`);
         }
@@ -115,28 +97,16 @@ class SpoSiteSetCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${args.options.url}/_vti_bin/client.svc/ProcessQuery`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'X-RequestDigest': res.FormDigestValue
-          }),
+          },
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${classification}${disableFlows}</Actions><ObjectPaths><Identity Id="5" Name="e10a459e-60c8-4000-8240-a68d6a12d39e|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${siteId}" /></ObjectPaths></Request>`
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.post(requestOptions);
       })
       .then((res: string): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
         const json: ClientSvcResponse = JSON.parse(res);
         const response: ClientSvcResponseContents = json[0];
         if (response.ErrorInfo) {

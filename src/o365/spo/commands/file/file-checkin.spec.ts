@@ -5,7 +5,7 @@ import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
 const command: Command = require('./file-checkin');
 import * as assert from 'assert';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.FILE_CHECKIN, () => {
@@ -15,7 +15,7 @@ describe(commands.FILE_CHECKIN, () => {
   let cmdInstanceLogSpy: sinon.SinonSpy;
   let trackEvent: any;
   let telemetry: any;
-  let stubPostResponses: any = (getFileByServerRelativeUrlResp = null, getFileByIdResp = null) => {
+  let stubPostResponses: any = (getFileByServerRelativeUrlResp: any = null, getFileByIdResp: any = null) => {
     return sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf('/common/oauth2/token') > -1) {
         return Promise.resolve('abc');

@@ -1,12 +1,11 @@
 import auth from '../../SpoAuth';
 import config from '../../../../config';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import commands from '../../commands';
 import {
   CommandOption, CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import Utils from '../../../../Utils';
 import { ContextInfo } from '../../spo';
 import GlobalOptions from '../../../../GlobalOptions';
 import { Auth } from '../../../../Auth';
@@ -39,7 +38,7 @@ class SpoFieldAddCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<ContextInfo> => {
         siteAccessToken = accessToken;
 
         if (this.debug) {
@@ -52,20 +51,14 @@ class SpoFieldAddCommand extends SpoCommand {
 
         return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
       })
-      .then((res: ContextInfo): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log('Response:')
-          cmd.log(res);
-          cmd.log('');
-        }
-
+      .then((res: ContextInfo): Promise<{}> => {
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/${(args.options.listTitle ? `lists/getByTitle('${encodeURIComponent(args.options.listTitle)}')/` : '')}fields/CreateFieldAsXml`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'X-RequestDigest': res.FormDigestValue,
             accept: 'application/json;odata=nometadata'
-          }),
+          },
           body: {
             parameters: {
               SchemaXml: args.options.xml,
@@ -75,21 +68,9 @@ class SpoFieldAddCommand extends SpoCommand {
           json: true
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return request.post(requestOptions);
       })
       .then((res: any): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
         cmd.log(res);
 
         if (this.verbose) {

@@ -3,12 +3,11 @@ import config from '../../../../config';
 import commands from '../../commands';
 import * as path from 'path';
 import * as fs from 'fs';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandOption, CommandValidate
 } from '../../../../Command';
-import Utils from '../../../../Utils';
 import GraphCommand from '../../GraphCommand';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -47,7 +46,7 @@ class GraphUserSendmailCommand extends GraphCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((): request.RequestPromise => {
+      .then((): Promise<{}> => {
         let bodyContents: string = args.options.bodyContents as string;
         if (args.options.bodyContentsFilePath) {
           bodyContents = fs.readFileSync(path.resolve(args.options.bodyContentsFilePath), 'utf-8');
@@ -55,11 +54,11 @@ class GraphUserSendmailCommand extends GraphCommand {
 
         const requestOptions: any = {
           url: `${auth.service.resource}/v1.0/me/sendMail`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${auth.service.accessToken}`,
             accept: 'application/json;odata.metadata=none',
             'content-type': 'application/json'
-          }),
+          },
           json: true,
           body: {
             message: {
@@ -80,21 +79,9 @@ class GraphUserSendmailCommand extends GraphCommand {
           }
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return request.post(requestOptions);
       })
       .then((res: any): void => {
-        if (this.debug) {
-          cmd.log('Response:')
-          cmd.log(res);
-          cmd.log('');
-        }
-
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
         }

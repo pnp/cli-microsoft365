@@ -2,13 +2,12 @@ import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import Utils from '../../../../Utils';
 import { Auth } from '../../../../Auth';
 import * as url from 'url';
 
@@ -71,7 +70,7 @@ class SpoFolderMoveCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<any> => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}.`);
         }
@@ -83,10 +82,10 @@ class SpoFolderMoveCommand extends SpoCommand {
         const requestUrl: string = this.urlCombine(webUrl, '/_api/site/CreateCopyJobs');
         const requestOptions: any = {
           url: requestUrl,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata'
-          }),
+          },
           body: {
             exportObjectUris: [sourceAbsoluteUrl],
             destinationUri: this.urlCombine(tenantUrl, args.options.targetUrl),
@@ -99,19 +98,9 @@ class SpoFolderMoveCommand extends SpoCommand {
           json: true
         };
 
-        if (this.debug) {
-          cmd.log('CreateCopyJobs request...');
-          cmd.log(requestOptions);
-        }
-
         return request.post(requestOptions);
       })
       .then((jobInfo: any): Promise<void> => {
-        if (this.debug) {
-          cmd.log('CreateCopyJobs response...');
-          cmd.log(jobInfo);
-        }
-
         const jobProgressOptions: JobProgressOptions = {
           webUrl: webUrl,
           accessToken: siteAccessToken,
@@ -146,74 +135,71 @@ class SpoFolderMoveCommand extends SpoCommand {
       const requestUrl: string = `${opts.webUrl}/_api/site/GetCopyJobProgress`;
       const requestOptions: any = {
         url: requestUrl,
-        headers: Utils.getRequestHeaders({
+        headers: {
           authorization: `Bearer ${opts.accessToken}`,
           'accept': 'application/json;odata=nometadata'
-        }),
+        },
         body: { "copyJobInfo": opts.copyJopInfo },
         json: true
       };
 
-      if (this.debug) {
-        cmd.log('getCopyJobProgress request...');
-        cmd.log(requestOptions);
-      }
+      request
+        .post<{ JobState?: number, Logs: string[] }>(requestOptions)
+        .then((resp: { JobState?: number, Logs: string[] }): void => {
+          retryAttemptsCount = 0; // clear retry on promise success 
 
-      request.post(requestOptions).then((resp: { JobState?: number, Logs: string[] }): void => {
-        retryAttemptsCount = 0; // clear retry on promise success 
-
-        if (this.debug) {
-          cmd.log('getCopyJobProgress response...');
-          cmd.log(resp);
-        }
-
-        if (this.verbose) {
-          if (resp.JobState && resp.JobState === 4) {
-            cmd.log(`Check #${pollCount}. Copy job in progress... JobState: ${resp.JobState}`);
+          if (this.debug) {
+            cmd.log('getCopyJobProgress response...');
+            cmd.log(resp);
           }
-          else {
-            cmd.log(`Check #${pollCount}. JobState: ${resp.JobState}`);
+
+          if (this.verbose) {
+            if (resp.JobState && resp.JobState === 4) {
+              cmd.log(`Check #${pollCount}. Copy job in progress... JobState: ${resp.JobState}`);
+            }
+            else {
+              cmd.log(`Check #${pollCount}. JobState: ${resp.JobState}`);
+            }
           }
-        }
 
-        for (const item of resp.Logs) {
-          const log: { Event: string; Message: string } = JSON.parse(item);
+          for (const item of resp.Logs) {
+            const log: { Event: string; Message: string } = JSON.parse(item);
 
-          // reject if progress error 
-          if (log.Event === "JobError" || log.Event === "JobFatalError") {
-            return reject(log.Message);
+            // reject if progress error 
+            if (log.Event === "JobError" || log.Event === "JobFatalError") {
+              return reject(log.Message);
+            }
           }
-        }
 
-        // three possible scenarios
-        // job done = success promise returned
-        // job in progress = recursive call using setTimeout returned
-        // max poll attempts flag raised = reject promise returned
-        if (resp.JobState === 0) {
-          // job done
-          resolve();
-        }
-        else if (pollCount < opts.progressMaxPollAttempts) {
-          // if the condition isn't met but the timeout hasn't elapsed, go again
-          setTimeout(checkCondition, opts.progressPollInterval, resolve, reject);
-        }
-        else {
-          reject(new Error('getCopyJobProgress timed out'));
-        }
-      },
-        (error: any) => {
-          retryAttemptsCount++;
-
-          // let's retry x times in row before we give up since
-          // this is progress check and even if rejects a promise
-          // the actual move process can success.
-          if (retryAttemptsCount <= opts.progressRetryAttempts) {
+          // three possible scenarios
+          // job done = success promise returned
+          // job in progress = recursive call using setTimeout returned
+          // max poll attempts flag raised = reject promise returned
+          if (resp.JobState === 0) {
+            // job done
+            resolve();
+          }
+          else if (pollCount < opts.progressMaxPollAttempts) {
+            // if the condition isn't met but the timeout hasn't elapsed, go again
             setTimeout(checkCondition, opts.progressPollInterval, resolve, reject);
           }
           else {
-            reject(error);
+            reject(new Error('getCopyJobProgress timed out'));
           }
-        });
+        },
+          (error: any) => {
+            retryAttemptsCount++;
+
+            // let's retry x times in row before we give up since
+            // this is progress check and even if rejects a promise
+            // the actual move process can success.
+            if (retryAttemptsCount <= opts.progressRetryAttempts) {
+              setTimeout(checkCondition, opts.progressPollInterval, resolve, reject);
+            }
+            else {
+              reject(error);
+            }
+          });
     };
 
     return new Promise<void>(checkCondition);

@@ -1,4 +1,4 @@
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import auth from '../../GraphAuth';
 import Utils from '../../../../Utils';
 import config from '../../../../config';
@@ -38,30 +38,18 @@ class GraphTeamsAppRemoveCommand extends GraphCommand {
 
     const removeApp: () => void = (): void => {
       auth.ensureAccessToken(auth.service.resource, cmd, this.debug)
-        .then((): request.RequestPromise => {
+        .then((): Promise<string> => {
           const requestOptions: any = {
             url: `${auth.service.resource}/v1.0/appCatalogs/teamsApps/${appId}`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${auth.service.accessToken}`,
               accept: 'application/json;odata.metadata=none'
-            })
+            }
           };
-
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
 
           return request.delete(requestOptions);
         })
         .then((res: string): void => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
-          }
-
           if (this.verbose) {
             cmd.log(vorpal.chalk.green('DONE'));
           }

@@ -2,13 +2,12 @@ import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import { ContextInfo } from '../../spo';
 import Utils from '../../../../Utils';
 import { ListInstance } from "./ListInstance";
 import { Auth } from '../../../../Auth';
@@ -51,20 +50,11 @@ class ListGetCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<ListInstance> => {
         siteAccessToken = accessToken;
 
         if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
-
-        return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
-      })
-      .then((res: ContextInfo): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
+          cmd.log(`Retrieved access token ${accessToken}`);
         }
 
         if (this.verbose) {
@@ -83,28 +73,16 @@ class ListGetCommand extends SpoCommand {
         const requestOptions: any = {
           url: requestUrl,
           method: 'GET',
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata'
-          }),
+          },
           json: true
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.get(requestOptions);
       })
       .then((listInstance: ListInstance): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(listInstance);
-          cmd.log('');
-        }
-
         cmd.log(listInstance);
 
         cb();

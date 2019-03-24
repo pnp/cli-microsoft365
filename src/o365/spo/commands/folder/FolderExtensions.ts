@@ -1,4 +1,4 @@
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
 import * as url from 'url';
 
@@ -79,27 +79,15 @@ export class FolderExtensions {
 
       const requestOptions: any = {
         url: `${webFullUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderServerRelativeUrl)}')`,
-        headers: Utils.getRequestHeaders({
+        headers: {
           authorization: `Bearer ${siteAccessToken}`,
           'accept': 'application/json;odata=nometadata'
-        })
+        }
       };
 
-      if (this.debug) {
-        this.cmd.log(`Check if ${nextFolder} exists`);
-        this.cmd.log(requestOptions);
-        this.cmd.log('');
-      }
-
-      request.get(requestOptions)
-        .then((res: any) => {
-
-          if (this.debug) {
-            this.cmd.log(`${nextFolder} exists. Moving to the next one`);
-            this.cmd.log(res);
-            this.cmd.log('');
-          }
-
+      request
+        .get(requestOptions)
+        .then(() => {
           folderIndex++;
           checkOrAddFolder(resolve, reject);
         })
@@ -107,33 +95,19 @@ export class FolderExtensions {
           const prevFolderServerRelativeUrl: string = Utils.getServerRelativePath(webFullUrl, prevFolder);
           const requestOptions: any = {
             url: `${webFullUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27${encodeURIComponent(prevFolderServerRelativeUrl)}%27&@a2=%27${encodeURIComponent(folders[folderIndex])}%27`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${siteAccessToken}`,
               'accept': 'application/json;odata=nometadata'
-            }),
+            },
             json: true
           };
 
-          if (this.debug) {
-            this.cmd.log(`Add folder ${folderServerRelativeUrl}`);
-            this.cmd.log(requestOptions);
-            this.cmd.log('');
-          }
-
           return request.post(requestOptions)
             .then((res: any) => {
-
-              if (this.debug) {
-                this.cmd.log(`Folder ${folderServerRelativeUrl} added`);
-                this.cmd.log(JSON.stringify(res));
-                this.cmd.log('');
-              }
-
               folderIndex++;
               checkOrAddFolder(resolve, reject);
             })
             .catch((err: any) => {
-
               if (this.debug) {
                 this.cmd.log(`Could not create sub-folder ${folderServerRelativeUrl}`);
               }

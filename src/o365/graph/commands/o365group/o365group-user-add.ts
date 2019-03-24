@@ -6,7 +6,7 @@ import {
   CommandOption, CommandValidate
 } from '../../../../Command';
 import Utils from '../../../../Utils';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import GraphCommand from '../../GraphCommand';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -48,48 +48,30 @@ class GraphO365GroupUserAddCommand extends GraphCommand {
 
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((): request.RequestPromise => {
+      .then((): Promise<{ value: string; }> => {
         const requestOptions: any = {
           url: `${auth.service.resource}/v1.0/users/${encodeURIComponent(args.options.userName)}/id`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${auth.service.accessToken}`,
             accept: 'application/json;odata.metadata=none'
-          }),
+          },
           json: true
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return request.get(requestOptions);
       })
-      .then((res: { value: string; }): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log('Response:')
-          cmd.log(res);
-          cmd.log('');
-        }
-
+      .then((res: { value: string; }): Promise<{}> => {
         const endpoint: string = `${auth.service.resource}/v1.0/groups/${providedGroupId}/${((typeof args.options.role !== 'undefined') ? args.options.role : '').toLowerCase() === 'owner' ? 'owners' : 'members'}/$ref`;
 
         const requestOptions: any = {
           url: endpoint,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${auth.service.accessToken}`,
             'accept': 'application/json;odata.metadata=none'
-          }),
+          },
           json: true,
           body: { "@odata.id": "https://graph.microsoft.com/v1.0/directoryObjects/" + res.value }
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.post(requestOptions);
       })

@@ -33,7 +33,9 @@ const loadAllCommands = (rootFolder: string): void => {
           cmd.init(vorpal);
         }
       }
-      catch { }
+      catch (e) {
+        console.log(e);
+      }
     }
   });
 };
@@ -126,6 +128,7 @@ fs.realpath(__dirname, (err: NodeJS.ErrnoException, resolvedPath: string): void 
   });
 
   let v: Vorpal | null = null;
+
   try {
     if (process.argv.length > 2) {
       vorpal.delimiter('');

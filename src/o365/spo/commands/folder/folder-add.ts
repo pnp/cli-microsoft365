@@ -2,7 +2,7 @@ import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate
@@ -39,7 +39,7 @@ class SpoFolderAddCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<FolderProperties> => {
         siteAccessToken = accessToken;
 
         if (this.debug) {
@@ -55,21 +55,15 @@ class SpoFolderAddCommand extends SpoCommand {
         const requestUrl: string = `${args.options.webUrl}/_api/web/folders`;
         const requestOptions: any = {
           url: requestUrl,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata',
-          }),
+          },
           body: {
             'ServerRelativeUrl': serverRelativeUrl
           },
           json: true
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.post(requestOptions);
       })

@@ -1,7 +1,7 @@
 import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import { CommandOption, CommandValidate, CommandCancel } from '../../../../Command';
@@ -78,7 +78,7 @@ class SpoSiteClassicSetCommand extends SpoCommand {
 
         return this.ensureFormDigest(cmd, this.context, this.debug);
       })
-      .then((res: FormDigestInfo): request.RequestPromise | Promise<void> => {
+      .then((res: FormDigestInfo): Promise<string> => {
         this.context = res; 
         if (this.verbose) {
           cmd.log(`Setting basic properties ${args.options.url}...`);
@@ -104,7 +104,7 @@ class SpoSiteClassicSetCommand extends SpoCommand {
         }
 
         if (!updateBasicProperties) {
-          return Promise.resolve();
+          return Promise.resolve(undefined as any);
         }
 
         let i: number = 0;
@@ -141,18 +141,12 @@ class SpoSiteClassicSetCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': this.context.FormDigestValue
-          }),
+          },
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${updates.join('')}<ObjectPath Id="14" ObjectPathId="13" /><ObjectIdentityQuery Id="15" ObjectPathId="5" /><Query Id="16" ObjectPathId="13"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="53d8499e-d0d2-5000-cb83-9ade5be42ca4|${auth.site.tenantId.substr(pos, auth.site.tenantId.indexOf('&') - pos)}&#xA;SiteProperties&#xA;${encodeURIComponent(args.options.url)}" /><Method Id="13" ParentId="5" Name="Update" /></ObjectPaths></Request>`
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.post(requestOptions);
       })
@@ -209,25 +203,19 @@ class SpoSiteClassicSetCommand extends SpoCommand {
             });
         });
       })
-      .then((): request.RequestPromise | Promise<void> => {
+      .then((): Promise<string> => {
         if (!args.options.lockState) {
-          return Promise.resolve();
+          return Promise.resolve(undefined as any);
         }
 
         const requestOptions: any = {
           url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': (this.context as FormDigestInfo).FormDigestValue
-          }),
+          },
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="7" ObjectPathId="5" Name="LockState"><Parameter Type="String">${Utils.escapeXml(args.options.lockState)}</Parameter></SetProperty><ObjectPath Id="9" ObjectPathId="8" /><ObjectIdentityQuery Id="10" ObjectPathId="5" /><Query Id="11" ObjectPathId="8"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Method Id="5" ParentId="3" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.url)}</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Id="8" ParentId="5" Name="Update" /><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.post(requestOptions);
       })
@@ -236,12 +224,6 @@ class SpoSiteClassicSetCommand extends SpoCommand {
           if (!res) {
             resolve();
             return;
-          }
-
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
           }
 
           const json: ClientSvcResponse = JSON.parse(res);
@@ -284,32 +266,20 @@ class SpoSiteClassicSetCommand extends SpoCommand {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       this
         .ensureFormDigest(cmd, this.context, this.debug)
-        .then((res: FormDigestInfo): request.RequestPromise => {
+        .then((res: FormDigestInfo): Promise<string> => {
           this.context = res; 
           const requestOptions: any = {
             url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${auth.service.accessToken}`,
               'X-RequestDigest': this.context.FormDigestValue
-            }),
+            },
             body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="48" ObjectPathId="47" /></Actions><ObjectPaths><Method Id="47" ParentId="34" Name="SetSiteAdmin"><Parameters><Parameter Type="String">${Utils.escapeXml(siteUrl)}</Parameter><Parameter Type="String">${Utils.escapeXml(principal)}</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Constructor Id="34" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
           };
-
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
 
           return request.post(requestOptions);
         })
         .then((res: string): void => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
-          }
-
           const json: ClientSvcResponse = JSON.parse(res);
           const response: ClientSvcResponseContents = json[0];
           if (response.ErrorInfo) {

@@ -1,4 +1,4 @@
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import auth from '../../GraphAuth';
 import Utils from '../../../../Utils';
 import config from '../../../../config';
@@ -31,22 +31,16 @@ class GraphTeamsUnarchiveCommand extends GraphCommand {
 
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((): request.RequestPromise => {
+      .then((): Promise<void> => {
         const requestOptions: any = {
           url: `${endpoint}/teams/${encodeURIComponent(args.options.teamId)}/unarchive`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${auth.service.accessToken}`,
             'content-type': 'application/json;odata=nometadata',
             'accept': 'application/json;odata.metadata=none'
-          }),
+          },
           json: true
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.post(requestOptions);
       })

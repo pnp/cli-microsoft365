@@ -5,7 +5,7 @@ import appInsights from '../../../../appInsights';
 import auth from '../../AzmgmtAuth';
 const command: Command = require('./flow-export');
 import * as assert from 'assert';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
 import * as fs from 'fs';
 import { Service } from '../../../../Auth';

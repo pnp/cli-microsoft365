@@ -1,6 +1,6 @@
 import auth from '../../SpoAuth';
 import config from '../../../../config';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
@@ -8,7 +8,6 @@ import {
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import { ContextInfo } from '../../spo';
 import Utils from '../../../../Utils';
 import { CustomAction } from './customaction';
 import { Auth } from '../../../../Auth';
@@ -50,24 +49,8 @@ class SpoCustomActionGetCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<CustomAction> => {
         siteAccessToken = accessToken;
-
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
-
-        return this.getRequestDigestForSite(args.options.url, siteAccessToken, cmd, this.debug);
-      })
-      .then((contextResponse: ContextInfo): request.RequestPromise | Promise<CustomAction> => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(JSON.stringify(contextResponse));
-          cmd.log('');
-
-          cmd.log(`Attempt to get custom action with scope: ${args.options.scope}`);
-          cmd.log('');
-        }
 
         if (args.options.scope && args.options.scope.toLowerCase() !== "all") {
           return this.getCustomAction(args.options, siteAccessToken, cmd);
@@ -76,12 +59,6 @@ class SpoCustomActionGetCommand extends SpoCommand {
         return this.searchAllScopes(args.options, siteAccessToken, cmd);
       })
       .then((customAction: CustomAction): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(JSON.stringify(customAction));
-          cmd.log('');
-        }
-
         if (customAction["odata.null"] === true) {
           if (this.verbose) {
             cmd.log(`Custom action with id ${args.options.id} not found`);
@@ -114,21 +91,15 @@ class SpoCustomActionGetCommand extends SpoCommand {
       }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
   }
 
-  private getCustomAction(options: Options, siteAccessToken: string, cmd: CommandInstance): request.RequestPromise {
+  private getCustomAction(options: Options, siteAccessToken: string, cmd: CommandInstance): Promise<CustomAction> {
     const requestOptions: any = {
       url: `${options.url}/_api/${options.scope}/UserCustomActions('${encodeURIComponent(options.id)}')`,
-      headers: Utils.getRequestHeaders({
+      headers: {
         authorization: `Bearer ${siteAccessToken}`,
         accept: 'application/json;odata=nometadata'
-      }),
+      },
       json: true
     };
-
-    if (this.debug) {
-      cmd.log('Executing web request...');
-      cmd.log(JSON.stringify(requestOptions));
-      cmd.log('');
-    }
 
     return request.get(requestOptions);
   }
@@ -145,12 +116,6 @@ class SpoCustomActionGetCommand extends SpoCommand {
       this
         .getCustomAction(options, siteAccessToken, cmd)
         .then((webResult: CustomAction): void => {
-          if (this.debug) {
-            cmd.log('getCustomAction with scope of web result...');
-            cmd.log(JSON.stringify(webResult));
-            cmd.log('');
-          }
-
           if (webResult["odata.null"] !== true) {
             return resolve(webResult);
           }
@@ -159,12 +124,6 @@ class SpoCustomActionGetCommand extends SpoCommand {
           this
             .getCustomAction(options, siteAccessToken, cmd)
             .then((siteResult: CustomAction): void => {
-              if (this.debug) {
-                cmd.log('getCustomAction with scope of site result...');
-                cmd.log(JSON.stringify(siteResult));
-                cmd.log('');
-              }
-
               return resolve(siteResult);
             }, (err: any): void => {
               reject(err);

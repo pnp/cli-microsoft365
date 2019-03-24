@@ -2,7 +2,7 @@ import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate,
@@ -62,15 +62,8 @@ class SpoListItemGetCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise | Promise<any> => {
+      .then((accessToken: string): Promise<any> => {
         siteAccessToken = accessToken;
-
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}.`);
-          cmd.log(``);
-          cmd.log(`auth object:`);
-          cmd.log(auth);
-        }
 
         const fieldSelect: string = args.options.fields ?
           `?$select=${encodeURIComponent(args.options.fields)}` :
@@ -82,18 +75,12 @@ class SpoListItemGetCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${listRestUrl}/items(${args.options.id})${fieldSelect}`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata'
-          }),
+          },
           json: true
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.get(requestOptions);
       })

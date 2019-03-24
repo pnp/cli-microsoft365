@@ -4,7 +4,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
 import * as assert from 'assert';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 const command: Command = require('./contenttype-field-remove');

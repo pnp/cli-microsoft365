@@ -1,5 +1,5 @@
 import auth from '../../SpoAuth';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import { CommandOption, CommandTypes, CommandValidate, CommandError } from '../../../../Command';
@@ -56,7 +56,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
       const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
       auth
         .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-        .then((accessToken: string): request.RequestPromise => {
+        .then((accessToken: string): Promise<{ Id: string; }> => {
           siteAccessToken = accessToken;
 
           if (this.debug) {
@@ -66,22 +66,16 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
           // GET SiteId
           const requestOptions: any = {
             url: `${args.options.webUrl}/_api/site?$select=Id`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${siteAccessToken}`,
               accept: 'application/json;odata=nometadata'
-            }),
+            },
             json: true
-          }
-
-          if (this.debug) {
-            cmd.log('Executing web request:');
-            cmd.log(requestOptions);
-            cmd.log('');
           }
 
           return request.get(requestOptions);
         })
-        .then((res: { Id: string }) => {
+        .then((res: { Id: string }): Promise<{ Id: string; }> => {
           siteId = res.Id;
 
           if (this.debug) {
@@ -92,22 +86,16 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
           // GET WebId
           const requestOptions: any = {
             url: `${args.options.webUrl}/_api/web?$select=Id`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${siteAccessToken}`,
               accept: 'application/json;odata=nometadata'
-            }),
+            },
             json: true
-          }
-
-          if (this.debug) {
-            cmd.log('Executing web request:');
-            cmd.log(requestOptions);
-            cmd.log('');
           }
 
           return request.get(requestOptions);
         })
-        .then((res: { Id: string }) => {
+        .then((res: { Id: string }): Promise<{ Id: string; }> => {
           webId = res.Id;
 
           if (this.debug) {
@@ -116,27 +104,21 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
 
           // If ListTitle is provided
           if (!args.options.listTitle) {
-            return Promise.resolve(null);
+            return Promise.resolve(undefined as any);
           }
           // Request for the ListId
           const requestOptions: any = {
             url: `${args.options.webUrl}/_api/lists/GetByTitle('${encodeURIComponent(args.options.listTitle)}')?$select=Id`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${siteAccessToken}`,
               accept: 'application/json;odata=nometadata'
-            }),
+            },
             json: true
-          }
-
-          if (this.debug) {
-            cmd.log('Executing list request:');
-            cmd.log(requestOptions);
-            cmd.log('');
           }
 
           return request.get(requestOptions);
         })
-        .then((res?: { Id: string }) => {
+        .then((res?: { Id: string }): Promise<ContextInfo> => {
           if (res) {
             listId = res.Id;
 
@@ -147,11 +129,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
 
           return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug)
         })
-        .then((res: ContextInfo) => {
-          if (this.debug) {
-            cmd.log(`Form digest='${res.FormDigestValue}`);
-            cmd.log('');
-          }
+        .then((res: ContextInfo): Promise<string> => {
           const requestDigest: string = res.FormDigestValue;
 
           const updateChildContentTypes: boolean = args.options.listTitle ? false : args.options.updateChildContentTypes === true;
@@ -173,28 +151,16 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
 
           const requestOptions: any = {
             url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${siteAccessToken}`,
               'X-RequestDigest': requestDigest
-            }),
+            },
             body: requestBody
           };
 
-          if (this.debug) {
-            cmd.log('Executing web request.');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
-
           return request.post(requestOptions);
         })
-        .then((res: any): void => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
-          }
-
+        .then((res: string): void => {
           const json: ClientSvcResponse = JSON.parse(res);
           const response: ClientSvcResponseContents = json[0];
           if (response.ErrorInfo) {

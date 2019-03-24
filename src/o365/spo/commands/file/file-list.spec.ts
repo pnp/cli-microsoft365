@@ -5,7 +5,7 @@ import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
 const command: Command = require('./file-list');
 import * as assert from 'assert';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.FILE_LIST, () => {
@@ -163,7 +163,7 @@ describe(commands.FILE_LIST, () => {
       folder: 'Shared Documents'
     } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({value: [{ 
+        assert(cmdInstanceLogSpy.calledWith([{ 
           CheckInComment: "",
           CheckOutType: 2,
           ContentTag: "{F09C4EFE-B8C0-4E89-A166-03418661B89B},9,12",
@@ -185,7 +185,7 @@ describe(commands.FILE_LIST, () => {
           UIVersion: 1536,
           UIVersionLabel: "3.0",
           UniqueId: "f09c4efe-b8c0-4e89-a166-03418661b89b"
-        }]}));
+        }]));
         done();
       }
       catch (e) {

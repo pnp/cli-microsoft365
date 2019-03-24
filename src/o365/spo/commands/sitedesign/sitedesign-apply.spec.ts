@@ -5,7 +5,7 @@ import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
 const command: Command = require('./sitedesign-apply');
 import * as assert from 'assert';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.SITEDESIGN_APPLY, () => {
@@ -164,9 +164,7 @@ describe(commands.SITEDESIGN_APPLY, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
-          value: [{ "Outcome": "1", "OutcomeText": "One or more of the properties on this action has an invalid type.", "Title": "Add to hub site" }, { "Outcome": "0", "OutcomeText": null, "Title": "Associate SPFX extension Collab Footer" }]
-        }));
+        assert(cmdInstanceLogSpy.calledWith([{ "Outcome": "1", "OutcomeText": "One or more of the properties on this action has an invalid type.", "Title": "Add to hub site" }, { "Outcome": "0", "OutcomeText": null, "Title": "Associate SPFX extension Collab Footer" }]));
         done();
       }
       catch (e) {

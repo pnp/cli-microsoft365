@@ -2,7 +2,7 @@ import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate
@@ -50,7 +50,7 @@ class SpoListLabelGetCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<ListInstance> => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}`);
         }
@@ -81,58 +81,34 @@ class SpoListLabelGetCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: requestUrl,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${accessToken}`,
             'accept': 'application/json;odata=nometadata'
-          }),
+          },
           json: true
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return request.get(requestOptions);
       })
-      .then((listInstance: ListInstance): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(listInstance);
-          cmd.log('');
-        }
-
+      .then((listInstance: ListInstance): Promise<any> => {
         const listAbsoluteUrl: string = Utils.getAbsoluteUrl(args.options.webUrl, listInstance.RootFolder.ServerRelativeUrl);
         const requestUrl: string = `${args.options.webUrl}/_api/SP_CompliancePolicy_SPPolicyStoreProxy_GetListComplianceTag`;
         const requestOptions: any = {
           url: requestUrl,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata',
             'content-type': 'application/json;odata=nometadata'
-          }),
+          },
           json: true,
           body: {
             listUrl: listAbsoluteUrl
           }
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return request.post(requestOptions);
       })
       .then((res: any): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
         if (res['odata.null'] !== true) {
           cmd.log(res);
         }

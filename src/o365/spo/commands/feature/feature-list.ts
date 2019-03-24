@@ -1,7 +1,7 @@
 import auth from '../../SpoAuth';
 import { Auth } from '../../../../Auth';
 import config from '../../../../config';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
@@ -9,7 +9,6 @@ import {
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import Utils from '../../../../Utils';
 import { Feature } from './Feature';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -44,7 +43,7 @@ class SpoFeatureListCommand extends SpoCommand {
     let siteAccessToken: string = '';
 
     auth.getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<{ value: Feature[]; }> => {
         siteAccessToken = accessToken;
 
         if (this.debug) {
@@ -53,22 +52,16 @@ class SpoFeatureListCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${args.options.url}/_api/${scope}/Features?$select=DisplayName,DefinitionId`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata'
-          }),
+          },
           json: true
         };
 
         return request.get(requestOptions);
       })
       .then((features: { value: Feature[] }): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(features);
-          cmd.log('');
-        }
-
         if (features.value && features.value.length > 0) {
           cmd.log(features.value);
         }

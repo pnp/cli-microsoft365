@@ -2,7 +2,7 @@ import auth from '../../AadAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate
@@ -40,7 +40,7 @@ class SpGetCommand extends AadCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<{ value: any[] }> => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}. Retrieving information about the service principal...`);
         }
@@ -55,28 +55,16 @@ class SpGetCommand extends AadCommand {
 
         const requestOptions: any = {
           url: `${auth.service.resource}/myorganization/servicePrincipals?api-version=1.6&$filter=${spMatchQuery}`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${accessToken}`,
             accept: 'application/json;odata=nometadata'
-          }),
+          },
           json: true
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.get(requestOptions);
       })
       .then((res: { value: any[] }): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(JSON.stringify(res, null, 2));
-          cmd.log('');
-        }
-
         if (res.value && res.value.length > 0) {
           cmd.log(res.value[0]);
         }

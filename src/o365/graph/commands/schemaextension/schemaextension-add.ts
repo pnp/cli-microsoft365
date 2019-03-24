@@ -1,7 +1,7 @@
 import auth from '../../GraphAuth';
 import config from '../../../../config';
 import commands from '../../commands';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandOption, CommandValidate
@@ -35,7 +35,7 @@ class GraphSchemaExtensionAdd extends GraphCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((): request.RequestPromise => {
+      .then((): Promise<{}> => {
         if (this.verbose) {
           cmd.log(`Adding schema extension with id '${args.options.id}'...`);
         }
@@ -45,11 +45,11 @@ class GraphSchemaExtensionAdd extends GraphCommand {
 
         const requestOptions: any = {
           url: `${auth.service.resource}/v1.0/schemaExtensions`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${auth.service.accessToken}`,
             accept: 'application/json;odata.metadata=none',
             'content-type': 'application/json'
-          }),
+          },
           body: {
             id: args.options.id,
             description: args.options.description,
@@ -60,21 +60,9 @@ class GraphSchemaExtensionAdd extends GraphCommand {
           json: true
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return request.post(requestOptions);
       })
       .then((res: any): void => {
-        if (this.debug) {
-          cmd.log('Response:')
-          cmd.log(res);
-          cmd.log('');
-        }
-
         cmd.log(res);
 
         if (this.verbose) {

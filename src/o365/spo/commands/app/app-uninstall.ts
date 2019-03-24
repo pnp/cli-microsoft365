@@ -3,7 +3,7 @@ import { Auth } from '../../../../Auth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate
@@ -48,7 +48,7 @@ class SpoAppUninstallCommand extends SpoCommand {
 
       auth
         .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-        .then((accessToken: string): request.RequestPromise => {
+        .then((accessToken: string): Promise<void> => {
           siteAccessToken = accessToken;
 
           if (this.debug) {
@@ -61,27 +61,15 @@ class SpoAppUninstallCommand extends SpoCommand {
 
           const requestOptions: any = {
             url: `${args.options.siteUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${encodeURIComponent(args.options.id)}')/uninstall`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${siteAccessToken}`,
               accept: 'application/json;odata=nometadata'
-            })
+            }
           };
-
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
 
           return request.post(requestOptions);
         })
-        .then((res: string): void => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
-          }
-
+        .then((): void => {
           if (this.verbose) {
             cmd.log(vorpal.chalk.green('DONE'));
           }

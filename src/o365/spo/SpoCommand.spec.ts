@@ -1,7 +1,7 @@
 import * as sinon from 'sinon';
 import * as assert from 'assert';
 import SpoCommand from './SpoCommand';
-import * as request from 'request-promise-native';
+import request from '../../request';
 import auth, { Site } from './SpoAuth';
 import Utils from '../../Utils';
 import { CommandError } from '../../Command';

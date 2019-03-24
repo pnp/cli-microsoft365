@@ -1,4 +1,4 @@
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import * as fs from 'fs';
 import * as path from 'path';
 import auth from '../../GraphAuth';
@@ -34,7 +34,7 @@ class GraphTeamsAppUpdateCommand extends GraphCommand {
 
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((): request.RequestPromise => {
+      .then((): Promise<string> => {
         const fullPath: string = path.resolve(filePath);
         if (this.verbose) {
           cmd.log(`Updating app with id '${appId}' and file '${fullPath}' in the app catalog...`);
@@ -42,28 +42,16 @@ class GraphTeamsAppUpdateCommand extends GraphCommand {
 
         const requestOptions: any = {
           url: `${auth.service.resource}/v1.0/appCatalogs/teamsApps/${appId}`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${auth.service.accessToken}`,
             "content-type": "application/zip"
-          }),
+          },
           body: fs.readFileSync(fullPath)
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.put(requestOptions);
       })
       .then((res: string): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
         }

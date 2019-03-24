@@ -6,8 +6,7 @@ import {
   CommandOption,
   CommandValidate
 } from '../../../../Command';
-import * as request from 'request-promise-native';
-import Utils from '../../../../Utils';
+import request from '../../../../request';
 import AzmgmtCommand from '../../AzmgmtCommand';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -32,7 +31,7 @@ class AzmgmtFlowEnvironmentGetCommand extends AzmgmtCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<{}> => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}.`);
         }
@@ -43,28 +42,16 @@ class AzmgmtFlowEnvironmentGetCommand extends AzmgmtCommand {
 
         const requestOptions: any = {
           url: `${auth.service.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${accessToken}`,
             accept: 'application/json'
-          }),
+          },
           json: true
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.get(requestOptions);
       })
       .then((res: any): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
         cmd.log(res);
 
         cb();

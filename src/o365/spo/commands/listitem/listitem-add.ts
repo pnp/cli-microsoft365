@@ -2,7 +2,7 @@ import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate,
@@ -76,7 +76,7 @@ class SpoListItemAddCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<any> => {
         siteAccessToken = accessToken;
 
         if (this.debug) {
@@ -89,27 +89,16 @@ class SpoListItemAddCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${listRestUrl}/contenttypes?$select=Name,Id`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata'
-          }),
+          },
           json: true
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return request.get(requestOptions);
       })
-      .then((response: any): request.RequestPromise | Promise<void> => {
-        if (this.debug) {
-          cmd.log('content type lookup response...');
-          cmd.log(response);
-        }
-
+      .then((response: any): Promise<void> => {
         if (args.options.contentType) {
           const foundContentType = response.value.filter((ct: any) => {
             const contentTypeMatch: boolean = ct.Id.StringValue === args.options.contentType || ct.Name === args.options.contentType;
@@ -147,26 +136,16 @@ class SpoListItemAddCommand extends SpoCommand {
 
           const requestOptions: any = {
             url: `${listRestUrl}/rootFolder`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${siteAccessToken}`,
               'accept': 'application/json;odata=nometadata'
-            }),
+            },
             json: true
           }
 
-          if (this.debug) {
-            cmd.log('Executing web request for list\'s root folder...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
-
-          return request.get(requestOptions)
+          return request
+            .get<any>(requestOptions)
             .then(rootFolderResponse => {
-              if (this.debug) {
-                cmd.log('list root folder lookup response...');
-                cmd.log(rootFolderResponse);
-              }
-
               targetFolderServerRelativeUrl = Utils.getServerRelativePath(rootFolderResponse["ServerRelativeUrl"], args.options.folder);
                         
               return folderExtensions.ensureFolder(args.options.webUrl, targetFolderServerRelativeUrl, siteAccessToken);
@@ -176,12 +155,7 @@ class SpoListItemAddCommand extends SpoCommand {
           return Promise.resolve();
         }
       })
-      .then((response: any): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log('Ensure folder response...');
-          cmd.log(response);
-        }
-
+      .then((): Promise<any> => {
         if (this.verbose) {
           cmd.log(`Creating item in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
         }
@@ -211,32 +185,17 @@ class SpoListItemAddCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${listRestUrl}/AddValidateUpdateItemUsingPath()`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata'
-          }),
+          },
           body: requestBody,
           json: true
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-          cmd.log('Body:');
-          cmd.log(requestBody);
-          cmd.log('');
-        }
-
         return request.post(requestOptions);
       })
-      .then((response: any): request.RequestPromise | Promise<void> => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(response);
-          cmd.log('');
-        }
-
+      .then((response: any): Promise<any> => {
         // Response is from /AddValidateUpdateItemUsingPath POST call, perform get on added item to get all field values
         const fieldValues: FieldValue[] = response.value;
         const idField = fieldValues.filter((thisField, index, values) => {
@@ -255,18 +214,12 @@ class SpoListItemAddCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${listRestUrl}/items(${idField[0].FieldValue})`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata'
-          }),
+          },
           json: true
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.get(requestOptions);
       })

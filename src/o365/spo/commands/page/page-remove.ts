@@ -1,10 +1,9 @@
 import auth from '../../SpoAuth';
 import config from '../../../../config';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import commands from '../../commands';
 import { CommandOption, CommandValidate } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import Utils from '../../../../Utils';
 import { ContextInfo } from '../../spo';
 import GlobalOptions from '../../../../GlobalOptions';
 import { Auth } from '../../../../Auth';
@@ -40,7 +39,7 @@ class SpoPageRemoveCommand extends SpoCommand {
     const removePage = () => {
       auth
         .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-        .then((accessToken: string): request.RequestPromise => {
+        .then((accessToken: string): Promise<ContextInfo> => {
           if (this.debug) {
             cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
           }
@@ -53,13 +52,7 @@ class SpoPageRemoveCommand extends SpoCommand {
 
           return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
         })
-        .then((res: ContextInfo): request.RequestPromise => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
-          }
-
+        .then((res: ContextInfo): Promise<void> => {
           requestDigest = res.FormDigestValue;
 
           if (!pageName.endsWith('.aspx')) {
@@ -73,21 +66,15 @@ class SpoPageRemoveCommand extends SpoCommand {
           const requestOptions: any = {
             url: `${args.options
               .webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeSiteUrl}/sitepages/${pageName}')`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${siteAccessToken}`,
               'X-RequestDigest': requestDigest,
               'X-HTTP-Method': 'DELETE',
               'content-type': 'application/json;odata=nometadata',
               accept: 'application/json;odata=nometadata'
-            }),
+            },
             json: true
           };
-
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
 
           return request.post(requestOptions);
         })

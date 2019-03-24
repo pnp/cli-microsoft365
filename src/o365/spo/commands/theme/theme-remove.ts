@@ -2,13 +2,12 @@ import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import Utils from '../../../../Utils';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -44,7 +43,7 @@ class SpoThemeRemoveCommand extends SpoCommand {
     const removeTheme = (): void => {
       auth
         .ensureAccessToken(auth.service.resource, cmd, this.debug)
-        .then((accessToken: string): request.RequestPromise => {
+        .then((accessToken: string): Promise<void> => {
           if (this.debug) {
             cmd.log(`Retrieved access token ${accessToken}`);
           }
@@ -55,31 +54,19 @@ class SpoThemeRemoveCommand extends SpoCommand {
 
           const requestOptions: any = {
             url: `${auth.site.url}/_api/thememanager/DeleteTenantTheme`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${accessToken}`,
               'accept': 'application/json;odata=nometadata'
-            }),
+            },
             body: {
               name: args.options.name,
             },
             json: true
           };
 
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
-
           return request.post(requestOptions);
         })
-        .then((rawRes: string): void => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(rawRes);
-            cmd.log('');
-          }
-
+        .then((): void => {
           if (this.verbose) {
             cmd.log(vorpal.chalk.green('DONE'));
           }

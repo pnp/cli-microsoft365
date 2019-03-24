@@ -1,14 +1,13 @@
 import auth from '../../GraphAuth';
 import config from '../../../../config';
 import commands from '../../commands';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandOption, CommandValidate
 } from '../../../../Command';
 import { Group } from './Group';
 import { GraphItemsListCommand } from '../GraphItemsListCommand';
-import Utils from '../../../../Utils';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -111,21 +110,15 @@ class GraphO365GroupListCommand extends GraphItemsListCommand<Group> {
     return new Promise<{ id: string, url: string }>((resolve: (siteInfo: { id: string, url: string }) => void, reject: (error: any) => void): void => {
       auth
         .ensureAccessToken(auth.service.resource, cmd, this.debug)
-        .then((): request.RequestPromise => {
+        .then((): Promise<{ webUrl: string }> => {
           const requestOptions: any = {
             url: `${auth.service.resource}/v1.0/groups/${groupId}/drive?$select=webUrl`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${auth.service.accessToken}`,
               accept: 'application/json;odata.metadata=none'
-            }),
+            },
             json: true
           };
-
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
 
           return request.get(requestOptions);
         })
