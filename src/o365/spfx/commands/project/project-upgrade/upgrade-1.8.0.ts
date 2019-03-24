@@ -44,6 +44,6 @@ module.exports = [
   new FN012014_TSC_inlineSources(false),
   new FN012015_TSC_strictNullChecks(false),
   new FN012016_TSC_noUnusedLocals(false),
-  new FN012017_TSC_extends('./node_modules/@microsoft/rush-stack-compiler-2.7/includes/tsconfig-web.json'),
+  new FN012017_TSC_extends('./node_modules/@microsoft/rush-stack-compiler-{tscVersion}/includes/tsconfig-web.json'),
   new FN016004_TS_property_pane_property_import()
 ];
