@@ -266,6 +266,7 @@ nav:
         - teams message list: 'cmd/graph/teams/teams-message-list.md'
         - teams membersettings list: 'cmd/graph/teams/teams-membersettings-list.md'
         - teams messagingsettings list: 'cmd/graph/teams/teams-messagingsettings-list.md'
+        - teams tab list: 'cmd/graph/teams/teams-tab-list.md'
         - teams user add: 'cmd/graph/o365group/o365group-user-add.md'
         - teams user list: 'cmd/graph/teams/teams-user-list.md'
         - teams user remove: 'cmd/graph/teams/teams-user-remove.md'
