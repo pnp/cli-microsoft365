@@ -1,12 +1,11 @@
 import auth from '../../SpoAuth';
 import config from '../../../../config';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import commands from '../../commands';
 import {
   CommandOption, CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import Utils from '../../../../Utils';
 import GlobalOptions from '../../../../GlobalOptions';
 import { Auth } from '../../../../Auth';
 import { PageHeader, CustomPageHeader, CustomPageHeaderServerProcessedContent, CustomPageHeaderProperties } from './PageHeader';
@@ -159,7 +158,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<{ IsPageCheckedOutToCurrentUser: boolean, Title: string; }> => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}`);
         }
@@ -172,28 +171,16 @@ class SpoPageHeaderSetCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')?$select=IsPageCheckedOutToCurrentUser,Title`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata'
-          }),
+          },
           json: true
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return request.get(requestOptions);
       })
-      .then((res: { IsPageCheckedOutToCurrentUser: boolean, Title: string; }): Promise<void> | request.RequestPromise => {
-        if (this.debug) {
-          cmd.log('Response:')
-          cmd.log(res);
-          cmd.log('');
-        }
-
+      .then((res: { IsPageCheckedOutToCurrentUser: boolean, Title: string; }): Promise<void> => {
         title = res.Title;
 
         if (res.IsPageCheckedOutToCurrentUser) {
@@ -202,18 +189,12 @@ class SpoPageHeaderSetCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/checkoutpage`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata'
-          }),
+          },
           json: true
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.post(requestOptions);
       })
@@ -281,14 +262,8 @@ class SpoPageHeaderSetCommand extends SpoCommand {
           return Promise.resolve();
         }
       })
-      .then((res: void | any[]): request.RequestPromise => {
+      .then((res: void | any[]): Promise<void> => {
         if (res) {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
-          }
-
           (header.serverProcessedContent as CustomPageHeaderServerProcessedContent).customMetadata = {
             imageSource: {
               siteId: res[0].Id,
@@ -307,26 +282,20 @@ class SpoPageHeaderSetCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/savepage`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata',
             'content-type': 'application/json;odata=nometadata'
-          }),
+          },
           body: {
             LayoutWebpartsContent: JSON.stringify([header])
           },
           json: true
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return request.post(requestOptions);
       })
-      .then((res: any): void => {
+      .then((): void => {
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
         }
@@ -335,71 +304,53 @@ class SpoPageHeaderSetCommand extends SpoCommand {
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
 
-  private getSiteId(siteUrl: string, accessToken: string, verbose: boolean, debug: boolean, cmd: CommandInstance): request.RequestPromise {
+  private getSiteId(siteUrl: string, accessToken: string, verbose: boolean, debug: boolean, cmd: CommandInstance): Promise<any> {
     if (verbose) {
       cmd.log(`Retrieving information about the site collection...`);
     }
 
     const requestOptions: any = {
       url: `${siteUrl}/_api/site?$select=Id`,
-      headers: Utils.getRequestHeaders({
+      headers: {
         authorization: `Bearer ${accessToken}`,
         accept: 'application/json;odata=nometadata'
-      }),
+      },
       json: true
     };
-
-    if (debug) {
-      cmd.log('Executing web request...');
-      cmd.log(requestOptions);
-      cmd.log('');
-    }
 
     return request.get(requestOptions);
   }
 
-  private getWebId(siteUrl: string, accessToken: string, verbose: boolean, debug: boolean, cmd: CommandInstance): request.RequestPromise {
+  private getWebId(siteUrl: string, accessToken: string, verbose: boolean, debug: boolean, cmd: CommandInstance): Promise<any> {
     if (verbose) {
       cmd.log(`Retrieving information about the site...`);
     }
 
     const requestOptions: any = {
       url: `${siteUrl}/_api/web?$select=Id`,
-      headers: Utils.getRequestHeaders({
+      headers: {
         authorization: `Bearer ${accessToken}`,
         accept: 'application/json;odata=nometadata'
-      }),
+      },
       json: true
     };
-
-    if (debug) {
-      cmd.log('Executing web request...');
-      cmd.log(requestOptions);
-      cmd.log('');
-    }
 
     return request.get(requestOptions);
   }
 
-  private getImageInfo(siteUrl: string, imageUrl: string, accessToken: string, verbose: boolean, debug: boolean, cmd: CommandInstance): request.RequestPromise {
+  private getImageInfo(siteUrl: string, imageUrl: string, accessToken: string, verbose: boolean, debug: boolean, cmd: CommandInstance): Promise<any> {
     if (verbose) {
       cmd.log(`Retrieving information about the header image...`);
     }
 
     const requestOptions: any = {
       url: `${siteUrl}/_api/web/getfilebyserverrelativeurl('${encodeURIComponent(imageUrl)}')?$select=ListId,UniqueId`,
-      headers: Utils.getRequestHeaders({
+      headers: {
         authorization: `Bearer ${accessToken}`,
         accept: 'application/json;odata=nometadata'
-      }),
+      },
       json: true
     };
-
-    if (debug) {
-      cmd.log('Executing web request...');
-      cmd.log(requestOptions);
-      cmd.log('');
-    }
 
     return request.get(requestOptions);
   }

@@ -1,6 +1,6 @@
 import auth from '../../SpoAuth';
 import config from '../../../../config';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import commands from '../../commands';
 import {
   CommandOption, CommandValidate, CommandTypes, CommandError
@@ -57,13 +57,7 @@ class SpoContentTypeAddCommand extends SpoCommand {
 
         return this.getParentInfo(args.options.listTitle, args.options.webUrl, siteAccessToken, cmd);
       })
-      .then((parent: string): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log('Parent object');
-          cmd.log(parent);
-          cmd.log('');
-        }
-
+      .then((parent: string): Promise<ContextInfo> => {
         parentInfo = parent;
 
         if (this.verbose) {
@@ -72,44 +66,26 @@ class SpoContentTypeAddCommand extends SpoCommand {
 
         return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
       })
-      .then((res: ContextInfo): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log('Response:')
-          cmd.log(res);
-          cmd.log('');
-        }
-
+      .then((res: ContextInfo): Promise<string> => {
         const description: string = args.options.description ?
           `<Property Name="Description" Type="String">${Utils.escapeXml(args.options.description)}</Property>` :
           '<Property Name="Description" Type="Null" />';
         const group: string = args.options.group ?
           `<Property Name="Group" Type="String">${Utils.escapeXml(args.options.group)}</Property>` :
           '<Property Name="Group" Type="Null" />';
-          
+
         const requestOptions: any = {
           url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'X-RequestDigest': res.FormDigestValue
-          }),
+          },
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="8" ObjectPathId="7" /><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /></Actions><ObjectPaths><Property Id="7" ParentId="5" Name="ContentTypes" /><Method Id="9" ParentId="7" Name="Add"><Parameters><Parameter TypeId="{168f3091-4554-4f14-8866-b20d48e45b54}">${description}${group}<Property Name="Id" Type="String">${Utils.escapeXml(args.options.id)}</Property><Property Name="Name" Type="String">${Utils.escapeXml(args.options.name)}</Property><Property Name="ParentContentType" Type="Null" /></Parameter></Parameters></Method>${parentInfo}</ObjectPaths></Request>`
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.post(requestOptions);
       })
       .then((res: string): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
         const json: ClientSvcResponse = JSON.parse(res);
         const response: ClientSvcResponseContents = json[0];
         if (response.ErrorInfo) {
@@ -135,35 +111,23 @@ class SpoContentTypeAddCommand extends SpoCommand {
       let siteId: string = '';
       let webId: string = '';
 
-      ((): request.RequestPromise => {
+      ((): Promise<{ Id: string; }> => {
         if (this.verbose) {
           cmd.log(`Retrieving site collection id...`);
         }
 
         const requestOptions: any = {
           url: `${webUrl}/_api/site?$select=Id`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata'
-          }),
+          },
           json: true
-        }
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
         }
 
         return request.get(requestOptions);
       })()
-        .then((res: { Id: string }): request.RequestPromise => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
-          }
-
+        .then((res: { Id: string }): Promise<{ Id: string; }> => {
           siteId = res.Id;
 
           if (this.verbose) {
@@ -172,28 +136,16 @@ class SpoContentTypeAddCommand extends SpoCommand {
 
           const requestOptions: any = {
             url: `${webUrl}/_api/web?$select=Id`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${siteAccessToken}`,
               accept: 'application/json;odata=nometadata'
-            }),
+            },
             json: true
-          }
-
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
           }
 
           return request.get(requestOptions);
         })
-        .then((res: { Id: string }): request.RequestPromise => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
-          }
-
+        .then((res: { Id: string }): Promise<{ Id: string; }> => {
           webId = res.Id;
 
           if (this.verbose) {
@@ -202,28 +154,16 @@ class SpoContentTypeAddCommand extends SpoCommand {
 
           const requestOptions: any = {
             url: `${webUrl}/_api/web/lists/getByTitle('${encodeURIComponent(listTitle)}')?$select=Id`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${siteAccessToken}`,
               accept: 'application/json;odata=nometadata'
-            }),
+            },
             json: true
-          }
-
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
           }
 
           return request.get(requestOptions);
         })
         .then((res: { Id: string }): void => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
-          }
-
           resolve(`<Identity Id="5" Name="1a48869e-c092-0000-1f61-81ec89809537|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${siteId}:web:${webId}:list:${res.Id}" />`)
         }, (error: any): void => {
           reject(error);

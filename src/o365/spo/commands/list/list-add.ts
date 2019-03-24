@@ -2,7 +2,7 @@ import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate,
@@ -248,7 +248,7 @@ class SpoListAddCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<ListInstance> => {
         siteAccessToken = accessToken;
 
         if (this.debug) {
@@ -264,29 +264,17 @@ class SpoListAddCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/lists`,
           method: 'POST',
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata'
-          }),
+          },
           body: requestBody,
           json: true
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return request.post(requestOptions);
       })
       .then((listInstance: ListInstance): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(listInstance);
-          cmd.log('');
-        }
-
         cmd.log(listInstance);
 
         cb();

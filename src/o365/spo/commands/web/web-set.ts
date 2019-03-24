@@ -1,7 +1,7 @@
 import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandOption,
@@ -9,7 +9,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import { Auth } from '../../../../Auth';
-import Utils from '../../../../Utils';
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
 interface CommandArgs {
@@ -53,7 +52,7 @@ class SpoWebSetCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<void> => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}. Updating subsite properties...`);
         }
@@ -83,20 +82,14 @@ class SpoWebSetCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${accessToken}`,
             'content-type': 'application/json;odata=nometadata',
             accept: 'application/json;odata=nometadata'
-          }),
+          },
           json: true,
           body: payload
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         if (this.verbose) {
           cmd.log(`Updating properties of subsite ${args.options.webUrl}...`);
@@ -104,13 +97,7 @@ class SpoWebSetCommand extends SpoCommand {
 
         return request.patch(requestOptions)
       })
-      .then((res: any): void => {
-        if (this.debug) {
-          cmd.log('Response:')
-          cmd.log(res);
-          cmd.log('');
-        }
-
+      .then((): void => {
         if (this.debug) {
           cmd.log(vorpal.chalk.green('DONE'));
         }

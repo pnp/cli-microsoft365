@@ -1,7 +1,7 @@
 import auth from '../../SpoAuth';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import config from '../../../../config';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
@@ -44,7 +44,7 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
     return true;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     const cdnTypeString: string = args.options.type || 'Public';
     const cdnType: number = cdnTypeString === 'Private' ? 1 : 0;
     const chalk: any = vorpal.chalk;
@@ -56,61 +56,37 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
 
       auth
         .ensureAccessToken(auth.service.resource, cmd, this.debug)
-        .then((accessToken: string): request.RequestPromise => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(accessToken);
-            cmd.log('');
-          }
-
+        .then((accessToken: string): Promise<ContextInfo> => {
           return this.getRequestDigest(cmd, this.debug);
         })
-        .then((res: ContextInfo): request.RequestPromise => {
-          if (this.debug) {
-            cmd.log('Response:')
-            cmd.log(res);
-            cmd.log('');
-          }
-
+        .then((res: ContextInfo): Promise<string> => {
           if (this.verbose) {
             cmd.log(`Removing origin ${args.options.origin} from the ${(cdnType === 1 ? 'Private' : 'Public')} CDN. Please wait, this might take a moment...`);
           }
 
           const requestOptions: any = {
             url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${auth.service.accessToken}`,
               'X-RequestDigest': res.FormDigestValue
-            }),
+            },
             body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="RemoveTenantCdnOrigin" Id="33" ObjectPathId="29"><Parameters><Parameter Type="Enum">${cdnType}</Parameter><Parameter Type="String">${Utils.escapeXml(args.options.origin)}</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="29" Name="${auth.site.tenantId}" /></ObjectPaths></Request>`
           };
-
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
 
           return request.post(requestOptions);
         })
         .then((res: string): void => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
-          }
-
           const json: ClientSvcResponse = JSON.parse(res);
           const response: ClientSvcResponseContents = json[0];
           if (response.ErrorInfo) {
-            cmd.log(new CommandError(response.ErrorInfo.ErrorMessage));
+            cb(new CommandError(response.ErrorInfo.ErrorMessage));
           }
           else {
             if (this.verbose) {
               cmd.log(chalk.green('DONE'));
             }
+            cb();
           }
-          cb();
         }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
     };
 

@@ -2,7 +2,7 @@ import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate
@@ -43,7 +43,7 @@ class SpoFolderRenameCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<ContextInfo> => {
         siteAccessToken = accessToken;
 
         if (this.debug) {
@@ -55,30 +55,12 @@ class SpoFolderRenameCommand extends SpoCommand {
       .then((contextResponse: ContextInfo): Promise<IdentityResponse> => {
         formDigestValue = contextResponse.FormDigestValue;
 
-        if (this.debug) {
-          cmd.log('contextResponse:');
-          cmd.log(JSON.stringify(contextResponse));
-          cmd.log('');
-        }
-
         return clientSvc.getCurrentWebIdentity(args.options.webUrl, siteAccessToken, formDigestValue);
       })
       .then((webIdentityResp: IdentityResponse): Promise<IdentityResponse> => {
-        if (this.debug) {
-          cmd.log('IdentityResponse:');
-          cmd.log(JSON.stringify(webIdentityResp));
-          cmd.log('');
-        }
-
         return clientSvc.getFolderIdentity(webIdentityResp.objectIdentity, args.options.webUrl, args.options.folderUrl, siteAccessToken, formDigestValue);
       })
       .then((folderObjectIdentity: IdentityResponse): Promise<void> => {
-        if (this.debug) {
-          cmd.log('IdentityResponse:');
-          cmd.log(JSON.stringify(folderObjectIdentity));
-          cmd.log('');
-        }
-
         if (this.verbose) {
           cmd.log(`Renaming folder ${args.options.folderUrl} to ${args.options.name}`);
         }
@@ -89,18 +71,12 @@ class SpoFolderRenameCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'X-RequestDigest': formDigestValue
-          }),
+          },
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="MoveTo" Id="32" ObjectPathId="26"><Parameters><Parameter Type="String">${renamedServerRelativeUrl}</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="26" Name="${folderObjectIdentity.objectIdentity}" /></ObjectPaths></Request>`
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return new Promise<void>((resolve: any, reject: any): void => {
           request.post(requestOptions).then((res: any) => {

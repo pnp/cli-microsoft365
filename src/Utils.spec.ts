@@ -102,22 +102,6 @@ describe('Utils', () => {
     assert(result == false);
   });
 
-  it('adds User-Agent string to undefined headers', () => {
-    const result = Utils.getRequestHeaders(undefined);
-    assert.equal(!result['User-Agent'], false);
-  });
-
-  it('adds User-Agent string to empty headers', () => {
-    const result = Utils.getRequestHeaders({});
-    assert.equal(!result['User-Agent'], false);
-  });
-
-  it('adds User-Agent string to existing headers', () => {
-    const result = Utils.getRequestHeaders({ accept: 'application/json' });
-    assert.equal(!result['User-Agent'], false);
-    assert.equal(result.accept, 'application/json');
-  });
-
   it('doesn\'t fail when restoring stub if the passed object is undefined', () => {
     Utils.restore(undefined);
     assert(true);

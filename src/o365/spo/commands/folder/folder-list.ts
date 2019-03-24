@@ -2,7 +2,7 @@ import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate
@@ -42,7 +42,7 @@ class SpoFolderListCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<{ value: FolderProperties[]; }> => {
         siteAccessToken = accessToken;
 
         if (this.debug) {
@@ -53,32 +53,20 @@ class SpoFolderListCommand extends SpoCommand {
           cmd.log(`Retrieving folders from site ${args.options.webUrl} parent folder ${args.options.parentFolderUrl}...`);
         }
 
-        const serverRelativeUrl: string =  Utils.getServerRelativePath(args.options.webUrl, args.options.parentFolderUrl);
+        const serverRelativeUrl: string = Utils.getServerRelativePath(args.options.webUrl, args.options.parentFolderUrl);
         const requestUrl: string = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(serverRelativeUrl)}')/folders`;
         const requestOptions: any = {
           url: requestUrl,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata'
-          }),
+          },
           json: true
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.get(requestOptions);
       })
       .then((resp: { value: FolderProperties[] }): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(resp);
-          cmd.log('');
-        }
-
         if (args.options.output === 'json') {
           cmd.log(resp.value);
         }

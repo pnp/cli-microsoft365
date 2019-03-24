@@ -2,7 +2,7 @@ import auth from '../../AzmgmtAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate
@@ -57,7 +57,7 @@ class AzmgmtFlowExportCommand extends AzmgmtCommand {
 
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((retrievedAccessToken: string): request.RequestPromise | Promise<void> => {
+      .then((retrievedAccessToken: string): Promise<void> => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${retrievedAccessToken}.`);
         }
@@ -78,10 +78,10 @@ class AzmgmtFlowExportCommand extends AzmgmtCommand {
 
         const requestOptions: any = {
           url: `${auth.service.resource}providers/Microsoft.BusinessAppPlatform/environments/${encodeURIComponent(args.options.environment)}/listPackageResources?api-version=2016-11-01`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${accessToken}`,
             accept: 'application/json'
-          }),
+          },
           body: {
             "baseResourceIds": [
               `/providers/Microsoft.Flow/flows/${args.options.id}`
@@ -90,21 +90,9 @@ class AzmgmtFlowExportCommand extends AzmgmtCommand {
           json: true
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return request.post(requestOptions);
       })
-      .then((res: any): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
+      .then((res: any): Promise<{}> => {
         if (this.verbose) {
           cmd.log(`Initiating package export for Microsoft Flow ${args.options.id}...`);
         }
@@ -113,10 +101,10 @@ class AzmgmtFlowExportCommand extends AzmgmtCommand {
           url: `${auth.service.resource}providers/${formatArgument === 'json' ?
             `Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.id)}?api-version=2016-11-01`
             : `Microsoft.BusinessAppPlatform/environments/${encodeURIComponent(args.options.environment)}/exportPackage?api-version=2016-11-01`}`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${accessToken}`,
             accept: 'application/json'
-          }),
+          },
           json: true
         };
 
@@ -135,21 +123,9 @@ class AzmgmtFlowExportCommand extends AzmgmtCommand {
           }
         }
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return formatArgument === 'json' ? request.get(requestOptions) : request.post(requestOptions);
       })
-      .then((res: any): request.RequestPromise | Promise<void> => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
+      .then((res: any): Promise<string> => {
         if (this.verbose) {
           cmd.log(`Getting file for Microsoft Flow ${args.options.id}...`);
         }
@@ -172,29 +148,17 @@ class AzmgmtFlowExportCommand extends AzmgmtCommand {
             `${auth.service.resource}/providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.id)}/exportToARMTemplate?api-version=2016-11-01`
             : downloadFileUrl,
           encoding: null, // Set encoding to null, otherwise binary data will be encoded to utf8 and binary data is corrupt 
-          headers: formatArgument === 'json' ? Utils.getRequestHeaders({
+          headers: formatArgument === 'json' ? {
             authorization: `Bearer ${accessToken}`,
             accept: 'application/json'
-          })
-            : Utils.getRequestHeaders({}),
+          } : {},
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return formatArgument === 'json' ?
           request.post(requestOptions)
           : request.get(requestOptions);
       })
       .then((file: string): void => {
-        if (this.debug) {
-          cmd.log('Response received');
-          cmd.log(file);
-          cmd.log('');
-        }
         const path = args.options.path ? args.options.path : `./${filenameFromApi}`
 
         fs.writeFileSync(path, file, 'binary');

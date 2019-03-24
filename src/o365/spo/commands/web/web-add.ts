@@ -1,7 +1,7 @@
 import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import GlobalOptions from '../../../../GlobalOptions';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import {
@@ -12,7 +12,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import { Auth } from '../../../../Auth';
-import Utils from '../../../../Utils';
 import { PermissionKind, BasePermissions } from './../../common/base-permissions';
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -61,7 +60,7 @@ class SpoWebAddCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<ContextInfo> => {
         siteAccessToken = accessToken;
 
         if (this.debug) {
@@ -70,21 +69,15 @@ class SpoWebAddCommand extends SpoCommand {
 
         return this.getRequestDigestForSite(args.options.parentWebUrl, siteAccessToken, cmd, this.debug);
       })
-      .then((res: ContextInfo): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log('Response:')
-          cmd.log(res);
-          cmd.log('');
-        }
-
+      .then((res: ContextInfo): Promise<any> => {
         const requestOptions: any = {
           url: `${args.options.parentWebUrl}/_api/web/webinfos/add`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'content-type': 'application/json;odata=nometadata',
             accept: 'application/json;odata=nometadata',
             'X-RequestDigest': res.FormDigestValue
-          }),
+          },
           json: true,
           body: {
             parameters: {
@@ -98,25 +91,13 @@ class SpoWebAddCommand extends SpoCommand {
           }
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         if (this.verbose) {
           cmd.log(`Creating subsite ${args.options.parentWebUrl}/${args.options.webUrl}...`);
         }
 
         return request.post(requestOptions)
       })
-      .then((res: any): request.RequestPromise | Promise<boolean> => {
-        if (this.debug) {
-          cmd.log('Response:')
-          cmd.log(res);
-          cmd.log('');
-        }
-
+      .then((res: any): Promise<any> => {
         siteInfo = res;
 
         if (!args.options.inheritNavigation) {
@@ -131,37 +112,19 @@ class SpoWebAddCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${subsiteFullUrl}/_api/web/effectivebasepermissions`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata'
-          }),
+          },
           json: true
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return request.get(requestOptions);
       })
-      .then((res: any): request.RequestPromise | Promise<boolean> => {
-        if (this.debug) {
-          cmd.log('Response:')
-          cmd.log(res);
-          cmd.log('');
-        }
-
+      .then((res: any): Promise<ContextInfo> => {
         const permissions: BasePermissions = new BasePermissions();
         permissions.high = res.High as number;
         permissions.low = res.Low as number;
-
-        if (this.debug) {
-          cmd.log("WebEffectiveBasePermission")
-          cmd.log(res);
-          cmd.log('');
-        }
 
         /// Detects if the site in question has no script enabled or not. 
         /// Detection is done by verifying if the AddAndCustomizePages permission is missing.
@@ -178,38 +141,19 @@ class SpoWebAddCommand extends SpoCommand {
 
         return this.getRequestDigestForSite(subsiteFullUrl, siteAccessToken, cmd, this.debug);
       })
-      .then((res: ContextInfo): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log('Response:')
-          cmd.log(res);
-          cmd.log('');
-        }
-
+      .then((res: ContextInfo): Promise<string> => {
         const requestOptions: any = {
           url: `${subsiteFullUrl}/_vti_bin/client.svc/ProcessQuery`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
-
             'X-RequestDigest': res.FormDigestValue
-          }),
+          },
           body: `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="1" ObjectPathId="0" /><ObjectPath Id="3" ObjectPathId="2" /><ObjectPath Id="5" ObjectPathId="4" /><SetProperty Id="6" ObjectPathId="4" Name="UseShared"><Parameter Type="Boolean">true</Parameter></SetProperty></Actions><ObjectPaths><StaticProperty Id="0" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /><Property Id="2" ParentId="0" Name="Web" /><Property Id="4" ParentId="2" Name="Navigation" /></ObjectPaths></Request>`
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return request.post(requestOptions)
       })
-      .then((res: any): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
+      .then((res: string): void => {
         const json: ClientSvcResponse = JSON.parse(res);
         const response: ClientSvcResponseContents = json[0];
         if (response.ErrorInfo) {

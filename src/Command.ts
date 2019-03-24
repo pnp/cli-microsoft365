@@ -1,5 +1,6 @@
 import appInsights from './appInsights';
 import GlobalOptions from './GlobalOptions';
+import request from './request';
 
 const vorpal: Vorpal = require('./vorpal-init');
 
@@ -97,7 +98,7 @@ export default abstract class Command {
     const cmd: Command = this;
     return function (this: CommandInstance, args: CommandArgs, cb: () => void) {
       args = cmd.processArgs(args);
-      cmd.initAction(args);
+      cmd.initAction(args, this);
       cmd.commandAction(this, args, cb);
     }
   }
@@ -299,9 +300,11 @@ export default abstract class Command {
     this.handleError(rawResponse, cmd, callback);
   }
 
-  protected initAction(args: CommandArgs): void {
+  protected initAction(args: CommandArgs, cmd: CommandInstance): void {
     this._debug = args.options.debug || process.env.OFFICE365CLI_DEBUG === '1';
     this._verbose = this._debug || args.options.verbose || process.env.OFFICE365CLI_VERBOSE === '1';
+    request.debug = this._debug;
+    request.cmd = cmd;
 
     appInsights.trackEvent({
       name: this.getCommandName(),

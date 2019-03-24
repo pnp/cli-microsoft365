@@ -1,12 +1,11 @@
 import auth from '../../SpoAuth';
 import config from '../../../../config';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import commands from '../../commands';
 import {
   CommandOption, CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import Utils from '../../../../Utils';
 import GlobalOptions from '../../../../GlobalOptions';
 import { Auth } from '../../../../Auth';
 
@@ -53,7 +52,7 @@ class SpoSiteOffice365GroupSetCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<any> => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}. Connecting site collection to Office 365 Group...`);
         }
@@ -78,31 +77,19 @@ class SpoSiteOffice365GroupSetCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${args.options.siteUrl}/_api/GroupSiteManager/CreateGroupForSite`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${accessToken}`,
             'content-type': 'application/json;odata=nometadata',
             accept: 'application/json;odata=nometadata',
             json: true
-          }),
+          },
           body: payload,
           json: true
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return request.post(requestOptions);
       })
       .then((res: any): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
         cmd.log(res);
 
         if (this.verbose) {

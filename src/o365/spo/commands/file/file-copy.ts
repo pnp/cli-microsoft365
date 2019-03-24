@@ -2,13 +2,12 @@ import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import Utils from '../../../../Utils';
 import { Auth } from '../../../../Auth';
 import { ContextInfo } from '../../spo';
 import * as url from 'url';
@@ -79,11 +78,7 @@ class SpoFileCopyCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}.`);
-        }
-
+      .then((accessToken: string): Promise<void> => {
         siteAccessToken = accessToken;
 
         // Check if the source file exists.
@@ -95,12 +90,7 @@ class SpoFileCopyCommand extends SpoCommand {
         // the user can receive misleading error message.
         return this.fileExists(tenantUrl, webUrl, args.options.sourceUrl, siteAccessToken, cmd);
       })
-      .then((resp: any): Promise<void> => {
-        if (this.debug) {
-          cmd.log(`fileExists response...`);
-          cmd.log(resp);
-        }
-
+      .then((): Promise<void> => {
         if (args.options.deleteIfAlreadyExists) {
           // try delete target file, if deleteIfAlreadyExists flag is set
           const filename = args.options.sourceUrl.replace(/^.*[\\\/]/, '');
@@ -109,22 +99,17 @@ class SpoFileCopyCommand extends SpoCommand {
 
         return Promise.resolve();
       })
-      .then((resp: any): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log(`deleteIfAlreadyExists response`);
-          cmd.log(resp);
-        }
-
+      .then((): Promise<any> => {
         // all preconditions met, now create copy job
         const sourceAbsoluteUrl = this.urlCombine(webUrl, args.options.sourceUrl);
         const allowSchemaMismatch: boolean = args.options.allowSchemaMismatch || false;
         const requestUrl: string = this.urlCombine(webUrl, '/_api/site/CreateCopyJobs');
         const requestOptions: any = {
           url: requestUrl,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata'
-          }),
+          },
           body: {
             exportObjectUris: [sourceAbsoluteUrl],
             destinationUri: this.urlCombine(tenantUrl, args.options.targetUrl),
@@ -136,20 +121,9 @@ class SpoFileCopyCommand extends SpoCommand {
           json: true
         };
 
-        if (this.debug) {
-          cmd.log('CreateCopyJobs request...');
-          cmd.log(requestOptions);
-        }
-
         return request.post(requestOptions);
       })
       .then((jobInfo: any): Promise<any> => {
-
-        if (this.debug) {
-          cmd.log('CreateCopyJobs response...');
-          cmd.log(jobInfo);
-        }
-
         const jobProgressOptions: JobProgressOptions = {
           webUrl: webUrl,
           accessToken: siteAccessToken,
@@ -172,7 +146,7 @@ class SpoFileCopyCommand extends SpoCommand {
   /**
    * Checks if a file exists on the server relative url
    */
-  private fileExists(tenantUrl: string, webUrl: string, sourceUrl: string, siteAccessToken: string, cmd: any): request.RequestPromise {
+  private fileExists(tenantUrl: string, webUrl: string, sourceUrl: string, siteAccessToken: string, cmd: any): Promise<void> {
     const webServerRelativeUrl: string = webUrl.replace(tenantUrl, '');
     const fileServerRelativeUrl: string = `${webServerRelativeUrl}${sourceUrl}`;
 
@@ -180,17 +154,12 @@ class SpoFileCopyCommand extends SpoCommand {
     const requestOptions: any = {
       url: requestUrl,
       method: 'GET',
-      headers: Utils.getRequestHeaders({
+      headers: {
         authorization: `Bearer ${siteAccessToken}`,
         'accept': 'application/json;odata=nometadata'
-      }),
+      },
       json: true
     };
-
-    if (this.debug) {
-      cmd.log(`fileExists request...`);
-      cmd.log(requestOptions);
-    }
 
     return request.get(requestOptions);
   }
@@ -208,26 +177,16 @@ class SpoFileCopyCommand extends SpoCommand {
       const requestUrl: string = `${opts.webUrl}/_api/site/GetCopyJobProgress`;
       const requestOptions: any = {
         url: requestUrl,
-        headers: Utils.getRequestHeaders({
+        headers: {
           authorization: `Bearer ${opts.accessToken}`,
           'accept': 'application/json;odata=nometadata'
-        }),
+        },
         body: { "copyJobInfo": opts.copyJopInfo },
         json: true
       };
 
-      if (this.debug) {
-        cmd.log('waitForJobResult request...');
-        cmd.log(requestOptions);
-      }
-
       request.post(requestOptions).then((resp: any): void => {
         retryAttemptsCount = 0; // clear retry on promise success 
-
-        if (this.debug) {
-          cmd.log('waitForJobResult response...');
-          cmd.log(resp);
-        }
 
         if (this.verbose) {
           if (resp.JobState && resp.JobState === 4) {
@@ -309,22 +268,17 @@ class SpoFileCopyCommand extends SpoCommand {
           const requestOptions: any = {
             url: requestUrl,
             method: 'POST',
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${siteAccessToken}`,
               'X-HTTP-Method': 'DELETE',
               'If-Match': '*',
               'accept': 'application/json;odata=nometadata'
-            }),
+            },
             json: true
           };
 
-          if (this.debug) {
-            cmd.log(`recycleFile request...`);
-            cmd.log(requestOptions);
-          }
-
           request.post(requestOptions)
-            .then((resp: any): void => {
+            .then((): void => {
               resolve();
             })
             .catch((err: any): any => {

@@ -1,7 +1,7 @@
 import auth from '../../SpoAuth';
 import { Auth } from '../../../../Auth';
 import config from '../../../../config';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
@@ -9,7 +9,6 @@ import {
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import Utils from '../../../../Utils';
 import { TenantProperty } from './TenantProperty';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -40,7 +39,7 @@ class SpoStorageEntityListCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<{ storageentitiesindex?: string }> => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}. Loading all tenant properties...`);
         }
@@ -51,28 +50,16 @@ class SpoStorageEntityListCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${args.options.appCatalogUrl}/_api/web/AllProperties?$select=storageentitiesindex`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${accessToken}`,
             accept: 'application/json;odata=nometadata'
-          }),
+          },
           json: true
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.get(requestOptions);
       })
       .then((web: { storageentitiesindex?: string }): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(web);
-          cmd.log('');
-        }
-
         try {
           if (!web.storageentitiesindex ||
             web.storageentitiesindex.trim().length === 0) {

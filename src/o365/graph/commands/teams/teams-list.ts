@@ -7,8 +7,7 @@ import {
 } from '../../../../Command';
 import { Team } from './Team';
 import { GraphItemsListCommand } from '../GraphItemsListCommand';
-import * as request from 'request-promise-native';
-import Utils from '../../../../Utils';
+import request from '../../../../request';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -69,21 +68,15 @@ class TeamsListCommand extends GraphItemsListCommand<Team> {
     return new Promise<Team>((resolve: (team: Team) => void, reject: (error: any) => void): void => {
       auth
         .ensureAccessToken(auth.service.resource, cmd, this.debug)
-        .then((): request.RequestPromise => {
+        .then((): Promise<{}> => {
           const requestOptions: any = {
             url: `${auth.service.resource}/beta/teams/${group.id}`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${auth.service.accessToken}`,
               accept: 'application/json;odata.metadata=none'
-            }),
+            },
             json: true
           };
-
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
 
           return request.get(requestOptions);
         })

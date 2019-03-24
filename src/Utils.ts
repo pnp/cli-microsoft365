@@ -1,4 +1,3 @@
-const packageJSON = require('../package.json');
 import Table = require('easy-table');
 import * as os from 'os';
 const vorpal: Vorpal = require('./vorpal-init');
@@ -47,16 +46,6 @@ export default class Utils {
         m.restore();
       }
     });
-  }
-
-  public static getRequestHeaders(headers: any): any {
-    if (!headers) {
-      headers = {};
-    }
-
-    headers['User-Agent'] = `NONISV|SharePointPnP|Office365CLI/${packageJSON.version}`;
-
-    return headers;
   }
 
   public static isValidGuid(guid: string): boolean {

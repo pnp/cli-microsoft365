@@ -1,5 +1,5 @@
 import * as sinon from 'sinon';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
 import { Page } from './Page';
 import { ClientSidePage } from './clientsidepages';

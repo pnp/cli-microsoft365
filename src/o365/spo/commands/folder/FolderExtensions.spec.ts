@@ -1,6 +1,5 @@
-
 import * as assert from 'assert';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
 import * as sinon from 'sinon';
 import { FolderExtensions } from './FolderExtensions'
@@ -14,7 +13,7 @@ describe('FolderExtensions', () => {
   let cmdInstanceLogSpy: sinon.SinonSpy;
 
   let stubPostResponses: any = (
-    folderAddResp = null
+    folderAddResp: any = null
   ) => {
     return sinon.stub(request, 'post').callsFake((opts) => {
 
@@ -31,7 +30,7 @@ describe('FolderExtensions', () => {
   }
 
   let stubGetResponses: any = (
-    getFolderByServerRelativeUrlResp = null
+    getFolderByServerRelativeUrlResp: any = null
   ) => {
     return sinon.stub(request, 'get').callsFake((opts) => {
 

@@ -1,6 +1,6 @@
 import auth from '../../SpoAuth';
 import config from '../../../../config';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
@@ -8,7 +8,6 @@ import {
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import { ContextInfo } from '../../spo';
 import Utils from '../../../../Utils';
 import { CustomAction } from './customaction';
 import { Auth } from '../../../../Auth';
@@ -53,24 +52,8 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
 
       auth
         .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-        .then((accessToken: string): request.RequestPromise => {
+        .then((accessToken: string): Promise<CustomAction | void> => {
           siteAccessToken = accessToken;
-
-          if (this.debug) {
-            cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-          }
-
-          return this.getRequestDigestForSite(args.options.url, siteAccessToken, cmd, this.debug);
-        })
-        .then((contextResponse: ContextInfo): request.RequestPromise | Promise<CustomAction | undefined> => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(JSON.stringify(contextResponse));
-            cmd.log('');
-
-            cmd.log(`Attempt to get custom action with scope: ${args.options.scope}`);
-            cmd.log('');
-          }
 
           if (args.options.scope && args.options.scope.toLowerCase() !== "all") {
             return this.removeScopedCustomAction(args.options, siteAccessToken, cmd);
@@ -78,12 +61,7 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
 
           return this.searchAllScopes(args.options, siteAccessToken, cmd);
         })
-        .then((customAction: CustomAction | undefined): void => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(JSON.stringify(customAction));
-            cmd.log('');
-          }
+        .then((customAction: CustomAction | void): void => {
           if (this.verbose) {
             if (customAction && customAction["odata.null"] === true) {
               cmd.log(`Custom action with id ${args.options.id} not found`);
@@ -116,22 +94,16 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
     }
   }
 
-  private removeScopedCustomAction(options: Options, siteAccessToken: string, cmd: CommandInstance): request.RequestPromise {
+  private removeScopedCustomAction(options: Options, siteAccessToken: string, cmd: CommandInstance): Promise<undefined> {
     const requestOptions: any = {
       url: `${options.url}/_api/${options.scope}/UserCustomActions('${encodeURIComponent(options.id)}')`,
-      headers: Utils.getRequestHeaders({
+      headers: {
         authorization: `Bearer ${siteAccessToken}`,
         accept: 'application/json;odata=nometadata',
         'X-HTTP-Method': 'DELETE'
-      }),
+      },
       json: true
     };
-
-    if (this.debug) {
-      cmd.log('Executing web request...');
-      cmd.log(JSON.stringify(requestOptions));
-      cmd.log('');
-    }
 
     return request.post(requestOptions);
   }
@@ -148,12 +120,6 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
       this
         .removeScopedCustomAction(options, siteAccessToken, cmd)
         .then((webResult: CustomAction | undefined): void => {
-          if (this.debug) {
-            cmd.log('removeCustomAction with scope of web result...');
-            cmd.log(JSON.stringify(webResult));
-            cmd.log('');
-          }
-
           if (webResult === undefined) {
             return resolve(webResult);
           }
@@ -162,12 +128,6 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
           this
             .removeScopedCustomAction(options, siteAccessToken, cmd)
             .then((siteResult: CustomAction | undefined): void => {
-              if (this.debug) {
-                cmd.log('removeCustomAction with scope of site result...');
-                cmd.log(JSON.stringify(siteResult));
-                cmd.log('');
-              }
-
               return resolve(siteResult);
             }, (err: any): void => {
               reject(err);

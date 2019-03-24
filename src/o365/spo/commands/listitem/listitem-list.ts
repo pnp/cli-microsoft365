@@ -2,7 +2,7 @@ import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate,
@@ -73,15 +73,8 @@ class SpoListItemListCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise | Promise<any> => {
+      .then((accessToken: string): Promise<any> => {
         siteAccessToken = accessToken;
-
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}.`);
-          cmd.log(``);
-          cmd.log(`auth object:`);
-          cmd.log(auth);
-        }
 
         if (args.options.query) {
           if (this.debug) {
@@ -94,13 +87,7 @@ class SpoListItemListCommand extends SpoCommand {
           return Promise.resolve();
         }
       })
-      .then((res: ContextInfo): request.RequestPromise | Promise<any> => {
-        if (this.debug) {
-          cmd.log('Response:')
-          cmd.log(res);
-          cmd.log('');
-        }
-
+      .then((res: ContextInfo): Promise<any> => {
         formDigestValue = args.options.query ? res.FormDigestValue : '';
 
         if (args.options.pageNumber && Number(args.options.pageNumber) > 0) {
@@ -110,19 +97,13 @@ class SpoListItemListCommand extends SpoCommand {
 
           const requestOptions: any = {
             url: `${listRestUrl}/items${fieldSelect}`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${siteAccessToken}`,
               'accept': 'application/json;odata=nometadata',
               'X-RequestDigest': formDigestValue
-            }),
+            },
             json: true
           };
-
-          if (this.debug) {
-            cmd.log('Executing web request for skip token id lookup...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
 
           return request.get(requestOptions);
         }
@@ -130,13 +111,7 @@ class SpoListItemListCommand extends SpoCommand {
           return Promise.resolve();
         }
       })
-      .then((res: any): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log('Response:')
-          cmd.log(res);
-          cmd.log('');
-        }
-
+      .then((res: any): Promise<ListItemInstanceCollection> => {
         const skipTokenId = (res && res.value && res.value.length && res.value[res.value.length - 1]) ? res.value[res.value.length - 1].Id : 0
         const skipToken: string = (args.options.pageNumber && Number(args.options.pageNumber) > 0 && skipTokenId > 0) ? `$skiptoken=Paged=TRUE%26p_ID=${res.value[res.value.length - 1].Id}` : ``;
         const rowLimit: string = args.options.pageSize ? `$top=${args.options.pageSize}` : ``
@@ -154,20 +129,14 @@ class SpoListItemListCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${listRestUrl}/${args.options.query ? `GetItems` : `items${fieldSelect}`}`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata',
             'X-RequestDigest': formDigestValue
-          }),
+          },
           json: true,
           body: requestBody
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return args.options.query ? request.post(requestOptions) : request.get(requestOptions);
       })

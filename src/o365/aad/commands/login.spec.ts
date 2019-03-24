@@ -5,7 +5,7 @@ import appInsights from '../../../appInsights';
 import auth from '../AadAuth';
 const command: Command = require('./login');
 import * as assert from 'assert';
-import * as request from 'request-promise-native';
+import request from '../../../request';
 import Utils from '../../../Utils';
 import { Service, AuthType } from '../../../Auth';
 import * as fs from 'fs';

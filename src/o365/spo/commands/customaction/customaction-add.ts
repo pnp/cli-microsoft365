@@ -1,6 +1,6 @@
 import auth from '../../SpoAuth';
 import config from '../../../../config';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
@@ -8,7 +8,6 @@ import {
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import { ContextInfo } from '../../spo';
 import Utils from '../../../../Utils';
 import { CustomAction } from './customaction';
 import { Auth } from '../../../../Auth';
@@ -95,16 +94,9 @@ class SpoCustomActionAddCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<CustomAction> => {
         siteAccessToken = accessToken;
 
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
-
-        return this.getRequestDigestForSite(args.options.url, siteAccessToken, cmd, this.debug);
-      })
-      .then((contextResponse: ContextInfo): request.RequestPromise => {
         if (!args.options.scope) {
           args.options.scope = 'Web';
         }
@@ -113,29 +105,17 @@ class SpoCustomActionAddCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${args.options.url}/_api/${args.options.scope}/UserCustomActions`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata'
-          }),
+          },
           body: requestBody,
           json: true
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return request.post(requestOptions);
       })
       .then((customAction: CustomAction): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(customAction);
-          cmd.log('');
-        }
-
         if (this.verbose) {
           cmd.log({
             ClientSideComponentId: customAction.ClientSideComponentId,

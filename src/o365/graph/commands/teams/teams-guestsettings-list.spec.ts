@@ -5,7 +5,7 @@ import appInsights from '../../../../appInsights';
 import auth from '../../GraphAuth';
 const command: Command = require('./teams-guestsettings-list');
 import * as assert from 'assert';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
 import { Service } from '../../../../Auth';
 

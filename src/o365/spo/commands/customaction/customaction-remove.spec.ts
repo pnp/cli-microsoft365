@@ -5,7 +5,7 @@ import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
 const command: Command = require('./customaction-remove');
 import * as assert from 'assert';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.CUSTOMACTION_REMOVE, () => {
@@ -236,7 +236,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     };
     cmdInstance.action({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', url: 'https://contoso.sharepoint.com' }}, () => {
       try {
-        assert(postCallsSpy.calledTwice === true);
+        assert(postCallsSpy.calledOnce === true);
         assert(removeScopedCustomActionSpy.calledWith(sinon.match(
           { 
             id: 'b2307a39-e878-458b-bc90-03bc578531d6',
@@ -273,7 +273,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     cmdInstance.action({ options: options }, () => {
 
       try {
-        assert(postCallsSpy.calledTwice === true);
+        assert(postCallsSpy.calledOnce === true);
         assert(removeScopedCustomActionSpy.calledWith({
           debug: false,
           id: 'b2307a39-e878-458b-bc90-03bc578531d6',
@@ -312,7 +312,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     cmdInstance.action({ options: options }, () => {
 
       try {
-        assert(postCallsSpy.calledTwice === true);
+        assert(postCallsSpy.calledOnce === true);
         assert(removeScopedCustomActionSpy.calledWith(
           {
             id: 'b2307a39-e878-458b-bc90-03bc578531d6',
@@ -352,7 +352,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     }, () => {
 
       try {
-        assert(postCallsSpy.calledTwice === true);
+        assert(postCallsSpy.calledOnce === true);
         assert(removeScopedCustomActionSpy.calledOnce == true);
         done();
       }

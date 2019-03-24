@@ -5,7 +5,7 @@ import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
 const command: Command = require('./folder-move');
 import * as assert from 'assert';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.FOLDER_MOVE, () => {
@@ -17,11 +17,11 @@ describe(commands.FOLDER_MOVE, () => {
   let telemetry: any;
 
   let stubAllPostRequests: any = (
-    getAccessToken = null,
-    getRequestDigestForSite = null,
-    recycleFolder = null,
-    createCopyJobs = null,
-    getCopyJobProgress = null
+    getAccessToken: any = null,
+    getRequestDigestForSite: any = null,
+    recycleFolder: any = null,
+    createCopyJobs: any = null,
+    getCopyJobProgress: any = null
   ) => {
     return sinon.stub(request, 'post').callsFake((opts) => {
 
@@ -69,7 +69,7 @@ describe(commands.FOLDER_MOVE, () => {
     });
   }
 
-  let stubAllGetRequests: any = (folderExists = null) => {
+  let stubAllGetRequests: any = (folderExists: any = null) => {
 
     return sinon.stub(request, 'get').callsFake((opts) => {
 

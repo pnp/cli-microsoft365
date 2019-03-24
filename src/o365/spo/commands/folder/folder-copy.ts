@@ -2,13 +2,12 @@ import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import Utils from '../../../../Utils';
 import { Auth } from '../../../../Auth';
 import * as url from 'url';
 
@@ -71,7 +70,7 @@ class SpoFolderCopyCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<any> => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}.`);
         }
@@ -83,10 +82,10 @@ class SpoFolderCopyCommand extends SpoCommand {
         const requestUrl: string = this.urlCombine(webUrl, '/_api/site/CreateCopyJobs');
         const requestOptions: any = {
           url: requestUrl,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata'
-          }),
+          },
           body: {
             exportObjectUris: [sourceAbsoluteUrl],
             destinationUri: this.urlCombine(tenantUrl, args.options.targetUrl),
@@ -98,19 +97,9 @@ class SpoFolderCopyCommand extends SpoCommand {
           json: true
         };
 
-        if (this.debug) {
-          cmd.log('CreateCopyJobs request...');
-          cmd.log(requestOptions);
-        }
-
         return request.post(requestOptions);
       })
       .then((jobInfo: any): Promise<any> => {
-        if (this.debug) {
-          cmd.log('CreateCopyJobs response...');
-          cmd.log(jobInfo);
-        }
-
         const jobProgressOptions: JobProgressOptions = {
           webUrl: webUrl,
           accessToken: siteAccessToken,
@@ -146,26 +135,16 @@ class SpoFolderCopyCommand extends SpoCommand {
       const requestUrl: string = `${opts.webUrl}/_api/site/GetCopyJobProgress`;
       const requestOptions: any = {
         url: requestUrl,
-        headers: Utils.getRequestHeaders({
+        headers: {
           authorization: `Bearer ${opts.accessToken}`,
           'accept': 'application/json;odata=nometadata'
-        }),
+        },
         body: { "copyJobInfo": opts.copyJopInfo },
         json: true
       };
 
-      if (this.debug) {
-        cmd.log('waitForJobResult request...');
-        cmd.log(requestOptions);
-      }
-
       request.post(requestOptions).then((resp: any): void => {
         retryAttemptsCount = 0; // clear retry on promise success 
-
-        if (this.debug) {
-          cmd.log('waitForJobResult response...');
-          cmd.log(resp);
-        }
 
         if (this.verbose) {
           if (resp.JobState && resp.JobState === 4) {

@@ -5,7 +5,7 @@ import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
 const command: Command = require('./folder-get');
 import * as assert from 'assert';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.FOLDER_GET, () => {
@@ -24,7 +24,7 @@ describe(commands.FOLDER_GET, () => {
       telemetry = t;
     });
 
-    stubGetResponses = (getResp = null) => {
+    stubGetResponses = (getResp: any = null) => {
       return sinon.stub(request, 'get').callsFake((opts) => {
         if (opts.url.indexOf('GetFolderByServerRelativeUrl') > -1) {
           if (getResp) {

@@ -1,8 +1,7 @@
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import * as fs from 'fs';
 import * as path from 'path';
 import auth from '../../GraphAuth';
-import Utils from '../../../../Utils';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -31,7 +30,7 @@ class GraphTeamsAppPublishCommand extends GraphCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((): request.RequestPromise => {
+      .then((): Promise<{ id: string; }> => {
         const fullPath: string = path.resolve(args.options.filePath);
         if (this.verbose) {
           cmd.log(`Adding app '${fullPath}' to app catalog...`);
@@ -39,29 +38,17 @@ class GraphTeamsAppPublishCommand extends GraphCommand {
 
         const requestOptions: any = {
           url: `${auth.service.resource}/v1.0/appCatalogs/teamsApps`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${auth.service.accessToken}`,
             "content-type": "application/zip",
             accept: 'application/json;odata.metadata=none'
-          }),
+          },
           body: fs.readFileSync(fullPath)
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.post(requestOptions);
       })
       .then((res: { id: string; }): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
         if (res && res.id) {
           cmd.log(res.id);
         }

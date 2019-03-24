@@ -1,7 +1,7 @@
 import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate
@@ -54,7 +54,7 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
 
       auth
         .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-        .then((accessToken: string): request.RequestPromise => {
+        .then((accessToken: string): Promise<ContextInfo> => {
           this.siteAccessToken = accessToken;
 
           if (this.debug) {
@@ -66,21 +66,9 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
         .then((contextResponse: ContextInfo): Promise<IdentityResponse> => {
           this.formDigestValue = contextResponse.FormDigestValue;
 
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(JSON.stringify(contextResponse));
-            cmd.log('');
-          }
-
           return clientSvcCommons.getCurrentWebIdentity(args.options.webUrl, this.siteAccessToken, this.formDigestValue);
         })
         .then((identityResp: IdentityResponse): Promise<IdentityResponse> => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(JSON.stringify(identityResp));
-            cmd.log('');
-          }
-
           const opts: Options = args.options;
           if (opts.folder) {
             // get the folder guid instead of the web guid
@@ -89,21 +77,9 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
           return new Promise<IdentityResponse>(resolve => { return resolve(identityResp); });
         })
         .then((identityResp: IdentityResponse): Promise<any> => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(JSON.stringify(identityResp));
-            cmd.log('');
-          }
-
           return this.removeProperty(identityResp, args.options);
         })
         .then((res: any): void => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(JSON.stringify(res));
-            cmd.log('');
-          }
-
           if (this.verbose) {
             cmd.log('DONE');
           }
@@ -140,10 +116,10 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
 
     const requestOptions: any = {
       url: `${options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
-      headers: Utils.getRequestHeaders({
+      headers: {
         authorization: `Bearer ${this.siteAccessToken}`,
         'X-RequestDigest': this.formDigestValue
-      }),
+      },
       body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetFieldValue" Id="206" ObjectPathId="205"><Parameters><Parameter Type="String">${Utils.escapeXml(options.key)}</Parameter><Parameter Type="Null" /></Parameters></Method><Method Name="Update" Id="207" ObjectPathId="198" /></Actions><ObjectPaths><Property Id="205" ParentId="198" Name="${objectType}" /><Identity Id="198" Name="${identityResp.objectIdentity}" /></ObjectPaths></Request>`
     };
 

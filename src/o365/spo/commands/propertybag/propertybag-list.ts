@@ -1,7 +1,6 @@
 import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
-import * as request from 'request-promise-native';
 import {
   CommandOption,
   CommandValidate
@@ -50,7 +49,7 @@ class SpoPropertyBagListCommand extends SpoPropertyBagBaseCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<ContextInfo> => {
         this.siteAccessToken = accessToken;
 
         if (this.debug) {
@@ -62,21 +61,9 @@ class SpoPropertyBagListCommand extends SpoPropertyBagBaseCommand {
       .then((contextResponse: ContextInfo): Promise<IdentityResponse> => {
         this.formDigestValue = contextResponse.FormDigestValue;
 
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(JSON.stringify(contextResponse));
-          cmd.log('');
-        }
-
         return clientSvcCommons.getCurrentWebIdentity(args.options.webUrl, this.siteAccessToken, this.formDigestValue);
       })
-      .then((identityResp: IdentityResponse): Promise<Object> => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(JSON.stringify(identityResp));
-          cmd.log('');
-        }
-
+      .then((identityResp: IdentityResponse): Promise<any> => {
         const opts: Options = args.options;
         if (opts.folder) {
           return this.getFolderPropertyBag(identityResp, opts.webUrl, opts.folder, cmd);
@@ -84,13 +71,7 @@ class SpoPropertyBagListCommand extends SpoPropertyBagBaseCommand {
 
         return this.getWebPropertyBag(identityResp, opts.webUrl, cmd);
       })
-      .then((propertyBagData: Object): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(JSON.stringify(propertyBagData));
-          cmd.log('');
-        }
-
+      .then((propertyBagData: any): void => {
         cmd.log(this.formatOutput(propertyBagData));
 
         cb();

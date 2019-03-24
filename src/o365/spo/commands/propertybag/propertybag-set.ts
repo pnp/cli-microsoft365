@@ -2,7 +2,6 @@ import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import SpoCommand from '../../SpoCommand';
-import * as request from 'request-promise-native';
 import {
   CommandOption,
   CommandValidate
@@ -53,7 +52,7 @@ class SpoPropertyBagSetCommand extends SpoPropertyBagBaseCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<ContextInfo> => {
         this.siteAccessToken = accessToken;
 
         if (this.debug) {
@@ -64,12 +63,6 @@ class SpoPropertyBagSetCommand extends SpoPropertyBagBaseCommand {
       })
       .then((contextResponse: ContextInfo): Promise<IdentityResponse> => {
         this.formDigestValue = contextResponse.FormDigestValue;
-
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(JSON.stringify(contextResponse));
-          cmd.log('');
-        }
 
         return clientSvcCommons.getCurrentWebIdentity(args.options.webUrl, this.siteAccessToken, this.formDigestValue);
       })
@@ -94,21 +87,9 @@ class SpoPropertyBagSetCommand extends SpoPropertyBagBaseCommand {
         return new Promise<IdentityResponse>(resolve => { return resolve(webIdentityResp); });
       })
       .then((identityResp: IdentityResponse): Promise<any> => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(JSON.stringify(identityResp));
-          cmd.log('');
-        }
-
         return this.setProperty(identityResp, args.options, cmd);
       })
       .then((res: any): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(JSON.stringify(res));
-          cmd.log('');
-        }
-
         if (this.verbose) {
           cmd.log('DONE');
         }

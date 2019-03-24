@@ -1,6 +1,6 @@
 import auth from '../../SpoAuth';
 import config from '../../../../config';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
@@ -9,7 +9,6 @@ import {
 } from '../../../../Command';
 import * as fs from 'fs';
 import * as path from 'path';
-import Utils from '../../../../Utils';
 import { Auth } from '../../../../Auth';
 import { SpoAppBaseCommand } from './SpoAppBaseCommand';
 
@@ -65,14 +64,8 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
 
         return auth.getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug);
       })
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<string> => {
         siteAccessToken = accessToken;
-
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(accessToken);
-          cmd.log('');
-        }
 
         const fullPath: string = path.resolve(args.options.filePath);
         if (this.verbose) {
@@ -82,29 +75,17 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
         const fileName: string = path.basename(fullPath);
         const requestOptions: any = {
           url: `${appCatalogSiteUrl}/_api/web/${scope}appcatalog/Add(overwrite=${(overwrite.toString().toLowerCase())}, url='${fileName}')`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata',
             binaryStringRequestBody: 'true'
-          }),
+          },
           body: fs.readFileSync(fullPath)
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.post(requestOptions);
       })
       .then((res: string): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
         const json: any = JSON.parse(res);
         if (args.options.output === 'json') {
           cmd.log(json);

@@ -5,9 +5,8 @@ import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
 const command: Command = require('./folder-add');
 import * as assert from 'assert';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
-const packageJson = require('../../../../../package.json');
 
 describe(commands.FOLDER_ADD, () => {
   let vorpal: Vorpal;
@@ -25,7 +24,7 @@ describe(commands.FOLDER_ADD, () => {
       telemetry = t;
     });
 
-    stubPostResponses = (addResp = null) => {
+    stubPostResponses = (addResp: any = null) => {
       return sinon.stub(request, 'post').callsFake((opts) => {
         if (opts.url.indexOf('/common/oauth2/token') > -1) {
           return Promise.resolve('abc');
@@ -194,8 +193,7 @@ describe(commands.FOLDER_ADD, () => {
         assert(request.calledWith({ url: 'https://contoso.sharepoint.com/_api/web/folders',
         headers:
          { authorization: 'Bearer ABC',
-           accept: 'application/json;odata=nometadata',
-           'User-Agent': `NONISV|SharePointPnP|Office365CLI/${packageJson.version}` },
+           accept: 'application/json;odata=nometadata' },
         body: { ServerRelativeUrl: '/Shared Documents/abc' },
         json: true }));
         done();
@@ -227,8 +225,7 @@ describe(commands.FOLDER_ADD, () => {
         assert(request.calledWith({ url: 'https://contoso.sharepoint.com/sites/test1/_api/web/folders',
         headers:
          { authorization: 'Bearer ABC',
-           accept: 'application/json;odata=nometadata',
-           'User-Agent': `NONISV|SharePointPnP|Office365CLI/${packageJson.version}` },
+           accept: 'application/json;odata=nometadata' },
         body: { ServerRelativeUrl: '/sites/test1/Shared Documents/abc' },
         json: true }));
         done();

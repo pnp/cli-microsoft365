@@ -2,7 +2,7 @@ import auth from '../../AadAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate
@@ -33,7 +33,7 @@ class Oauth2GrantListCommand extends AadCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<{ value: OAuth2PermissionGrant[] }> => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}. Retrieving list of OAuth grants for the service principal...`);
         }
@@ -44,28 +44,16 @@ class Oauth2GrantListCommand extends AadCommand {
 
         const requestOptions: any = {
           url: `${auth.service.resource}/myorganization/oauth2PermissionGrants?api-version=1.6&$filter=clientId eq '${encodeURIComponent(args.options.clientId)}'`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${accessToken}`,
             accept: 'application/json;odata=nometadata'
-          }),
+          },
           json: true
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.get(requestOptions);
       })
       .then((res: { value: OAuth2PermissionGrant[] }): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
         if (res.value && res.value.length > 0) {
           if (args.options.output === 'json') {
             cmd.log(res.value);

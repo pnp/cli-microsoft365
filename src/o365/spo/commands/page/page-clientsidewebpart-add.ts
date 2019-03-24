@@ -1,6 +1,6 @@
 import auth from '../../SpoAuth';
 import config from '../../../../config';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import commands from '../../commands';
 import { CommandOption, CommandValidate } from '../../../../Command';
 const uuidv4 = require('uuid/v4');
@@ -71,7 +71,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<{ CanvasContent1: string; IsPageCheckedOutToCurrentUser: boolean }> => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}`);
         }
@@ -84,28 +84,16 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata'
-          }),
+          },
           json: true
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return request.get(requestOptions);
       })
-      .then((res: { CanvasContent1: string; IsPageCheckedOutToCurrentUser: boolean }): Promise<void> | request.RequestPromise => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
+      .then((res: { CanvasContent1: string; IsPageCheckedOutToCurrentUser: boolean }): Promise<void> => {
         canvasContent = JSON.parse(res.CanvasContent1 || "[{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]");
 
         if (res.IsPageCheckedOutToCurrentUser) {
@@ -114,18 +102,12 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/checkoutpage`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata'
-          }),
+          },
           json: true
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.post(requestOptions);
       })
@@ -139,13 +121,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
         // Get the WebPart according to arguments
         return this.getWebPart(cmd, args, siteAccessToken);
       })
-      .then((webPart: ClientSideWebpart): request.RequestPromise | Promise<void> => {
-        if (this.debug) {
-          cmd.log(`Retrieved WebPart definition:`);
-          cmd.log(webPart);
-          cmd.log('');
-        }
-
+      .then((webPart: ClientSideWebpart): Promise<void> => {
         if (this.verbose) {
           cmd.log(`Setting client-side web part layout and properties...`);
         }
@@ -252,32 +228,20 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/savepage`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata',
             'content-type': 'application/json;odata=nometadata'
-          }),
+          },
           body: {
             CanvasContent1: JSON.stringify(canvasContent)
           },
           json: true
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return request.post(requestOptions);
       })
-      .then((res: any): void => {
-        if (this.debug) {
-          cmd.log(`Response`);
-          cmd.log(res);
-          cmd.log('');
-        }
-
+      .then((): void => {
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
         }
@@ -301,28 +265,16 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
 
       const requestOptions: any = {
         url: `${args.options.webUrl}/_api/web/getclientsidewebparts()`,
-        headers: Utils.getRequestHeaders({
+        headers: {
           authorization: `Bearer ${accessToken}`,
           accept: 'application/json;odata=nometadata'
-        }),
+        },
         json: true
       };
 
-      if (this.debug) {
-        cmd.log('Executing web request...');
-        cmd.log(requestOptions);
-        cmd.log('');
-      }
-
       request
-        .get(requestOptions)
+        .get<{ value: ClientSidePageComponent[] }>(requestOptions)
         .then((res: { value: ClientSidePageComponent[] }): void => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
-          }
-
           const webPartDefinition = res.value.filter((c) => c.Id.toLowerCase() === (webPartId as string).toLowerCase() || c.Id.toLowerCase() === `{${(webPartId as string).toLowerCase()}}`);
           if (webPartDefinition.length === 0) {
             reject(new Error(`There is no available WebPart with Id ${webPartId}.`));

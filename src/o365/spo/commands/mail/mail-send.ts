@@ -2,13 +2,12 @@ import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import Utils from '../../../../Utils';
 import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -56,7 +55,7 @@ class SpoMailSendCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise | Promise<void> => {
+      .then((accessToken: string): Promise<void> => {
         siteAccessToken = accessToken;
 
         if (this.debug) {
@@ -103,29 +102,17 @@ class SpoMailSendCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/SP.Utilities.Utility.SendEmail`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'content-type': 'application/json;odata=verbose'
-          }),
+          },
           json: true,
           body: params
         };
 
-        if (this.debug) {
-          cmd.log('Executing the request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return request.post(requestOptions);
       })
-      .then((rawRes: string): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(rawRes);
-          cmd.log('');
-        }
-
+      .then((): void => {
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
         }

@@ -5,7 +5,7 @@ import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
 const command: Command = require('./file-copy');
 import * as assert from 'assert';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.FILE_COPY, () => {
@@ -17,11 +17,11 @@ describe(commands.FILE_COPY, () => {
   let telemetry: any;
 
   let stubAllPostRequests: any = (
-    getAccessToken = null,
-    getRequestDigestForSite = null,
-    recycleFile = null,
-    createCopyJobs = null,
-    waitForJobResult = null
+    getAccessToken: any = null,
+    getRequestDigestForSite: any = null,
+    recycleFile: any = null,
+    createCopyJobs: any = null,
+    waitForJobResult: any = null
   ) => {
     return sinon.stub(request, 'post').callsFake((opts) => {
 
@@ -69,7 +69,7 @@ describe(commands.FILE_COPY, () => {
     });
   }
 
-  let stubAllGetRequests: any = (fileExists = null) => {
+  let stubAllGetRequests: any = (fileExists: any = null) => {
 
     return sinon.stub(request, 'get').callsFake((opts) => {
 

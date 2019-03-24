@@ -1,4 +1,4 @@
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import auth from '../../GraphAuth';
 import Utils from '../../../../Utils';
 import config from '../../../../config';
@@ -32,25 +32,19 @@ class GraphTeamsAppInstallCommand extends GraphCommand {
 
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((): request.RequestPromise => {
+      .then((): Promise<{}> => {
         const requestOptions: any = {
           url: `${endpoint}/teams/${args.options.teamId}/installedApps`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${auth.service.accessToken}`,
             'content-type': 'application/json;odata=nometadata',
             'accept': 'application/json;odata.metadata=none'
-          }),
+          },
           json: true,
           body: {
             'teamsApp@odata.bind': `${endpoint}/appCatalogs/teamsApps/${args.options.appId}`
           }
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.post(requestOptions);
       })

@@ -5,7 +5,7 @@ import appInsights from '../../../../appInsights';
 import auth from '../../GraphAuth';
 const command: Command = require('./o365group-add');
 import * as assert from 'assert';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
 import { Service } from '../../../../Auth';
 import * as fs from 'fs';
@@ -806,6 +806,7 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('creates Office 365 Group with specific owners (debug)', (done) => {
+    let groupCreated: boolean = false;
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
         if (JSON.stringify(opts.body) === JSON.stringify({
@@ -819,6 +820,7 @@ describe(commands.O365GROUP_ADD, () => {
           securityEnabled: false,
           visibility: 'Public'
         })) {
+          groupCreated = true;
           return Promise.resolve({
             id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
             deletedDateTime: null,
@@ -884,27 +886,7 @@ describe(commands.O365GROUP_ADD, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com,user@contoso.onmicrosoft.com' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
-          id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
-          deletedDateTime: null,
-          classification: null,
-          createdDateTime: "2018-02-24T18:38:53Z",
-          description: "My awesome group",
-          displayName: "My group",
-          groupTypes: ["Unified"],
-          mail: "my_group@contoso.onmicrosoft.com",
-          mailEnabled: true,
-          mailNickname: "my_group",
-          onPremisesLastSyncDateTime: null,
-          onPremisesProvisioningErrors: [],
-          onPremisesSecurityIdentifier: null,
-          onPremisesSyncEnabled: null,
-          preferredDataLocation: null,
-          proxyAddresses: ["SMTP:my_group@contoso.onmicrosoft.com"],
-          renewedDateTime: "2018-02-24T18:38:53Z",
-          securityEnabled: false,
-          visibility: "Public"
-        }));
+        assert(groupCreated);
         done();
       }
       catch (e) {
@@ -1007,6 +989,7 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('creates Office 365 Group with specific members (debug)', (done) => {
+    let groupCreated: boolean = false;
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
         if (JSON.stringify(opts.body) === JSON.stringify({
@@ -1020,6 +1003,7 @@ describe(commands.O365GROUP_ADD, () => {
           securityEnabled: false,
           visibility: 'Public'
         })) {
+          groupCreated = true;
           return Promise.resolve({
             id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
             deletedDateTime: null,
@@ -1085,27 +1069,7 @@ describe(commands.O365GROUP_ADD, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com,user@contoso.onmicrosoft.com' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
-          id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
-          deletedDateTime: null,
-          classification: null,
-          createdDateTime: "2018-02-24T18:38:53Z",
-          description: "My awesome group",
-          displayName: "My group",
-          groupTypes: ["Unified"],
-          mail: "my_group@contoso.onmicrosoft.com",
-          mailEnabled: true,
-          mailNickname: "my_group",
-          onPremisesLastSyncDateTime: null,
-          onPremisesProvisioningErrors: [],
-          onPremisesSecurityIdentifier: null,
-          onPremisesSyncEnabled: null,
-          preferredDataLocation: null,
-          proxyAddresses: ["SMTP:my_group@contoso.onmicrosoft.com"],
-          renewedDateTime: "2018-02-24T18:38:53Z",
-          securityEnabled: false,
-          visibility: "Public"
-        }));
+        assert(groupCreated);
         done();
       }
       catch (e) {

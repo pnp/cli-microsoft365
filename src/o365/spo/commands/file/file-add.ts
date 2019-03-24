@@ -2,7 +2,7 @@ import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate
@@ -94,7 +94,7 @@ class SpoFileAddCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): any => {
+      .then((accessToken: string): Promise<void> => {
         siteAccessToken = accessToken;
 
         if (this.debug) {
@@ -104,24 +104,18 @@ class SpoFileAddCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderPath)}')`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata'
-          })
+          }
         };
 
-        return request.get(requestOptions).catch((err: string): Promise<void> => {
+        return request.get<void>(requestOptions).catch((err: string): Promise<void> => {
           // folder does not exist so will attempt to create the folder tree
           return folderExtensions.ensureFolder(args.options.webUrl, folderPath, siteAccessToken);
         });
       })
-      .then((res: any): Promise<void> => {
-        if (this.debug) {
-          cmd.log('Target folder exists ...');
-          cmd.log(res);
-          cmd.log('');
-        }
-
+      .then((): Promise<void> => {
         if (args.options.checkOut) {
           return this.fileCheckOut(fileName, args.options.webUrl, folderPath, siteAccessToken, cmd)
             .then((res: any) => {
@@ -138,7 +132,7 @@ class SpoFileAddCommand extends SpoCommand {
 
         return Promise.resolve();
       })
-      .then((res: any): request.RequestPromise => {
+      .then((): Promise<void> => {
         if (this.verbose) {
           cmd.log(`Upload file to site ${args.options.webUrl}...`);
         }
@@ -149,31 +143,19 @@ class SpoFileAddCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderPath)}')/Files/Add(url='${encodeURIComponent(fileName)}', overwrite=true)`,
           body: fileBody,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata',
             'content-length': bodyLength
-          })
+          }
         };
 
         return request.post(requestOptions);
       })
-      .then((res: any): request.RequestPromise | Promise<void> => {
-        if (this.debug) {
-          cmd.log('File added ...');
-          cmd.log(JSON.stringify(res));
-          cmd.log('');
-        }
-
+      .then((): Promise<void> => {
         if (args.options.contentType || args.options.publish || args.options.approve) {
           return this.getFileParentList(fileName, args.options.webUrl, folderPath, siteAccessToken, cmd)
             .then((listSettingsResp: ListSettings) => {
-              if (this.debug) {
-                cmd.log('List details response...');
-                cmd.log(JSON.stringify(listSettingsResp));
-                cmd.log('');
-              }
-
               listSettings = listSettingsResp;
 
               if (args.options.contentType) {
@@ -186,7 +168,7 @@ class SpoFileAddCommand extends SpoCommand {
 
         return Promise.resolve();
       })
-      .then((res: any): request.RequestPromise | Promise<void> => {
+      .then((): Promise<void> => {
         // check if there are unknown options 
         // and map them as fields to update
         let fieldsToUpdate: FieldValue[] = this.mapUnknownOptionsAsFieldValue(args.options);
@@ -209,7 +191,7 @@ class SpoFileAddCommand extends SpoCommand {
 
         return Promise.resolve();
       })
-      .then((res: any): request.RequestPromise | Promise<void> => {
+      .then((): Promise<void> => {
         // approve and publish cannot be used together 
         // when approve is used it will automatically publish the file
         // so then no need to publish afterwards
@@ -221,18 +203,12 @@ class SpoFileAddCommand extends SpoCommand {
           // approve the existing file with given comment
           const requestOptions: any = {
             url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderPath)}')/Files('${encodeURIComponent(fileName)}')/approve(comment='${encodeURIComponent(args.options.approveComment || '')}')`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${siteAccessToken}`,
               'accept': 'application/json;odata=nometadata'
-            }),
+            },
             json: true
           };
-
-          if (this.debug) {
-            cmd.log('Approve paylaod ...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
 
           return request.post(requestOptions);
         }
@@ -248,31 +224,19 @@ class SpoFileAddCommand extends SpoCommand {
           // publish the existing file with given comment
           const requestOptions: any = {
             url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderPath)}')/Files('${encodeURIComponent(fileName)}')/publish(comment='${encodeURIComponent(args.options.publishComment || '')}')`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${siteAccessToken}`,
               'accept': 'application/json;odata=nometadata'
-            }),
+            },
             json: true
           };
-
-          if (this.debug) {
-            cmd.log('Publish paylaod ...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
 
           return request.post(requestOptions);
         }
 
         return Promise.resolve();
       })
-      .then((res: any): void => {
-        if (this.debug) {
-          cmd.log('Approve or publish response ...');
-          cmd.log(JSON.stringify(res));
-          cmd.log('');
-        }
-
+      .then((): void => {
         if (this.verbose) {
           cmd.log('DONE');
         }
@@ -285,9 +249,9 @@ class SpoFileAddCommand extends SpoCommand {
 
           const requestOptions: any = {
             url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderPath)}')/Files('${encodeURIComponent(fileName)}')/UndoCheckOut()`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${siteAccessToken}`
-            })
+            }
           };
 
           request.post(requestOptions)
@@ -496,21 +460,15 @@ class SpoFileAddCommand extends SpoCommand {
 
     const requestOptions: any = {
       url: `${webUrl}/_api/web/lists('${listSettings.Id}')/contenttypes?$select=Name,Id`,
-      headers: Utils.getRequestHeaders({
+      headers: {
         authorization: `Bearer ${siteAccessToken}`,
         'accept': 'application/json;odata=nometadata'
-      }),
+      },
       json: true
     };
 
-    return request.get(requestOptions).then(response => {
+    return request.get<any>(requestOptions).then(response => {
       // check if the specified content type is in the list
-
-      if (this.debug) {
-        cmd.log('Content type lookup response ...');
-        cmd.log(response);
-      }
-
       for (const ct of response.value) {
         if (ct.Id.StringValue === contentType || ct.Name === contentType) {
           return Promise.resolve();
@@ -525,59 +483,41 @@ class SpoFileAddCommand extends SpoCommand {
     // check if file already exists, otherwise it can't be checked out
     const requestOptions: any = {
       url: `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folder)}')/Files('${encodeURIComponent(fileName)}')`,
-      headers: Utils.getRequestHeaders({
+      headers: {
         authorization: `Bearer ${siteAccessToken}`,
         'accept': 'application/json;odata=nometadata'
-      })
+      }
     };
 
-    return request.get(requestOptions)
-      .then((res: any) => {
-        if (this.debug) {
-          cmd.log('File exists response...');
-          cmd.log(res);
-          cmd.log('');
-        }
-
+    return request.get<void>(requestOptions)
+      .then(() => {
         // checkout the existing file
         const requestOptions: any = {
           url: `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folder)}')/Files('${encodeURIComponent(fileName)}')/CheckOut()`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata',
-          }),
+          },
           json: true
         };
 
-        if (this.debug) {
-          cmd.log(`Checkout file ${fileName}`);
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
-        return request.post(requestOptions);
+        return request.post<void>(requestOptions);
       });
   }
 
-  private getFileParentList(fileName: string, webUrl: string, folder: string, siteAccessToken: string, cmd: any): request.RequestPromise {
+  private getFileParentList(fileName: string, webUrl: string, folder: string, siteAccessToken: string, cmd: any): Promise<ListSettings> {
     if (this.verbose) {
       cmd.log(`Getting list details in order to get its available content types afterwards...`);
     }
 
     const requestOptions: any = {
       url: `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folder)}')/Files('${encodeURIComponent(fileName)}')/ListItemAllFields/ParentList?$Select=Id,EnableModeration,EnableVersioning,EnableMinorVersions`,
-      headers: Utils.getRequestHeaders({
+      headers: {
         authorization: `Bearer ${siteAccessToken}`,
         'accept': 'application/json;odata=nometadata'
-      }),
+      },
       json: true
     };
-
-    if (this.debug) {
-      cmd.log('Get ParentList web request...');
-      cmd.log(requestOptions);
-      cmd.log('');
-    }
 
     return request.get(requestOptions);
   }
@@ -601,28 +541,16 @@ class SpoFileAddCommand extends SpoCommand {
     // update the existing file list item fields
     const requestOptions: any = {
       url: `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderPath)}')/Files('${encodeURIComponent(fileName)}')/ListItemAllFields/ValidateUpdateListItem()`,
-      headers: Utils.getRequestHeaders({
+      headers: {
         authorization: `Bearer ${siteAccessToken}`,
         'accept': 'application/json;odata=nometadata'
-      }),
+      },
       body: requestBody,
       json: true
     };
 
-    if (this.debug) {
-      cmd.log('ValidateUpdateListItem payload ...');
-      cmd.log(requestOptions);
-      cmd.log('');
-    }
-
     return request.post(requestOptions)
       .then((res: any) => {
-        if (this.debug) {
-          cmd.log('ValidateUpdateListItem response ...');
-          cmd.log(res);
-          cmd.log('');
-        }
-
         // check for field value update for errors
         const fieldValues: FieldValueResult[] = res.value;
         for (const fieldValue of fieldValues) {
@@ -637,21 +565,15 @@ class SpoFileAddCommand extends SpoCommand {
       });
   }
 
-  private fileCheckIn(args: any, fileName: string, siteAccessToken: string, cmd: any): request.RequestPromise {
+  private fileCheckIn(args: any, fileName: string, siteAccessToken: string, cmd: any): Promise<void> {
     const requestOptions: any = {
       url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(args.options.folder)}')/Files('${encodeURIComponent(fileName)}')/CheckIn(comment='${encodeURIComponent(args.options.checkInComment || '')}',checkintype=0)`,
-      headers: Utils.getRequestHeaders({
+      headers: {
         authorization: `Bearer ${siteAccessToken}`,
         'accept': 'application/json;odata=nometadata'
-      }),
+      },
       json: true
     };
-
-    if (this.debug) {
-      cmd.log(`File ${fileName} check in`);
-      cmd.log(requestOptions);
-      cmd.log('');
-    }
 
     return request.post(requestOptions);
   }

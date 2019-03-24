@@ -6,7 +6,7 @@ import {
   CommandOption, CommandValidate
 } from '../../../../Command';
 import Utils from '../../../../Utils';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import GraphCommand from '../../GraphCommand';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -39,25 +39,18 @@ class GraphTeamsRemoveCommand extends GraphCommand {
     const removeTeam: () => void = (): void => {
       auth
         .ensureAccessToken(auth.service.resource, cmd, this.debug)
-        .then((): request.RequestPromise => {
+        .then((): Promise<void> => {
           const requestOptions: any = {
             url: `${auth.service.resource}/v1.0/groups/${encodeURIComponent(args.options.teamId)}`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${auth.service.accessToken}`,
               accept: 'application/json;odata.metadata=none'
-            }),
+            },
             json: true
           };
 
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
-
           return request.delete(requestOptions);
-        })
-                
+        })  
         .then((): void => {
           if (this.verbose) {
             cmd.log(vorpal.chalk.green('DONE'));

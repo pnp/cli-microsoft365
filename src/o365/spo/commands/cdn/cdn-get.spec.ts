@@ -6,7 +6,7 @@ import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
 const command: Command = require('./cdn-get');
 import * as assert from 'assert';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.CDN_GET, () => {
@@ -358,16 +358,9 @@ describe(commands.CDN_GET, () => {
     auth.site.url = 'https://contoso-admin.sharepoint.com';
     auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, () => {
-      let genericErrorHandled = false;
-      log.forEach(l => {
-        if (l && typeof l === 'string' && l.indexOf('An error has occurred') > -1) {
-          genericErrorHandled = true;
-        }
-      });
-
+    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
       try {
-        assert(genericErrorHandled);
+        assert.equal(err.message, 'An error has occurred');
         done();
       }
       catch (e) {

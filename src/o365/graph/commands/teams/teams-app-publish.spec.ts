@@ -1,6 +1,6 @@
 import * as sinon from 'sinon';
 import * as assert from 'assert';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import * as fs from 'fs';
 import commands from '../../commands';
 import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';

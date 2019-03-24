@@ -1,7 +1,7 @@
 import auth from '../../SpoAuth';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import config from '../../../../config';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
@@ -43,7 +43,7 @@ class SpoStorageEntityRemoveCommand extends SpoCommand {
     return true;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     const removeTenantProperty = (): void => {
       if (this.verbose) {
         cmd.log(`Removing tenant property ${args.options.key} from ${args.options.appCatalogUrl}...`);
@@ -51,55 +51,37 @@ class SpoStorageEntityRemoveCommand extends SpoCommand {
 
       auth
         .ensureAccessToken(auth.service.resource, cmd, this.debug)
-        .then((accessToken: string): request.RequestPromise => {
+        .then((accessToken: string): Promise<ContextInfo> => {
           if (this.debug) {
             cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
           }
 
           return this.getRequestDigest(cmd, this.debug);
         })
-        .then((res: ContextInfo): request.RequestPromise => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
-          }
-
+        .then((res: ContextInfo): Promise<string> => {
           const requestOptions: any = {
             url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${auth.service.accessToken}`,
               'X-RequestDigest': res.FormDigestValue
-            }),
+            },
             body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="31" ObjectPathId="30" /><ObjectPath Id="33" ObjectPathId="32" /><ObjectPath Id="35" ObjectPathId="34" /><Method Name="RemoveStorageEntity" Id="36" ObjectPathId="34"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.key)}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="30" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="32" ParentId="30" Name="GetSiteByUrl"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.appCatalogUrl)}</Parameter></Parameters></Method><Property Id="34" ParentId="32" Name="RootWeb" /></ObjectPaths></Request>`
           };
-
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
 
           return request.post(requestOptions);
         })
         .then((res: string): void => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
-          }
-
           const json: ClientSvcResponse = JSON.parse(res);
           const response: ClientSvcResponseContents = json[0];
           if (response.ErrorInfo) {
-            cmd.log(new CommandError(response.ErrorInfo.ErrorMessage));
+            cb(new CommandError(response.ErrorInfo.ErrorMessage));
           }
           else {
             if (this.verbose) {
               cmd.log(vorpal.chalk.green('DONE'));
             }
+            cb();
           }
-          cb();
         }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
     }
 

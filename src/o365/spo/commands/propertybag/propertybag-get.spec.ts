@@ -5,7 +5,7 @@ import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
 const command: Command = require('./propertybag-get');
 import * as assert from 'assert';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
 import config from '../../../../config';
 import { IdentityResponse, ClientSvc } from '../../common/ClientSvc';
@@ -18,9 +18,9 @@ describe(commands.PROPERTYBAG_GET, () => {
   let trackEvent: any;
   let telemetry: any;
   let stubAllPostRequests: any = (
-    requestObjectIdentityResp = null,
-    getFolderPropertyBagResp = null,
-    getWebPropertyBagResp = null
+    requestObjectIdentityResp: any = null,
+    getFolderPropertyBagResp: any = null,
+    getWebPropertyBagResp: any = null
   ) => {
     return sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf('/common/oauth2/token') > -1) {

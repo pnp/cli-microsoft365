@@ -1,8 +1,7 @@
 import auth from '../../SpoAuth';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import config from '../../../../config';
 import commands from '../../commands';
-import Utils from '../../../../Utils';
 import SpoCommand from '../../SpoCommand';
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -18,36 +17,18 @@ class SpoTenantAppCatalogUrlGetCommand extends SpoCommand {
   public commandAction(cmd: CommandInstance, args: any, cb: (err?: any) => void): void {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(accessToken);
-          cmd.log('');
-        }
-
+      .then((): Promise<string> => {
         const requestOptions: any = {
           url: `${auth.site.url}/_api/SP_TenantSettings_Current`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${auth.service.accessToken}`,
             accept: 'application/json;odata=nometadata'
-          })
+          }
         };
-    
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
     
         return request.get(requestOptions);
       })
       .then((res: string): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
         const json = JSON.parse(res);
 
         if (json.CorporateCatalogUrl) {

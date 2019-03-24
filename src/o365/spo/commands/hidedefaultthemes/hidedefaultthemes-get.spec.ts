@@ -5,7 +5,7 @@ import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
 const command: Command = require('./hidedefaultthemes-get');
 import * as assert from 'assert';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.HIDEDEFAULTTHEMES_GET, () => {
@@ -177,7 +177,7 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve(true);
+          return Promise.resolve({ value: true });
         }
       }
       return Promise.reject('Invalid request');

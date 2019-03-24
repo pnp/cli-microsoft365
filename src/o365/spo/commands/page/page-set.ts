@@ -1,12 +1,11 @@
 import auth from '../../SpoAuth';
 import config from '../../../../config';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import commands from '../../commands';
 import {
   CommandOption, CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import Utils from '../../../../Utils';
 import { ContextInfo } from '../../spo';
 import GlobalOptions from '../../../../GlobalOptions';
 import { Auth } from '../../../../Auth';
@@ -58,7 +57,7 @@ class SpoPageSetCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<ContextInfo> => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
         }
@@ -71,13 +70,7 @@ class SpoPageSetCommand extends SpoCommand {
 
         return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
       })
-      .then((res: ContextInfo): request.RequestPromise | Promise<void> => {
-        if (this.debug) {
-          cmd.log('Response:')
-          cmd.log(res);
-          cmd.log('');
-        }
-
+      .then((res: ContextInfo): Promise<void> => {
         requestDigest = res.FormDigestValue;
 
         if (!args.options.layoutType) {
@@ -86,14 +79,14 @@ class SpoPageSetCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeSiteUrl}')/ListItemAllFields`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'X-RequestDigest': requestDigest,
             'content-type': 'application/json;odata=nometadata',
             'X-HTTP-Method': 'MERGE',
             'IF-MATCH': '*',
             accept: 'application/json;odata=nometadata'
-          }),
+          },
           body: {
             PageLayoutType: args.options.layoutType
           },
@@ -108,15 +101,9 @@ class SpoPageSetCommand extends SpoCommand {
           };
         }
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return request.post(requestOptions);
       })
-      .then((res: any): request.RequestPromise | Promise<void> => {
+      .then((): Promise<void> => {
         if (!args.options.promoteAs) {
           return Promise.resolve();
         }
@@ -128,28 +115,28 @@ class SpoPageSetCommand extends SpoCommand {
         switch (args.options.promoteAs) {
           case 'HomePage':
             requestOptions.url = `${args.options.webUrl}/_api/web/rootfolder`;
-            requestOptions.headers = Utils.getRequestHeaders({
+            requestOptions.headers = {
               authorization: `Bearer ${siteAccessToken}`,
               'X-RequestDigest': requestDigest,
               'X-HTTP-Method': 'MERGE',
               'IF-MATCH': '*',
               'content-type': 'application/json;odata=nometadata',
               accept: 'application/json;odata=nometadata'
-            });
+            };
             requestOptions.body = {
               WelcomePage: `SitePages/${pageName}`
             };
             break;
           case 'NewsPage':
             requestOptions.url = `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeSiteUrl}')/ListItemAllFields`;
-            requestOptions.headers = Utils.getRequestHeaders({
+            requestOptions.headers = {
               authorization: `Bearer ${siteAccessToken}`,
               'X-RequestDigest': requestDigest,
               'X-HTTP-Method': 'MERGE',
               'IF-MATCH': '*',
               'content-type': 'application/json;odata=nometadata',
               accept: 'application/json;odata=nometadata'
-            });
+            };
             requestOptions.body = {
               PromotedState: 2,
               FirstPublishedDate: new Date().toISOString().replace('Z', '')
@@ -157,81 +144,45 @@ class SpoPageSetCommand extends SpoCommand {
             break;
         }
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return request.post(requestOptions);
       })
-      .then((res: any): request.RequestPromise | Promise<void> => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
+      .then((): Promise<void> => {
         if (typeof args.options.commentsEnabled === 'undefined') {
           return Promise.resolve();
         }
 
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeSiteUrl}')/ListItemAllFields/SetCommentsDisabled(${args.options.commentsEnabled === 'false'})`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'X-RequestDigest': requestDigest,
             'content-type': 'application/json;odata=nometadata',
             accept: 'application/json;odata=nometadata'
-          }),
+          },
           json: true
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return request.post(requestOptions);
       })
-      .then((res: any): request.RequestPromise | Promise<void> => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
+      .then((): Promise<void> => {
         if (!args.options.publish) {
           return Promise.resolve();
         }
 
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeSiteUrl}')/Publish('${encodeURIComponent(args.options.publishMessage || '').replace(/'/g, '%39')}')`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'X-RequestDigest': requestDigest,
             'content-type': 'application/json;odata=nometadata',
             accept: 'application/json;odata=nometadata'
-          }),
+          },
           json: true
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return request.post(requestOptions);
       })
-      .then((res: any): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
+      .then((): void => {
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
         }

@@ -2,7 +2,7 @@ import auth from "../../SpoAuth";
 import config from "../../../../config";
 import commands from "../../commands";
 import GlobalOptions from "../../../../GlobalOptions";
-import * as request from "request-promise-native";
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate,
@@ -49,7 +49,7 @@ class SpoListItemRecordDeclareCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
     const clientSvc: ClientSvc = new ClientSvc(cmd, this.debug);
     let siteAccessToken: string = '';
@@ -67,7 +67,7 @@ class SpoListItemRecordDeclareCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<ContextInfo> => {
         siteAccessToken = accessToken;
 
         if (this.debug) {
@@ -79,15 +79,9 @@ class SpoListItemRecordDeclareCommand extends SpoCommand {
       .then((contextResponse: ContextInfo): Promise<IdentityResponse> => {
         formDigestValue = contextResponse.FormDigestValue;
 
-        if (this.debug) {
-          cmd.log("contextResponse:");
-          cmd.log(JSON.stringify(contextResponse));
-          cmd.log("");
-        }
-
         return clientSvc.getCurrentWebIdentity(args.options.webUrl, siteAccessToken, formDigestValue);
       })
-      .then((webIdentityResp: IdentityResponse): request.RequestPromise | Promise<{ Id: string }> => {
+      .then((webIdentityResp: IdentityResponse): Promise<{ Id: string }> => {
         webIdentity = webIdentityResp.objectIdentity;
 
         if (args.options.listId) {
@@ -96,61 +90,43 @@ class SpoListItemRecordDeclareCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${listRestUrl}?$select=Id`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata'
-          }),
+          },
           json: true
-        }
-
-        if (this.debug) {
-          cmd.log('Executing get list web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
         }
 
         return request.get(requestOptions);
       })
-      .then((res: { Id: string }): request.RequestPromise => {
+      .then((res: { Id: string }): Promise<string> => {
         listId = res.Id;
         const requestBody: string = this.getDeclareRecordRequestBody(webIdentity, listId, args.options.id, args.options.date || '');
 
         const requestOptions: any = {
           url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'Content-Type': 'text/xml',
             'X-RequestDigest': formDigestValue
-          }),
+          },
           body: requestBody
         };
-
-        if (this.debug) {
-          cmd.log("Executing declare item as record web request...");
-          cmd.log(requestOptions);
-          cmd.log("");
-        }
 
         return request.post(requestOptions);
       })
       .then((res: string): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
         const json: ClientSvcResponse = JSON.parse(res);
         const response: ClientSvcResponseContents = json[0];
 
         if (response.ErrorInfo) {
-          cmd.log(new CommandError(response.ErrorInfo.ErrorMessage));
+          cb(new CommandError(response.ErrorInfo.ErrorMessage));
         }
         else {
           const result: boolean = json[json.length - 1];
           cmd.log(result);
+          cb();
         }
-        cb();
       }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
   }
 

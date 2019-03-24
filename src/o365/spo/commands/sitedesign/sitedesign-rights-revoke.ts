@@ -1,6 +1,6 @@
 import auth from '../../SpoAuth';
 import config from '../../../../config';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import commands from '../../commands';
 import {
   CommandOption, CommandValidate
@@ -41,7 +41,7 @@ class SpoSiteDesignRightsRevokeCommand extends SpoCommand {
     const revokePermissions: () => void = (): void => {
       auth
         .ensureAccessToken(auth.service.resource, cmd, this.debug)
-        .then((accessToken: string): request.RequestPromise => {
+        .then((accessToken: string): Promise<ContextInfo> => {
           if (this.debug) {
             cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
           }
@@ -52,21 +52,15 @@ class SpoSiteDesignRightsRevokeCommand extends SpoCommand {
 
           return this.getRequestDigest(cmd, this.debug);
         })
-        .then((res: ContextInfo): request.RequestPromise => {
-          if (this.debug) {
-            cmd.log('Response:')
-            cmd.log(res);
-            cmd.log('');
-          }
-
+        .then((res: ContextInfo): Promise<void> => {
           const requestOptions: any = {
             url: `${auth.site.url}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.RevokeSiteDesignRights`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${auth.service.accessToken}`,
               'X-RequestDigest': res.FormDigestValue,
               'content-type': 'application/json;charset=utf-8',
               accept: 'application/json;odata=nometadata'
-            }),
+            },
             body: {
               id: args.options.id,
               principalNames: args.options.principals.split(',').map(p => p.trim())
@@ -74,21 +68,9 @@ class SpoSiteDesignRightsRevokeCommand extends SpoCommand {
             json: true
           };
 
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
-
           return request.post(requestOptions);
         })
-        .then((res: any): void => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
-          }
-
+        .then((): void => {
           if (this.verbose) {
             cmd.log(vorpal.chalk.green('DONE'));
           }

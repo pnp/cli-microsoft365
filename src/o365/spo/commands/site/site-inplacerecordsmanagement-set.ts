@@ -1,7 +1,7 @@
 import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandOption,
@@ -42,17 +42,17 @@ class SpoSiteInPlaceRecordsManagementSetCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<void> => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}.`);
         }
 
         const requestOptions: any = {
           url: `${args.options.siteUrl}/_api/site/features/${enabled ? 'add' : 'remove'}`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${accessToken}`,
             accept: 'application/json;odata=nometadata'
-          }),
+          },
           body: {
             featureId: 'da2e115b-07e4-49d9-bb2c-35e93bb9fca9',
             force: true
@@ -60,25 +60,13 @@ class SpoSiteInPlaceRecordsManagementSetCommand extends SpoCommand {
           json: true
         };
 
-        if (this.debug) {
-          cmd.log('Executing site request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         if (this.verbose) {
           cmd.log(`${enabled ? 'Activating' : 'Deactivating'} in-place records management for site ${args.options.siteUrl}`);
         }
 
         return request.post(requestOptions);
       })
-      .then((res: any): void => {
-        if (this.debug) {
-          cmd.log('Response:')
-          cmd.log(res);
-          cmd.log('');
-        }
-
+      .then((): void => {
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
         }

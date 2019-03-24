@@ -1,7 +1,7 @@
 import auth from '../../SpoAuth';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import config from '../../../../config';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
@@ -75,7 +75,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<FieldLink> => {
         siteAccessToken = accessToken;
 
         if (this.verbose) {
@@ -84,34 +84,22 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/contenttypes('${encodeURIComponent(args.options.contentTypeId)}')/fieldlinks('${args.options.fieldId}')`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata'
-          }),
+          },
           json: true
-        }
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
         }
 
         return request.get(requestOptions);
       })
-      .then((res: FieldLink): request.RequestPromise | Promise<void> => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
+      .then((res: FieldLink): Promise<{ SchemaXmlWithResourceTokens: string; }> => {
         if (res["odata.null"] !== true) {
           if (this.verbose) {
             cmd.log('Field link found');
           }
           this.fieldLink = res;
-          return Promise.resolve();
+          return Promise.resolve(undefined as any);
         }
 
         if (this.verbose) {
@@ -121,28 +109,16 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/fields('${args.options.fieldId}')?$select=SchemaXmlWithResourceTokens`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata'
-          }),
+          },
           json: true
-        }
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
         }
 
         return request.get(requestOptions);
       })
       .then((res?: { SchemaXmlWithResourceTokens: string; }): Promise<void> => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
         if (!res) {
           return Promise.resolve();
         }
@@ -150,9 +126,9 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         schemaXmlWithResourceTokens = res.SchemaXmlWithResourceTokens;
         return this.createFieldLink(cmd, args, schemaXmlWithResourceTokens, siteAccessToken);
       })
-      .then((): request.RequestPromise | Promise<void> => {
+      .then((): Promise<FieldLink> => {
         if (this.fieldLink) {
-          return Promise.resolve();
+          return Promise.resolve(undefined as any);
         }
 
         if (this.verbose) {
@@ -161,28 +137,16 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/contenttypes('${encodeURIComponent(args.options.contentTypeId)}')/fieldlinks('${args.options.fieldId}')`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata'
-          }),
+          },
           json: true
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return request.get(requestOptions);
       })
-      .then((res?: FieldLink): Promise<void> | request.RequestPromise => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
+      .then((res?: FieldLink): Promise<{ Id: string; }> => {
         if (res && res["odata.null"] !== true) {
           this.fieldLink = res;
         }
@@ -210,7 +174,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         }
 
         if (this.siteId) {
-          return Promise.resolve();
+          return Promise.resolve(undefined as any);
         }
 
         if (this.verbose) {
@@ -219,34 +183,22 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/site?$select=Id`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata'
-          }),
+          },
           json: true
-        }
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
         }
 
         return request.get(requestOptions);
       })
-      .then((res?: { Id: string }): Promise<void> | request.RequestPromise => {
-        if (this.debug && res) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
+      .then((res?: { Id: string }): Promise<{ Id: string; }> => {
         if (res) {
           this.siteId = res.Id;
         }
 
         if (this.webId) {
-          return Promise.resolve();
+          return Promise.resolve(undefined as any);
         }
 
         if (this.verbose) {
@@ -255,28 +207,16 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web?$select=Id`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata'
-          }),
+          },
           json: true
-        }
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
         }
 
         return request.get(requestOptions);
       })
-      .then((res?: { Id: string }): request.RequestPromise => {
-        if (this.debug && res) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
+      .then((res?: { Id: string }): Promise<string> => {
         if (res) {
           this.webId = res.Id;
         }
@@ -292,28 +232,16 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             'X-RequestDigest': this.requestDigest
-          }),
+          },
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${requiredProperty}${hiddenProperty}<Method Name="Update" Id="124" ObjectPathId="19"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="121" Name="716a7b9e-3012-0000-22fb-84acfcc67d04|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${this.siteId}:web:${this.webId}:contenttype:${Utils.escapeXml(args.options.contentTypeId)}:fl:${(this.fieldLink as FieldLink).Id}" /><Identity Id="19" Name="716a7b9e-3012-0000-22fb-84acfcc67d04|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${this.siteId}:web:${this.webId}:contenttype:${Utils.escapeXml(args.options.contentTypeId)}" /></ObjectPaths></Request>`
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.post(requestOptions);
       })
       .then((res: string): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
         const json: ClientSvcResponse = JSON.parse(res);
         const response: ClientSvcResponseContents = json[0];
         if (response.ErrorInfo) {
@@ -357,35 +285,23 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
 
       this
         .updateField(xField, requiresUpdate, siteAccessToken, cmd, args)
-        .then((): request.RequestPromise => {
+        .then((): Promise<{ Id: string; }> => {
           if (this.verbose) {
             cmd.log(`Retrieving site collection id...`);
           }
 
           const requestOptions: any = {
             url: `${args.options.webUrl}/_api/site?$select=Id`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${siteAccessToken}`,
               accept: 'application/json;odata=nometadata'
-            }),
+            },
             json: true
-          }
-
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
           }
 
           return request.get(requestOptions);
         })
-        .then((res: { Id: string }): request.RequestPromise => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
-          }
-
+        .then((res: { Id: string }): Promise<{ Id: string; }> => {
           this.siteId = res.Id;
 
           if (this.verbose) {
@@ -394,57 +310,33 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
 
           const requestOptions: any = {
             url: `${args.options.webUrl}/_api/web?$select=Id`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${siteAccessToken}`,
               accept: 'application/json;odata=nometadata'
-            }),
+            },
             json: true
-          }
-
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
           }
 
           return request.get(requestOptions);
         })
         .then((res: { Id: string }): Promise<void> => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
-          }
-
           this.webId = res.Id;
 
           return this.ensureRequestDigest(args.options.webUrl, siteAccessToken, cmd);
         })
-        .then((): request.RequestPromise => {
+        .then((): Promise<string> => {
           const requestOptions: any = {
             url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${siteAccessToken}`,
               'X-RequestDigest': this.requestDigest
-            }),
+            },
             body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="5" ObjectPathId="4" /><ObjectIdentityQuery Id="6" ObjectPathId="4" /><Method Name="Update" Id="7" ObjectPathId="1"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="2" Name="d6667b9e-50fb-0000-2693-032ae7a0df25|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${this.siteId}:web:${this.webId}:field:${args.options.fieldId}" /><Method Id="4" ParentId="3" Name="Add"><Parameters><Parameter TypeId="{63fb2c92-8f65-4bbb-a658-b6cd294403f4}"><Property Name="Field" ObjectPathId="2" /></Parameter></Parameters></Method><Identity Id="1" Name="d6667b9e-80f4-0000-2693-05528ff416bf|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${this.siteId}:web:${this.webId}:contenttype:${Utils.escapeXml(args.options.contentTypeId)}" /><Property Id="3" ParentId="1" Name="FieldLinks" /></ObjectPaths></Request>`
           };
 
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
-
           return request.post(requestOptions);
         })
-        .then((res: any): void => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
-          }
-
+        .then((res: string): void => {
           const json: ClientSvcResponse = JSON.parse(res);
           const response: ClientSvcResponseContents = json[0];
           if (response.ErrorInfo) {
@@ -471,41 +363,29 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
 
       this
         .ensureRequestDigest(args.options.webUrl, siteAccessToken, cmd)
-        .then((): request.RequestPromise => {
+        .then((): Promise<void> => {
           if (this.verbose) {
             cmd.log(`Updating field schema...`);
           }
 
           const requestOptions: any = {
             url: `${args.options.webUrl}/_api/web/fields('${args.options.fieldId}')`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${siteAccessToken}`,
               accept: 'application/json;odata=nometadata',
               'content-type': 'application/json;odata=nometadata',
               'X-HTTP-Method': 'MERGE',
               'x-requestdigest': this.requestDigest
-            }),
+            },
             body: {
               SchemaXml: schemaXml
             },
             json: true
           }
 
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
-
           return request.post(requestOptions);
         })
-        .then((res: any): void => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
-          }
-
+        .then((): void => {
           resolve();
         }, (error: any): void => {
           reject(error);
@@ -530,12 +410,6 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
       this
         .getRequestDigestForSite(siteUrl, siteAccessToken, cmd, this.debug)
         .then((res: ContextInfo): void => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
-          }
-
           this.requestDigest = res.FormDigestValue;
           resolve();
         }, (error: any): void => {

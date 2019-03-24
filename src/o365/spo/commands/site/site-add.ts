@@ -2,7 +2,7 @@ import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate,
@@ -76,7 +76,7 @@ class SpoSiteAddCommand extends SpoCommand {
 
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<CreateGroupExResponse> => {
         if (args.options.allowFileSharingForGuestUsers && this.verbose) {
           cmd.log(vorpal.chalk.yellow(`Option 'allowFileSharingForGuestUsers' is deprecated. Please use 'shareByEmailEnabled' instead`));
         }
@@ -94,11 +94,11 @@ class SpoSiteAddCommand extends SpoCommand {
         if (isTeamSite) {
           requestOptions = {
             url: `${auth.site.url}/_api/GroupSiteManager/CreateGroupEx`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${auth.service.accessToken}`,
               'content-type': 'application/json; odata=verbose; charset=utf-8',
               accept: 'application/json;odata=nometadata'
-            }),
+            },
             json: true,
             body: {
               displayName: args.options.title,
@@ -144,11 +144,11 @@ class SpoSiteAddCommand extends SpoCommand {
 
           requestOptions = {
             url: `${auth.site.url}/_api/SPSiteManager/Create`,
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${auth.service.accessToken}`,
               'content-type': 'application/json;odata=nometadata',
               accept: 'application/json;odata=nometadata'
-            }),
+            },
             json: true,
             body: {
               request: {
@@ -168,21 +168,9 @@ class SpoSiteAddCommand extends SpoCommand {
           }
         }
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(JSON.stringify(requestOptions));
-          cmd.log('');
-        }
-
         return request.post(requestOptions);
       })
       .then((res: CreateGroupExResponse): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
         if (isTeamSite) {
           if (res.ErrorMessage !== null) {
             cb(new CommandError(res.ErrorMessage));

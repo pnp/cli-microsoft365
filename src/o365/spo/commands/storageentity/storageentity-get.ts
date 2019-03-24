@@ -1,13 +1,12 @@
 import auth from '../../SpoAuth';
 import config from '../../../../config';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandOption
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import Utils from '../../../../Utils';
 import { TenantProperty } from './TenantProperty';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -36,35 +35,23 @@ class SpoStorageEntityGetCommand extends SpoCommand {
 
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<TenantProperty> => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}. Loading details for the ${args.options.key} tenant property...`);
         }
 
         const requestOptions: any = {
           url: `${auth.site.url}/_api/web/GetStorageEntity('${encodeURIComponent(args.options.key)}')`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${accessToken}`,
             accept: 'application/json;odata=nometadata'
-          }),
+          },
           json: true
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.get(requestOptions);
       })
       .then((property: TenantProperty): void => {
-        if (this.debug) {
-          cmd.log('Property:');
-          cmd.log(property);
-          cmd.log('');
-        }
-
         if (property["odata.null"] === true) {
           if (this.verbose) {
             cmd.log(`Property with key ${args.options.key} not found`);

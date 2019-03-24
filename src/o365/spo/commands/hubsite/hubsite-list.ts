@@ -1,10 +1,9 @@
 import auth from '../../SpoAuth';
 import config from '../../../../config';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import commands from '../../commands';
 import { CommandOption } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import Utils from '../../../../Utils';
 import GlobalOptions from '../../../../GlobalOptions';
 import { HubSite } from './HubSite';
 import { QueryListResult } from './QueryListResult';
@@ -47,35 +46,23 @@ class SpoHubSiteListCommand extends SpoCommand {
 
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<{ value: HubSite[]; }> => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
         }
 
         const requestOptions: any = {
           url: `${auth.site.url}/_api/hubsites`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${auth.service.accessToken}`,
             accept: 'application/json;odata=nometadata'
-          }),
+          },
           json: true
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.get(requestOptions);
       })
       .then((res: { value: HubSite[] }): Promise<any[] | void> => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
         hubSites = res.value;
 
         if (args.options.includeAssociatedSites !== true || args.options.output !== 'json') {
@@ -90,10 +77,10 @@ class SpoHubSiteListCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${auth.site.url}/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/RenderListDataAsStream`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${auth.service.accessToken}`,
             accept: 'application/json;odata=nometadata'
-          }),
+          },
           json: true,
           body: {
             parameters: {
@@ -102,12 +89,6 @@ class SpoHubSiteListCommand extends SpoCommand {
             }
           }
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         if (this.debug || this.verbose) {
           cmd.log(`Will retrieve associated sites (including the hub sites) in batches of ${this.batchSize}`);
@@ -142,12 +123,6 @@ class SpoHubSiteListCommand extends SpoCommand {
         return getSites(requestOptions, requestOptions.url);
       })
       .then((res: AssociatedSite[] | void): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
         if (res) {
           hubSites.forEach(h => {
             const filteredSites = res.filter(f => {

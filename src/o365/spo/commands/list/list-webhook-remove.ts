@@ -2,7 +2,7 @@ import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate
@@ -55,7 +55,7 @@ class SpoListWebhookRemoveCommand extends SpoCommand {
 
       auth
         .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-        .then((accessToken: string): request.RequestPromise => {
+        .then((accessToken: string): Promise<void> => {
           siteAccessToken = accessToken;
 
           if (this.debug) {
@@ -78,22 +78,16 @@ class SpoListWebhookRemoveCommand extends SpoCommand {
           const requestOptions: any = {
             url: requestUrl,
             method: 'DELETE',
-            headers: Utils.getRequestHeaders({
+            headers: {
               authorization: `Bearer ${siteAccessToken}`,
               'accept': 'application/json;odata=nometadata'
-            }),
+            },
             json: true
           };
 
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
-
           return request.delete(requestOptions);
         })
-        .then((res: any): void => {
+        .then((): void => {
           // REST delete call doesn't return anything
           cb();
         }, (err: any): void => {

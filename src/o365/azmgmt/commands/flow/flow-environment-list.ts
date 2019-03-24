@@ -2,8 +2,7 @@ import auth from '../../AzmgmtAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
-import Utils from '../../../../Utils';
+import request from '../../../../request';
 import AzmgmtCommand from '../../AzmgmtCommand';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -24,7 +23,7 @@ class AzmgmtFlowEnvironmentListCommand extends AzmgmtCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
+      .then((accessToken: string): Promise<{ value: [{ name: string, properties: { displayName: string } }] }> => {
         if (this.debug) {
           cmd.log(`Retrieved access token ${accessToken}.`);
         }
@@ -35,28 +34,16 @@ class AzmgmtFlowEnvironmentListCommand extends AzmgmtCommand {
 
         const requestOptions: any = {
           url: `${auth.service.resource}providers/Microsoft.ProcessSimple/environments?api-version=2016-11-01`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${accessToken}`,
             accept: 'application/json'
-          }),
+          },
           json: true
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.get(requestOptions);
       })
       .then((res: { value: [{ name: string, properties: { displayName: string } }] }): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
         if (res.value && res.value.length > 0) {
           if (args.options.output === 'json') {
             cmd.log(res.value);

@@ -3,7 +3,7 @@ import { Auth } from '../../../../Auth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as request from 'request-promise-native';
+import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate
@@ -63,7 +63,7 @@ class SpoAppGetCommand extends SpoAppBaseCommand {
         const resource: string = Auth.getResourceFromUrl(appCatalogSiteUrl);
         return auth.getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug);
       })
-      .then((accessToken: string): Promise<{ UniqueId: string }> | request.RequestPromise => {
+      .then((accessToken: string): Promise<{ UniqueId: string }> => {
         siteAccessToken = accessToken;
 
         if (this.debug) {
@@ -80,50 +80,32 @@ class SpoAppGetCommand extends SpoAppBaseCommand {
 
         const requestOptions: any = {
           url: `${appCatalogSiteUrl}/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('${args.options.name}')?$select=UniqueId`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata'
-          }),
+          },
           json: true
         };
 
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
         return request.get(requestOptions);
       })
-      .then((res: { UniqueId: string }): request.RequestPromise => {
+      .then((res: { UniqueId: string }): Promise<AppMetadata> => {
         if (this.verbose) {
           cmd.log(`Retrieving information for app ${res}...`);
         }
 
         const requestOptions: any = {
           url: `${appCatalogSiteUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${encodeURIComponent(res.UniqueId)}')`,
-          headers: Utils.getRequestHeaders({
+          headers: {
             authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata'
-          }),
+          },
           json: true
         };
-
-        if (this.debug) {
-          cmd.log('Executing web request...');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
 
         return request.get(requestOptions);
       })
       .then((res: AppMetadata): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
         cmd.log(res);
 
         cb();
