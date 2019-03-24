@@ -115,6 +115,15 @@ describe(commands.PROJECT_UPGRADE, () => {
     });
   });
 
+  it('shows error if the specified typescript version is not supported by the CLI', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-170-webpart-react'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.8.0', toTypeScriptVersion: '1.0' } }, (err?: any) => {
+      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Office 365 CLI doesn't support upgrading projects to TypeScript v1.0`, 7)));
+    });
+  });
+
   it('correctly handles the case when .yo-rc.json exists but doesn\'t contain spfx project info', () => {
     const originalExistsSync = fs.existsSync;
     sinon.stub(fs, 'existsSync').callsFake((path: string) => {

@@ -13,6 +13,8 @@ import { Project, Manifest, TsFile } from './project-upgrade/model';
 import { FindingToReport } from './project-upgrade/FindingToReport';
 import { FN017001_MISC_npm_dedupe } from './project-upgrade/rules/FN017001_MISC_npm_dedupe';
 import { ReportData, ReportDataModification } from './ReportData';
+import { FN012017_TSC_extends } from './project-upgrade/rules/FN012017_TSC_extends';
+// import { strictEqual } from 'assert';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -22,11 +24,13 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   toVersion?: string;
+  toTypeScriptVersion?: string;
 }
 
 class SpfxProjectUpgradeCommand extends Command {
   private projectVersion: string | undefined;
   private toVersion: string = '';
+  private toTypeScriptVersion: string = '';
   private projectRootPath: string | null = null;
   private allFindings: Finding[] = [];
   private supportedVersions: string[] = [
@@ -51,12 +55,18 @@ class SpfxProjectUpgradeCommand extends Command {
     '1.8.0'
   ];
 
+  private supportedTypeScriptVersions: string[] = [
+    '2.7',
+    '3.3'
+  ];
+
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
   public static ERROR_UNSUPPORTED_TO_VERSION: number = 2;
   public static ERROR_NO_VERSION: number = 3;
   public static ERROR_UNSUPPORTED_FROM_VERSION: number = 4;
   public static ERROR_NO_DOWNGRADE: number = 5;
   public static ERROR_PROJECT_UP_TO_DATE: number = 6;
+  public static ERROR_UNSUPPORTED_TYPSCRIPT_VERSION: number = 7;
 
   public get name(): string {
     return commands.PROJECT_UPGRADE;
@@ -79,7 +89,12 @@ class SpfxProjectUpgradeCommand extends Command {
       return;
     }
 
-    this.toVersion = args.options.toVersion ? args.options.toVersion : this.supportedVersions[this.supportedVersions.length - 1];
+    this.toVersion = args.options.toVersion 
+      ? args.options.toVersion 
+      : this.supportedVersions[this.supportedVersions.length - 1];
+    this.toTypeScriptVersion = args.options.toTypeScriptVersion 
+      ? args.options.toTypeScriptVersion 
+      : this.supportedTypeScriptVersions[this.supportedTypeScriptVersions.length - 1];
 
     if (this.supportedVersions.indexOf(this.toVersion) < 0) {
       cb(new CommandError(`Office 365 CLI doesn't support upgrading SharePoint Framework projects to version ${this.toVersion}. Supported versions are ${this.supportedVersions.join(', ')}`, SpfxProjectUpgradeCommand.ERROR_UNSUPPORTED_TO_VERSION));
@@ -101,6 +116,12 @@ class SpfxProjectUpgradeCommand extends Command {
     const posTo: number = this.supportedVersions.indexOf(this.toVersion);
     if (pos > posTo) {
       cb(new CommandError('You cannot downgrade a project', SpfxProjectUpgradeCommand.ERROR_NO_DOWNGRADE));
+      return;
+    }
+
+    const tsPosTo: number = this.supportedTypeScriptVersions.indexOf(this.toTypeScriptVersion);
+    if (tsPosTo < 0) {
+      cb(new CommandError(`Office 365 CLI doesn't support upgrading projects to TypeScript v${this.toTypeScriptVersion}`, SpfxProjectUpgradeCommand.ERROR_UNSUPPORTED_TYPSCRIPT_VERSION));
       return;
     }
 
@@ -126,6 +147,9 @@ class SpfxProjectUpgradeCommand extends Command {
       try {
         const rules: Rule[] = require(`./project-upgrade/upgrade-${v}`);
         rules.forEach(r => {
+          if (r instanceof FN012017_TSC_extends){
+            r.tscVersion = this.toTypeScriptVersion;
+          }
           r.visit(project, this.allFindings);
         });
       }
@@ -565,6 +589,10 @@ ${f.resolution}
       {
         option: '-v, --toVersion [toVersion]',
         description: 'The version of SharePoint Framework to which upgrade the project'
+      },
+      {
+        option: '--toTypeScriptVersion [toTypeScriptVersion]',
+        description: 'The version of TypeScript to which upgrade the project'
       }
     ];
 
@@ -591,7 +619,7 @@ ${f.resolution}
     The ${this.name} command helps you upgrade your SharePoint Framework
     project to the specified version. If no version is specified, the command
     will upgrade to the latest version of the SharePoint Framework it supports
-    (v1.7.1).
+    (v1.8.0).
 
     This command doesn't change your project files. Instead, it gives you
     a report with all steps necessary to upgrade your project to the specified
@@ -619,6 +647,11 @@ ${f.resolution}
     Get instructions to upgrade the current SharePoint Framework project to the
     latest SharePoint Framework version supported by the Office 365 CLI
       ${chalk.grey(config.delimiter)} ${this.name}
+
+    Get instructions to upgrade the current SharePoint Framework project to
+    SharePoint Framework version 1.5.0 using TypeScript version 3.3 and save 
+    the findings in a Markdown file
+      ${chalk.grey(config.delimiter)} ${this.name} --toVersion 1.5.0 --toTypeScriptVersion 3.3 --output md > upgrade-report.md
 `);
   }
 }

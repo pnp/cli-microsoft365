@@ -39,6 +39,10 @@ export class FN012017_TSC_extends extends Rule {
     return './tsconfig.json';
   };
 
+  set tscVersion(tsc: string) {
+    this._extends = this._extends.replace("{tscVersion}", tsc);
+  }
+  
   visit(project: Project, findings: Finding[]): void {
     if (!project.tsConfigJson) {
       return;
