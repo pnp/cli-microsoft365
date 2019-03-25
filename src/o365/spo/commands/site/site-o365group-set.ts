@@ -35,6 +35,10 @@ class SpoSiteOffice365GroupSetCommand extends SpoCommand {
     return 'Connects site collection to an Office 365 Group';
   }
 
+  public alias(): string[] | undefined {
+    return [commands.SITE_GROUPIFY];
+  }
+
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.description = typeof args.options.description !== 'undefined';

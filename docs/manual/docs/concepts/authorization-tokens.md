@@ -42,13 +42,14 @@ Office 365 CLI requires the following permissions to Office 365 services:
     - Access directory as the signed in user
     - Read and write identity providers
     - Send mail as a user
+    - Read and write to all app catalogs
 - Windows Azure Active Directory
     - Access the directory as the signed-in user
 - Windows Azure Service Management API
     - Access Azure Service Management as organization users
 
 !!! attention
-    After changing the ID of the Azure AD application used by the Office 365 CLI refresh the existing connections to Office 365 using the corresponding `<service> connect` command. If you try to use the existing connection, Office 365 CLI will fail when trying to refresh the existing access token.
+    After changing the ID of the Azure AD application used by the Office 365 CLI refresh the existing connections to Office 365 using the corresponding `<service> login` command. If you try to use the existing connection, Office 365 CLI will fail when trying to refresh the existing access token.
 
 ### Access and refresh tokens in the Office 365 CLI
 

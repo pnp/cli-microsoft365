@@ -1,5 +1,79 @@
 # Release notes
 
+## [v1.16.0](https://github.com/pnp/office365-cli/releases/tag/v1.16.0)
+
+### New commands
+
+**Microsoft Graph:**
+
+- [graph teams channel set](../cmd/graph/teams/teams-channel-set.md) - updates properties of the specified channel in the given Microsoft Teams team [#816](https://github.com/pnp/office365-cli/issues/816)
+- [graph teams guestsettings set](../cmd/graph/teams/teams-guestsettings-set.md) - updates guest settings of a Microsoft Teams team [#818](https://github.com/pnp/office365-cli/issues/818)
+
+### Changes
+
+- extended 'graph teams app list' [#859](https://github.com/pnp/office365-cli/issues/859)
+- added 'spo site groupify' alias [#873](https://github.com/pnp/office365-cli/issues/873)
+
+## [v1.15.0](https://github.com/pnp/office365-cli/releases/tag/v1.15.0)
+
+### New commands
+
+**SharePoint Online:**
+
+- [spo field remove](../cmd/spo/field/field-remove.md) - removes the specified list- or site column [#738](https://github.com/pnp/office365-cli/issues/738)
+- [spo listitem record undeclare](../cmd/spo/listitem/listitem-record-undeclare.md) - undeclares list item as a record [#770](https://github.com/pnp/office365-cli/issues/770)
+- [spo web reindex](../cmd/spo/web/web-reindex.md) - requests reindexing the specified subsite [#822](https://github.com/pnp/office365-cli/issues/822)
+
+**Microsoft Graph:**
+
+- [graph teams app install](../cmd/graph/teams/teams-app-install.md) - installs an app from the catalog to a Microsoft Teams team [#842](https://github.com/pnp/office365-cli/issues/842)
+- [graph teams funsettings list](../cmd/graph/teams/teams-funsettings-list.md) - lists fun settings for the specified Microsoft Teams team [#809](https://github.com/pnp/office365-cli/issues/809)
+- [graph teams guestsettings list](../cmd/graph/teams/teams-guestsettings-list.md) - lists guests settings for a Microsoft Teams team [#810](https://github.com/pnp/office365-cli/issues/810)
+- [graph teams membersettings list](../cmd/graph/teams/teams-membersettings-list.md) - lists member settings for a Microsoft Teams team [#811](https://github.com/pnp/office365-cli/issues/811)
+- [graph teams membersettings set](../cmd/graph/teams/teams-membersettings-set.md) - updates member settings of a Microsoft Teams team [#819](https://github.com/pnp/office365-cli/issues/819)
+- [graph teams messagingsettings list](../cmd/graph/teams/teams-messagingsettings-list.md) - lists messaging settings for a Microsoft Teams team [#812](https://github.com/pnp/office365-cli/issues/812)
+
+### Changes
+
+- fixed ID of the FN002009 SPFx project upgrade rule [#854](https://github.com/pnp/office365-cli/issues/854)
+- fixed issue with updating the header of non-en-US pages [#851](https://github.com/pnp/office365-cli/issues/851)
+- added support for upgrading projects built using SharePoint Framework v1.7.1 [#848](https://github.com/pnp/office365-cli/issues/848)
+
+## [v1.14.0](https://github.com/pnp/office365-cli/releases/tag/v1.14.0)
+
+### New commands
+
+**SharePoint Online:**
+
+- [spo list label get](../cmd/spo/list/list-label-get.md) - gets label set on the specified list [#773](https://github.com/pnp/office365-cli/issues/773)
+- [spo list label set](../cmd/spo/list/list-label-set.md) - sets classification label on the specified list [#772](https://github.com/pnp/office365-cli/issues/772)
+- [spo list view field add](../cmd/spo/list/list-view-field-add.md) - adds the specified field to list view [#735](https://github.com/pnp/office365-cli/issues/735)
+- [spo list view field remove](../cmd/spo/list/list-view-field-remove.md) - removes the specified field from list view [#736](https://github.com/pnp/office365-cli/issues/736)
+- [spo site inplacerecordsmanagement set](../cmd/spo/site/site-inplacerecordsmanagement-set.md) - activates or deactivates in-place records management for a site collection [#774](https://github.com/pnp/office365-cli/issues/774)
+- [spo sitedesign run list](../cmd/spo/sitedesign/sitedesign-run-list.md) - lists information about site designs applied to the specified site [#779](https://github.com/pnp/office365-cli/issues/779)
+- [spo sitedesign run status get](../cmd/spo/sitedesign/sitedesign-run-status-get.md) - gets information about the site scripts executed for the specified site design [#780](https://github.com/pnp/office365-cli/issues/780)
+- [spo sitedesign task get](../cmd/spo/sitedesign/sitedesign-task-get.md) - gets information about the specified site design scheduled for execution [#782](https://github.com/pnp/office365-cli/issues/782)
+- [spo sitedesign task list](../cmd/spo/sitedesign/sitedesign-task-list.md) - lists site designs scheduled for execution on the specified site [#781](https://github.com/pnp/office365-cli/issues/781)
+
+**Microsoft Graph:**
+
+- [graph teams app list](../cmd/graph/teams/teams-app-list.md) - lists apps from the Microsoft Teams app catalog [#826](https://github.com/pnp/office365-cli/issues/826)
+- [graph teams app publish](../cmd/graph/teams/teams-app-publish.md) - publishes Teams app to the organization's app catalog [#824](https://github.com/pnp/office365-cli/issues/824)
+- [graph teams app remove](../cmd/graph/teams/teams-app-remove.md) - removes a Teams app from the organization's app catalog [#825](https://github.com/pnp/office365-cli/issues/825)
+- [graph teams app update](../cmd/graph/teams/teams-app-update.md) - updates Teams app in the organization's app catalog [#827](https://github.com/pnp/office365-cli/issues/827)
+- [graph teams channel list](../cmd/graph/teams/teams-channel-list.md) - lists channels in the specified Microsoft Teams team [#586](https://github.com/pnp/office365-cli/issues/586)
+- [graph teams user remove](../cmd/graph/teams/teams-user-remove.md) - removes the specified user from the specified Microsoft Teams team [#757](https://github.com/pnp/office365-cli/issues/757)
+- [graph teams user set](../cmd/graph/teams/teams-user-set.md) - updates role of the specified user in the given Microsoft Teams team [#760](https://github.com/pnp/office365-cli/issues/760)
+
+### Changes
+
+- updated 'spo list webhook list' parameters [#747](https://github.com/pnp/office365-cli/issues/747)
+- updated 'azmgmt flow list' to support paged content [#776](https://github.com/pnp/office365-cli/issues/776)
+- added fieldTitle, listId and listUrl options to 'spo file get' [#754](https://github.com/pnp/office365-cli/issues/754)
+- extended 'spo sitedesign apply' with large site designs [#714](https://github.com/pnp/office365-cli/issues/714)
+- added support for dynamic data [#751](https://github.com/pnp/office365-cli/issues/751)
+- extended 'spo web set' with modern UI options [#798](https://github.com/pnp/office365-cli/issues/798)
+
 ## [v1.13.0](https://github.com/pnp/office365-cli/releases/tag/v1.13.0)
 
 ### New commands

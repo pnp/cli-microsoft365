@@ -60,6 +60,11 @@ describe(commands.SITE_O365GROUP_SET, () => {
     assert.notEqual(command.description, null);
   });
 
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notEqual(typeof alias, 'undefined');
+  });
+
   it('calls telemetry', (done) => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, () => {
