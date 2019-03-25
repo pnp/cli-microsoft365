@@ -219,9 +219,42 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
     cmdInstance.action = command.action();
 
     const options: any = {
+      listId: '99a14fe8-781c-3ce1-a1d5-c6e6a14561da',
+      id: 147,
+      webUrl: `https://contoso.sharepoint.com/sites/project-y/`,
+      debug: true,
+    };
+
+    declareItemAsRecordFakeCalled = false;
+    cmdInstance.action({ options: options }, () => {
+      try {
+        assert(declareItemAsRecordFakeCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
+      }
+    });
+  });
+
+  it('declares a record when specifying a date in debug mode', (done) => {
+    sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'post').callsFake(postFakes);
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    const options: any = {
       debug: true,
       listId: '99a14fe8-781c-3ce1-a1d5-c6e6a14561da',
       id: 147,
+      date: '2019-03-14',
       webUrl: `https://contoso.sharepoint.com/sites/project-y/`,
     };
 
@@ -251,7 +284,6 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
     cmdInstance.action = command.action();
 
     const options: any = {
-      debug: true,
       listId: '99a14fe8-781c-3ce1-a1d5-c6e6a14561da',
       id: 147,
       date: '2019-03-14',
