@@ -118,7 +118,7 @@ class SiteListCommand extends SpoCommand {
         })
         return {
           Url: s.Url,
-          DeletionTime: new Date(dateChunks[0], dateChunks[1], dateChunks[2], dateChunks[3], dateChunks[4], dateChunks[5], dateChunks[6]).toISOString(),
+          DeletionTime: new Date(Date.UTC(dateChunks[0], dateChunks[1], dateChunks[2], dateChunks[3], dateChunks[4], dateChunks[5], dateChunks[6])).toISOString(),
           DaysRemaining: s.DaysRemaining
         }
       } else {

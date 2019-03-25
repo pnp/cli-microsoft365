@@ -542,12 +542,12 @@ describe(commands.SITE_LIST, () => {
         assert(cmdInstanceLogSpy.calledWith([
           {
             Url: 'https://bloemium.sharepoint.com/sites/garbage-only',
-            DeletionTime: '2019-02-27T20:26:55.007Z',
+            DeletionTime: '2019-02-27T21:26:55.007Z',
             DaysRemaining: 76
           },
           {
             Url: 'https://bloemium.sharepoint.com/sites/throw-away',
-            DeletionTime: '2019-02-25T18:26:41.767Z',
+            DeletionTime: '2019-02-25T19:26:41.767Z',
             DaysRemaining: 74
           }
         ]))
@@ -600,12 +600,12 @@ describe(commands.SITE_LIST, () => {
         assert(cmdInstanceLogSpy.calledWith([
           {
             Url: 'https://bloemium.sharepoint.com/sites/garbage-only',
-            DeletionTime: '2019-02-27T20:26:55.007Z',
+            DeletionTime: '2019-02-27T21:26:55.007Z',
             DaysRemaining: 76
           },
           {
             Url: 'https://bloemium.sharepoint.com/sites/throw-away',
-            DeletionTime: '2019-02-25T18:26:41.767Z',
+            DeletionTime: '2019-02-25T19:26:41.767Z',
             DaysRemaining: 74
           }
         ]))
