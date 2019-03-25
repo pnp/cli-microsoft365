@@ -32,6 +32,7 @@ export default {
   FEATURE_LIST: `${prefix} feature list`,
   FIELD_ADD: `${prefix} field add`,
   FIELD_GET: `${prefix} field get`,
+  FIELD_REMOVE: `${prefix} field remove`,
   FIELD_SET: `${prefix} field set`,
   FILE_ADD: `${prefix} file add`,
   FILE_CHECKIN: `${prefix} file checkin`,
@@ -86,6 +87,7 @@ export default {
   LISTITEM_ADD: `${prefix} listitem add`,
   LISTITEM_GET: `${prefix} listitem get`,
   LISTITEM_LIST: `${prefix} listitem list`,
+  LISTITEM_RECORD_UNDECLARE: `${prefix} listitem record undeclare`,
   LISTITEM_REMOVE: `${prefix} listitem remove`,
   LISTITEM_SET: `${prefix} listitem set`,
   LOGIN: `${prefix} login`,
@@ -129,6 +131,7 @@ export default {
   SITE_CLASSIC_SET: `${prefix} site classic set`,
   SITE_CLASSIC_REMOVE: `${prefix} site classic remove`,
   SITE_GET: `${prefix} site get`,
+  SITE_GROUPIFY: `${prefix} site groupify`,
   SITE_LIST: `${prefix} site list`,
   SITE_INPLACERECORDSMANAGEMENT_SET: `${prefix} site inplacerecordsmanagement set`,
   SITE_O365GROUP_SET: `${prefix} site o365group set`,
@@ -184,6 +187,7 @@ export default {
   WEB_CLIENTSIDEWEBPART_LIST: `${prefix} web clientsidewebpart list`,
   WEB_GET: `${prefix} web get`,
   WEB_LIST: `${prefix} web list`,
+  WEB_REINDEX: `${prefix} web reindex`,
   WEB_REMOVE: `${prefix} web remove`,
   WEB_SET: `${prefix} web set`
 };

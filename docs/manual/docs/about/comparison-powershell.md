@@ -205,7 +205,7 @@ Add-PnPWorkflowSubscription|SharePointPnPPowerShellOnline|
 Apply-PnPProvisioningHierarchy|SharePointPnPPowerShellOnline|
 Apply-PnPProvisioningTemplate|SharePointPnPPowerShellOnline|
 Approve-PnPTenantServicePrincipalPermissionRequest|SharePointPnPPowerShellOnline|[spo serviceprincipal permissionrequest approve](../cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-approve.md)
-Clear-PnPListItemAsRecord|SharePointPnPPowerShellOnline|
+Clear-PnPListItemAsRecord|SharePointPnPPowerShellOnline|[spo listitem record undeclare](../cmd/spo/listitem/listitem-record-undeclare.md)
 Clear-PnPRecycleBinItem|SharePointPnPPowerShellOnline|
 Clear-PnPTenantRecycleBinItem|SharePointPnPPowerShellOnline|
 Connect-PnPHubSite|SharePointPnPPowerShellOnline|[spo hubsite connect](../cmd/spo/hubsite/hubsite-connect.md)
@@ -394,7 +394,7 @@ Remove-PnPContentTypeFromDocumentSet|SharePointPnPPowerShellOnline|
 Remove-PnPContentTypeFromList|SharePointPnPPowerShellOnline|[spo list contenttype remove](../cmd/spo/list/list-contenttype-remove.md)
 Remove-PnPCustomAction|SharePointPnPPowerShellOnline|[spo customaction remove](../cmd/spo/customaction/customaction-remove.md)
 Remove-PnPEventReceiver|SharePointPnPPowerShellOnline|
-Remove-PnPField|SharePointPnPPowerShellOnline|
+Remove-PnPField|SharePointPnPPowerShellOnline|[spo field remove](../cmd/spo/field/field-remove.md)
 Remove-PnPFieldFromContentType|SharePointPnPPowerShellOnline|
 Remove-PnPFile|SharePointPnPPowerShellOnline|[spo file remove](../cmd/spo/file/file-remove.md)
 Remove-PnPFileFromProvisioningTemplate|SharePointPnPPowerShellOnline|
@@ -433,7 +433,7 @@ Remove-PnPWorkflowSubscription|SharePointPnPPowerShellOnline|
 Rename-PnPFile|SharePointPnPPowerShellOnline|
 Rename-PnPFolder|SharePointPnPPowerShellOnline|[spo folder rename](../cmd/spo/folder/folder-rename.md)
 Request-PnPReIndexList|SharePointPnPPowerShellOnline|
-Request-PnPReIndexWeb|SharePointPnPPowerShellOnline|
+Request-PnPReIndexWeb|SharePointPnPPowerShellOnline|[spo web reindex](../cmd/spo/web/web-reindex.md)
 Restore-PnPRecycleBinItem|SharePointPnPPowerShellOnline|
 Restore-PnPTenantRecycleBinItem|SharePointPnPPowerShellOnline|
 Resolve-PnPFolder|SharePointPnPPowerShellOnline|
@@ -615,11 +615,11 @@ Connect-MicrosoftTeams|MicrosoftTeams|[graph login](../cmd/graph/login.md)
 Disconnect-MicrosoftTeams|MicrosoftTeams|[graph logout](../cmd/graph/logout.md)
 Get-Team|MicrosoftTeams|[graph teams list](../cmd/graph/teams/teams-list.md)
 Get-TeamChannel|MicrosoftTeams|[graph teams channel list](../cmd/graph/teams/teams-channel-list.md)
-Get-TeamFunSettings|MicrosoftTeams|
-Get-TeamGuestSettings|MicrosoftTeams|
+Get-TeamFunSettings|MicrosoftTeams|[graph teams funsettings list](../cmd/graph/teams/teams-funsettings-list.md)
+Get-TeamGuestSettings|MicrosoftTeams|[graph teams guestsettings list](../cmd/graph/teams/teams-guestsettings-list.md)
 Get-TeamHelp|MicrosoftTeams|
-Get-TeamMemberSettings|MicrosoftTeams|
-Get-TeamMessagingSettings|MicrosoftTeams|
+Get-TeamMemberSettings|MicrosoftTeams|[graph teams membersettings list](../cmd/graph/teams/teams-membersettings-list.md)
+Get-TeamMessagingSettings|MicrosoftTeams|[graph teams messagingsettings list](../cmd/graph/teams/teams-messagingsettings-list.md)
 Get-TeamUser|MicrosoftTeams|[graph teams user list](../cmd/graph/teams/teams-user-list.md)
 New-Team|MicrosoftTeams|
 New-TeamChannel|MicrosoftTeams|[graph teams channel add](../cmd/graph/teams/teams-channel-add.md)
@@ -627,9 +627,9 @@ Remove-Team|MicrosoftTeams|
 Remove-TeamChannel|MicrosoftTeams|
 Remove-TeamUser|MicrosoftTeams|[graph teams user remove](../cmd/graph/teams/teams-user-remove.md)
 Set-Team|MicrosoftTeams|
-Set-TeamChannel|MicrosoftTeams|
+Set-TeamChannel|MicrosoftTeams|[graph teams channel set](../cmd/graph/teams/teams-channel-set.md)
 Set-TeamFunSettings|MicrosoftTeams|
-Set-TeamGuestSettings|MicrosoftTeams|
-Set-TeamMemberSettings|MicrosoftTeams|
+Set-TeamGuestSettings|MicrosoftTeams|[graph teams guestsettings set](../cmd/graph/teams/teams-guestsettings-set.md)
+Set-TeamMemberSettings|MicrosoftTeams|[graph teams membersettings set](../cmd/graph/teams/teams-membersettings-set.md)
 Set-TeamMessagingSettings|MicrosoftTeams|
 Set-TeamPicture|MicrosoftTeams|

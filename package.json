@@ -1,6 +1,6 @@
 {
   "name": "@pnp/office365-cli",
-  "version": "1.15.0",
+  "version": "1.16.0",
   "description": "Manage Microsoft Office 365 and SharePoint Framework projects on any platform",
   "license": "MIT",
   "main": "./dist/index.js",
@@ -47,6 +47,7 @@
   "contributors": [
     "Ågren, Simon <simon.agren@sogeti.com>",
     "Bauer, Stefan <stefan.bauer@n8d.at>",
+    "Bernier, Hugo <hugoabernier@live.ca>",
     "Biret, Vincent <baywet@users.noreply.github.com>",
     "Bloemsma, Arjen <a.bloemsma@gmail.com>",
     "Brouwers, Stijn <stijnbrouwers@gmail.com>",
@@ -58,6 +59,7 @@
     "Jaakke, Robert <robert.jaakke@mavention.nl>",
     "Kailasam, Balamurugan <kshsbala@engineer.com>",
     "Keijzers, Paul <KbWorks@users.noreply.github.com>",
+    "Kumar, Shantha <34408892+ktskumar@users.noreply.github.com>",
     "Laskewitz, Daniel <daniel@laskewitz.nl>",
     "Mastykarz, Waldek <waldek@mastykarz.nl>",
     "Plenevaux, Yannick <yannick.plenevaux@gmail.com>",
@@ -71,6 +73,7 @@
     "Struyf, Elio <info@estruyf.be>",
     "Svenson, Mikael <miksvenson@gmail.com>",
     "van Hunen, Erwin <erwin.van.hunen@outlook.com>",
+    "van Rousselt, Rick <rick.vanrousselt@outlook.com>",
     "Wilen, Wictor <wictor@wictorwilen.se>",
     "Williams, Rabia <rabiawilliams@gmail.com>"
   ],

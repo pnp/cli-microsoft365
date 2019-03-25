@@ -2,9 +2,11 @@ import auth from '../../GraphAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import { CommandOption } from '../../../../Command';
+import { CommandOption, CommandValidate } from '../../../../Command';
 import { TeamsApp } from './TeamsApp'
 import { GraphItemsListCommand } from '../GraphItemsListCommand'
+import { TeamsAppInstallation } from './TeamsAppInstallation';
+import Utils from '../../../../Utils';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -14,6 +16,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   all?: boolean;
+  teamId?: string;
 }
 
 class GraphTeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
@@ -22,19 +25,31 @@ class GraphTeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
   }
 
   public get description(): string {
-    return 'Lists apps from the Microsoft Teams app catalog';
+    return 'Lists apps from the Microsoft Teams app catalog or apps installed in the specified team';
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.all = args.options.all || false;
+    telemetryProps.teamId = typeof args.options.teamId !== 'undefined';
     return telemetryProps;
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    let endpoint: string = `${auth.service.resource}/v1.0/appCatalogs/teamsApps`;
-    if (!args.options.all) {
-      endpoint += `?$filter=distributionMethod eq 'organization'`;
+    let endpoint: string = '';
+    if (args.options.teamId) {
+      endpoint = `${auth.service.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/installedApps?$expand=teamsApp`;
+
+      if (!args.options.all) {
+        endpoint += `&$filter=teamsApp/distributionMethod eq 'organization'`;
+      }
+    }
+    else {
+      endpoint = `${auth.service.resource}/v1.0/appCatalogs/teamsApps`;
+
+      if (!args.options.all) {
+        endpoint += `?$filter=distributionMethod eq 'organization'`;
+      }
     }
 
     this
@@ -44,13 +59,24 @@ class GraphTeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
           cmd.log(this.items);
         }
         else {
-          cmd.log(this.items.map(i => {
-            return {
-              id: i.id,
-              displayName: i.displayName,
-              distributionMethod: i.distributionMethod
-            };
-          }));
+          if (args.options.teamId) {
+            cmd.log((this.items as unknown as TeamsAppInstallation[]).map(i => {
+              return {
+                id: i.id,
+                displayName: i.teamsApp.displayName,
+                distributionMethod: i.teamsApp.distributionMethod
+              };
+            }));
+          }
+          else {
+            cmd.log(this.items.map(i => {
+              return {
+                id: i.id,
+                displayName: i.displayName,
+                distributionMethod: i.distributionMethod
+              };
+            }));
+          }
         }
 
         if (this.verbose) {
@@ -65,12 +91,26 @@ class GraphTeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
     const options: CommandOption[] = [
       {
         option: '-a, --all',
-        description: 'Get apps from your organization\'s app catalog and the Microsoft Teams store'
+        description: 'Specify, to get apps from your organization only'
+      },
+      {
+        option: '-i, --teamId [teamId]',
+        description: 'The ID of the team for which to list installed apps'
       }
     ];
 
     const parentOptions: CommandOption[] = super.options();
     return options.concat(parentOptions);
+  }
+
+  public validate(): CommandValidate {
+    return (args: CommandArgs): boolean | string => {
+      if (args.options.teamId && !Utils.isValidGuid(args.options.teamId)) {
+        return `${args.options.teamId} is not a valid GUID`;
+      }
+
+      return true;
+    };
   }
 
   public commandHelp(args: CommandArgs, log: (help: string) => void): void {
@@ -83,17 +123,27 @@ class GraphTeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
 
   Remarks:
 
-    To list apps in the Microsoft Teams app catalog, you have to first log in to
-    the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
+    To list apps in the Microsoft Teams app catalog or installed
+    in the specified team, you have to first log in to the Microsoft Graph
+    using the ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
+
+    To list apps installed in the specified Microsoft Teams team, specify that
+    team's ID using the ${chalk.grey('teamId')} option. If the ${chalk.grey('teamId')} option
+    is not specified, the command will list apps available in the Teams app
+    catalog.
 
   Examples:
 
     List all Microsoft Teams apps from your organization's app catalog only
       ${chalk.grey(config.delimiter)} ${commands.TEAMS_APP_LIST}
          
-    List all apps from the Microsoft Teams app catalog and the Microsoft Teams store
+    List all apps from the Microsoft Teams app catalog and the Microsoft Teams
+    store
       ${chalk.grey(config.delimiter)} ${commands.TEAMS_APP_LIST} --all
+
+    List your organization's apps installed in the specified Microsoft Teams
+    team
+      ${chalk.grey(config.delimiter)} ${commands.TEAMS_APP_LIST} --teamId 6f6fd3f7-9ba5-4488-bbe6-a789004d0d55
 `);
   }
 }

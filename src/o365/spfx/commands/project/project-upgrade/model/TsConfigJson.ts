@@ -1,4 +1,5 @@
 export interface TsConfigJson {
+  extends?: string;
   compilerOptions?: {
     lib?: string[];
     module?: string;
@@ -8,6 +9,9 @@ export interface TsConfigJson {
     typeRoots?: string[];
     types?: string[];
     experimentalDecorators?: boolean;
+    inlineSources?: boolean;
+    strictNullChecks?: boolean;
+    noUnusedLocals?: boolean;
   };
   exclude?: string[];
   include?: string[];
