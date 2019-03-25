@@ -88,6 +88,10 @@ class GraphTeamsAppUninstallCommand extends GraphCommand {
       {
         option: '--teamId <teamId>',
         description: 'The ID of the Microsoft Teams team from which to uninstall the app'
+      },
+      {
+        option: '--confirm',
+        description: 'Don\'t prompt for confirmation when uninstalling the app'
       }
     ];
 
