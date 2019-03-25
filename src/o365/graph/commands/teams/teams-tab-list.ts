@@ -5,10 +5,11 @@ import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandOption
 } from '../../../../Command';
-import { Team } from './Team';
+
+import { Tab } from './Tab';
 import { GraphItemsListCommand } from '../GraphItemsListCommand';
-import * as request from 'request-promise-native';
-import Utils from '../../../../Utils';
+
+
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -18,15 +19,17 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   joined?: boolean;
+  teamId: string;
+  channelId: string;
 }
 
-class TeamsListCommand extends GraphItemsListCommand<Team> {
+class TabListCommand extends GraphItemsListCommand<Tab> {
   public get name(): string {
     return `${commands.TEAMS_TAB_LIST}`;
   }
 
   public get description(): string {
-    return 'Lists Microsoft Teams in the current tenant TGO';
+    return 'Lists Microsoft Teams in the current tenant TGO TEST VERSION';
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -36,30 +39,32 @@ class TeamsListCommand extends GraphItemsListCommand<Team> {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-
-    /*let endpoint: string = `${auth.service.resource}/beta/groups?$filter=resourceProvisioningOptions/Any(x:x eq 'Team')&$select=id,displayName,description`;
-    if (args.options.joined) {
-      endpoint = `${auth.service.resource}/beta/me/joinedTeams`;
-    }*/
-    let endpoint: string = `${auth.service.resource}/v1.0/me/joinedTeams`;
+   
+    let endpoint: string = `${auth.service.resource}/V1.0/teams/${args.options.teamId}/channels/${args.options.channelId}/tabs?$expand=teamsApp`;
     if (args.options.joined) {
       endpoint += `?$filter=distributionMethod eq 'organization'`;
     }
     this
-      .getAllItems(endpoint, cmd, true)
-      .then((): Promise<any> => {
-        if (args.options.joined) {
-          return Promise.resolve();
-        } else {
-          return Promise.all(this.items.map(g => this.getTeamFromGroup(g, cmd)));
-        }
-      })
-      .then((res?: Team[]): void => {
-        if (res) {
-          this.items = res;
-        }
-
+    .getAllItems(endpoint, cmd, true)
+    .then((): void => {
+      if (args.options.output === 'json') {
         cmd.log(this.items);
+      }
+      else {
+        cmd.log(this.items.map(t => {
+          return {
+            id: t.id,
+            displayName: t.displayName,
+            webUrl: t.webUrl,
+            sortOrderIndex: t.sortOrderIndex,
+            teamsAppId: t.teamsAppId,
+            configuration: t.configuration,
+            teamsApp: t.teamsApp            
+          }
+        }));
+      }
+
+        //cmd.log(this.items);
 
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
@@ -68,7 +73,7 @@ class TeamsListCommand extends GraphItemsListCommand<Team> {
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
-
+/*
   private getTeamFromGroup(group: { id: string, displayName: string, description: string }, cmd: CommandInstance): Promise<Team> {
     return new Promise<Team>((resolve: (team: Team) => void, reject: (error: any) => void): void => {
       auth
@@ -115,12 +120,16 @@ class TeamsListCommand extends GraphItemsListCommand<Team> {
     });
   }
 
-
+*/
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-j, --joined',
-        description: 'Retrieve only joined teams'
+        option: '-i, --teamId <teamId>',
+        description: 'The ID of the team to list the tab of'
+      },
+      {
+        option: '-c, --channelId <channelId>',
+        description: 'The ID of the channel to list the tab of'
       }
     ];
 
@@ -155,4 +164,4 @@ class TeamsListCommand extends GraphItemsListCommand<Team> {
   }
 }
 
-module.exports = new TeamsListCommand();
+module.exports = new TabListCommand();
