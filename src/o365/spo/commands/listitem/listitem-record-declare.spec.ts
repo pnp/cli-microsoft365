@@ -153,7 +153,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
 
   it('calls telemetry', (done) => {
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
+    cmdInstance.action({ options: { debug: true } }, () => {
       try {
         assert(trackEvent.called);
         done();
@@ -166,7 +166,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
 
   it('logs correct telemetry event', (done) => {
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
+    cmdInstance.action({ options: { debug: true } }, () => {
       try {
         assert.equal(telemetry.name, commands.LISTITEM_RECORD_DECLARE);
         done();
@@ -321,7 +321,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com', listTitle: 'Test List' } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com', listTitle: 'Test List' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
         done();
@@ -378,7 +378,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
     cmdInstance.action = command.action();
 
     let options: any = {
-      debug: false,
+      debug: true,
       listTitle: 'Test List',
       id: 147,
       webUrl: 'https://rejectme.sharepoint.com/sites/project-y',
@@ -528,7 +528,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
       options: {
         listId: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
         webUrl: "https://contoso.sharepoint.com",
-        debug: false
+        debug: true
       }
     }, (err?: any) => {
       try {
