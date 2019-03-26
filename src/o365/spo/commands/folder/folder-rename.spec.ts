@@ -2,7 +2,7 @@ import commands from '../../commands';
 import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth, { Site } from '../../SpoAuth';
+import auth from '../../../../Auth';
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
@@ -15,34 +15,22 @@ describe(commands.FOLDER_RENAME, () => {
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  let trackEvent: any;
-  let telemetry: any;
   let stubAllPostRequests: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub((command as any), 'getRequestDigest').callsFake(() => Promise.resolve({
+      FormDigestValue: 'abc'
+    }));
+    auth.service.connected = true;
 
     stubAllPostRequests  = (
       requestObjectIdentityResp: any = null,
       folderObjectIdentityResp: any = null,
-      folderRenameResp: any = null,
-      effectiveBasePermissionsResp: any = null
+      folderRenameResp: any = null
     ): sinon.SinonStub => {
       return sinon.stub(request, 'post').callsFake((opts) => {
-        if (opts.url.indexOf('/common/oauth2/token') > -1) {
-          return Promise.resolve('abc');
-        }
-  
-        if (opts.url.indexOf('/_api/contextinfo') > -1) {
-          return Promise.resolve({
-            FormDigestValue: 'abc'
-          });
-        }
-  
         // fake requestObjectIdentity
         if (opts.body.indexOf('3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a') > -1) {
           if (requestObjectIdentityResp) {
@@ -102,13 +90,15 @@ describe(commands.FOLDER_RENAME, () => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.site = new Site();
-    telemetry = null;
   });
 
   afterEach(() => {
@@ -120,10 +110,11 @@ describe(commands.FOLDER_RENAME, () => {
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.getAccessToken,
-      auth.restoreAuth
+      auth.restoreAuth,
+      (command as any).getRequestDigest,
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -134,53 +125,8 @@ describe(commands.FOLDER_RENAME, () => {
     assert.notEqual(command.description, null);
   });
 
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {}, appCatalogUrl: 'https://contoso.sharepoint.com' }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { webUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
-      try {
-        assert.equal(telemetry.name, commands.FOLDER_RENAME);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not logged in to a SharePoint site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { webUrl: 'https://contoso.sharepoint.com/sites/abc' } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('should send correct folder remove request body', (done) => {
     const requestStub: sinon.SinonStub = stubAllPostRequests();
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com/sites/abc',
       folderUrl: '/Shared Documents/Test2',
@@ -191,7 +137,6 @@ describe(commands.FOLDER_RENAME, () => {
     const folderObjectIdentity: string = "e52c649e-a019-5000-c38d-8d334a079fd2|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:7f1c42fe-5933-430d-bafb-6c839aa87a5c:web:30a3906a-a55e-4f48-aaae-ecf45346bf53:folder:10c46485-5035-475f-a40f-d842bab30708";
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         const bodyPayload = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="MoveTo" Id="32" ObjectPathId="26"><Parameters><Parameter Type="String">/sites/abc/Shared Documents/test1</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="26" Name="${folderObjectIdentity}" /></ObjectPaths></Request>`;
         assert.equal(requestStub.lastCall.args[0].body, bodyPayload);
@@ -200,18 +145,11 @@ describe(commands.FOLDER_RENAME, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should display done when folder removed (verbose)', (done) => {
     stubAllPostRequests();
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com/sites/abc',
       folderUrl: '/Shared Documents/Test2',
@@ -220,7 +158,6 @@ describe(commands.FOLDER_RENAME, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         assert.equal(cmdInstanceLogSpy.lastCall.args[0], 'DONE');
         done();
@@ -228,18 +165,11 @@ describe(commands.FOLDER_RENAME, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should not display anything when folder removed, but not verbose', (done) => {
     stubAllPostRequests();
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com/sites/abc',
       folderUrl: '/Shared Documents/Test2',
@@ -247,7 +177,6 @@ describe(commands.FOLDER_RENAME, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         assert.equal(cmdInstanceLogSpy.called, false);
         done();
@@ -255,18 +184,11 @@ describe(commands.FOLDER_RENAME, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should correctly handle requestObjectIdentity reject promise', (done) => {
     stubAllPostRequests(new Promise<any>((resolve, reject) => { return reject('requestObjectIdentity error'); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       folderUrl: '/Shared Documents/test',
@@ -281,19 +203,12 @@ describe(commands.FOLDER_RENAME, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should correctly handle requestObjectIdentity ClientSvc error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "requestObjectIdentity ClientSvc error" } }]);
     stubAllPostRequests(new Promise<any>((resolve, reject) => { return resolve(error); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       folderUrl: '/Shared Documents/test',
@@ -308,18 +223,11 @@ describe(commands.FOLDER_RENAME, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should correctly handle requestFolderObjectIdentity reject promise', (done) => {
     stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return reject('abc 1'); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       folderUrl: '/Shared Documents/test',
@@ -334,19 +242,12 @@ describe(commands.FOLDER_RENAME, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should correctly handle requestFolderObjectIdentity ClientSvc error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "requestFolderObjectIdentity error" } }]);
     stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return resolve(error); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       folderUrl: '/Shared Documents/test',
@@ -361,19 +262,12 @@ describe(commands.FOLDER_RENAME, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should correctly handle requestFolderObjectIdentity ClientSvc empty error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "" } }]);
     stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return resolve(error); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       folderUrl: '/Shared Documents/test',
@@ -389,18 +283,11 @@ describe(commands.FOLDER_RENAME, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should requestFolderObjectIdentity reject promise if _ObjectIdentity_ not found', (done) => {
     stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return resolve('[{}]') }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       folderUrl: '/Shared Documents/test',
@@ -415,18 +302,11 @@ describe(commands.FOLDER_RENAME, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should correctly handle folder remove reject promise response', (done) => {
     stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return reject('folder remove promise error'); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object =  {
       webUrl: 'https://contoso.sharepoint.com',
       folderUrl: '/Shared Documents/test',
@@ -441,19 +321,12 @@ describe(commands.FOLDER_RENAME, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should correctly handle folder rename ClientSvc error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "File Not Found" } }]);
     stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return resolve(error); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       folderUrl: '/Shared Documents/test',
@@ -468,19 +341,12 @@ describe(commands.FOLDER_RENAME, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should correctly handle ClientSvc empty error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "" } }]);
     stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return resolve(error); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       folderUrl: '/Shared Documents/test',
@@ -495,9 +361,6 @@ describe(commands.FOLDER_RENAME, () => {
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore(request.post);
       }
     });
   });
@@ -584,33 +447,5 @@ describe(commands.FOLDER_RENAME, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.getAccessToken);
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        webUrl: 'https://contoso.sharepoint.com',
-        key: 'key1',
-        value: 'value1',
-
-      }
-    }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        Utils.restore(auth.getAccessToken);
-      }
-    });
   });
 });

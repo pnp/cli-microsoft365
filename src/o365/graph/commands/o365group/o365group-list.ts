@@ -1,5 +1,3 @@
-import auth from '../../GraphAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import request from '../../../../request';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -49,10 +47,10 @@ class GraphO365GroupListCommand extends GraphItemsListCommand<Group> {
     const expandOwners: string = args.options.orphaned ? '&$expand=owners' : '';
     const topCount: string = '&$top=100';
 
-    let endpoint: string = `${auth.service.resource}/v1.0/groups${groupFilter}${displayNameFilter}${mailNicknameFilter}${expandOwners}${topCount}`;
+    let endpoint: string = `${this.resource}/v1.0/groups${groupFilter}${displayNameFilter}${mailNicknameFilter}${expandOwners}${topCount}`;
 
     if (args.options.deleted) {
-      endpoint = `${auth.service.resource}/v1.0/directory/deletedItems/Microsoft.Graph.Group${groupFilter}${displayNameFilter}${mailNicknameFilter}${topCount}`;
+      endpoint = `${this.resource}/v1.0/directory/deletedItems/Microsoft.Graph.Group${groupFilter}${displayNameFilter}${mailNicknameFilter}${topCount}`;
     }
 
     this
@@ -124,20 +122,16 @@ class GraphO365GroupListCommand extends GraphItemsListCommand<Group> {
 
   private getGroupSiteUrl(groupId: string, cmd: CommandInstance): Promise<{ id: string, url: string }> {
     return new Promise<{ id: string, url: string }>((resolve: (siteInfo: { id: string, url: string }) => void, reject: (error: any) => void): void => {
-      auth
-        .ensureAccessToken(auth.service.resource, cmd, this.debug)
-        .then((): Promise<{ webUrl: string }> => {
-          const requestOptions: any = {
-            url: `${auth.service.resource}/v1.0/groups/${groupId}/drive?$select=webUrl`,
-            headers: {
-              authorization: `Bearer ${auth.service.accessToken}`,
-              accept: 'application/json;odata.metadata=none'
-            },
-            json: true
-          };
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/groups/${groupId}/drive?$select=webUrl`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        json: true
+      };
 
-          return request.get(requestOptions);
-        })
+      request
+        .get<{ webUrl: string }>(requestOptions)
         .then((res: { webUrl: string }): void => {
           resolve({
             id: groupId,
@@ -191,14 +185,7 @@ class GraphO365GroupListCommand extends GraphItemsListCommand<Group> {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to the Microsoft Graph
-    using the ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
-
-    To list available Office 365 Groups, you have to first log in to
-    the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
+      `  Remarks:
 
     Using the ${chalk.blue('--includeSiteUrl')} option, you can retrieve the URL
     of the site associated with the particular Office 365 Group. If you however
@@ -216,26 +203,26 @@ class GraphO365GroupListCommand extends GraphItemsListCommand<Group> {
   Examples:
   
     List all Office 365 Groups in the tenant
-      ${chalk.grey(config.delimiter)} ${this.name}
+      ${this.name}
 
     List Office 365 Groups with display name starting with ${chalk.grey(`Project`)}
-      ${chalk.grey(config.delimiter)} ${this.name} --displayName Project
+      ${this.name} --displayName Project
 
     List Office 365 Groups mail nick name starting with ${chalk.grey(`team`)}
-      ${chalk.grey(config.delimiter)} ${this.name} --mailNickname team
+      ${this.name} --mailNickname team
 
     List deleted Office 365 Groups with display name starting with ${chalk.grey(`Project`)}
-      ${chalk.grey(config.delimiter)} ${this.name} --displayName Project --deleted
+      ${this.name} --displayName Project --deleted
 
     List deleted Office 365 Groups with mail nick name starting with ${chalk.grey(`team`)}
-      ${chalk.grey(config.delimiter)} ${this.name} --mailNickname team --deleted
+      ${this.name} --mailNickname team --deleted
 
     List Office 365 Groups with display name starting with ${chalk.grey(`Project`)} including
     the URL of the corresponding SharePoint site
-      ${chalk.grey(config.delimiter)} ${this.name} --displayName Project --includeSiteUrl
+      ${this.name} --displayName Project --includeSiteUrl
 
     List Office 365 Groups without owners
-      ${chalk.grey(config.delimiter)} ${this.name} --orphaned
+      ${this.name} --orphaned
 `);
   }
 }

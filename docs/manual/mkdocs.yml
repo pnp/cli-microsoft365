@@ -7,10 +7,10 @@ nav:
     - 'Logging in to Office 365': 'user-guide/connecting-office-365.md'
     - 'CLI output mode': 'user-guide/cli-output-mode.md'
   - Commands:
+    - login: 'cmd/login.md'
+    - logout: 'cmd/logout.md'
+    - status: 'cmd/status.md'
     - SharePoint Online (spo):
-      - login: 'cmd/spo/login.md'
-      - logout: 'cmd/spo/logout.md'
-      - status: 'cmd/spo/status.md'
       - app:
         - app add: 'cmd/spo/app/app-add.md'
         - app deploy: 'cmd/spo/app/app-deploy.md'
@@ -234,9 +234,6 @@ nav:
       - project:
         - project upgrade: 'cmd/spfx/project/project-upgrade.md'
     - Microsoft Graph (graph):
-      - login: 'cmd/graph/login.md'
-      - logout: 'cmd/graph/logout.md'
-      - status: 'cmd/graph/status.md'
       - groupsetting:
         - groupsetting add: 'cmd/graph/groupsetting/groupsetting-add.md'
         - groupsetting get: 'cmd/graph/groupsetting/groupsetting-get.md'
@@ -308,9 +305,6 @@ nav:
         - user list: 'cmd/graph/user/user-list.md'
         - user sendmail: 'cmd/graph/user/user-sendmail.md'
     - Azure Management Service (azmgmt):
-      - login: 'cmd/azmgmt/login.md'
-      - logout: 'cmd/azmgmt/logout.md'
-      - status: 'cmd/azmgmt/status.md'
       - flow:
         - flow environment get: 'cmd/azmgmt/flow/flow-environment-get.md'
         - flow environment list: 'cmd/azmgmt/flow/flow-environment-list.md'
@@ -320,9 +314,6 @@ nav:
         - flow run get: 'cmd/azmgmt/flow/flow-run-get.md'
         - flow run list: 'cmd/azmgmt/flow/flow-run-list.md'
     - Azure Active Directory Graph (aad):
-      - login: 'cmd/aad/login.md'
-      - logout: 'cmd/aad/logout.md'
-      - status: 'cmd/aad/status.md'
       - oauth2grant:
         - oauth2grant add: 'cmd/aad/oauth2grant/oauth2grant-add.md'
         - oauth2grant list: 'cmd/aad/oauth2grant/oauth2grant-list.md'

@@ -1,6 +1,4 @@
-import auth from '../../GraphAuth';
 import Utils from '../../../../Utils';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import { CommandOption, CommandValidate } from '../../../../Command';
@@ -27,20 +25,16 @@ class GraphTeamsFunSettingsListCommand extends GraphCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((): Promise<{ funSettings: any; }> => {
-        const requestOptions: any = {
-          url: `${auth.service.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}?$select=funSettings`,
-          headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
-            accept: 'application/json;odata.metadata=none'
-          },
-          json: true
-        };
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}?$select=funSettings`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      json: true
+    };
 
-        return request.get(requestOptions);
-      })
+    request
+      .get<{ funSettings: any }>(requestOptions)
       .then((res: { funSettings: any }): void => {
         cmd.log(res.funSettings);
 
@@ -50,7 +44,6 @@ class GraphTeamsFunSettingsListCommand extends GraphCommand {
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   };
-
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
@@ -79,21 +72,12 @@ class GraphTeamsFunSettingsListCommand extends GraphCommand {
   }
 
   public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to the Microsoft Graph
-    using the ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
-
-    To get fun settings of a Microsoft Teams team, you have to first log in to
-    the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
-
-  Examples:
+      `  Examples:
 
     List fun settings of a Microsoft Teams team
-      ${chalk.grey(config.delimiter)} ${this.name} --teamId 83cece1e-938d-44a1-8b86-918cf6151957
+      ${this.name} --teamId 83cece1e-938d-44a1-8b86-918cf6151957
 `);
   }
 }

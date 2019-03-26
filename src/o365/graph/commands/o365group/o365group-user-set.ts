@@ -1,5 +1,3 @@
-import auth from '../../GraphAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
@@ -78,12 +76,11 @@ class GraphO365GroupUserSetCommand extends GraphItemsListCommand<GroupUser> {
           const foundMember: GroupUser | undefined = this.items.find(e => e.userPrincipalName.toLocaleLowerCase() === args.options.userName.toLocaleLowerCase() && e.userType === 'Member');
 
           if (foundMember !== undefined) {
-            const endpoint: string = `${auth.service.resource}/v1.0/groups/${groupId}/owners/$ref`;
+            const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/owners/$ref`;
 
             const requestOptions: any = {
               url: endpoint,
               headers: {
-                authorization: `Bearer ${auth.service.accessToken}`,
                 'accept': 'application/json;odata.metadata=none'
               },
               json: true,
@@ -104,12 +101,11 @@ class GraphO365GroupUserSetCommand extends GraphItemsListCommand<GroupUser> {
           const foundOwner: GroupUser | undefined = this.items.find(e => e.userPrincipalName.toLocaleLowerCase() === args.options.userName.toLocaleLowerCase() && e.userType === 'Owner');
 
           if (foundOwner !== undefined) {
-            const endpoint: string = `${auth.service.resource}/v1.0/groups/${groupId}/owners/${foundOwner.id}/$ref`;
+            const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/owners/${foundOwner.id}/$ref`;
 
             const requestOptions: any = {
               url: endpoint,
               headers: {
-                authorization: `Bearer ${auth.service.accessToken}`,
                 'accept': 'application/json;odata.metadata=none'
               },
             };
@@ -135,7 +131,7 @@ class GraphO365GroupUserSetCommand extends GraphItemsListCommand<GroupUser> {
   }
 
   private getOwners(cmd: CommandInstance, groupId: string): Promise<void> {
-    const endpoint: string = `${auth.service.resource}/v1.0/groups/${groupId}/owners?$select=id,displayName,userPrincipalName,userType`;
+    const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/owners?$select=id,displayName,userPrincipalName,userType`;
 
     return this.getAllItems(endpoint, cmd, true).then((): void => {
       // Currently there is a bug in the Microsoft Graph that returns Owners as
@@ -147,7 +143,7 @@ class GraphO365GroupUserSetCommand extends GraphItemsListCommand<GroupUser> {
   }
 
   private getMembersAndGuests(cmd: CommandInstance, groupId: string): Promise<void> {
-    const endpoint: string = `${auth.service.resource}/v1.0/groups/${groupId}/members?$select=id,displayName,userPrincipalName,userType`;
+    const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/members?$select=id,displayName,userPrincipalName,userType`;
     return this.getAllItems(endpoint, cmd, false);
   }
 
@@ -211,17 +207,8 @@ class GraphO365GroupUserSetCommand extends GraphItemsListCommand<GroupUser> {
   }
 
   public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
-    log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to the Microsoft Graph
-    using the ${chalk.blue(commands.LOGIN)} command.
-
-  Remarks:
-
-    To update the role of the given user in the specified Office 365 Group or Microsoft Teams team,
-    you have to first log in to the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
+    log(`  Remarks:
 
     The command will return an error if the user already has the specified role
     in the given Office 365 Group or Microsoft Teams team.
@@ -229,17 +216,18 @@ class GraphO365GroupUserSetCommand extends GraphItemsListCommand<GroupUser> {
   Examples:
 
     Promote the specified user to owner of the given Office 365 Group
-      ${chalk.grey(config.delimiter)} ${this.name} --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner
+      ${this.name} --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner
 
     Demote the specified user from owner to member in the given Office 365 Group
-      ${chalk.grey(config.delimiter)} ${this.name} --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Member
+      ${this.name} --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Member
 
     Promote the specified user to owner of the given Microsoft Teams team
-      ${chalk.grey(config.delimiter)} ${commands.TEAMS_USER_SET} --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner
+      ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner
 
-    Demote the specified user from owner to member in the given Microsoft Teams team
-      ${chalk.grey(config.delimiter)} ${commands.TEAMS_USER_SET} --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Member
-      `);
+    Demote the specified user from owner to member in the given Microsoft Teams
+    team
+      ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Member
+`);
   }
 }
 

@@ -1,4 +1,3 @@
-import config from '../../config';
 import commands from './commands';
 import GlobalOptions from '../../GlobalOptions';
 import request from '../../request';
@@ -32,12 +31,14 @@ class TenantIdGetCommand extends Command {
       url: `https://login.windows.net/${args.options.domainName}/.well-known/openid-configuration`,
       headers: {
         'content-type': 'application/json',
-        accept: 'application/json'
+        accept: 'application/json',
+        'x-anonymous': true
       },
       json: true
     };
 
-    request.get(requestOptions)
+    request
+      .get(requestOptions)
       .then((res: any): void => {
         if (res.error) {
           cb(new CommandError(res.error_description));
@@ -75,13 +76,12 @@ class TenantIdGetCommand extends Command {
   }
 
   public commandHelp(args: any, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
     log(vorpal.find(commands.TENANT_ID_GET).helpInformation());
     log(
       `Examples:
   
     Get Office 365 tenant ID for the specified domain
-      ${chalk.grey(config.delimiter)} ${commands.TENANT_ID_GET} --domainName contoso.com
+      ${commands.TENANT_ID_GET} --domainName contoso.com
 `);
   }
 }

@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
 import {
@@ -8,7 +6,6 @@ import {
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import GlobalOptions from '../../../../GlobalOptions';
-import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -47,58 +44,45 @@ class SpoFieldRemoveCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-    let siteAccessToken: string = '';
-
     const removeField: () => void = (): void => {
-      if (this.debug) {
-        cmd.log(`Retrieving access token for ${resource}...`);
+      if (this.verbose) {
+        cmd.log(`Removing field in site at ${args.options.webUrl}...`);
       }
 
-      auth
-        .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-        .then((accessToken: string): Promise<void> => {
-          siteAccessToken = accessToken;
+      let listRestUrl: string = '';
 
-          if (this.verbose) {
-            cmd.log(`Removing field in site at ${args.options.webUrl}...`);
-          }
+      if (args.options.listId) {
+        listRestUrl = `lists(guid'${encodeURIComponent(args.options.listId)}')/`;
+      }
+      else if (args.options.listTitle) {
+        listRestUrl = `lists/getByTitle('${encodeURIComponent(args.options.listTitle as string)}')/`;
+      }
+      else if (args.options.listUrl) {
+        const listServerRelativeUrl: string = Utils.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+        listRestUrl = `GetList('${encodeURIComponent(listServerRelativeUrl)}')/`;
+      }
 
-          let listRestUrl: string = '';
+      let fieldRestUrl: string = '';
+      if (args.options.id) {
+        fieldRestUrl = `/getbyid('${encodeURIComponent(args.options.id)}')`;
+      }
+      else {
+        fieldRestUrl = `/getbyinternalnameortitle('${encodeURIComponent(args.options.fieldTitle as string)}')`;
+      }
 
-          if (args.options.listId) {
-            listRestUrl = `lists(guid'${encodeURIComponent(args.options.listId)}')/`;
-          }
-          else if (args.options.listTitle) {
-            listRestUrl = `lists/getByTitle('${encodeURIComponent(args.options.listTitle as string)}')/`;
-          }
-          else if (args.options.listUrl) {
-            const listServerRelativeUrl: string = Utils.getServerRelativePath(args.options.webUrl, args.options.listUrl);
-            listRestUrl = `GetList('${encodeURIComponent(listServerRelativeUrl)}')/`;
-          }
+      const requestOptions: any = {
+        url: `${args.options.webUrl}/_api/web/${listRestUrl}fields${fieldRestUrl}`,
+        method: 'POST',
+        headers: {
+          'X-HTTP-Method': 'DELETE',
+          'If-Match': '*',
+          'accept': 'application/json;odata=nometadata'
+        },
+        json: true
+      };
 
-          let fieldRestUrl: string = '';
-          if (args.options.id) {
-            fieldRestUrl = `/getbyid('${encodeURIComponent(args.options.id)}')`;
-          }
-          else {
-            fieldRestUrl = `/getbyinternalnameortitle('${encodeURIComponent(args.options.fieldTitle as string)}')`;
-          }
-
-          const requestOptions: any = {
-            url: `${args.options.webUrl}/_api/web/${listRestUrl}fields${fieldRestUrl}`,
-            method: 'POST',
-            headers: {
-              authorization: `Bearer ${siteAccessToken}`,
-              'X-HTTP-Method': 'DELETE',
-              'If-Match': '*',
-              'accept': 'application/json;odata=nometadata'
-            },
-            json: true
-          };
-
-          return request.post(requestOptions);
-        })
+      request
+        .post(requestOptions)
         .then((): void => {
           // REST post call doesn't return anything
           cb();
@@ -200,31 +184,25 @@ class SpoFieldRemoveCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-    using the ${chalk.blue(commands.LOGIN)} command.
+      `  Remarks:
   
-  Remarks:
-  
-    To remove a field, you have to first log in to a SharePoint using the
-    ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-
     If the specified field not exists, you will get an ${chalk.grey('Invalid field name')} error.
         
   Examples:
 
     Remove the site column with the specified ID, located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/contoso-sales')}
-      ${chalk.grey(config.delimiter)} ${commands.FIELD_REMOVE} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --id 5ee2dd25-d941-455a-9bdb-7f2c54aed11b
+      ${commands.FIELD_REMOVE} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --id 5ee2dd25-d941-455a-9bdb-7f2c54aed11b
     
     Remove the list column with the specified ID, located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/contoso-sales')}.
     Retrieves the list by its title
-      ${chalk.grey(config.delimiter)} ${commands.FIELD_REMOVE} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listTitle Events --id 5ee2dd25-d941-455a-9bdb-7f2c54aed11b
+      ${commands.FIELD_REMOVE} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listTitle Events --id 5ee2dd25-d941-455a-9bdb-7f2c54aed11b
 
     Remove the list column with the specified display name, located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/contoso-sales')}.
     Retrieves the list by its url
-      ${chalk.grey(config.delimiter)} ${commands.FIELD_REMOVE} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listUrl 'Lists/Events' --fieldTitle 'Title'     
+      ${commands.FIELD_REMOVE} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listUrl 'Lists/Events' --fieldTitle 'Title'     
       `);
   }
 }

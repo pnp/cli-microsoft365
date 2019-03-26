@@ -1,4 +1,3 @@
-import auth from '../../SpoAuth';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -44,19 +43,15 @@ class SpoHubSiteSetCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  protected requiresTenantAdmin(): boolean {
-    return true;
-  }
-
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${auth.service.resource}...`);
-    }
+    let spoAdminUrl: string = '';
 
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((): Promise<ContextInfo> => {
-        return this.getRequestDigest(cmd, this.debug);
+    this
+      .getSpoAdminUrl(cmd, this.debug)
+      .then((_spoAdminUrl: string): Promise<ContextInfo> => {
+        spoAdminUrl = _spoAdminUrl;
+
+        return this.getRequestDigest(spoAdminUrl);
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
@@ -68,9 +63,8 @@ class SpoHubSiteSetCommand extends SpoCommand {
         const logoUrl: string = typeof args.options.logoUrl === 'string' ? `<SetProperty Id="14" ObjectPathId="10" Name="LogoUrl"><Parameter Type="String">${Utils.escapeXml(args.options.logoUrl)}</Parameter></SetProperty>` : '';
 
         const requestOptions: any = {
-          url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+          url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': res.FormDigestValue
           },
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="9" ObjectPathId="8" /><ObjectPath Id="11" ObjectPathId="10" /><Query Id="12" ObjectPathId="10"><Query SelectAllProperties="true"><Properties /></Query></Query>${title}${logoUrl}${description}<Method Name="Update" Id="16" ObjectPathId="10" /></Actions><ObjectPaths><Constructor Id="8" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="10" ParentId="8" Name="GetHubSitePropertiesById"><Parameters><Parameter Type="Guid">${Utils.escapeXml(args.options.id)}</Parameter></Parameters></Method></ObjectPaths></Request>`
@@ -157,8 +151,8 @@ class SpoHubSiteSetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.HUBSITE_SET).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online tenant
-    admin site, using the ${chalk.blue(commands.LOGIN)} command.
+      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
+    the tenant admin site.
         
   Remarks:
 
@@ -166,20 +160,16 @@ class SpoHubSiteSetCommand extends SpoCommand {
     in preview and is subject to change once the API reached general
     availability.
 
-    To update hub site's properties, you have to first log in to a tenant admin
-    site using the ${chalk.blue(commands.LOGIN)} command, eg.
-    ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso-admin.sharepoint.com`)}.
-
     If the specified ${chalk.grey('id')} doesn't refer to an existing hub site, you will get
     an ${chalk.grey('Unknown Error')} error.
 
   Examples:
   
     Update hub site's title
-      ${chalk.grey(config.delimiter)} ${this.name} --id 255a50b2-527f-4413-8485-57f4c17a24d1 --title Sales
+      ${this.name} --id 255a50b2-527f-4413-8485-57f4c17a24d1 --title Sales
 
     Update hub site's title and description
-      ${chalk.grey(config.delimiter)} ${this.name} --id 255a50b2-527f-4413-8485-57f4c17a24d1 --title Sales --description "All things sales"
+      ${this.name} --id 255a50b2-527f-4413-8485-57f4c17a24d1 --title Sales --description "All things sales"
 
   More information:
 

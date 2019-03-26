@@ -1,5 +1,3 @@
-import auth from '../../GraphAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -42,39 +40,31 @@ class GraphO365GroupAddCommand extends GraphCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     let group: Group;
 
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<Group> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}.`);
-        }
+    if (this.verbose) {
+      cmd.log(`Creating Office 365 Group...`);
+    }
 
-        if (this.verbose) {
-          cmd.log(`Creating Office 365 Group...`);
-        }
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/groups`,
+      headers: {
+        'accept': 'application/json;odata.metadata=none'
+      },
+      json: true,
+      body: {
+        description: args.options.description,
+        displayName: args.options.displayName,
+        groupTypes: [
+          "Unified"
+        ],
+        mailEnabled: true,
+        mailNickname: args.options.mailNickname,
+        securityEnabled: false,
+        visibility: args.options.isPrivate == 'true' ? 'Private' : 'Public'
+      }
+    };
 
-        const requestOptions: any = {
-          url: `${auth.service.resource}/v1.0/groups`,
-          headers: {
-            authorization: `Bearer ${accessToken}`,
-            'accept': 'application/json;odata.metadata=none'
-          },
-          json: true,
-          body: {
-            description: args.options.description,
-            displayName: args.options.displayName,
-            groupTypes: [
-              "Unified"
-            ],
-            mailEnabled: true,
-            mailNickname: args.options.mailNickname,
-            securityEnabled: false,
-            visibility: args.options.isPrivate == 'true' ? 'Private' : 'Public'
-          }
-        };
-
-        return request.post(requestOptions);
-      })
+    request
+      .post<Group>(requestOptions)
       .then((res: Group): Promise<void> => {
         group = res;
 
@@ -92,9 +82,8 @@ class GraphO365GroupAddCommand extends GraphCommand {
         }
 
         const requestOptions: any = {
-          url: `${auth.service.resource}/v1.0/groups/${group.id}/photo/$value`,
+          url: `${this.resource}/v1.0/groups/${group.id}/photo/$value`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             'content-type': this.getImageContentType(fullPath)
           },
           body: fs.readFileSync(fullPath)
@@ -120,9 +109,8 @@ class GraphO365GroupAddCommand extends GraphCommand {
         }
 
         const requestOptions: any = {
-          url: `${auth.service.resource}/v1.0/users?$filter=${owners.map(o => `userPrincipalName eq '${o}'`).join(' or ')}&$select=id`,
+          url: `${this.resource}/v1.0/users?$filter=${owners.map(o => `userPrincipalName eq '${o}'`).join(' or ')}&$select=id`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             'content-type': 'application/json'
           },
           json: true
@@ -136,9 +124,8 @@ class GraphO365GroupAddCommand extends GraphCommand {
         }
 
         return Promise.all(res.value.map(u => request.post({
-          url: `${auth.service.resource}/v1.0/groups/${group.id}/owners/$ref`,
+          url: `${this.resource}/v1.0/groups/${group.id}/owners/$ref`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             'content-type': 'application/json'
           },
           json: true,
@@ -163,9 +150,8 @@ class GraphO365GroupAddCommand extends GraphCommand {
         }
 
         const requestOptions: any = {
-          url: `${auth.service.resource}/v1.0/users?$filter=${members.map(o => `userPrincipalName eq '${o}'`).join(' or ')}&$select=id`,
+          url: `${this.resource}/v1.0/users?$filter=${members.map(o => `userPrincipalName eq '${o}'`).join(' or ')}&$select=id`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             'content-type': 'application/json'
           },
           json: true
@@ -179,9 +165,8 @@ class GraphO365GroupAddCommand extends GraphCommand {
         }
 
         return Promise.all(res.value.map(u => request.post({
-          url: `${auth.service.resource}/v1.0/groups/${group.id}/members/$ref`,
+          url: `${this.resource}/v1.0/groups/${group.id}/members/$ref`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             'content-type': 'application/json'
           },
           json: true,
@@ -322,17 +307,10 @@ class GraphO365GroupAddCommand extends GraphCommand {
   }
 
   public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to the Microsoft Graph,
-    using the ${chalk.blue(commands.LOGIN)} command.
-
-  Remarks:
+      `  Remarks:
   
-    To create an Office 365 Group, you have to first log in to the Microsoft
-    Graph using the ${chalk.blue(commands.LOGIN)} command.
-
     When specifying the path to the logo image you can use both relative and
     absolute paths. Note, that ~ in the path, will not be resolved and will most
     likely result in an error.
@@ -340,19 +318,19 @@ class GraphO365GroupAddCommand extends GraphCommand {
   Examples:
 
     Create a public Office 365 Group
-      ${chalk.grey(config.delimiter)} ${this.name} --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance
+      ${this.name} --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance
 
     Create a private Office 365 Group
-      ${chalk.grey(config.delimiter)} ${this.name} --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --isPrivate true
+      ${this.name} --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --isPrivate true
 
     Create a public Office 365 Group and set specified users as its owners
-      ${chalk.grey(config.delimiter)} ${this.name} --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --owners DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com
+      ${this.name} --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --owners DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com
 
     Create a public Office 365 Group and set specified users as its members
-      ${chalk.grey(config.delimiter)} ${this.name} --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --members DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com
+      ${this.name} --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --members DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com
 
     Create a public Office 365 Group and set its logo
-      ${chalk.grey(config.delimiter)} ${this.name} --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --logoPath images/logo.png
+      ${this.name} --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --logoPath images/logo.png
 `);
   }
 }

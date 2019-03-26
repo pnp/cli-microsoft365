@@ -19,15 +19,9 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
-!!! important
-    Before using this command, log in to the Microsoft Graph, using the [graph login](../login.md) command.
-
 ## Remarks
 
-To remove the specified Microsoft Teams team, you have to first log in to the Microsoft Graph using the [graph login](../login.md) command, eg. `graph login`.
-
-When deleted, Office 365 groups are moved to a temporary container and can be restored within 30 days. 
-After that time, they are permanently deleted. This applies only to Office 365 groups.
+When deleted, Office 365 groups are moved to a temporary container and can be restored within 30 days. After that time, they are permanently deleted. This applies only to Office 365 groups.
 
 ## Examples
 

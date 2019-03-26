@@ -1,4 +1,3 @@
-import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import request from '../../../../request';
@@ -8,7 +7,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
-import { Auth } from '../../../../Auth';
 import { SpoPropertyBagBaseCommand } from './propertybag-base';
 import GlobalOptions from '../../../../GlobalOptions';
 import Utils from '../../../../Utils';
@@ -45,34 +43,20 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const removeProperty = (): void => {
-      const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
       const clientSvcCommons: ClientSvc = new ClientSvc(cmd, this.debug);
 
-      if (this.debug) {
-        cmd.log(`Retrieving access token for ${resource}...`);
-      }
-
-      auth
-        .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-        .then((accessToken: string): Promise<ContextInfo> => {
-          this.siteAccessToken = accessToken;
-
-          if (this.debug) {
-            cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-          }
-
-          return this.getRequestDigestForSite(args.options.webUrl, this.siteAccessToken, cmd, this.debug);
-        })
+      this
+        .getRequestDigest(args.options.webUrl)
         .then((contextResponse: ContextInfo): Promise<IdentityResponse> => {
           this.formDigestValue = contextResponse.FormDigestValue;
 
-          return clientSvcCommons.getCurrentWebIdentity(args.options.webUrl, this.siteAccessToken, this.formDigestValue);
+          return clientSvcCommons.getCurrentWebIdentity(args.options.webUrl, this.formDigestValue);
         })
         .then((identityResp: IdentityResponse): Promise<IdentityResponse> => {
           const opts: Options = args.options;
           if (opts.folder) {
             // get the folder guid instead of the web guid
-            return clientSvcCommons.getFolderIdentity(identityResp.objectIdentity, opts.webUrl, opts.folder, this.siteAccessToken, this.formDigestValue)
+            return clientSvcCommons.getFolderIdentity(identityResp.objectIdentity, opts.webUrl, opts.folder, this.formDigestValue)
           }
           return new Promise<IdentityResponse>(resolve => { return resolve(identityResp); });
         })
@@ -117,7 +101,6 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
     const requestOptions: any = {
       url: `${options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
       headers: {
-        authorization: `Bearer ${this.siteAccessToken}`,
         'X-RequestDigest': this.formDigestValue
       },
       body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetFieldValue" Id="206" ObjectPathId="205"><Parameters><Parameter Type="String">${Utils.escapeXml(options.key)}</Parameter><Parameter Type="Null" /></Parameters></Method><Method Name="Update" Id="207" ObjectPathId="198" /></Actions><ObjectPaths><Property Id="205" ParentId="198" Name="${objectType}" /><Identity Id="198" Name="${identityResp.objectIdentity}" /></ObjectPaths></Request>`
@@ -179,31 +162,22 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.PROPERTYBAG_REMOVE).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-    using the ${chalk.blue(commands.LOGIN)} command.
-                      
-  Remarks:
-
-    To remove property bag value, you have to first log in to a SharePoint
-    Online site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-
-  Examples:
+      `  Examples:
 
     Removes the value of the ${chalk.grey('key1')} property from the property bag located in site ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.PROPERTYBAG_REMOVE} --webUrl https://contoso.sharepoint.com/sites/test --key key1
+      ${commands.PROPERTYBAG_REMOVE} --webUrl https://contoso.sharepoint.com/sites/test --key key1
 
     Removes the value of the ${chalk.grey('key1')} property from the property bag located in site root folder ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.PROPERTYBAG_REMOVE} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder / --confirm
+      ${commands.PROPERTYBAG_REMOVE} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder / --confirm
 
     Removes the value of the ${chalk.grey('key1')} property from the property bag located in site document library ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.PROPERTYBAG_REMOVE} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder '/Shared Documents'
+      ${commands.PROPERTYBAG_REMOVE} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder '/Shared Documents'
     
     Removes property bag value located in folder in site document library ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.PROPERTYBAG_REMOVE} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder '/Shared Documents/MyFolder'
+      ${commands.PROPERTYBAG_REMOVE} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder '/Shared Documents/MyFolder'
 
     Removes the value of the ${chalk.grey('key1')} property from the property bag located in site list ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.PROPERTYBAG_REMOVE} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder /Lists/MyList
+      ${commands.PROPERTYBAG_REMOVE} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder /Lists/MyList
     `);
   }
 }

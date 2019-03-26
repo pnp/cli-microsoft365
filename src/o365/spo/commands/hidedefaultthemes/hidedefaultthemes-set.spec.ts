@@ -2,7 +2,7 @@ import commands from '../../commands';
 import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth, { Site } from '../../SpoAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./hidedefaultthemes-set');
 import * as assert from 'assert';
 import request from '../../../../request';
@@ -12,45 +12,44 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
-  let trackEvent: any;
-  let telemetry: any;
   let requests: any[];
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    auth.service.connected = true;
+    auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    auth.site = new Site();
     requests = [];
-    telemetry = null;
   });
 
   afterEach(() => {
-    Utils.restore(vorpal.find);
+    Utils.restore([
+      vorpal.find,
+      request.post
+    ]);
   });
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.ensureAccessToken,
-      auth.getAccessToken,
       auth.restoreAuth,
-      request.get,
-      request.post
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
+    auth.service.spoUrl = undefined;
   });
 
   it('has correct name', () => {
@@ -59,47 +58,6 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
 
   it('has a description', () => {
     assert.notEqual(command.description, null);
-  });
-
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.HIDEDEFAULTTHEMES_SET);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not logged in to a SharePoint site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 
   it('sets the value of the HideDefaultThemes setting', (done) => {
@@ -112,23 +70,15 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
-
     cmdInstance.action({
       options: {
         debug: false,
         hideDefaultThemes: true
       }
     }, () => {
-
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/thememanager/SetHideDefaultThemes`) > -1 &&
-          r.headers.authorization &&
-          r.headers.authorization.indexOf('Bearer ') === 0 &&
           r.headers.accept &&
           r.headers.accept.indexOf('application/json') === 0) {
           correctRequestIssued = true;
@@ -141,11 +91,6 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore([
-          request.post
-        ]);
       }
     });
   });
@@ -160,23 +105,15 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
-
     cmdInstance.action({
       options: {
         debug: true,
         hideDefaultThemes: true
       }
     }, () => {
-
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/thememanager/SetHideDefaultThemes`) > -1 &&
-          r.headers.authorization &&
-          r.headers.authorization.indexOf('Bearer ') === 0 &&
           r.headers.accept &&
           r.headers.accept.indexOf('application/json') === 0) {
           correctRequestIssued = true;
@@ -190,11 +127,6 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore([
-          request.post
-        ]);
-      }
     });
   });
 
@@ -207,11 +139,6 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
 
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
@@ -229,11 +156,6 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore([
-          request.post
-        ]);
       }
     });
   });

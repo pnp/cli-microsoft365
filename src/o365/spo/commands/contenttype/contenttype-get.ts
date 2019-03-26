@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
 import {
@@ -7,7 +5,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import GlobalOptions from '../../../../GlobalOptions';
-import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -37,29 +34,16 @@ class SpoContentTypeGetCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-    let siteAccessToken: string = '';
+    const requestOptions: any = {
+      url: `${args.options.webUrl}/_api/web/${(args.options.listTitle ? `lists/getByTitle('${encodeURIComponent(args.options.listTitle)}')/` : '')}contenttypes('${encodeURIComponent(args.options.id)}')`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      json: true
+    };
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<any> => {
-        siteAccessToken = accessToken;
-
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving information about the content type ${args.options.id}...`);
-        }
-
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/${(args.options.listTitle ? `lists/getByTitle('${encodeURIComponent(args.options.listTitle)}')/` : '')}contenttypes('${encodeURIComponent(args.options.id)}')`,
-          headers: {
-            authorization: `Bearer ${siteAccessToken}`,
-            accept: 'application/json;odata=nometadata'
-          },
-          json: true
-        };
-
-        return request.get(requestOptions);
-      })
+    request
+      .get(requestOptions)
       .then((res: any): void => {
         if (res['odata.null'] === true) {
           cb(new CommandError(`Content type with ID ${args.options.id} not found`));
@@ -119,14 +103,7 @@ class SpoContentTypeGetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site using
-    the ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
-
-    To retrieve information about a content type, you have to first log in to
-    a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
+      `  Remarks:
 
     If no content type with the specified is found in the site or the list, you
     will get the ${chalk.grey('Content type with ID 0x010012 not found')} error.
@@ -134,10 +111,10 @@ class SpoContentTypeGetCommand extends SpoCommand {
   Examples:
   
     Retrieve site content type
-      ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --id 0x0100558D85B7216F6A489A499DB361E1AE2F
+      ${this.name} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --id 0x0100558D85B7216F6A489A499DB361E1AE2F
     
     Retrieve list content type
-      ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listTitle Events --id 0x0100558D85B7216F6A489A499DB361E1AE2F
+      ${this.name} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listTitle Events --id 0x0100558D85B7216F6A489A499DB361E1AE2F
 `);
   }
 }

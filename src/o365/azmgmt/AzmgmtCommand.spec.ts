@@ -1,10 +1,5 @@
-import * as sinon from 'sinon';
 import * as assert from 'assert';
 import AzmgmtCommand from './AzmgmtCommand';
-import auth from './AzmgmtAuth';
-import Utils from '../../Utils';
-import { CommandError } from '../../Command';
-import appInsights from '../../appInsights';
 
 class MockCommand extends AzmgmtCommand {
   public get name(): string {
@@ -23,62 +18,8 @@ class MockCommand extends AzmgmtCommand {
 }
 
 describe('AzmgmtCommand', () => {
-  before(() => {
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
-  });
-
-  after(() => {
-    Utils.restore(appInsights.trackEvent);
-  });
-  
-  it('correctly reports an error while restoring auth info', (done) => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
-    const command = new MockCommand();
-    const cmdInstance = {
-      commandWrapper: {
-        command: 'azmgmt command'
-      },
-      log: (msg: any) => {},
-      prompt: () => {},
-      action: command.action()
-    };
-    cmdInstance.action({options:{}}, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        Utils.restore(auth.restoreAuth);
-      }
-    });
-  });
-
-  it('doesn\'t execute command when error occurred while restoring auth info', (done) => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
-    const command = new MockCommand();
-    const cmdInstance = {
-      commandWrapper: {
-        command: 'azmgmt command'
-      },
-      log: (msg: any) => {},
-      prompt: () => {},
-      action: command.action()
-    };
-    const commandCommandActionSpy = sinon.spy(command, 'commandAction');
-    cmdInstance.action({options:{}}, () => {
-      try {
-        assert(commandCommandActionSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        Utils.restore(auth.restoreAuth);
-      }
-    });
+  it('defines correct resource', () => {
+    const cmd = new MockCommand();
+    assert.strictEqual((cmd as any).resource, 'https://management.azure.com/');
   });
 });

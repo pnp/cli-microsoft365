@@ -1,50 +1,48 @@
-import commands from '../commands';
-import Command from '../../../Command';
+import commands from './commands';
+import Command, { CommandError } from '../../Command';
 import * as sinon from 'sinon';
-import appInsights from '../../../appInsights';
-import auth from '../AadAuth';
+import appInsights from '../../appInsights';
+import auth from '../../Auth';
 const command: Command = require('./logout');
 import * as assert from 'assert';
-import Utils from '../../../Utils';
-import { Service } from '../../../Auth';
+import Utils from '../../Utils';
 
 describe(commands.LOGOUT, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
-  let trackEvent: any;
-  let telemetry: any;
   let authClearConnectionInfoStub: sinon.SinonStub;
 
   before(() => {
+    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     authClearConnectionInfoStub = sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.resolve());
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
   });
 
   beforeEach(() => {
-    vorpal = require('../../../vorpal-init');
+    vorpal = require('../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
-        command: 'aad logout'
+        command: 'logout'
       },
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    auth.service = new Service('https://graph.windows.net');
-    sinon.stub(auth.service, 'logout').callsFake(() => { });
-    telemetry = null;
   });
 
   afterEach(() => {
-    Utils.restore(vorpal.find);
+    Utils.restore([
+      vorpal.find
+    ]);
   });
 
   after(() => {
-    Utils.restore(appInsights.trackEvent);
+    Utils.restore([
+      auth.restoreAuth,
+      appInsights.trackEvent
+    ]);
   });
 
   it('has correct name', () => {
@@ -55,34 +53,7 @@ describe(commands.LOGOUT, () => {
     assert.notEqual(command.description, null);
   });
 
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.LOGOUT);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs out from AAD Graph when logged out', (done) => {
-    auth.service = new Service('https://graph.windows.net');
+  it('logs out from Office 365 when logged in', (done) => {
     auth.service.connected = true;
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
@@ -96,8 +67,7 @@ describe(commands.LOGOUT, () => {
     });
   });
 
-  it('logs out from AAD Graph when not logged in', (done) => {
-    auth.service = new Service('https://graph.windows.net');
+  it('logs out from Office 365 when not logged in', (done) => {
     auth.service.connected = false;
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
@@ -112,7 +82,6 @@ describe(commands.LOGOUT, () => {
   });
 
   it('clears persisted connection info when logging out', (done) => {
-    auth.service = new Service('https://graph.windows.net');
     auth.service.connected = true;
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
@@ -126,20 +95,15 @@ describe(commands.LOGOUT, () => {
     });
   });
 
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notEqual(typeof alias, 'undefined');
-  });
-
   it('has help referring to the right command', () => {
     const cmd: any = {
-      log: (msg: string) => {},
-      prompt: () => {},
-      helpInformation: () => {}
+      log: (msg: string) => { },
+      prompt: () => { },
+      helpInformation: () => { }
     };
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
-    cmd.help({}, () => {});
+    cmd.help({}, () => { });
     assert(find.calledWith(commands.LOGOUT));
   });
 
@@ -149,12 +113,12 @@ describe(commands.LOGOUT, () => {
       log: (msg: string) => {
         _log.push(msg);
       },
-      prompt: () => {},
-      helpInformation: () => {}
+      prompt: () => { },
+      helpInformation: () => { }
     };
     sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
-    cmd.help({}, () => {});
+    cmd.help({}, () => { });
     let containsExamples: boolean = false;
     _log.forEach(l => {
       if (l && l.indexOf('Examples:') > -1) {
@@ -168,7 +132,6 @@ describe(commands.LOGOUT, () => {
   it('correctly handles error while clearing persisted connection info', (done) => {
     Utils.restore(auth.clearConnectionInfo);
     sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
-    auth.service = new Service('https://graph.windows.net');
     const logoutSpy = sinon.spy(auth.service, 'logout');
     auth.service.connected = true;
     cmdInstance.action = command.action();
@@ -181,14 +144,16 @@ describe(commands.LOGOUT, () => {
         done(e);
       }
       finally {
-        Utils.restore(auth.clearConnectionInfo);
+        Utils.restore([
+          auth.clearConnectionInfo,
+          auth.service.logout
+        ]);
       }
     });
   });
 
   it('correctly handles error while clearing persisted connection info (debug)', (done) => {
     sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
-    auth.service = new Service('https://graph.windows.net');
     const logoutSpy = sinon.spy(auth.service, 'logout');
     auth.service.connected = true;
     cmdInstance.action = command.action();
@@ -201,7 +166,30 @@ describe(commands.LOGOUT, () => {
         done(e);
       }
       finally {
-        Utils.restore(auth.clearConnectionInfo);
+        Utils.restore([
+          auth.clearConnectionInfo,
+          auth.service.logout
+        ]);
+      }
+    });
+  });
+
+  it('correctly handles error when restoring auth information', (done) => {
+    Utils.restore(auth.restoreAuth);
+    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: {} }, (err?: any) => {
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore([
+          auth.clearConnectionInfo
+        ]);
       }
     });
   });

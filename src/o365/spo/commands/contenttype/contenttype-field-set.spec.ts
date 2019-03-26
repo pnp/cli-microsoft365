@@ -2,7 +2,7 @@ import commands from '../../commands';
 import Command, { CommandOption, CommandValidate, CommandError, CommandTypes } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth, { Site } from '../../SpoAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./contenttype-field-set');
 import * as assert from 'assert';
 import request from '../../../../request';
@@ -14,29 +14,28 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  let trackEvent: any;
-  let telemetry: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    sinon.stub(command as any, 'getRequestDigestForSite').callsFake(() => Promise.resolve({ FormDigestValue: 'ABC' }));
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'ABC' }));
+    auth.service.connected = true;
+    auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.site = new Site();
-    telemetry = null;
     (command as any).requestDigest = '';
     (command as any).siteId = '';
     (command as any).webId = '';
@@ -53,11 +52,12 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.getAccessToken,
       auth.restoreAuth,
-      (command as any).getRequestDigestForSite
+      (command as any).getRequestDigest,
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
+    auth.service.spoUrl = undefined;
   });
 
   it('has correct name', () => {
@@ -66,47 +66,6 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
 
   it('has a description', () => {
     assert.notEqual(command.description, null);
-  });
-
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.CONTENTTYPE_FIELD_SET);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not logged in to a SharePoint site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 
   it('adds a field reference to content type updating field schema', (done) => {
@@ -193,10 +152,6 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
@@ -307,10 +262,6 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
@@ -406,10 +357,6 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
@@ -498,10 +445,6 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
@@ -590,10 +533,6 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
@@ -645,10 +584,6 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
@@ -724,10 +659,6 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
@@ -782,10 +713,6 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
@@ -840,10 +767,6 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
@@ -898,10 +821,6 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'false', hidden: 'true' } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
@@ -956,10 +875,6 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'false' } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
@@ -1024,10 +939,6 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Couldn't find field link for field 5ee2dd25-d941-455a-9bdb-7f2c54aed11b`)));
@@ -1054,10 +965,6 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b' } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
@@ -1084,10 +991,6 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
@@ -1150,10 +1053,6 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Unknown Error`)));
@@ -1283,8 +1182,8 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
   });
 
   it('handles error while retrieving request digest', (done) => {
-    Utils.restore((command as any).getRequestDigestForSite);
-    sinon.stub(command as any, 'getRequestDigestForSite').callsFake(() => Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } }));
+    Utils.restore((command as any).getRequestDigest);
+    sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } }));
     let fieldLinksRequestNum: number = 0;
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')/fieldlinks('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
@@ -1314,31 +1213,9 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.getAccessToken);
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/sales', contentTypeId: '0x0100FF0B2E33A3718B46A3909298D240FD93', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b' } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
         done();
       }
       catch (e) {

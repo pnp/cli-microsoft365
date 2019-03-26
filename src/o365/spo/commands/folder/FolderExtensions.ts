@@ -16,7 +16,7 @@ export class FolderExtensions {
    * @param folderToEnsure web relative or server relative folder path e.g. /Documents/MyFolder or /sites/site1/Documents/MyFolder
    * @param siteAccessToken a valid access token for the site specified in the webFullUrl param
    */
-  public ensureFolder(webFullUrl: string, folderToEnsure: string, siteAccessToken: string): Promise<void> {
+  public ensureFolder(webFullUrl: string, folderToEnsure: string): Promise<void> {
 
     const webUrl = url.parse(webFullUrl);
     if (!webUrl.protocol || !webUrl.hostname) {
@@ -25,10 +25,6 @@ export class FolderExtensions {
 
     if (!folderToEnsure) {
       return Promise.reject('folderToEnsure cannot be empty');
-    }
-
-    if (!siteAccessToken) {
-      return Promise.reject('siteAccessToken cannot be empty');
     }
 
     // remove last '/' of webFullUrl if exists
@@ -62,9 +58,7 @@ export class FolderExtensions {
 
     // recursive function
     const checkOrAddFolder = (resolve: () => void, reject: (error: any) => void): void => {
-
       if (folderIndex === folders.length) {
-
         if (this.debug) {
           this.cmd.log(`All sub-folders exist`);
         }
@@ -80,7 +74,6 @@ export class FolderExtensions {
       const requestOptions: any = {
         url: `${webFullUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderServerRelativeUrl)}')`,
         headers: {
-          authorization: `Bearer ${siteAccessToken}`,
           'accept': 'application/json;odata=nometadata'
         }
       };
@@ -96,14 +89,13 @@ export class FolderExtensions {
           const requestOptions: any = {
             url: `${webFullUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27${encodeURIComponent(prevFolderServerRelativeUrl)}%27&@a2=%27${encodeURIComponent(folders[folderIndex])}%27`,
             headers: {
-              authorization: `Bearer ${siteAccessToken}`,
               'accept': 'application/json;odata=nometadata'
             },
             json: true
           };
 
           return request.post(requestOptions)
-            .then((res: any) => {
+            .then(() => {
               folderIndex++;
               checkOrAddFolder(resolve, reject);
             })

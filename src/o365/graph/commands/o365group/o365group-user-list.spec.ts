@@ -2,40 +2,37 @@ import commands from '../../commands';
 import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth from '../../GraphAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./o365group-user-list');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import { Service } from '../../../../Auth';
 
 describe(commands.O365GROUP_USER_LIST, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  let trackEvent: any;
-  let telemetry: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    auth.service.connected = true;
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.service = new Service();
-    telemetry = null;
     (command as any).items = [];
   });
 
@@ -48,10 +45,10 @@ describe(commands.O365GROUP_USER_LIST, () => {
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.ensureAccessToken,
-      auth.restoreAuth
+      auth.restoreAuth,
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -72,42 +69,6 @@ describe(commands.O365GROUP_USER_LIST, () => {
     assert.notEqual(command.description, null);
   });
 
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.O365GROUP_USER_LIST);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('fails validation if the groupId is not a valid guid.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        groupId: 'not-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    });
-    assert.notEqual(actual, true);
-    done();
-  });
-
   it('fails validation if the teamId is not a valid guid.', (done) => {
     const actual = (command.validate() as CommandValidate)({
       options: {
@@ -122,6 +83,16 @@ describe(commands.O365GROUP_USER_LIST, () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         role: 'Member'
+      }
+    });
+    assert.notEqual(actual, true);
+    done();
+  });
+
+  it('fails validation if the groupId is not a valid guid.', (done) => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        groupId: 'not-c49b-4fd4-8223-28f0ac3a6402'
       }
     });
     assert.notEqual(actual, true);
@@ -196,8 +167,6 @@ describe(commands.O365GROUP_USER_LIST, () => {
   it('correctly lists all users in a office365 group', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners?$select=id,displayName,userPrincipalName,userType`) {
-        console.log('resolving owners...');
-
         return Promise.resolve({
           "value": [{ "id": "00000000-0000-0000-0000-000000000000", "displayName": "Anne Matthews", "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com", "userType": "Member" }]
         });
@@ -211,10 +180,6 @@ describe(commands.O365GROUP_USER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000" } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith([
@@ -249,10 +214,6 @@ describe(commands.O365GROUP_USER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", role: "Owner" } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith([
@@ -284,14 +245,9 @@ describe(commands.O365GROUP_USER_LIST, () => {
         });
       }
 
-
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", role: "Member" } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith([
@@ -323,14 +279,9 @@ describe(commands.O365GROUP_USER_LIST, () => {
         });
       }
 
-
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000" } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith([
@@ -355,13 +306,14 @@ describe(commands.O365GROUP_USER_LIST, () => {
     });
   });
 
-  it('aborts when not logged in to Microsoft Graph', (done) => {
-    auth.service = new Service();
-    auth.service.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
+  it('correctly handles error when listing users', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      return Promise.reject('An error has occurred');
+    });
+
+    cmdInstance.action({ options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000" } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to the Microsoft Graph first')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -413,23 +365,5 @@ describe(commands.O365GROUP_USER_LIST, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.ensureAccessToken);
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 });

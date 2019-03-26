@@ -1,5 +1,3 @@
-import auth from '../../GraphAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
@@ -41,7 +39,7 @@ class GraphUserListCommand extends GraphItemsListCommand<any> {
       args.options.properties.split(',').map(p => p.trim()) :
       ['userPrincipalName', 'displayName'];
     const filter: string = this.getFilter(args.options);
-    const url: string = `${auth.service.resource}/v1.0/users?$select=${properties.join(',')}${(filter.length > 0 ? '&' + filter : '')}&$top=100`;
+    const url: string = `${this.resource}/v1.0/users?$select=${properties.join(',')}${(filter.length > 0 ? '&' + filter : '')}&$top=100`;
 
     this
       .getAllItems(url, cmd, true)
@@ -94,14 +92,7 @@ class GraphUserListCommand extends GraphItemsListCommand<any> {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to the Microsoft Graph
-    using the ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
-
-    To list users matching specific criteria, you have to first log in to
-    the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
+      `  Remarks:
 
     Using the ${chalk.blue('--properties')} option, you can specify
     a comma-separated list of user properties to retrieve from the Microsoft
@@ -117,17 +108,17 @@ class GraphUserListCommand extends GraphItemsListCommand<any> {
   Examples:
   
     List all users in the tenant
-      ${chalk.grey(config.delimiter)} ${this.name}
+      ${this.name}
 
     List all users in the tenant. For each one return the display name and
     e-mail address
-      ${chalk.grey(config.delimiter)} ${this.name} --properties displayName,mail
+      ${this.name} --properties displayName,mail
 
     Show users whose display name starts with ${chalk.grey('Patt')}
-      ${chalk.grey(config.delimiter)} ${this.name} --displayName Patt
+      ${this.name} --displayName Patt
 
     Show all account managers whose display name starts with ${chalk.grey('Patt')}
-      ${chalk.grey(config.delimiter)} ${this.name} --displayName Patt --jobTitle 'Account manager'
+      ${this.name} --displayName Patt --jobTitle 'Account manager'
 
   More information:
     

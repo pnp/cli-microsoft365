@@ -2,54 +2,51 @@ import commands from '../../commands';
 import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth from '../../GraphAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./report-teamsdeviceusageuserdetail');
 import * as assert from 'assert';
 import Utils from '../../../../Utils';
-import { Service } from '../../../../Auth';
 import request from '../../../../request';
 
 describe(commands.REPORT_TEAMSDEVICEUSAGEUSERDETAIL, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
-  let trackEvent: any;
-  let telemetry: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    auth.service.connected = true;
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    auth.service = new Service();
-    telemetry = null;
     (command as any).items = [];
   });
 
   afterEach(() => {
     Utils.restore([
       vorpal.find,
-      request.post
+      request.get
     ]);
   });
 
   after(() => {
     Utils.restore([
       appInsights.trackEvent,
-      auth.ensureAccessToken,
       auth.restoreAuth
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -60,49 +57,8 @@ describe(commands.REPORT_TEAMSDEVICEUSAGEUSERDETAIL, () => {
     assert.notEqual(command.description, null);
   });
 
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.REPORT_TEAMSDEVICEUSAGEUSERDETAIL);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not logged in to Microsoft Graph', (done) => {
-    auth.service = new Service();
-    auth.service.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to the Microsoft Graph first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('fails validation if both period and date options are not passed', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { } });
+    const actual = (command.validate() as CommandValidate)({ options: {} });
     assert.notEqual(actual, true);
   });
 
@@ -176,10 +132,6 @@ describe(commands.REPORT_TEAMSDEVICEUSAGEUSERDETAIL, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, period: 'D7' } }, () => {
       try {
         assert(1 === 1);
@@ -187,9 +139,6 @@ describe(commands.REPORT_TEAMSDEVICEUSAGEUSERDETAIL, () => {
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore(request.get);
       }
     });
   });
@@ -205,10 +154,6 @@ describe(commands.REPORT_TEAMSDEVICEUSAGEUSERDETAIL, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, date: '2019-05-01' } }, () => {
       try {
         assert(1 === 1);
@@ -217,8 +162,19 @@ describe(commands.REPORT_TEAMSDEVICEUSAGEUSERDETAIL, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.get);
+    });
+  });
+
+  it('correctly handles random API error', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => Promise.reject('An error has occurred'));
+
+    cmdInstance.action({ options: { debug: false, date: '2019-05-01' } }, (err?: any) => {
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        done();
+      }
+      catch (e) {
+        done(e);
       }
     });
   });
@@ -266,23 +222,5 @@ describe(commands.REPORT_TEAMSDEVICEUSAGEUSERDETAIL, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.ensureAccessToken);
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 });

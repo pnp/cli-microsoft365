@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -9,7 +7,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
-import { Auth } from '../../../../Auth';
 import { ListInstance } from './ListInstance';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -41,62 +38,44 @@ class SpoListLabelGetCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-    let siteAccessToken: string;
-
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
+    if (this.verbose) {
+      const list: string = args.options.listId ? encodeURIComponent(args.options.listId as string) : encodeURIComponent(args.options.listTitle as string);
+      cmd.log(`Getting label set on the list ${list} in site at ${args.options.webUrl}...`);
     }
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<ListInstance> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}`);
-        }
+    let requestUrl: string = '';
 
-        siteAccessToken = accessToken;
+    if (args.options.listId) {
+      if (this.debug) {
+        cmd.log(`Retrieving List Url from Id '${args.options.listId}'...`);
+      }
 
-        if (this.verbose) {
-          const list: string = args.options.listId ? encodeURIComponent(args.options.listId as string) : encodeURIComponent(args.options.listTitle as string);
-          cmd.log(`Getting label set on the list ${list} in site at ${args.options.webUrl}...`);
-        }
+      requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.listId)}')?$expand=RootFolder&$select=RootFolder`;
+    }
+    else {
+      if (this.debug) {
+        cmd.log(`Retrieving List Url from Title '${args.options.listTitle}'...`);
+      }
 
-        let requestUrl: string = '';
+      requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.listTitle as string)}')?$expand=RootFolder&$select=RootFolder`;
+    }
 
-        if (args.options.listId) {
-          if (this.debug) {
-            cmd.log(`Retrieving List Url from Id '${args.options.listId}'...`);
-          }
+    const requestOptions: any = {
+      url: requestUrl,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      json: true
+    };
 
-          requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.listId)}')?$expand=RootFolder&$select=RootFolder`;
-        }
-        else {
-          if (this.debug) {
-            cmd.log(`Retrieving List Url from Title '${args.options.listTitle}'...`);
-          }
-
-          requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.listTitle as string)}')?$expand=RootFolder&$select=RootFolder`;
-        }
-
-        const requestOptions: any = {
-          url: requestUrl,
-          headers: {
-            authorization: `Bearer ${accessToken}`,
-            'accept': 'application/json;odata=nometadata'
-          },
-          json: true
-        };
-
-        return request.get(requestOptions);
-      })
+    request
+      .get<ListInstance>(requestOptions)
       .then((listInstance: ListInstance): Promise<any> => {
         const listAbsoluteUrl: string = Utils.getAbsoluteUrl(args.options.webUrl, listInstance.RootFolder.ServerRelativeUrl);
         const requestUrl: string = `${args.options.webUrl}/_api/SP_CompliancePolicy_SPPolicyStoreProxy_GetListComplianceTag`;
         const requestOptions: any = {
           url: requestUrl,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata',
             'content-type': 'application/json;odata=nometadata'
           },
@@ -172,24 +151,15 @@ class SpoListLabelGetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to SharePoint,
-    using the ${chalk.blue(commands.LOGIN)} command.
-  
-  Remarks:
-  
-    To get the label set on the specified list, you have to first log in to
-    SharePoint using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-        
-  Examples:
+      `  Examples:
   
     Gets label set on the list with title ${chalk.grey('ContosoList')} located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LIST_LABEL_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle ContosoList
+      ${commands.LIST_LABEL_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle ContosoList
 
     Gets label set on the list with id ${chalk.grey('cc27a922-8224-4296-90a5-ebbc54da2e85')} located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LIST_LABEL_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --listId cc27a922-8224-4296-90a5-ebbc54da2e85
+      ${commands.LIST_LABEL_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --listId cc27a922-8224-4296-90a5-ebbc54da2e85
 
       `);
   }

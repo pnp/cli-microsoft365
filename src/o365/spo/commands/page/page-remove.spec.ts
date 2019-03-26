@@ -2,7 +2,7 @@ import commands from '../../commands';
 import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth, { Site } from '../../SpoAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./page-remove');
 import * as assert from 'assert';
 import request from '../../../../request';
@@ -13,8 +13,6 @@ describe(commands.PAGE_REMOVE, () => {
 	let log: string[];
 	let cmdInstance: any;
 	let cmdInstanceLogSpy: sinon.SinonSpy;
-	let trackEvent: any;
-	let telemetry: any;
 	let promptOptions: any;
 
 	const fakeRestCalls: (pageName?: string) => sinon.SinonStub = (pageName: string='page.aspx') => {
@@ -29,21 +27,21 @@ describe(commands.PAGE_REMOVE, () => {
 
 	before(() => {
 		sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-		sinon.stub(auth, 'getAccessToken').callsFake(() => {
-			return Promise.resolve('ABC');
-		});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
 		sinon
-			.stub(command as any, 'getRequestDigestForSite')
+			.stub(command as any, 'getRequestDigest')
 			.callsFake(() => Promise.resolve({ FormDigestValue: 'ABC' }));
-		trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-			telemetry = t;
-		});
+		auth.service.connected = true;
 	});
 
 	beforeEach(() => {
 		vorpal = require('../../../../vorpal-init');
 		log = [];
 		cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
 			log: (msg: string) => {
 				log.push(msg);
 			},
@@ -53,21 +51,19 @@ describe(commands.PAGE_REMOVE, () => {
 			}
 		};
 		cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-		auth.site = new Site();
-		telemetry = null;
 	});
 
 	afterEach(() => {
-		Utils.restore([ vorpal.find, request.post ]);
+    Utils.restore([ vorpal.find, request.post ]);
 	});
 
 	after(() => {
 		Utils.restore([
-			appInsights.trackEvent,
-			auth.getAccessToken,
 			auth.restoreAuth,
-			(command as any).getRequestDigestForSite
-		]);
+			(command as any).getRequestDigest,
+      appInsights.trackEvent
+    ]);
+    auth.service.connected = false;
 	});
 
 	it('has correct name', () => {
@@ -78,53 +74,8 @@ describe(commands.PAGE_REMOVE, () => {
 		assert.notEqual(command.description, null);
 	});
 
-	it('calls telemetry', (done) => {
-		cmdInstance.action = command.action();
-		cmdInstance.action({ options: {} }, () => {
-			try {
-				assert(trackEvent.called);
-				done();
-			} catch (e) {
-				done(e);
-			}
-		});
-	});
-
-	it('logs correct telemetry event', (done) => {
-		cmdInstance.action = command.action();
-		cmdInstance.action({ options: {} }, () => {
-			try {
-				assert.equal(telemetry.name, commands.PAGE_REMOVE);
-				done();
-			} catch (e) {
-				done(e);
-			}
-		});
-	});
-
-	it('aborts when not logged in to a SharePoint site', (done) => {
-		auth.site = new Site();
-		auth.site.connected = false;
-		cmdInstance.action = command.action();
-		cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-			try {
-				assert.equal(
-					JSON.stringify(err),
-					JSON.stringify(new CommandError('Log in to a SharePoint Online site first'))
-				);
-				done();
-			} catch (e) {
-				done(e);
-			}
-		});
-	});
-
 	it('removes a modern page without confirm prompt', (done) => {
 		fakeRestCalls();
-		auth.site = new Site();
-		auth.site.connected = true;
-		auth.site.url = 'https://contoso.sharepoint.com';
-		cmdInstance.action = command.action();
 		cmdInstance.action(
 			{
 				options: {
@@ -147,10 +98,6 @@ describe(commands.PAGE_REMOVE, () => {
 
 	it('removes a modern page (debug) without confirm prompt', (done) => {
     fakeRestCalls();
-		auth.site = new Site();
-		auth.site.connected = true;
-		auth.site.url = 'https://contoso.sharepoint.com';
-		cmdInstance.action = command.action();
 		cmdInstance.action(
 			{
 				options: {
@@ -173,10 +120,6 @@ describe(commands.PAGE_REMOVE, () => {
 
 	it('removes a modern page with confirm prompt', (done) => {
 		fakeRestCalls();
-		auth.site = new Site();
-		auth.site.connected = true;
-		auth.site.url = 'https://contoso.sharepoint.com';
-		cmdInstance.action = command.action();
 		cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
 			promptOptions = options;
 			cb({ continue: true });
@@ -202,10 +145,6 @@ describe(commands.PAGE_REMOVE, () => {
 
 	it('removes a modern page (debug) with confirm prompt', (done) => {
 		fakeRestCalls();
-		auth.site = new Site();
-		auth.site.connected = true;
-		auth.site.url = 'https://contoso.sharepoint.com';
-		cmdInstance.action = command.action();
 		cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
 			promptOptions = options;
 			cb({ continue: true });
@@ -231,10 +170,6 @@ describe(commands.PAGE_REMOVE, () => {
 
 	it('should prompt before removing page when confirmation argument not passed', (done) => {
 		fakeRestCalls();
-		auth.site = new Site();
-		auth.site.connected = true;
-		auth.site.url = 'https://contoso.sharepoint.com';
-		cmdInstance.action = command.action();
 		cmdInstance.action(
 			{
 				options: {
@@ -262,10 +197,6 @@ describe(commands.PAGE_REMOVE, () => {
 
 	it('should abort page removal when prompt not confirmed', (done) => {
 		let postCallSpy = fakeRestCalls();
-		auth.site = new Site();
-		auth.site.connected = true;
-		auth.site.url = 'https://contoso-admin.sharepoint.com';
-		cmdInstance.action = command.action();
 		cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
 			cb({ continue: false });
 		};
@@ -290,10 +221,6 @@ describe(commands.PAGE_REMOVE, () => {
 
 	it('automatically appends the .aspx extension', (done) => {
 		fakeRestCalls();
-		auth.site = new Site();
-		auth.site.url = 'https://contoso.sharepoint.com';
-		cmdInstance.action = command.action();
-		auth.site.connected = true;
 		cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
 			cb({ continue: false });
 		};
@@ -322,10 +249,6 @@ describe(commands.PAGE_REMOVE, () => {
 			return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
 		});
 
-		auth.site = new Site();
-		auth.site.connected = true;
-		auth.site.url = 'https://contoso.sharepoint.com';
-		cmdInstance.action = command.action();
 		cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
 			cb({ continue: false });
 		};
@@ -463,34 +386,5 @@ describe(commands.PAGE_REMOVE, () => {
 		});
 		Utils.restore(vorpal.find);
 		assert(containsExamples);
-	});
-
-	it('correctly handles lack of valid access token', (done) => {
-		Utils.restore(auth.getAccessToken);
-		sinon.stub(auth, 'getAccessToken').callsFake(() => {
-			return Promise.reject(new Error('Error getting access token'));
-		});
-		auth.site = new Site();
-		auth.site.connected = true;
-		auth.site.url = 'https://contoso.sharepoint.com';
-		cmdInstance.action = command.action();
-		cmdInstance.action(
-			{
-				options: {
-					debug: false,
-					name: 'page.aspx',
-					webUrl: 'https://contoso.sharepoint.com/sites/team-a',
-					confirm: true
-				}
-			},
-			(err?: any) => {
-				try {
-					assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-					done();
-				} catch (e) {
-					done(e);
-				}
-			}
-		);
 	});
 });

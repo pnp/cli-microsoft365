@@ -2,57 +2,62 @@ import commands from '../../commands';
 import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth, { Site } from '../../SpoAuth';
 const command: Command = require('./theme-set');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import * as fs from 'fs';
+import auth from '../../../../Auth';
+import config from '../../../../config';
 
 describe(commands.THEME_SET, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  let requests: any[];
-  let trackEvent: any;
-  let telemetry: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'ABC' }));
+    auth.service.connected = true;
+    auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.site = new Site();
-    requests = [];
+    sinon.stub(fs, 'readFileSync').callsFake(() => '123');
   });
 
   afterEach(() => {
-    Utils.restore(vorpal.find);
+    Utils.restore([
+      vorpal.find,
+      fs.readFileSync,
+      fs.existsSync,
+      fs.lstatSync,
+      request.post
+    ]);
   });
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.ensureAccessToken,
-      auth.getAccessToken,
       auth.restoreAuth,
-      request.get,
-      request.post
+      (command as any).getRequestDigest,
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
+    auth.service.spoUrl = undefined;
   });
 
   it('has correct name', () => {
@@ -63,76 +68,15 @@ describe(commands.THEME_SET, () => {
     assert.notEqual(command.description, null);
   });
 
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.THEME_SET);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not logged in to a SharePoint site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('adds theme when correct parameters are passed', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      requests.push(opts);
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve({ FormDigestValue: 'abc' });
-        }
-      }
+    const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
 
       if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers['X-RequestDigest'] &&
-          opts.headers['X-RequestDigest'] === 'abc') {
-          return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "3d92299e-e019-4000-c866-de7d45aa9628" }, 12, true]));
-        }
+        return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "3d92299e-e019-4000-c866-de7d45aa9628" }, 12, true]));
       }
 
       return Promise.reject('Invalid request');
     });
-
-    sinon.stub(fs, 'readFileSync').callsFake(() => '123');
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
 
     cmdInstance.action({
       options: {
@@ -142,60 +86,28 @@ describe(commands.THEME_SET, () => {
         isInverted: false
       }
     }, () => {
-
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
-          r.headers.authorization &&
-          r.headers.authorization.indexOf('Bearer ') === 0 &&
-          r.headers['X-RequestDigest'] &&
-          r.body) {
-        }
-      });
       try {
-        assert(cmdInstanceLogSpy.calledWith(true));
+        assert.equal(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery');
+        assert.equal(postStub.lastCall.args[0].headers['X-RequestDigest'], 'ABC');
+        assert.equal(postStub.lastCall.args[0].body, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><Method Name="UpdateTenantTheme" Id="11" ObjectPathId="9"><Parameters><Parameter Type="String">Contoso</Parameter><Parameter Type="String">{"isInverted":false,"name":"Contoso","palette":123}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="9" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`);
+        assert.equal(cmdInstanceLogSpy.notCalled, true);
         done();
       }
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore([
-          fs.readFileSync,
-          request.post
-        ]);
-      }
     });
   });
 
   it('adds theme when correct parameters are passed (debug)', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      requests.push(opts);
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve({ FormDigestValue: 'abc' });
-        }
-      }
+    const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
 
       if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers['X-RequestDigest'] &&
-          opts.headers['X-RequestDigest'] === 'abc') {
-          return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "3d92299e-e019-4000-c866-de7d45aa9628" }, 12, true]));
-        }
+        return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "3d92299e-e019-4000-c866-de7d45aa9628" }, 12, true]));
       }
 
       return Promise.reject('Invalid request');
     });
-
-    sinon.stub(fs, 'readFileSync').callsFake(() => '123');
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
 
     cmdInstance.action({
       options: {
@@ -205,63 +117,26 @@ describe(commands.THEME_SET, () => {
         isInverted: true
       }
     }, () => {
-
-      let correctRequestIssued = false;
-
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
-          r.headers.authorization &&
-          r.headers.authorization.indexOf('Bearer ') === 0 &&
-          r.headers['X-RequestDigest'] &&
-          r.body) {
-          correctRequestIssued = true;
-        }
-      });
       try {
-        assert(correctRequestIssued);
+        assert.equal(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery');
+        assert.equal(postStub.lastCall.args[0].headers['X-RequestDigest'], 'ABC');
+        assert.equal(postStub.lastCall.args[0].body, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><Method Name="UpdateTenantTheme" Id="11" ObjectPathId="9"><Parameters><Parameter Type="String">Contoso</Parameter><Parameter Type="String">{"isInverted":true,"name":"Contoso","palette":123}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="9" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`);
+        assert.notEqual(cmdInstanceLogSpy.lastCall.args[0].indexOf('DONE'), -1);
         done();
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore([
-          fs.readFileSync,
-          request.post
-        ]);
       }
     });
   });
 
   it('handles error command error correctly', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      requests.push(opts);
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve({ FormDigestValue: 'abc' });
-        }
-      }
-
       if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers['X-RequestDigest'] &&
-          opts.headers['X-RequestDigest'] === 'abc') {
-          return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": "{ErrorMessage:error occured}", "TraceCorrelationId": "3d92299e-e019-4000-c866-de7d45aa9628" }, 12, false]));
-        }
+        return Promise.resolve(JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "requestObjectIdentity ClientSvc error" } }]));
       }
-
       return Promise.reject('Invalid request');
     });
-
-    sinon.stub(fs, 'readFileSync').callsFake(() => '123');
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
 
     cmdInstance.action({
       options: {
@@ -270,86 +145,39 @@ describe(commands.THEME_SET, () => {
         filePath: 'theme.json',
         inverted: false,
       }
-    }, () => {
-
-      let correctRequestIssued = false;
-
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
-          r.headers.authorization &&
-          r.headers.authorization.indexOf('Bearer ') === 0 &&
-          r.headers['X-RequestDigest'] &&
-          r.body) {
-          correctRequestIssued = true;
-        }
-      });
+    }, (err?: any) => {
       try {
-        assert(correctRequestIssued);
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('requestObjectIdentity ClientSvc error')));
         done();
       }
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore([
-          fs.readFileSync,
-          request.post
-        ]);
-      }
     });
   });
 
-  it('handles error while adding theme', (done) => {
+  it('handles unknown error command error correctly', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      requests.push(opts);
-
       if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers['X-RequestDigest'] &&
-          opts.headers['X-RequestDigest'] === 'abc') {
-          return Promise.reject('An error has occurred');
-        }
+        return Promise.resolve(JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "" } }]));
       }
-
       return Promise.reject('Invalid request');
     });
-
-    sinon.stub(fs, 'readFileSync').callsFake(() => '123');
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
 
     cmdInstance.action({
       options: {
         debug: true,
         name: 'Contoso',
         filePath: 'theme.json',
-        isInverted: false
+        inverted: false,
       }
-    }, () => {
-
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
-          r.headers.authorization &&
-          r.headers.authorization.indexOf('Bearer ') === 0 &&
-          r.headers['X-RequestDigest'] &&
-          r.body) {
-        }
-      });
+    }, (err?: any) => {
       try {
-        assert(true);
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
         done();
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore([
-          fs.readFileSync,
-          request.post
-        ]);
       }
     });
   });
@@ -362,7 +190,6 @@ describe(commands.THEME_SET, () => {
   it('fails validation if file path doesn\'t exist', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     const actual = (command.validate() as CommandValidate)({ options: { name: 'abc', filePath: 'abc', isInverted: false } });
-    Utils.restore(fs.existsSync);
     assert.notEqual(actual, true);
   });
 
@@ -372,10 +199,6 @@ describe(commands.THEME_SET, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
     const actual = (command.validate() as CommandValidate)({ options: { name: 'abc', filePath: 'abc', isInverted: false } });
-    Utils.restore([
-      fs.existsSync,
-      fs.lstatSync
-    ]);
     assert.notEqual(actual, true);
   });
 
@@ -385,10 +208,7 @@ describe(commands.THEME_SET, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
     const actual = (command.validate() as CommandValidate)({ options: { name: 'contoso-blue', filePath: 'contoso-blue.json', isInverted: false } });
-    Utils.restore([
-      fs.existsSync,
-      fs.lstatSync
-    ]);
+
     assert.equal(actual, true);
   });
 
@@ -420,28 +240,13 @@ describe(commands.THEME_SET, () => {
     assert.notEqual(actual, true);
   });
 
-  it('passes validation when name is passed', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { name: 'Contoso-Blue' } });
-    assert(actual);
-  });
-
   it('fails validation if path is not passed', () => {
     const actual = (command.validate() as CommandValidate)({ options: { fullPath: '' } });
     assert.notEqual(actual, true);
   });
 
-  it('passes validation when path is passed', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { fullPath: 'theme.json' } });
-    assert(actual);
-  });
-
   it('fails validation when inverted parameter is not passed', () => {
     const actual = (command.validate() as CommandValidate)({ options: { name: 'abc', filePath: 'abc' } });
     assert.notEqual(actual, true);
-  });
-
-  it('passes validation when inverted parameter is passed', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { isInverted: false } });
-    assert(actual);
   });
 });

@@ -12,15 +12,16 @@ interface StorageEntry {
 export class WindowsTokenStorage implements TokenStorage {
   private credsExePath: string = path.join(__dirname, '../../bin/windows/creds.exe');
   private prefix: string = 'Office365Cli:target=';
+  private prefixShort: string = 'Office365Cli';
   private MAX_CREDENTIAL_BYTES: number = 2048;
   private propertyRegex: RegExp = /^([^:]+):\s(.*)$/;
 
-  public get(service: string): Promise<string> {
-    return new Promise<string>((resolve: (token: string) => void, reject: (error: any) => void): void => {
+  public get(): Promise<string> {
+    return new Promise<string>((resolve: (connectionInfo: string) => void, reject: (error: any) => void): void => {
       const args: string[] = [
         '-s',
         '-g',
-        '-t', `${this.prefix}${service}*`
+        '-t', `${this.prefix}${this.prefixShort}*`
       ];
 
       childProcess.execFile(this.credsExePath, args, (err: Error | null, stdout: string, stderr: string): void => {
@@ -101,26 +102,26 @@ export class WindowsTokenStorage implements TokenStorage {
     });
   };
 
-  public set(service: string, token: string): Promise<void> {
+  public set(connectionInfo: string): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       // because the new token might be longer/shorter than the previous one
       // we first need to clear the previous entry to avoid issues
       this
-        .remove(service)
+        .remove()
         .then((): void => {
           const entries: StorageEntry[] = [];
 
-          if (token.length <= this.MAX_CREDENTIAL_BYTES) {
-            entries.push({ name: this.prefix + service, value: token });
+          if (connectionInfo.length <= this.MAX_CREDENTIAL_BYTES) {
+            entries.push({ name: this.prefix + this.prefixShort, value: connectionInfo });
           }
           else {
-            const numBytes: number = token.length;
+            const numBytes: number = connectionInfo.length;
             let numBlocks: number = Math.ceil(numBytes / this.MAX_CREDENTIAL_BYTES);
 
             for (let i: number = 0; i < numBlocks; i++) {
               entries.push({
-                name: `${this.prefix}${service}--${i + 1}-${numBlocks}`,
-                value: token.substr(i * this.MAX_CREDENTIAL_BYTES, this.MAX_CREDENTIAL_BYTES)
+                name: `${this.prefix}${this.prefixShort}--${i + 1}-${numBlocks}`,
+                value: connectionInfo.substr(i * this.MAX_CREDENTIAL_BYTES, this.MAX_CREDENTIAL_BYTES)
               });
             }
           }
@@ -151,12 +152,12 @@ export class WindowsTokenStorage implements TokenStorage {
     });
   };
 
-  public remove(service: string): Promise<void> {
+  public remove(): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       const args: string[] = [
         '-d',
         '-g',
-        '-t', `${this.prefix}${service}*`
+        '-t', `${this.prefix}${this.prefixShort}*`
       ];
 
       childProcess.execFile(this.credsExePath, args, (err: Error | null, stdout: string, stderr: string): void => {

@@ -2,7 +2,7 @@ import commands from '../../commands';
 import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth, { Site } from '../../SpoAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./site-add');
 import * as assert from 'assert';
 import request from '../../../../request';
@@ -12,27 +12,26 @@ describe(commands.SITE_ADD, () => {
   let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
-  let trackEvent: any;
-  let telemetry: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    auth.service.connected = true;
+    auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    auth.site = new Site();
-    telemetry = null;
   });
 
   afterEach(() => {
@@ -44,10 +43,11 @@ describe(commands.SITE_ADD, () => {
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.ensureAccessToken,
-      auth.restoreAuth
+      auth.restoreAuth,
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
+    auth.service.spoUrl = undefined;
   });
 
   it('has correct name', () => {
@@ -56,47 +56,6 @@ describe(commands.SITE_ADD, () => {
 
   it('has a description', () => {
     assert.notEqual(command.description, null);
-  });
-
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.SITE_ADD);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not logged in to a SharePoint site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 
   it('creates modern team site using the correct endpoint', (done) => {
@@ -108,10 +67,6 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false } }, () => {
       assert(true);
       done();
@@ -129,10 +84,6 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
       assert(true);
       done();
@@ -153,10 +104,6 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, type: 'TeamSite', title: expected } }, () => {
       try {
         assert.equal(actual, expected);
@@ -180,10 +127,6 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, type: 'TeamSite', alias: expected } }, () => {
       try {
         assert.equal(actual, expected);
@@ -207,10 +150,6 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, type: 'TeamSite', isPublic: true } }, () => {
       try {
         assert.equal(actual, expected);
@@ -234,10 +173,6 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, type: 'TeamSite' } }, () => {
       try {
         assert.equal(actual, expected);
@@ -261,10 +196,6 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, type: 'TeamSite', description: expected } }, () => {
       try {
         assert.equal(actual, expected);
@@ -288,10 +219,6 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, type: 'TeamSite' } }, () => {
       try {
         assert.equal(actual, expected);
@@ -315,10 +242,6 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, type: 'TeamSite', classification: expected } }, () => {
       try {
         assert.equal(actual, expected);
@@ -342,10 +265,6 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, type: 'TeamSite' } }, () => {
       try {
         assert.equal(actual, expected);
@@ -369,10 +288,6 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, type: 'TeamSite', lcid: 1033 } }, () => {
       try {
         assert.equal(actual, expected);
@@ -396,10 +311,6 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, type: 'TeamSite', owners: 'admin@contoso.com' } }, () => {
       try {
         assert.strictEqual(actual, expected);
@@ -423,10 +334,6 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, type: 'TeamSite', owners: 'admin@contoso.com,steve@contoso.com' } }, () => {
       try {
         assert.strictEqual(actual, expected);
@@ -450,10 +357,6 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, type: 'TeamSite', owners: 'admin@contoso.com, steve@contoso.com' } }, () => {
       try {
         assert.strictEqual(actual, expected);
@@ -474,10 +377,6 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, type: 'TeamSite' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('The group alias already exists.')));
@@ -494,10 +393,6 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, type: 'TeamSite' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
@@ -518,10 +413,6 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, type: 'CommunicationSite' } }, () => {
       assert(true);
       done();
@@ -542,10 +433,6 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', title: expected } }, () => {
       try {
         assert.equal(actual, expected);
@@ -569,10 +456,6 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', url: expected } }, () => {
       try {
         assert.equal(actual, expected);
@@ -596,10 +479,6 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', allowFileSharingForGuestUsers: true } }, () => {
       try {
         assert.equal(actual, expected);
@@ -623,10 +502,6 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', shareByEmailEnabled: true } }, () => {
       try {
         assert.equal(actual, expected);
@@ -643,10 +518,6 @@ describe(commands.SITE_ADD, () => {
       return Promise.resolve({});
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { verbose: true, type: 'CommunicationSite', allowFileSharingForGuestUsers: true } }, () => {
       try {
         assert(log.find(l => l.indexOf(`Option 'allowFileSharingForGuestUsers' is deprecated`) > -1));
@@ -670,10 +541,6 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, type: 'CommunicationSite' } }, () => {
       try {
         assert.equal(actual, expected);
@@ -697,10 +564,6 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', description: expected } }, () => {
       try {
         assert.equal(actual, expected);
@@ -724,10 +587,6 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, type: 'CommunicationSite' } }, () => {
       try {
         assert.equal(actual, expected);
@@ -751,10 +610,6 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', classification: expected } }, () => {
       try {
         assert.equal(actual, expected);
@@ -778,10 +633,6 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, type: 'CommunicationSite' } }, () => {
       try {
         assert.equal(actual, expected);
@@ -805,10 +656,6 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', siteDesign: 'Topic' } }, () => {
       try {
         assert.equal(actual, expected);
@@ -832,10 +679,6 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', siteDesign: 'Showcase' } }, () => {
       try {
         assert.equal(actual, expected);
@@ -859,10 +702,6 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', siteDesign: 'Blank' } }, () => {
       try {
         assert.equal(actual, expected);
@@ -886,10 +725,6 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, type: 'CommunicationSite' } }, () => {
       try {
         assert.equal(actual, expected);
@@ -913,10 +748,6 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', siteDesignId: expected } }, () => {
       try {
         assert.equal(actual, expected);
@@ -940,10 +771,6 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', lcid: expected } }, () => {
       try {
         assert.equal(actual, expected);
@@ -1403,23 +1230,5 @@ describe(commands.SITE_ADD, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.ensureAccessToken);
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 });

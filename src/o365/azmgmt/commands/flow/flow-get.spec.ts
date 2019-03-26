@@ -2,40 +2,37 @@ import commands from '../../commands';
 import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth from '../../AzmgmtAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./flow-get');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import { Service } from '../../../../Auth';
 
 describe(commands.FLOW_GET, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  let trackEvent: any;
-  let telemetry: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    auth.service.connected = true;
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.service = new Service('https://management.azure.com/');
-    telemetry = null;
   });
 
   afterEach(() => {
@@ -47,10 +44,10 @@ describe(commands.FLOW_GET, () => {
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.ensureAccessToken,
-      auth.restoreAuth
+      auth.restoreAuth,
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -61,53 +58,10 @@ describe(commands.FLOW_GET, () => {
     assert.notEqual(command.description, null);
   });
 
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.FLOW_GET);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not logged in to the Azure Management Service', (done) => {
-    auth.service = new Service('https://management.azure.com/');
-    auth.service.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to the Azure Management Service first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('retrieves information about the specified flow (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d?api-version=2016-11-01`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
+        if (opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
             "name": "3989cb59-ce1a-4a5c-bb78-257c5c39381d",
@@ -798,9 +752,6 @@ describe(commands.FLOW_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service('https://management.azure.com/');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, name: '3989cb59-ce1a-4a5c-bb78-257c5c39381d', environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({
@@ -821,9 +772,7 @@ describe(commands.FLOW_GET, () => {
   it('retrieves information about the specified flow', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d?api-version=2016-11-01`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
+        if (opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
             "name": "3989cb59-ce1a-4a5c-bb78-257c5c39381d",
@@ -1514,9 +1463,6 @@ describe(commands.FLOW_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service('https://management.azure.com/');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, name: '3989cb59-ce1a-4a5c-bb78-257c5c39381d', environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({
@@ -1537,9 +1483,7 @@ describe(commands.FLOW_GET, () => {
   it('retrieves information about the specified flow as admin', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`providers/Microsoft.ProcessSimple/scopes/admin/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d?api-version=2016-11-01`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
+        if (opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
             "name": "3989cb59-ce1a-4a5c-bb78-257c5c39381d",
@@ -2230,9 +2174,6 @@ describe(commands.FLOW_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service('https://management.azure.com/');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, name: '3989cb59-ce1a-4a5c-bb78-257c5c39381d', environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', asAdmin: true } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({
@@ -2937,9 +2878,7 @@ describe(commands.FLOW_GET, () => {
 
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d?api-version=2016-11-01`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
+        if (opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve(flowInfo);
         }
@@ -2948,9 +2887,6 @@ describe(commands.FLOW_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service('https://management.azure.com/');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, name: '3989cb59-ce1a-4a5c-bb78-257c5c39381d', environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', output: 'json' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(flowInfo));
@@ -3652,9 +3588,6 @@ describe(commands.FLOW_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service('https://management.azure.com/');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, name: '3989cb59-ce1a-4a5c-bb78-257c5c39381d', environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({
@@ -3682,9 +3615,6 @@ describe(commands.FLOW_GET, () => {
       });
     });
 
-    auth.service = new Service('https://management.azure.com/');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6', name: '3989cb59-ce1a-4a5c-bb78-257c5c39381d' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Access to the environment 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' is denied.`)));
@@ -3706,9 +3636,6 @@ describe(commands.FLOW_GET, () => {
       });
     });
 
-    auth.service = new Service('https://management.azure.com/');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6', name: '1c6ee23a-a835-44bc-a4f5-462b658efc12' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`The caller with object id 'da8f7aea-cf43-497f-ad62-c2feae89a194' does not have permission for connection '1c6ee23a-a835-44bc-a4f5-462b658efc12' under Api 'shared_logicflows'.`)));
@@ -3730,9 +3657,6 @@ describe(commands.FLOW_GET, () => {
       });
     });
 
-    auth.service = new Service('https://management.azure.com/');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6', name: '1c6ee23a-a835-44bc-a4f5-462b658efc12', asAdmin: true } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Could not find flow '1c6ee23a-a835-44bc-a4f5-462b658efc12'.`)));
@@ -3758,9 +3682,6 @@ describe(commands.FLOW_GET, () => {
       });
     });
 
-    auth.service = new Service('https://management.azure.com/');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', name: '3989cb59-ce1a-4a5c-bb78-257c5c39381d' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
@@ -3852,22 +3773,5 @@ describe(commands.FLOW_GET, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.ensureAccessToken);
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.service = new Service('https://management.azure.com/');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 });

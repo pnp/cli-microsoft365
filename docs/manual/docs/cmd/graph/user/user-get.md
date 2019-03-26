@@ -20,12 +20,7 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
-!!! important
-    Before using this command, log in to the Microsoft Graph, using the [graph login](../login.md) command.
-
 ## Remarks
-
-To get information about a user, you have to first log in to the Microsoft Graph using the [graph login](../login.md) command, eg. `graph login`.
 
 You can retrieve information about a user, either by specifying that user's id or user name (`userPrincipalName`), but not both.
 

@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
 import {
@@ -29,17 +27,12 @@ class SpoHubSiteGetCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<any> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
-
+    this
+      .getSpoUrl(cmd, this.debug)
+      .then((spoUrl: string): Promise<any> => {
         const requestOptions: any = {
-          url: `${auth.site.url}/_api/hubsites/getbyid('${encodeURIComponent(args.options.id)}')`,
+          url: `${spoUrl}/_api/hubsites/getbyid('${encodeURIComponent(args.options.id)}')`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             accept: 'application/json;odata=nometadata'
           },
           json: true
@@ -88,18 +81,11 @@ class SpoHubSiteGetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site using
-    the ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
+      `  Remarks:
 
     ${chalk.yellow('Attention:')} This command is based on a SharePoint API that is currently
     in preview and is subject to change once the API reached general
     availability.
-
-    To get information about a hub site, you have to first log in to
-    a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
 
     If the specified ${chalk.grey('id')} doesn't refer to an existing hub site, you will get
     a ${chalk.grey('ResourceNotFoundException')} error.
@@ -107,7 +93,7 @@ class SpoHubSiteGetCommand extends SpoCommand {
   Examples:
   
     Get information about the hub site with ID ${chalk.grey('2c1ba4c4-cd9b-4417-832f-92a34bc34b2a')}
-      ${chalk.grey(config.delimiter)} ${this.name} --id 2c1ba4c4-cd9b-4417-832f-92a34bc34b2a
+      ${this.name} --id 2c1ba4c4-cd9b-4417-832f-92a34bc34b2a
 
   More information:
 

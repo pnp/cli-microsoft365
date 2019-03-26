@@ -1,4 +1,3 @@
-import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -8,11 +7,11 @@ import {
   CommandValidate,
   CommandError
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
 import { Auth } from '../../../../Auth';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
-import { ClientSvc, IdentityResponse } from '../../common/ClientSvc';
+import { ClientSvc, IdentityResponse } from '../../ClientSvc';
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
 interface CommandArgs {
@@ -53,7 +52,6 @@ class SpoListItemIsRecordCommand extends SpoCommand {
     const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
     const listIdArgument: string = args.options.listId || '';
     const listTitleArgument: string = args.options.listTitle || '';
-    let siteAccessToken: string = '';
     const listRestUrl: string = (args.options.listId ?
       `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(listIdArgument)}')`
       : `${args.options.webUrl}/_api/web/lists/getByTitle('${encodeURIComponent(listTitleArgument)}')`);
@@ -65,33 +63,28 @@ class SpoListItemIsRecordCommand extends SpoCommand {
       cmd.log(`Retrieving access token for ${resource}...`);
     }
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<{ Id: string; }> => {
-        siteAccessToken = accessToken;
-
-        if (typeof args.options.listId !== 'undefined') {
-          if (this.verbose) {
-            cmd.log(`List Id passed in as an argument.`);
-          }
-
-          return Promise.resolve({ Id: args.options.listId });
-        }
-
+    ((): Promise<{ Id: string; }> => {
+      if (typeof args.options.listId !== 'undefined') {
         if (this.verbose) {
-          cmd.log(`Getting list id...`);
-        }
-        const requestOptions: any = {
-          url: `${listRestUrl}?$select=Id`,
-          headers: {
-            authorization: `Bearer ${siteAccessToken}`,
-            accept: 'application/json;odata=nometadata'
-          },
-          json: true
+          cmd.log(`List Id passed in as an argument.`);
         }
 
-        return request.get(requestOptions);
-      })
+        return Promise.resolve({ Id: args.options.listId });
+      }
+
+      if (this.verbose) {
+        cmd.log(`Getting list id...`);
+      }
+      const requestOptions: any = {
+        url: `${listRestUrl}?$select=Id`,
+        headers: {
+          accept: 'application/json;odata=nometadata'
+        },
+        json: true
+      }
+
+      return request.get(requestOptions);
+    })()
       .then((res: { Id: string }): Promise<ContextInfo> => {
         listId = res.Id;
 
@@ -99,11 +92,11 @@ class SpoListItemIsRecordCommand extends SpoCommand {
           cmd.log(`Getting request digest for request`);
         }
 
-        return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
+        return this.getRequestDigest(args.options.webUrl);
       })
       .then((res: ContextInfo): Promise<IdentityResponse> => {
         formDigestValue = res.FormDigestValue;
-        return clientSvcCommons.getCurrentWebIdentity(args.options.webUrl, siteAccessToken, formDigestValue);
+        return clientSvcCommons.getCurrentWebIdentity(args.options.webUrl, formDigestValue);
       })
       .then((webIdentityResp: IdentityResponse): Promise<string> => {
         if (this.verbose) {
@@ -114,7 +107,6 @@ class SpoListItemIsRecordCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             'Content-Type': 'text/xml',
             'X-RequestDigest': formDigestValue,
           },
@@ -220,26 +212,17 @@ class SpoListItemIsRecordCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-    using the ${chalk.blue(commands.LOGIN)} command.
-  
-  Remarks:
-  
-    To check whether an item is a record, you have to first log in to SharePoint
-    using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-        
-  Examples:
+      `  Examples:
 
     Check whether the document with id ${chalk.grey(1)} in the list with title
     ${chalk.grey('Documents')}, located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
     is a record
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_ISRECORD} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'Documents' --id 1
+      ${commands.LISTITEM_ISRECORD} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'Documents' --id 1
     
     Check whether the document with id ${chalk.grey(1)} in list with ID
     ${chalk.grey('0cd891ef-afce-4e55-b836-fce03286cccf')}, located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} is a record
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_ISRECORD} --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --id 1
+      ${commands.LISTITEM_ISRECORD} --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --id 1
       `);
   }
 }

@@ -2,7 +2,7 @@ import commands from '../../commands';
 import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth, { Site } from '../../SpoAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./feature-list');
 import * as assert from 'assert';
 import request from '../../../../request';
@@ -13,37 +13,26 @@ describe(commands.FEATURE_LIST, () => {
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  let trackEvent: any;
-  let telemetry: any;
-  let stubAuth: any = () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/common/oauth2/token') > -1) {
-        return Promise.resolve('abc');
-      }
-
-      return Promise.reject('Invalid request');
-    });
-  }
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    auth.service.connected = true;
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.site = new Site();
-    telemetry = null;
   });
 
   afterEach(() => {
@@ -55,11 +44,10 @@ describe(commands.FEATURE_LIST, () => {
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.ensureAccessToken,
       auth.restoreAuth,
-      request.get
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -70,50 +58,7 @@ describe(commands.FEATURE_LIST, () => {
     assert.notEqual(command.description, null);
   });
 
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.FEATURE_LIST);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not logged in to a SharePoint site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/abc' } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('retrieves available features from site collection', (done) => {
-    stubAuth();
-
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
         return Promise.resolve({
@@ -133,10 +78,6 @@ describe(commands.FEATURE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         debug: false,
@@ -161,18 +102,10 @@ describe(commands.FEATURE_LIST, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore([
-          request.post,
-          request.get
-        ]);
-      }
     });
   });
 
   it('retrieves available features from site', (done) => {
-    stubAuth();
-
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf('/_api/Web/Features?$select=DisplayName,DefinitionId') > -1) {
         return Promise.resolve({
@@ -192,10 +125,6 @@ describe(commands.FEATURE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         debug: false,
@@ -220,18 +149,10 @@ describe(commands.FEATURE_LIST, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore([
-          request.post,
-          request.get
-        ]);
-      }
     });
   });
 
   it('retrieves available features from site (default) when no scope is entered', (done) => {
-    stubAuth();
-
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
         return Promise.reject('Invalid request');
@@ -255,10 +176,6 @@ describe(commands.FEATURE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         debug: false,
@@ -282,18 +199,10 @@ describe(commands.FEATURE_LIST, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore([
-          request.post,
-          request.get
-        ]);
-      }
     });
   });
 
   it('returns all properties for output JSON', (done) => {
-    stubAuth();
-
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
         return Promise.resolve({
@@ -319,12 +228,7 @@ describe(commands.FEATURE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
-    const options: Object = {
+    const options: any = {
       debug: true,
       url: 'https://contoso.sharepoint.com',
       scope: 'Site',
@@ -332,7 +236,6 @@ describe(commands.FEATURE_LIST, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         assert(cmdInstanceLogSpy.calledWith(
           [
@@ -356,29 +259,19 @@ describe(commands.FEATURE_LIST, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-        Utils.restore(request.get);
-      }
     });
   });
 
   it('correctly handles no features in site collection', (done) => {
-    stubAuth();
     sinon.stub(request, 'get').callsFake((opts) => {
-
       if (opts.url.indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
         return Promise.resolve(JSON.stringify({ value: [] }));
       }
+
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
-    const options: Object = {
+    const options: any = {
       debug: false,
       url: 'https://contoso.sharepoint.com',
       scope: 'Site',
@@ -391,30 +284,20 @@ describe(commands.FEATURE_LIST, () => {
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore(request.post);
-        Utils.restore(request.get);
       }
     });
   });
 
   it('correctly handles no features in site', (done) => {
-    stubAuth();
     sinon.stub(request, 'get').callsFake((opts) => {
-
       if (opts.url.indexOf('/_api/Web/Features?$select=DisplayName,DefinitionId') > -1) {
         return Promise.resolve(JSON.stringify({ value: [] }));
       }
+
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
-    const options: Object = {
+    const options: any = {
       debug: false,
       url: 'https://contoso.sharepoint.com',
       scope: 'Web',
@@ -428,29 +311,19 @@ describe(commands.FEATURE_LIST, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-        Utils.restore(request.get);
-      }
     });
   });
 
   it('correctly handles no features in site collection (verbose)', (done) => {
-    stubAuth();
     sinon.stub(request, 'get').callsFake((opts) => {
-
       if (opts.url.indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
         return Promise.resolve(JSON.stringify({ value: [] }));
       }
+
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
-    const options: Object = {
+    const options: any = {
       verbose: true,
       debug: false,
       url: 'https://contoso.sharepoint.com',
@@ -474,29 +347,19 @@ describe(commands.FEATURE_LIST, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-        Utils.restore(request.get);
-      }
     });
   });
 
   it('correctly handles no features in site (verbose)', (done) => {
-    stubAuth();
     sinon.stub(request, 'get').callsFake((opts) => {
-
       if (opts.url.indexOf('/_api/Web/Features?$select=DisplayName,DefinitionId') > -1) {
         return Promise.resolve(JSON.stringify({ value: [] }));
       }
+
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
-    const options: Object = {
+    const options: any = {
       verbose: true,
       debug: false,
       url: 'https://contoso.sharepoint.com',
@@ -520,16 +383,10 @@ describe(commands.FEATURE_LIST, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-        Utils.restore(request.get);
-      }
     });
   });
 
   it('correctly handles web feature reject request', (done) => {
-    stubAuth();
-
     const err = 'Invalid web Features reject request';
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf('/_api/Web/Features?$select=DisplayName,DefinitionId') > -1) {
@@ -538,11 +395,6 @@ describe(commands.FEATURE_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     cmdInstance.action({
       options: {
@@ -558,18 +410,10 @@ describe(commands.FEATURE_LIST, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore([
-          request.post,
-          request.get
-        ]);
-      }
     });
   });
 
   it('correctly handles site Features reject request', (done) => {
-    stubAuth();
-
     const err = 'Invalid site Features reject request';
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
@@ -578,11 +422,6 @@ describe(commands.FEATURE_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     cmdInstance.action({
       options: {
@@ -598,11 +437,6 @@ describe(commands.FEATURE_LIST, () => {
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore(request.post);
-        Utils.restore(request.get);
-        Utils.restore(cmdInstance.log);
       }
     });
   });
@@ -642,8 +476,6 @@ describe(commands.FEATURE_LIST, () => {
   });
 
   it('retrieves all Web features', (done) => {
-    stubAuth();
-
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf('/_api/Web/Features?$select=DisplayName,DefinitionId') > -1) {
         return Promise.resolve({
@@ -658,11 +490,6 @@ describe(commands.FEATURE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com/sites/abc', scope: 'Web' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith([
@@ -676,18 +503,11 @@ describe(commands.FEATURE_LIST, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.get);
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('retrieves all site features', (done) => {
-    stubAuth();
-
     sinon.stub(request, 'get').callsFake((opts) => {
-
       if (opts.url.indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
         return Promise.resolve({
           value: [
@@ -702,11 +522,6 @@ describe(commands.FEATURE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com/sites/abc', scope: 'Site' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith([
@@ -719,10 +534,6 @@ describe(commands.FEATURE_LIST, () => {
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore(request.get);
-        Utils.restore(request.post);
       }
     });
   });
@@ -845,31 +656,5 @@ describe(commands.FEATURE_LIST, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.getAccessToken);
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        url: "https://contoso.sharepoint.com",
-        debug: false
-      }
-    }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        Utils.restore(auth.getAccessToken);
-      }
-    });
   });
 });

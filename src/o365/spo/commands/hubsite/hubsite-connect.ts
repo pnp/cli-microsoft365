@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
 import {
@@ -9,7 +7,6 @@ import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import { ContextInfo } from '../../spo';
 import GlobalOptions from '../../../../GlobalOptions';
-import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -32,29 +29,12 @@ class SpoHubSiteConnectCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.url);
-    let siteAccessToken: string = '';
-
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<ContextInfo> => {
-        siteAccessToken = accessToken;
-
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
-
-        if (this.verbose) {
-          cmd.log(`Retrieving request digest...`);
-        }
-
-        return this.getRequestDigestForSite(args.options.url, siteAccessToken, cmd, this.debug);
-      })
+    this
+      .getRequestDigest(args.options.url)
       .then((res: ContextInfo): Promise<void> => {
         const requestOptions: any = {
           url: `${args.options.url}/_api/site/JoinHubSite('${encodeURIComponent(args.options.hubSiteId)}')`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             'X-RequestDigest': res.FormDigestValue,
             accept: 'application/json;odata=nometadata'
           },
@@ -115,18 +95,11 @@ class SpoHubSiteConnectCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site using
-    the ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
+      `  Remarks:
 
     ${chalk.yellow('Attention:')} This command is based on a SharePoint API that is currently
     in preview and is subject to change once the API reached general
     availability.
-
-    To connect a site collection to a hub site, you have to first log in to
-    a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
 
     If the specified site collection is already connected to a hub site,
     it will be disconnected and connected to the newly specified hub site.
@@ -139,7 +112,7 @@ class SpoHubSiteConnectCommand extends SpoCommand {
     Connect the site collection with URL
     ${chalk.grey('https://contoso.sharepoint.com/sites/contoso-sales')} to the hub site
     with ID ${chalk.grey('255a50b2-527f-4413-8485-57f4c17a24d1')}
-      ${chalk.grey(config.delimiter)} ${this.name} --url https://contoso.sharepoint.com/sites/contoso-sales --hubSiteId 255a50b2-527f-4413-8485-57f4c17a24d1
+      ${this.name} --url https://contoso.sharepoint.com/sites/contoso-sales --hubSiteId 255a50b2-527f-4413-8485-57f4c17a24d1
 
   More information:
 

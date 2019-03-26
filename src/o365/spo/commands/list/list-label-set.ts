@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -9,7 +7,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
-import { Auth } from '../../../../Auth';
 import { ListInstance } from './ListInstance';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -50,58 +47,41 @@ class SpoListLabelSetCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-    let siteAccessToken: string = '';
+    ((): Promise<string> => {
+      let listRestUrl: string = '';
 
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
-    }
+      if (args.options.listUrl) {
+        const listServerRelativeUrl: string = Utils.getServerRelativePath(args.options.webUrl, args.options.listUrl);
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<string> => {
-        siteAccessToken = accessToken;
+        return Promise.resolve(listServerRelativeUrl);
+      }
+      else if (args.options.listId) {
+        listRestUrl = `lists(guid'${encodeURIComponent(args.options.listId)}')/`;
+      }
+      else {
+        listRestUrl = `lists/getByTitle('${encodeURIComponent(args.options.listTitle as string)}')/`;
+      }
 
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}.`);
-        }
+      const requestOptions: any = {
+        url: `${args.options.webUrl}/_api/web/${listRestUrl}?$expand=RootFolder&$select=RootFolder`,
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        json: true
+      };
 
-        let listRestUrl: string = '';
-
-        if (args.options.listUrl) {
-          const listServerRelativeUrl: string = Utils.getServerRelativePath(args.options.webUrl, args.options.listUrl);
-
-          return Promise.resolve(listServerRelativeUrl);
-        }
-        else if (args.options.listId) {
-          listRestUrl = `lists(guid'${encodeURIComponent(args.options.listId)}')/`;
-        }
-        else {
-          listRestUrl = `lists/getByTitle('${encodeURIComponent(args.options.listTitle as string)}')/`;
-        }
-
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/${listRestUrl}?$expand=RootFolder&$select=RootFolder`,
-          headers: {
-            authorization: `Bearer ${siteAccessToken}`,
-            'accept': 'application/json;odata=nometadata'
-          },
-          json: true
-        };
-
-        return request
-          .get<ListInstance>(requestOptions)
-          .then((listInstance: ListInstance): Promise<string> => {
-            return Promise.resolve(listInstance.RootFolder.ServerRelativeUrl);
-          });
-      })
+      return request
+        .get<ListInstance>(requestOptions)
+        .then((listInstance: ListInstance): Promise<string> => {
+          return Promise.resolve(listInstance.RootFolder.ServerRelativeUrl);
+        });
+    })()
       .then((listServerRelativeUrl: string): Promise<void> => {
         const listAbsoluteUrl: string = Utils.getAbsoluteUrl(args.options.webUrl, listServerRelativeUrl);
         const requestUrl: string = `${args.options.webUrl}/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`;
         const requestOptions: any = {
           url: requestUrl,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata'
           },
           body: {
@@ -191,25 +171,16 @@ class SpoListLabelSetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-    using the ${chalk.blue(commands.LOGIN)} command.
-  
-  Remarks:
-  
-    To set a list classification label, you have to first log in to SharePoint
-    using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-        
-  Examples:
+      `  Examples:
   
     Sets classification label "Confidential" for list ${chalk.grey('Shared Documents')}
     located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LIST_LABEL_SET} --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl 'Shared Documents' --label 'Confidential'
+      ${commands.LIST_LABEL_SET} --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl 'Shared Documents' --label 'Confidential'
 
     Sets classification label "Confidential" and disables editing and deleting
     items on the list and all existing items for list ${chalk.grey('Documents')}
     located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LIST_LABEL_SET} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'Documents' --label 'Confidential' --blockEdit --blockDelete --syncToItems
+      ${commands.LIST_LABEL_SET} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'Documents' --label 'Confidential' --blockEdit --blockDelete --syncToItems
 `);
   }
 }

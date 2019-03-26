@@ -1,5 +1,3 @@
-import auth from '../../GraphAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import request from '../../../../request';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -37,20 +35,16 @@ class GraphSiteClassificationDisableCommand extends GraphCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     const disableSiteClassification: () => void = (): void => {
-      auth
-        .ensureAccessToken(auth.service.resource, cmd, this.debug)
-        .then((): Promise<DirectorySettingTemplatesRsp> => {
-          const requestOptions: any = {
-            url: `${auth.service.resource}/beta/settings`,
-            headers: {
-              authorization: `Bearer ${auth.service.accessToken}`,
-              accept: 'application/json;odata.metadata=none'
-            },
-            json: true
-          };
+      const requestOptions: any = {
+        url: `${this.resource}/beta/settings`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        json: true
+      };
 
-          return request.get(requestOptions);
-        })
+      request
+        .get<DirectorySettingTemplatesRsp>(requestOptions)
         .then((res: DirectorySettingTemplatesRsp): Promise<void> => {
           if (res.value.length === 0) {
             return Promise.reject('Site classification is not enabled.');
@@ -70,9 +64,8 @@ class GraphSiteClassificationDisableCommand extends GraphCommand {
           }
 
           const requestOptions: any = {
-            url: `${auth.service.resource}/beta/settings/` + unifiedGroupSetting[0].id,
+            url: `${this.resource}/beta/settings/` + unifiedGroupSetting[0].id,
             headers: {
-              authorization: `Bearer ${auth.service.accessToken}`,
               accept: 'application/json;odata.metadata=none',
               'content-type': 'application/json'
             },
@@ -81,7 +74,7 @@ class GraphSiteClassificationDisableCommand extends GraphCommand {
 
           return request.delete(requestOptions);
         })
-        .then((res: any): void => {
+        .then((): void => {
           if (this.verbose) {
             cmd.log(vorpal.chalk.green('DONE'));
           }
@@ -126,26 +119,19 @@ class GraphSiteClassificationDisableCommand extends GraphCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, connect to the Microsoft Graph
-    using the ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
+      `  Remarks:
 
     ${chalk.yellow('Attention:')} This command is based on an API that is currently
     in preview and is subject to change once the API reached general
     availability.
 
-    To disable the Office 365 Tenant site classification, you have to first login
-    to the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
-
   Examples:
   
     Disable site classification 
-      ${chalk.grey(config.delimiter)} ${this.name}  
+      ${this.name}  
 
     Disable site classification without confirmation
-      ${chalk.grey(config.delimiter)} ${this.name} --confirm
+      ${this.name} --confirm
 
   More information:
 

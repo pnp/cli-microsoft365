@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import {
   CommandOption,
@@ -7,7 +5,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import { ContextInfo } from '../../spo';
-import { Auth } from '../../../../Auth';
 import { SpoPropertyBagBaseCommand, Property } from './propertybag-base';
 import GlobalOptions from '../../../../GlobalOptions';
 import { ClientSvc, IdentityResponse } from '../../common/ClientSvc';
@@ -25,7 +22,6 @@ export interface Options extends GlobalOptions {
 }
 
 class SpoPropertyBagGetCommand extends SpoPropertyBagBaseCommand {
-
   public get name(): string {
     return `${commands.PROPERTYBAG_GET}`;
   }
@@ -41,28 +37,14 @@ class SpoPropertyBagGetCommand extends SpoPropertyBagBaseCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
     const clientSvcCommons: ClientSvc = new ClientSvc(cmd, this.debug);
 
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
-    }
-
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<ContextInfo> => {
-        this.siteAccessToken = accessToken;
-
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
-
-        return this.getRequestDigestForSite(args.options.webUrl, this.siteAccessToken, cmd, this.debug);
-      })
+    this
+      .getRequestDigest(args.options.webUrl)
       .then((contextResponse: ContextInfo): Promise<IdentityResponse> => {
         this.formDigestValue = contextResponse.FormDigestValue;
 
-        return clientSvcCommons.getCurrentWebIdentity(args.options.webUrl, this.siteAccessToken, this.formDigestValue);
+        return clientSvcCommons.getCurrentWebIdentity(args.options.webUrl, this.formDigestValue);
       })
       .then((identityResp: IdentityResponse): Promise<any> => {
         const opts: Options = args.options;
@@ -122,36 +104,27 @@ class SpoPropertyBagGetCommand extends SpoPropertyBagBaseCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.PROPERTYBAG_GET).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-    using the ${chalk.blue(commands.LOGIN)} command.
-                      
-  Remarks:
-
-    To retrieve property bag value, you have to first log in to a SharePoint
-    Online site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-
-  Examples:
+      `  Examples:
 
     Returns the value of the ${chalk.grey('key1')} property from the property bag located
     in site ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.PROPERTYBAG_GET} --webUrl https://contoso.sharepoint.com/sites/test --key key1
+      ${commands.PROPERTYBAG_GET} --webUrl https://contoso.sharepoint.com/sites/test --key key1
     
     Returns the value of the ${chalk.grey('key1')} property from the property bag located
     in site root folder ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.PROPERTYBAG_GET} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder /
+      ${commands.PROPERTYBAG_GET} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder /
 
     Returns the value of the ${chalk.grey('key1')} property from the property bag located
     in site document library ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.PROPERTYBAG_GET} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder '/Shared Documents'
+      ${commands.PROPERTYBAG_GET} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder '/Shared Documents'
 
     Returns the value of the ${chalk.grey('key1')} property from the property bag located
     in folder in site document library ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.PROPERTYBAG_GET} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder '/Shared Documents/MyFolder'
+      ${commands.PROPERTYBAG_GET} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder '/Shared Documents/MyFolder'
 
     Returns the value of the ${chalk.grey('key1')} property from the property bag located
     in site list ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.PROPERTYBAG_GET} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder /Lists/MyList
+      ${commands.PROPERTYBAG_GET} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder /Lists/MyList
       `);
   }
 

@@ -1,5 +1,3 @@
-import auth from '../../AadAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -21,7 +19,7 @@ interface Options extends GlobalOptions {
   displayName?: string;
 }
 
-class SpGetCommand extends AadCommand {
+class AadSpGetCommand extends AadCommand {
   public get name(): string {
     return commands.SP_GET;
   }
@@ -38,32 +36,24 @@ class SpGetCommand extends AadCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<{ value: any[] }> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving information about the service principal...`);
-        }
+    if (this.verbose) {
+      cmd.log(`Retrieving service principal information...`);
+    }
 
-        if (this.verbose) {
-          cmd.log(`Retrieving service principal information...`);
-        }
+    const spMatchQuery: string = args.options.appId ?
+      `appId eq '${encodeURIComponent(args.options.appId)}'` :
+      `displayName eq '${encodeURIComponent(args.options.displayName as string)}'`;
 
-        const spMatchQuery: string = args.options.appId ?
-          `appId eq '${encodeURIComponent(args.options.appId)}'` :
-          `displayName eq '${encodeURIComponent(args.options.displayName as string)}'`;
+    const requestOptions: any = {
+      url: `${this.resource}/myorganization/servicePrincipals?api-version=1.6&$filter=${spMatchQuery}`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      json: true
+    };
 
-        const requestOptions: any = {
-          url: `${auth.service.resource}/myorganization/servicePrincipals?api-version=1.6&$filter=${spMatchQuery}`,
-          headers: {
-            authorization: `Bearer ${accessToken}`,
-            accept: 'application/json;odata=nometadata'
-          },
-          json: true
-        };
-
-        return request.get(requestOptions);
-      })
+    request
+      .get<{ value: any[] }>(requestOptions)
       .then((res: { value: any[] }): void => {
         if (res.value && res.value.length > 0) {
           cmd.log(res.value[0]);
@@ -113,14 +103,8 @@ class SpGetCommand extends AadCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.SP_GET).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to Azure Active Directory Graph,
-      using the ${chalk.blue(commands.LOGIN)} command.
-
-  Remarks:
+      `  Remarks:
   
-    To get information about a service principal, you have to first log in to Azure Active Directory
-    Graph using the ${chalk.blue(commands.LOGIN)} command.
-
     When looking up information about a service principal you should specify either its ${chalk.grey('appId')}
     or ${chalk.grey('displayName')} but not both. If you specify both values, the command will fail
     with an error.
@@ -128,10 +112,10 @@ class SpGetCommand extends AadCommand {
   Examples:
   
     Return details about the service principal with appId ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}.
-      ${chalk.grey(config.delimiter)} ${commands.SP_GET} --appId b2307a39-e878-458b-bc90-03bc578531d6
+      ${commands.SP_GET} --appId b2307a39-e878-458b-bc90-03bc578531d6
 
     Return details about the ${chalk.grey('Microsoft Graph')} service principal.
-      ${chalk.grey(config.delimiter)} ${commands.SP_GET} --displayName "Microsoft Graph"
+      ${commands.SP_GET} --displayName "Microsoft Graph"
 
   More information:
   
@@ -141,4 +125,4 @@ class SpGetCommand extends AadCommand {
   }
 }
 
-module.exports = new SpGetCommand();
+module.exports = new AadSpGetCommand();

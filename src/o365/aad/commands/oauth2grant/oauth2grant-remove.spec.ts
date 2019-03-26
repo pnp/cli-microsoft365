@@ -2,40 +2,37 @@ import commands from '../../commands';
 import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth from '../../AadAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./oauth2grant-remove');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import { Service } from '../../../../Auth';
 
 describe(commands.OAUTH2GRANT_REMOVE, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  let trackEvent: any;
-  let telemetry: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    auth.service.connected = true;
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.service = new Service('https://graph.windows.net');
-    telemetry = null;
   });
 
   afterEach(() => {
@@ -47,10 +44,10 @@ describe(commands.OAUTH2GRANT_REMOVE, () => {
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.ensureAccessToken,
-      auth.restoreAuth
+      auth.restoreAuth,
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -61,62 +58,15 @@ describe(commands.OAUTH2GRANT_REMOVE, () => {
     assert.notEqual(command.description, null);
   });
 
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.OAUTH2GRANT_REMOVE);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not logged in to AAD Graph', (done) => {
-    auth.service = new Service('https://graph.windows.net');
-    auth.service.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to Azure Active Directory Graph first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('removes OAuth2 permission grant (debug)', (done) => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url.indexOf(`/myorganization/oauth2PermissionGrants/YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek?api-version=1.6`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0) {
-          return Promise.resolve();
-        }
+        return Promise.resolve();
       }
 
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service('https://graph.windows.net');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
@@ -131,18 +81,12 @@ describe(commands.OAUTH2GRANT_REMOVE, () => {
   it('removes OAuth2 permission grant', (done) => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url.indexOf(`/myorganization/oauth2PermissionGrants/YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek?api-version=1.6`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0) {
-          return Promise.resolve();
-        }
+        return Promise.resolve();
       }
 
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service('https://graph.windows.net');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
@@ -153,7 +97,7 @@ describe(commands.OAUTH2GRANT_REMOVE, () => {
       }
     });
   });
-  
+
   it('correctly handles API OData error', (done) => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       return Promise.reject({
@@ -168,9 +112,6 @@ describe(commands.OAUTH2GRANT_REMOVE, () => {
       });
     });
 
-    auth.service = new Service('https://graph.windows.net');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
@@ -246,22 +187,5 @@ describe(commands.OAUTH2GRANT_REMOVE, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.ensureAccessToken);
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.service = new Service('https://graph.windows.net');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 });

@@ -1,6 +1,3 @@
-import auth from '../../SpoAuth';
-import { Auth } from '../../../../Auth';
-import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -39,24 +36,19 @@ class SpoCustomActionListCommand extends SpoCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const scope: string = args.options.scope ? args.options.scope : 'All';
-    const resource: string = Auth.getResourceFromUrl(args.options.url);
-    let siteAccessToken: string = '';
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<CustomAction[]> => {
-        siteAccessToken = accessToken;
+    ((): Promise<CustomAction[]> => {
+      if (this.debug) {
+        cmd.log(`Attempt to get custom actions list with scope: ${scope}`);
+        cmd.log('');
+      }
 
-        if (this.debug) {
-          cmd.log(`Attempt to get custom actions list with scope: ${scope}`);
-          cmd.log('');
-        }
+      if (scope && scope.toLowerCase() !== "all") {
+        return this.getCustomActions(args.options);
+      }
 
-        if (scope && scope.toLowerCase() !== "all") {
-          return this.getCustomActions(args.options, siteAccessToken, cmd);
-        }
-        return this.searchAllScopes(args.options, siteAccessToken, cmd);
-      })
+      return this.searchAllScopes(args.options);
+    })()
       .then((customActions: CustomAction[]): void => {
         if (customActions.length === 0) {
           if (this.verbose) {
@@ -82,11 +74,10 @@ class SpoCustomActionListCommand extends SpoCommand {
       }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
   }
 
-  private getCustomActions(options: Options, accessToken: string, cmd: CommandInstance): Promise<CustomAction[]> {
+  private getCustomActions(options: Options): Promise<CustomAction[]> {
     const requestOptions: any = {
       url: `${options.url}/_api/${options.scope}/UserCustomActions`,
       headers: {
-        authorization: `Bearer ${accessToken}`,
         accept: 'application/json;odata=nometadata'
       },
       json: true
@@ -108,19 +99,19 @@ class SpoCustomActionListCommand extends SpoCommand {
    * Two REST GET requests with `web` and `site` scope are sent.
    * The results are combined in one array.
    */
-  private searchAllScopes(options: Options, accessToken: string, cmd: CommandInstance): Promise<CustomAction[]> {
+  private searchAllScopes(options: Options): Promise<CustomAction[]> {
     return new Promise<CustomAction[]>((resolve: (list: CustomAction[]) => void, reject: (error: any) => void): void => {
       options.scope = "Web";
       let webCustomActions: CustomAction[] = [];
 
       this
-        .getCustomActions(options, accessToken, cmd)
+        .getCustomActions(options)
         .then((customActions: CustomAction[]): Promise<CustomAction[]> => {
           webCustomActions = customActions;
 
           options.scope = "Site";
 
-          return this.getCustomActions(options, accessToken, cmd);
+          return this.getCustomActions(options);
         })
         .then((siteCustomActions: CustomAction[]): void => {
           resolve(siteCustomActions.concat(webCustomActions));
@@ -181,35 +172,30 @@ class SpoCustomActionListCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.CUSTOMACTION_LIST).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-        using the ${chalk.blue(commands.LOGIN)} command.
-                      
-  Remarks:
+      `  Remarks:
 
-    To retrieve list of custom actions, you have to first log in to a SharePoint Online site using the
-    ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-
-    When using the text output type (default), the command lists only the values of the ${chalk.grey('Name')},
-    ${chalk.grey('Location')}, ${chalk.grey('Scope')} and ${chalk.grey('Id')} properties of the custom action. When setting the output
-    type to JSON, all available properties are included in the command output.
+    When using the text output type (default), the command lists only the values
+    of the ${chalk.grey('Name')}, ${chalk.grey('Location')}, ${chalk.grey('Scope')} and ${chalk.grey('Id')} properties of the custom action.
+    When setting the output type to JSON, all available properties are included
+    in the command output.
 
   Examples:
   
     Return details about all user custom actions located
     in site or site collection ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.CUSTOMACTION_LIST} -u https://contoso.sharepoint.com/sites/test
+      ${commands.CUSTOMACTION_LIST} --url https://contoso.sharepoint.com/sites/test
 
     Return details about all user custom actions located
     in site or site collection ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.CUSTOMACTION_LIST} --url https://contoso.sharepoint.com/sites/test
+      ${commands.CUSTOMACTION_LIST} --url https://contoso.sharepoint.com/sites/test
 
     Return details about all user custom actions located 
     in site collection ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.CUSTOMACTION_LIST} -u https://contoso.sharepoint.com/sites/test -s Site
+      ${commands.CUSTOMACTION_LIST} --url https://contoso.sharepoint.com/sites/test --scope Site
 
     Return details about all user custom actions located 
     in site ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.CUSTOMACTION_LIST} --url https://contoso.sharepoint.com/sites/test --scope Web
+      ${commands.CUSTOMACTION_LIST} --url https://contoso.sharepoint.com/sites/test --scope Web
 
   More information:
 

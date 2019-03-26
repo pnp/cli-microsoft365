@@ -11,14 +11,13 @@ describe('KeychainTokenStorage', () => {
     let file = '';
     let args: string[] = [];
     sinon.stub(childProcess, 'execFile').callsFake((f, a) => { file = f; args = a });
-    const service = 'mock';
-    keychain.get(service);
+    keychain.get();
     try {
       assert.equal(file, '/usr/bin/security');
       assert.deepEqual(args, [
           'find-generic-password',
-          '-a', service,
-          '-s', service,
+          '-a', 'Office 365 CLI',
+          '-s', 'Office 365 CLI',
           '-D', 'Office 365 CLI',
           '-g'
         ]);
@@ -35,7 +34,7 @@ describe('KeychainTokenStorage', () => {
   it('correctly handles error when getting password from Keychain', (done) => {
     sinon.stub(childProcess, 'execFile').callsArgWith(2, { message: 'An error has occurred' });
     keychain
-      .get('mock')
+      .get()
       .then(() => {
         Utils.restore(childProcess.execFile);
         done('Expected failure but passed');
@@ -56,7 +55,7 @@ describe('KeychainTokenStorage', () => {
   it('correctly handles error when something else than password returned from Keychain', (done) => {
     sinon.stub(childProcess, 'execFile').callsArgWith(2, null, '', 'random output');
     keychain
-      .get('mock')
+      .get()
       .then(() => {
         Utils.restore(childProcess.execFile);
         done('Expected failure but passed');
@@ -77,7 +76,7 @@ describe('KeychainTokenStorage', () => {
   it('returns password retrieved from Keychain', (done) => {
     sinon.stub(childProcess, 'execFile').callsArgWith(2, null, '', 'password: "ABC"');
     keychain
-      .get('mock')
+      .get()
       .then((password) => {
         try {
           assert.equal(password, 'ABC');
@@ -99,15 +98,14 @@ describe('KeychainTokenStorage', () => {
     let file = '';
     let args: string[] = [];
     sinon.stub(childProcess, 'execFile').callsFake((f, a) => { file = f; args = a });
-    const service = 'mock';
     const token = 'ABC';
-    keychain.set(service, token);
+    keychain.set(token);
     try {
       assert.equal(file, '/usr/bin/security');
       assert.deepEqual(args, [
           'add-generic-password',
-          '-a', service,
-          '-s', service,
+          '-a', 'Office 365 CLI',
+          '-s', 'Office 365 CLI',
           '-D', 'Office 365 CLI',
           '-w', token,
           '-U'
@@ -125,7 +123,7 @@ describe('KeychainTokenStorage', () => {
   it('correctly handles error when setting password in Keychain', (done) => {
     sinon.stub(childProcess, 'execFile').callsArgWith(2, { message: 'An error has occurred' });
     keychain
-      .set('mock', 'ABC')
+      .set('ABC')
       .then(() => {
         Utils.restore(childProcess.execFile);
         done('Expected failure but passed');
@@ -146,7 +144,7 @@ describe('KeychainTokenStorage', () => {
   it('completes when setting password in Keychain succeeded', (done) => {
     sinon.stub(childProcess, 'execFile').callsArgWith(2, null, null, null);
     keychain
-      .set('mock', 'ABC')
+      .set('ABC')
       .then(() => {
         Utils.restore(childProcess.execFile);
         done();
@@ -160,14 +158,13 @@ describe('KeychainTokenStorage', () => {
     let file = '';
     let args: string[] = [];
     sinon.stub(childProcess, 'execFile').callsFake((f, a) => { file = f; args = a });
-    const service = 'mock';
-    keychain.remove(service);
+    keychain.remove();
     try {
       assert.equal(file, '/usr/bin/security');
       assert.deepEqual(args, [
           'delete-generic-password',
-          '-a', service,
-          '-s', service,
+          '-a', 'Office 365 CLI',
+          '-s', 'Office 365 CLI',
           '-D', 'Office 365 CLI'
         ]);
       done();
@@ -183,7 +180,7 @@ describe('KeychainTokenStorage', () => {
   it('correctly handles error when removing password from Keychain', (done) => {
     sinon.stub(childProcess, 'execFile').callsArgWith(2, { message: 'An error has occurred' });
     keychain
-      .remove('mock')
+      .remove()
       .then(() => {
         Utils.restore(childProcess.execFile);
         done('Expected failure but passed');
@@ -204,7 +201,7 @@ describe('KeychainTokenStorage', () => {
   it('completes when removing password from Keychain succeeded', (done) => {
     sinon.stub(childProcess, 'execFile').callsArgWith(2, null, null, null);
     keychain
-      .remove('mock')
+      .remove()
       .then(() => {
         Utils.restore(childProcess.execFile);
         done();

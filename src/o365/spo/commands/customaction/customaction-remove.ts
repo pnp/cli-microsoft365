@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -10,7 +8,6 @@ import {
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import { CustomAction } from './customaction';
-import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -43,24 +40,13 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const removeCustomAction = (): void => {
-      const resource: string = Auth.getResourceFromUrl(args.options.url);
-      let siteAccessToken: string = '';
+      ((): Promise<CustomAction | void> => {
+        if (args.options.scope && args.options.scope.toLowerCase() !== "all") {
+          return this.removeScopedCustomAction(args.options);
+        }
 
-      if (this.debug) {
-        cmd.log(`Retrieving access token for ${resource}...`);
-      }
-
-      auth
-        .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-        .then((accessToken: string): Promise<CustomAction | void> => {
-          siteAccessToken = accessToken;
-
-          if (args.options.scope && args.options.scope.toLowerCase() !== "all") {
-            return this.removeScopedCustomAction(args.options, siteAccessToken, cmd);
-          }
-
-          return this.searchAllScopes(args.options, siteAccessToken, cmd);
-        })
+        return this.searchAllScopes(args.options);
+      })()
         .then((customAction: CustomAction | void): void => {
           if (this.verbose) {
             if (customAction && customAction["odata.null"] === true) {
@@ -94,11 +80,10 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
     }
   }
 
-  private removeScopedCustomAction(options: Options, siteAccessToken: string, cmd: CommandInstance): Promise<undefined> {
+  private removeScopedCustomAction(options: Options): Promise<undefined> {
     const requestOptions: any = {
       url: `${options.url}/_api/${options.scope}/UserCustomActions('${encodeURIComponent(options.id)}')`,
       headers: {
-        authorization: `Bearer ${siteAccessToken}`,
         accept: 'application/json;odata=nometadata',
         'X-HTTP-Method': 'DELETE'
       },
@@ -113,12 +98,12 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
    * If custom action not found then 
    * another get request is send with `site` scope.
    */
-  private searchAllScopes(options: Options, siteAccessToken: string, cmd: CommandInstance): Promise<CustomAction | undefined> {
+  private searchAllScopes(options: Options): Promise<CustomAction | undefined> {
     return new Promise<CustomAction | undefined>((resolve: (result: CustomAction | undefined) => void, reject: (error: any) => void): void => {
       options.scope = "Web";
 
       this
-        .removeScopedCustomAction(options, siteAccessToken, cmd)
+        .removeScopedCustomAction(options)
         .then((webResult: CustomAction | undefined): void => {
           if (webResult === undefined) {
             return resolve(webResult);
@@ -126,7 +111,7 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
 
           options.scope = "Site";
           this
-            .removeScopedCustomAction(options, siteAccessToken, cmd)
+            .removeScopedCustomAction(options)
             .then((siteResult: CustomAction | undefined): void => {
               return resolve(siteResult);
             }, (err: any): void => {
@@ -189,31 +174,23 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.CUSTOMACTION_REMOVE).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-        using the ${chalk.blue(commands.LOGIN)} command.
-                      
-  Remarks:
-
-    To remove user custom action, you have to first log in to a SharePoint Online site using the
-    ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-
-  Examples:
+      `  Examples:
   
     Removes user custom action with ID ${chalk.grey('058140e3-0e37-44fc-a1d3-79c487d371a3')}
     located in site or site collection ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.CUSTOMACTION_REMOVE} -i 058140e3-0e37-44fc-a1d3-79c487d371a3 -u https://contoso.sharepoint.com/sites/test --confirm
+      ${commands.CUSTOMACTION_REMOVE} -i 058140e3-0e37-44fc-a1d3-79c487d371a3 -u https://contoso.sharepoint.com/sites/test --confirm
 
     Removes user custom action with ID ${chalk.grey('058140e3-0e37-44fc-a1d3-79c487d371a3')}
     located in site or site collection ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.CUSTOMACTION_REMOVE} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --url https://contoso.sharepoint.com/sites/test
+      ${commands.CUSTOMACTION_REMOVE} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --url https://contoso.sharepoint.com/sites/test
 
     Removes user custom action with ID ${chalk.grey('058140e3-0e37-44fc-a1d3-79c487d371a3')}
     located in site collection ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.CUSTOMACTION_REMOVE} -i 058140e3-0e37-44fc-a1d3-79c487d371a3 -u https://contoso.sharepoint.com/sites/test -s Site
+      ${commands.CUSTOMACTION_REMOVE} -i 058140e3-0e37-44fc-a1d3-79c487d371a3 -u https://contoso.sharepoint.com/sites/test -s Site
 
     Removes user custom action with ID ${chalk.grey('058140e3-0e37-44fc-a1d3-79c487d371a3')}
     located in site ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.CUSTOMACTION_REMOVE} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --url https://contoso.sharepoint.com/sites/test --scope Web
+      ${commands.CUSTOMACTION_REMOVE} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --url https://contoso.sharepoint.com/sites/test --scope Web
 
   More information:
 

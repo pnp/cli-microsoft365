@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import request from '../../../../request';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -8,7 +6,6 @@ import {
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import { Auth } from '../../../../Auth';
 import Utils from '../../../../Utils';
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -37,35 +34,26 @@ class SpoSiteInPlaceRecordsManagementSetCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.siteUrl);
     const enabled: boolean = args.options.enabled.toLocaleLowerCase() === 'true';
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<void> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}.`);
-        }
+    const requestOptions: any = {
+      url: `${args.options.siteUrl}/_api/site/features/${enabled ? 'add' : 'remove'}`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      body: {
+        featureId: 'da2e115b-07e4-49d9-bb2c-35e93bb9fca9',
+        force: true
+      },
+      json: true
+    };
 
-        const requestOptions: any = {
-          url: `${args.options.siteUrl}/_api/site/features/${enabled ? 'add' : 'remove'}`,
-          headers: {
-            authorization: `Bearer ${accessToken}`,
-            accept: 'application/json;odata=nometadata'
-          },
-          body: {
-            featureId: 'da2e115b-07e4-49d9-bb2c-35e93bb9fca9',
-            force: true
-          },
-          json: true
-        };
+    if (this.verbose) {
+      cmd.log(`${enabled ? 'Activating' : 'Deactivating'} in-place records management for site ${args.options.siteUrl}`);
+    }
 
-        if (this.verbose) {
-          cmd.log(`${enabled ? 'Activating' : 'Deactivating'} in-place records management for site ${args.options.siteUrl}`);
-        }
-
-        return request.post(requestOptions);
-      })
+    request
+      .post(requestOptions)
       .then((): void => {
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
@@ -113,24 +101,15 @@ class SpoSiteInPlaceRecordsManagementSetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-    using the ${chalk.blue(commands.LOGIN)} command.
-
-  Remarks:
-  
-    To activate or deactivate in-place records management, you have to first
-    log in to SharePoint using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-  
-  Examples:
+      `  Examples:
   
     Activates in-place records management for site
     ${chalk.grey('https://contoso.sharepoint.com/sites/team-a')}
-      ${chalk.grey(config.delimiter)} ${commands.SITE_INPLACERECORDSMANAGEMENT_SET} --siteUrl https://contoso.sharepoint.com/sites/team-a --enabled true
+      ${commands.SITE_INPLACERECORDSMANAGEMENT_SET} --siteUrl https://contoso.sharepoint.com/sites/team-a --enabled true
 
     Deactivates in-place records management for site
     ${chalk.grey('https://contoso.sharepoint.com/sites/team-a')}
-      ${chalk.grey(config.delimiter)} ${commands.SITE_INPLACERECORDSMANAGEMENT_SET} --siteUrl https://contoso.sharepoint.com/sites/team-a --enabled false
+      ${commands.SITE_INPLACERECORDSMANAGEMENT_SET} --siteUrl https://contoso.sharepoint.com/sites/team-a --enabled false
   ` );
   }
 }

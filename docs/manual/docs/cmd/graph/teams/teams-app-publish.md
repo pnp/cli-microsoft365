@@ -18,12 +18,7 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
-!!! important
-    Before using this command, log in to the Microsoft Graph, using the [graph login](../login.md) command.
-
 ## Remarks
-
-To publish Microsoft Teams apps, you have to first log in to the Microsoft Graph using the [graph login](../login.md) command, eg. `graph login`.
 
 You can only publish a Teams app as a global administrator.
 

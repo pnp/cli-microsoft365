@@ -2,7 +2,7 @@ import commands from '../../commands';
 import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth, { Site } from '../../SpoAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./propertybag-get');
 import * as assert from 'assert';
 import request from '../../../../request';
@@ -15,24 +15,12 @@ describe(commands.PROPERTYBAG_GET, () => {
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  let trackEvent: any;
-  let telemetry: any;
   let stubAllPostRequests: any = (
     requestObjectIdentityResp: any = null,
     getFolderPropertyBagResp: any = null,
     getWebPropertyBagResp: any = null
   ) => {
     return sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/common/oauth2/token') > -1) {
-        return Promise.resolve('abc');
-      }
-
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
       // fake requestObjectIdentity
       if (opts.body.indexOf('3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a') > -1) {
         if (requestObjectIdentityResp) {
@@ -95,38 +83,45 @@ describe(commands.PROPERTYBAG_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({
+      FormDigestValue: 'abc'
+    }));
+    auth.service.connected = true;
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.site = new Site();
-    telemetry = null;
   });
 
   afterEach(() => {
     Utils.restore([
       vorpal.find,
-      request.post
+      request.post,
+      (command as any).getWebPropertyBag,
+      (command as any).filterByKey,
+      (command as any).getFolderPropertyBag,
+      ClientSvc.prototype.getCurrentWebIdentity
     ]);
   });
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.getAccessToken,
-      auth.restoreAuth
+      auth.restoreAuth,
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -137,54 +132,8 @@ describe(commands.PROPERTYBAG_GET, () => {
     assert.notEqual(command.description, null);
   });
 
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {}, appCatalogUrl: 'https://contoso-admin.sharepoint.com' }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { webUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
-      try {
-        assert.equal(telemetry.name, commands.PROPERTYBAG_GET);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not logged in to a SharePoint site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { webUrl: 'https://contoso.sharepoint.com/sites/abc' } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('should call getWebPropertyBag when folder is not specified and site is /', (done) => {
     stubAllPostRequests();
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const getWebPropertyBagSpy = sinon.spy((command as any), 'getWebPropertyBag');
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -205,10 +154,6 @@ describe(commands.PROPERTYBAG_GET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-        Utils.restore((command as any)['getWebPropertyBag']);
-      }
     });
   });
 
@@ -223,11 +168,6 @@ describe(commands.PROPERTYBAG_GET, () => {
       "_ObjectIdentity_": "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
       "ServerRelativeUrl": "\u002fsites\u002ftest"
     }])) }));
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     const getWebPropertyBagSpy = sinon.spy((command as any), 'getWebPropertyBag');
     const options: Object = {
@@ -249,20 +189,11 @@ describe(commands.PROPERTYBAG_GET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-        Utils.restore((command as any)['getWebPropertyBag']);
-      }
     });
   });
 
   it('should call getFolderPropertyBag when folder is specified and site is /', (done) => {
     stubAllPostRequests();
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const getFolderPropertyBagSpy = sinon.spy((command as any), 'getFolderPropertyBag');
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -284,10 +215,6 @@ describe(commands.PROPERTYBAG_GET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-        Utils.restore((command as any)['getFolderPropertyBag']);
-      }
     });
   });
 
@@ -302,11 +229,6 @@ describe(commands.PROPERTYBAG_GET, () => {
       "_ObjectIdentity_": "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
       "ServerRelativeUrl": "\u002fsites\u002ftest"
     }])) }));
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     const getFolderPropertyBagSpy = sinon.spy((command as any), 'getFolderPropertyBag');
     const options: Object = {
@@ -329,20 +251,11 @@ describe(commands.PROPERTYBAG_GET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-        Utils.restore((command as any)['getFolderPropertyBag']);
-      }
     });
   });
 
   it('should correctly handle getFolderPropertyBag reject promise', (done) => {
     stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return reject('abc'); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const getFolderPropertyBagSpy = sinon.spy((command as any), 'getFolderPropertyBag');
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -358,20 +271,11 @@ describe(commands.PROPERTYBAG_GET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-        Utils.restore((command as any)['getFolderPropertyBag']);
-      }
     });
   });
 
   it('should correctly handle getWebPropertyBag reject promise', (done) => {
     stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return reject('abc1'); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const getWebPropertyBagSpy = sinon.spy((command as any), 'getWebPropertyBag');
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -387,21 +291,12 @@ describe(commands.PROPERTYBAG_GET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-        Utils.restore((command as any)['getWebPropertyBag']);
-      }
     });
   });
 
   it('should correctly handle getFolderPropertyBag ClientSvc error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "getFolderPropertyBag error" } }]);
     stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return resolve(error); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const getFolderPropertyBagSpy = sinon.spy((command as any), 'getFolderPropertyBag');
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -418,21 +313,12 @@ describe(commands.PROPERTYBAG_GET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-        Utils.restore((command as any)['getFolderPropertyBag']);
-      }
     });
   });
 
   it('should correctly handle getWebPropertyBag ClientSvc error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "getWebPropertyBag error" } }]);
     stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return resolve(error); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const getWebPropertyBagSpy = sinon.spy((command as any), 'getWebPropertyBag');
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com'
@@ -447,10 +333,6 @@ describe(commands.PROPERTYBAG_GET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-        Utils.restore((command as any)['getWebPropertyBag']);
-      }
     });
   });
 
@@ -458,11 +340,6 @@ describe(commands.PROPERTYBAG_GET, () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "requestObjectIdentity error" } }]);
 
     stubAllPostRequests(new Promise<any>((resolve, reject) => { return resolve(error) }), null, null);
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const requestObjectIdentitySpy = sinon.spy(ClientSvc.prototype, 'getCurrentWebIdentity');
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com'
@@ -477,9 +354,6 @@ describe(commands.PROPERTYBAG_GET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore([request.post, requestObjectIdentitySpy]);
-      }
     });
   });
 
@@ -487,11 +361,6 @@ describe(commands.PROPERTYBAG_GET, () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": undefined } }]);
 
     stubAllPostRequests(new Promise<any>((resolve, reject) => { return resolve(error) }), null, null);
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const requestObjectIdentitySpy = sinon.spy(ClientSvc.prototype, 'getCurrentWebIdentity');
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com'
@@ -506,10 +375,6 @@ describe(commands.PROPERTYBAG_GET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-        Utils.restore([request.post, requestObjectIdentitySpy]);
-      }
     });
   });
 
@@ -517,10 +382,6 @@ describe(commands.PROPERTYBAG_GET, () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": undefined } }]);
 
     stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return resolve(error) }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'vti_parentid',
@@ -535,9 +396,6 @@ describe(commands.PROPERTYBAG_GET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
@@ -545,9 +403,6 @@ describe(commands.PROPERTYBAG_GET, () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": undefined } }]);
 
     stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return resolve(error) }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -562,19 +417,11 @@ describe(commands.PROPERTYBAG_GET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should correctly return string property', (done) => {
     stubAllPostRequests();
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const filterByKeySpy = sinon.spy((command as any), 'filterByKey');
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -594,20 +441,11 @@ describe(commands.PROPERTYBAG_GET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-        Utils.restore((command as any)['filterByKey']);
-      }
     });
   });
 
   it('should correctly return date property (text)', (done) => {
     stubAllPostRequests();
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const filterByKeySpy = sinon.spy((command as any), 'filterByKey');
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -633,20 +471,11 @@ describe(commands.PROPERTYBAG_GET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-        Utils.restore((command as any)['filterByKey']);
-      }
     });
   });
 
   it('should correctly return date property (json)', (done) => {
     stubAllPostRequests();
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const filterByKeySpy = sinon.spy((command as any), 'filterByKey');
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -674,20 +503,11 @@ describe(commands.PROPERTYBAG_GET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-        Utils.restore((command as any)['filterByKey']);
-      }
     });
   });
 
   it('should correctly return int property', (done) => {
     stubAllPostRequests();
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const filterByKeySpy = sinon.spy((command as any), 'filterByKey');
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -707,20 +527,11 @@ describe(commands.PROPERTYBAG_GET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-        Utils.restore((command as any)['filterByKey']);
-      }
     });
   });
 
   it('should correctly return int property with value 0', (done) => {
     stubAllPostRequests();
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
@@ -728,7 +539,6 @@ describe(commands.PROPERTYBAG_GET, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         assert.equal(cmdInstanceLogSpy.lastCall.args[0], 0);
         done();
@@ -736,19 +546,11 @@ describe(commands.PROPERTYBAG_GET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should correctly return bool property', (done) => {
     stubAllPostRequests();
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const filterByKeySpy = sinon.spy((command as any), 'filterByKey');
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -757,7 +559,6 @@ describe(commands.PROPERTYBAG_GET, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         assert(filterByKeySpy.calledOnce === true);
         
@@ -768,20 +569,11 @@ describe(commands.PROPERTYBAG_GET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-        Utils.restore((command as any)['filterByKey']);
-      }
     });
   });
 
   it('should correctly return property not found (verbose)', (done) => {
     stubAllPostRequests();
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
@@ -799,18 +591,11 @@ describe(commands.PROPERTYBAG_GET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should correctly return empty line if not found and not verbose', (done) => {
     stubAllPostRequests();
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
@@ -819,7 +604,6 @@ describe(commands.PROPERTYBAG_GET, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         assert.equal(cmdInstanceLogSpy.notCalled, true);
         done();
@@ -827,18 +611,11 @@ describe(commands.PROPERTYBAG_GET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should reject promise if _ObjectIdentity_ not found', (done) => {
     stubAllPostRequests(new Promise<any>((resolve, reject) => { return resolve('[{}]') }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
@@ -853,18 +630,11 @@ describe(commands.PROPERTYBAG_GET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should reject promise if Properties not found', (done) => {
     stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return resolve('[{}]') }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
@@ -879,18 +649,11 @@ describe(commands.PROPERTYBAG_GET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should reject promise if AllProperties not found', (done) => {
     stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return resolve('[{}]') }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'vti_parentid'
@@ -904,18 +667,11 @@ describe(commands.PROPERTYBAG_GET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should return error if requestObjectIdentity reqest failed', (done) => {
     stubAllPostRequests(new Promise<any>((resolve, reject) => { return reject('error1') }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'vti_parentid'
@@ -929,61 +685,43 @@ describe(commands.PROPERTYBAG_GET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should correctly post url, headers and body when calling client.svc when requestObjectIdentity', (done) => {
     const postRequestSpy: sinon.SinonSpy = stubAllPostRequests();
     
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'vti_parentid'
     };
 
     cmdInstance.action({ options: options }, () => {
-      
       try {
-        const secondCall = postRequestSpy.getCalls()[1];
-        assert(secondCall.calledWith(sinon.match({ url: 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery' })));
-        assert(secondCall.calledWith(sinon.match({ headers: { authorization: 'Bearer ABC'}})));
-        assert(secondCall.calledWith(sinon.match({ headers: { 'X-RequestDigest': 'abc'}})));
+        const secondCall = postRequestSpy.getCalls()[0];
+        assert(secondCall.calledWith(sinon.match({ url: 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery' })), 'url');
+        assert(secondCall.calledWith(sinon.match({ headers: { 'X-RequestDigest': 'abc'}})), 'request digest');
         assert(secondCall.calledWith(sinon.match({ body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="1" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="ServerRelativeUrl" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Property Id="5" ParentId="3" Name="Web" /><StaticProperty Id="3" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /></ObjectPaths></Request>`
-        })));
+        })), 'body');
         done();
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore(request.post);
       }
     });
   });
 
   it('should correctly post url, headers and body when calling client.svc when getWebPropertyBag', (done) => {
     const postRequestSpy: sinon.SinonSpy = stubAllPostRequests();
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'vti_parentid'
     };
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         const lastCall = postRequestSpy.lastCall;
         assert(lastCall.calledWith(sinon.match({ url: 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery' })));
-        assert(lastCall.calledWith(sinon.match({ headers: { authorization: 'Bearer ABC'}})));
         assert(lastCall.calledWith(sinon.match({ headers: { 'X-RequestDigest': 'abc'}})));
         assert(lastCall.calledWith(sinon.match({ body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="97" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="ServerRelativeUrl" ScalarProperty="true" /><Property Name="AllProperties" SelectAll="true"><Query SelectAllProperties="false"><Properties /></Query></Property></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275" /></ObjectPaths></Request>`
         })));
@@ -992,18 +730,11 @@ describe(commands.PROPERTYBAG_GET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should correctly post payload when calling client.svc when getFolderPropertyBag and site is /', (done) => {
     const postRequestSpy: sinon.SinonSpy = stubAllPostRequests();
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'vti_parentid',
@@ -1015,7 +746,6 @@ describe(commands.PROPERTYBAG_GET, () => {
       try {
         const lastCall = postRequestSpy.lastCall;
         assert(lastCall.calledWith(sinon.match({ url: 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery' })));
-        assert(lastCall.calledWith(sinon.match({ headers: { authorization: 'Bearer ABC'}})));
         assert(lastCall.calledWith(sinon.match({ headers: { 'X-RequestDigest': 'abc'}})));
         assert(lastCall.calledWith(sinon.match({ body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /><Query Id="12" ObjectPathId="9"><Query SelectAllProperties="false"><Properties><Property Name="Properties" SelectAll="true"><Query SelectAllProperties="false"><Properties /></Query></Property></Properties></Query></Query></Actions><ObjectPaths><Method Id="9" ParentId="5" Name="GetFolderByServerRelativeUrl"><Parameters><Parameter Type="String">/</Parameter></Parameters></Method><Identity Id="5" Name="38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275" /></ObjectPaths></Request>`
         })));
@@ -1023,9 +753,6 @@ describe(commands.PROPERTYBAG_GET, () => {
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore(request.post);
       }
     });
   });
@@ -1042,10 +769,6 @@ describe(commands.PROPERTYBAG_GET, () => {
       "ServerRelativeUrl": "\u002fsites\u002ftest"
     }])) }));
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com/sites/test',
       key: 'vti_parentid',
@@ -1057,7 +780,6 @@ describe(commands.PROPERTYBAG_GET, () => {
       try {
         const lastCall = postRequestSpy.lastCall;
         assert(lastCall.calledWith(sinon.match({ url: 'https://contoso.sharepoint.com/sites/test/_vti_bin/client.svc/ProcessQuery' })));
-        assert(lastCall.calledWith(sinon.match({ headers: { authorization: 'Bearer ABC'}})));
         assert(lastCall.calledWith(sinon.match({ headers: { 'X-RequestDigest': 'abc'}})));
         assert(lastCall.calledWith(sinon.match({ body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /><Query Id="12" ObjectPathId="9"><Query SelectAllProperties="false"><Properties><Property Name="Properties" SelectAll="true"><Query SelectAllProperties="false"><Properties /></Query></Property></Properties></Query></Query></Actions><ObjectPaths><Method Id="9" ParentId="5" Name="GetFolderByServerRelativeUrl"><Parameters><Parameter Type="String">/sites/test/</Parameter></Parameters></Method><Identity Id="5" Name="38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275" /></ObjectPaths></Request>`
         })));
@@ -1066,18 +788,11 @@ describe(commands.PROPERTYBAG_GET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should correctly post payload when calling client.svc when getFolderPropertyBag and site is /', (done) => {
     const postRequestSpy: sinon.SinonSpy = stubAllPostRequests();
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'vti_parentid',
@@ -1089,7 +804,6 @@ describe(commands.PROPERTYBAG_GET, () => {
       try {
         const lastCall = postRequestSpy.lastCall;
         assert(lastCall.calledWith(sinon.match({ url: 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery' })));
-        assert(lastCall.calledWith(sinon.match({ headers: { authorization: 'Bearer ABC'}})));
         assert(lastCall.calledWith(sinon.match({ headers: { 'X-RequestDigest': 'abc'}})));
         assert(lastCall.calledWith(sinon.match({ body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /><Query Id="12" ObjectPathId="9"><Query SelectAllProperties="false"><Properties><Property Name="Properties" SelectAll="true"><Query SelectAllProperties="false"><Properties /></Query></Property></Properties></Query></Query></Actions><ObjectPaths><Method Id="9" ParentId="5" Name="GetFolderByServerRelativeUrl"><Parameters><Parameter Type="String">/</Parameter></Parameters></Method><Identity Id="5" Name="38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275" /></ObjectPaths></Request>`
         })));
@@ -1097,9 +811,6 @@ describe(commands.PROPERTYBAG_GET, () => {
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore(request.post);
       }
     });
   });
@@ -1116,10 +827,6 @@ describe(commands.PROPERTYBAG_GET, () => {
       "ServerRelativeUrl": "\u002fsites\u002ftest"
     }])) }));
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com/sites/test';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com/sites/test',
       key: 'vti_parentid',
@@ -1127,11 +834,9 @@ describe(commands.PROPERTYBAG_GET, () => {
     };
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         const lastCall = postRequestSpy.lastCall;
         assert(lastCall.calledWith(sinon.match({ url: 'https://contoso.sharepoint.com/sites/test/_vti_bin/client.svc/ProcessQuery' })));
-        assert(lastCall.calledWith(sinon.match({ headers: { authorization: 'Bearer ABC'}})));
         assert(lastCall.calledWith(sinon.match({ headers: { 'X-RequestDigest': 'abc'}})));
         assert(lastCall.calledWith(sinon.match({ body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /><Query Id="12" ObjectPathId="9"><Query SelectAllProperties="false"><Properties><Property Name="Properties" SelectAll="true"><Query SelectAllProperties="false"><Properties /></Query></Property></Properties></Query></Query></Actions><ObjectPaths><Method Id="9" ParentId="5" Name="GetFolderByServerRelativeUrl"><Parameters><Parameter Type="String">/sites/test/</Parameter></Parameters></Method><Identity Id="5" Name="38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275" /></ObjectPaths></Request>`
         })));
@@ -1139,9 +844,6 @@ describe(commands.PROPERTYBAG_GET, () => {
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore(request.post);
       }
     });
   });
@@ -1287,30 +989,5 @@ describe(commands.PROPERTYBAG_GET, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.getAccessToken);
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        webUrl: "https://contoso.sharepoint.com"
-      }
-    }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        Utils.restore(auth.getAccessToken);
-      }
-    });
   });
 });

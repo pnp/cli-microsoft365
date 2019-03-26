@@ -18,12 +18,7 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
-!!! important
-    Before using this command, log in to the Microsoft Graph, using the [graph login](../login.md) command.
-
 ## Remarks
-
-To list available Microsoft Teams teams, you have to first log in to the Microsoft Graph using the [graph login](../login.md) command, eg. `graph login`.
 
 You can only see the details or archived status of the Microsoft Teams you are a member of.
 

@@ -1,5 +1,3 @@
-import auth from '../../AzmgmtAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
@@ -32,28 +30,20 @@ class AzmgmtFlowRunGetCommand extends AzmgmtCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<{}> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}.`);
-        }
+    if (this.verbose) {
+      cmd.log(`Retrieving information about run ${args.options.name} of Microsoft Flow ${args.options.flow}...`);
+    }
 
-        if (this.verbose) {
-          cmd.log(`Retrieving information about run ${args.options.name} of Microsoft Flow ${args.options.flow}...`);
-        }
+    const requestOptions: any = {
+      url: `${this.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.flow)}/runs/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`,
+      headers: {
+        accept: 'application/json'
+      },
+      json: true
+    };
 
-        const requestOptions: any = {
-          url: `${auth.service.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.flow)}/runs/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`,
-          headers: {
-            authorization: `Bearer ${accessToken}`,
-            accept: 'application/json'
-          },
-          json: true
-        };
-
-        return request.get(requestOptions);
-      })
+    request
+      .get(requestOptions)
       .then((res: any): void => {
         if (args.options.output === 'json') {
           cmd.log(res);
@@ -115,18 +105,12 @@ class AzmgmtFlowRunGetCommand extends AzmgmtCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.FLOW_RUN_GET).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to the Azure Management Service,
-    using the ${chalk.blue(commands.LOGIN)} command.
-
-  Remarks:
+      `  Remarks:
 
     ${chalk.yellow('Attention:')} This command is based on an API that is currently
     in preview and is subject to change once the API reached general
     availability.
   
-    To get information about the specified run, you have to first log in to
-    the Azure Management Service using the ${chalk.blue(commands.LOGIN)} command.
- 
     If the environment with the name you specified doesn't exist, you will get
     the ${chalk.grey('Access to the environment \'xyz\' is denied.')} error.
 
@@ -140,7 +124,7 @@ class AzmgmtFlowRunGetCommand extends AzmgmtCommand {
   Examples:
   
     Get information about the given run of the specified Microsoft Flow
-      ${chalk.grey(config.delimiter)} ${this.getCommandName()} --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --flow 5923cb07-ce1a-4a5c-ab81-257ce820109a --name 08586653536760200319026785874CU62
+      ${this.getCommandName()} --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --flow 5923cb07-ce1a-4a5c-ab81-257ce820109a --name 08586653536760200319026785874CU62
 `);
   }
 }

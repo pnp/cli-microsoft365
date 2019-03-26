@@ -1,5 +1,6 @@
 import * as request from 'request-promise-native';
 import { RequestError } from 'request-promise-native/errors';
+import auth, { Auth } from './Auth';
 const packageJSON = require('../package.json');
 
 class Request {
@@ -54,8 +55,27 @@ class Request {
     }
 
     return new Promise<TResponse>((_resolve: (res: TResponse) => void, _reject: (error: any) => void): void => {
-      this
-        .req(options)
+      const resource: string = Auth.getResourceFromUrl(options.url.toString());
+
+      ((): Promise<string> => {
+        if (options.headers && options.headers['x-anonymous']) {
+          return Promise.resolve('');
+        }
+        else {
+          return auth.ensureAccessToken(resource, this._cmd as CommandInstance, request.debug)
+        }
+      })()
+        .then((accessToken: string): Promise<TResponse> => {
+          if (options.headers) {
+            if (options.headers['x-anonymous']) {
+              delete options.headers['x-anonymous'];
+            }
+            else {
+              options.headers.authorization = `Bearer ${accessToken}`;
+            }
+          }
+          return this.req(options);
+        })
         .then((res: TResponse): void => {
           if (request.debug && res) {
             (this._cmd as CommandInstance).log('REQUEST response body');

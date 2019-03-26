@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -9,7 +7,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import { ListInstanceCollection } from "./ListInstanceCollection";
-import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -31,47 +28,30 @@ class ListListCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-    let siteAccessToken: string = '';
-
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
+    if (this.verbose) {
+      cmd.log(`Retrieving all lists in site at ${args.options.webUrl}...`);
     }
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<ListInstanceCollection> => {
-        siteAccessToken = accessToken;
+    let requestUrl: string;
 
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}`);
-        }
+    if (args.options.output === 'json') {
+      requestUrl = `${args.options.webUrl}/_api/web/lists?$expand=RootFolder`;
+    }
+    else {
+      requestUrl = `${args.options.webUrl}/_api/web/lists?$expand=RootFolder&$select=Title,Id,RootFolder/ServerRelativeURL`;
+    }
 
-        if (this.verbose) {
-          cmd.log(`Retrieving all lists in site at ${args.options.webUrl}...`);
-        }
+    const requestOptions: any = {
+      url: requestUrl,
+      method: 'GET',
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      json: true
+    };
 
-        let requestUrl: string;
-
-        if (args.options.output === 'json') {
-          requestUrl = `${args.options.webUrl}/_api/web/lists?$expand=RootFolder`;
-        }
-        else {
-          requestUrl = `${args.options.webUrl}/_api/web/lists?$expand=RootFolder&$select=Title,Id,RootFolder/ServerRelativeURL`;
-        }
-
-        const requestOptions: any = {
-          url: requestUrl,
-          method: 'GET',
-          headers: {
-            authorization: `Bearer ${siteAccessToken}`,
-            'accept': 'application/json;odata=nometadata'
-          },
-          json: true
-        };
-
-        return request.get(requestOptions);
-      })
+    request
+      .get<ListInstanceCollection>(requestOptions)
       .then((listInstances: ListInstanceCollection): void => {
         if (args.options.output === 'json') {
           cmd.log(listInstances);
@@ -121,18 +101,10 @@ class ListListCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-      using the ${chalk.blue(commands.LOGIN)} command.
-  
-  Remarks:
-  
-    To get all lists, you have to first log in to SharePoint using the
-    ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-        
-  Examples:
+      `  Examples:
   
     Return all lists located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LIST_LIST} --webUrl https://contoso.sharepoint.com/sites/project-x
+      ${commands.LIST_LIST} --webUrl https://contoso.sharepoint.com/sites/project-x
       `);
   }
 }

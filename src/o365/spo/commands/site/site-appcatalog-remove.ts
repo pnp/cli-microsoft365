@@ -1,4 +1,3 @@
-import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import request from '../../../../request';
@@ -27,10 +26,6 @@ class SpoSiteAppCatalogRemoveCommand extends SpoCommand {
     return 'Removes site collection app catalog from the specified site';
   }
 
-  protected requiresTenantAdmin(): boolean {
-    return true;
-  }
-
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.url = (!(!args.options.url)).toString();
@@ -39,15 +34,14 @@ class SpoSiteAppCatalogRemoveCommand extends SpoCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     const url: string = args.options.url;
+    let spoAdminUrl: string = '';
 
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<ContextInfo> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest for tenant admin at ${auth.site.url}...`);
-        }
+    this
+      .getSpoAdminUrl(cmd, this.debug)
+      .then((_spoAdminUrl: string): Promise<ContextInfo> => {
+        spoAdminUrl = _spoAdminUrl;
 
-        return this.getRequestDigest(cmd, this.debug);
+        return this.getRequestDigest(spoAdminUrl);
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
@@ -55,9 +49,8 @@ class SpoSiteAppCatalogRemoveCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+          url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': res.FormDigestValue
           },
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="50" ObjectPathId="49" /><ObjectPath Id="52" ObjectPathId="51" /><ObjectPath Id="54" ObjectPathId="53" /><ObjectPath Id="56" ObjectPathId="55" /><ObjectPath Id="58" ObjectPathId="57" /><Method Name="Remove" Id="59" ObjectPathId="57"><Parameters><Parameter Type="String">${Utils.escapeXml(url)}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="49" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="51" ParentId="49" Name="GetSiteByUrl"><Parameters><Parameter Type="String">${Utils.escapeXml(url)}</Parameter></Parameters></Method><Property Id="53" ParentId="51" Name="RootWeb" /><Property Id="55" ParentId="53" Name="TenantAppCatalog" /><Property Id="57" ParentId="55" Name="SiteCollectionAppCatalogsSites" /></ObjectPaths></Request>`
@@ -113,14 +106,10 @@ class SpoSiteAppCatalogRemoveCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online
-    tenant admin site, using the ${chalk.blue(commands.LOGIN)} command.
+      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
+    the tenant admin site.
    
   Remarks:
-
-    To remove a site collection app catalog, you have to first log in
-    to a tenant admin site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso-admin.sharepoint.com`)}.
 
     While the command uses the term 'remove', like its equivalent PowerShell
     cmdlet, it does not remove the special library Apps for SharePoint from
@@ -131,7 +120,7 @@ class SpoSiteAppCatalogRemoveCommand extends SpoCommand {
   Examples:
   
     Remove the site collection app catalog from the specified site
-      ${chalk.grey(config.delimiter)} ${commands.SITE_APPCATALOG_REMOVE} --url https://contoso.sharepoint.com/sites/site
+      ${commands.SITE_APPCATALOG_REMOVE} --url https://contoso.sharepoint.com/sites/site
 
   More information:
     

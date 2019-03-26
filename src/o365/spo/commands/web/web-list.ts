@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -9,7 +7,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import { WebPropertiesCollection } from "./WebPropertiesCollection";
-import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -31,40 +28,26 @@ class SpoWebListCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
+    if (this.verbose) {
+      cmd.log(`Retrieving all webs in site at ${args.options.webUrl}...`);
     }
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<WebPropertiesCollection> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}.`);
-        }
+    let requestUrl: string = `${args.options.webUrl}/_api/web/webs`;
 
-        if (this.verbose) {
-          cmd.log(`Retrieving all webs in site at ${args.options.webUrl}...`);
-        }
+    if (args.options.output !== 'json') {
+      requestUrl += '?$select=Title,Id,URL';
+    }
 
-        let requestUrl: string = `${args.options.webUrl}/_api/web/webs`;
+    const requestOptions: any = {
+      url: requestUrl,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      json: true
+    };
 
-        if (args.options.output !== 'json') {
-          requestUrl += '?$select=Title,Id,URL';
-        }
-
-        const requestOptions: any = {
-          url: requestUrl,
-          headers: {
-            authorization: `Bearer ${accessToken}`,
-            'accept': 'application/json;odata=nometadata'
-          },
-          json: true
-        };
-
-        return request.get(requestOptions);
-      })
+    request
+      .get<WebPropertiesCollection>(requestOptions)
       .then((webProperties: WebPropertiesCollection): void => {
         if (args.options.output === 'json') {
           cmd.log(webProperties);
@@ -114,18 +97,10 @@ class SpoWebListCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-    using the ${chalk.blue(commands.LOGIN)} command.
-  
-  Remarks:
-  
-    To list subsites, you have to first log in to SharePoint using the
-    ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-        
-  Examples:
+      `  Examples:
   
     Return all subsites from site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.WEB_LIST} --webUrl https://contoso.sharepoint.com/sites/project-x
+      ${commands.WEB_LIST} --webUrl https://contoso.sharepoint.com/sites/project-x
       `);
   }
 }

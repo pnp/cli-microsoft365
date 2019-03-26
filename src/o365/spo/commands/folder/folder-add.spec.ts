@@ -2,7 +2,7 @@ import commands from '../../commands';
 import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth, { Site } from '../../SpoAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./folder-add');
 import * as assert from 'assert';
 import request from '../../../../request';
@@ -13,23 +13,15 @@ describe(commands.FOLDER_ADD, () => {
   let log: any[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  let trackEvent: any;
-  let telemetry: any;
   let stubPostResponses: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    auth.service.connected = true;
 
     stubPostResponses = (addResp: any = null) => {
       return sinon.stub(request, 'post').callsFake((opts) => {
-        if (opts.url.indexOf('/common/oauth2/token') > -1) {
-          return Promise.resolve('abc');
-        }
-  
         if (opts.url.indexOf('/_api/web/folders') > -1) {
           if (addResp) {
             return addResp;
@@ -47,13 +39,15 @@ describe(commands.FOLDER_ADD, () => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.site = new Site();
-    telemetry = null;
   });
 
   afterEach(() => {
@@ -65,11 +59,10 @@ describe(commands.FOLDER_ADD, () => {
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.getAccessToken,
       auth.restoreAuth,
-      request.post
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -80,54 +73,8 @@ describe(commands.FOLDER_ADD, () => {
     assert.notEqual(command.description, null);
   });
 
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.FOLDER_ADD);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not logged in to a SharePoint site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com', parentFolderUrl: '/Shared Documents' } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('should correctly handle folder add reject request', (done) => {
     stubPostResponses(new Promise((resolve, reject) => { reject('error1'); }));
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     cmdInstance.action({
       options: {
@@ -149,11 +96,6 @@ describe(commands.FOLDER_ADD, () => {
   it('should correctly handle folder add success request', (done) => {
     stubPostResponses();
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     cmdInstance.action({
       options: {
         debug: true,
@@ -162,7 +104,6 @@ describe(commands.FOLDER_ADD, () => {
         name: 'abc'
       }
     }, () => {
-
       try {
         assert(cmdInstanceLogSpy.lastCall.calledWith({ "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "abc", "ProgID": null, "ServerRelativeUrl": "/sites/test1/Shared Documents/abc", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" }));
         done();
@@ -176,11 +117,6 @@ describe(commands.FOLDER_ADD, () => {
   it('should correctly pass params to request', (done) => {
     const request: sinon.SinonStub = stubPostResponses();
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     cmdInstance.action({
       options: {
         debug: true,
@@ -192,8 +128,7 @@ describe(commands.FOLDER_ADD, () => {
       try {
         assert(request.calledWith({ url: 'https://contoso.sharepoint.com/_api/web/folders',
         headers:
-         { authorization: 'Bearer ABC',
-           accept: 'application/json;odata=nometadata' },
+         { accept: 'application/json;odata=nometadata' },
         body: { ServerRelativeUrl: '/Shared Documents/abc' },
         json: true }));
         done();
@@ -207,11 +142,6 @@ describe(commands.FOLDER_ADD, () => {
   it('should correctly pass params to request (sites/test1)', (done) => {
     const request: sinon.SinonStub = stubPostResponses();
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com/sites/test1';
-    cmdInstance.action = command.action();
-
     cmdInstance.action({
       options: {
         debug: true,
@@ -220,12 +150,10 @@ describe(commands.FOLDER_ADD, () => {
         name: 'abc'
       }
     }, () => {
-
       try {
         assert(request.calledWith({ url: 'https://contoso.sharepoint.com/sites/test1/_api/web/folders',
         headers:
-         { authorization: 'Bearer ABC',
-           accept: 'application/json;odata=nometadata' },
+         { accept: 'application/json;odata=nometadata' },
         body: { ServerRelativeUrl: '/sites/test1/Shared Documents/abc' },
         json: true }));
         done();
@@ -315,29 +243,5 @@ describe(commands.FOLDER_ADD, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.getAccessToken);
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        webUrl: "https://contoso.sharepoint.com",
-        parentFolderUrl: '/Shared Documents',
-        debug: false
-      }
-    }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 });
