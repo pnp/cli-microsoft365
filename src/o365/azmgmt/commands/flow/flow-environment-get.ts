@@ -1,5 +1,3 @@
-import auth from '../../AzmgmtAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
@@ -29,28 +27,20 @@ class AzmgmtFlowEnvironmentGetCommand extends AzmgmtCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<{}> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}.`);
-        }
+    if (this.verbose) {
+      cmd.log(`Retrieving information about Microsoft Flow environment ${args.options.name}...`);
+    }
 
-        if (this.verbose) {
-          cmd.log(`Retrieving information about Microsoft Flow environment ${args.options.name}...`);
-        }
+    const requestOptions: any = {
+      url: `${this.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`,
+      headers: {
+        accept: 'application/json'
+      },
+      json: true
+    };
 
-        const requestOptions: any = {
-          url: `${auth.service.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`,
-          headers: {
-            authorization: `Bearer ${accessToken}`,
-            accept: 'application/json'
-          },
-          json: true
-        };
-
-        return request.get(requestOptions);
-      })
+    request
+      .get(requestOptions)
       .then((res: any): void => {
         cmd.log(res);
 
@@ -84,19 +74,12 @@ class AzmgmtFlowEnvironmentGetCommand extends AzmgmtCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.FLOW_ENVIRONMENT_GET).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to the Azure Management Service,
-    using the ${chalk.blue(commands.LOGIN)} command.
-
-  Remarks:
+      `  Remarks:
 
     ${chalk.yellow('Attention:')} This command is based on an API that is currently
     in preview and is subject to change once the API reached general
     availability.
   
-    To get information about the specified Microsoft Flow environment, you have
-    to first log in to the Azure Management Service using the
-    ${chalk.blue(commands.LOGIN)} command.
-
     If the environment with the name you specified doesn't exist, you will get
     the ${chalk.grey('Access to the environment \'xyz\' is denied.')} error.
    
@@ -104,7 +87,7 @@ class AzmgmtFlowEnvironmentGetCommand extends AzmgmtCommand {
   
     Get information about the Microsoft Flow environment named
     ${chalk.grey('Default-d87a7535-dd31-4437-bfe1-95340acd55c5')}
-      ${chalk.grey(config.delimiter)} ${this.getCommandName()} --name Default-d87a7535-dd31-4437-bfe1-95340acd55c5
+      ${this.getCommandName()} --name Default-d87a7535-dd31-4437-bfe1-95340acd55c5
 `);
   }
 }

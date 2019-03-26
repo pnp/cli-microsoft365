@@ -1,5 +1,3 @@
-import auth from '../../GraphAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -44,44 +42,40 @@ class GraphUserSendmailCommand extends GraphCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((): Promise<{}> => {
-        let bodyContents: string = args.options.bodyContents as string;
-        if (args.options.bodyContentsFilePath) {
-          bodyContents = fs.readFileSync(path.resolve(args.options.bodyContentsFilePath), 'utf-8');
-        }
+    let bodyContents: string = args.options.bodyContents as string;
+    if (args.options.bodyContentsFilePath) {
+      bodyContents = fs.readFileSync(path.resolve(args.options.bodyContentsFilePath), 'utf-8');
+    }
 
-        const requestOptions: any = {
-          url: `${auth.service.resource}/v1.0/me/sendMail`,
-          headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
-            accept: 'application/json;odata.metadata=none',
-            'content-type': 'application/json'
-          },
-          json: true,
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/me/sendMail`,
+      headers: {
+        accept: 'application/json;odata.metadata=none',
+        'content-type': 'application/json'
+      },
+      json: true,
+      body: {
+        message: {
+          subject: args.options.subject,
           body: {
-            message: {
-              subject: args.options.subject,
-              body: {
-                contentType: args.options.bodyContentType || 'Text',
-                content: bodyContents
-              },
-              toRecipients: args.options.to.split(',').map(e => {
-                return {
-                  emailAddress: {
-                    address: e.trim()
-                  }
-                };
-              })
-            },
-            saveToSentItems: args.options.saveToSentItems
-          }
-        };
+            contentType: args.options.bodyContentType || 'Text',
+            content: bodyContents
+          },
+          toRecipients: args.options.to.split(',').map(e => {
+            return {
+              emailAddress: {
+                address: e.trim()
+              }
+            };
+          })
+        },
+        saveToSentItems: args.options.saveToSentItems
+      }
+    };
 
-        return request.post(requestOptions);
-      })
-      .then((res: any): void => {
+    request
+      .post(requestOptions)
+      .then((): void => {
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
         }
@@ -170,33 +164,23 @@ class GraphUserSendmailCommand extends GraphCommand {
   }
 
   public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to the Microsoft Graph
-    using the ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
-
-    To send an e-mail on behalf of the current user, you have to first log in
-    to the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
-
-  Examples:
+      `  Examples:
 
     Send a text e-mail to the specified e-mail address
-      ${chalk.grey(config.delimiter)} ${this.name} --to chris@contoso.com --subject 'DG2000 Data Sheets' --bodyContents 'The latest data sheets are in the team site'
+      ${this.name} --to chris@contoso.com --subject 'DG2000 Data Sheets' --bodyContents 'The latest data sheets are in the team site'
 
     Send an HTML e-mail to the specified e-mail addresses
-      ${chalk.grey(config.delimiter)} ${this.name} --to chris@contoso.com,brian@contoso.com --subject 'DG2000 Data Sheets' --bodyContents 'The latest data sheets are in the <a href="https://contoso.sharepoint.com/sites/marketing">team site</a>' --bodyContentType HTML
+      ${this.name} --to chris@contoso.com,brian@contoso.com --subject 'DG2000 Data Sheets' --bodyContents 'The latest data sheets are in the <a href="https://contoso.sharepoint.com/sites/marketing">team site</a>' --bodyContentType HTML
 
     Send an HTML e-mail to the specified e-mail address loading e-mail contents
     from a file on disk
-      ${chalk.grey(config.delimiter)} ${this.name} --to chris@contoso.com --subject 'DG2000 Data Sheets' --bodyContentsFilePath email.html --bodyContentType HTML
+      ${this.name} --to chris@contoso.com --subject 'DG2000 Data Sheets' --bodyContentsFilePath email.html --bodyContentType HTML
   
     Send a text e-mail to the specified e-mail address. Don't store the e-mail
     in sent items
-      ${chalk.grey(config.delimiter)} ${this.name} --to chris@contoso.com --subject 'DG2000 Data Sheets' --bodyContents 'The latest data sheets are in the team site' --saveToSentItems false
+      ${this.name} --to chris@contoso.com --subject 'DG2000 Data Sheets' --bodyContents 'The latest data sheets are in the team site' --saveToSentItems false
 `);
   }
 }

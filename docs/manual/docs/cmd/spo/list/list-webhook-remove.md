@@ -22,12 +22,7 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
-!!! important
-    Before using this command, log in to SharePoint, using the [spo login](../login.md) command.
-
 ## Remarks
-
-To remove a webhook from a list, you have to first log in to SharePoint using the [spo login](../login.md) command, eg. `spo login https://contoso.sharepoint.com`.
 
 If the specified id doesn't refer to an existing webhook, you will get a `404 - "404 FILE NOT FOUND"` error.
 

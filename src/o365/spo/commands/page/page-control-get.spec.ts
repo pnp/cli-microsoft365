@@ -2,7 +2,7 @@ import commands from '../../commands';
 import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth, { Site } from '../../SpoAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./page-control-get');
 import * as assert from 'assert';
 import request from '../../../../request';
@@ -14,28 +14,26 @@ describe(commands.PAGE_CONTROL_GET, () => {
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  let trackEvent: any;
-  let telemetry: any;
-
+  
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    auth.service.connected = true;
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.site = new Site();
-    telemetry = null;
   });
 
   afterEach(() => {
@@ -48,10 +46,10 @@ describe(commands.PAGE_CONTROL_GET, () => {
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.getAccessToken,
-      auth.restoreAuth
+      auth.restoreAuth,
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -60,47 +58,6 @@ describe(commands.PAGE_CONTROL_GET, () => {
 
   it('has a description', () => {
     assert.notEqual(command.description, null);
-  });
-
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.PAGE_CONTROL_GET);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not logged in to a SharePoint site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 
   it('gets information about the control on a modern page', (done) => {
@@ -169,10 +126,6 @@ describe(commands.PAGE_CONTROL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({ "controlType": "Client-side web part", "dataVersion": "1.0", "order": 2, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5", "controlData": { "controlType": 3, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "position": { "zoneIndex": 1, "sectionIndex": 1, "controlIndex": 1, "sectionFactor": 8 }, "displayMode": 2, "addedFromPersistedData": true, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5" }, "title": "News", "description": "Display recent news.", "propertieJson": { "layoutId": "FeaturedNews", "dataProviderId": "viewCounts", "emptyStateHelpItemsCount": 1, "newsDataSourceProp": 2, "newsSiteList": [], "webId": "4f118c69-66e0-497c-96ff-d7855ce0713d", "siteId": "016bd1f4-ea50-46a4-809b-e97efb96399c" }, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "htmlProperties": "<div data-sp-prop-name=\"title\" data-sp-searchableplaintext=\"true\">News</div><a data-sp-prop-name=\"baseUrl\" href=\"/sites/team-a\"></a>", "serverProcessedContent": { "htmlStrings": {}, "searchablePlainTexts": { "title": "News" }, "imageSources": {}, "links": { "baseUrl": "https://contoso.sharepoint.com/sites/team-a" } }, "canvasDataVersion": "1.0" }));
@@ -250,10 +203,6 @@ describe(commands.PAGE_CONTROL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({ "controlType": "Client-side web part", "dataVersion": "1.0", "order": 2, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5", "controlData": { "controlType": 3, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "position": { "zoneIndex": 1, "sectionIndex": 1, "controlIndex": 1, "sectionFactor": 8 }, "displayMode": 2, "addedFromPersistedData": true, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5" }, "title": "News", "description": "Display recent news.", "propertieJson": { "layoutId": "FeaturedNews", "dataProviderId": "viewCounts", "emptyStateHelpItemsCount": 1, "newsDataSourceProp": 2, "newsSiteList": [], "webId": "4f118c69-66e0-497c-96ff-d7855ce0713d", "siteId": "016bd1f4-ea50-46a4-809b-e97efb96399c" }, "dynamicDataPaths": { "dynamicProperty0": "WebPart.2bacb933-9f9d-457f-bfa5-b00bfc9cd625.69800bc3-0d7c-495c-a5b6-3423f226d5c5:queryText" }, "dynamicDataValues": { "dynamicProperty1": "" }, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "htmlProperties": "<div data-sp-prop-name=\"title\" data-sp-searchableplaintext=\"true\">News</div><a data-sp-prop-name=\"baseUrl\" href=\"/sites/team-a\"></a>", "serverProcessedContent": { "htmlStrings": {}, "searchablePlainTexts": { "title": "News" }, "imageSources": {}, "links": { "baseUrl": "https://contoso.sharepoint.com/sites/team-a" } }, "canvasDataVersion": "1.0" }));
@@ -331,10 +280,6 @@ describe(commands.PAGE_CONTROL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({ "controlType": "Client-side web part", "dataVersion": "1.0", "order": 2, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5", "controlData": { "controlType": 3, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "position": { "zoneIndex": 1, "sectionIndex": 1, "controlIndex": 1, "sectionFactor": 8 }, "displayMode": 2, "addedFromPersistedData": true, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5" }, "title": "News", "description": "Display recent news.", "propertieJson": { "layoutId": "FeaturedNews", "dataProviderId": "viewCounts", "emptyStateHelpItemsCount": 1, "newsDataSourceProp": 2, "newsSiteList": [], "webId": "4f118c69-66e0-497c-96ff-d7855ce0713d", "siteId": "016bd1f4-ea50-46a4-809b-e97efb96399c" }, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "htmlProperties": "<div data-sp-prop-name=\"title\" data-sp-searchableplaintext=\"true\">News</div><a data-sp-prop-name=\"baseUrl\" href=\"/sites/team-a\"></a>", "serverProcessedContent": { "htmlStrings": {}, "searchablePlainTexts": { "title": "News" }, "imageSources": {}, "links": { "baseUrl": "https://contoso.sharepoint.com/sites/team-a" } }, "canvasDataVersion": "1.0" }));
@@ -412,10 +357,6 @@ describe(commands.PAGE_CONTROL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({ "controlType": "Client-side web part", "dataVersion": "1.0", "order": 2, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5", "controlData": { "controlType": 3, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "position": { "zoneIndex": 1, "sectionIndex": 1, "controlIndex": 1, "sectionFactor": 8 }, "displayMode": 2, "addedFromPersistedData": true, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5" }, "title": "News", "description": "Display recent news.", "propertieJson": { "layoutId": "FeaturedNews", "dataProviderId": "viewCounts", "emptyStateHelpItemsCount": 1, "newsDataSourceProp": 2, "newsSiteList": [], "webId": "4f118c69-66e0-497c-96ff-d7855ce0713d", "siteId": "016bd1f4-ea50-46a4-809b-e97efb96399c" }, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "htmlProperties": "<div data-sp-prop-name=\"title\" data-sp-searchableplaintext=\"true\">News</div><a data-sp-prop-name=\"baseUrl\" href=\"/sites/team-a\"></a>", "serverProcessedContent": { "htmlStrings": {}, "searchablePlainTexts": { "title": "News" }, "imageSources": {}, "links": { "baseUrl": "https://contoso.sharepoint.com/sites/team-a" } }, "canvasDataVersion": "1.0" }));
@@ -493,10 +434,6 @@ describe(commands.PAGE_CONTROL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5', output: 'json' } }, () => {
       try {
         assert.equal(JSON.stringify(log[0]), JSON.stringify({ "controlType": 3, "dataVersion": "1.0", "order": 2, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5", "controlData": { "controlType": 3, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "position": { "zoneIndex": 1, "sectionIndex": 1, "controlIndex": 1, "sectionFactor": 8 }, "displayMode": 2, "addedFromPersistedData": true, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5" }, "title": "News", "description": "Display recent news.", "propertieJson": { "layoutId": "FeaturedNews", "dataProviderId": "viewCounts", "emptyStateHelpItemsCount": 1, "newsDataSourceProp": 2, "newsSiteList": [], "webId": "4f118c69-66e0-497c-96ff-d7855ce0713d", "siteId": "016bd1f4-ea50-46a4-809b-e97efb96399c" }, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "htmlProperties": "<div data-sp-prop-name=\"title\" data-sp-searchableplaintext=\"true\">News</div><a data-sp-prop-name=\"baseUrl\" href=\"/sites/team-a\"></a>", "serverProcessedContent": { "htmlStrings": {}, "searchablePlainTexts": { "title": "News" }, "imageSources": {}, "links": { "baseUrl": "https://contoso.sharepoint.com/sites/team-a" } }, "canvasDataVersion": "1.0" }));
@@ -580,10 +517,6 @@ describe(commands.PAGE_CONTROL_GET, () => {
     sinon.stub(page, 'findControlById').callsFake(() => emptyColumn);
     sinon.stub(ClientSidePage, 'fromHtml').callsFake(() => page);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '88f7b5b2-83a8-45d1-bc61-c11425f233e3' } }, () => {
       try {
         assert.equal(JSON.stringify(log[0]), JSON.stringify({"controlType":"Empty column","dataVersion":"1.0","order":1,"id":"88f7b5b2-83a8-45d1-bc61-c11425f233e3","controlData":null,"_text":"<p></p>"}));
@@ -666,10 +599,6 @@ describe(commands.PAGE_CONTROL_GET, () => {
     sinon.stub(page, 'findControlById').callsFake(() => emptyColumn);
     sinon.stub(ClientSidePage, 'fromHtml').callsFake(() => page);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '88f7b5b2-83a8-45d1-bc61-c11425f233e3' } }, () => {
       try {
         assert.equal(JSON.stringify(log[0]), JSON.stringify({"controlType":"Client-side text","dataVersion":"1.0","order":1,"id":"88f7b5b2-83a8-45d1-bc61-c11425f233e3","controlData":null,"_text":"<p></p>"}));
@@ -753,10 +682,6 @@ describe(commands.PAGE_CONTROL_GET, () => {
     sinon.stub(page, 'findControlById').callsFake(() => unknown);
     sinon.stub(ClientSidePage, 'fromHtml').callsFake(() => page);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '88f7b5b2-83a8-45d1-bc61-c11425f233e3' } }, () => {
       try {
         assert.equal(JSON.stringify(log[0]), JSON.stringify({"controlType":"5","dataVersion":"1.0","order":1,"id":"88f7b5b2-83a8-45d1-bc61-c11425f233e3","controlData":null,"_text":"<p></p>"}));
@@ -831,10 +756,6 @@ describe(commands.PAGE_CONTROL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Page home.aspx is not a modern page.')));
@@ -912,10 +833,6 @@ describe(commands.PAGE_CONTROL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e6' } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
@@ -993,10 +910,6 @@ describe(commands.PAGE_CONTROL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e6' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith('Control with ID 3ede60d3-dc2c-438b-b5bf-cc40bb2351e6 not found on page home.aspx'));
@@ -1023,10 +936,6 @@ describe(commands.PAGE_CONTROL_GET, () => {
       });
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('The file /sites/team-a/SitePages/home1.aspx does not exist.')));
@@ -1043,10 +952,6 @@ describe(commands.PAGE_CONTROL_GET, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
@@ -1131,23 +1036,5 @@ describe(commands.PAGE_CONTROL_GET, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.getAccessToken);
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 });

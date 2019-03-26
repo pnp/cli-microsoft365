@@ -1,6 +1,3 @@
-import auth from '../../SpoAuth';
-import { Auth } from '../../../../Auth';
-import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -31,34 +28,20 @@ class SpoStorageEntityListCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.appCatalogUrl);
-
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource} using refresh token ${auth.service.refreshToken}...`);
+    if (this.verbose) {
+      cmd.log(`Retrieving details for all tenant properties in ${args.options.appCatalogUrl}...`);
     }
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<{ storageentitiesindex?: string }> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Loading all tenant properties...`);
-        }
+    const requestOptions: any = {
+      url: `${args.options.appCatalogUrl}/_api/web/AllProperties?$select=storageentitiesindex`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      json: true
+    };
 
-        if (this.verbose) {
-          cmd.log(`Retrieving details for all tenant properties in ${args.options.appCatalogUrl}...`);
-        }
-
-        const requestOptions: any = {
-          url: `${args.options.appCatalogUrl}/_api/web/AllProperties?$select=storageentitiesindex`,
-          headers: {
-            authorization: `Bearer ${accessToken}`,
-            accept: 'application/json;odata=nometadata'
-          },
-          json: true
-        };
-
-        return request.get(requestOptions);
-      })
+    request
+      .get<{ storageentitiesindex?: string }>(requestOptions)
       .then((web: { storageentitiesindex?: string }): void => {
         try {
           if (!web.storageentitiesindex ||
@@ -122,22 +105,18 @@ class SpoStorageEntityListCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.STORAGEENTITY_LIST).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site using the
-  ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
+      `  Remarks:
 
-    To list tenant properties, you have to first log in to a SharePoint site using the
-    ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-
-    Tenant properties are stored in the app catalog site. To list all tenant properties,
-    you have to specify the absolute URL of the app catalog site. If you specify an incorrect
-    URL, or the site at the given URL is not an app catalog site, no properties will be retrieved.
+    Tenant properties are stored in the app catalog site. To list all tenant
+    properties, you have to specify the absolute URL of the app catalog site.
+    If you specify an incorrect URL, or the site at the given URL is not an
+    app catalog site, no properties will be retrieved.
 
   Examples:
   
-    List all tenant properties stored in the ${chalk.grey('https://contoso.sharepoint.com/sites/appcatalog')} app catalog site
-      ${chalk.grey(config.delimiter)} ${commands.STORAGEENTITY_LIST} -u https://contoso.sharepoint.com/sites/appcatalog
+    List all tenant properties stored in the
+    ${chalk.grey('https://contoso.sharepoint.com/sites/appcatalog')} app catalog site
+      ${commands.STORAGEENTITY_LIST} --appCatalogUrl https://contoso.sharepoint.com/sites/appcatalog
 
   More information:
 

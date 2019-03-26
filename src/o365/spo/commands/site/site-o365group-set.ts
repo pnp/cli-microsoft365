@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
 import {
@@ -7,7 +5,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import GlobalOptions from '../../../../GlobalOptions';
-import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -48,47 +45,37 @@ class SpoSiteOffice365GroupSetCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.siteUrl);
+    const optionalParams: any = {}
+    const payload: any = {
+      displayName: args.options.displayName,
+      alias: args.options.alias,
+      isPublic: args.options.isPublic === true,
+      optionalParams: optionalParams
+    };
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<any> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Connecting site collection to Office 365 Group...`);
-        }
+    if (args.options.description) {
+      optionalParams.Description = args.options.description;
+    }
+    if (args.options.classification) {
+      optionalParams.Classification = args.options.classification;
+    }
+    if (args.options.keepOldHomepage) {
+      optionalParams.CreationOptions = ["SharePointKeepOldHomepage"];
+    }
 
-        const optionalParams: any = {}
-        const payload: any = {
-          displayName: args.options.displayName,
-          alias: args.options.alias,
-          isPublic: args.options.isPublic === true,
-          optionalParams: optionalParams
-        };
+    const requestOptions: any = {
+      url: `${args.options.siteUrl}/_api/GroupSiteManager/CreateGroupForSite`,
+      headers: {
+        'content-type': 'application/json;odata=nometadata',
+        accept: 'application/json;odata=nometadata',
+        json: true
+      },
+      body: payload,
+      json: true
+    };
 
-        if (args.options.description) {
-          optionalParams.Description = args.options.description;
-        }
-        if (args.options.classification) {
-          optionalParams.Classification = args.options.classification;
-        }
-        if (args.options.keepOldHomepage) {
-          optionalParams.CreationOptions = ["SharePointKeepOldHomepage"];
-        }
-
-        const requestOptions: any = {
-          url: `${args.options.siteUrl}/_api/GroupSiteManager/CreateGroupForSite`,
-          headers: {
-            authorization: `Bearer ${accessToken}`,
-            'content-type': 'application/json;odata=nometadata',
-            accept: 'application/json;odata=nometadata',
-            json: true
-          },
-          body: payload,
-          json: true
-        };
-
-        return request.post(requestOptions);
-      })
+    request
+      .post(requestOptions)
       .then((res: any): void => {
         cmd.log(res);
 
@@ -163,18 +150,11 @@ class SpoSiteOffice365GroupSetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site
-    using the ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
+      `  Remarks:
 
     ${chalk.yellow('Attention:')} This command is based on a SharePoint API that is currently
     in preview and is subject to change once the API reached general
     availability.
-
-    To connect site collection to an Office 365 Group, you have to first log in
-    to a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
 
     When connecting site collection to an Office 365 Group, SharePoint will
     create a new group using the specified information. If a group with the same
@@ -184,16 +164,16 @@ class SpoSiteOffice365GroupSetCommand extends SpoCommand {
   Examples:
   
     Connect site collection to an Office 365 Group
-      ${chalk.grey(config.delimiter)} ${this.name} --siteUrl https://contoso.sharepoin.com/sites/team-a --alias team-a --displayName 'Team A'
+      ${this.name} --siteUrl https://contoso.sharepoin.com/sites/team-a --alias team-a --displayName 'Team A'
 
     Connect site collection to an Office 365 Group and make the group public
-      ${chalk.grey(config.delimiter)} ${this.name} --siteUrl https://contoso.sharepoin.com/sites/team-a --alias team-a --displayName 'Team A' --isPublic
+      ${this.name} --siteUrl https://contoso.sharepoin.com/sites/team-a --alias team-a --displayName 'Team A' --isPublic
 
     Connect site collection to an Office 365 Group and set the group classification
-      ${chalk.grey(config.delimiter)} ${this.name} --siteUrl https://contoso.sharepoin.com/sites/team-a --alias team-a --displayName 'Team A' --classification HBI
+      ${this.name} --siteUrl https://contoso.sharepoin.com/sites/team-a --alias team-a --displayName 'Team A' --classification HBI
 
     Connect site collection to an Office 365 Group and keep the old home page
-      ${chalk.grey(config.delimiter)} ${this.name} --siteUrl https://contoso.sharepoin.com/sites/team-a --alias team-a --displayName 'Team A' --keepOldHomepage
+      ${this.name} --siteUrl https://contoso.sharepoin.com/sites/team-a --alias team-a --displayName 'Team A' --keepOldHomepage
 
   More information:
 

@@ -1,5 +1,3 @@
-import auth from '../../GraphAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
@@ -46,27 +44,22 @@ class GraphO365GroupUserAddCommand extends GraphCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const providedGroupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string
 
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((): Promise<{ value: string; }> => {
-        const requestOptions: any = {
-          url: `${auth.service.resource}/v1.0/users/${encodeURIComponent(args.options.userName)}/id`,
-          headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
-            accept: 'application/json;odata.metadata=none'
-          },
-          json: true
-        };
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/users/${encodeURIComponent(args.options.userName)}/id`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      json: true
+    };
 
-        return request.get(requestOptions);
-      })
+    request
+      .get<{ value: string; }>(requestOptions)
       .then((res: { value: string; }): Promise<{}> => {
-        const endpoint: string = `${auth.service.resource}/v1.0/groups/${providedGroupId}/${((typeof args.options.role !== 'undefined') ? args.options.role : '').toLowerCase() === 'owner' ? 'owners' : 'members'}/$ref`;
+        const endpoint: string = `${this.resource}/v1.0/groups/${providedGroupId}/${((typeof args.options.role !== 'undefined') ? args.options.role : '').toLowerCase() === 'owner' ? 'owners' : 'members'}/$ref`;
 
         const requestOptions: any = {
           url: endpoint,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             'accept': 'application/json;odata.metadata=none'
           },
           json: true,
@@ -142,28 +135,18 @@ class GraphO365GroupUserAddCommand extends GraphCommand {
   }
 
   public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to the Microsoft Graph
-    using the ${chalk.blue(commands.LOGIN)} command.
-
-  Remarks:
-
-    To add user to the specified Office 365 Group or Microsoft Teams team,
-    you have to first log in to the Microsoft Graph using the ${chalk.blue(commands.LOGIN)}
-    command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
-
-  Examples:
+      `  Examples:
 
     Add a new member to the specified Office 365 Group
-      ${chalk.grey(config.delimiter)} ${this.name} --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com'
+      ${this.name} --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com'
 
     Add a new owner to the specified Office 365 Group
-      ${chalk.grey(config.delimiter)} ${this.name} --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner
+      ${this.name} --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner
 
     Add a new member to the specified Microsoft Teams team
-      ${chalk.grey(config.delimiter)} ${(this.alias() as string[])[0]} --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com'
+      ${(this.alias() as string[])[0]} --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com'
 `);
   }
 }

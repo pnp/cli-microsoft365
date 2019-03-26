@@ -2,40 +2,37 @@ import commands from '../../commands';
 import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth from '../../AadAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./sp-get');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import { Service } from '../../../../Auth';
 
 describe(commands.SP_GET, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  let trackEvent: any;
-  let telemetry: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    auth.service.connected = true;
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.service = new Service('https://graph.windows.net');
-    telemetry = null;
   });
 
   afterEach(() => {
@@ -47,10 +44,10 @@ describe(commands.SP_GET, () => {
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.ensureAccessToken,
-      auth.restoreAuth
+      auth.restoreAuth,
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -61,55 +58,12 @@ describe(commands.SP_GET, () => {
     assert.notEqual(command.description, null);
   });
 
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.SP_GET);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not logged in to AAD Graph', (done) => {
-    auth.service = new Service('https://graph.windows.net');
-    auth.service.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to Azure Active Directory Graph first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('retrieves information about the specified service principal using its display name (debug)', (done) => {
     const sp: any = { "objectType": "ServicePrincipal", "objectId": "d03a0062-1aa6-43e1-8f49-d73e969c5812", "deletionTimestamp": null, "accountEnabled": true, "addIns": [], "alternativeNames": [], "appDisplayName": "SharePoint Online Client", "appId": "57fb890c-0dab-4253-a5e0-7188c88b2bb4", "appOwnerTenantId": null, "appRoleAssignmentRequired": false, "appRoles": [], "displayName": "SharePoint Online Client", "errorUrl": null, "homepage": null, "keyCredentials": [], "logoutUrl": null, "oauth2Permissions": [], "passwordCredentials": [], "preferredTokenSigningKeyThumbprint": null, "publisherName": null, "replyUrls": [], "samlMetadataUrl": null, "servicePrincipalNames": ["57fb890c-0dab-4253-a5e0-7188c88b2bb4"], "servicePrincipalType": "Application", "tags": [], "tokenEncryptionKeyId": null };
 
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`/myorganization/servicePrincipals?api-version=1.6&$filter=displayName eq 'SharePoint%20Online%20Client'`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
+        if (opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({ value: [sp] });
         }
@@ -118,9 +72,6 @@ describe(commands.SP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service('https://graph.windows.net');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, displayName: 'SharePoint Online Client' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(sp));
@@ -137,9 +88,7 @@ describe(commands.SP_GET, () => {
 
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`/myorganization/servicePrincipals?api-version=1.6&$filter=displayName eq 'SharePoint%20Online%20Client'`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
+        if (opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({ value: [sp] });
         }
@@ -148,9 +97,6 @@ describe(commands.SP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service('https://graph.windows.net');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, displayName: 'SharePoint Online Client' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(sp));
@@ -167,9 +113,7 @@ describe(commands.SP_GET, () => {
 
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`/myorganization/servicePrincipals?api-version=1.6&$filter=appId eq '57fb890c-0dab-4253-a5e0-7188c88b2bb4'`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
+        if (opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({ value: [sp] });
         }
@@ -178,9 +122,6 @@ describe(commands.SP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service('https://graph.windows.net');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, appId: '57fb890c-0dab-4253-a5e0-7188c88b2bb4' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(sp));
@@ -195,9 +136,7 @@ describe(commands.SP_GET, () => {
   it('correctly handles no service principal found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`/myorganization/servicePrincipals?api-version=1.6&$filter=displayName eq 'Foo'`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
+        if (opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({ value: [] });
         }
@@ -206,9 +145,6 @@ describe(commands.SP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service('https://graph.windows.net');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, displayName: 'Foo' } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
@@ -234,9 +170,6 @@ describe(commands.SP_GET, () => {
       });
     });
 
-    auth.service = new Service('https://graph.windows.net');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
@@ -338,22 +271,5 @@ describe(commands.SP_GET, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.ensureAccessToken);
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.service = new Service('https://graph.windows.net');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 });

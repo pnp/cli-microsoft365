@@ -1,4 +1,3 @@
-import auth from '../../SpoAuth';
 import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
@@ -35,29 +34,24 @@ class SpoServicePrincipalGrantAddCommand extends SpoCommand {
     return [commands.SP_GRANT_ADD];
   }
 
-  protected requiresTenantAdmin(): boolean {
-    return true;
-  }
-
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<ContextInfo> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
+    let spoAdminUrl: string = '';
+
+    this
+      .getSpoAdminUrl(cmd, this.debug)
+      .then((_spoAdminUrl: string): Promise<ContextInfo> => {
+        spoAdminUrl = _spoAdminUrl;
 
         if (this.verbose) {
           cmd.log(`Retrieving request digest...`);
         }
 
-        return this.getRequestDigest(cmd, this.debug);
+        return this.getRequestDigest(spoAdminUrl);
       })
       .then((res: ContextInfo): Promise<string> => {
         const requestOptions: any = {
-          url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+          url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': res.FormDigestValue
           },
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><ObjectPath Id="6" ObjectPathId="5" /><ObjectPath Id="8" ObjectPathId="7" /><Query Id="9" ObjectPathId="7"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Constructor Id="3" TypeId="{104e8f06-1e00-4675-99c6-1b9b504ed8d8}" /><Property Id="5" ParentId="3" Name="PermissionRequests" /><Method Id="7" ParentId="5" Name="Approve"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.resource)}</Parameter><Parameter Type="String">${Utils.escapeXml(args.options.scope)}</Parameter></Parameters></Method></ObjectPaths></Request>`
@@ -119,22 +113,17 @@ class SpoServicePrincipalGrantAddCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.SERVICEPRINCIPAL_GRANT_ADD).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online tenant
-    admin site using the ${chalk.blue(commands.LOGIN)} command.
+      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
+    the tenant admin site.
         
-  Remarks:
-
-    To grant the service principal API permission, you have to first log in to
-    a SharePoint tenant admin site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso-admin.sharepoint.com`)}.
-
   Examples:
   
-    Grant the service principal permission to read email using the Microsoft Graph
-      ${chalk.grey(config.delimiter)} ${commands.SERVICEPRINCIPAL_GRANT_ADD} --resource 'Microsoft Graph' --scope 'Mail.Read'
+    Grant the service principal permission to read email using the Microsoft
+    Graph
+      ${commands.SERVICEPRINCIPAL_GRANT_ADD} --resource 'Microsoft Graph' --scope 'Mail.Read'
 
     Grant the service principal permission to a custom API
-      ${chalk.grey(config.delimiter)} ${commands.SERVICEPRINCIPAL_GRANT_ADD} --resource 'contoso-api' --scope 'user_impersonation'
+      ${commands.SERVICEPRINCIPAL_GRANT_ADD} --resource 'contoso-api' --scope 'user_impersonation'
 `);
   }
 }

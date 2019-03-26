@@ -1,13 +1,10 @@
-import auth from '../../SpoAuth';
 import request from '../../../../request';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import { CommandOption, CommandTypes, CommandValidate, CommandError } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
-import { Auth } from '../../../../Auth';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
-import config from '../../../../config';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 interface CommandArgs {
@@ -49,32 +46,24 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     let webId: string = '';
     let siteId: string = '';
-    let siteAccessToken: string = '';
     let listId: string = '';
 
     const removeFieldLink = (): void => {
-      const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-      auth
-        .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-        .then((accessToken: string): Promise<{ Id: string; }> => {
-          siteAccessToken = accessToken;
+      if (this.debug) {
+        cmd.log(`Get SiteId required by ProcessQuery endpoint.`);
+      }
 
-          if (this.debug) {
-            cmd.log(`Get SiteId required by ProcessQuery endpoint.`);
-          }
+      // GET SiteId
+      const requestOptions: any = {
+        url: `${args.options.webUrl}/_api/site?$select=Id`,
+        headers: {
+          accept: 'application/json;odata=nometadata'
+        },
+        json: true
+      }
 
-          // GET SiteId
-          const requestOptions: any = {
-            url: `${args.options.webUrl}/_api/site?$select=Id`,
-            headers: {
-              authorization: `Bearer ${siteAccessToken}`,
-              accept: 'application/json;odata=nometadata'
-            },
-            json: true
-          }
-
-          return request.get(requestOptions);
-        })
+      request
+        .get<{ Id: string }>(requestOptions)
         .then((res: { Id: string }): Promise<{ Id: string; }> => {
           siteId = res.Id;
 
@@ -87,7 +76,6 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
           const requestOptions: any = {
             url: `${args.options.webUrl}/_api/web?$select=Id`,
             headers: {
-              authorization: `Bearer ${siteAccessToken}`,
               accept: 'application/json;odata=nometadata'
             },
             json: true
@@ -110,7 +98,6 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
           const requestOptions: any = {
             url: `${args.options.webUrl}/_api/lists/GetByTitle('${encodeURIComponent(args.options.listTitle)}')?$select=Id`,
             headers: {
-              authorization: `Bearer ${siteAccessToken}`,
               accept: 'application/json;odata=nometadata'
             },
             json: true
@@ -127,7 +114,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
             }
           }
 
-          return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug)
+          return this.getRequestDigest(args.options.webUrl)
         })
         .then((res: ContextInfo): Promise<string> => {
           const requestDigest: string = res.FormDigestValue;
@@ -152,7 +139,6 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
           const requestOptions: any = {
             url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
             headers: {
-              authorization: `Bearer ${siteAccessToken}`,
               'X-RequestDigest': requestDigest
             },
             body: requestBody
@@ -229,7 +215,6 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
   }
 
   public validate(): CommandValidate {
-
     return (args: CommandArgs): boolean | string => {
       if (!args.options.contentTypeId) {
         return 'Required parameter contentTypeId missing';
@@ -255,31 +240,22 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site using
-    the ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
-
-    To remove a column from a content type, you have to first log in to
-    a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-
-  Examples:
+      `  Examples:
   
     Remove column with ID ${chalk.grey('2c1ba4c4-cd9b-4417-832f-92a34bc34b2a')} from
     content type with ID ${chalk.grey('0x0100CA0FA0F5DAEF784494B9C6020C3020A6')}
     from web with URL ${chalk.grey('https://contoso.sharepoint.com')}
-      ${chalk.grey(config.delimiter)} ${this.name} --contentTypeId "0x0100CA0FA0F5DAEF784494B9C6020C3020A6" --fieldLinkId "880d2f46-fccb-43ca-9def-f88e722cef80" --webUrl https://contoso.sharepoint.com --confirm
+      ${this.name} --contentTypeId "0x0100CA0FA0F5DAEF784494B9C6020C3020A6" --fieldLinkId "880d2f46-fccb-43ca-9def-f88e722cef80" --webUrl https://contoso.sharepoint.com --confirm
 
     Remove column with ID ${chalk.grey('2c1ba4c4-cd9b-4417-832f-92a34bc34b2a')} from
     content type with ID ${chalk.grey('0x0100CA0FA0F5DAEF784494B9C6020C3020A6')}
     from web with URL ${chalk.grey('https://contoso.sharepoint.com')} updating child content types
-      ${chalk.grey(config.delimiter)} ${this.name} --contentTypeId "0x0100CA0FA0F5DAEF784494B9C6020C3020A6" --fieldLinkId "880d2f46-fccb-43ca-9def-f88e722cef80" --webUrl https://contoso.sharepoint.com --updateChildContentTypes 
+      ${this.name} --contentTypeId "0x0100CA0FA0F5DAEF784494B9C6020C3020A6" --fieldLinkId "880d2f46-fccb-43ca-9def-f88e722cef80" --webUrl https://contoso.sharepoint.com --updateChildContentTypes 
 
     Remove fieldLink with ID ${chalk.grey('2c1ba4c4-cd9b-4417-832f-92a34bc34b2a')} from list
     content type with ID ${chalk.grey('0x0100CA0FA0F5DAEF784494B9C6020C3020A6')}
     from web with URL ${chalk.grey('https://contoso.sharepoint.com')} 
-      ${chalk.grey(config.delimiter)} ${this.name} --contentTypeId "0x0100CA0FA0F5DAEF784494B9C6020C3020A60062F089A38C867747942DB2C3FC50FF6A" --fieldLinkId "880d2f46-fccb-43ca-9def-f88e722cef80" --webUrl https://contoso.sharepoint.com --listTitle "Documents"
+      ${this.name} --contentTypeId "0x0100CA0FA0F5DAEF784494B9C6020C3020A60062F089A38C867747942DB2C3FC50FF6A" --fieldLinkId "880d2f46-fccb-43ca-9def-f88e722cef80" --webUrl https://contoso.sharepoint.com --listTitle "Documents"
       `);
   }
 }

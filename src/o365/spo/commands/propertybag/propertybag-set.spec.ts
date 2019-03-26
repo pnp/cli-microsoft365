@@ -2,7 +2,7 @@ import commands from '../../commands';
 import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth, { Site } from '../../SpoAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./propertybag-set');
 import * as assert from 'assert';
 import request from '../../../../request';
@@ -14,8 +14,6 @@ describe(commands.PROPERTYBAG_SET, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
-  let trackEvent: any;
-  let telemetry: any;
   const stubAllPostRequests = (
     requestObjectIdentityResp: any = null,
     folderObjectIdentityResp: any = null,
@@ -23,16 +21,6 @@ describe(commands.PROPERTYBAG_SET, () => {
     effectiveBasePermissionsResp: any = null
   ): sinon.SinonStub => {
     return sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/common/oauth2/token') > -1) {
-        return Promise.resolve('abc');
-      }
-
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
       // fake requestObjectIdentity
       if (opts.body.indexOf('3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a') > -1) {
         if (requestObjectIdentityResp) {
@@ -118,37 +106,41 @@ describe(commands.PROPERTYBAG_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({
+      FormDigestValue: 'abc'
+    }));
+    auth.service.connected = true;
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    auth.site = new Site();
-    telemetry = null;
   });
 
   afterEach(() => {
     Utils.restore([
       vorpal.find,
-      request.post
+      request.post,
+      (command as any).setProperty
     ]);
   });
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.getAccessToken,
-      auth.restoreAuth
+      auth.restoreAuth,
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -159,54 +151,8 @@ describe(commands.PROPERTYBAG_SET, () => {
     assert.notEqual(command.description, null);
   });
 
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {}, appCatalogUrl: 'https://contoso-admin.sharepoint.com' }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { webUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
-      try {
-        assert.equal(telemetry.name, commands.PROPERTYBAG_SET);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not logged in to a SharePoint site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { webUrl: 'https://contoso.sharepoint.com/sites/abc' } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('should call setProperty when folder is not specified', (done) => {
     stubAllPostRequests();
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const setPropertySpy = sinon.spy((command as any), 'setProperty');
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -221,7 +167,6 @@ describe(commands.PROPERTYBAG_SET, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         assert(setPropertySpy.calledWith(objIdentity, options));
         assert(setPropertySpy.calledOnce === true);
@@ -229,10 +174,6 @@ describe(commands.PROPERTYBAG_SET, () => {
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore(request.post);
-        Utils.restore((command as any)['setProperty']);
       }
     });
   });
@@ -250,11 +191,6 @@ describe(commands.PROPERTYBAG_SET, () => {
         "ServerRelativeUrl": "\u002f"
       }]));
     }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const setPropertySpy = sinon.spy((command as any), 'setProperty');
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -278,20 +214,11 @@ describe(commands.PROPERTYBAG_SET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-        Utils.restore((command as any)['setProperty']);
-      }
     });
   });
 
   it('should call setProperty when list folder is specified', (done) => {
     stubAllPostRequests();
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const setPropertySpy = sinon.spy((command as any), 'setProperty');
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com/sites/abc',
@@ -315,20 +242,11 @@ describe(commands.PROPERTYBAG_SET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-        Utils.restore((command as any)['setProperty']);
-      }
     });
   });
 
   it('should send correct property set request body when folder is not specified', (done) => {
     const requestStub: sinon.SinonStub = stubAllPostRequests();
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
@@ -341,7 +259,6 @@ describe(commands.PROPERTYBAG_SET, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         const bodyPayload = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetFieldValue" Id="206" ObjectPathId="205"><Parameters><Parameter Type="String">${(options as any).key}</Parameter><Parameter Type="String">${(options as any).value}</Parameter></Parameters></Method><Method Name="Update" Id="207" ObjectPathId="198" /></Actions><ObjectPaths><Property Id="205" ParentId="198" Name="AllProperties" /><Identity Id="198" Name="${objIdentity.objectIdentity}" /></ObjectPaths></Request>`
         assert(requestStub.calledWith(sinon.match({ body: bodyPayload })));
@@ -350,25 +267,16 @@ describe(commands.PROPERTYBAG_SET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should send correct property set request body when folder is specified', (done) => {
     const requestStub: sinon.SinonStub = stubAllPostRequests();
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       value: 'value1',
-      folder: '/',
-
+      folder: '/'
     }
     const objIdentity: IdentityResponse = {
       objectIdentity: "93e5499e-00f1-5000-1f36-3ab12512a7e9|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:f3806c23-0c9f-42d3-bc7d-3895acc06dc3:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d2c5:folder:df4291de-226f-4c39-bbcc-df21915f5fc1",
@@ -376,7 +284,6 @@ describe(commands.PROPERTYBAG_SET, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         const bodyPayload = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetFieldValue" Id="206" ObjectPathId="205"><Parameters><Parameter Type="String">${(options as any).key}</Parameter><Parameter Type="String">${(options as any).value}</Parameter></Parameters></Method><Method Name="Update" Id="207" ObjectPathId="198" /></Actions><ObjectPaths><Property Id="205" ParentId="198" Name="Properties" /><Identity Id="198" Name="${objIdentity.objectIdentity}" /></ObjectPaths></Request>`
         assert(requestStub.calledWith(sinon.match({ body: bodyPayload })));
@@ -385,25 +292,16 @@ describe(commands.PROPERTYBAG_SET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should correctly handle requestObjectIdentity reject promise', (done) => {
     stubAllPostRequests(new Promise<any>((resolve, reject) => { return reject('requestObjectIdentity error'); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       value: 'value1',
-      folder: '/',
-
+      folder: '/'
     }
 
     cmdInstance.action({ options: options }, (err?: any) => {
@@ -414,26 +312,17 @@ describe(commands.PROPERTYBAG_SET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should correctly handle requestObjectIdentity ClientSvc error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "requestObjectIdentity ClientSvc error" } }]);
     stubAllPostRequests(new Promise<any>((resolve, reject) => { return resolve(error); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       value: 'value1',
-      folder: '/',
-
+      folder: '/'
     }
 
     cmdInstance.action({ options: options }, (err?: any) => {
@@ -444,19 +333,11 @@ describe(commands.PROPERTYBAG_SET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should correctly handle requestFolderObjectIdentity reject promise', (done) => {
     stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return reject('abc'); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
@@ -473,26 +354,18 @@ describe(commands.PROPERTYBAG_SET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should correctly handle requestFolderObjectIdentity ClientSvc error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "requestFolderObjectIdentity error" } }]);
     stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return resolve(error); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       value: 'value1',
       folder: '/',
-      verbose: true,
-
+      verbose: true
     }
 
     cmdInstance.action({ options: options }, (err?: any) => {
@@ -503,26 +376,18 @@ describe(commands.PROPERTYBAG_SET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should correctly handle requestFolderObjectIdentity ClientSvc empty error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "" } }]);
     stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return resolve(error); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       value: 'value1',
       folder: '/',
-      debug: true,
-
+      debug: true
     }
 
     cmdInstance.action({ options: options }, (err?: any) => {
@@ -533,24 +398,16 @@ describe(commands.PROPERTYBAG_SET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should requestFolderObjectIdentity reject promise if _ObjectIdentity_ not found', (done) => {
     stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return resolve('[{}]') }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
       key: 'vti_parentid',
-      value: 'value1',
-
+      value: 'value1'
     }
 
     cmdInstance.action({ options: options }, (err?: any) => {
@@ -560,9 +417,6 @@ describe(commands.PROPERTYBAG_SET, () => {
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore(request.post);
       }
     });
   });
@@ -585,11 +439,6 @@ describe(commands.PROPERTYBAG_SET, () => {
         }
       ]));
     }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
@@ -606,19 +455,11 @@ describe(commands.PROPERTYBAG_SET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should correctly handle getEffectiveBasePermissions reject promise', (done) => {
     stubAllPostRequests(null, null, null, new Promise<any>((resolve, reject) => { return reject('getEffectiveBasePermissions abc'); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
@@ -635,19 +476,12 @@ describe(commands.PROPERTYBAG_SET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should correctly handle getEffectiveBasePermissions ClientSvc error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "getEffectiveBasePermissions error" } }]);
     stubAllPostRequests(null, null, null, new Promise<any>((resolve, reject) => { return resolve(error); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
@@ -664,19 +498,12 @@ describe(commands.PROPERTYBAG_SET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should correctly handle getEffectiveBasePermissions ClientSvc empty error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "" } }]);
     stubAllPostRequests(null, null, null, new Promise<any>((resolve, reject) => { return resolve(error); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
@@ -693,18 +520,11 @@ describe(commands.PROPERTYBAG_SET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should getEffectiveBasePermissions reject promise if EffectiveBasePermissions not found', (done) => {
     stubAllPostRequests(null, null, null, new Promise<any>((resolve, reject) => { return resolve('[{}]') }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
@@ -720,26 +540,18 @@ describe(commands.PROPERTYBAG_SET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should correctly handle setProperty reject promise response', (done) => {
     stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return reject('setProperty promise error'); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const setPropertySpy = sinon.spy((command as any), 'setProperty');
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       value: 'value1',
       folder: '/',
-      verbose: true,
-
+      verbose: true
     }
 
     cmdInstance.action({ options: options }, (err?: any) => {
@@ -751,26 +563,18 @@ describe(commands.PROPERTYBAG_SET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should correctly handle setProperty ClientSvc error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "setProperty error" } }]);
     stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return resolve(error); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       value: 'value1',
       folder: '/',
-      verbose: true,
-
+      verbose: true
     }
 
     cmdInstance.action({ options: options }, (err?: any) => {
@@ -781,26 +585,18 @@ describe(commands.PROPERTYBAG_SET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should correctly handle setProperty ClientSvc empty error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "" } }]);
     stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return resolve(error); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       value: 'value1',
       folder: '/',
-      verbose: true,
-
+      verbose: true
     }
 
     cmdInstance.action({ options: options }, (err?: any) => {
@@ -810,9 +606,6 @@ describe(commands.PROPERTYBAG_SET, () => {
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore(request.post);
       }
     });
   });
@@ -954,33 +747,5 @@ describe(commands.PROPERTYBAG_SET, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.getAccessToken);
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        webUrl: 'https://contoso.sharepoint.com',
-        key: 'key1',
-        value: 'value1',
-
-      }
-    }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        Utils.restore(auth.getAccessToken);
-      }
-    });
   });
 });

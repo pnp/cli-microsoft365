@@ -2,26 +2,21 @@ import commands from '../../commands';
 import Command, { CommandError, CommandOption, CommandValidate } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth, { Site } from '../../SpoAuth';
 const command: Command = require('./tenant-settings-set');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import config from '../../../../config';
+import auth from '../../../../Auth';
 
 describe(commands.TENANT_SETTINGS_SET, () => {
   let vorpal: Vorpal;
   let log: any[];
-  let requests: any[];
   let cmdInstance: any;
-  let trackEvent: any;
-  let telemetry: any;
-
   let cmdInstanceLogSpy: sinon.SinonSpy;
 
   let defaultRequestsSuccessStub = (): sinon.SinonStub => {
     return sinon.stub(request, 'post').callsFake((opts) => {
-      requests.push(opts);
       if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
         return Promise.resolve(JSON.stringify([
           {
@@ -30,52 +25,50 @@ describe(commands.TENANT_SETTINGS_SET, () => {
             "IsNull": false
           }]));
       }
-      if (opts.url.indexOf('contextinfo') > -1) {
-        return Promise.resolve('abc');
-      }
       return Promise.reject('Invalid request');
     });
   }
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    sinon.stub(command as any, 'getRequestDigestForSite').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc' }); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'ABC' }));
+    auth.service.connected = true;
+    auth.service.spoUrl = 'https://contoso-admin.sharepoint.com';
+    auth.service.tenantId = '6648899e-a042-6000-ee90-5bfa05d08b79|908bed80-a04a-4433-b4a0-883d9847d11d:ea1787c6-7ce2-4e71-be47-5e0deb30f9ee&#xA;Tenant';
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
-    requests = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.site = new Site();
-    telemetry = null;
   });
 
   afterEach(() => {
     Utils.restore([
       vorpal.find,
-      request.get,
       request.post
     ]);
   });
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.ensureAccessToken,
       auth.restoreAuth,
-      request.get,
-      request.post
+      (command as any).getRequestDigest,
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
+    auth.service.spoUrl = undefined;
+    auth.service.tenantId = undefined;
   });
 
   it('has correct name', () => {
@@ -84,36 +77,6 @@ describe(commands.TENANT_SETTINGS_SET, () => {
 
   it('has a description', () => {
     assert.notEqual(command.description, null);
-  });
-
-  it('requires a tenant admin', () => {
-    assert.equal((command as any).requiresTenantAdmin(), true);
-  });
-
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.TENANT_SETTINGS_SET);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 
   it('supports debug mode', () => {
@@ -161,59 +124,14 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     assert(containsExamples);
   });
 
-  it('handles promise error while getting tenant context', (done) => {
+  it('handles client.svc promise error', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      requests.push(opts);
       if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
         return Promise.reject('An error has occurred');
       }
-      if (opts.url.indexOf('contextinfo') > -1) {
-        return Promise.resolve('abc');
-      }
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-
-      }
-    }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('handles error while getting tenant context', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      requests.push(opts);
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-        return Promise.resolve(JSON.stringify([
-          {
-            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": {
-              "ErrorMessage": "An error has occurred", "ErrorValue": null, "TraceCorrelationId": "18091989-62a6-4cad-9717-29892ee711bc", "ErrorCode": -1, "ErrorTypeName": "Microsoft.SharePoint.Client.ServerException"
-            }, "TraceCorrelationId": "18091989-62a6-4cad-9717-29892ee711bc"
-          }
-        ]));
-      }
-      if (opts.url.indexOf('contextinfo') > -1) {
-        return Promise.resolve('abc');
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
 
@@ -232,10 +150,6 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   it('sets the tenant settings (debug) successfully', (done) => {
     defaultRequestsSuccessStub();
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         verbose: true,
@@ -255,10 +169,6 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   it('sets the tenant settings successfully', (done) => {
     defaultRequestsSuccessStub();
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         NotificationsInSharePointEnabled: true
@@ -277,11 +187,6 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   it('sends xml as array of strings for option excludedFileExtensionsForSyncClient', (done) => {
     let request = defaultRequestsSuccessStub();
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.tenantId = '6648899e-a042-6000-ee90-5bfa05d08b79|908bed80-a04a-4433-b4a0-883d9847d11d:ea1787c6-7ce2-4e71-be47-5e0deb30f9ee&#xA;Tenant';
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         ExcludedFileExtensionsForSyncClient: 'xml,xslt,xsd'
@@ -300,11 +205,6 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   it('sends xml as array of guids for option allowedDomainListForSyncClient', (done) => {
     let request = defaultRequestsSuccessStub();
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.tenantId = '6648899e-a042-6000-ee90-5bfa05d08b79|908bed80-a04a-4433-b4a0-883d9847d11d:ea1787c6-7ce2-4e71-be47-5e0deb30f9ee&#xA;Tenant';
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         AllowedDomainListForSyncClient: '6648899e-a042-6000-ee90-5bfa05d08b79,6648899e-a042-6000-ee90-5bfa05d08b77'
@@ -323,11 +223,6 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   it('sends xml as array of guids for option disabledWebPartIds', (done) => {
     let request = defaultRequestsSuccessStub();
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.tenantId = '6648899e-a042-6000-ee90-5bfa05d08b79|908bed80-a04a-4433-b4a0-883d9847d11d:ea1787c6-7ce2-4e71-be47-5e0deb30f9ee&#xA;Tenant';
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         DisabledWebPartIds: '6648899e-a042-6000-ee90-5bfa05d08b79,6648899e-a042-6000-ee90-5bfa05d08b77'
@@ -346,11 +241,6 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   it('sends xml for multiple options specified', (done) => {
     let request = defaultRequestsSuccessStub();
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.tenantId = '6648899e-a042-6000-ee90-5bfa05d08b79|908bed80-a04a-4433-b4a0-883d9847d11d:ea1787c6-7ce2-4e71-be47-5e0deb30f9ee&#xA;Tenant';
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         DisabledWebPartIds: '6648899e-a042-6000-ee90-5bfa05d08b79,6648899e-a042-6000-ee90-5bfa05d08b77',
@@ -372,7 +262,6 @@ describe(commands.TENANT_SETTINGS_SET, () => {
 
   it('handles tenant settings SelectAllProperties (first \'POST\') request error', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      requests.push(opts);
       if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
         return Promise.resolve(JSON.stringify([
           {
@@ -384,16 +273,9 @@ describe(commands.TENANT_SETTINGS_SET, () => {
           }
         ]));
       }
-      if (opts.url.indexOf('contextinfo') > -1) {
-        return Promise.resolve('abc');
-      }
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         debug: true
@@ -412,7 +294,6 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   it('handles tenant settings set (second \'POST\') request error', (done) => {
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      requests.push(opts);
       if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
 
         if (opts.body.indexOf('SelectAllProperties') > -1) {
@@ -443,16 +324,9 @@ describe(commands.TENANT_SETTINGS_SET, () => {
           ]));
         }
       }
-      if (opts.url.indexOf('contextinfo') > -1) {
-        return Promise.resolve('abc');
-      }
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
       }
@@ -470,11 +344,6 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   it('should turn enums to int in the request successfully', (done) => {
     const stubRequest: sinon.SinonStub = defaultRequestsSuccessStub();
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.tenantId = '6648899e-a042-6000-ee90-5bfa05d08b79|908bed80-a04a-4433-b4a0-883d9847d11d:ea1787c6-7ce2-4e71-be47-5e0deb30f9ee&#xA;Tenant';
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         debug: true,

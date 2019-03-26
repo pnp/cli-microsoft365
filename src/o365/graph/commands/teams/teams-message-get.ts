@@ -1,5 +1,3 @@
-import auth from '../../GraphAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
@@ -37,25 +35,23 @@ class GraphTeamsMessageGetCommand extends GraphCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     this.showDeprecationWarning(cmd, commands.TEAMS_CHANNEL_MESSAGE_GET, commands.TEAMS_MESSAGE_GET);
 
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((): Promise<{}> => {
-        const requestOptions: any = {
-          url: `${auth.service.resource}/beta/teams/${args.options.teamId}/channels/${args.options.channelId}/messages/${args.options.messageId}`,
-          headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
-            accept: 'application/json;odata.metadata=none'
-          },
-          json: true
-        };
+    const requestOptions: any = {
+      url: `${this.resource}/beta/teams/${args.options.teamId}/channels/${args.options.channelId}/messages/${args.options.messageId}`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      json: true
+    };
 
-        return request.get(requestOptions);
-      })
+    request
+      .get(requestOptions)
       .then((res: any): void => {
         cmd.log(res);
+
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
         }
+
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
@@ -105,23 +101,16 @@ class GraphTeamsMessageGetCommand extends GraphCommand {
       return true;
     };
   }
-  
+
   public commandHelp(args: {}, log: (help: string) => void): void {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to the Microsoft Graph
-    using the ${chalk.blue(commands.LOGIN)} command.
-          
-  Remarks:
+      `  Remarks:
 
     ${chalk.yellow('Attention:')} This command is based on an API that is currently
     in preview and is subject to change once the API reached general
     availability.
-
-    To retrieve a message from a Microsoft Teams channel, you have to first log
-    in to the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
 
     You can only retrieve a message from a Microsoft Teams team if you are
     a member of that team.
@@ -129,7 +118,7 @@ class GraphTeamsMessageGetCommand extends GraphCommand {
   Examples:
   
     Retrieve the specified message from a channel of the Microsoft Teams team
-      ${chalk.grey(config.delimiter)} ${this.name} --teamId 5f5d7b71-1161-44d8-bcc1-3da710eb4171 --channelId 19:88f7e66a8dfe42be92db19505ae912a8@thread.skype --messageId 1540747442203
+      ${this.name} --teamId 5f5d7b71-1161-44d8-bcc1-3da710eb4171 --channelId 19:88f7e66a8dfe42be92db19505ae912a8@thread.skype --messageId 1540747442203
 `   );
   }
 }

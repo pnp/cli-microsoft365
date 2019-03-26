@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -9,7 +7,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
-import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -45,52 +42,39 @@ class SpoListItemRemoveCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-    let siteAccessToken: string = '';
-
     const removeListItem: () => void = (): void => {
-      if (this.debug) {
-        cmd.log(`Retrieving access token for ${resource}...`);
+      if (this.verbose) {
+        cmd.log(`Removing list item in site at ${args.options.webUrl}...`);
       }
 
-      auth
-        .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-        .then((accessToken: string): Promise<void> => {
-          siteAccessToken = accessToken;
+      let requestUrl: string = '';
 
-          if (this.verbose) {
-            cmd.log(`Removing list item in site at ${args.options.webUrl}...`);
-          }
+      if (args.options.listId) {
+        requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.listId)}')`;
+      }
+      else {
+        requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.listTitle as string)}')`;
+      }
 
-          let requestUrl: string = '';
+      requestUrl += `/items(${args.options.id})`;
 
-          if (args.options.listId) {
-            requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.listId)}')`;
-          }
-          else {
-            requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.listTitle as string)}')`;
-          }
+      if (args.options.recycle) {
+        requestUrl += `/recycle()`;
+      }
 
-          requestUrl += `/items(${args.options.id})`;
+      const requestOptions: any = {
+        url: requestUrl,
+        method: 'POST',
+        headers: {
+          'X-HTTP-Method': 'DELETE',
+          'If-Match': '*',
+          'accept': 'application/json;odata=nometadata'
+        },
+        json: true
+      };
 
-          if (args.options.recycle) {
-            requestUrl += `/recycle()`;
-          }
-
-          const requestOptions: any = {
-            url: requestUrl,
-            method: 'POST',
-            headers: {
-              authorization: `Bearer ${siteAccessToken}`,
-              'X-HTTP-Method': 'DELETE',
-              'If-Match': '*',
-              'accept': 'application/json;odata=nometadata'
-            },
-            json: true
-          };
-
-          return request.post(requestOptions);
-        })
+      request
+        .post(requestOptions)
         .then((): void => {
           // REST post call doesn't return anything
           cb();
@@ -190,25 +174,17 @@ class SpoListItemRemoveCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-    using the ${chalk.blue(commands.LOGIN)} command.
-  
-  Remarks:
-  
-    To remove a list item, you have to first log in to SharePoint using the
-    ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-        
-  Examples:
+      `  Examples:
   
     Remove the list item with ID ${chalk.grey(1)} from list with ID
     ${chalk.grey('0cd891ef-afce-4e55-b836-fce03286cccf')} located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_REMOVE} --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --id 1
+      ${commands.LISTITEM_REMOVE} --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --id 1
 
     Remove the list item with with ID ${chalk.grey(1)} from list with title
     ${chalk.grey('List 1')} located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_REMOVE} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'List 1' --id 1
+      ${commands.LISTITEM_REMOVE} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'List 1' --id 1
       `);
   }
 }

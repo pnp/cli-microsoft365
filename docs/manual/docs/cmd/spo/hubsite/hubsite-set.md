@@ -2,9 +2,6 @@
 
 Updates properties of the specified hub site
 
-!!! attention
-    This command is based on a SharePoint API that is currently in preview and is subject to change once the API reached general availability.
-
 ## Usage
 
 ```sh
@@ -25,11 +22,12 @@ Option|Description
 `--debug`|Runs command with debug logging
 
 !!! important
-    Before using this command, log in to a SharePoint Online tenant admin site, using the [spo login](../login.md) command.
+    To use this command you have to have permissions to access the tenant admin site.
 
 ## Remarks
 
-To update hub site's properties, you have to first log in to a tenant admin site using the [spo login](../login.md) command, eg. `spo login https://contoso-admin.sharepoint.com`.
+!!! attention
+    This command is based on a SharePoint API that is currently in preview and is subject to change once the API reached general availability.
 
 If the specified `id` doesn't refer to an existing hub site, you will get an `Unknown Error` error.
 

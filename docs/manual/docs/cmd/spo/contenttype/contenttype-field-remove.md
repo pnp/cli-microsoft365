@@ -23,13 +23,6 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
-!!! important
-    Before using this command, log in to a SharePoint Online tenant admin site, using the [spo login](../login.md) command.
-
-## Remarks
-
-To remove a column from a content type, you have to first log in to a SharePoint site using the [spo login](../login.md) command, eg. `spo login https://contoso.sharepoint.com`.
-
 ## Examples
 
 Remove column with ID _2c1ba4c4-cd9b-4417-832f-92a34bc34b2a_ from content type with ID _0x0100CA0FA0F5DAEF784494B9C6020C3020A6_ from web with URL _https://contoso.sharepoint.com_

@@ -1,4 +1,3 @@
-import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import request from '../../../../request';
@@ -32,7 +31,8 @@ interface Options extends GlobalOptions {
 
 class SpoSiteClassicSetCommand extends SpoCommand {
   private context?: FormDigestInfo;
-  private accessToken?: string;
+  private spoAdminUrl?: string;
+  private tenantId?: string;
   private dots?: string;
   private timeout?: NodeJS.Timer;
 
@@ -42,10 +42,6 @@ class SpoSiteClassicSetCommand extends SpoCommand {
 
   public get description(): string {
     return 'Change classic site settings';
-  }
-
-  protected requiresTenantAdmin(): boolean {
-    return true;
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -67,16 +63,17 @@ class SpoSiteClassicSetCommand extends SpoCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     this.dots = '';
 
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<FormDigestInfo> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest for tenant admin site at ${auth.site.url}...`);
-        }
+    this
+      .getTenantId(cmd, this.debug)
+      .then((_tenantId: string): Promise<string> => {
+        this.tenantId = _tenantId;
 
-        this.accessToken = accessToken;
+        return this.getSpoAdminUrl(cmd, this.debug)
+      })
+      .then((_spoAdminUrl: string): Promise<FormDigestInfo> => {
+        this.spoAdminUrl = _spoAdminUrl;
 
-        return this.ensureFormDigest(cmd, this.context, this.debug);
+        return this.ensureFormDigest(this.spoAdminUrl, cmd, this.context, this.debug);
       })
       .then((res: FormDigestInfo): Promise<string> => {
         this.context = res; 
@@ -137,15 +134,14 @@ class SpoSiteClassicSetCommand extends SpoCommand {
           updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="DenyAddAndCustomizePages"><Parameter Type="Enum">${noScriptSite}</Parameter></SetProperty>`);
         }
 
-        const pos: number = auth.site.tenantId.indexOf('|') + 1;
+        const pos: number = (this.tenantId as string).indexOf('|') + 1;
 
         const requestOptions: any = {
-          url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+          url: `${this.spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': this.context.FormDigestValue
           },
-          body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${updates.join('')}<ObjectPath Id="14" ObjectPathId="13" /><ObjectIdentityQuery Id="15" ObjectPathId="5" /><Query Id="16" ObjectPathId="13"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="53d8499e-d0d2-5000-cb83-9ade5be42ca4|${auth.site.tenantId.substr(pos, auth.site.tenantId.indexOf('&') - pos)}&#xA;SiteProperties&#xA;${encodeURIComponent(args.options.url)}" /><Method Id="13" ParentId="5" Name="Update" /></ObjectPaths></Request>`
+          body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${updates.join('')}<ObjectPath Id="14" ObjectPathId="13" /><ObjectIdentityQuery Id="15" ObjectPathId="5" /><Query Id="16" ObjectPathId="13"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="53d8499e-d0d2-5000-cb83-9ade5be42ca4|${(this.tenantId as string).substr(pos, (this.tenantId as string).indexOf('&') - pos)}&#xA;SiteProperties&#xA;${encodeURIComponent(args.options.url)}" /><Method Id="13" ParentId="5" Name="Update" /></ObjectPaths></Request>`
         };
 
         return request.post(requestOptions);
@@ -155,12 +151,6 @@ class SpoSiteClassicSetCommand extends SpoCommand {
           if (!res) {
             resolve();
             return;
-          }
-
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
           }
 
           const json: ClientSvcResponse = JSON.parse(res);
@@ -177,13 +167,13 @@ class SpoSiteClassicSetCommand extends SpoCommand {
             }
 
             this.timeout = setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), resolve, reject, this.accessToken as string, cmd, this.context as FormDigestInfo, this.dots, this.timeout);
+              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, cmd, this.context as FormDigestInfo, this.dots, this.timeout);
             }, operation.PollingInterval);
           }
         });
       })
       .then((): Promise<FormDigestInfo> => {
-        return this.ensureFormDigest(cmd, this.context, this.debug);
+        return this.ensureFormDigest(this.spoAdminUrl as string, cmd, this.context, this.debug);
       })
       .then((res: FormDigestInfo): Promise<void> => {
         this.context = res; 
@@ -209,9 +199,8 @@ class SpoSiteClassicSetCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+          url: `${this.spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': (this.context as FormDigestInfo).FormDigestValue
           },
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="7" ObjectPathId="5" Name="LockState"><Parameter Type="String">${Utils.escapeXml(args.options.lockState)}</Parameter></SetProperty><ObjectPath Id="9" ObjectPathId="8" /><ObjectIdentityQuery Id="10" ObjectPathId="5" /><Query Id="11" ObjectPathId="8"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Method Id="5" ParentId="3" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.url)}</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Id="8" ParentId="5" Name="Update" /><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
@@ -240,7 +229,7 @@ class SpoSiteClassicSetCommand extends SpoCommand {
             }
 
             this.timeout = setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), resolve, reject, this.accessToken as string, cmd, this.context as FormDigestInfo, this.dots, this.timeout);
+              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, cmd, this.context as FormDigestInfo, this.dots, this.timeout);
             }, operation.PollingInterval);
           }
         });
@@ -265,13 +254,12 @@ class SpoSiteClassicSetCommand extends SpoCommand {
   private setAdmin(cmd: CommandInstance, siteUrl: string, principal: string): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       this
-        .ensureFormDigest(cmd, this.context, this.debug)
+        .ensureFormDigest(this.spoAdminUrl as string, cmd, this.context, this.debug)
         .then((res: FormDigestInfo): Promise<string> => {
           this.context = res; 
           const requestOptions: any = {
-            url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+            url: `${this.spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
             headers: {
-              authorization: `Bearer ${auth.service.accessToken}`,
               'X-RequestDigest': this.context.FormDigestValue
             },
             body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="48" ObjectPathId="47" /></Actions><ObjectPaths><Method Id="47" ParentId="34" Name="SetSiteAdmin"><Parameters><Parameter Type="String">${Utils.escapeXml(siteUrl)}</Parameter><Parameter Type="String">${Utils.escapeXml(principal)}</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Constructor Id="34" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
@@ -425,14 +413,10 @@ class SpoSiteClassicSetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online tenant admin site,
-    using the ${chalk.blue(commands.LOGIN)} command.
+      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
+    the tenant admin site.
    
   Remarks:
-
-    To update a classic site, you have to first log in to a tenant admin
-    site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso-admin.sharepoint.com`)}.
 
     The value of the ${chalk.blue('--resourceQuota')} option must not exceed
     the company's aggregate available Sandboxed Solutions quota.
@@ -473,14 +457,14 @@ class SpoSiteClassicSetCommand extends SpoCommand {
 
     Change the title of the site collection. Don't wait for the configuration
     to complete
-      ${chalk.grey(config.delimiter)} ${this.getCommandName()} --url https://contoso.sharepoint.com/sites/team --title Team
+      ${this.getCommandName()} --url https://contoso.sharepoint.com/sites/team --title Team
 
     Add the specified user accounts as site collection administrators
-      ${chalk.grey(config.delimiter)} ${this.getCommandName()} --url https://contoso.sharepoint.com/sites/team --owners joe@contoso.com,steve@contoso.com
+      ${this.getCommandName()} --url https://contoso.sharepoint.com/sites/team --owners joe@contoso.com,steve@contoso.com
 
     Lock the site preventing users from accessing it. Wait for the configuration
     to complete
-      ${chalk.grey(config.delimiter)} ${this.getCommandName()} --url https://contoso.sharepoint.com/sites/team --LockState NoAccess --wait
+      ${this.getCommandName()} --url https://contoso.sharepoint.com/sites/team --LockState NoAccess --wait
 `);
   }
 }

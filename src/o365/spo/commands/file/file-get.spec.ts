@@ -2,7 +2,7 @@ import commands from '../../commands';
 import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth, { Site } from '../../SpoAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./file-get');
 import * as assert from 'assert';
 import request from '../../../../request';
@@ -14,37 +14,26 @@ describe(commands.FILE_GET, () => {
   let log: any[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  let trackEvent: any;
-  let telemetry: any;
-  let stubAuth: any = () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/common/oauth2/token') > -1) {
-        return Promise.resolve('abc');
-      }
-
-      return Promise.reject('Invalid request');
-    });
-  }
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    auth.service.connected = true;
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.site = new Site();
-    telemetry = null;
   });
 
   afterEach(() => {
@@ -56,11 +45,10 @@ describe(commands.FILE_GET, () => {
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.getAccessToken,
       auth.restoreAuth,
-      request.get
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -71,58 +59,7 @@ describe(commands.FILE_GET, () => {
     assert.notEqual(command.description, null);
   });
 
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.FILE_GET);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not logged in to a SharePoint site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com' } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('command correctly handles file get reject request', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
     const err = 'Invalid request';
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf('/_api/web/GetFileById') > -1) {
@@ -131,11 +68,6 @@ describe(commands.FILE_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     cmdInstance.action({
       options: {
@@ -151,18 +83,10 @@ describe(commands.FILE_GET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore([
-          request.post,
-          request.get
-        ]);
-      }
     });
   });
 
   it('uses correct API url when output json option is passed', (done) => {
-    stubAuth();
-
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf('select123=') > -1) {
         return Promise.resolve('Correct Url1')
@@ -170,11 +94,6 @@ describe(commands.FILE_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     cmdInstance.action({
       options: {
@@ -184,7 +103,6 @@ describe(commands.FILE_GET, () => {
         id: 'b2307a39-e878-458b-bc90-03bc578531d6'
       }
     }, () => {
-
       try {
         assert('Correct Url');
         done();
@@ -192,18 +110,11 @@ describe(commands.FILE_GET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore([
-          request.post,
-          request.get
-        ]);
-      }
     });
 
   });
 
   it('retrieves file as binary string object', (done) => {
-    stubAuth();
     let returnValue: string = 'BinaryFileString';
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf('/_api/web/GetFileById(') > -1) {
@@ -213,11 +124,6 @@ describe(commands.FILE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         debug: false,
@@ -233,16 +139,10 @@ describe(commands.FILE_GET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.get);
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('retrieves and prints all details of file as ListItem object', (done) => {
-    stubAuth();
-
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf('?$expand=ListItemAllFields') > -1) {
         return Promise.resolve({
@@ -291,11 +191,6 @@ describe(commands.FILE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         debug: true,
@@ -328,16 +223,10 @@ describe(commands.FILE_GET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.get);
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('uses correct API url when id option is passed', (done) => {
-    stubAuth();
-
     const getStub: any = sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf('/_api/web/GetFileById(') > -1) {
         return Promise.resolve('Correct Url')
@@ -345,11 +234,6 @@ describe(commands.FILE_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     const actionId: string = '0CD891EF-AFCE-4E55-B836-FCE03286CCCF';
 
@@ -360,27 +244,17 @@ describe(commands.FILE_GET, () => {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       }
     }, () => {
-
       try {
         assert.equal(getStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileById(\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')');
-        assert.equal(getStub.lastCall.args[0].headers.authorization, 'Bearer ABC');
         done();
       }
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore([
-          request.post,
-          request.get
-        ]);
-      }
     });
   });
 
   it('uses correct API url when url option is passed', (done) => {
-    stubAuth();
-
     const getStub: any = sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf('/_api/web/GetFileByServerRelativeUrl(') > -1) {
         return Promise.resolve('Correct Url')
@@ -389,11 +263,6 @@ describe(commands.FILE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     cmdInstance.action({
       options: {
         debug: false,
@@ -401,35 +270,21 @@ describe(commands.FILE_GET, () => {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       }
     }, () => {
-
       try {
         assert.equal(getStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativeUrl(\'%2Fsites%2Fproject-x%2FDocuments%2FTest1.docx\')');
-        assert.equal(getStub.lastCall.args[0].headers.authorization, 'Bearer ABC');
         done();
       }
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore([
-          request.post,
-          request.get
-        ]);
-      }
     });
   });
 
   it('should handle promise rejection', (done) => {
-    stubAuth();
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: File Not Found." } } });
     sinon.stub(request, 'get').callsFake((opts) => {
       return Promise.reject(expectedError);
     });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     cmdInstance.action({
       options: {
@@ -437,19 +292,12 @@ describe(commands.FILE_GET, () => {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       }
     }, (err: any) => {
-
       try {
         assert.equal(JSON.stringify(err.message), JSON.stringify(expectedError));
         done();
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore([
-          request.post,
-          request.get
-        ]);
       }
     });
   });
@@ -462,8 +310,6 @@ describe(commands.FILE_GET, () => {
   });
 
   it('writeFile called when option --asFile is specified', (done) => {
-    stubAuth();
-
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf('/_api/web/GetFileById(') > -1) {
         return Promise.resolve('abc');
@@ -471,11 +317,6 @@ describe(commands.FILE_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     const writeFileSyncStub = sinon.stub(fs, 'writeFileSync').callsFake(() => '');
     const options: Object = {
@@ -497,8 +338,6 @@ describe(commands.FILE_GET, () => {
       }
       finally {
         Utils.restore([
-          request.post,
-          request.get,
           fs.writeFileSync
         ]);
       }
@@ -506,8 +345,6 @@ describe(commands.FILE_GET, () => {
   });
 
   it('writeFile called when option --asFile is specified (debug)', (done) => {
-    stubAuth();
-
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf('/_api/web/GetFileById(') > -1) {
         return Promise.resolve('abc');
@@ -515,11 +352,6 @@ describe(commands.FILE_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     const writeFileSyncStub = sinon.stub(fs, 'writeFileSync').callsFake(() => '');
     const options: Object = {
@@ -541,8 +373,6 @@ describe(commands.FILE_GET, () => {
       }
       finally {
         Utils.restore([
-          request.post,
-          request.get,
           fs.writeFileSync
         ]);
       }
@@ -550,8 +380,6 @@ describe(commands.FILE_GET, () => {
   });
 
   it('writeFile not called when option --asFile and path is empty is specified', (done) => {
-    stubAuth();
-
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf('/_api/web/GetFileById(') > -1) {
         return Promise.resolve('abc');
@@ -559,11 +387,6 @@ describe(commands.FILE_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     const writeFileSyncStub = sinon.stub(fs, 'writeFileSync').callsFake(() => '');
     const options: Object = {
@@ -585,8 +408,6 @@ describe(commands.FILE_GET, () => {
       }
       finally {
         Utils.restore([
-          request.post,
-          request.get,
           fs.writeFileSync
         ]);
       }
@@ -717,28 +538,5 @@ describe(commands.FILE_GET, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.getAccessToken);
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        webUrl: "https://contoso.sharepoint.com",
-        debug: false
-      }
-    }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 });

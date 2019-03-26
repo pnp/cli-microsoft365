@@ -1,41 +1,38 @@
 import commands from '../../commands';
-import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
+import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth from '../../GraphAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./teams-funsettings-set');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import { Service } from '../../../../Auth';
 
 describe(commands.TEAMS_FUNSETTINGS_SET, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  let trackEvent: any;
-  let telemetry: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    auth.service.connected = true;
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.service = new Service();
-    telemetry = null;
     (command as any).items = [];
   });
 
@@ -50,9 +47,9 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
   after(() => {
     Utils.restore([
       appInsights.trackEvent,
-      auth.ensureAccessToken,
       auth.restoreAuth
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -61,47 +58,6 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
 
   it('has a description', () => {
     assert.notEqual(command.description, null);
-  });
-
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.TEAMS_FUNSETTINGS_SET);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not logged in to Microsoft Graph', (done) => {
-    auth.service = new Service();
-    auth.service.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to the Microsoft Graph first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 
   it('sets allowGiphy settings to false', (done) => {
@@ -118,10 +74,6 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowGiphy: 'false' }
     }, (err?: any) => {
@@ -149,10 +101,6 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowGiphy: 'true' }
     }, (err?: any) => {
@@ -180,10 +128,6 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', giphyContentRating: 'moderate' }
     }, (err?: any) => {
@@ -211,10 +155,6 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', giphyContentRating: 'strict' }
     }, (err?: any) => {
@@ -242,10 +182,6 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowStickersAndMemes: 'true' }
     }, (err?: any) => {
@@ -273,10 +209,6 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowStickersAndMemes: 'false' }
     }, (err?: any) => {
@@ -305,10 +237,6 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowCustomMemes: 'true' }
     }, (err?: any) => {
@@ -336,10 +264,6 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: { debug: true, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowCustomMemes: 'false' }
     }, (err?: any) => {
@@ -367,10 +291,6 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: { debug: true, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowCustomMemes: 'false' }
     }, (err?: any) => {
@@ -393,10 +313,6 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         debug: true,
@@ -409,6 +325,29 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
     }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly handles random API error', (done) => {
+    sinon.stub(request, 'patch').callsFake(() => Promise.reject('An error has occurred'));
+
+    cmdInstance.action({
+      options: {
+        debug: true,
+        teamId: "02bd9fd6-8f93-4758-87c3-1fb73740a315",
+        allowGiphy: true,
+        giphyContentRating: "moderate",
+        allowStickersAndMemes: false,
+        allowCustomMemes: true
+      }
+    }, (err?: any) => {
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -546,23 +485,5 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.ensureAccessToken);
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 });

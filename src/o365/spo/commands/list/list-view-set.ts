@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -9,7 +7,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
-import { Auth } from '../../../../Auth';
 import { ContextInfo } from '../../spo';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -44,39 +41,23 @@ class SpoListViewSetCommand extends SpoCommand {
     telemetryProps.listId = typeof args.options.listId !== 'undefined';
     telemetryProps.listTitle = typeof args.options.listTitle !== 'undefined';
     telemetryProps.viewId = typeof args.options.viewId !== 'undefined';
-    telemetryProps.viewTitle = typeof args.options.viewTitle !== 'undefined';    
+    telemetryProps.viewTitle = typeof args.options.viewTitle !== 'undefined';
     return telemetryProps;
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-    let siteAccessToken: string = '';
     const baseRestUrl: string = `${args.options.webUrl}/_api/web/lists`;
     const listRestUrl: string = args.options.listId ?
       `(guid'${encodeURIComponent(args.options.listId)}')`
       : `/getByTitle('${encodeURIComponent(args.options.listTitle as string)}')`;
     const viewRestUrl: string = `/views/${(args.options.viewId ? `getById('${encodeURIComponent(args.options.viewId)}')` : `getByTitle('${encodeURIComponent(args.options.viewTitle as string)}')`)}`;
 
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
-    }
-
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<ContextInfo> => {
-        siteAccessToken = accessToken;
-
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
-
-        return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
-      })
+    this
+      .getRequestDigest(args.options.webUrl)
       .then((res: ContextInfo): Promise<void> => {
         const requestOptions: any = {
           url: `${baseRestUrl}${listRestUrl}${viewRestUrl}`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             'X-RequestDigest': res.FormDigestValue,
             'content-type': 'application/json;odata=nometadata',
             accept: 'application/json;odata=nometadata'
@@ -116,7 +97,7 @@ class SpoListViewSetCommand extends SpoCommand {
         payload[key] = options[key];
       }
     });
-    
+
     return payload;
   }
 
@@ -193,15 +174,8 @@ class SpoListViewSetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-    using the ${chalk.blue(commands.LOGIN)} command.
+      `  Remarks:
   
-  Remarks:
-  
-    To update a list view, you have to first log in to SharePoint using
-    the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-
     Specify properties to update using their names, eg.
     ${chalk.grey("--Title 'New Title' --JSLink jslink.js")}
 
@@ -211,13 +185,13 @@ class SpoListViewSetCommand extends SpoCommand {
   Examples:
 
     Update the title of the list view specified by its name
-      ${chalk.grey(config.delimiter)} ${commands.LIST_VIEW_SET} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'My List' --viewTitle 'All items' --Title 'All events'
+      ${commands.LIST_VIEW_SET} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'My List' --viewTitle 'All items' --Title 'All events'
 
     Update the title of the list view specified by its ID
-      ${chalk.grey(config.delimiter)} ${commands.LIST_VIEW_SET} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'My List' --viewId 330f29c5-5c4c-465f-9f4b-7903020ae1ce --Title 'All events'
+      ${commands.LIST_VIEW_SET} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'My List' --viewId 330f29c5-5c4c-465f-9f4b-7903020ae1ce --Title 'All events'
   
     Update view formatting of the specified list view
-      ${chalk.grey(config.delimiter)} ${commands.LIST_VIEW_SET} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'My List' --viewTitle 'All items' --CustomFormatter '\`{"schema":"https://developer.microsoft.com/json-schemas/sp/view-formatting.schema.json","additionalRowClass": "=if([$DueDate] &lt;= @now, 'sp-field-severity--severeWarning', '')"}\`'
+      ${commands.LIST_VIEW_SET} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'My List' --viewTitle 'All items' --CustomFormatter '\`{"schema":"https://developer.microsoft.com/json-schemas/sp/view-formatting.schema.json","additionalRowClass": "=if([$DueDate] &lt;= @now, 'sp-field-severity--severeWarning', '')"}\`'
    `);
   }
 }

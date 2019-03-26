@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
 import {
@@ -32,25 +30,19 @@ class SpoSiteDesignRightsGrantCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<ContextInfo> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
+    let spoUrl: string = '';
 
-        if (this.verbose) {
-          cmd.log(`Retrieving request digest...`);
-        }
-
-        return this.getRequestDigest(cmd, this.debug);
+    this
+      .getSpoUrl(cmd, this.debug)
+      .then((_spoUrl: string): Promise<ContextInfo> => {
+        spoUrl = _spoUrl;
+        return this.getRequestDigest(spoUrl);
       })
       .then((res: ContextInfo): Promise<void> => {
         const grantedRights: string = '1';
         const requestOptions: any = {
-          url: `${auth.site.url}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GrantSiteDesignRights`,
+          url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GrantSiteDesignRights`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': res.FormDigestValue,
             'content-type': 'application/json;charset=utf-8',
             accept: 'application/json;odata=nometadata'
@@ -125,24 +117,16 @@ class SpoSiteDesignRightsGrantCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site using the
-      ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
-
-    To grant access to a site design, you have to first log in to a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-
-  Examples:
+      `  Examples:
   
     Grant user with alias ${chalk.grey('PattiF')} view permission to the specified site design
-      ${chalk.grey(config.delimiter)} ${this.name} --id 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --principals PattiF --rights View
+      ${this.name} --id 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --principals PattiF --rights View
 
     Grant users with aliases ${chalk.grey('PattiF')} and ${chalk.grey('AdeleV')} view permission to the specified site design
-      ${chalk.grey(config.delimiter)} ${this.name} --id 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --principals PattiF,AdeleV --rights View
+      ${this.name} --id 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --principals PattiF,AdeleV --rights View
 
     Grant user with email ${chalk.grey('PattiF@contoso.com')} view permission to the specified site design
-      ${chalk.grey(config.delimiter)} ${this.name} --id 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --principals PattiF@contoso.com --rights View
+      ${this.name} --id 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --principals PattiF@contoso.com --rights View
 
   More information:
 

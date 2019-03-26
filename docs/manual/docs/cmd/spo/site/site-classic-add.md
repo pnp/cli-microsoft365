@@ -30,11 +30,9 @@ Option|Description
 `--debug`|Runs command with debug logging
 
 !!! important
-    Before using this command, log in to a SharePoint Online tenant admin site, using the [spo login](../login.md) command.
+    To use this command you have to have permissions to access the tenant admin site.
 
 ## Remarks
-
-To create a new classic site, you have to first log in to a tenant admin site using the [spo login](../login.md) command, eg. `spo login https://contoso-admin.sharepoint.com`.
 
 Using the `-z, --timeZone` option you have to specify the time zone of the site. For more information about the valid values see [https://msdn.microsoft.com/library/microsoft.sharepoint.spregionalsettings.timezones.aspx](https://msdn.microsoft.com/library/microsoft.sharepoint.spregionalsettings.timezones.aspx).
 

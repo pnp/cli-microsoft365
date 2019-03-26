@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -20,26 +18,17 @@ class SpoThemeListCommand extends SpoCommand {
     return 'Retrieves the list of custom themes';
   }
 
-  protected requiresTenantAdmin(): boolean {
-    return true;
-  }
-
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<any> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}`);
-        }
-
+    this
+      .getSpoAdminUrl(cmd, this.debug)
+      .then((spoAdminUrl: string): Promise<any> => {
         if (this.verbose) {
           cmd.log(`Retrieving themes from tenant store...`);
         }
 
         const requestOptions: any = {
-          url: `${auth.site.url}/_api/thememanager/GetTenantThemingOptions`,
+          url: `${spoAdminUrl}/_api/thememanager/GetTenantThemingOptions`,
           headers: {
-            authorization: `Bearer ${accessToken}`,
             'accept': 'application/json;odata=nometadata'
           },
           json: true
@@ -72,19 +61,13 @@ class SpoThemeListCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-    using the ${chalk.blue(commands.LOGIN)} command.
-
-  Remarks:
-  
-    To get the list of available themes, you have to first log in to SharePoint
-    using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-        
+      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
+    the tenant admin site.
+    
   Examples:
   
     List available themes
-      ${chalk.grey(config.delimiter)} ${commands.THEME_LIST}
+      ${commands.THEME_LIST}
 
   More information:
 

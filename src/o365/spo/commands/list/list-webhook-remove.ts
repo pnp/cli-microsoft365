@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -9,7 +7,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
-import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -44,49 +41,33 @@ class SpoListWebhookRemoveCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-    let siteAccessToken: string = '';
     const list: string = args.options.listId ? encodeURIComponent(args.options.listId as string) : encodeURIComponent(args.options.listTitle as string);
 
     const removeWebhook: () => void = (): void => {
-      if (this.debug) {
-        cmd.log(`Retrieving access token for ${resource}...`);
+      if (this.verbose) {
+        cmd.log(`Webhook ${args.options.id} is about to be removed from list ${list} located at site ${args.options.webUrl}...`);
       }
 
-      auth
-        .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-        .then((accessToken: string): Promise<void> => {
-          siteAccessToken = accessToken;
+      let requestUrl: string = '';
 
-          if (this.debug) {
-            cmd.log(`Retrieved access token ${accessToken}. About to remove the specified webhook...`);
-          }
+      if (args.options.listId) {
+        requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.listId)}')/Subscriptions('${encodeURIComponent(args.options.id)}')`;
+      }
+      else {
+        requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.listTitle as string)}')/Subscriptions('${encodeURIComponent(args.options.id)}')`;
+      }
 
-          if (this.verbose) {
-            cmd.log(`Webhook ${args.options.id} is about to be removed from list ${list} located at site ${args.options.webUrl}...`);
-          }
+      const requestOptions: any = {
+        url: requestUrl,
+        method: 'DELETE',
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        json: true
+      };
 
-          let requestUrl: string = '';
-
-          if (args.options.listId) {
-            requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.listId)}')/Subscriptions('${encodeURIComponent(args.options.id)}')`;
-          }
-          else {
-            requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.listTitle as string)}')/Subscriptions('${encodeURIComponent(args.options.id)}')`;
-          }
-
-          const requestOptions: any = {
-            url: requestUrl,
-            method: 'DELETE',
-            headers: {
-              authorization: `Bearer ${siteAccessToken}`,
-              'accept': 'application/json;odata=nometadata'
-            },
-            json: true
-          };
-
-          return request.delete(requestOptions);
-        })
+      request
+        .delete(requestOptions)
         .then((): void => {
           // REST delete call doesn't return anything
           cb();
@@ -184,15 +165,8 @@ class SpoListWebhookRemoveCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to SharePoint,
-    using the ${chalk.blue(commands.LOGIN)} command.
+      `  Remarks:
   
-  Remarks:
-  
-    To remove a webhook from a list, you have to first log in to SharePoint
-    using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-
     If the specified ${chalk.grey('id')} doesn't refer to an existing webhook,
     you will get a ${chalk.grey('404 - "404 FILE NOT FOUND"')} error.
         
@@ -201,17 +175,17 @@ class SpoListWebhookRemoveCommand extends SpoCommand {
     Remove webhook with ID ${chalk.grey('cc27a922-8224-4296-90a5-ebbc54da2e81')} from a
     list with ID ${chalk.grey('0cd891ef-afce-4e55-b836-fce03286cccf')}
     located in site ${chalk.grey('https://contoso.sharepoint.com/sites/ninja')}
-      ${chalk.grey(config.delimiter)} ${commands.LIST_WEBHOOK_REMOVE} --webUrl https://contoso.sharepoint.com/sites/ninja --listId 0cd891ef-afce-4e55-b836-fce03286cccf --id cc27a922-8224-4296-90a5-ebbc54da2e81
+      ${commands.LIST_WEBHOOK_REMOVE} --webUrl https://contoso.sharepoint.com/sites/ninja --listId 0cd891ef-afce-4e55-b836-fce03286cccf --id cc27a922-8224-4296-90a5-ebbc54da2e81
 
     Remove webhook with ID ${chalk.grey('cc27a922-8224-4296-90a5-ebbc54da2e81')} from a
     list with title ${chalk.grey('Documents')} located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/ninja')}
-      ${chalk.grey(config.delimiter)} ${commands.LIST_WEBHOOK_REMOVE} --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e81
+      ${commands.LIST_WEBHOOK_REMOVE} --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e81
 
     Remove webhook with ID ${chalk.grey('cc27a922-8224-4296-90a5-ebbc54da2e81')} from a
     list with title ${chalk.grey('Documents')} located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/ninja')} without being asked for confirmation
-      ${chalk.grey(config.delimiter)} ${commands.LIST_WEBHOOK_REMOVE} --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e81 --confirm
+      ${commands.LIST_WEBHOOK_REMOVE} --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e81 --confirm
       `);
   }
 }

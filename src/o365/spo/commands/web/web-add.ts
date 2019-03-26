@@ -1,4 +1,3 @@
-import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import request from '../../../../request';
@@ -7,11 +6,9 @@ import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../..
 import {
   CommandOption,
   CommandValidate,
-  CommandError,
-
+  CommandError
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import { Auth } from '../../../../Auth';
 import { PermissionKind, BasePermissions } from './../../common/base-permissions';
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -48,32 +45,19 @@ class SpoWebAddCommand extends SpoCommand {
     telemetryProps.locale = args.options.locale || '1033';
     telemetryProps.breakInheritance = args.options.breakInheritance || false;
     telemetryProps.inheritNavigation = args.options.inheritNavigation || false;
-
     return telemetryProps;
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.parentWebUrl);
-    let siteAccessToken: string = '';
     let siteInfo: any = null;
     let subsiteFullUrl: string = '';
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<ContextInfo> => {
-        siteAccessToken = accessToken;
-
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
-
-        return this.getRequestDigestForSite(args.options.parentWebUrl, siteAccessToken, cmd, this.debug);
-      })
+    this
+      .getRequestDigest(args.options.parentWebUrl)
       .then((res: ContextInfo): Promise<any> => {
         const requestOptions: any = {
           url: `${args.options.parentWebUrl}/_api/web/webinfos/add`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             'content-type': 'application/json;odata=nometadata',
             accept: 'application/json;odata=nometadata',
             'X-RequestDigest': res.FormDigestValue
@@ -113,7 +97,6 @@ class SpoWebAddCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${subsiteFullUrl}/_api/web/effectivebasepermissions`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata'
           },
           json: true
@@ -139,13 +122,12 @@ class SpoWebAddCommand extends SpoCommand {
           return Promise.reject(SpoWebAddCommand.DONE);
         }
 
-        return this.getRequestDigestForSite(subsiteFullUrl, siteAccessToken, cmd, this.debug);
+        return this.getRequestDigest(subsiteFullUrl);
       })
       .then((res: ContextInfo): Promise<string> => {
         const requestOptions: any = {
           url: `${subsiteFullUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             'X-RequestDigest': res.FormDigestValue
           },
           body: `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="1" ObjectPathId="0" /><ObjectPath Id="3" ObjectPathId="2" /><ObjectPath Id="5" ObjectPathId="4" /><SetProperty Id="6" ObjectPathId="4" Name="UseShared"><Parameter Type="Boolean">true</Parameter></SetProperty></Actions><ObjectPaths><StaticProperty Id="0" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /><Property Id="2" ParentId="0" Name="Web" /><Property Id="4" ParentId="2" Name="Navigation" /></ObjectPaths></Request>`
@@ -186,12 +168,7 @@ class SpoWebAddCommand extends SpoCommand {
           cb(new CommandError(err.error['odata.error'].message.value));
         }
         else {
-          if (err instanceof Error) {
-            cb(new CommandError(err.message));
-          }
-          else {
-            cb(new CommandError(err));
-          }
+          this.handleRejectedPromise(err, cmd, cb);
         }
       });
   }
@@ -276,24 +253,16 @@ class SpoWebAddCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-      using the ${chalk.blue(commands.LOGIN)} command.
-
-    Remarks:
-    
-      To create a subsite, you have to first log in to SharePoint using the
-      ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-    
-    Examples:
+      `  Examples:
     
       Create subsite using the ${chalk.grey('Team site')} template in the ${chalk.grey('en-US')} locale
-        ${chalk.grey(config.delimiter)} ${commands.WEB_ADD} --title Subsite --description Subsite --webUrl subsite --webTemplate STS#0 --parentWebUrl https://contoso.sharepoint.com --locale 1033
+        ${commands.WEB_ADD} --title Subsite --description Subsite --webUrl subsite --webTemplate STS#0 --parentWebUrl https://contoso.sharepoint.com --locale 1033
 
       Create subsite with unique permissions using the default ${chalk.grey('en-US')} locale
-        ${chalk.grey(config.delimiter)} ${commands.WEB_ADD} --title Subsite --webUrl subsite --webTemplate STS#0 --parentWebUrl https://contoso.sharepoint.com --breakInheritance
+        ${commands.WEB_ADD} --title Subsite --webUrl subsite --webTemplate STS#0 --parentWebUrl https://contoso.sharepoint.com --breakInheritance
 
       Create subsite with the same navigation as the parent site
-        ${chalk.grey(config.delimiter)} ${commands.WEB_ADD} --title Subsite --webUrl subsite --webTemplate STS#0 --parentWebUrl https://contoso.sharepoint.com --inheritNavigation
+        ${commands.WEB_ADD} --title Subsite --webUrl subsite --webTemplate STS#0 --parentWebUrl https://contoso.sharepoint.com --inheritNavigation
   ` );
   }
 }

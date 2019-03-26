@@ -1,6 +1,4 @@
-import auth from '../../SpoAuth';
 import { ContextInfo } from '../../spo';
-import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -9,7 +7,6 @@ import {
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -42,24 +39,8 @@ class SpoNavigationNodeRemoveCommand extends SpoCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const removeNode: () => void = (): void => {
-      const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-      let siteAccessToken: string = '';
-
-      if (this.debug) {
-        cmd.log(`Retrieving access token for ${resource}...`);
-      }
-
-      auth
-        .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-        .then((accessToken: string): Promise<ContextInfo> => {
-          siteAccessToken = accessToken;
-
-          if (this.debug) {
-            cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-          }
-
-          return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
-        })
+      this
+        .getRequestDigest(args.options.webUrl)
         .then((res: ContextInfo): Promise<void> => {
           if (this.verbose) {
             cmd.log(`Removing navigation node...`);
@@ -68,7 +49,6 @@ class SpoNavigationNodeRemoveCommand extends SpoCommand {
           const requestOptions: any = {
             url: `${args.options.webUrl}/_api/web/navigation/${args.options.location.toLowerCase()}/getbyid(${args.options.id})`,
             headers: {
-              authorization: `Bearer ${siteAccessToken}`,
               accept: 'application/json;odata=nometadata',
               'X-RequestDigest': res.FormDigestValue
             },
@@ -166,25 +146,15 @@ class SpoNavigationNodeRemoveCommand extends SpoCommand {
   }
 
   public commandHelp(args: CommandArgs, log: (message: string) => void): void {
-    const chalk = vorpal.chalk;
     log(vorpal.find(commands.NAVIGATION_NODE_REMOVE).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-    using the ${chalk.blue(commands.LOGIN)} command.
-                
-  Remarks:
-
-    To remove a navigation node from a site, you have to first log in to
-    a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-
-  Examples:
+      `  Examples:
   
     Remove a node from the top navigation. Will prompt for confirmation
-      ${chalk.grey(config.delimiter)} ${commands.NAVIGATION_NODE_REMOVE} --webUrl https://contoso.sharepoint.com/sites/team-a --location TopNavigationBar --id 2003
+      ${commands.NAVIGATION_NODE_REMOVE} --webUrl https://contoso.sharepoint.com/sites/team-a --location TopNavigationBar --id 2003
 
     Remove a node from the quick launch without prompting for confirmation
-      ${chalk.grey(config.delimiter)} ${commands.NAVIGATION_NODE_REMOVE} --webUrl https://contoso.sharepoint.com/sites/team-a --location QuickLaunch --id 2003 --confirm
+      ${commands.NAVIGATION_NODE_REMOVE} --webUrl https://contoso.sharepoint.com/sites/team-a --location QuickLaunch --id 2003 --confirm
 `);
   }
 }

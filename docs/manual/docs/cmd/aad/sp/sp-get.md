@@ -19,12 +19,7 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
-!!! important
-    Before using this command, log in to Azure Active Directory Graph, using the [aad login](../login.md) command.
-
 ## Remarks
-
-To get information about a service principal, you have to first log in to Azure Active Directory Graph using the [aad login](../login.md) command, eg. `aad login`.
 
 When looking up information about a service principal you should specify either its `appId` or `displayName` but not both. If you specify both values, the command will fail with an error.
 

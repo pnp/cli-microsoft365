@@ -19,13 +19,6 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
-!!! important
-    Before using this command, log in to the Microsoft Graph, using the [graph login](../login.md) command.
-
-## Remarks
-
-To get information about a group setting template, you have to first log in to the Microsoft Graph using the [graph login](../login.md) command, eg. `graph login`.
-
 ## Examples
 
 Get information about the group setting template with id _62375ab9-6b52-47ed-826b-58e47e0e304b_

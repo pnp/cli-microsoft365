@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import {
   CommandOption,
@@ -7,7 +5,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import { ContextInfo } from '../../spo';
-import { Auth } from '../../../../Auth';
 import { SpoPropertyBagBaseCommand, Property } from './propertybag-base';
 import GlobalOptions from '../../../../GlobalOptions';
 import { ClientSvc, IdentityResponse } from '../../common/ClientSvc';
@@ -40,28 +37,14 @@ class SpoPropertyBagListCommand extends SpoPropertyBagBaseCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
     const clientSvcCommons: ClientSvc = new ClientSvc(cmd, this.debug);
 
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
-    }
-
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<ContextInfo> => {
-        this.siteAccessToken = accessToken;
-
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
-
-        return this.getRequestDigestForSite(args.options.webUrl, this.siteAccessToken, cmd, this.debug);
-      })
+    this
+      .getRequestDigest(args.options.webUrl)
       .then((contextResponse: ContextInfo): Promise<IdentityResponse> => {
         this.formDigestValue = contextResponse.FormDigestValue;
 
-        return clientSvcCommons.getCurrentWebIdentity(args.options.webUrl, this.siteAccessToken, this.formDigestValue);
+        return clientSvcCommons.getCurrentWebIdentity(args.options.webUrl, this.formDigestValue);
       })
       .then((identityResp: IdentityResponse): Promise<any> => {
         const opts: Options = args.options;
@@ -108,31 +91,22 @@ class SpoPropertyBagListCommand extends SpoPropertyBagBaseCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.PROPERTYBAG_LIST).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-    using the ${chalk.blue(commands.LOGIN)} command.
-                      
-  Remarks:
-
-    To retrieve property bag values, you have to first log in to a SharePoint
-    Online site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-
-  Examples:
+      `  Examples:
 
     Return property bag values located in site ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.PROPERTYBAG_LIST} --webUrl https://contoso.sharepoint.com/sites/test
+      ${commands.PROPERTYBAG_LIST} --webUrl https://contoso.sharepoint.com/sites/test
 
     Return property bag values located in site root folder ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.PROPERTYBAG_LIST} --webUrl https://contoso.sharepoint.com/sites/test -f /
+      ${commands.PROPERTYBAG_LIST} --webUrl https://contoso.sharepoint.com/sites/test -f /
 
     Return property bag values located in site document library ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.PROPERTYBAG_LIST} --webUrl https://contoso.sharepoint.com/sites/test --folder '/Shared Documents'
+      ${commands.PROPERTYBAG_LIST} --webUrl https://contoso.sharepoint.com/sites/test --folder '/Shared Documents'
 
     Return property bag values located in folder in site document library ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.PROPERTYBAG_LIST} -w https://contoso.sharepoint.com/sites/test -f '/Shared Documents/MyFolder'
+      ${commands.PROPERTYBAG_LIST} -w https://contoso.sharepoint.com/sites/test -f '/Shared Documents/MyFolder'
 
     Return property bag values located in site list ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.PROPERTYBAG_LIST} --webUrl https://contoso.sharepoint.com/sites/test --folder /Lists/MyList
+      ${commands.PROPERTYBAG_LIST} --webUrl https://contoso.sharepoint.com/sites/test --folder /Lists/MyList
     `);
   }
 

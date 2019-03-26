@@ -1,6 +1,7 @@
 import appInsights from './appInsights';
 import GlobalOptions from './GlobalOptions';
 import request from './request';
+import auth from './Auth';
 
 const vorpal: Vorpal = require('./vorpal-init');
 
@@ -46,7 +47,7 @@ export interface ODataError {
   }
 }
 
-interface CommandArgs {
+export interface CommandArgs {
   options: GlobalOptions;
 }
 
@@ -80,6 +81,10 @@ export default abstract class Command {
       return commandName;
     }
 
+    if (!this.alias()) {
+      return '';
+    }
+    
     // since the command was called by something else than its name
     // it must have aliases
     const aliases: string[] = this.alias() as string[];
@@ -96,10 +101,22 @@ export default abstract class Command {
 
   public action(): CommandAction {
     const cmd: Command = this;
-    return function (this: CommandInstance, args: CommandArgs, cb: () => void) {
-      args = cmd.processArgs(args);
-      cmd.initAction(args, this);
-      cmd.commandAction(this, args, cb);
+    return function (this: CommandInstance, args: CommandArgs, cb: (err?: any) => void) {
+      auth
+        .restoreAuth()
+        .then((): void => {
+          args = cmd.processArgs(args);
+          cmd.initAction(args, this);
+
+          if (!auth.service.connected) {
+            cb(new CommandError('Log in to Office 365 first'));
+            return;
+          }
+
+          cmd.commandAction(this, args, cb);
+        }, (error: any): void => {
+          cb(new CommandError(error));
+        });
     }
   }
 
@@ -307,13 +324,13 @@ export default abstract class Command {
     request.cmd = cmd;
 
     appInsights.trackEvent({
-      name: this.getCommandName(),
+      name: this.getUsedCommandName(cmd),
       properties: this.getTelemetryProperties(args)
     });
     appInsights.flush();
   }
 
-  private processArgs(args: CommandArgs): CommandArgs {
+  protected processArgs(args: CommandArgs): CommandArgs {
     if (!this.allowUnknownOptions()) {
       return args;
     }
@@ -342,7 +359,7 @@ export default abstract class Command {
         cmd._types.string.push(a.substr(2));
       }
     });
-    
+
     args = vorpal.util.buildCommandArgs(commandData.matchArgs, cmd, undefined, vorpal.isCommandArgKeyPairNormalized);
 
     return args;

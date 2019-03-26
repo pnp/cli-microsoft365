@@ -1,5 +1,6 @@
 import * as sinon from 'sinon';
 import * as assert from 'assert';
+import auth from './Auth';
 import Command, {
   CommandValidate,
   CommandCancel,
@@ -42,10 +43,6 @@ class MockCommand1 extends Command {
 
   public commandAction(cmd: CommandInstance, args: any, cb: (err?: any) => void): void {
     this.showDeprecationWarning(cmd, 'mc1', this.name);
-
-    appInsights.trackEvent({
-      name: this.getUsedCommandName(cmd)
-    });
 
     cb();
   }
@@ -188,6 +185,7 @@ describe('Command', () => {
   let telemetry: any;
 
   before(() => {
+    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
       telemetry = t;
     });
@@ -202,6 +200,7 @@ describe('Command', () => {
     helpSpy = sinon.spy(vcmd, 'help');
     typesSpy = sinon.spy(vcmd, 'types');
     telemetry = null;
+    auth.service.connected = true;
   });
 
   afterEach(() => {
@@ -220,10 +219,14 @@ describe('Command', () => {
     ]);
     vorpal.commands = [];
     (vorpal as any)._command = undefined;
+    auth.service.connected = false;
   });
 
   after(() => {
-    Utils.restore(appInsights.trackEvent);
+    Utils.restore([
+      appInsights.trackEvent,
+      auth.restoreAuth
+    ]);
   })
 
   it('initiates command 1 with vorpal', () => {
@@ -471,15 +474,16 @@ describe('Command', () => {
   });
 
   it('logs command name in the telemetry when command name used', (done) => {
+    const mock = new MockCommand1();
     const cmd = {
+      action: mock.action(),
       commandWrapper: {
         command: 'mock-command'
       },
       log: (msg?: string) => { },
       prompt: () => { }
     };
-    const mock = new MockCommand1();
-    mock.commandAction(cmd, {}, (err?: any): void => {
+    cmd.action({ options: {} }, () => {
       try {
         assert.equal(telemetry.name, 'mock-command');
         done();
@@ -491,15 +495,16 @@ describe('Command', () => {
   });
 
   it('logs command alias in the telemetry when command alias used', (done) => {
+    const mock = new MockCommand1();
     const cmd = {
+      action: mock.action(),
       commandWrapper: {
         command: 'mc1'
       },
       log: (msg?: string) => { },
       prompt: () => { }
     };
-    const mock = new MockCommand1();
-    mock.commandAction(cmd, {}, (err?: any): void => {
+    cmd.action({ options: {} }, () => {
       try {
         assert.equal(telemetry.name, 'mc1');
         done();
@@ -511,15 +516,16 @@ describe('Command', () => {
   });
 
   it('logs empty command name in telemetry when command called using something else than name or alias', (done) => {
+    const mock = new MockCommand1();
     const cmd = {
+      action: mock.action(),
       commandWrapper: {
         command: 'foo'
       },
       log: (msg?: string) => { },
       prompt: () => { }
     };
-    const mock = new MockCommand1();
-    mock.commandAction(cmd, {}, (err?: any): void => {
+    cmd.action({ options: {} }, () => {
       try {
         assert.equal(telemetry.name, '');
         done();
@@ -552,7 +558,6 @@ describe('Command', () => {
     cmd.init(vorpal);
     process.argv = ['node', 'o365', 'mock-command', '--option3', '00123'];
     vorpal.parse(['node', 'o365', 'mock-command', '--option3', '00123']);
-    process.argv = argv;
   });
 
   it('removes leading zeroes from known options that aren\'t a string', (done) => {
@@ -577,7 +582,6 @@ describe('Command', () => {
     cmd.init(vorpal);
     process.argv = ['node', 'o365', 'mock-command', '--option1', '00123'];
     vorpal.parse(['node', 'o365', 'mock-command', '--option1', '00123']);
-    process.argv = argv;
   });
 
   it('doesn\'t remove leading zeroes from known options that are a string', (done) => {
@@ -602,7 +606,6 @@ describe('Command', () => {
     cmd.init(vorpal);
     process.argv = ['node', 'o365', 'mock-command', '--option2', '00123'];
     vorpal.parse(['node', 'o365', 'mock-command', '--option2', '00123']);
-    process.argv = argv;
   });
 
   it('doesn\'t remove leading zeroes from unknown options where no types specified', (done) => {
@@ -627,7 +630,6 @@ describe('Command', () => {
     cmd.init(vorpal);
     process.argv = ['node', 'o365', 'mock-command', '--option1', '00123'];
     vorpal.parse(['node', 'o365', 'mock-command', '--option1', '00123']);
-    process.argv = argv;
   });
 
   it('removes leading zeroes from known options when the command doesn\'t support unknown options', (done) => {
@@ -652,6 +654,18 @@ describe('Command', () => {
     cmd.init(vorpal);
     process.argv = ['node', 'o365', 'mock-command', '--option1', '00123'];
     vorpal.parse(['node', 'o365', 'mock-command', '--option1', '00123']);
-    process.argv = argv;
+  });
+
+  it('correctly handles error when instance of error returned from the promise', (done) => {
+    const cmd = new MockCommand3();
+    (cmd as any).handleRejectedODataPromise(new Error('An error has occurred'), undefined, (msg: any): void => {
+      try {
+        assert.equal(JSON.stringify(msg), JSON.stringify(new CommandError('An error has occurred')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 });

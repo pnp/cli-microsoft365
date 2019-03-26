@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
 import {
@@ -30,17 +28,12 @@ class SpoSiteDesignTaskGetCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<SiteDesignTask> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving information about site design scheduled for execution...`);
-        }
-
+    this
+      .getSpoUrl(cmd, this.debug)
+      .then((spoUrl: string): Promise<SiteDesignTask> => {
         const requestOptions: any = {
-          url: `${auth.site.url}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignTask`,
+          url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignTask`,
           headers: {
-            authorization: `Bearer ${accessToken}`,
             accept: 'application/json;odata=nometadata',
           },
           body: {
@@ -91,22 +84,12 @@ class SpoSiteDesignTaskGetCommand extends SpoCommand {
   }
 
   public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site
-    using the ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
-
-    To get information about the specified site design scheduled for execution,
-    you have to first log in to a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-
-  Examples:
+      `  Examples:
   
     Get information about the specified site design scheduled for execution
-      ${chalk.grey(config.delimiter)} ${this.name} --taskId 6ec3ca5b-d04b-4381-b169-61378556d76e
+      ${this.name} --taskId 6ec3ca5b-d04b-4381-b169-61378556d76e
 
   More information:
 

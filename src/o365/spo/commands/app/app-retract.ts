@@ -1,6 +1,3 @@
-import auth from '../../SpoAuth';
-import { Auth } from '../../../../Auth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -44,29 +41,14 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
-    let siteAccessToken: string = '';
-    let appCatalogSiteUrl: string = '';
 
     const retractApp: () => void = (): void => {
-      this.getAppCatalogSiteUrl(cmd, auth.site.url, auth.service.accessToken, args)
-        .then((siteUrl: string): Promise<string> => {
-          appCatalogSiteUrl = siteUrl;
-
-          if (this.debug) {
-            cmd.log(`Retrieved app catalog URL ${appCatalogSiteUrl}`);
-          }
-
-          const resource: string = Auth.getResourceFromUrl(appCatalogSiteUrl);
-          return auth.getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug);
+      this
+        .getSpoUrl(cmd, this.debug)
+        .then((spoUrl: string): Promise<string> => {
+          return this.getAppCatalogSiteUrl(cmd, spoUrl, args);
         })
-        .then((accessToken: string): Promise<void> => {
-
-          siteAccessToken = accessToken;
-
-          if (this.debug) {
-            cmd.log(`Retrieved access token ${accessToken}.`);
-          }
-
+        .then((appCatalogSiteUrl: string): Promise<string> => {
           if (this.verbose) {
             cmd.log(`Retracting app...`);
           }
@@ -74,7 +56,6 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
           const requestOptions: any = {
             url: `${appCatalogSiteUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${encodeURIComponent(args.options.id)}')/retract`,
             headers: {
-              authorization: `Bearer ${siteAccessToken}`,
               accept: 'application/json;odata=nometadata'
             }
           };
@@ -168,15 +149,8 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.APP_RETRACT).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint site,
-    using the ${chalk.blue(commands.LOGIN)} command.
-
-  Remarks:
+      `  Remarks:
   
-    To retract an app from the tenant or site collection app catalog,
-    you have to first log in to a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-
     When adding an app to the tenant app catalog, it's not necessary to specify
     the tenant app catalog URL. When the URL is not specified, the CLI will
     try to resolve the URL itself. Specifying the app catalog URL is required
@@ -195,21 +169,21 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
     Retract the specified app from the tenant app catalog. Try to resolve the URL
     of the tenant app catalog automatically. Additionally, will prompt for confirmation before
     actually retracting the app.
-      ${chalk.grey(config.delimiter)} ${commands.APP_RETRACT} --id 058140e3-0e37-44fc-a1d3-79c487d371a3
+      ${commands.APP_RETRACT} --id 058140e3-0e37-44fc-a1d3-79c487d371a3
 
     Retract the specified app from the tenant app catalog located at
     ${chalk.grey('https://contoso.sharepoint.com/sites/apps')}. Additionally, will prompt for confirmation before
     actually retracting the app.
-      ${chalk.grey(config.delimiter)} ${commands.APP_RETRACT} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --appCatalogUrl https://contoso.sharepoint.com/sites/apps
+      ${commands.APP_RETRACT} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --appCatalogUrl https://contoso.sharepoint.com/sites/apps
 
     Retract the specified app from the tenant app catalog. Try to resolve the URL
     of the tenant app catalog automatically. Will not prompt for confirmation before retracting
     the app.
-      ${chalk.grey(config.delimiter)} ${commands.APP_RETRACT} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --confirm
+      ${commands.APP_RETRACT} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --confirm
 
     Retract the specified app from a site collection app catalog 
     of site ${chalk.grey('https://contoso.sharepoint.com/sites/site1')}.
-      ${chalk.grey(config.delimiter)} ${commands.APP_RETRACT} --id d95f8c94-67a1-4615-9af8-361ad33be93c --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
+      ${commands.APP_RETRACT} --id d95f8c94-67a1-4615-9af8-361ad33be93c --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
     
   More information:
   

@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -8,7 +6,6 @@ import {
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -40,28 +37,13 @@ class SpoCustomActionClearCommand extends SpoCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const clearCustomActions = (): void => {
-      const resource: string = Auth.getResourceFromUrl(args.options.url);
-      let siteAccessToken: string = '';
+      ((): Promise<void> => {
+        if (args.options.scope && args.options.scope.toLowerCase() !== "all") {
+          return this.clearScopedCustomActions(args.options);
+        }
 
-      if (this.debug) {
-        cmd.log(`Retrieving access token for ${resource}...`);
-      }
-
-      auth
-        .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-        .then((accessToken: string): Promise<void> => {
-          siteAccessToken = accessToken;
-
-          if (this.debug) {
-            cmd.log(`Retrieved access token ${accessToken}. Clearing custom actions in scope ${args.options.scope}...`);
-          }
-
-          if (args.options.scope && args.options.scope.toLowerCase() !== "all") {
-            return this.clearScopedCustomActions(args.options, siteAccessToken, cmd);
-          }
-
-          return this.clearAllScopes(args.options, siteAccessToken, cmd);
-        })
+        return this.clearAllScopes(args.options);
+      })()
         .then((): void => {
           if (this.verbose) {
             cmd.log(vorpal.chalk.green('DONE'));
@@ -90,11 +72,10 @@ class SpoCustomActionClearCommand extends SpoCommand {
     }
   }
 
-  private clearScopedCustomActions(options: Options, siteAccessToken: string, cmd: CommandInstance): Promise<void> {
+  private clearScopedCustomActions(options: Options): Promise<void> {
     const requestOptions: any = {
       url: `${options.url}/_api/${options.scope}/UserCustomActions/clear`,
       headers: {
-        authorization: `Bearer ${siteAccessToken}`,
         accept: 'application/json;odata=nometadata'
       },
       json: true
@@ -107,15 +88,15 @@ class SpoCustomActionClearCommand extends SpoCommand {
    * Clear request with `web` scope is send first. 
    * Another clear request is send with `site` scope after.
    */
-  private clearAllScopes(options: Options, siteAccessToken: string, cmd: CommandInstance): Promise<void> {
+  private clearAllScopes(options: Options): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       options.scope = "Web";
 
       this
-        .clearScopedCustomActions(options, siteAccessToken, cmd)
+        .clearScopedCustomActions(options)
         .then((): Promise<void> => {
           options.scope = "Site";
-          return this.clearScopedCustomActions(options, siteAccessToken, cmd);
+          return this.clearScopedCustomActions(options);
         })
         .then((): void => {
           return resolve();
@@ -172,29 +153,20 @@ class SpoCustomActionClearCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.CUSTOMACTION_CLEAR).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-    using the ${chalk.blue(commands.LOGIN)} command.
-                      
-  Remarks:
-
-    To clear user custom actions, you have to first log in to a SharePoint
-    Online site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-
-  Examples:
+      `  Examples:
   
     Clears all user custom actions for both site and site collection
     ${chalk.grey('https://contoso.sharepoint.com/sites/test')}. Skips the confirmation prompt
     message.
-      ${chalk.grey(config.delimiter)} ${commands.CUSTOMACTION_CLEAR} -u https://contoso.sharepoint.com/sites/test --confirm
+      ${commands.CUSTOMACTION_CLEAR} -u https://contoso.sharepoint.com/sites/test --confirm
 
     Clears all user custom actions for site
     ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.CUSTOMACTION_CLEAR} -u https://contoso.sharepoint.com/sites/test -s Web
+      ${commands.CUSTOMACTION_CLEAR} -u https://contoso.sharepoint.com/sites/test -s Web
 
     Clears all user custom actions for site collection
     ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.CUSTOMACTION_CLEAR} --url https://contoso.sharepoint.com/sites/test --scope Site
+      ${commands.CUSTOMACTION_CLEAR} --url https://contoso.sharepoint.com/sites/test --scope Site
     `);
   }
 }

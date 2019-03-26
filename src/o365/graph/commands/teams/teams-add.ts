@@ -1,5 +1,3 @@
-import auth from '../../GraphAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
@@ -38,12 +36,10 @@ class GraphTeamsAddCommand extends GraphCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((): Promise<{}> => {
-        return args.options.groupId ? this.createTeamForGroup(cmd, args) :
-          this.createTeam(cmd, args);
-      })
+      ((): Promise<{}> => {
+        return args.options.groupId ? this.createTeamForGroup(args) :
+          this.createTeam(args);
+      })()
       .then((res: any): void => {
         // get the teams id from the response header.
         const teamsRspHdrRegEx: RegExpExecArray | null = /teams?\('([^']+)'\)/i.exec(res.headers.location);
@@ -61,12 +57,11 @@ class GraphTeamsAddCommand extends GraphCommand {
       });
   }
 
-  private createTeam(cmd: CommandInstance, args: CommandArgs): Promise<{}> {
+  private createTeam(args: CommandArgs): Promise<{}> {
     const requestOptions: any = {
-      url: `${auth.service.resource}/beta/teams`,
+      url: `${this.resource}/beta/teams`,
       resolveWithFullResponse: true,
       headers: {
-        authorization: `Bearer ${auth.service.accessToken}`,
         accept: 'application/json;odata.metadata=none',
         'content-type': 'application/json;odata.metadata=none'
       },
@@ -81,12 +76,11 @@ class GraphTeamsAddCommand extends GraphCommand {
     return request.post(requestOptions);
   }
 
-  private createTeamForGroup(cmd: CommandInstance, args: CommandArgs): Promise<{}> {
+  private createTeamForGroup(args: CommandArgs): Promise<{}> {
     const requestOptions: any = {
-      url: `${auth.service.resource}/beta/groups/${args.options.groupId}/team`,
+      url: `${this.resource}/beta/groups/${args.options.groupId}/team`,
       resolveWithFullResponse: true,
       headers: {
-        authorization: `Bearer ${auth.service.accessToken}`,
         accept: 'application/json;odata.metadata=none',
         'content-type': 'application/json;odata.metadata=none'
       },
@@ -150,24 +144,18 @@ class GraphTeamsAddCommand extends GraphCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to the Microsoft Graph
-    using the ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
+      `  Remarks:
 
     ${chalk.yellow('Attention:')} This command is based on an API that is currently in preview
     and is subject to change once the API reached general availability.
 
-    To add a new Microsoft Teams team, you have to first log in to
-    the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
-
   Examples:
   
     Add a new Microsoft Teams team by creating a group 
-      ${chalk.grey(config.delimiter)} ${this.name} --name 'Architecture' --description 'Architecture Discussion'
+      ${this.name} --name 'Architecture' --description 'Architecture Discussion'
 
     Add a new Microsoft Teams team to an existing Office 365 group 
-      ${chalk.grey(config.delimiter)} ${this.name} --groupId 6d551ed5-a606-4e7d-b5d7-36063ce562cc
+      ${this.name} --groupId 6d551ed5-a606-4e7d-b5d7-36063ce562cc
   `);
   }
 }

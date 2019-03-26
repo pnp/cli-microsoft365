@@ -18,11 +18,7 @@ Option|Description
 `--debug`|Runs command with debug logging
 
 !!! important
-    Before using this command, log in to a SharePoint Online site, using the [spo login](../login.md) command.
-
-## Remarks
-
-To get the list of available themes, you have to first log in to a SharePoint admin site using the [spo login](../login.md) command, eg. `spo login https://contoso-admin.sharepoint.com`.
+    To use this command you have to have permissions to access the tenant admin site.
 
 ## Examples
 

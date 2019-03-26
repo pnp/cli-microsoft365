@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -9,7 +7,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
-import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -45,56 +42,39 @@ class SpoListWebhookSetCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-    let siteAccessToken: string = '';
-
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
+    if (this.verbose) {
+      cmd.log(`Updating webhook ${args.options.id} belonging to list ${args.options.listId ? encodeURIComponent(args.options.listId) : encodeURIComponent(args.options.listTitle as string)} located at site ${args.options.webUrl}...`);
     }
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<void> => {
-        siteAccessToken = accessToken;
+    let requestUrl: string = '';
 
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Updating the webhook...`);
-        }
+    if (args.options.listId) {
+      requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.listId)}')/Subscriptions('${encodeURIComponent(args.options.id)}')`;
+    }
+    else {
+      requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.listTitle as string)}')/Subscriptions('${encodeURIComponent(args.options.id)}')`;
+    }
 
-        if (this.verbose) {
-          cmd.log(`Updating webhook ${args.options.id} belonging to list ${args.options.listId ? encodeURIComponent(args.options.listId) : encodeURIComponent(args.options.listTitle as string)} located at site ${args.options.webUrl}...`);
-        }
+    const requestBody: any = {};
+    if (args.options.notificationUrl) {
+      requestBody.notificationUrl = args.options.notificationUrl;
+    }
+    if (args.options.expirationDateTime) {
+      requestBody.expirationDateTime = args.options.expirationDateTime;
+    }
 
-        let requestUrl: string = '';
+    const requestOptions: any = {
+      url: requestUrl,
+      method: 'PATCH',
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      body: requestBody,
+      json: true
+    };
 
-        if (args.options.listId) {
-          requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.listId)}')/Subscriptions('${encodeURIComponent(args.options.id)}')`;
-        }
-        else {
-          requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.listTitle as string)}')/Subscriptions('${encodeURIComponent(args.options.id)}')`;
-        }
-
-        const requestBody: any = {};
-        if (args.options.notificationUrl) {
-          requestBody.notificationUrl = args.options.notificationUrl;
-        }
-        if (args.options.expirationDateTime) {
-          requestBody.expirationDateTime = args.options.expirationDateTime;
-        }
-
-        const requestOptions: any = {
-          url: requestUrl,
-          method: 'PATCH',
-          headers: {
-            authorization: `Bearer ${siteAccessToken}`,
-            'accept': 'application/json;odata=nometadata'
-          },
-          body: requestBody,
-          json: true
-        };
-
-        return request.patch(requestOptions);
-      })
+    request
+      .patch(requestOptions)
       .then((): void => {
         // REST patch call doesn't return anything
         cb();
@@ -195,15 +175,8 @@ class SpoListWebhookSetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to SharePoint,
-    using the ${chalk.blue(commands.LOGIN)} command.
+      `  Remarks:
   
-  Remarks:
-  
-    To update a webhook, you have to first log in to SharePoint
-    using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-
     If the specified ${chalk.grey('id')} doesn't refer to an existing webhook,
     you will get a ${chalk.grey('404 - "404 FILE NOT FOUND"')} error.
         
@@ -214,21 +187,21 @@ class SpoListWebhookSetCommand extends SpoCommand {
     ${chalk.grey('0cd891ef-afce-4e55-b836-fce03286cccf')} located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/ninja')} to
     ${chalk.grey('https://contoso-functions.azurewebsites.net/webhook')}
-      ${chalk.grey(config.delimiter)} ${commands.LIST_WEBHOOK_SET} --webUrl https://contoso.sharepoint.com/sites/ninja --listId 0cd891ef-afce-4e55-b836-fce03286cccf --id cc27a922-8224-4296-90a5-ebbc54da2e81 --notificationUrl https://contoso-functions.azurewebsites.net/webhook
+      ${commands.LIST_WEBHOOK_SET} --webUrl https://contoso.sharepoint.com/sites/ninja --listId 0cd891ef-afce-4e55-b836-fce03286cccf --id cc27a922-8224-4296-90a5-ebbc54da2e81 --notificationUrl https://contoso-functions.azurewebsites.net/webhook
 
     Update the expiration date of a webhook with ID
     ${chalk.grey('cc27a922-8224-4296-90a5-ebbc54da2e81')} which belongs to a list with title
     ${chalk.grey('Documents')} located in site 
     ${chalk.grey('https://contoso.sharepoint.com/sites/ninja')} to
     ${chalk.grey('October 9th, 2018 at 6:15 PM')}
-      ${chalk.grey(config.delimiter)} ${commands.LIST_WEBHOOK_SET} --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e81 --expirationDateTime 2018-10-09T18:15
+      ${commands.LIST_WEBHOOK_SET} --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e81 --expirationDateTime 2018-10-09T18:15
 
     From the webhook with ID ${chalk.grey('cc27a922-8224-4296-90a5-ebbc54da2e81')} which
     belongs to a list with title ${chalk.grey('Documents')} located in site 
     ${chalk.grey('https://contoso.sharepoint.com/sites/ninja')} update the notification url to 
     to ${chalk.grey('https://contoso-functions.azurewebsites.net/webhook')} and the expiration
     date to ${chalk.grey('March 2nd, 2019')}
-      ${chalk.grey(config.delimiter)} ${commands.LIST_WEBHOOK_SET} --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e81 --notificationUrl https://contoso-functions.azurewebsites.net/webhook --expirationDateTime 2019-03-02
+      ${commands.LIST_WEBHOOK_SET} --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e81 --notificationUrl https://contoso-functions.azurewebsites.net/webhook --expirationDateTime 2019-03-02
       `);
   }
 }

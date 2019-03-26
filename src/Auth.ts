@@ -7,33 +7,42 @@ import { AuthenticationContext, TokenResponse, ErrorResponse, UserCodeInfo, Logg
 import { CommandError } from './Command';
 import config from './config';
 
+export interface Hash<TValue> {
+  [key: string]: TValue;
+}
+
+export interface AccessToken {
+  expiresOn: string;
+  value: string;
+}
+
 export class Service {
   connected: boolean = false;
-  resource: string;
-  accessToken: string = '';
   refreshToken?: string;
-  expiresOn: string = '';
   authType: AuthType = AuthType.DeviceCode;
   userName?: string;
   password?: string;
   certificate?: string
   thumbprint?: string;
+  accessTokens: Hash<AccessToken>;
+  spoUrl?: string;
+  tenantId?: string;
 
-  constructor(resource: string = '') {
-    this.resource = resource;
+  constructor() {
+    this.accessTokens = {};
   }
 
   public logout(): void {
     this.connected = false;
-    this.resource = '';
-    this.accessToken = '';
+    this.accessTokens = {};
     this.refreshToken = undefined;
-    this.expiresOn = '';
     this.authType = AuthType.DeviceCode;
     this.userName = undefined;
     this.password = undefined;
     this.certificate = undefined;
     this.thumbprint = undefined;
+    this.spoUrl = undefined;
+    this.tenantId = undefined;
   }
 }
 
@@ -47,22 +56,32 @@ export enum AuthType {
   Certificate
 }
 
-export abstract class Auth {
+export class Auth {
   protected authCtx: AuthenticationContext;
   private userCodeInfo?: UserCodeInfo;
+  private _service: Service;
+  private appId: string;
 
-  protected abstract serviceId(): string;
+  public get service(): Service {
+    return this._service;
+  }
 
-  constructor(public service: Service, private appId?: string) {
+  public get defaultResource(): string {
+    return 'https://graph.microsoft.com';
+  }
+
+  constructor() {
+    this.appId = config.cliAadAppId;
+    this._service = new Service();
     this.authCtx = new AuthenticationContext(`https://login.microsoftonline.com/${config.tenant}`);
   }
 
   public restoreAuth(): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       this
-        .getServiceConnectionInfo<Service>(this.serviceId())
+        .getServiceConnectionInfo<Service>()
         .then((service: Service): void => {
-          this.service = service;
+          this._service = Object.assign(this._service, service);
           resolve();
         }, (error: any): void => {
           resolve();
@@ -81,19 +100,24 @@ export abstract class Auth {
 
     return new Promise<string>((resolve: (accessToken: string) => void, reject: (error: any) => void): void => {
       const now: Date = new Date();
-      const expiresOn: Date = new Date(this.service.expiresOn);
+      const accessToken: AccessToken | undefined = this.service.accessTokens[resource];
+      const expiresOn: Date = accessToken ? new Date(accessToken.expiresOn) : new Date(0);
 
-      if (expiresOn > now &&
-        this.service.accessToken !== undefined) {
+      if (accessToken && expiresOn > now) {
         if (debug) {
-          stdout.log(`Existing access token ${this.service.accessToken} still valid. Returning...`);
+          stdout.log(`Existing access token ${accessToken.value} still valid. Returning...`);
         }
-        resolve(this.service.accessToken);
+        resolve(accessToken.value);
         return;
       }
       else {
         if (debug) {
-          stdout.log(`No existing access token or expired. Token: ${this.service.accessToken}, ExpiresAt: ${this.service.expiresOn}`);
+          if (!accessToken) {
+            stdout.log(`No token found for resource ${resource}`);
+          }
+          else {
+            stdout.log(`Access token expired. Token: ${accessToken.value}, ExpiresAt: ${accessToken.expiresOn}`);
+          }
         }
       }
 
@@ -116,22 +140,40 @@ export abstract class Auth {
         }
       }
 
+      let error: any = undefined;
+
       getTokenPromise(resource, stdout, debug)
         .then((tokenResponse: TokenResponse): Promise<void> => {
-          this.service.accessToken = tokenResponse.accessToken;
+          this.service.accessTokens[resource] = {
+            expiresOn: tokenResponse.expiresOn as string,
+            value: tokenResponse.accessToken
+          };
           this.service.refreshToken = tokenResponse.refreshToken;
-          this.service.expiresOn = tokenResponse.expiresOn as string;
-          return this.setServiceConnectionInfo(this.serviceId(), this.service);
-        }, (error: any): void => {
-          reject(error);
+          this.service.connected = true;
+          return this.storeConnectionInfo();
+        }, (_error: any): Promise<void> => {
+          error = _error;
+          // return rejected promise to prevent resolving the parent promise
+          // with access token when there is none
+          return Promise.reject(_error);
         })
         .then((): void => {
-          resolve(this.service.accessToken);
-        }, (error: any): void => {
+          resolve(this.service.accessTokens[resource].value);
+        }, (_error: any): void => {
+          // _error could happen due to an issue with persisting the access
+          // token which shouldn't fail the overall token retrieval process
           if (debug) {
-            stdout.log(new CommandError(error));
+            stdout.log(new CommandError(_error));
           }
-          resolve(this.service.accessToken);
+          // was there an issue earlier in the process
+          if (error) {
+            reject(error);
+          }
+          else {
+            // resolve with the retrieved token despite the issue with
+            // persisting the token
+            resolve(this.service.accessTokens[resource].value);
+          }
         });
     });
   }
@@ -271,46 +313,6 @@ export abstract class Auth {
     }
   }
 
-  public getAccessTokenWithResponse(resource: string, refreshToken: string, stdout: Logger, debug: boolean = false): Promise<TokenResponse> {
-    if (debug) {
-      stdout.log(`Starting Auth.getAccessTokenWithResponse. resource: ${resource}, refreshToken: ${refreshToken}, debug: ${debug}`);
-    }
-
-    if (this.service.authType === AuthType.Certificate) {
-      return this.ensureAccessTokenWithCertificate(resource, stdout, debug);
-    }
-    else {
-      return new Promise<TokenResponse>((resolve: (tokenResponse: TokenResponse) => void, reject: (err: any) => void): void => {
-        if (debug) {
-          stdout.log(`Retrieving access token for ${resource} using refresh token ${refreshToken}`);
-        }
-
-        this.authCtx.acquireTokenWithRefreshToken(refreshToken, this.appId as string, resource,
-          (error: Error, response: TokenResponse | ErrorResponse): void => {
-            if (error) {
-              if (debug) {
-                stdout.log('Error:');
-                stdout.log(error);
-                stdout.log('');
-              }
-
-              reject((response && (response as any).error_description) || error.message);
-              return;
-            }
-
-            if (debug) {
-              stdout.log('Response:');
-              stdout.log(response);
-              stdout.log('');
-            }
-
-            const tokenResponse: TokenResponse = <TokenResponse>response;
-            resolve(tokenResponse);
-          });
-      });
-    }
-  }
-
   public static getResourceFromUrl(url: string): string {
     let resource: string = url;
     const pos: number = resource.indexOf('/', 8);
@@ -321,35 +323,32 @@ export abstract class Auth {
     return resource;
   }
 
-  protected getServiceConnectionInfo<TConn>(service: string): Promise<TConn> {
+  private getServiceConnectionInfo<TConn>(): Promise<TConn> {
     return new Promise<TConn>((resolve: (connectionInfo: TConn) => void, reject: (error: any) => void): void => {
       const tokenStorage = this.getTokenStorage();
       tokenStorage
-        .get(service)
+        .get()
         .then((json: string): void => {
-          resolve(JSON.parse(json));
+          try {
+            resolve(JSON.parse(json));
+          }
+          catch (err) {
+            reject(err);
+          }
         }, (error: any): void => {
           reject(error);
         })
     });
   }
 
-  protected setServiceConnectionInfo<TConn>(service: string, connectionInfo: TConn): Promise<void> {
-    const tokenStorage = this.getTokenStorage();
-    return tokenStorage.set(service, JSON.stringify(connectionInfo));
-  }
-
   public storeConnectionInfo(): Promise<void> {
-    return this.setServiceConnectionInfo(this.serviceId(), this.service);
-  }
-
-  protected clearServiceConnectionInfo(service: string): Promise<void> {
     const tokenStorage = this.getTokenStorage();
-    return tokenStorage.remove(service);
+    return tokenStorage.set(JSON.stringify(this.service));
   }
 
   public clearConnectionInfo(): Promise<void> {
-    return this.clearServiceConnectionInfo(this.serviceId());
+    const tokenStorage = this.getTokenStorage();
+    return tokenStorage.remove();
   }
 
   public getTokenStorage(): TokenStorage {
@@ -370,3 +369,5 @@ export abstract class Auth {
     return tokenStorage;
   }
 }
+
+export default new Auth();

@@ -1,12 +1,12 @@
 import commands from '../../commands';
 import Command, { CommandError, CommandOption } from '../../../../Command';
 import * as sinon from 'sinon';
-import auth, { Site } from '../../SpoAuth';
+import appInsights from '../../../../appInsights';
+import auth from '../../../../Auth';
 const command: Command = require('./orgnewssite-list');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import appInsights from '../../../../appInsights';
 
 describe(commands.ORGNEWSSITE_LIST, () => {
   let vorpal: Vorpal;
@@ -16,20 +16,27 @@ describe(commands.ORGNEWSSITE_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({
+      FormDigestValue: 'abc'
+    }));
+    auth.service.connected = true;
+    auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.site = new Site();
   });
 
   afterEach(() => {
@@ -41,11 +48,12 @@ describe(commands.ORGNEWSSITE_LIST, () => {
 
   after(() => {
     Utils.restore([
-      auth.ensureAccessToken,
       auth.restoreAuth,
-      request.post,
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      (command as any).getRequestDigest
     ]);
+    auth.service.connected = false;
+    auth.service.spoUrl = undefined;
   });
 
   it('has correct name', () => {
@@ -56,31 +64,8 @@ describe(commands.ORGNEWSSITE_LIST, () => {
     assert.notEqual(command.description, null);
   });
 
-  it('aborts when not logged in to a SharePoint tenant admin site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`https://contoso.sharepoint.com is not a tenant admin site. Log in to your tenant admin site and try again`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('returns a result', (done) => {
     const svcListRequest = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0) {
-          return Promise.resolve({ FormDigestValue: 'abc' });
-        }
-      }
-
       if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return Promise.resolve(JSON.stringify([
           { "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "8992299e-a003-4000-7686-fda36e26a53c" }, 22, ['http://contoso.sharepoint.com/sites/site1']
@@ -90,14 +75,9 @@ describe(commands.ORGNEWSSITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, verbose: true } }, () => {
       try {
-        assert.equal(svcListRequest.callCount, 2);
+        assert.equal(svcListRequest.callCount, 1);
         assert(cmdInstanceLogSpy.calledWith(['http://contoso.sharepoint.com/sites/site1']));
         done();
       }
@@ -109,13 +89,6 @@ describe(commands.ORGNEWSSITE_LIST, () => {
 
   it('returns array of results', (done) => {
     const svcListRequest = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0) {
-          return Promise.resolve({ FormDigestValue: 'abc' });
-        }
-      }
-
       if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return Promise.resolve(JSON.stringify([
           { "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "8992299e-a003-4000-7686-fda36e26a53c" }, 22, ['http://contoso.sharepoint.com/sites/site1', 'http://contoso.sharepoint.com/sites/site2']
@@ -125,14 +98,9 @@ describe(commands.ORGNEWSSITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, verbose: false } }, () => {
       try {
-        assert.equal(svcListRequest.callCount, 2);
+        assert.equal(svcListRequest.callCount, 1);
         assert(cmdInstanceLogSpy.calledWith(['http://contoso.sharepoint.com/sites/site1', 'http://contoso.sharepoint.com/sites/site2']));
         done();
       }
@@ -144,17 +112,8 @@ describe(commands.ORGNEWSSITE_LIST, () => {
 
   it('handles error getting request', (done) => {
     const svcListRequest = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0) {
-          return Promise.resolve({ FormDigestValue: 'abc' });
-        }
-      }
-
       if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers['X-RequestDigest']) {
+        if (opts.headers['X-RequestDigest']) {
           return Promise.resolve(JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": {
@@ -168,11 +127,6 @@ describe(commands.ORGNEWSSITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         debug: true
@@ -181,6 +135,20 @@ describe(commands.ORGNEWSSITE_LIST, () => {
       try {
         assert(svcListRequest.called);
         assert.equal(err.message, 'An error has occurred');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly handles random API error', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => Promise.reject('An error has occurred'));
+
+    cmdInstance.action({ options: {} }, (err?: any) => {
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -232,23 +200,5 @@ describe(commands.ORGNEWSSITE_LIST, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.ensureAccessToken);
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 });

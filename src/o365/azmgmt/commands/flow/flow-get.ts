@@ -1,5 +1,3 @@
-import auth from '../../AzmgmtAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
@@ -32,28 +30,20 @@ class AzmgmtFlowGetCommand extends AzmgmtCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<{}> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}.`);
-        }
+    if (this.verbose) {
+      cmd.log(`Retrieving information about Microsoft Flow ${args.options.name}...`);
+    }
 
-        if (this.verbose) {
-          cmd.log(`Retrieving information about Microsoft Flow ${args.options.name}...`);
-        }
+    const requestOptions: any = {
+      url: `${this.resource}providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`,
+      headers: {
+        accept: 'application/json'
+      },
+      json: true
+    };
 
-        const requestOptions: any = {
-          url: `${auth.service.resource}providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`,
-          headers: {
-            authorization: `Bearer ${accessToken}`,
-            accept: 'application/json'
-          },
-          json: true
-        };
-
-        return request.get(requestOptions);
-      })
+    request
+      .get(requestOptions)
       .then((res: any): void => {
         if (args.options.output === 'json') {
           cmd.log(res);
@@ -111,18 +101,12 @@ class AzmgmtFlowGetCommand extends AzmgmtCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.FLOW_GET).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to the Azure Management Service,
-    using the ${chalk.blue(commands.LOGIN)} command.
-
-  Remarks:
+      `  Remarks:
 
     ${chalk.yellow('Attention:')} This command is based on an API that is currently
     in preview and is subject to change once the API reached general
     availability.
   
-    To get information about the specified Microsoft Flow, you have to first
-    log in to the Azure Management Service using the ${chalk.blue(commands.LOGIN)} command.
-
     By default, the command will try to retrieve Microsoft Flows you own.
     If you want to retrieve Flow owned by another user, use the ${chalk.blue('asAdmin')}
     flag.
@@ -132,7 +116,7 @@ class AzmgmtFlowGetCommand extends AzmgmtCommand {
 
     If the Microsoft Flow with the name you specified doesn't exist, you will
     get the ${chalk.grey(`The caller with object id \'abc\' does not have permission${os.EOL}` +
-    '    for connection \'xyz\' under Api \'shared_logicflows\'.')} error.
+        '    for connection \'xyz\' under Api \'shared_logicflows\'.')} error.
     If you try to retrieve a non-existing flow as admin, you will get the
     ${chalk.grey('Could not find flow \'xyz\'.')} error.
    
@@ -140,10 +124,10 @@ class AzmgmtFlowGetCommand extends AzmgmtCommand {
   
     Get information about the specified Microsoft Flow owned by the currently
     signed-in user
-      ${chalk.grey(config.delimiter)} ${this.getCommandName()} --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d
+      ${this.getCommandName()} --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d
 
     Get information about the specified Microsoft Flow owned by another user
-      ${chalk.grey(config.delimiter)} ${this.getCommandName()} --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --asAdmin
+      ${this.getCommandName()} --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --asAdmin
 `);
   }
 }

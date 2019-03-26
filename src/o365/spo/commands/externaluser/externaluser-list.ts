@@ -1,4 +1,3 @@
-import auth from '../../SpoAuth';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -36,10 +35,6 @@ class SpoExternalUserListCommand extends SpoCommand {
     return 'Lists external users in the tenant';
   }
 
-  protected requiresTenantAdmin(): boolean {
-    return true;
-  }
-
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.filter = (!(!args.options.filter)).toString();
@@ -51,18 +46,14 @@ class SpoExternalUserListCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    if (this.debug) {
-      cmd.log(`Retrieving access token for the tenant admin site ${auth.service.resource}...`);
-    }
+    let spoAdminUrl: string = '';
 
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<ContextInfo> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
+    this
+      .getSpoAdminUrl(cmd, this.debug)
+      .then((_spoAdminUrl: string): Promise<ContextInfo> => {
+        spoAdminUrl = _spoAdminUrl;
 
-        return this.getRequestDigest(cmd, this.debug);
+        return this.getRequestDigest(spoAdminUrl);
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
@@ -83,9 +74,8 @@ class SpoExternalUserListCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+          url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': res.FormDigestValue
           },
           body: payload
@@ -193,29 +183,26 @@ class SpoExternalUserListCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.getCommandName()).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online tenant admin site,
-  using the ${chalk.blue(commands.LOGIN)} command.
+      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
+    the tenant admin site.
                 
-  Remarks:
-
-    To list external users, you have to first log in to a tenant admin site using the
-    ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso-admin.sharepoint.com`)}.
-
   Examples:
   
-    List all external users from the current tenant. Show the first batch of 50 users.
-      ${chalk.grey(config.delimiter)} ${this.getCommandName()} --pageSize 50 --position 0
+    List all external users from the current tenant. Show the first batch of 50
+    users.
+      ${this.getCommandName()} --pageSize 50 --position 0
 
-    List all external users from the current tenant whose first name, last name or email address
-    begins with ${chalk.grey('Vesa')}. Show the first batch of 50 users.
-      ${chalk.grey(config.delimiter)} ${this.getCommandName()} --pageSize 50 --position 0 --filter Vesa
+    List all external users from the current tenant whose first name, last name
+    or email address begins with ${chalk.grey('Vesa')}. Show the first batch of 50 users.
+      ${this.getCommandName()} --pageSize 50 --position 0 --filter Vesa
 
-    List all external users from the specified site. Show the first batch of 50 users.
-      ${chalk.grey(config.delimiter)} ${this.getCommandName()} --pageSize 50 --position 0 --siteUrl https://contoso.sharepoint.com
+    List all external users from the specified site. Show the first batch of 50
+    users.
+      ${this.getCommandName()} --pageSize 50 --position 0 --siteUrl https://contoso.sharepoint.com
 
-    List all external users from the current tenant. Show the first batch of 50 users sorted descending
-    by e-mail.
-      ${chalk.grey(config.delimiter)} ${this.getCommandName()} --pageSize 50 --position 0 --sortOrder desc
+    List all external users from the current tenant. Show the first batch of 50
+    users sorted descending by e-mail.
+      ${this.getCommandName()} --pageSize 50 --position 0 --sortOrder desc
 `);
   }
 }

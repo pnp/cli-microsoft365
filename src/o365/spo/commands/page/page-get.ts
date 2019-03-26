@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
 import {
@@ -7,7 +5,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import GlobalOptions from '../../../../GlobalOptions';
-import { Auth } from '../../../../Auth';
 import { PageItem } from './PageItem';
 import { ClientSidePage } from './clientsidepages';
 
@@ -32,40 +29,26 @@ class SpoPageGetCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
+    if (this.verbose) {
+      cmd.log(`Retrieving information about the page...`);
     }
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<PageItem> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}`);
-        }
+    let pageName: string = args.options.name;
+    if (args.options.name.indexOf('.aspx') < 0) {
+      pageName += '.aspx';
+    }
 
-        if (this.verbose) {
-          cmd.log(`Retrieving information about the page...`);
-        }
+    const requestOptions: any = {
+      url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${args.options.webUrl.substr(args.options.webUrl.indexOf('/', 8))}/SitePages/${encodeURIComponent(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId,ListItemAllFields/PageLayoutType,ListItemAllFields/CommentsDisabled`,
+      headers: {
+        'content-type': 'application/json;charset=utf-8',
+        accept: 'application/json;odata=nometadata'
+      },
+      json: true
+    };
 
-        let pageName: string = args.options.name;
-        if (args.options.name.indexOf('.aspx') < 0) {
-          pageName += '.aspx';
-        }
-
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${args.options.webUrl.substr(args.options.webUrl.indexOf('/', 8))}/SitePages/${encodeURIComponent(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId,ListItemAllFields/PageLayoutType,ListItemAllFields/CommentsDisabled`,
-          headers: {
-            authorization: `Bearer ${accessToken}`,
-            'content-type': 'application/json;charset=utf-8',
-            accept: 'application/json;odata=nometadata'
-          },
-          json: true
-        };
-
-        return request.get(requestOptions);
-      })
+    request
+      .get<PageItem>(requestOptions)
       .then((res: PageItem): void => {
         if (res.ListItemAllFields.ClientSideApplicationId !== 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec') {
           cb(new CommandError(`Page ${args.options.name} is not a modern page.`));
@@ -135,13 +118,7 @@ class SpoPageGetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site using the
-      ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
-
-    To get information about a modern page, you have to first log in to a SharePoint site
-    using the ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
+      `  Remarks:
 
     If the specified ${chalk.grey('name')} doesn't refer to an existing modern page, you will get
     a ${chalk.grey('File doesn\'t exists')} error.
@@ -149,7 +126,7 @@ class SpoPageGetCommand extends SpoCommand {
   Examples:
   
     Get information about the modern page with name ${chalk.grey('home.aspx')}
-      ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx
+      ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx
 `);
   }
 }

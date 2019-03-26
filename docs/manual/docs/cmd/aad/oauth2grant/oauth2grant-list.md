@@ -18,12 +18,7 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
-!!! important
-    Before using this command, log in to Azure Active Directory Graph, using the [aad login](../login.md) command.
-
 ## Remarks
-
-To get information about service principal OAuth2 permission grants, you have to first log in to Azure Active Directory Graph using the [aad login](../login.md) command, eg. `aad login`.
 
 In order to list existing OAuth2 permissions granted to a service principal, you need its `objectId`. You can retrieve it using the [aad sp get](../sp/sp-get.md) command.
 

@@ -12,7 +12,7 @@ interface Options extends GlobalOptions {
 }
 
 export abstract class SpoAppBaseCommand extends SpoCommand {
-  public getAppCatalogSiteUrl(cmd: CommandInstance, authSiteUrl: string, accessToken: string, args: CommandArgs): Promise<string> {
+  public getAppCatalogSiteUrl(cmd: CommandInstance, authSiteUrl: string, args: CommandArgs): Promise<string> {
     return new Promise<string>((resolve: (appCatalogSiteUrl: string) => void, reject: (error: any) => void): void => {
       if (args.options.scope === 'sitecollection') {
         return resolve((args.options.appCatalogUrl as string).toLowerCase().replace('/appcatalog', ''));
@@ -25,7 +25,6 @@ export abstract class SpoAppBaseCommand extends SpoCommand {
       const requestOptions: any = {
         url: `${authSiteUrl}/_api/SP_TenantSettings_Current`,
         headers: {
-          authorization: `Bearer ${accessToken}`,
           accept: 'application/json;odata=nometadata'
         },
         json: true
