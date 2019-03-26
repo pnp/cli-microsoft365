@@ -37,6 +37,8 @@ class GraphO365GroupUserListCommand extends GraphItemsListCommand<GroupUser> {
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.role = args.options.role;
+    telemetryProps.teamId = typeof args.options.teamId !== 'undefined';
+    telemetryProps.groupId = typeof args.options.groupId !== 'undefined';
     return telemetryProps;
   }
 
@@ -46,7 +48,7 @@ class GraphO365GroupUserListCommand extends GraphItemsListCommand<GroupUser> {
     this
       .getOwners(cmd, providedGroupId)
       .then((): Promise<void> => {
-        if (args.options.role === "Owner") {
+        if (args.options.role && args.options.role.toLowerCase() === "owner") {
           return Promise.resolve();
         }
 
@@ -55,14 +57,14 @@ class GraphO365GroupUserListCommand extends GraphItemsListCommand<GroupUser> {
       .then(
         (): void => {
           // Filter out duplicate added values for owners (as they are returned as members as well)
-          this.items = this.items.filter((groupUser, index, self) =>
+          this.items = this.items.filter((groupUser: GroupUser, index: number, self: GroupUser[]) =>
             index === self.findIndex((t) => (
               t.id === groupUser.id && t.displayName === groupUser.displayName
             ))
           );
 
           if (args.options.role) {
-            this.items = this.items.filter(i => i.userType === args.options.role)
+            this.items = this.items.filter(i => i.userType.toLowerCase() === (args.options.role as string).toLowerCase())
           }
 
           cmd.log(this.items);
@@ -103,13 +105,12 @@ class GraphO365GroupUserListCommand extends GraphItemsListCommand<GroupUser> {
         description: "The ID of the Office 365 group for which to list users"
       },
       {
-        option: "--teamdId [teamdId]",
-        description: "The ID of the Teams team for which to list users"
+        option: "--teamId [teamId]",
+        description: "The ID of the Microsoft Teams team for which to list users"
       },
       {
-        option: "-r, --role [type]",
-        description:
-          "Filter the results to only users with the given role: Owner|Member|Guest",
+        option: "-r, --role [role]",
+        description: "Filter the results to only users with the given role: Owner|Member|Guest",
         autocomplete: ["Owner", "Member", "Guest"]
       }
     ];
@@ -137,7 +138,7 @@ class GraphO365GroupUserListCommand extends GraphItemsListCommand<GroupUser> {
       }
 
       if (args.options.role) {
-        if (['Owner', 'Member', 'Guest'].indexOf(args.options.role) === -1) {
+        if (['owner', 'member', 'guest'].indexOf(args.options.role.toLocaleLowerCase()) === -1) {
           return `${args.options.role} is not a valid role value. Allowed values Owner|Member|Guest`;
         }
       }
@@ -171,10 +172,10 @@ class GraphO365GroupUserListCommand extends GraphItemsListCommand<GroupUser> {
       ${chalk.grey(config.delimiter)} ${this.name} --groupId '00000000-0000-0000-0000-000000000000' --role Guest
 
     List all users and their role in the specified Microsoft Teams team
-      ${chalk.grey(config.delimiter)} ${this.alias} --teamId '00000000-0000-0000-0000-000000000000'
+      ${chalk.grey(config.delimiter)} ${(this.alias() as string[])[0]} --teamId '00000000-0000-0000-0000-000000000000'
 
     List all owners and their role in the specified Microsoft Teams team
-      ${chalk.grey(config.delimiter)} ${this.alias} --teamId '00000000-0000-0000-0000-000000000000' --role Owner
+      ${chalk.grey(config.delimiter)} ${(this.alias() as string[])[0]} --teamId '00000000-0000-0000-0000-000000000000' --role Owner
 
 `);
   }

@@ -1,6 +1,6 @@
 # graph o365group user list
 
-LLists users for the specified Office 365 group or Microsoft Teams team
+Lists users for the specified Office 365 group or Microsoft Teams team
 
 ## Usage
 
@@ -21,7 +21,7 @@ Option|Description
 `--help`|output usage information
 `-i, --groupId [groupId]`|The ID of the Office 365 group for which to list users
 `--teamId [teamId]`|The ID of the Microsoft Teams team for which to list users
-`-r, --role [type]`|Filter the results to only users with the given role: `Owner|Member|Guest`
+`-r, --role [role]`|Filter the results to only users with the given role: `Owner|Member|Guest`
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
