@@ -1,4 +1,3 @@
-import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -10,7 +9,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
-import { Auth } from '../../../../Auth';
 import { ListItemInstance } from './ListItemInstance';
 import { ContextInfo, ClientSvcResponseContents, ClientSvcResponse } from '../../spo';
 
@@ -52,10 +50,8 @@ class SpoListItemSetCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
     const listIdArgument = args.options.listId || '';
     const listTitleArgument = args.options.listTitle || '';
-    let siteAccessToken: string = '';
     const listRestUrl: string = (args.options.listId ?
       `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(listIdArgument)}')`
       : `${args.options.webUrl}/_api/web/lists/getByTitle('${encodeURIComponent(listTitleArgument)}')`);
@@ -64,35 +60,26 @@ class SpoListItemSetCommand extends SpoCommand {
     let formDigestValue: string = '';
     let environmentListId: string = '';
 
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
-    }
-
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<any> => {
-        siteAccessToken = accessToken;
-
-        if (args.options.systemUpdate) {
-          if (this.verbose) {
-            cmd.log(`Getting list id...`);
-          }
-
-          const listRequestOptions: any = {
-            url: `${listRestUrl}/id`,
-            headers: {
-              authorization: `Bearer ${siteAccessToken}`,
-              'accept': 'application/json;odata=nometadata'
-            },
-            json: true
-          };
-
-          return request.get(listRequestOptions)
+    ((): Promise<any> => {
+      if (args.options.systemUpdate) {
+        if (this.verbose) {
+          cmd.log(`Getting list id...`);
         }
-        else {
-          return Promise.resolve();
-        }
-      })
+
+        const listRequestOptions: any = {
+          url: `${listRestUrl}/id`,
+          headers: {
+            'accept': 'application/json;odata=nometadata'
+          },
+          json: true
+        };
+
+        return request.get(listRequestOptions)
+      }
+      else {
+        return Promise.resolve();
+      }
+    })()
       .then((dataReturned: any): Promise<void> => {
         if (dataReturned) {
           environmentListId = dataReturned.value;
@@ -106,7 +93,6 @@ class SpoListItemSetCommand extends SpoCommand {
           const requestOptions: any = {
             url: `${listRestUrl}/contenttypes?$select=Name,Id`,
             headers: {
-              authorization: `Bearer ${siteAccessToken}`,
               'accept': 'application/json;odata=nometadata'
             },
             json: true
@@ -158,7 +144,7 @@ class SpoListItemSetCommand extends SpoCommand {
             cmd.log(`getting request digest for systemUpdate request`);
           }
 
-          return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
+          return this.getRequestDigest(args.options.webUrl);
         }
         else {
           return Promise.resolve(undefined as any);
@@ -172,7 +158,7 @@ class SpoListItemSetCommand extends SpoCommand {
         formDigestValue = args.options.systemUpdate ? res['FormDigestValue'] : '';
 
         if (args.options.systemUpdate) {
-          return this.requestObjectIdentity(args.options.webUrl, cmd, formDigestValue, siteAccessToken);
+          return this.requestObjectIdentity(args.options.webUrl, cmd, formDigestValue);
         }
 
         return Promise.resolve('');
@@ -213,7 +199,6 @@ class SpoListItemSetCommand extends SpoCommand {
         const requestOptions: any = args.options.systemUpdate ? {
           url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             'Content-Type': 'text/xml',
             'X-RequestDigest': formDigestValue,
           },
@@ -221,7 +206,6 @@ class SpoListItemSetCommand extends SpoCommand {
         } : {
             url: `${listRestUrl}/items(${args.options.id})/ValidateUpdateListItem()`,
             headers: {
-              authorization: `Bearer ${siteAccessToken}`,
               'accept': 'application/json;odata=nometadata'
             },
             body: requestBody,
@@ -256,7 +240,6 @@ class SpoListItemSetCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${listRestUrl}/items(${itemId})`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata'
           },
           json: true
@@ -349,46 +332,37 @@ class SpoListItemSetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-    using the ${chalk.blue(commands.LOGIN)} command.
-  
-  Remarks:
-  
-    To update an item in a list, you have to first log in to SharePoint using
-    the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-        
-  Examples:
+      `  Examples:
   
     Update the item with ID of ${chalk.grey('147')} with Title ${chalk.grey('Demo Item')} and content type name
     ${chalk.grey('Item')} in list with title ${chalk.grey('Demo List')} in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_SET} --contentType Item --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Item"
+      ${commands.LISTITEM_SET} --contentType Item --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Item"
 
     Update an item with Title ${chalk.grey('Demo Multi Managed Metadata Field')} and
     a single-select metadata field named ${chalk.grey('SingleMetadataField')} in list with
     title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_SET} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x  --id 147 --Title "Demo Single Managed Metadata Field" --SingleMetadataField "TermLabel1|fa2f6bfd-1fad-4d18-9c89-289fe6941377;"
+      ${commands.LISTITEM_SET} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x  --id 147 --Title "Demo Single Managed Metadata Field" --SingleMetadataField "TermLabel1|fa2f6bfd-1fad-4d18-9c89-289fe6941377;"
 
     Update an item with ID of ${chalk.grey('147')} with Title ${chalk.grey('Demo Multi Managed Metadata Field')}
     and a multi-select metadata field named ${chalk.grey('MultiMetadataField')} in list
     with title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_SET} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --id 147 --Title "Demo Multi Managed Metadata Field" --MultiMetadataField "TermLabel1|cf8c72a1-0207-40ee-aebd-fca67d20bc8a;TermLabel2|e5cc320f-8b65-4882-afd5-f24d88d52b75;"
+      ${commands.LISTITEM_SET} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --id 147 --Title "Demo Multi Managed Metadata Field" --MultiMetadataField "TermLabel1|cf8c72a1-0207-40ee-aebd-fca67d20bc8a;TermLabel2|e5cc320f-8b65-4882-afd5-f24d88d52b75;"
   
     Update an item with ID of ${chalk.grey('147')} with Title ${chalk.grey('Demo Single Person Field')}
     and a single-select people field named ${chalk.grey('SinglePeopleField')} in list
     with title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_SET} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --id 147 --Title "Demo Single Person Field" --SinglePeopleField "[{'Key':'i:0#.f|membership|markh@conotoso.com'}]"
+      ${commands.LISTITEM_SET} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --id 147 --Title "Demo Single Person Field" --SinglePeopleField "[{'Key':'i:0#.f|membership|markh@conotoso.com'}]"
       
     Update an item with ID of ${chalk.grey('147')} with Title ${chalk.grey('Demo Multi Person Field')}
     and a multi-select people field named ${chalk.grey('MultiPeopleField')} in list
     with title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_SET} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --id 147 --Title "Demo Multi Person Field" --MultiPeopleField "[{'Key':'i:0#.f|membership|markh@conotoso.com'},{'Key':'i:0#.f|membership|adamb@conotoso.com'}]"
+      ${commands.LISTITEM_SET} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --id 147 --Title "Demo Multi Person Field" --MultiPeopleField "[{'Key':'i:0#.f|membership|markh@conotoso.com'},{'Key':'i:0#.f|membership|adamb@conotoso.com'}]"
     
     Update an item with ID of ${chalk.grey('147')} with Title ${chalk.grey('Demo Hyperlink Field')}
     and a hyperlink field named ${chalk.grey('CustomHyperlink')} in list
     with title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_SET} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --id 147 --Title "Demo Hyperlink Field" --CustomHyperlink "https://www.bing.com, Bing"
+      ${commands.LISTITEM_SET} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --id 147 --Title "Demo Hyperlink Field" --CustomHyperlink "https://www.bing.com, Bing"
    `);
   }
 
@@ -434,11 +408,10 @@ class SpoListItemSetCommand extends SpoCommand {
    * @param webUrl web url
    * @param cmd command cmd
    */
-  protected requestObjectIdentity(webUrl: string, cmd: CommandInstance, formDigestValue: string, siteAccessToken: string): Promise<string> {
+  private requestObjectIdentity(webUrl: string, cmd: CommandInstance, formDigestValue: string): Promise<string> {
     const requestOptions: any = {
       url: `${webUrl}/_vti_bin/client.svc/ProcessQuery`,
       headers: {
-        authorization: `Bearer ${siteAccessToken}`,
         'X-RequestDigest': formDigestValue
       },
       body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="1" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="ServerRelativeUrl" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Property Id="5" ParentId="3" Name="Web" /><StaticProperty Id="3" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /></ObjectPaths></Request>`

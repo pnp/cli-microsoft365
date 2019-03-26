@@ -19,12 +19,7 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
-!!! important
-    Before using this command, log in to the Microsoft Graph, using the [graph login](../login.md) command.
-
 ## Remarks
-
-To list apps in the Microsoft Teams app catalog or installed in the specified team, you have to first log in to the Microsoft Graph using the [graph login](../login.md) command, eg. `graph login`.
 
 To list apps installed in the specified Microsoft Teams team, specify that team's ID using the `teamId` option. If the `teamId` option is not specified, the command will list apps available in the Teams app catalog.
 

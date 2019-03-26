@@ -2,7 +2,7 @@ import commands from '../../commands';
 import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth, { Site } from '../../SpoAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./propertybag-list');
 import * as assert from 'assert';
 import request from '../../../../request';
@@ -14,24 +14,12 @@ describe(commands.PROPERTYBAG_LIST, () => {
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  let trackEvent: any;
-  let telemetry: any;
   let stubAllPostRequests: any = (
     requestObjectIdentityResp: any = null,
     getFolderPropertyBagResp: any = null,
     getWebPropertyBagResp: any = null
   ) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/common/oauth2/token') > -1) {
-        return Promise.resolve('abc');
-      }
-
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
       // fake requestObjectIdentity
       if (opts.body.indexOf('3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a') > -1) {
         if (requestObjectIdentityResp) {
@@ -94,38 +82,45 @@ describe(commands.PROPERTYBAG_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({
+      FormDigestValue: 'abc'
+    }));
+    auth.service.connected = true;
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.site = new Site();
-    telemetry = null;
   });
 
   afterEach(() => {
     Utils.restore([
       vorpal.find,
-      request.post
+      request.post,
+      (command as any).getWebPropertyBag,
+      (command as any).getFolderPropertyBag,
+      ClientSvc.prototype.getCurrentWebIdentity,
+      (command as any).formatOutput
     ]);
   });
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.getAccessToken,
-      auth.restoreAuth
+      auth.restoreAuth,
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -136,54 +131,8 @@ describe(commands.PROPERTYBAG_LIST, () => {
     assert.notEqual(command.description, null);
   });
 
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {}, appCatalogUrl: 'https://contoso-admin.sharepoint.com' }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { webUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
-      try {
-        assert.equal(telemetry.name, commands.PROPERTYBAG_LIST);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not logged in to a SharePoint site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { webUrl: 'https://contoso.sharepoint.com/sites/abc' } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('should call getWebPropertyBag when folder is not specified', (done) => {
     stubAllPostRequests();
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const getWebPropertyBagSpy = sinon.spy((command as any), 'getWebPropertyBag');
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -195,7 +144,6 @@ describe(commands.PROPERTYBAG_LIST, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         assert(getWebPropertyBagSpy.calledWith(objIdentity, 'https://contoso.sharepoint.com', cmdInstance));
         assert(getWebPropertyBagSpy.calledOnce === true);
@@ -204,20 +152,11 @@ describe(commands.PROPERTYBAG_LIST, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-        Utils.restore((command as any)['getWebPropertyBag']);
-      }
     });
   });
 
   it('should call getFolderPropertyBag when folder is specified', (done) => {
     stubAllPostRequests();
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const getFolderPropertyBagSpy = sinon.spy((command as any), 'getFolderPropertyBag');
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -230,7 +169,6 @@ describe(commands.PROPERTYBAG_LIST, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         assert(getFolderPropertyBagSpy.calledWith(objIdentity, 'https://contoso.sharepoint.com', '/', cmdInstance));
         assert(getFolderPropertyBagSpy.calledOnce === true);
@@ -239,20 +177,11 @@ describe(commands.PROPERTYBAG_LIST, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-        Utils.restore((command as any)['getFolderPropertyBag']);
-      }
     });
   });
 
   it('should correctly handle getFolderPropertyBag reject promise', (done) => {
     stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return reject('abc'); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const getFolderPropertyBagSpy = sinon.spy((command as any), 'getFolderPropertyBag');
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -268,20 +197,11 @@ describe(commands.PROPERTYBAG_LIST, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-        Utils.restore((command as any)['getFolderPropertyBag']);
-      }
     });
   });
 
   it('should correctly handle getWebPropertyBag reject promise', (done) => {
     stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return reject('abc1'); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const getWebPropertyBagSpy = sinon.spy((command as any), 'getWebPropertyBag');
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -297,21 +217,12 @@ describe(commands.PROPERTYBAG_LIST, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-        Utils.restore((command as any)['getWebPropertyBag']);
-      }
     });
   });
 
   it('should correctly handle getFolderPropertyBag ClientSvc error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "getFolderPropertyBag error" } }]);
     stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return resolve(error); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const getFolderPropertyBagSpy = sinon.spy((command as any), 'getFolderPropertyBag');
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -328,21 +239,12 @@ describe(commands.PROPERTYBAG_LIST, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-        Utils.restore((command as any)['getFolderPropertyBag']);
-      }
     });
   });
 
   it('should correctly handle getWebPropertyBag ClientSvc error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "getWebPropertyBag error" } }]);
     stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return resolve(error); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const getWebPropertyBagSpy = sinon.spy((command as any), 'getWebPropertyBag');
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com'
@@ -357,10 +259,6 @@ describe(commands.PROPERTYBAG_LIST, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-        Utils.restore((command as any)['getWebPropertyBag']);
-      }
     });
   });
 
@@ -368,11 +266,6 @@ describe(commands.PROPERTYBAG_LIST, () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "requestObjectIdentity error" } }]);
 
     stubAllPostRequests(new Promise<any>((resolve, reject) => { return resolve(error) }), null, null);
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const requestObjectIdentitySpy = sinon.spy(ClientSvc.prototype, 'getCurrentWebIdentity');
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com'
@@ -387,9 +280,6 @@ describe(commands.PROPERTYBAG_LIST, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore([request.post, requestObjectIdentitySpy]);
-      }
     });
   });
 
@@ -397,11 +287,6 @@ describe(commands.PROPERTYBAG_LIST, () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": undefined } }]);
 
     stubAllPostRequests(new Promise<any>((resolve, reject) => { return resolve(error) }), null, null);
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const requestObjectIdentitySpy = sinon.spy(ClientSvc.prototype, 'getCurrentWebIdentity');
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com'
@@ -416,19 +301,11 @@ describe(commands.PROPERTYBAG_LIST, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore([request.post, requestObjectIdentitySpy]);
-      }
     });
   });
 
   it('should correctly format response output (text)', (done) => {
     stubAllPostRequests();
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const formatOutputSpy = sinon.spy((command as any), 'formatOutput');
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -469,10 +346,6 @@ describe(commands.PROPERTYBAG_LIST, () => {
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore(request.post);
-        Utils.restore((command as any)['formatOutput']);
       }
     });
   });
@@ -604,30 +477,5 @@ describe(commands.PROPERTYBAG_LIST, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.getAccessToken);
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        webUrl: "https://contoso.sharepoint.com"
-      }
-    }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        Utils.restore(auth.getAccessToken);
-      }
-    });
   });
 });

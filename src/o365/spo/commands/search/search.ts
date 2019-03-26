@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import request from '../../../../request';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -8,7 +6,6 @@ import {
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import { Auth } from '../../../../Auth';
 import Utils from '../../../../Utils';
 import { SearchResult } from './datatypes/SearchResult';
 import { ResultTableRow } from './datatypes/ResultTableRow';
@@ -85,30 +82,26 @@ class SpoSearchCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const webUrl = args.options.webUrl ? args.options.webUrl : auth.site.url;
-    const resource: string = Auth.getResourceFromUrl(webUrl);
+    let webUrl: string = '';
 
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
-    }
-
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): string => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}.`);
+      ((): Promise<string> => {
+        if (args.options.webUrl) {
+          return Promise.resolve(args.options.webUrl);
         }
+        else {
+          return this.getSpoUrl(cmd, this.debug);
+        }
+      })()
+      .then((_webUrl: string): Promise<SearchResult[]> => {
+        webUrl = _webUrl;
 
         if (this.verbose) {
           cmd.log(`Executing search query '${args.options.query}' on site at ${webUrl}...`);
         }
 
-        return accessToken;
-      })
-      .then((accessToken: string): Promise<SearchResult[]> => {
         const startRow = args.options.startRow ? args.options.startRow : 0;
 
-        return this.executeSearchQuery(cmd, args, accessToken, webUrl, [], startRow);
+        return this.executeSearchQuery(cmd, args, webUrl, [], startRow);
       })
       .then((results: SearchResult[]) => {
         this.printResults(cmd, args, results);
@@ -116,13 +109,12 @@ class SpoSearchCommand extends SpoCommand {
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
 
-  private executeSearchQuery(cmd: CommandInstance, args: CommandArgs, accessToken: string, webUrl: string, resultSet: SearchResult[], startRow: number): Promise<SearchResult[]> {
+  private executeSearchQuery(cmd: CommandInstance, args: CommandArgs, webUrl: string, resultSet: SearchResult[], startRow: number): Promise<SearchResult[]> {
     return ((): Promise<SearchResult> => {
       const requestUrl: string = this.getRequestUrl(webUrl, cmd, args, startRow);
       const requestOptions: any = {
         url: requestUrl,
         headers: {
-          authorization: `Bearer ${accessToken}`,
           'accept': 'application/json;odata=nometadata'
         },
         json: true
@@ -139,7 +131,7 @@ class SpoSearchCommand extends SpoCommand {
         if (args.options.allResults) {
           if (startRow + searchResult.PrimaryQueryResult.RelevantResults.RowCount < searchResult.PrimaryQueryResult.RelevantResults.TotalRows) {
             const nextStartRow = startRow + searchResult.PrimaryQueryResult.RelevantResults.RowCount;
-            return this.executeSearchQuery(cmd, args, accessToken, webUrl, resultSet, nextStartRow);
+            return this.executeSearchQuery(cmd, args, webUrl, resultSet, nextStartRow);
           }
         }
         return new Promise<SearchResult[]>((resolve) => { resolve(resultSet); });
@@ -416,30 +408,22 @@ class SpoSearchCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-      using the ${chalk.blue(commands.LOGIN)} command.
-  
-  Remarks:
-  
-    To execute a search query you have to first log in to SharePoint using the
-    ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-        
-  Examples:
+      `  Examples:
   
     Execute search query to retrieve all Document Sets
     (ContentTypeId = '${chalk.grey('0x0120D520')}') for the English locale
-      ${chalk.grey(config.delimiter)} ${commands.SEARCH} --query 'ContentTypeId:0x0120D520' --culture 1033
+      ${commands.SEARCH} --query 'ContentTypeId:0x0120D520' --culture 1033
 
     Retrieve all documents. For each document, retrieve the Path, Author
     and FileType.
-      ${chalk.grey(config.delimiter)} ${commands.SEARCH} --query 'IsDocument:1' --selectProperties 'Path,Author,FileType' --allResults
+      ${commands.SEARCH} --query 'IsDocument:1' --selectProperties 'Path,Author,FileType' --allResults
     
     Return the top 50 items of which the title starts with 'Marketing' while
     trimming duplicates.
-      ${chalk.grey(config.delimiter)} ${commands.SEARCH} --query 'Title:Marketing*' --rowLimit=50 --trimDuplicates
+      ${commands.SEARCH} --query 'Title:Marketing*' --rowLimit=50 --trimDuplicates
 
     Return only items from a specific result source (using the source id).
-      ${chalk.grey(config.delimiter)} ${commands.SEARCH} --query '*' --sourceId 6e71030e-5e16-4406-9bff-9c1829843083
+      ${commands.SEARCH} --query '*' --sourceId 6e71030e-5e16-4406-9bff-9c1829843083
       `);
   }
 }

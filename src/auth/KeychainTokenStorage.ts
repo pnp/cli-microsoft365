@@ -5,12 +5,12 @@ export class KeychainTokenStorage implements TokenStorage {
   private securityPath: string = '/usr/bin/security';
   private description: string = 'Office 365 CLI';
 
-  public get(service: string): Promise<string> {
-    return new Promise<string>((resolve: (token: string) => void, reject: (error: any) => void): void => {
+  public get(): Promise<string> {
+    return new Promise<string>((resolve: (connectionInfo: string) => void, reject: (error: any) => void): void => {
       const args: string[] = [
         'find-generic-password',
-        '-a', service,
-        '-s', service,
+        '-a', this.description,
+        '-s', this.description,
         '-D', this.description,
         '-g'
       ];
@@ -33,14 +33,14 @@ export class KeychainTokenStorage implements TokenStorage {
     });
   };
 
-  public set(service: string, token: string): Promise<void> {
+  public set(connectionInfo: string): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       const args: string[] = [
         'add-generic-password',
-        '-a', service,
-        '-s', service,
+        '-a', this.description,
+        '-s', this.description,
         '-D', this.description,
-        '-w', token,
+        '-w', connectionInfo,
         '-U'
       ];
 
@@ -55,12 +55,12 @@ export class KeychainTokenStorage implements TokenStorage {
     });
   };
 
-  public remove(service: string): Promise<void> {
+  public remove(): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       const args: string[] = [
         'delete-generic-password',
-        '-a', service,
-        '-s', service,
+        '-a', this.description,
+        '-s', this.description,
         '-D', this.description
       ];
 

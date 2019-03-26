@@ -1,4 +1,3 @@
-import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -9,7 +8,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
-import { Auth } from '../../../../Auth';
 import { ContextInfo } from '../../spo';
 import { ClientSvc, IdentityResponse } from '../../common/ClientSvc';
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -43,10 +41,8 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const clientSvcCommons: ClientSvc = new ClientSvc(cmd, this.debug);
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
     const listIdArgument: string = args.options.listId || '';
     const listTitleArgument: string = args.options.listTitle || '';
-    let siteAccessToken: string = '';
     const listRestUrl: string = (args.options.listId ?
       `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(listIdArgument)}')`
       : `${args.options.webUrl}/_api/web/lists/getByTitle('${encodeURIComponent(listTitleArgument)}')`);
@@ -54,33 +50,24 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
     let formDigestValue: string = '';
     let environmentListId: string = '';
 
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
-    }
+    ((): Promise<{ value: string; }> => {
+      if (typeof args.options.listId !== 'undefined') {
+        return Promise.resolve({ value: args.options.listId });
+      }
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<{ value: string; }> => {
-        siteAccessToken = accessToken;
+      if (this.verbose) {
+        cmd.log(`Getting list id...`);
+      }
+      const listRequestOptions: any = {
+        url: `${listRestUrl}/id`,
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        json: true
+      };
 
-        if (typeof args.options.listId !== 'undefined') {
-          return Promise.resolve({ value: args.options.listId });
-        }
-
-        if (this.verbose) {
-          cmd.log(`Getting list id...`);
-        }
-        const listRequestOptions: any = {
-          url: `${listRestUrl}/id`,
-          headers: {
-            authorization: `Bearer ${siteAccessToken}`,
-            'accept': 'application/json;odata=nometadata'
-          },
-          json: true
-        };
-
-        return request.get(listRequestOptions);
-      })
+      return request.get(listRequestOptions);
+    })()
       .then((res: { value: string }): Promise<ContextInfo> => {
         environmentListId = res.value;
 
@@ -88,12 +75,12 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
           cmd.log(`getting request digest for request`);
         }
 
-        return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
+        return this.getRequestDigest(args.options.webUrl);
       })
       .then((res: ContextInfo): Promise<IdentityResponse> => {
         formDigestValue = res.FormDigestValue;
 
-        return clientSvcCommons.getCurrentWebIdentity(args.options.webUrl, siteAccessToken, formDigestValue);
+        return clientSvcCommons.getCurrentWebIdentity(args.options.webUrl, formDigestValue);
       })
       .then((objectIdentity: IdentityResponse): Promise<void> => {
         if (this.verbose) {
@@ -103,7 +90,6 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             'Content-Type': 'text/xml',
             'X-RequestDigest': formDigestValue,
           },
@@ -183,25 +169,16 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-    using the ${chalk.blue(commands.LOGIN)} command.
-  
-  Remarks:
-  
-    To undeclare an item as a record in a list, you have to first log in to
-    SharePoint using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-        
-  Examples:
+      `  Examples:
 
     Undeclare the list item as a record with ID ${chalk.grey(1)} from list with ID
     ${chalk.grey('0cd891ef-afce-4e55-b836-fce03286cccf')} located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_RECORD_UNDECLARE} --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --id 1
+      ${commands.LISTITEM_RECORD_UNDECLARE} --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --id 1
 
     Undeclare the list item as a record with ID ${chalk.grey(1)} from list with title
     ${chalk.grey('List 1')} located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_RECORD_UNDECLARE} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'List 1' --id 1
+      ${commands.LISTITEM_RECORD_UNDECLARE} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'List 1' --id 1
      `);
   }
 }

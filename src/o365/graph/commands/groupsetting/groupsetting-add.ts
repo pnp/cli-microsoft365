@@ -1,5 +1,3 @@
-import auth from '../../GraphAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import request from '../../../../request';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -40,29 +38,24 @@ class GraphGroupSettingAddCommand extends GraphCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((): Promise<GroupSettingTemplate> => {
-        if (this.verbose) {
-          cmd.log(`Retrieving group setting template with id '${args.options.templateId}'...`);
-        }
+    if (this.verbose) {
+      cmd.log(`Retrieving group setting template with id '${args.options.templateId}'...`);
+    }
 
-        const requestOptions: any = {
-          url: `${auth.service.resource}/v1.0/groupSettingTemplates/${args.options.templateId}`,
-          headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
-            accept: 'application/json;odata.metadata=none'
-          },
-          json: true
-        };
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/groupSettingTemplates/${args.options.templateId}`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      json: true
+    };
 
-        return request.get(requestOptions);
-      })
+    request
+      .get<GroupSettingTemplate>(requestOptions)
       .then((groupSettingTemplate: GroupSettingTemplate): Promise<{}> => {
         const requestOptions: any = {
-          url: `${auth.service.resource}/v1.0/groupSettings`,
+          url: `${this.resource}/v1.0/groupSettings`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             accept: 'application/json;odata.metadata=none',
             'content-type': 'application/json'
           },
@@ -146,14 +139,7 @@ class GraphGroupSettingAddCommand extends GraphCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to the Microsoft Graph
-    using the ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
-
-    To create a group setting, you have to first log in to
-    the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
+      `  Remarks:
 
     To create a group setting, you have to specify the ID of the group setting
     template that should be used to create the setting. You can retrieve the ID
@@ -183,7 +169,7 @@ class GraphGroupSettingAddCommand extends GraphCommand {
   Examples:
   
     Configure classification for modern SharePoint sites
-      ${chalk.grey(config.delimiter)} ${this.name} --templateId 62375ab9-6b52-47ed-826b-58e47e0e304b --UsageGuidelinesUrl https://contoso.sharepoint.com/sites/compliance --ClassificationList 'HBI, MBI, LBI, GDPR' --DefaultClassification MBI
+      ${this.name} --templateId 62375ab9-6b52-47ed-826b-58e47e0e304b --UsageGuidelinesUrl https://contoso.sharepoint.com/sites/compliance --ClassificationList 'HBI, MBI, LBI, GDPR' --DefaultClassification MBI
 `);
   }
 }

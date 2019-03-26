@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
 import {
@@ -38,24 +36,18 @@ class SpoSiteDesignRemoveCommand extends SpoCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const removeSiteDesign: () => void = (): void => {
-      auth
-        .ensureAccessToken(auth.service.resource, cmd, this.debug)
-        .then((accessToken: string): Promise<ContextInfo> => {
-          if (this.debug) {
-            cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-          }
+      let spoUrl: string = '';
 
-          if (this.verbose) {
-            cmd.log(`Retrieving request digest...`);
-          }
-
-          return this.getRequestDigest(cmd, this.debug);
+      this
+        .getSpoUrl(cmd, this.debug)
+        .then((_spoUrl: string): Promise<ContextInfo> => {
+          spoUrl = _spoUrl;
+          return this.getRequestDigest(spoUrl);
         })
         .then((res: ContextInfo): Promise<void> => {
           const requestOptions: any = {
-            url: `${auth.site.url}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.DeleteSiteDesign`,
+            url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.DeleteSiteDesign`,
             headers: {
-              authorization: `Bearer ${auth.service.accessToken}`,
               'X-RequestDigest': res.FormDigestValue,
               'content-type': 'application/json;charset=utf-8',
               accept: 'application/json;odata=nometadata'
@@ -129,13 +121,7 @@ class SpoSiteDesignRemoveCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site using the
-      ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
-
-    To remove a site design, you have to first log in to a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
+      `  Remarks:
 
     If the specified ${chalk.grey('id')} doesn't refer to an existing site design, you will get
     a ${chalk.grey('File not found')} error.
@@ -144,11 +130,11 @@ class SpoSiteDesignRemoveCommand extends SpoCommand {
   
     Remove site design with ID ${chalk.grey('2c1ba4c4-cd9b-4417-832f-92a34bc34b2a')}. Will prompt
     for confirmation before removing the design
-      ${chalk.grey(config.delimiter)} ${this.name} --id 2c1ba4c4-cd9b-4417-832f-92a34bc34b2a
+      ${this.name} --id 2c1ba4c4-cd9b-4417-832f-92a34bc34b2a
 
     Remove site design with ID ${chalk.grey('2c1ba4c4-cd9b-4417-832f-92a34bc34b2a')} without prompting
     for confirmation
-      ${chalk.grey(config.delimiter)} ${this.name} --id 2c1ba4c4-cd9b-4417-832f-92a34bc34b2a --confirm
+      ${this.name} --id 2c1ba4c4-cd9b-4417-832f-92a34bc34b2a --confirm
 
   More information:
 

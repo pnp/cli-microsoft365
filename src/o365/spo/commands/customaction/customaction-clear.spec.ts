@@ -2,7 +2,7 @@ import commands from '../../commands';
 import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth, { Site } from '../../SpoAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./customaction-clear');
 import * as assert from 'assert';
 import request from '../../../../request';
@@ -13,27 +13,15 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  let trackEvent: any;
-  let telemetry: any;
   let promptOptions: any;
   const defaultPostCallsStub = (): sinon.SinonStub => {
     return sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/common/oauth2/token') > -1) {
-        return Promise.resolve('abc');
-      }
-
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
       // fakes clear custom actions success (site)
       if (opts.url.indexOf('/_api/Web/UserCustomActions/clear') > -1) {
         return Promise.resolve(undefined);
       }
 
-      // fakes clear custom actions success (site colleciton)
+      // fakes clear custom actions success (site collection)
       if (opts.url.indexOf('/_api/Site/UserCustomActions/clear') > -1) {
         return Promise.resolve(undefined);
       }
@@ -44,16 +32,18 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    auth.service.connected = true;
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       },
@@ -63,8 +53,6 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.site = new Site();
-    telemetry = null;
     promptOptions = undefined;
   });
 
@@ -77,10 +65,10 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.getAccessToken,
-      auth.restoreAuth
+      auth.restoreAuth,
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -91,55 +79,9 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     assert.notEqual(command.description, null);
   });
 
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {}, appCatalogUrl: 'https://contoso-admin.sharepoint.com' }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
-      try {
-        assert.equal(telemetry.name, commands.CUSTOMACTION_CLEAR);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not logged in to a SharePoint site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/appcatalog'} }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('should user custom actions cleared successfully without prompting with confirmation argument', (done) => {
     defaultPostCallsStub();
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: {
       verbose: false,
       url: 'https://contoso.sharepoint.com',
@@ -158,11 +100,6 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   it('should user custom actions cleared successfully (verbose) without prompting with confirmation argument', (done) => {
     defaultPostCallsStub();
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: {
       verbose: true,
       url: 'https://contoso.sharepoint.com',
@@ -179,10 +116,6 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   });
 
   it('should prompt before clearing custom actions when confirmation argument not passed', (done) => {
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com'} }, () => {
       let promptIssued = false;
 
@@ -203,16 +136,12 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   it('should abort custom actions clear when prompt not confirmed', (done) => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     };
     cmdInstance.action({ options: {  url: 'https://contoso.sharepoint.com'}}, () => {
       try {
-        assert(postCallsSpy.notCalled === true);
+        assert(postCallsSpy.notCalled);
         done();
       }
       catch (e) {
@@ -225,16 +154,12 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
     const clearScopedCustomActionsSpy = sinon.spy((command as any), 'clearScopedCustomActions');
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     };
     cmdInstance.action({ options: {  url: 'https://contoso.sharepoint.com' }}, () => {
       try {
-        assert(postCallsSpy.calledTwice === true);
+        assert(postCallsSpy.calledTwice);
         assert(clearScopedCustomActionsSpy.calledWith(sinon.match(
           { 
             url: 'https://contoso.sharepoint.com'
@@ -253,11 +178,6 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   it('should clearScopedCustomActions be called once when scope is Web', (done) => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const clearScopedCustomActionsSpy = sinon.spy((command as any), 'clearScopedCustomActions');
     const options: Object = {
       debug: false,
@@ -267,16 +187,15 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
-        assert(postCallsSpy.calledOnce === true);
+        assert(postCallsSpy.calledOnce);
         assert(clearScopedCustomActionsSpy.calledWith({
           debug: false,
           url: 'https://contoso.sharepoint.com',
           scope: 'Web',
           confirm: true
-        }, 'ABC', cmdInstance), 'clearScopedCustomActionsSpy data error');
-        assert(clearScopedCustomActionsSpy.calledOnce === true, 'clearScopedCustomActionsSpy calledOnce error');
+        }), 'clearScopedCustomActionsSpy data error');
+        assert(clearScopedCustomActionsSpy.calledOnce, 'clearScopedCustomActionsSpy calledOnce error');
         done();
       }
       catch (e) {
@@ -291,11 +210,6 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   it('should clearScopedCustomActions be called once when scope is Site', (done) => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const clearScopedCustomActionsSpy = sinon.spy((command as any), 'clearScopedCustomActions');
     const options: Object = {
       url: 'https://contoso.sharepoint.com',
@@ -304,7 +218,6 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         assert(postCallsSpy.calledOnce === true);
         assert(clearScopedCustomActionsSpy.calledWith(
@@ -312,8 +225,8 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
             url: 'https://contoso.sharepoint.com',
             scope: 'Site',
             confirm: true
-          }, 'ABC', cmdInstance), 'clearScopedCustomActionsSpy data error');
-        assert(clearScopedCustomActionsSpy.calledOnce === true, 'clearScopedCustomActionsSpy calledOnce error');
+          }), 'clearScopedCustomActionsSpy data error');
+        assert(clearScopedCustomActionsSpy.calledOnce, 'clearScopedCustomActionsSpy calledOnce error');
         done();
       }
       catch (e) {
@@ -328,11 +241,6 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   it('should clearScopedCustomActions be called twice when scope is All', (done) => {
     defaultPostCallsStub();
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const clearScopedCustomActionsSpy = sinon.spy((command as any), 'clearScopedCustomActions');
 
     cmdInstance.action({
@@ -342,9 +250,8 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
         confirm: true
       }
     }, () => {
-
       try {
-        assert(clearScopedCustomActionsSpy.calledTwice == true);
+        assert(clearScopedCustomActionsSpy.calledTwice);
         done();
       }
       catch (e) {
@@ -359,11 +266,6 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   it('should clearScopedCustomActions be calledTwice when scope is All', (done) => {
     defaultPostCallsStub();
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const clearScopedCustomActionsSpy: sinon.SinonSpy = sinon.spy((command as any), 'clearScopedCustomActions');
     const options: Object = {
       url: 'https://contoso.sharepoint.com',
@@ -371,9 +273,8 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
-        assert(clearScopedCustomActionsSpy.calledTwice == true, 'clearScopedCustomActionsSpy.calledTwice');
+        assert(clearScopedCustomActionsSpy.calledTwice, 'clearScopedCustomActionsSpy.calledTwice');
         done();
       }
       catch (e) {
@@ -388,18 +289,12 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   it('should the post calls be have the correct endpoint urls when scope is All', (done) => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const options: Object = {
       url: 'https://contoso.sharepoint.com',
       confirm: true
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         assert(postCallsSpy.calledWith(sinon.match({
           url: 'https://contoso.sharepoint.com/_api/Web/UserCustomActions/clear'
@@ -419,16 +314,6 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     const err = 'abc error';
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/common/oauth2/token') > -1) {
-        return Promise.resolve('abc');
-      }
-
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
       // fakes clear custom actions success (site)
       if (opts.url.indexOf('/_api/Web/UserCustomActions/clear') > -1) {
         return Promise.reject(err);
@@ -436,11 +321,6 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
 
       return Promise.reject('Invalid request');
     });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     cmdInstance.action({
       options: {
@@ -463,16 +343,6 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     const err = 'abc error';
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/common/oauth2/token') > -1) {
-        return Promise.resolve('abc');
-      }
-
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
       // should return null to proceed with site when scope is All
       if (opts.url.indexOf('/_api/Web/UserCustomActions/clear') > -1) {
         return Promise.resolve({ "odata.null": true });
@@ -484,11 +354,6 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
 
       return Promise.reject('Invalid request');
     });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     cmdInstance.action({
       options: {
@@ -659,29 +524,5 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.getAccessToken);
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        url: "https://contoso.sharepoint.com",
-        debug: false,
-        confirm: true
-      }
-    }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 });

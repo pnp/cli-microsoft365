@@ -2,7 +2,7 @@ import commands from '../../commands';
 import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth, { Site } from '../../SpoAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./customaction-set');
 import * as assert from 'assert';
 import request from '../../../../request';
@@ -13,21 +13,9 @@ describe(commands.CUSTOMACTION_SET, () => {
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  let trackEvent: any;
-  let telemetry: any;
   let defaultCommandOptions: any;
   let initDefaultPostStubs = (): sinon.SinonStub => {
     return sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/common/oauth2/token') > -1) {
-        return Promise.resolve('abc');
-      }
-
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
       if (opts.url.indexOf('/_api/Web/UserCustomActions') > -1) {
         return Promise.resolve('abc');
       }
@@ -42,24 +30,23 @@ describe(commands.CUSTOMACTION_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    auth.service.connected = true;
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.site = new Site();
-    telemetry = null;
-
     defaultCommandOptions = {
       url: 'https://contoso.sharepoint.com',
       id: '058140e3-0e37-44fc-a1d3-79c487d371a3',
@@ -70,16 +57,18 @@ describe(commands.CUSTOMACTION_SET, () => {
   afterEach(() => {
     Utils.restore([
       vorpal.find,
-      request.post
+      request.post,
+      (command as any).updateCustomAction,
+      (command as any).searchAllScopes
     ]);
   });
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.getAccessToken,
-      auth.restoreAuth
+      auth.restoreAuth,
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -94,56 +83,9 @@ describe(commands.CUSTOMACTION_SET, () => {
     assert.equal((command as any)['permissionsKindMap'].length, 37);
   });
 
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.CUSTOMACTION_SET);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not logged in to a SharePoint site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('correct https body send when custom action with location StandardMenu', (done) => {
-    let postRequestSpy = initDefaultPostStubs();
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
-    let options: any = {
+    const postRequestSpy = initDefaultPostStubs();
+    const options: any = {
       url: 'https://contoso.sharepoint.com',
       title: 'title1',
       name: 'name1',
@@ -155,7 +97,6 @@ describe(commands.CUSTOMACTION_SET, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         assert(postRequestSpy.calledWith(sinon.match({
           body: {
@@ -173,21 +114,12 @@ describe(commands.CUSTOMACTION_SET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('correct https body send when custom action with location ClientSideExtension.ApplicationCustomizer', (done) => {
-    let postRequestSpy = initDefaultPostStubs();
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
-    let options: any = {
+    const postRequestSpy = initDefaultPostStubs();
+    const options: any = {
       url: 'https://contoso.sharepoint.com',
       title: 'title1',
       name: 'name1',
@@ -200,7 +132,6 @@ describe(commands.CUSTOMACTION_SET, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         assert(postRequestSpy.calledWith(sinon.match({
           body: {
@@ -218,21 +149,12 @@ describe(commands.CUSTOMACTION_SET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('correct https body send when custom action with location ClientSideExtension.ListViewCommandSet', (done) => {
-    let postRequestSpy = initDefaultPostStubs();
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
-    let options: any = {
+    const postRequestSpy = initDefaultPostStubs();
+    const options: any = {
       url: 'https://contoso.sharepoint.com',
       title: 'title1',
       name: 'name1',
@@ -246,7 +168,6 @@ describe(commands.CUSTOMACTION_SET, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         assert(postRequestSpy.calledWith(sinon.match({
           body: {
@@ -266,21 +187,12 @@ describe(commands.CUSTOMACTION_SET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('correct https body send when custom action with location EditControlBlock', (done) => {
-    let postRequestSpy = initDefaultPostStubs();
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
-    let options: any = {
+    const postRequestSpy = initDefaultPostStubs();
+    const options: any = {
       url: 'https://contoso.sharepoint.com',
       title: 'title1',
       name: 'name1',
@@ -293,7 +205,6 @@ describe(commands.CUSTOMACTION_SET, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         assert(postRequestSpy.calledWith(sinon.match({
           body: {
@@ -312,21 +223,12 @@ describe(commands.CUSTOMACTION_SET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('correct https body send when custom action with location ScriptLink', (done) => {
-    let postRequestSpy = initDefaultPostStubs();
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
-    let options: any = {
+    const postRequestSpy = initDefaultPostStubs();
+    const options: any = {
       url: 'https://contoso.sharepoint.com',
       title: 'title1',
       name: 'name1',
@@ -338,7 +240,6 @@ describe(commands.CUSTOMACTION_SET, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         assert(postRequestSpy.calledWith(sinon.match({
           body: {
@@ -355,21 +256,12 @@ describe(commands.CUSTOMACTION_SET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('correct https body send when custom action with location ScriptLink and ScriptBlock', (done) => {
-    let postRequestSpy = initDefaultPostStubs();
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
-    let options: any = {
+    const postRequestSpy = initDefaultPostStubs();
+    const options: any = {
       url: 'https://contoso.sharepoint.com',
       title: 'title1',
       name: 'name1',
@@ -379,7 +271,6 @@ describe(commands.CUSTOMACTION_SET, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         assert(postRequestSpy.calledWith(sinon.match({
           body: {
@@ -395,21 +286,12 @@ describe(commands.CUSTOMACTION_SET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('correct https body send when custom action with location CommandUI.Ribbon', (done) => {
-    let postRequestSpy = initDefaultPostStubs();
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
-    let options: any = {
+    const postRequestSpy = initDefaultPostStubs();
+    const options: any = {
       url: 'https://contoso.sharepoint.com',
       title: 'title1',
       name: 'name1',
@@ -422,7 +304,6 @@ describe(commands.CUSTOMACTION_SET, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         assert(postRequestSpy.calledWith(sinon.match({
           body: {
@@ -440,21 +321,12 @@ describe(commands.CUSTOMACTION_SET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('correct https body send when custom action with delegated rights', (done) => {
-    let postRequestSpy = initDefaultPostStubs();
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
-    let options: any = {
+    const postRequestSpy = initDefaultPostStubs();
+    const options: any = {
       url: 'https://contoso.sharepoint.com',
       title: 'title1',
       name: 'name1',
@@ -467,7 +339,6 @@ describe(commands.CUSTOMACTION_SET, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         assert(postRequestSpy.calledWith(sinon.match({
           body: {
@@ -485,35 +356,17 @@ describe(commands.CUSTOMACTION_SET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('retrieves and prints the added user custom actions details when verbose specified', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/common/oauth2/token') > -1) {
-        return Promise.resolve('abc');
-      }
-
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
       if (opts.url.indexOf('/_api/Web/UserCustomActions') > -1) {
         return Promise.resolve(undefined);
       }
+
       return Promise.reject('Invalid request');
     });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
 
     defaultCommandOptions.verbose = true;
 
@@ -525,31 +378,17 @@ describe(commands.CUSTOMACTION_SET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('updateCustomAction called once when scope is Web', (done) => {
-    let postRequestSpy = sinon.stub(request, 'post').callsFake((opts) => {  
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
+    const postRequestSpy = sinon.stub(request, 'post').callsFake((opts) => {  
       if (opts.url.indexOf('/_api/Web/UserCustomActions(') > -1) {
         return Promise.resolve('abc');
       }
 
       return Promise.reject('Invalid request');
     });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     const updateCustomActionSpy = sinon.spy((command as any), 'updateCustomAction');
     const options: Object = {
@@ -559,45 +398,30 @@ describe(commands.CUSTOMACTION_SET, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
-        assert(postRequestSpy.calledOnce === true, 'postRequestSpy.calledOnce');
+        assert(postRequestSpy.calledOnce, 'postRequestSpy.calledOnce');
         assert(updateCustomActionSpy.calledWith({
           id: 'b2307a39-e878-458b-bc90-03bc578531d6',
           url: 'https://contoso.sharepoint.com',
           scope: 'Web'
-        }, 'ABC', cmdInstance), 'updateCustomActionSpy.calledWith');
-        assert(updateCustomActionSpy.calledOnce === true, 'updateCustomActionSpy.calledOnce');
+        }), 'updateCustomActionSpy.calledWith');
+        assert(updateCustomActionSpy.calledOnce, 'updateCustomActionSpy.calledOnce');
         done();
       }
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore([postRequestSpy, updateCustomActionSpy]);
-      }
     });
   });
 
   it('updateCustomAction called once when scope is Site', (done) => {
-    let postRequestSpy = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
+    const postRequestSpy = sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf('/_api/Site/UserCustomActions(') > -1) {
         return Promise.resolve('abc');
       }
 
       return Promise.reject('Invalid request');
     });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     const updateCustomActionSpy = sinon.spy((command as any), 'updateCustomAction');
     const options: Object = {
@@ -607,46 +431,31 @@ describe(commands.CUSTOMACTION_SET, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
-        assert(postRequestSpy.calledOnce === true, 'postRequestSpy.calledOnce');
+        assert(postRequestSpy.calledOnce, 'postRequestSpy.calledOnce');
         assert(updateCustomActionSpy.calledWith(
           {
             id: 'b2307a39-e878-458b-bc90-03bc578531d6',
             url: 'https://contoso.sharepoint.com',
             scope: 'Site'
-          }, 'ABC', cmdInstance), 'updateCustomActionSpy.calledWith');
-        assert(updateCustomActionSpy.calledOnce === true, 'updateCustomActionSpy.calledOnce');
+          }), 'updateCustomActionSpy.calledWith');
+        assert(updateCustomActionSpy.calledOnce, 'updateCustomActionSpy.calledOnce');
         done();
       }
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore([postRequestSpy, updateCustomActionSpy]);
-      }
     });
   });
 
   it('updateCustomAction called once when scope is All, but item found on web level', (done) => {
-    let postRequestSpy = sinon.stub(request, 'post').callsFake((opts) => {  
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
+    const postRequestSpy = sinon.stub(request, 'post').callsFake((opts) => {  
       if (opts.url.indexOf('/_api/Web/UserCustomActions(') > -1) {
         return Promise.resolve('abc');
       }
 
       return Promise.reject('Invalid request');
     });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     const updateCustomActionSpy = sinon.spy((command as any), 'updateCustomAction');
 
@@ -658,29 +467,19 @@ describe(commands.CUSTOMACTION_SET, () => {
         title: 'title'
       }
     }, () => {
-
       try {
-        assert(postRequestSpy.calledOnce === true, 'postRequest');
-        assert(updateCustomActionSpy.calledOnce === true, 'updateCustomAction');
+        assert(postRequestSpy.calledOnce, 'postRequest');
+        assert(updateCustomActionSpy.calledOnce, 'updateCustomAction');
         done();
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore([postRequestSpy, updateCustomActionSpy]);
       }
     });
   });
 
   it('updateCustomAction called twice when scope is All, but item not found on web level', (done) => {
     let postRequestSpy = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
       if (opts.url.indexOf('/_api/Web/UserCustomActions(') > -1) {
         return Promise.resolve({ "odata.null": true });
       }
@@ -691,11 +490,6 @@ describe(commands.CUSTOMACTION_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     const updateCustomActionSpy = sinon.spy((command as any), 'updateCustomAction');
 
@@ -706,38 +500,24 @@ describe(commands.CUSTOMACTION_SET, () => {
       }
     }, () => {
       try {
-        assert(postRequestSpy.calledTwice === true, 'postRequest');
-        assert(updateCustomActionSpy.calledTwice === true, 'updateCustomAction');
+        assert(postRequestSpy.calledTwice, 'postRequest');
+        assert(updateCustomActionSpy.calledTwice, 'updateCustomAction');
         done();
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore([postRequestSpy, updateCustomActionSpy]);
       }
     });
   });
 
   it('searchAllScopes called when scope is All', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
       if (opts.url.indexOf('/_api/Web/UserCustomActions(') > -1) {
         return Promise.resolve('abc');
       }
 
       return Promise.reject('Invalid request');
     });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     const searchAllScopesSpy = sinon.spy((command as any), 'searchAllScopes');
     const options: Object = {
@@ -747,33 +527,23 @@ describe(commands.CUSTOMACTION_SET, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         assert(searchAllScopesSpy.calledWith(sinon.match(
           {
             id: 'b2307a39-e878-458b-bc90-03bc578531d6',
             url: 'https://contoso.sharepoint.com'
-          }), 'ABC', cmdInstance), 'searchAllScopesSpy.calledWith');
-        assert(searchAllScopesSpy.calledOnce === true, 'searchAllScopesSpy.calledOnce');
+          })), 'searchAllScopesSpy.calledWith');
+        assert(searchAllScopesSpy.calledOnce, 'searchAllScopesSpy.calledOnce');
         done();
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore([request.post, searchAllScopesSpy]);
       }
     });
   });
 
   it('searchAllScopes correctly handles custom action odata.null when All scope specified', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
       if (opts.url.indexOf('/_api/Web/UserCustomActions(') > -1) {
         return Promise.resolve({ "odata.null": true });
       }
@@ -785,15 +555,9 @@ describe(commands.CUSTOMACTION_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     cmdInstance.action({
       options: defaultCommandOptions
     }, () => {
-
       try {
         assert(cmdInstanceLogSpy.notCalled);
         done();
@@ -801,20 +565,11 @@ describe(commands.CUSTOMACTION_SET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('searchAllScopes correctly handles custom action Web odata.null when All scope specified', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
       if (opts.url.indexOf('/_api/Web/UserCustomActions(') > -1) {
         return Promise.resolve({ "odata.null": true });
       }
@@ -826,11 +581,6 @@ describe(commands.CUSTOMACTION_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    
     const updateCustomActionSpy = sinon.spy((command as any), 'updateCustomAction');
     const searchAllScopesSpy = sinon.spy((command as any), 'searchAllScopes');
     const options: Object = {
@@ -843,35 +593,25 @@ describe(commands.CUSTOMACTION_SET, () => {
     cmdInstance.action({
       options: options
     }, () => {
-
       try {
-        assert(searchAllScopesSpy.calledOnce === true);
-        assert(updateCustomActionSpy.calledTwice === true);
+        assert(searchAllScopesSpy.calledOnce);
+        assert(updateCustomActionSpy.calledTwice);
         assert(updateCustomActionSpy.calledWith(sinon.match(
           {
             id: 'b2307a39-e878-458b-bc90-03bc578531d6',
             url: 'https://contoso.sharepoint.com',
             scope: 'Site'
-          }), 'ABC', cmdInstance), 'searchAllScopesSpy.calledWith');
+          })), 'searchAllScopesSpy.calledWith');
         done();
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore([request.post, searchAllScopesSpy, updateCustomActionSpy]);
       }
     });
   });
 
   it('searchAllScopes correctly handles custom action odata.null when All scope specified (verbose)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
       if (opts.url.indexOf('/_api/Web/UserCustomActions(') > -1) {
         return Promise.resolve({ "odata.null": true });
       }
@@ -883,11 +623,6 @@ describe(commands.CUSTOMACTION_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const actionId: string = 'b2307a39-e878-458b-bc90-03bc578531d6';
 
     cmdInstance.action({
@@ -898,7 +633,6 @@ describe(commands.CUSTOMACTION_SET, () => {
         scope: 'All'
       }
     }, () => {
-
       try {
         assert(cmdInstanceLogSpy.calledWith(`Custom action with id ${actionId} not found`));
         done();
@@ -906,31 +640,17 @@ describe(commands.CUSTOMACTION_SET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('searchAllScopes correctly handles web custom action reject request', (done) => {
     const err = 'Invalid custom action request';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
       if (opts.url.indexOf('/_api/Web/UserCustomActions(') > -1) {
         return Promise.reject(err);
       }
       return Promise.reject('Invalid request');
     });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     const actionId: string = 'b2307a39-e878-458b-bc90-03bc578531d6';
 
@@ -958,12 +678,6 @@ describe(commands.CUSTOMACTION_SET, () => {
   it('searchAllScopes correctly handles site custom action reject request', (done) => {
     const err = 'Invalid custom action request';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
       if (opts.url.indexOf('/_api/Web/UserCustomActions(') > -1) {
         return Promise.resolve({ "odata.null": true });
       }
@@ -974,11 +688,6 @@ describe(commands.CUSTOMACTION_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     const actionId: string = 'b2307a39-e878-458b-bc90-03bc578531d6';
 
@@ -997,9 +706,6 @@ describe(commands.CUSTOMACTION_SET, () => {
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore([request.post, cmdInstance.log]);
       }
     });
   });
@@ -1038,31 +744,26 @@ describe(commands.CUSTOMACTION_SET, () => {
   });
 
   it('getRegistrationType returns 0 if registrationType wrong value', () => {
-
     let registrationType: number = (command as any)['getRegistrationType']('abc');
     assert(registrationType === 0);
   });
 
   it('getRegistrationType returns 1 if registrationType value is List', () => {
-
     let registrationType: number = (command as any)['getRegistrationType']('List');
     assert(registrationType === 1);
   });
 
   it('getRegistrationType returns 2 if registrationType value is ContentType', () => {
-
     let registrationType: number = (command as any)['getRegistrationType']('ContentType');
     assert(registrationType === 2);
   });
 
   it('getRegistrationType returns 3 if registrationType value is ProgId', () => {
-
     let registrationType: number = (command as any)['getRegistrationType']('ProgId');
     assert(registrationType === 3);
   });
 
   it('getRegistrationType returns 4 if registrationType value is FileType', () => {
-
     let registrationType: number = (command as any)['getRegistrationType']('FileType');
     assert(registrationType === 4);
   });
@@ -1074,32 +775,26 @@ describe(commands.CUSTOMACTION_SET, () => {
   });
 
   it('getRegistrationType returns 1 if registrationType value is List', () => {
-
     let registrationType: number = (command as any)['getRegistrationType']('List');
     assert(registrationType === 1);
   });
 
   it('should map independently location', () => {
-
     let result: number = (command as any)['mapRequestBody']({location: 'abc'});
     assert(JSON.stringify(result) === `{"Location":"abc"}`);
   });
 
   it('should map independently name', () => {
-
     let result: number = (command as any)['mapRequestBody']({name: 'abc'});
     assert(JSON.stringify(result) === `{"Name":"abc"}`);
   });
 
-
   it('should map independently title', () => {
-
     let result: number = (command as any)['mapRequestBody']({title: 'abc'});
     assert(JSON.stringify(result) === `{"Title":"abc"}`);
   });
 
   it('should map independently group', () => {
-
     let result: number = (command as any)['mapRequestBody']({group: 'abc'});
     assert(JSON.stringify(result) === `{"Group":"abc"}`);
   });
@@ -1166,15 +861,9 @@ describe(commands.CUSTOMACTION_SET, () => {
   });
 
   it('calls the correct endpoint (url) when scope is Web', (done) => {
-    let postRequestSpy = initDefaultPostStubs();
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
+    const postRequestSpy = initDefaultPostStubs();
 
     cmdInstance.action({ options: defaultCommandOptions }, () => {
-
       try {
         assert(postRequestSpy.calledWith(sinon.match({
           url: `https://contoso.sharepoint.com/_api/Web/UserCustomActions('${defaultCommandOptions.id}')`,
@@ -1184,23 +873,14 @@ describe(commands.CUSTOMACTION_SET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('calls the correct endpoint (url) when scope is Site', (done) => {
-    let postRequestSpy = initDefaultPostStubs();
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
+    const postRequestSpy = initDefaultPostStubs();
 
     defaultCommandOptions.scope = "Site";
     cmdInstance.action({ options: defaultCommandOptions }, () => {
-
       try {
         assert(postRequestSpy.calledWith(sinon.match({
           url: `https://contoso.sharepoint.com/_api/Site/UserCustomActions('${defaultCommandOptions.id}')`,
@@ -1210,26 +890,16 @@ describe(commands.CUSTOMACTION_SET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should have X-HTTP-Method MERGE header when scope is Web', (done) => {
-    let postRequestSpy = initDefaultPostStubs();
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
+    const postRequestSpy = initDefaultPostStubs();
 
     cmdInstance.action({ options: defaultCommandOptions }, () => {
-
       try {
         assert(postRequestSpy.calledWith(sinon.match({
           headers: {
-            authorization: `Bearer ABC`,
             accept: 'application/json;odata=nometadata',
             'X-HTTP-Method': 'MERGE'
           }
@@ -1238,28 +908,18 @@ describe(commands.CUSTOMACTION_SET, () => {
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore(request.post);
       }
     });
   });
 
   it('should have X-HTTP-Method MERGE when scope is Site', (done) => {
-    let postRequestSpy = initDefaultPostStubs();
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
+    const postRequestSpy = initDefaultPostStubs();
 
     defaultCommandOptions.scope = "Site";
     cmdInstance.action({ options: defaultCommandOptions }, () => {
-
       try {
         assert(postRequestSpy.calledWith(sinon.match({
           headers: {
-            authorization: `Bearer ABC`,
             accept: 'application/json;odata=nometadata',
             'X-HTTP-Method': 'MERGE'
           }
@@ -1268,9 +928,6 @@ describe(commands.CUSTOMACTION_SET, () => {
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore(request.post);
       }
     });
   });
@@ -1352,32 +1009,5 @@ describe(commands.CUSTOMACTION_SET, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.getAccessToken);
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
-    cmdInstance.action({
-      options: {
-        url: 'https://contoso.sharepoint.com',
-        title: 'title',
-        name: 'name',
-        location: 'abc',
-        debug: true
-      }
-    }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 });

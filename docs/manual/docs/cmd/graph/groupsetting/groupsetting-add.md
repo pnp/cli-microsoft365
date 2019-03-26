@@ -18,12 +18,7 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
-!!! important
-    Before using this command, log in to the Microsoft Graph, using the [graph login](../login.md) command.
-
 ## Remarks
-
-To create a group setting, you have to first log in to the Microsoft Graph using the [graph login](../login.md) command, eg. `graph login`.
 
 To create a group setting, you have to specify the ID of the group setting template that should be used to create the setting. You can retrieve the ID of the template using the [graph groupsettingtemplate list](../groupsettingtemplate/groupsettingtemplate-list.md) command.
 

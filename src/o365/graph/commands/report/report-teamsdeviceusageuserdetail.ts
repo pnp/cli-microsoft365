@@ -1,5 +1,3 @@
-import auth from '../../GraphAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
@@ -36,22 +34,16 @@ class GraphReportTeamsDeviceUsageUserDetailCommand extends GraphCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((): Promise<{}> => {
-        const periodParameter: string = args.options.period ? `getTeamsDeviceUsageUserDetail(period='${encodeURIComponent(args.options.period)}')` : '';
-        const dateParameter: string = args.options.date ? `getTeamsDeviceUsageUserDetail(date=${encodeURIComponent(args.options.date)})` : '';
-        const endpoint: string = `${auth.service.resource}/v1.0/reports/${(args.options.period ? periodParameter : dateParameter)}`;
+    const periodParameter: string = args.options.period ? `getTeamsDeviceUsageUserDetail(period='${encodeURIComponent(args.options.period)}')` : '';
+    const dateParameter: string = args.options.date ? `getTeamsDeviceUsageUserDetail(date=${encodeURIComponent(args.options.date)})` : '';
+    const endpoint: string = `${this.resource}/v1.0/reports/${(args.options.period ? periodParameter : dateParameter)}`;
 
-        const requestOptions: any = {
-          url: endpoint,
-          headers: {
-            authorization: `Bearer ${auth.service.accessToken}`
-          }
-        };
+    const requestOptions: any = {
+      url: endpoint
+    };
 
-        return request.get(requestOptions);
-      })
+    request
+      .get(requestOptions)
       .then((res: any): void => {
         cmd.log(res);
 
@@ -101,18 +93,10 @@ class GraphReportTeamsDeviceUsageUserDetailCommand extends GraphCommand {
   }
 
   public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to the Microsoft Graph
-    using the ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
+      `  Remarks:
 
-    To get details about Microsoft Teams device usage by user, you have to first
-    log in to the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
-    
     As this report is only available for the past 28 days, date parameter value
     should be a date from that range.
 
@@ -120,11 +104,11 @@ class GraphReportTeamsDeviceUsageUserDetailCommand extends GraphCommand {
 
     Gets information about Microsoft Teams device usage by user for the last
     week
-      ${chalk.grey(config.delimiter)} ${commands.REPORT_TEAMSDEVICEUSAGEUSERDETAIL} --period 'D7'
+      ${commands.REPORT_TEAMSDEVICEUSAGEUSERDETAIL} --period 'D7'
 
     Gets information about Microsoft Teams device usage by user for
     May 1, 2019
-      ${chalk.grey(config.delimiter)} ${commands.REPORT_TEAMSDEVICEUSAGEUSERDETAIL} --date 2019-05-01
+      ${commands.REPORT_TEAMSDEVICEUSAGEUSERDETAIL} --date 2019-05-01
 `);
   }
 }

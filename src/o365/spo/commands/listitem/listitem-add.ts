@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -10,7 +8,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
-import { Auth } from '../../../../Auth';
 import { ListItemInstance } from './ListItemInstance';
 import { FolderExtensions } from '../folder/FolderExtensions';
 
@@ -59,10 +56,8 @@ class SpoListItemAddCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
     const listIdArgument = args.options.listId || '';
     const listTitleArgument = args.options.listTitle || '';
-    let siteAccessToken: string = '';
     const listRestUrl: string = (args.options.listId ?
       `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(listIdArgument)}')`
       : `${args.options.webUrl}/_api/web/lists/getByTitle('${encodeURIComponent(listTitleArgument)}')`);
@@ -70,34 +65,20 @@ class SpoListItemAddCommand extends SpoCommand {
     let targetFolderServerRelativeUrl: string = '';
     const folderExtensions: FolderExtensions = new FolderExtensions(cmd, this.debug);
 
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
+    if (this.verbose) {
+      cmd.log(`Getting content types for list...`);
     }
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<any> => {
-        siteAccessToken = accessToken;
+    const requestOptions: any = {
+      url: `${listRestUrl}/contenttypes?$select=Name,Id`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      json: true
+    };
 
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}.`);
-        }
-
-        if (this.verbose) {
-          cmd.log(`Getting content types for list...`);
-        }
-
-        const requestOptions: any = {
-          url: `${listRestUrl}/contenttypes?$select=Name,Id`,
-          headers: {
-            authorization: `Bearer ${siteAccessToken}`,
-            'accept': 'application/json;odata=nometadata'
-          },
-          json: true
-        };
-
-        return request.get(requestOptions);
-      })
+    request
+      .get(requestOptions)
       .then((response: any): Promise<void> => {
         if (args.options.contentType) {
           const foundContentType = response.value.filter((ct: any) => {
@@ -137,7 +118,6 @@ class SpoListItemAddCommand extends SpoCommand {
           const requestOptions: any = {
             url: `${listRestUrl}/rootFolder`,
             headers: {
-              authorization: `Bearer ${siteAccessToken}`,
               'accept': 'application/json;odata=nometadata'
             },
             json: true
@@ -147,8 +127,8 @@ class SpoListItemAddCommand extends SpoCommand {
             .get<any>(requestOptions)
             .then(rootFolderResponse => {
               targetFolderServerRelativeUrl = Utils.getServerRelativePath(rootFolderResponse["ServerRelativeUrl"], args.options.folder);
-                        
-              return folderExtensions.ensureFolder(args.options.webUrl, targetFolderServerRelativeUrl, siteAccessToken);
+
+              return folderExtensions.ensureFolder(args.options.webUrl, targetFolderServerRelativeUrl);
             });
         }
         else {
@@ -186,7 +166,6 @@ class SpoListItemAddCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${listRestUrl}/AddValidateUpdateItemUsingPath()`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata'
           },
           body: requestBody,
@@ -215,7 +194,6 @@ class SpoListItemAddCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${listRestUrl}/items(${idField[0].FieldValue})`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata'
           },
           json: true
@@ -301,44 +279,36 @@ class SpoListItemAddCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-    using the ${chalk.blue(commands.LOGIN)} command.
-  
-  Remarks:
-  
-    To add an item to a list, you have to first log in to SharePoint using the
-    ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-        
-  Examples:
+      `  Examples:
   
     Add an item with Title ${chalk.grey('Demo Item')} and content type name ${chalk.grey('Item')} to list with
     title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_ADD} --contentType Item --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Item"
+      ${commands.LISTITEM_ADD} --contentType Item --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Item"
 
     Add an item with Title ${chalk.grey('Demo Multi Managed Metadata Field')} and
     a single-select metadata field named ${chalk.grey('SingleMetadataField')} to list with
     title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_ADD} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Single Managed Metadata Field" --SingleMetadataField "TermLabel1|fa2f6bfd-1fad-4d18-9c89-289fe6941377;"
+      ${commands.LISTITEM_ADD} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Single Managed Metadata Field" --SingleMetadataField "TermLabel1|fa2f6bfd-1fad-4d18-9c89-289fe6941377;"
 
     Add an item with Title ${chalk.grey('Demo Multi Managed Metadata Field')} and a multi-select
     metadata field named ${chalk.grey('MultiMetadataField')} to list with title ${chalk.grey('Demo List')}
     in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_ADD} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Multi Managed Metadata Field" --MultiMetadataField "TermLabel1|cf8c72a1-0207-40ee-aebd-fca67d20bc8a;TermLabel2|e5cc320f-8b65-4882-afd5-f24d88d52b75;"
+      ${commands.LISTITEM_ADD} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Multi Managed Metadata Field" --MultiMetadataField "TermLabel1|cf8c72a1-0207-40ee-aebd-fca67d20bc8a;TermLabel2|e5cc320f-8b65-4882-afd5-f24d88d52b75;"
   
     Add an item with Title ${chalk.grey('Demo Single Person Field')} and a single-select people
     field named ${chalk.grey('SinglePeopleField')} to list with title ${chalk.grey('Demo List')} in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_ADD} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Single Person Field" --SinglePeopleField "[{'Key':'i:0#.f|membership|markh@conotoso.com'}]"
+      ${commands.LISTITEM_ADD} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Single Person Field" --SinglePeopleField "[{'Key':'i:0#.f|membership|markh@conotoso.com'}]"
       
     Add an item with Title ${chalk.grey('Demo Multi Person Field')} and a multi-select people
     field named ${chalk.grey('MultiPeopleField')} to list with title ${chalk.grey('Demo List')} in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_ADD} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Multi Person Field" --MultiPeopleField "[{'Key':'i:0#.f|membership|markh@conotoso.com'},{'Key':'i:0#.f|membership|adamb@conotoso.com'}]"
+      ${commands.LISTITEM_ADD} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Multi Person Field" --MultiPeopleField "[{'Key':'i:0#.f|membership|markh@conotoso.com'},{'Key':'i:0#.f|membership|adamb@conotoso.com'}]"
     
     Add an item with Title ${chalk.grey('Demo Hyperlink Field')} and a hyperlink field named
     ${chalk.grey('CustomHyperlink')} to list with title ${chalk.grey('Demo List')} in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_ADD} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Hyperlink Field" --CustomHyperlink "https://www.bing.com, Bing"
+      ${commands.LISTITEM_ADD} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Hyperlink Field" --CustomHyperlink "https://www.bing.com, Bing"
    `);
   }
 

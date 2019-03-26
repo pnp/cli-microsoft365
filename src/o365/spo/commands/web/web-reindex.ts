@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -8,7 +6,6 @@ import {
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import { Auth } from '../../../../Auth';
 import { SpoPropertyBagBaseCommand } from '../propertybag/propertybag-base';
 import { ContextInfo } from '../../spo';
 import { ClientSvc, IdentityResponse } from '../../common/ClientSvc';
@@ -40,27 +37,12 @@ class SpoWebReindexCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
     const clientSvcCommons: ClientSvc = new ClientSvc(cmd, this.debug);
-    let siteAccessToken: string = '';
     let requestDigest: string = '';
     let webIdentityResp: IdentityResponse;
 
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
-    }
-
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<ContextInfo> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
-
-        siteAccessToken = accessToken;
-
-        return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
-      })
+    this
+      .getRequestDigest(args.options.webUrl)
       .then((res: ContextInfo): Promise<IdentityResponse> => {
         requestDigest = res.FormDigestValue;
 
@@ -68,7 +50,7 @@ class SpoWebReindexCommand extends SpoCommand {
           cmd.log(`Retrieved request digest. Retrieving web identity...`);
         }
 
-        return clientSvcCommons.getCurrentWebIdentity(args.options.webUrl, siteAccessToken, requestDigest);
+        return clientSvcCommons.getCurrentWebIdentity(args.options.webUrl, requestDigest);
       })
       .then((identityResp: IdentityResponse): Promise<boolean> => {
         webIdentityResp = identityResp;
@@ -80,7 +62,7 @@ class SpoWebReindexCommand extends SpoCommand {
           cmd.log(`Checking if the site is a no-script site...`);
         }
 
-        return SpoPropertyBagBaseCommand.isNoScriptSite(args.options.webUrl, requestDigest, siteAccessToken, webIdentityResp, clientSvcCommons);
+        return SpoPropertyBagBaseCommand.isNoScriptSite(args.options.webUrl, requestDigest, webIdentityResp, clientSvcCommons);
       })
       .then((isNoScriptSite: boolean): Promise<{ vti_x005f_searchversion?: number }> => {
         if (isNoScriptSite) {
@@ -88,7 +70,7 @@ class SpoWebReindexCommand extends SpoCommand {
             cmd.log(`Site is a no-script site. Reindexing lists instead...`);
           }
 
-          return this.reindexLists(args.options.webUrl, requestDigest, siteAccessToken, cmd, webIdentityResp, clientSvcCommons) as any;
+          return this.reindexLists(args.options.webUrl, requestDigest, cmd, webIdentityResp, clientSvcCommons) as any;
         }
 
         if (this.verbose) {
@@ -98,7 +80,6 @@ class SpoWebReindexCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/allproperties`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata'
           },
           json: true
@@ -110,7 +91,7 @@ class SpoWebReindexCommand extends SpoCommand {
         let searchVersion: number = webProperties.vti_x005f_searchversion || 0;
         searchVersion++;
 
-        return SpoPropertyBagBaseCommand.setProperty('vti_searchversion', searchVersion.toString(), args.options.webUrl, requestDigest, siteAccessToken, webIdentityResp, cmd, this.debug);
+        return SpoPropertyBagBaseCommand.setProperty('vti_searchversion', searchVersion.toString(), args.options.webUrl, requestDigest, webIdentityResp, cmd, this.debug);
       })
       .then((): void => {
         if (this.verbose) {
@@ -132,7 +113,7 @@ class SpoWebReindexCommand extends SpoCommand {
       });
   }
 
-  private reindexLists(webUrl: string, requestDigest: string, siteAccessToken: string, cmd: CommandInstance, webIdentityResp: IdentityResponse, clientSvcCommons: ClientSvc): Promise<void> {
+  private reindexLists(webUrl: string, requestDigest: string, cmd: CommandInstance, webIdentityResp: IdentityResponse, clientSvcCommons: ClientSvc): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       ((): Promise<{ value: { NoCrawl: boolean; Title: string; RootFolder: { Properties: any; ServerRelativeUrl: string; } }[] }> => {
         if (this.debug) {
@@ -142,7 +123,6 @@ class SpoWebReindexCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${webUrl}/_api/web/lists?$select=NoCrawl,Title,RootFolder/Properties,RootFolder/ServerRelativeUrl&$expand=RootFolder/Properties`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata'
           },
           json: true
@@ -151,7 +131,7 @@ class SpoWebReindexCommand extends SpoCommand {
         return request.get(requestOptions);
       })()
         .then((lists: { value: { NoCrawl: boolean; Title: string; RootFolder: { Properties: any; ServerRelativeUrl: string; } }[] }): Promise<void[]> => {
-          const promises: Promise<void>[] = lists.value.map(l => this.reindexList(l, webUrl, requestDigest, siteAccessToken, webIdentityResp, clientSvcCommons, cmd));
+          const promises: Promise<void>[] = lists.value.map(l => this.reindexList(l, webUrl, requestDigest, webIdentityResp, clientSvcCommons, cmd));
           return Promise.all(promises);
         })
         .then((): void => {
@@ -161,7 +141,7 @@ class SpoWebReindexCommand extends SpoCommand {
     });
   }
 
-  private reindexList(list: { NoCrawl: boolean; Title: string; RootFolder: { Properties: any; ServerRelativeUrl: string; } }, webUrl: string, requestDigest: string, accessToken: string, webIdentityResp: IdentityResponse, clientSvcCommons: ClientSvc, cmd: CommandInstance): Promise<void> {
+  private reindexList(list: { NoCrawl: boolean; Title: string; RootFolder: { Properties: any; ServerRelativeUrl: string; } }, webUrl: string, requestDigest: string, webIdentityResp: IdentityResponse, clientSvcCommons: ClientSvc, cmd: CommandInstance): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       if (list.NoCrawl) {
         if (this.debug) {
@@ -172,12 +152,12 @@ class SpoWebReindexCommand extends SpoCommand {
       }
 
       clientSvcCommons
-        .getFolderIdentity(webIdentityResp.objectIdentity, webUrl, list.RootFolder.ServerRelativeUrl, accessToken, requestDigest)
+        .getFolderIdentity(webIdentityResp.objectIdentity, webUrl, list.RootFolder.ServerRelativeUrl, requestDigest)
         .then((folderIdentityResp: IdentityResponse): Promise<any> => {
           let searchversion: number = list.RootFolder.Properties.vti_x005f_searchversion || 0;
           searchversion++;
 
-          return SpoPropertyBagBaseCommand.setProperty('vti_searchversion', searchversion.toString(), webUrl, requestDigest, accessToken, folderIdentityResp, cmd, this.debug, list.RootFolder.ServerRelativeUrl);
+          return SpoPropertyBagBaseCommand.setProperty('vti_searchversion', searchversion.toString(), webUrl, requestDigest, folderIdentityResp, cmd, this.debug, list.RootFolder.ServerRelativeUrl);
         })
         .then((): void => {
           resolve();
@@ -216,14 +196,7 @@ class SpoWebReindexCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-    using the ${chalk.blue(commands.LOGIN)} command.
-  
-  Remarks:
-  
-    To request reindexing a subsite, you have to first log in to SharePoint
-    using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
+      `  Remarks:
 
     If the subsite to be reindexed is a no-script site, the command will request
     reindexing all lists from the subsite that haven't been excluded from the
@@ -232,7 +205,7 @@ class SpoWebReindexCommand extends SpoCommand {
   Examples:
   
     Request reindexing the subsite ${chalk.grey('https://contoso.sharepoint.com/subsite')}
-      ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/subsite
+      ${this.name} --webUrl https://contoso.sharepoint.com/subsite
       `);
   }
 }

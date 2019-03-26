@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -35,27 +33,18 @@ class SpoThemeRemoveCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  protected requiresTenantAdmin(): boolean {
-    return true;
-  }
-
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const removeTheme = (): void => {
-      auth
-        .ensureAccessToken(auth.service.resource, cmd, this.debug)
-        .then((accessToken: string): Promise<void> => {
-          if (this.debug) {
-            cmd.log(`Retrieved access token ${accessToken}`);
-          }
-
+      this
+        .getSpoAdminUrl(cmd, this.debug)
+        .then((spoAdminUrl: string): Promise<void> => {
           if (this.verbose) {
             cmd.log(`Removing theme from tenant...`);
           }
 
           const requestOptions: any = {
-            url: `${auth.site.url}/_api/thememanager/DeleteTenantTheme`,
+            url: `${spoAdminUrl}/_api/thememanager/DeleteTenantTheme`,
             headers: {
-              authorization: `Bearer ${accessToken}`,
               'accept': 'application/json;odata=nometadata'
             },
             body: {
@@ -125,21 +114,16 @@ class SpoThemeRemoveCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online tenant admin site,
-  using the ${chalk.blue(commands.LOGIN)} command.
+      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
+    the tenant admin site.
   
-  Remarks:
-  
-    To remove a theme, you have to first log in to a tenant admin site using the
-    ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso-admin.sharepoint.com`)}.
-        
   Examples:
 
     Remove theme. Will prompt for confirmation before removing the theme
-      ${chalk.grey(config.delimiter)} ${commands.THEME_REMOVE} --name Contoso-Blue
+      ${commands.THEME_REMOVE} --name Contoso-Blue
   
     Remove theme without prompting for confirmation
-      ${chalk.grey(config.delimiter)} ${commands.THEME_REMOVE} --name Contoso-Blue --confirm
+      ${commands.THEME_REMOVE} --name Contoso-Blue --confirm
 
   More information:
 

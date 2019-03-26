@@ -1,6 +1,4 @@
-import auth from '../../SpoAuth';
 import { ContextInfo } from '../../spo';
-import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
 import {
@@ -8,7 +6,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import GlobalOptions from '../../../../GlobalOptions';
-import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -38,24 +35,8 @@ class SpoHubSiteDisconnectCommand extends SpoCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const disconnectHubSite: () => void = (): void => {
-      const resource: string = Auth.getResourceFromUrl(args.options.url);
-      let siteAccessToken: string = '';
-
-      auth
-        .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-        .then((accessToken: string): Promise<ContextInfo> => {
-          siteAccessToken = accessToken;
-
-          if (this.debug) {
-            cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-          }
-
-          if (this.verbose) {
-            cmd.log(`Retrieving request digest...`);
-          }
-
-          return this.getRequestDigestForSite(args.options.url, siteAccessToken, cmd, this.debug);
-        })
+      this
+        .getRequestDigest(args.options.url)
         .then((res: ContextInfo): Promise<void> => {
           if (this.verbose) {
             cmd.log(`Disconnecting site collection ${args.options.url} from its hubsite...`);
@@ -64,7 +45,6 @@ class SpoHubSiteDisconnectCommand extends SpoCommand {
           const requestOptions: any = {
             url: `${args.options.url}/_api/site/JoinHubSite('00000000-0000-0000-0000-000000000000')`,
             headers: {
-              authorization: `Bearer ${siteAccessToken}`,
               'X-RequestDigest': res.FormDigestValue,
               accept: 'application/json;odata=nometadata'
             },
@@ -137,30 +117,23 @@ class SpoHubSiteDisconnectCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site using
-    the ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
+      `  Remarks:
 
     ${chalk.yellow('Attention:')} This command is based on a SharePoint API that is currently
     in preview and is subject to change once the API reached general
     availability.
-
-    To disconnect a site collection from its hub site, you have to first log in
-    to a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
 
   Examples:
   
     Disconnect the site collection with URL
     ${chalk.grey('https://contoso.sharepoint.com/sites/sales')} from its hub site. Will prompt
     for confirmation before disconnecting from the hub site.
-      ${chalk.grey(config.delimiter)} ${this.name} --url https://contoso.sharepoint.com/sites/sales
+      ${this.name} --url https://contoso.sharepoint.com/sites/sales
 
     Disconnect the site collection with URL
     ${chalk.grey('https://contoso.sharepoint.com/sites/sales')} from its hub site without
     prompting for confirmation
-      ${chalk.grey(config.delimiter)} ${this.name} --url https://contoso.sharepoint.com/sites/sales --confirm
+      ${this.name} --url https://contoso.sharepoint.com/sites/sales --confirm
 
   More information:
 

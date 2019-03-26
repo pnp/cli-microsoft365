@@ -1,6 +1,6 @@
 # Persisting connection information
 
-After logging in to an Office 365 service, like SharePoint Online, the Office 365 CLI will persist the information about the connection until you explicitly log out from the specific service.
+After logging in to Office 365, the Office 365 CLI will persist the information about the connection until you explicitly log out from Office 365.
 
 ## Why is persisting connection information important
 
@@ -37,25 +37,19 @@ First, you use the Office 365 CLI to get the list of all apps from the tenant ap
 
 ## Persisting connection information in Office 365 CLI
 
-When you log in to an Office 365 service, such as SharePoint Online, in the Office 365 CLI, the CLI will persist the information about the connection for future reuse. For each established connection, the Office 365 CLI persists the following information:
+When you log in to Office 365 in the Office 365 CLI, the CLI will persist the information about the connection for future reuse. For the established connection, the Office 365 CLI persists the refresh token as well as all access tokens obtained when using the different CLI commands.
 
-- service name, eg. `SPO`
-- Azure AD resource name, eg `https://contoso.sharepoint.com`
-- refresh token
-- access token
-- access token expiration timestamp
-
-Depending on the Office 365 service to which you log in, the Office 365 CLI might persist some additional information. For example, when logging in to SharePoint Online tenant admin site using the `spo login` command, the CLI will store the tenant ID. If you were initially connected to the tenant admin site, but also performed operations on other site collections (like retrieving the list of apps installed in the specific site), the CLI will store access token for regular SharePoint sites as well.
+Depending on the Office 365 CLI commands you have used, the CLI might persist some additional information. For example, when using commands that interact with SharePoint Online, the CLI will store the URL of your SharePoint Online tenant as well as its ID.
 
 Where the connection information is persisted, depends on the operating system that you are using.
 
 ### macOS
 
-On the macOS, the Office 365 CLI persists its connection information in the system Keychain. For each connected Office 365 service (such as `SPO`) it adds a generic credential. You can view what information is stored by opening **Keychain Access** and searching for `Office 365 CLI`.
+On the macOS, the Office 365 CLI persists its connection information in the system Keychain as a generic credential. You can view what information is stored by opening **Keychain Access** and searching for `Office 365 CLI`.
 
 ### Windows
 
-On Windows, the Office 365 CLI persists its connection information in the Windows Credential Manager. To view the persisted credentials, from the **Control Panel**, navigate to **User Accounts** and from the **Credential Manager** section open **Manage Windows Credentials**. Any credentials stored by the Office 365 CLI will be listed in the **Generic Credentials** section named as `[service]--x-y`, for example `SPO--1-3`. Because there is a limit how long a password stored in the Windows Credential Manager can be, connection information stored by the Office 365 CLI will often be split over multiple chunks, where the last two number in the chunk specify the number of chunk and the total number of chunks.
+On Windows, the Office 365 CLI persists its connection information in the Windows Credential Manager. To view the persisted credentials, from the **Control Panel**, navigate to **User Accounts** and from the **Credential Manager** section open **Manage Windows Credentials**. Credentials stored by the Office 365 CLI will be listed in the **Generic Credentials** section named as `Office365Cli--x-y`, for example `Office365Cli--1-3`. Because there is a limit how long a password stored in the Windows Credential Manager can be, connection information stored by the Office 365 CLI will often be split over multiple chunks, where the last two number in the chunk specify the number of chunk and the total number of chunks.
 
 ### Linux
 
@@ -65,6 +59,6 @@ On Linux, the Office 365 CLI stores its connection information in a JSON file lo
 
 Office 365 CLI persists its connection information until you either explicitly log out from the particular service or manually remove the stored credentials.
 
-To check if you are logged in to a particular Office 365 service in the Office 365 CLI, run the corresponding status command, for example `o365 spo status`. If you are logged in, the command will return the URL of the site to which you are logged in. If you are not connected, the command will return `false`.
+To check if you are logged in to Office 365 in the Office 365 CLI, run the `status` command. If you are logged in, the command will return the name of the user account or AAD application used to log in. If you are not connected, the command will return `false`.
 
-To log out from the specific Office 365 service, run the corresponding Office 365 CLI, for example, to log out from SharePoint Online and remove all persisted connection information, run `o365 spo logout`.
+To log out from Office, run the `logout` command. Running this command will remove all previously stored connection data from your machine.

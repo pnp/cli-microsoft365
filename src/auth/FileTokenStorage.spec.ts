@@ -1,8 +1,9 @@
 import * as sinon from 'sinon';
 import * as assert from 'assert';
 import Utils from '../Utils';
-import { FileTokenStorage, TokensFile } from './FileTokenStorage';
+import { FileTokenStorage } from './FileTokenStorage';
 import * as fs from 'fs';
+import { Service, AuthType } from '../Auth';
 
 describe('FileTokenStorage', () => {
   const fileStorage = new FileTokenStorage();
@@ -15,10 +16,10 @@ describe('FileTokenStorage', () => {
     ]);
   })
 
-  it('fails retrieving password from file if the token file doesn\'t exist', (done) => {
+  it('fails retrieving connection info from file if the token file doesn\'t exist', (done) => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     fileStorage
-      .get('mock')
+      .get()
       .then(() => {
         done('Expected fail but passed instead');
       }, (err) => {
@@ -32,61 +33,20 @@ describe('FileTokenStorage', () => {
       });
   });
 
-  it('fails retrieving password from file if the token file is empty', (done) => {
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => '');
-    fileStorage
-      .get('mock')
-      .then(() => {
-        done('Expected fail but passed instead');
-      }, (err) => {
-        done();
-      });
-  });
-
-  it('fails retrieving password from file if the token file contains invalid JSON string', (done) => {
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => '');
-    fileStorage
-      .get('mock')
-      .then(() => {
-        done('Expected fail but passed instead');
-      }, (err) => {
-        done();
-      });
-  });
-
-  it('fails retrieving password from file if the token file contains an empty object', (done) => {
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => '{}');
-    fileStorage
-      .get('mock')
-      .then(() => {
-        done('Expected fail but passed instead');
-      }, (err) => {
-        try {
-          assert.equal(err, 'Token for service mock not found');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
-  });
-
-  it('fails retrieving password from file if the token file doesn\'t contain any passwords', (done) => {
-    const tokensFile: TokensFile = {
-      services: {}
+  it('returns connection info from file', (done) => {
+    const tokensFile: Service = {
+      accessTokens: {},
+      authType: AuthType.DeviceCode,
+      connected: false,
+      logout: () => {}
     };
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'readFileSync').callsFake(() => JSON.stringify(tokensFile));
     fileStorage
-      .get('mock')
-      .then(() => {
-        done('Expected fail but passed instead');
-      }, (err) => {
+      .get()
+      .then((connectionInfo) => {
         try {
-          assert.equal(err, 'Token for service mock not found');
+          assert.equal(connectionInfo, JSON.stringify(tokensFile));
           done();
         }
         catch (e) {
@@ -95,61 +55,18 @@ describe('FileTokenStorage', () => {
       });
   });
 
-  it('fails retrieving password from file if the token file doesn\'t contain password for the specified service', (done) => {
-    const tokensFile: TokensFile = {
-      services: {
-        'SPO': 'abc'
-      }
-    };
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => JSON.stringify(tokensFile));
-    fileStorage
-      .get('mock')
-      .then(() => {
-        done('Expected fail but passed instead');
-      }, (err) => {
-        try {
-          assert.equal(err, 'Token for service mock not found');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
-  });
-
-  it('returns password from file when the token file contains password for the specified service', (done) => {
-    const tokensFile: TokensFile = {
-      services: {
-        'mock': 'abc'
-      }
-    };
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => JSON.stringify(tokensFile));
-    fileStorage
-      .get('mock')
-      .then((password) => {
-        try {
-          assert.equal(password, 'abc');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
-  });
-
-  it('saves the password in the file when the file doesn\'t exist', (done) => {
-    const expected: TokensFile = {
-      services: {
-        'mock': 'abc'
-      }
+  it('saves the connection info in the file when the file doesn\'t exist', (done) => {
+    const expected: Service = {
+      accessTokens: {},
+      authType: AuthType.DeviceCode,
+      connected: false,
+      logout: () => {}
     };
     let actual: string = '';
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     sinon.stub(fs, 'writeFile').callsFake((path, token) => { actual = token; }).callsArgWith(3, null);
     fileStorage
-      .set('mock', 'abc')
+      .set(JSON.stringify(expected))
       .then(() => {
         try {
           assert.equal(actual, JSON.stringify(expected));
@@ -161,18 +78,19 @@ describe('FileTokenStorage', () => {
       });
   });
 
-  it('saves the password in the file when the file is empty', (done) => {
-    const expected: TokensFile = {
-      services: {
-        'mock': 'abc'
-      }
+  it('saves the connection info in the file when the file is empty', (done) => {
+    const expected: Service = {
+      accessTokens: {},
+      authType: AuthType.DeviceCode,
+      connected: false,
+      logout: () => {}
     };
     let actual: string = '';
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'readFileSync').callsFake(() => '');
     sinon.stub(fs, 'writeFile').callsFake((path, token) => { actual = token; }).callsArgWith(3, null);
     fileStorage
-      .set('mock', 'abc')
+      .set(JSON.stringify(expected))
       .then(() => {
         try {
           assert.equal(actual, JSON.stringify(expected));
@@ -184,18 +102,19 @@ describe('FileTokenStorage', () => {
       });
   });
 
-  it('saves the password in the file when the file contains an empty JSON object', (done) => {
-    const expected: TokensFile = {
-      services: {
-        'mock': 'abc'
-      }
+  it('saves the connection info in the file when the file contains an empty JSON object', (done) => {
+    const expected: Service = {
+      accessTokens: {},
+      authType: AuthType.DeviceCode,
+      connected: false,
+      logout: () => {}
     };
     let actual: string = '';
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'readFileSync').callsFake(() => '{}');
     sinon.stub(fs, 'writeFile').callsFake((path, token) => { actual = token; }).callsArgWith(3, null);
     fileStorage
-      .set('mock', 'abc')
+      .set(JSON.stringify(expected))
       .then(() => {
         try {
           assert.equal(actual, JSON.stringify(expected));
@@ -207,18 +126,19 @@ describe('FileTokenStorage', () => {
       });
   });
 
-  it('saves the password in the file when the file contains no passwords', (done) => {
-    const expected: TokensFile = {
-      services: {
-        'mock': 'abc'
-      }
+  it('saves the connection info in the file when the file contains no access tokens', (done) => {
+    const expected: Service = {
+      accessTokens: {},
+      authType: AuthType.DeviceCode,
+      connected: false,
+      logout: () => {}
     };
     let actual: string = '';
     sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => '{services:{}}');
+    sinon.stub(fs, 'readFileSync').callsFake(() => '{"accessTokens":{},"authType":0,"connected":false}');
     sinon.stub(fs, 'writeFile').callsFake((path, token) => { actual = token; }).callsArgWith(3, null);
     fileStorage
-      .set('mock', 'abc')
+      .set(JSON.stringify(expected))
       .then(() => {
         try {
           assert.equal(actual, JSON.stringify(expected));
@@ -230,19 +150,29 @@ describe('FileTokenStorage', () => {
       });
   });
 
-  it('adds the password to the file when the file contains passwords', (done) => {
-    const expected: TokensFile = {
-      services: {
-        'SPO': 'def',
-        'mock': 'abc'
-      }
+  it('adds the connection info to the file when the file contains access tokens', (done) => {
+    const expected: Service = {
+      accessTokens: {},
+      authType: AuthType.DeviceCode,
+      connected: false,
+      logout: () => {}
     };
     let actual: string = '';
     sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => JSON.stringify({ services: { 'SPO': 'def' } }));
+    sinon.stub(fs, 'readFileSync').callsFake(() => JSON.stringify({
+      accessTokens: {
+        "https://contoso.sharepoint.com": {
+          expiresOn: '123',
+          value: '123'
+        }
+      },
+      authType: AuthType.DeviceCode,
+      connected: true,
+      refreshToken: 'ref'
+    }));
     sinon.stub(fs, 'writeFile').callsFake((path, token) => { actual = token; }).callsArgWith(3, null);
     fileStorage
-      .set('mock', 'abc')
+      .set(JSON.stringify(expected))
       .then(() => {
         try {
           assert.equal(actual, JSON.stringify(expected));
@@ -258,7 +188,7 @@ describe('FileTokenStorage', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     sinon.stub(fs, 'writeFile').callsFake(() => { }).callsArgWith(3, { message: 'An error has occurred' });
     fileStorage
-      .set('mock', 'abc')
+      .set('abc')
       .then(() => {
         done('Fail expected but passed instead');
       }, (err) => {
@@ -275,7 +205,7 @@ describe('FileTokenStorage', () => {
   it('succeeds with removing if the token file doesn\'t exist', (done) => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     fileStorage
-      .remove('mock')
+      .remove()
       .then(() => {
         done();
       }, (err) => {
@@ -287,7 +217,7 @@ describe('FileTokenStorage', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'readFileSync').callsFake(() => '');
     fileStorage
-      .remove('mock')
+      .remove()
       .then(() => {
         done();
       }, (err) => {
@@ -299,7 +229,7 @@ describe('FileTokenStorage', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'readFileSync').callsFake(() => '{}');
     fileStorage
-      .remove('mock')
+      .remove()
       .then(() => {
         done();
       }, (err) => {
@@ -312,7 +242,7 @@ describe('FileTokenStorage', () => {
     sinon.stub(fs, 'readFileSync').callsFake(() => JSON.stringify({ services: {} }));
     sinon.stub(fs, 'writeFile').callsFake(() => { }).callsArgWith(3, null);
     fileStorage
-      .remove('mock')
+      .remove()
       .then(() => {
         done();
       }, (err) => {
@@ -320,73 +250,16 @@ describe('FileTokenStorage', () => {
       });
   });
 
-  it('removes password for the specified service from the token file keeping other passwords intact', (done) => {
-    const expected: TokensFile = {
-      services: {
-        'SPO': 'abc'
-      }
-    };
-    let actual: string = '';
+  it('succeeds when connection info successfully removed from the token file', (done) => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'readFileSync').callsFake(() => JSON.stringify({
       services: {
-        'SPO': 'abc',
-        'mock': 'def'
-      }
-    }));
-    sinon.stub(fs, 'writeFile').callsFake((path, tokens) => { actual = tokens; }).callsArgWith(3, null);
-    fileStorage
-      .remove('mock')
-      .then(() => {
-        try {
-          assert.equal(actual, JSON.stringify(expected));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, (err) => {
-        done('Pass expected but failed instead');
-      });
-  });
-
-  it('removes password for the specified service from the token file', (done) => {
-    const expected: TokensFile = {
-      services: {}
-    };
-    let actual: string = '';
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => JSON.stringify({
-      services: {
-        'mock': 'def'
-      }
-    }));
-    sinon.stub(fs, 'writeFile').callsFake((path, tokens) => { actual = tokens; }).callsArgWith(3, null);
-    fileStorage
-      .remove('mock')
-      .then(() => {
-        try {
-          assert.equal(actual, JSON.stringify(expected));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, (err) => {
-        done('Pass expected but failed instead');
-      });
-  });
-
-  it('succeeds when password successfully removed from the token file', (done) => {
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => JSON.stringify({
-      services: {
-        'mock': 'def'
+        'abc': 'def'
       }
     }));
     sinon.stub(fs, 'writeFile').callsFake(() => {}).callsArgWith(3, null);
     fileStorage
-      .remove('mock')
+      .remove()
       .then(() => {
         try {
           done();
@@ -403,12 +276,12 @@ describe('FileTokenStorage', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'readFileSync').callsFake(() => JSON.stringify({
       services: {
-        'mock': 'def'
+        'abc': 'def'
       }
     }));
     sinon.stub(fs, 'writeFile').callsFake(() => {}).callsArgWith(3, { message: 'An error has occurred' });
     fileStorage
-      .remove('mock')
+      .remove()
       .then(() => {
         done('Fail expected but passed instead');
       }, (err) => {

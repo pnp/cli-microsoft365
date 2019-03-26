@@ -1,12 +1,9 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
 import { CommandOption, CommandValidate } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import { ContextInfo } from '../../spo';
 import GlobalOptions from '../../../../GlobalOptions';
-import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -30,28 +27,13 @@ class SpoPageRemoveCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-    let siteAccessToken: string = '';
     let requestDigest: string = '';
     let pageName: string = args.options.name;
     const serverRelativeSiteUrl: string = args.options.webUrl.substr(args.options.webUrl.indexOf('/', 8));
 
     const removePage = () => {
-      auth
-        .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-        .then((accessToken: string): Promise<ContextInfo> => {
-          if (this.debug) {
-            cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-          }
-
-          siteAccessToken = accessToken;
-
-          if (this.verbose) {
-            cmd.log(`Retrieving request digest...`);
-          }
-
-          return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
-        })
+      this
+        .getRequestDigest(args.options.webUrl)
         .then((res: ContextInfo): Promise<void> => {
           requestDigest = res.FormDigestValue;
 
@@ -67,7 +49,6 @@ class SpoPageRemoveCommand extends SpoCommand {
             url: `${args.options
               .webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeSiteUrl}/sitepages/${pageName}')`,
             headers: {
-              authorization: `Bearer ${siteAccessToken}`,
               'X-RequestDigest': requestDigest,
               'X-HTTP-Method': 'DELETE',
               'content-type': 'application/json;odata=nometadata',
@@ -154,14 +135,7 @@ class SpoPageRemoveCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site
-    using the ${chalk.blue(commands.LOGIN)} command.
-    
-  Remarks:
-
-    To remove a modern page, you have to first log in to a SharePoint site
-    using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
+      `  Remarks:
 
     If you try to remove a page with that does not exist, you will get
     a ${chalk.grey('The file does not exist')} error.
@@ -172,10 +146,10 @@ class SpoPageRemoveCommand extends SpoCommand {
   Examples:
 
     Remove a modern page.
-      ${chalk.grey(config.delimiter)} ${this.name} --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team
+      ${this.name} --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team
 
     Remove a modern page without a confirmation prompt.
-      ${chalk.grey(config.delimiter)} ${this.name} --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --confirm
+      ${this.name} --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --confirm
     `
     );
   }

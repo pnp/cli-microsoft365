@@ -1,4 +1,3 @@
-import auth from '../../SpoAuth';
 import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
@@ -33,29 +32,24 @@ class SpoServicePrincipalPermissionRequestDenyCommand extends SpoCommand {
     return 'Denies the specified permission request';
   }
 
-  protected requiresTenantAdmin(): boolean {
-    return true;
-  }
-
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<ContextInfo> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
+    let spoAdminUrl: string = '';
+
+    this
+      .getSpoAdminUrl(cmd, this.debug)
+      .then((_spoAdminUrl: string): Promise<ContextInfo> => {
+        spoAdminUrl = _spoAdminUrl;
 
         if (this.verbose) {
           cmd.log(`Retrieving request digest...`);
         }
 
-        return this.getRequestDigest(cmd, this.debug);
+        return this.getRequestDigest(spoAdminUrl);
       })
       .then((res: ContextInfo): Promise<string> => {
         const requestOptions: any = {
-          url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+          url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': res.FormDigestValue
           },
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="160" ObjectPathId="159" /><ObjectPath Id="162" ObjectPathId="161" /><ObjectPath Id="164" ObjectPathId="163" /><Method Name="Deny" Id="165" ObjectPathId="163" /></Actions><ObjectPaths><Constructor Id="159" TypeId="{104e8f06-1e00-4675-99c6-1b9b504ed8d8}" /><Property Id="161" ParentId="159" Name="PermissionRequests" /><Method Id="163" ParentId="161" Name="GetById"><Parameters><Parameter Type="Guid">{${Utils.escapeXml(args.options.requestId)}}</Parameter></Parameters></Method></ObjectPaths></Request>`
@@ -107,21 +101,18 @@ class SpoServicePrincipalPermissionRequestDenyCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_DENY).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online tenant admin site using the
-      ${chalk.blue(commands.LOGIN)} command.
+      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
+    the tenant admin site.
         
   Remarks:
 
-    To deny a permission request, you have to first log in to a SharePoint tenant admin
-    site using the ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso-admin.sharepoint.com`)}.
-
-    The permission request you want to deny is denoted using its ${chalk.grey('ID')}. You can retrieve
-    it using the ${chalk.grey(`${commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST}`)} command.
+    The permission request you want to deny is denoted using its ${chalk.grey('ID')}. You can
+    retrieve it using the ${chalk.grey(`${commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST}`)} command.
 
   Examples:
   
     Deny permission request with id ${chalk.grey('4dc4c043-25ee-40f2-81d3-b3bf63da7538')}
-      ${chalk.grey(config.delimiter)} ${commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_DENY} --requestId 4dc4c043-25ee-40f2-81d3-b3bf63da7538
+      ${commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_DENY} --requestId 4dc4c043-25ee-40f2-81d3-b3bf63da7538
 `);
   }
 }

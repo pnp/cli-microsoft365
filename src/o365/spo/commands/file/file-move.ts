@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -8,7 +6,6 @@ import {
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import { Auth } from '../../../../Auth';
 import { ContextInfo } from '../../spo';
 import * as url from 'url';
 
@@ -28,7 +25,6 @@ interface Options extends GlobalOptions {
 
 interface JobProgressOptions {
   webUrl: string;
-  accessToken: string;
   /**
    * Response object retrieved from /_api/site/CreateCopyJobs
    */
@@ -67,39 +63,24 @@ class SpoFileMoveCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-    let siteAccessToken = '';
     const webUrl = args.options.webUrl;
     const parsedUrl: url.UrlWithStringQuery = url.parse(webUrl);
     const tenantUrl: string = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
 
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
-    }
-
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<void> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}.`);
-        }
-
-        siteAccessToken = accessToken;
-
-        // Check if the source file exists.
-        // Called on purpose, we explicitly check if user specified file
-        // in the sourceUrl option. 
-        // The CreateCopyJobs endpoint accepts file, folder or batch from both.
-        // A user might enter folder instead of file as source url by mistake
-        // then there are edge cases when deleteIfAlreadyExists flag is set
-        // the user can receive misleading error message.
-        return this.fileExists(tenantUrl, webUrl, args.options.sourceUrl, siteAccessToken, cmd);
-      })
+    // Check if the source file exists.
+    // Called on purpose, we explicitly check if user specified file
+    // in the sourceUrl option. 
+    // The CreateCopyJobs endpoint accepts file, folder or batch from both.
+    // A user might enter folder instead of file as source url by mistake
+    // then there are edge cases when deleteIfAlreadyExists flag is set
+    // the user can receive misleading error message.
+    this
+      .fileExists(tenantUrl, webUrl, args.options.sourceUrl)
       .then((): Promise<void> => {
         if (args.options.deleteIfAlreadyExists) {
           // try delete target file, if deleteIfAlreadyExists flag is set
           const filename: string = args.options.sourceUrl.replace(/^.*[\\\/]/, '');
-          return this.recycleFile(tenantUrl, args.options.targetUrl, filename, siteAccessToken, cmd);
+          return this.recycleFile(tenantUrl, args.options.targetUrl, filename, cmd);
         }
 
         return Promise.resolve();
@@ -112,7 +93,6 @@ class SpoFileMoveCommand extends SpoCommand {
         const requestOptions: any = {
           url: requestUrl,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata'
           },
           body: {
@@ -132,7 +112,6 @@ class SpoFileMoveCommand extends SpoCommand {
       .then((jobInfo: any): Promise<any> => {
         const jobProgressOptions: JobProgressOptions = {
           webUrl: webUrl,
-          accessToken: siteAccessToken,
           copyJopInfo: jobInfo.value[0],
           progressMaxPollAttempts: 1000, // 1 sec.
           progressPollInterval: 30 * 60, // approx. 30 mins. if interval is 1000
@@ -152,7 +131,7 @@ class SpoFileMoveCommand extends SpoCommand {
   /**
    * Checks if a file exists on the server relative url
    */
-  private fileExists(tenantUrl: string, webUrl: string, sourceUrl: string, siteAccessToken: string, cmd: CommandInstance): Promise<void> {
+  private fileExists(tenantUrl: string, webUrl: string, sourceUrl: string): Promise<void> {
     const webServerRelativeUrl: string = webUrl.replace(tenantUrl, '');
     const fileServerRelativeUrl: string = `${webServerRelativeUrl}${sourceUrl}`;
 
@@ -161,7 +140,6 @@ class SpoFileMoveCommand extends SpoCommand {
       url: requestUrl,
       method: 'GET',
       headers: {
-        authorization: `Bearer ${siteAccessToken}`,
         'accept': 'application/json;odata=nometadata'
       },
       json: true
@@ -184,7 +162,6 @@ class SpoFileMoveCommand extends SpoCommand {
       const requestOptions: any = {
         url: requestUrl,
         headers: {
-          authorization: `Bearer ${opts.accessToken}`,
           'accept': 'application/json;odata=nometadata'
         },
         body: { "copyJobInfo": opts.copyJopInfo },
@@ -250,14 +227,14 @@ class SpoFileMoveCommand extends SpoCommand {
   /**
    * Moves file in the site recycle bin
    */
-  private recycleFile(tenantUrl: string, targetUrl: string, filename: string, siteAccessToken: string, cmd: CommandInstance): Promise<void> {
+  private recycleFile(tenantUrl: string, targetUrl: string, filename: string, cmd: CommandInstance): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       const targetFolderAbsoluteUrl: string = this.urlCombine(tenantUrl, targetUrl);
 
-      // since the target WebFullUrl is unknown we can use getRequestDigestForSite
+      // since the target WebFullUrl is unknown we can use getRequestDigest
       // to get it from target folder absolute url.
       // Similar approach used here Microsoft.SharePoint.Client.Web.WebUrlFromFolderUrlDirect
-      this.getRequestDigestForSite(targetFolderAbsoluteUrl, siteAccessToken, cmd, this.debug)
+      this.getRequestDigest(targetFolderAbsoluteUrl)
         .then((contextResponse: ContextInfo): void => {
           if (this.debug) {
             cmd.log(`contextResponse.WebFullUrl: ${contextResponse.WebFullUrl}`);
@@ -275,7 +252,6 @@ class SpoFileMoveCommand extends SpoCommand {
             url: requestUrl,
             method: 'POST',
             headers: {
-              authorization: `Bearer ${siteAccessToken}`,
               'X-HTTP-Method': 'DELETE',
               'If-Match': '*',
               'accept': 'application/json;odata=nometadata'
@@ -383,32 +359,26 @@ class SpoFileMoveCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-    using the ${chalk.blue(commands.LOGIN)} command.
+      `  Remarks:
   
-  Remarks:
-  
-    To move a file, you have to first log in to SharePoint using the
-    ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-
     When you move a file using the ${chalk.grey(this.name)} command,
     all of the versions are being moved.
         
   Examples:
   
     Move file to a document library in another site collection
-      ${chalk.grey(config.delimiter)} ${commands.FILE_MOVE} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/
+      ${commands.FILE_MOVE} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/
 
     Move file to a document library in the same site collection
-        ${chalk.grey(config.delimiter)} ${commands.FILE_MOVE} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test1/HRDocuments/
+        ${commands.FILE_MOVE} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test1/HRDocuments/
 
     Move file to a document library in another site collection. If a file with
     the same name already exists in the target document library, move it
     to the recycle bin
-        ${chalk.grey(config.delimiter)} ${commands.FILE_MOVE} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --deleteIfAlreadyExists
+        ${commands.FILE_MOVE} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --deleteIfAlreadyExists
     
     Moves file to a document library in another site collection. Will ignore any missing fields in the target destination and move anyway
-      ${chalk.grey(config.delimiter)} ${commands.FILE_MOVE} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
+      ${commands.FILE_MOVE} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
    
   More information:
 

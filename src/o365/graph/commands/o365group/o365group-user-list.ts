@@ -1,5 +1,3 @@
-import auth from '../../GraphAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
@@ -80,7 +78,7 @@ class GraphO365GroupUserListCommand extends GraphItemsListCommand<GroupUser> {
   }
 
   private getOwners(cmd: CommandInstance, groupId: string): Promise<void> {
-    const endpoint: string = `${auth.service.resource}/v1.0/groups/${groupId}/owners?$select=id,displayName,userPrincipalName,userType`;
+    const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/owners?$select=id,displayName,userPrincipalName,userType`;
 
     return this.getAllItems(endpoint, cmd, true).then(
       (): void => {
@@ -94,7 +92,7 @@ class GraphO365GroupUserListCommand extends GraphItemsListCommand<GroupUser> {
   }
 
   private getMembersAndGuests(cmd: CommandInstance, groupId: string): Promise<void> {
-    const endpoint: string = `${auth.service.resource}/v1.0/groups/${groupId}/members?$select=id,displayName,userPrincipalName,userType`;
+    const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/members?$select=id,displayName,userPrincipalName,userType`;
     return this.getAllItems(endpoint, cmd, false);
   }
 
@@ -149,34 +147,24 @@ class GraphO365GroupUserListCommand extends GraphItemsListCommand<GroupUser> {
   }
 
   public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to the Microsoft Graph
-    using the ${chalk.blue(commands.LOGIN)} command.
-
-  Remarks:
-
-    To list users in the specified Office 365 Group or Microsoft Teams team, you have to first
-    log in to the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
-
-  Examples:
+      `  Examples:
 
     List all users and their role in the specified Office 365 group
-      ${chalk.grey(config.delimiter)} ${this.name} --groupId '00000000-0000-0000-0000-000000000000'
+      ${this.name} --groupId '00000000-0000-0000-0000-000000000000'
 
     List all owners and their role in the specified Office 365 group
-      ${chalk.grey(config.delimiter)} ${this.name} --groupId '00000000-0000-0000-0000-000000000000' --role Owner
+      ${this.name} --groupId '00000000-0000-0000-0000-000000000000' --role Owner
 
     List all guests and their role in the specified Office 365 group
-      ${chalk.grey(config.delimiter)} ${this.name} --groupId '00000000-0000-0000-0000-000000000000' --role Guest
+      ${this.name} --groupId '00000000-0000-0000-0000-000000000000' --role Guest
 
     List all users and their role in the specified team
-      ${chalk.grey(config.delimiter)} ${commands.TEAMS_USER_LIST} --teamId '00000000-0000-0000-0000-000000000000'
+      ${commands.TEAMS_USER_LIST} --teamId '00000000-0000-0000-0000-000000000000'
 
     List all owners and their role in the specified team
-      ${chalk.grey(config.delimiter)} ${commands.TEAMS_USER_LIST} --teamId '00000000-0000-0000-0000-000000000000' --role Owner
+      ${commands.TEAMS_USER_LIST} --teamId '00000000-0000-0000-0000-000000000000' --role Owner
 
 `);
   }

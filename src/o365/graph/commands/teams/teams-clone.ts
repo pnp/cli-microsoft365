@@ -1,7 +1,5 @@
 
-import auth from '../../GraphAuth';
 import Utils from '../../../../Utils';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import { CommandOption, CommandValidate } from '../../../../Command';
@@ -41,37 +39,33 @@ class GraphTeamsCloneCommand extends GraphCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((): Promise<{}> => {
-        const body: any = {
-          displayName: args.options.displayName,
-          mailNickname: this.generateMailNickname(args.options.displayName),
-          partsToClone: args.options.partsToClone,
-        }
-        if (args.options.description) {
-          body.description = args.options.description;
-        }
-        if (args.options.classification) {
-          body.classification = args.options.classification;
-        }
-        if (args.options.visibility) {
-          body.visibility = args.options.visibility
-        }
+    const body: any = {
+      displayName: args.options.displayName,
+      mailNickname: this.generateMailNickname(args.options.displayName),
+      partsToClone: args.options.partsToClone,
+    }
+    if (args.options.description) {
+      body.description = args.options.description;
+    }
+    if (args.options.classification) {
+      body.classification = args.options.classification;
+    }
+    if (args.options.visibility) {
+      body.visibility = args.options.visibility
+    }
 
-        const requestOptions: any = {
-          url: `${auth.service.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/clone`,
-          headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
-            "content-type": "application/json",
-            accept: 'application/json;odata.metadata=none'
-          },
-          json: true,
-          body: body
-        };
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/clone`,
+      headers: {
+        "content-type": "application/json",
+        accept: 'application/json;odata.metadata=none'
+      },
+      json: true,
+      body: body
+    };
 
-        return request.post(requestOptions);
-      })
+    request
+      .post(requestOptions)
       .then((): void => {
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
@@ -160,17 +154,10 @@ class GraphTeamsCloneCommand extends GraphCommand {
   }
 
   public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} Before using this command, log in to the Microsoft Graph,
-    using the ${chalk.blue(commands.LOGIN)} command.
+      `  Remarks:
           
-  Remarks:
-          
-    To clone a Microsoft Teams team, you have to first log in to the Microsoft
-    Graph using the ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
-
     Using this command, global admins and Microsoft Teams service admins can
     access teams that they are not a member of.
 
@@ -182,11 +169,11 @@ class GraphTeamsCloneCommand extends GraphCommand {
   Examples:
     
     Creates a clone of a Microsoft Teams team with mandatory parameters
-      ${chalk.grey(config.delimiter)} ${commands.TEAMS_CLONE} --teamId 15d7a78e-fd77-4599-97a5-dbb6372846c5 --displayName "Library Assist" --partsToClone "apps,tabs,settings,channels,members" 
+      ${commands.TEAMS_CLONE} --teamId 15d7a78e-fd77-4599-97a5-dbb6372846c5 --displayName "Library Assist" --partsToClone "apps,tabs,settings,channels,members" 
     
     Creates a clone of a Microsoft Teams team with mandatory and optional
     parameters
-      ${chalk.grey(config.delimiter)} ${commands.TEAMS_CLONE} --teamId 15d7a78e-fd77-4599-97a5-dbb6372846c5 --displayName "Library Assist" --partsToClone "apps,tabs,settings,channels,members" --description "Self help community for library" --classification "Library" --visibility "public" 
+      ${commands.TEAMS_CLONE} --teamId 15d7a78e-fd77-4599-97a5-dbb6372846c5 --displayName "Library Assist" --partsToClone "apps,tabs,settings,channels,members" --description "Self help community for library" --classification "Library" --visibility "public" 
     `);
   }
 

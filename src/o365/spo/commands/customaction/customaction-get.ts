@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -10,7 +8,6 @@ import {
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import { CustomAction } from './customaction';
-import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -40,24 +37,13 @@ class SpoCustomActionGetCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.url);
-    let siteAccessToken: string = '';
+    ((): Promise<CustomAction> => {
+      if (args.options.scope && args.options.scope.toLowerCase() !== "all") {
+        return this.getCustomAction(args.options);
+      }
 
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
-    }
-
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<CustomAction> => {
-        siteAccessToken = accessToken;
-
-        if (args.options.scope && args.options.scope.toLowerCase() !== "all") {
-          return this.getCustomAction(args.options, siteAccessToken, cmd);
-        }
-
-        return this.searchAllScopes(args.options, siteAccessToken, cmd);
-      })
+      return this.searchAllScopes(args.options);
+    })()
       .then((customAction: CustomAction): void => {
         if (customAction["odata.null"] === true) {
           if (this.verbose) {
@@ -91,11 +77,10 @@ class SpoCustomActionGetCommand extends SpoCommand {
       }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
   }
 
-  private getCustomAction(options: Options, siteAccessToken: string, cmd: CommandInstance): Promise<CustomAction> {
+  private getCustomAction(options: Options): Promise<CustomAction> {
     const requestOptions: any = {
       url: `${options.url}/_api/${options.scope}/UserCustomActions('${encodeURIComponent(options.id)}')`,
       headers: {
-        authorization: `Bearer ${siteAccessToken}`,
         accept: 'application/json;odata=nometadata'
       },
       json: true
@@ -109,12 +94,12 @@ class SpoCustomActionGetCommand extends SpoCommand {
    * If custom action not found then 
    * another get request is send with `site` scope.
    */
-  private searchAllScopes(options: Options, siteAccessToken: string, cmd: CommandInstance): Promise<CustomAction> {
+  private searchAllScopes(options: Options): Promise<CustomAction> {
     return new Promise<CustomAction>((resolve: (customAction: CustomAction) => void, reject: (error: any) => void): void => {
       options.scope = "Web";
 
       this
-        .getCustomAction(options, siteAccessToken, cmd)
+        .getCustomAction(options)
         .then((webResult: CustomAction): void => {
           if (webResult["odata.null"] !== true) {
             return resolve(webResult);
@@ -122,7 +107,7 @@ class SpoCustomActionGetCommand extends SpoCommand {
 
           options.scope = "Site";
           this
-            .getCustomAction(options, siteAccessToken, cmd)
+            .getCustomAction(options)
             .then((siteResult: CustomAction): void => {
               return resolve(siteResult);
             }, (err: any): void => {
@@ -192,31 +177,23 @@ class SpoCustomActionGetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.CUSTOMACTION_GET).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-        using the ${chalk.blue(commands.LOGIN)} command.
-                      
-  Remarks:
-
-    To retrieve custom action, you have to first log in to a SharePoint Online site using the
-    ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-
-  Examples:
+      `  Examples:
   
     Return details about the user custom action with ID ${chalk.grey('058140e3-0e37-44fc-a1d3-79c487d371a3')}
     located in site or site collection ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.CUSTOMACTION_GET} -i 058140e3-0e37-44fc-a1d3-79c487d371a3 -u https://contoso.sharepoint.com/sites/test
+      ${commands.CUSTOMACTION_GET} -i 058140e3-0e37-44fc-a1d3-79c487d371a3 -u https://contoso.sharepoint.com/sites/test
 
     Return details about the user custom action with ID ${chalk.grey('058140e3-0e37-44fc-a1d3-79c487d371a3')}
     located in site or site collection ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.CUSTOMACTION_GET} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --url https://contoso.sharepoint.com/sites/test
+      ${commands.CUSTOMACTION_GET} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --url https://contoso.sharepoint.com/sites/test
 
     Return details about the user custom action with ID ${chalk.grey('058140e3-0e37-44fc-a1d3-79c487d371a3')}
     located in site collection ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.CUSTOMACTION_GET} -i 058140e3-0e37-44fc-a1d3-79c487d371a3 -u https://contoso.sharepoint.com/sites/test -s Site
+      ${commands.CUSTOMACTION_GET} -i 058140e3-0e37-44fc-a1d3-79c487d371a3 -u https://contoso.sharepoint.com/sites/test -s Site
 
     Return details about the user custom action with ID ${chalk.grey('058140e3-0e37-44fc-a1d3-79c487d371a3')}
     located in site ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.CUSTOMACTION_GET} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --url https://contoso.sharepoint.com/sites/test --scope Web
+      ${commands.CUSTOMACTION_GET} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --url https://contoso.sharepoint.com/sites/test --scope Web
 
   More information:
 

@@ -7,31 +7,18 @@ import { KeychainTokenStorage } from './auth/KeychainTokenStorage';
 import { WindowsTokenStorage } from './auth/WindowsTokenStorage';
 import { FileTokenStorage } from './auth/FileTokenStorage';
 import { TokenStorage } from './auth/TokenStorage';
-import { fail } from 'assert';
 import { CommandError } from './Command';
 
-class MockService extends Service {
-}
-
-class MockAuth extends Auth {
-  protected serviceId(): string {
-    return 'mock';
-  }
-  public getConnectionInfo(): Promise<MockService> {
-    return this.getServiceConnectionInfo('mock');
-  }
-}
-
 class MockTokenStorage implements TokenStorage {
-  public get(service: string): Promise<string> {
+  public get(): Promise<string> {
     return Promise.resolve('ABC');
   }
 
-  public set(service: string): Promise<void> {
+  public set(connectionInfo: string): Promise<void> {
     return Promise.resolve();
   }
 
-  public remove(service: string): Promise<void> {
+  public remove(): Promise<void> {
     return Promise.resolve();
   }
 }
@@ -39,7 +26,6 @@ class MockTokenStorage implements TokenStorage {
 describe('Auth', () => {
   let log: any[];
   let auth: Auth;
-  let service: MockService;
   const resource: string = 'https://contoso.sharepoint.com';
   const appId: string = '9bc3ab49-b65d-410a-85ad-de819febfddc';
   const refreshToken: string = 'ref';
@@ -52,8 +38,8 @@ describe('Auth', () => {
 
   beforeEach(() => {
     log = [];
-    service = new MockService();
-    auth = new MockAuth(service, appId);
+    auth = new Auth();
+    (auth as any).appId = appId;
   });
 
   afterEach(() => {
@@ -62,11 +48,13 @@ describe('Auth', () => {
   it('returns existing access token if still valid', (done) => {
     const now = new Date();
     now.setSeconds(now.getSeconds() + 1);
-    service.accessToken = 'abc';
-    service.expiresOn = now.toISOString();
+    auth.service.accessTokens[resource] = {
+      expiresOn: now.toISOString(),
+      value: 'abc'
+    }
     auth.ensureAccessToken(resource, stdout).then((accessToken) => {
       try {
-        assert.equal(accessToken, service.accessToken);
+        assert.equal(accessToken, auth.service.accessTokens[resource].value);
         done();
       }
       catch (e) {
@@ -80,11 +68,13 @@ describe('Auth', () => {
   it('returns existing access token if still valid (debug)', (done) => {
     const now = new Date();
     now.setSeconds(now.getSeconds() + 1);
-    service.accessToken = 'abc';
-    service.expiresOn = now.toISOString();
+    auth.service.accessTokens[resource] = {
+      expiresOn: now.toISOString(),
+      value: 'abc'
+    }
     auth.ensureAccessToken(resource, stdout, true).then((accessToken) => {
       try {
-        assert.equal(accessToken, service.accessToken);
+        assert.equal(accessToken, auth.service.accessTokens[resource].value);
         done();
       }
       catch (e) {
@@ -96,13 +86,13 @@ describe('Auth', () => {
   });
 
   it('retrieves new access token using existing refresh token', (done) => {
-    service.refreshToken = refreshToken;
-    sinon.stub((auth as any).authCtx, 'acquireTokenWithRefreshToken').callsArgWith(3, undefined, { accessToken: service.accessToken });
-    sinon.stub(auth as any, 'setServiceConnectionInfo').callsFake(() => Promise.resolve());
+    auth.service.refreshToken = refreshToken;
+    sinon.stub((auth as any).authCtx, 'acquireTokenWithRefreshToken').callsArgWith(3, undefined, { accessToken: 'abc' });
+    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
 
     auth.ensureAccessToken(resource, stdout).then((accessToken) => {
       try {
-        assert.equal(accessToken, service.accessToken);
+        assert.equal(accessToken, 'abc');
         done();
       }
       catch (e) {
@@ -114,13 +104,13 @@ describe('Auth', () => {
   });
 
   it('retrieves new access token using existing refresh token (debug)', (done) => {
-    service.refreshToken = refreshToken;
-    sinon.stub((auth as any).authCtx, 'acquireTokenWithRefreshToken').callsArgWith(3, undefined, { accessToken: service.accessToken });
-    sinon.stub(auth as any, 'setServiceConnectionInfo').callsFake(() => Promise.resolve());
+    auth.service.refreshToken = refreshToken;
+    sinon.stub((auth as any).authCtx, 'acquireTokenWithRefreshToken').callsArgWith(3, undefined, { accessToken: 'abc' });
+    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
 
     auth.ensureAccessToken(resource, stdout, true).then((accessToken) => {
       try {
-        assert.equal(accessToken, service.accessToken);
+        assert.equal(accessToken, 'abc');
         done();
       }
       catch (e) {
@@ -132,7 +122,7 @@ describe('Auth', () => {
   });
 
   it('handles error when retrieving new access token using existing refresh token', (done) => {
-    service.refreshToken = refreshToken;
+    auth.service.refreshToken = refreshToken;
     sinon.stub((auth as any).authCtx, 'acquireTokenWithRefreshToken').callsArgWith(3, { message: 'An error has occurred' }, undefined);
 
     auth.ensureAccessToken(resource, stdout).then((accessToken) => {
@@ -149,7 +139,7 @@ describe('Auth', () => {
   });
 
   it('handles error when retrieving new access token using existing refresh token (debug)', (done) => {
-    service.refreshToken = refreshToken;
+    auth.service.refreshToken = refreshToken;
     sinon.stub((auth as any).authCtx, 'acquireTokenWithRefreshToken').callsArgWith(3, { message: 'An error has occurred' }, undefined);
 
     auth.ensureAccessToken(resource, stdout, true).then((accessToken) => {
@@ -166,7 +156,7 @@ describe('Auth', () => {
   });
 
   it('shows AAD error when retrieving new access token using existing refresh token', (done) => {
-    service.refreshToken = refreshToken;
+    auth.service.refreshToken = refreshToken;
     sinon.stub((auth as any).authCtx, 'acquireTokenWithRefreshToken').callsArgWith(3, { message: 'An error has occurred' }, { error_description: 'AADSTS00000 An error has occurred' });
 
     auth.ensureAccessToken(resource, stdout).then((accessToken) => {
@@ -182,10 +172,34 @@ describe('Auth', () => {
     });
   });
 
+  it('retrieves new access token using existing refresh token when the access token expired (debug)', (done) => {
+    const now = new Date();
+    now.setSeconds(now.getSeconds() - 1);
+    auth.service.accessTokens[resource] = {
+      expiresOn: now.toISOString(),
+      value: 'abc'
+    }
+    auth.service.refreshToken = refreshToken;
+    sinon.stub((auth as any).authCtx, 'acquireTokenWithRefreshToken').callsArgWith(3, undefined, { accessToken: 'acc' });
+    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+
+    auth.ensureAccessToken(resource, stdout, true).then((accessToken) => {
+      try {
+        assert.equal(accessToken, 'acc');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    }, (err) => {
+      done(err);
+    });
+  });
+
   it('starts device code authentication flow when no refresh token available and no authType specified', (done) => {
     const acquireUserCodeStub = sinon.stub((auth as any).authCtx, 'acquireUserCode').callsArgWith(3, undefined, {});
     sinon.stub((auth as any).authCtx, 'acquireTokenWithDeviceCode').callsArgWith(3, undefined, {});
-    sinon.stub(auth as any, 'setServiceConnectionInfo').callsFake(() => Promise.resolve());
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
 
     auth.ensureAccessToken(resource, stdout).then((accessToken) => {
       try {
@@ -286,7 +300,7 @@ describe('Auth', () => {
   it('retrieves access token after device code auth completed', (done) => {
     sinon.stub((auth as any).authCtx, 'acquireUserCode').callsArgWith(3, undefined, {});
     sinon.stub((auth as any).authCtx, 'acquireTokenWithDeviceCode').callsArgWith(3, undefined, { accessToken: 'abc' });
-    sinon.stub(auth as any, 'setServiceConnectionInfo').callsFake(() => Promise.resolve());
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
 
     auth.ensureAccessToken(resource, stdout).then((accessToken) => {
       try {
@@ -304,7 +318,7 @@ describe('Auth', () => {
   it('retrieves access token after device code auth completed (debug)', (done) => {
     sinon.stub((auth as any).authCtx, 'acquireUserCode').callsArgWith(3, undefined, {});
     sinon.stub((auth as any).authCtx, 'acquireTokenWithDeviceCode').callsArgWith(3, undefined, { accessToken: 'abc' });
-    sinon.stub(auth as any, 'setServiceConnectionInfo').callsFake(() => Promise.resolve());
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
 
     auth.ensureAccessToken(resource, stdout, true).then((accessToken) => {
       try {
@@ -322,7 +336,7 @@ describe('Auth', () => {
   it('retrieves token using device code authentication flow when authType deviceCode specified', (done) => {
     sinon.stub((auth as any).authCtx, 'acquireUserCode').callsArgWith(3, undefined, {});
     const acquireTokenWithDeviceCodeStub = sinon.stub((auth as any).authCtx, 'acquireTokenWithDeviceCode').callsArgWith(3, undefined, {});
-    sinon.stub(auth as any, 'setServiceConnectionInfo').callsFake(() => Promise.resolve());
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
 
     auth.service.authType = AuthType.DeviceCode;
     auth.ensureAccessToken(resource, stdout).then((accessToken) => {
@@ -356,7 +370,7 @@ describe('Auth', () => {
 
   it('retrieves token using password flow when authType password specified', (done) => {
     const acquireTokenWithUsernamePassword = sinon.stub((auth as any).authCtx, 'acquireTokenWithUsernamePassword').callsArgWith(4, undefined, {});
-    sinon.stub(auth as any, 'setServiceConnectionInfo').callsFake(() => Promise.resolve());
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
 
     auth.service.authType = AuthType.Password;
     auth.ensureAccessToken(resource, stdout).then((accessToken) => {
@@ -374,7 +388,7 @@ describe('Auth', () => {
 
   it('retrieves token using password flow when authType password specified (debug)', (done) => {
     const acquireTokenWithUsernamePassword = sinon.stub((auth as any).authCtx, 'acquireTokenWithUsernamePassword').callsArgWith(4, undefined, {});
-    sinon.stub(auth as any, 'setServiceConnectionInfo').callsFake(() => Promise.resolve());
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
 
     auth.service.authType = AuthType.Password;
     auth.ensureAccessToken(resource, stdout, true).then((accessToken) => {
@@ -426,7 +440,7 @@ describe('Auth', () => {
 
   it('retrieves token using certificate flow when authType certificate specified ', (done) => {
     const ensureAccessTokenWithCertificate = sinon.stub((auth as any).authCtx, 'acquireTokenWithClientCertificate').callsArgWith(4, undefined, {});
-    sinon.stub(auth as any, 'setServiceConnectionInfo').callsFake(() => Promise.resolve());
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
 
     auth.service.authType = AuthType.Certificate;
     auth.ensureAccessToken(resource, stdout, false).then((accessToken) => {
@@ -444,7 +458,7 @@ describe('Auth', () => {
 
   it('retrieves token using certificate flow when authType certificate specified (debug)', (done) => {
     const ensureAccessTokenWithCertificate = sinon.stub((auth as any).authCtx, 'acquireTokenWithClientCertificate').callsArgWith(4, undefined, {});
-    sinon.stub(auth as any, 'setServiceConnectionInfo').callsFake(() => Promise.resolve());
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
 
     auth.service.authType = AuthType.Certificate;
     auth.ensureAccessToken(resource, stdout, true).then((accessToken) => {
@@ -497,7 +511,7 @@ describe('Auth', () => {
   it('returns access token if persisting connection fails', (done) => {
     sinon.stub((auth as any).authCtx, 'acquireUserCode').callsArgWith(3, undefined, {});
     sinon.stub((auth as any).authCtx, 'acquireTokenWithDeviceCode').callsArgWith(3, undefined, {});
-    sinon.stub(auth as any, 'setServiceConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
 
     auth.ensureAccessToken(resource, stdout).then((accessToken) => {
       done();
@@ -509,7 +523,7 @@ describe('Auth', () => {
   it('logs error message if persisting connection fails in debug mode', (done) => {
     sinon.stub((auth as any).authCtx, 'acquireUserCode').callsArgWith(3, undefined, {});
     sinon.stub((auth as any).authCtx, 'acquireTokenWithDeviceCode').callsArgWith(3, undefined, {});
-    sinon.stub(auth as any, 'setServiceConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
 
     auth.ensureAccessToken(resource, stdout, true).then((accessToken) => {
       try {
@@ -521,105 +535,6 @@ describe('Auth', () => {
       }
     }, (err) => {
       done(err);
-    });
-  });
-
-  it('gets access token using refresh token for the specified resource', (done) => {
-    sinon.stub((auth as any).authCtx, 'acquireTokenWithRefreshToken').callsArgWith(3, undefined, { accessToken: 'acc' });
-
-    auth.getAccessTokenWithResponse(resource, 'ref', stdout).then((tokenResponse) => {
-      try {
-        assert(tokenResponse.accessToken, 'abc');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    }, (err) => {
-      done(err);
-    });
-  });
-
-  it('gets access token using refresh token for the specified resource (debug)', (done) => {
-    sinon.stub((auth as any).authCtx, 'acquireTokenWithRefreshToken').callsArgWith(3, undefined, { accessToken: 'acc' });
-
-    auth.getAccessTokenWithResponse(resource, 'ref', stdout, true).then((tokenResponse) => {
-      try {
-        assert(tokenResponse.accessToken, 'abc');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    }, (err) => {
-      done(err);
-    });
-  });
-
-  it('gets access token using refresh token for the specified resource (debug)', (done) => {
-    sinon.stub(auth as any, 'ensureAccessTokenWithCertificate').callsFake(() => Promise.resolve({
-      accessToken: 'acc'
-    }));
-
-    auth.service.authType = AuthType.Certificate;
-    auth.getAccessTokenWithResponse(resource, '', stdout, true).then((tokenResponse) => {
-      try {
-        assert(tokenResponse.accessToken, 'acc');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    }, (err) => {
-      done(err);
-    });
-  });
-
-  it('handles error when getting access token using refresh token for the specified resource', (done) => {
-    sinon.stub((auth as any).authCtx, 'acquireTokenWithRefreshToken').callsArgWith(3, { message: 'An error has occurred' }, undefined);
-
-    auth.getAccessTokenWithResponse(resource, 'ref', stdout).then((tokenResponse) => {
-      done('Got access token');
-    }, (err) => {
-      try {
-        assert.equal(err, 'An error has occurred');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('shows AAD error when getting access token using refresh token for the specified resource', (done) => {
-    sinon.stub((auth as any).authCtx, 'acquireTokenWithRefreshToken').callsArgWith(3, { message: 'An error has occurred' }, { error_description: 'AADSTS00000 An error has occurred' });
-
-    auth.getAccessTokenWithResponse(resource, 'ref', stdout).then((tokenResponse) => {
-      done('Got access token');
-    }, (err) => {
-      try {
-        assert.equal(err, 'AADSTS00000 An error has occurred');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs the error message when getting access token using refresh token for the specified resource failed in debug mode', (done) => {
-    sinon.stub((auth as any).authCtx, 'acquireTokenWithRefreshToken').callsArgWith(3, { message: 'An error has occurred' }, undefined);
-
-    auth.getAccessTokenWithResponse(resource, 'ref', stdout, true).then((tokenResponse) => {
-      done('Got access token');
-    }, (err) => {
-      try {
-        assert(stdoutLogSpy.calledWith({ message: 'An error has occurred' }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
@@ -669,8 +584,10 @@ describe('Auth', () => {
   });
 
   it('restores authentication', (done) => {
+    const service: Service = new Service();
+    service.refreshToken = 'abc';
     const mockStorage = {
-      get: () => Promise.resolve(JSON.stringify({ resource: 'mock' }))
+      get: () => Promise.resolve(JSON.stringify(service))
     };
     sinon.stub(auth, 'getTokenStorage').callsFake(() => mockStorage);
 
@@ -678,7 +595,7 @@ describe('Auth', () => {
       .restoreAuth()
       .then(() => {
         try {
-          assert.equal(auth.service.resource, 'mock');
+          assert.equal(auth.service.refreshToken, 'abc');
           done();
         }
         catch (e) {
@@ -707,57 +624,48 @@ describe('Auth', () => {
       });
   });
 
-  it('retrieves connection information from the configured token storage', (done) => {
-    const mockStorage = new MockTokenStorage();
-    sinon.stub(mockStorage, 'get').callsFake(() => Promise.resolve(JSON.stringify({
-      connected: true,
-      resource: 'https://contoso.sharepoint.com'
-    })));
-    const mockAuth = new MockAuth(new MockService());
-    sinon.stub(mockAuth, 'getTokenStorage').callsFake(() => mockStorage);
+  it('doesn\'t fail when restoring authentication from an incorrect JSON string', (done) => {
+    const service: Service = new Service();
+    service.refreshToken = 'abc';
+    const mockStorage = {
+      get: () => Promise.resolve('abc')
+    };
+    sinon.stub(auth, 'getTokenStorage').callsFake(() => mockStorage);
 
-    mockAuth
-      .getConnectionInfo()
-      .then((service: MockService) => {
-        try {
-          assert.equal(service.connected, true);
-          assert.equal(service.resource, 'https://contoso.sharepoint.com');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
+    auth
+      .restoreAuth()
+      .then(() => {
+        assert.strictEqual(auth.service.connected, false);
+        done();
+      }, (err) => {
+        done(err);
       });
   });
 
-  it('correctly handles error when retrieving connection information from the configured token storage', (done) => {
-    const mockStorage = new MockTokenStorage();
-    sinon.stub(mockStorage, 'get').callsFake(() => Promise.reject('An error has occurred'));
-    const mockAuth = new MockAuth(new MockService());
-    sinon.stub(mockAuth, 'getTokenStorage').callsFake(() => mockStorage);
+  it('doesn\'t fail when restoring authentication failed', (done) => {
+    const service: Service = new Service();
+    service.refreshToken = 'abc';
+    const mockStorage = {
+      get: () => Promise.reject('abc')
+    };
+    sinon.stub(auth, 'getTokenStorage').callsFake(() => mockStorage);
 
-    mockAuth
-      .getConnectionInfo()
-      .then((service: MockService) => {
-        fail('Expected failure but passed');
-      }, (error: any) => {
-        try {
-          assert.equal(error, 'An error has occurred');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
+    auth
+      .restoreAuth()
+      .then(() => {
+        assert.strictEqual(auth.service.connected, false);
+        done();
+      }, (err) => {
+        done(err);
       });
   });
 
   it('stores connection information in the configured token storage', (done) => {
     const mockStorage = new MockTokenStorage();
     const mockStorageSetStub = sinon.stub(mockStorage, 'set').callsFake(() => Promise.resolve());
-    const mockAuth = new MockAuth(new MockService());
-    sinon.stub(mockAuth, 'getTokenStorage').callsFake(() => mockStorage);
+    sinon.stub(auth, 'getTokenStorage').callsFake(() => mockStorage);
 
-    mockAuth
+    auth
       .storeConnectionInfo()
       .then(() => {
         try {
@@ -773,10 +681,9 @@ describe('Auth', () => {
   it('clears connection information in the configured token storage', (done) => {
     const mockStorage = new MockTokenStorage();
     const mockStorageRemoveStub = sinon.stub(mockStorage, 'remove').callsFake(() => Promise.resolve());
-    const mockAuth = new MockAuth(new MockService());
-    sinon.stub(mockAuth, 'getTokenStorage').callsFake(() => mockStorage);
+    sinon.stub(auth, 'getTokenStorage').callsFake(() => mockStorage);
 
-    mockAuth
+    auth
       .clearConnectionInfo()
       .then(() => {
         try {
@@ -789,21 +696,52 @@ describe('Auth', () => {
       });
   });
 
-  it('stores connection information for the specified service', (done) => {
-    const mockService = new MockService();
-    const mockAuth = new MockAuth(mockService);
-    const setServiceConnectionInfoStub = sinon.stub(mockAuth as any, 'setServiceConnectionInfo').callsFake((serviceId, service) => Promise.resolve());
+  it('resets connection information on logout', () => {
+    auth.service.connected = true;
+    auth.service.accessTokens[resource] = {
+      expiresOn: new Date().toISOString(),
+      value: 'abc'
+    };
+    auth.service.refreshToken = 'ref';
+    auth.service.authType = AuthType.Certificate;
+    auth.service.userName = 'user';
+    auth.service.password = 'pwd';
+    auth.service.certificate = 'cert';
+    auth.service.thumbprint = 'thumb';
+    auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    auth.service.tenantId = '123';
 
-    mockAuth
-      .storeConnectionInfo()
-      .then(() => {
-        try {
-          assert(setServiceConnectionInfoStub.calledWith((mockAuth as any).serviceId(), mockService));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+    auth.service.logout();
+
+    assert.strictEqual(auth.service.connected, false, 'connected');
+    assert.strictEqual(JSON.stringify(auth.service.accessTokens), JSON.stringify({}), 'accessTokens');
+    assert.strictEqual(auth.service.refreshToken, undefined, 'refreshToken');
+    assert.strictEqual(auth.service.authType, AuthType.DeviceCode, 'authType');
+    assert.strictEqual(auth.service.userName, undefined, 'userName');
+    assert.strictEqual(auth.service.password, undefined, 'password');
+    assert.strictEqual(auth.service.certificate, undefined, 'certificate');
+    assert.strictEqual(auth.service.thumbprint, undefined, 'thumbprint');
+    assert.strictEqual(auth.service.spoUrl, undefined, 'spoUrl');
+    assert.strictEqual(auth.service.tenantId, undefined, 'tenantId');
+  });
+
+  it('uses the Microsoft Graph to authenticate', () => {
+    assert.strictEqual(auth.defaultResource, 'https://graph.microsoft.com');
+  });
+
+  it('correctly retrieves resource from the root SharePoint site URL without trailing slash', () => {
+    assert.strictEqual(Auth.getResourceFromUrl('https://contoso.sharepoint.com'), 'https://contoso.sharepoint.com');
+  });
+
+  it('correctly retrieves resource from the root SharePoint site URL with trailing slash', () => {
+    assert.strictEqual(Auth.getResourceFromUrl('https://contoso.sharepoint.com/'), 'https://contoso.sharepoint.com');
+  });
+
+  it('correctly retrieves resource from a SharePoint subsite', () => {
+    assert.strictEqual(Auth.getResourceFromUrl('https://contoso.sharepoint.com/subsite'), 'https://contoso.sharepoint.com');
+  });
+
+  it('correctly retrieves resource from a SharePoint site collection', () => {
+    assert.strictEqual(Auth.getResourceFromUrl('https://contoso.sharepoint.com/sites/team-a'), 'https://contoso.sharepoint.com');
   });
 });

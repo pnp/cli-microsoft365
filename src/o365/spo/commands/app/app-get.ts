@@ -1,6 +1,3 @@
-import auth from '../../SpoAuth';
-import { Auth } from '../../../../Auth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -43,32 +40,17 @@ class SpoAppGetCommand extends SpoAppBaseCommand {
     return telemetryProps;
   }
 
-  protected requiresTenantAdmin(): boolean {
-    return false;
-  }
-
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
-    let siteAccessToken: string = '';
     let appCatalogSiteUrl: string = '';
 
-    auth
-      .ensureAccessToken(auth.site.url, cmd, this.debug)
-      .then((accessToken: string): Promise<string> => {
-        return this.getAppCatalogSiteUrl(cmd, auth.site.url, accessToken, args)
+    this
+      .getSpoUrl(cmd, this.debug)
+      .then((spoUrl: string): Promise<string> => {
+        return this.getAppCatalogSiteUrl(cmd, spoUrl, args);
       })
-      .then((appCatalogUrl: string): Promise<string> => {
+      .then((appCatalogUrl: string): Promise<{ UniqueId: string }> => {
         appCatalogSiteUrl = appCatalogUrl;
-
-        const resource: string = Auth.getResourceFromUrl(appCatalogSiteUrl);
-        return auth.getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug);
-      })
-      .then((accessToken: string): Promise<{ UniqueId: string }> => {
-        siteAccessToken = accessToken;
-
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}...`);
-        }
 
         if (args.options.id) {
           return Promise.resolve({ UniqueId: args.options.id });
@@ -81,7 +63,6 @@ class SpoAppGetCommand extends SpoAppBaseCommand {
         const requestOptions: any = {
           url: `${appCatalogSiteUrl}/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('${args.options.name}')?$select=UniqueId`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata'
           },
           json: true
@@ -97,7 +78,6 @@ class SpoAppGetCommand extends SpoAppBaseCommand {
         const requestOptions: any = {
           url: `${appCatalogSiteUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${encodeURIComponent(res.UniqueId)}')`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata'
           },
           json: true
@@ -175,15 +155,8 @@ class SpoAppGetCommand extends SpoAppBaseCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.APP_GET).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-    using the ${chalk.blue(commands.LOGIN)} command.
-
-  Remarks:
+      `  Remarks:
   
-    To get information about the specified app available in the tenant app catalog,
-    you have to first log in to a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-
     When getting information about an app from the tenant app catalog,
     it's not necessary to specify the tenant app catalog URL. When the URL
     is not specified, the CLI will try to resolve the URL itself.
@@ -199,20 +172,20 @@ class SpoAppGetCommand extends SpoAppBaseCommand {
   
     Return details about the app with ID ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
     available in the tenant app catalog.
-      ${chalk.grey(config.delimiter)} ${commands.APP_GET} --id b2307a39-e878-458b-bc90-03bc578531d6
+      ${commands.APP_GET} --id b2307a39-e878-458b-bc90-03bc578531d6
 
     Return details about the app with name ${chalk.grey('solution.sppkg')}
     available in the tenant app catalog. Will try to detect the app catalog URL
-      ${chalk.grey(config.delimiter)} ${commands.APP_GET} --name solution.sppkg
+      ${commands.APP_GET} --name solution.sppkg
 
     Return details about the app with name ${chalk.grey('solution.sppkg')}
     available in the tenant app catalog using the specified app catalog URL
-      ${chalk.grey(config.delimiter)} ${commands.APP_GET} --name solution.sppkg --appCatalogUrl https://contoso.sharepoint.com/sites/apps
+      ${commands.APP_GET} --name solution.sppkg --appCatalogUrl https://contoso.sharepoint.com/sites/apps
 
     Return details about the app with ID ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
     available in the site collection app catalog
     of site ${chalk.grey('https://contoso.sharepoint.com/sites/site1')}.
-      ${chalk.grey(config.delimiter)} ${commands.APP_GET} --id b2307a39-e878-458b-bc90-03bc578531d6 --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
+      ${commands.APP_GET} --id b2307a39-e878-458b-bc90-03bc578531d6 --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
 
   More information:
   

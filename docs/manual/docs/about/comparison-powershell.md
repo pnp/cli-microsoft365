@@ -16,12 +16,12 @@ Add-SPOTheme|Microsoft.Online.SharePoint.PowerShell|[spo theme set](../cmd/spo/t
 Add-SPOUser|Microsoft.Online.SharePoint.PowerShell|
 Approve-SPOTenantServicePrincipalPermissionGrant|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal grant add](../cmd/spo/serviceprincipal/serviceprincipal-grant-add.md)
 Approve-SPOTenantServicePrincipalPermissionRequest|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal permissionrequest approve](../cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-approve.md)
-Connect-SPOService|Microsoft.Online.SharePoint.PowerShell|[spo login](../cmd/spo/login.md)
+Connect-SPOService|Microsoft.Online.SharePoint.PowerShell|[spo login](../cmd/login.md)
 ConvertTo-SPOMigrationEncryptedPackage|Microsoft.Online.SharePoint.PowerShell|
 ConvertTo-SPOMigrationTargetedPackage|Microsoft.Online.SharePoint.PowerShell|
 Deny-SPOTenantServicePrincipalPermissionRequest|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal permissionrequest deny](../cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-deny.md)
 Disable-SPOTenantServicePrincipal|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal set](../cmd/spo/serviceprincipal/serviceprincipal-set.md)
-Disconnect-SPOService|Microsoft.Online.SharePoint.PowerShell|[spo logout](../cmd/spo/logout.md)
+Disconnect-SPOService|Microsoft.Online.SharePoint.PowerShell|[spo logout](../cmd/logout.md)
 Enable-SPOCommSite|Microsoft.Online.SharePoint.PowerShell|[spo site commsite enable](../cmd/spo/site/site-commsite-enable.md)
 Enable-SPOTenantServicePrincipal|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal set](../cmd/spo/serviceprincipal/serviceprincipal-set.md)
 Export-SPOQueryLogs|Microsoft.Online.SharePoint.PowerShell|
@@ -233,9 +233,9 @@ Clear-PnPListItemAsRecord|SharePointPnPPowerShellOnline|[spo listitem record und
 Clear-PnPRecycleBinItem|SharePointPnPPowerShellOnline|
 Clear-PnPTenantRecycleBinItem|SharePointPnPPowerShellOnline|
 Connect-PnPHubSite|SharePointPnPPowerShellOnline|[spo hubsite connect](../cmd/spo/hubsite/hubsite-connect.md)
-Connect-PnPMicrosoftGraph|SharePointPnPPowerShellOnline|[graph login](../cmd/graph/login.md)
+Connect-PnPMicrosoftGraph|SharePointPnPPowerShellOnline|[login](../cmd/login.md)
 Convert-PnPFolderToProvisioningTemplate|SharePointPnPPowerShellOnline|
-Connect-PnPOnline|SharePointPnPPowerShellOnline|[spo login](../cmd/spo/login.md)
+Connect-PnPOnline|SharePointPnPPowerShellOnline|[login](../cmd/login.md)
 Convert-PnPProvisioningTemplate|SharePointPnPPowerShellOnline|
 ConvertTo-PnPClientSidePage|SharePointPnPPowerShellOnline|
 Copy-PnPFile|SharePointPnPPowerShellOnline|[spo file copy](../cmd/spo/file/file-copy.md), [spo folder copy](../cmd/spo/folder/folder-copy.md)
@@ -248,7 +248,7 @@ Disable-PnPResponsiveUI|SharePointPnPPowerShellOnline|
 Disable-PnPSiteClassification|SharePointPnPPowerShellOnline|[graph siteclassification disable](../cmd/graph/siteclassification/siteclassification-disable.md)
 Disable-PnPTenantServicePrincipal|SharePointPnPPowerShellOnline|[spo serviceprincipal set](../cmd/spo/serviceprincipal/serviceprincipal-set.md)
 Disconnect-PnPHubSite|SharePointPnPPowerShellOnline|[spo hubsite disconnect](../cmd/spo/hubsite/hubsite-disconnect.md)
-Disconnect-PnPOnline|SharePointPnPPowerShellOnline|[spo logout](../cmd/spo/logout.md)
+Disconnect-PnPOnline|SharePointPnPPowerShellOnline|[logout](../cmd/logout.md)
 Enable-PnPCommSite|SharePointPnPPowerShellOnline|[spo site commsite enable](../cmd/spo/site/site-commsite-enable.md)
 Enable-PnPFeature|SharePointPnPPowerShellOnline|
 Enable-PnPInPlaceRecordsManagementForSite|SharePointPnPPowerShellOnline|
@@ -663,8 +663,8 @@ Set-AdminPowerAppOwner|Microsoft.PowerApps.Administration.PowerShell|
 Set-AdminPowerAppRoleAssignment|Microsoft.PowerApps.Administration.PowerShell|
 Test-PowerAppsAccount|Microsoft.PowerApps.Administration.PowerShell|
 Add-TeamUser|MicrosoftTeams|[graph teams user add](../cmd/graph/o365group/o365group-user-add.md)
-Connect-MicrosoftTeams|MicrosoftTeams|[graph login](../cmd/graph/login.md)
-Disconnect-MicrosoftTeams|MicrosoftTeams|[graph logout](../cmd/graph/logout.md)
+Connect-MicrosoftTeams|MicrosoftTeams|[login](../cmd/login.md)
+Disconnect-MicrosoftTeams|MicrosoftTeams|[logout](../cmd/logout.md)
 Get-Team|MicrosoftTeams|[graph teams list](../cmd/graph/teams/teams-list.md)
 Get-TeamChannel|MicrosoftTeams|[graph teams channel list](../cmd/graph/teams/teams-channel-list.md), [graph teams channel get](../cmd/graph/teams/teams-channel-get.md)
 Get-TeamFunSettings|MicrosoftTeams|[graph teams funsettings list](../cmd/graph/teams/teams-funsettings-list.md)

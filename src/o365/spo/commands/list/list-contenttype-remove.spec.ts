@@ -2,7 +2,7 @@ import commands from '../../commands';
 import Command, { CommandValidate, CommandError, CommandOption, CommandTypes } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth, { Site } from '../../SpoAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./list-contenttype-remove');
 import * as assert from 'assert';
 import request from '../../../../request';
@@ -12,23 +12,23 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
   let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
-  let trackEvent: any;
-  let telemetry: any;
   let requests: any[];
   let promptOptions: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    auth.service.connected = true;
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       },
@@ -37,27 +37,22 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
         cb({ continue: false });
       }
     };
-    auth.site = new Site();
-    telemetry = null;
     requests = [];
   });
 
   afterEach(() => {
     Utils.restore([
       vorpal.find,
-      request.get,
       request.post
     ]);
   });
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.getAccessToken,
       auth.restoreAuth,
-      request.get,
-      request.post
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -68,59 +63,7 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
     assert.notEqual(command.description, null);
   });
 
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.LIST_CONTENTTYPE_REMOVE);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not connected to a SharePoint site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        debug: false,
-        webUrl: 'https://contoso.sharepoint.com/sites/ninja',
-        listTitle: 'Documents',
-        contentTypeId: '0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A'
-      }
-    }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('prompts before removing content type from list when confirmation argument not passed (listId)', (done) => {
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         debug: false,
@@ -146,10 +89,6 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
   });
 
   it('prompts before removing content type from list when confirmation argument not passed (listTitle)', (done) => {
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         debug: false,
@@ -179,9 +118,7 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
       requests.push(opts);
 
       if (opts.url.indexOf(`/_api/web/lists(guid'`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
+        if (opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve();
         }
@@ -190,10 +127,6 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     };
@@ -220,9 +153,7 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
       requests.push(opts);
 
       if (opts.url.indexOf(`/_api/web/lists`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
+        if (opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve();
         }
@@ -231,10 +162,6 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     };
@@ -253,8 +180,6 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/web/lists(guid'${encodeURIComponent(listId)}')/ContentTypes('${encodeURIComponent(contentTypeId)}')`) > -1 &&
-          r.headers.authorization &&
-          r.headers.authorization.indexOf('Bearer ') === 0 &&
           r.headers.accept &&
           r.headers.accept.indexOf('application/json') === 0 &&
           r.headers['X-HTTP-Method'] === 'DELETE' &&
@@ -277,9 +202,7 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
       requests.push(opts);
 
       if (opts.url.indexOf(`/_api/web/lists`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
+        if (opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve();
         }
@@ -288,10 +211,6 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     };
@@ -310,8 +229,6 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/web/lists/GetByTitle('${encodeURIComponent(listTitle)}')/ContentTypes('${encodeURIComponent(contentTypeId)}')`) > -1 &&
-          r.headers.authorization &&
-          r.headers.authorization.indexOf('Bearer ') === 0 &&
           r.headers.accept &&
           r.headers.accept.indexOf('application/json') === 0 &&
           r.headers['X-HTTP-Method'] === 'DELETE' &&
@@ -334,9 +251,7 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
       requests.push(opts);
 
       if (opts.url.indexOf(`/_api/web/lists`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
+        if (opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve();
         }
@@ -345,10 +260,6 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     };
@@ -367,8 +278,6 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/web/lists(guid'${encodeURIComponent(listId)}')/ContentTypes('${encodeURIComponent(contentTypeId)}')`) > -1 &&
-          r.headers.authorization &&
-          r.headers.authorization.indexOf('Bearer ') === 0 &&
           r.headers.accept &&
           r.headers.accept.indexOf('application/json') === 0 &&
           r.headers['X-HTTP-Method'] === 'DELETE' &&
@@ -391,9 +300,7 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
       requests.push(opts);
 
       if (opts.url.indexOf(`/_api/web/lists`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
+        if (opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve();
         }
@@ -402,10 +309,6 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     };
@@ -424,8 +327,6 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/web/lists/GetByTitle('${encodeURIComponent(listTitle)}')/ContentTypes('${encodeURIComponent(contentTypeId)}')`) > -1 &&
-          r.headers.authorization &&
-          r.headers.authorization.indexOf('Bearer ') === 0 &&
           r.headers.accept &&
           r.headers.accept.indexOf('application/json') === 0 &&
           r.headers['X-HTTP-Method'] === 'DELETE' &&
@@ -452,11 +353,6 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
 
       return Promise.reject('Invalid request');
     });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     const listTitle: string = 'Documents';
     const contentTypeId: string = '0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A';
@@ -489,11 +385,6 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const listTitle: string = 'Documents';
     const contentTypeId: string = '0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A';
 
@@ -506,7 +397,6 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
         confirm: true
       }
     }, () => {
-
       try {
         assert(1 === 1);
         done();
@@ -526,11 +416,6 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const listId: string = 'dfddade1-4729-428d-881e-7fedf3cae50d';
     const contentTypeId: string = '0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A';
 
@@ -543,7 +428,6 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
         confirm: true
       }
     }, () => {
-
       try {
         assert(1 === 1);
         done();
@@ -642,32 +526,6 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.getAccessToken);
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        contentTypeId: '0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A',
-        listId: "dfddade1-4729-428d-881e-7fedf3cae50d",
-        webUrl: "https://contoso.sharepoint.com",
-        debug: false,
-        confirm: true
-      }
-    }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 
   it('configures command types', () => {

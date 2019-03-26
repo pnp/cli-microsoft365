@@ -1,5 +1,5 @@
 export interface TokenStorage {
-  get: (service: string) => Promise<string>;
-  set: (service: string, token: string) => Promise<void>;
-  remove: (service: string) => Promise<void>;
+  get: () => Promise<string>;
+  set: (connectionInfo: string) => Promise<void>;
+  remove: () => Promise<void>;
 }

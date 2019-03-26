@@ -3,12 +3,8 @@ import { PageItem } from './PageItem';
 import { ClientSidePage, CanvasSection, CanvasColumn, ClientSidePart } from './clientsidepages';
 
 export class Page {
-  public static getPage(name: string, webUrl: string, accessToken: string, cmd: CommandInstance, debug: boolean, verbose: boolean): Promise<ClientSidePage> {
+  public static getPage(name: string, webUrl: string, cmd: CommandInstance, debug: boolean, verbose: boolean): Promise<ClientSidePage> {
     return new Promise((resolve: (page: ClientSidePage) => void, reject: (error: any) => void): void => {
-      if (debug) {
-        cmd.log(`Retrieved access token ${accessToken}`);
-      }
-
       if (verbose) {
         cmd.log(`Retrieving information about the page...`);
       }
@@ -21,7 +17,6 @@ export class Page {
       const requestOptions: any = {
         url: `${webUrl}/_api/web/getfilebyserverrelativeurl('${webUrl.substr(webUrl.indexOf('/', 8))}/SitePages/${encodeURIComponent(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId`,
         headers: {
-          authorization: `Bearer ${accessToken}`,
           'content-type': 'application/json;charset=utf-8',
           accept: 'application/json;odata=nometadata'
         },

@@ -6,6 +6,7 @@ import Utils from './Utils';
 import * as https from 'https';
 import request = require('request');
 import { WriteStream } from 'fs';
+import auth from './Auth';
 
 describe('Request', () => {
   const cmdInstance = {
@@ -22,6 +23,7 @@ describe('Request', () => {
   beforeEach(() => {
     _request.cmd = cmdInstance;
     _request.debug = false;
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve('ABC'));
   });
 
   afterEach(() => {
@@ -30,7 +32,8 @@ describe('Request', () => {
       global.setTimeout,
       https.request,
       (_request as any).req,
-      cmdInstance.log
+      cmdInstance.log,
+      auth.ensureAccessToken
     ]);
   });
 
@@ -58,7 +61,7 @@ describe('Request', () => {
       _options = options;
       return new WriteStream({
         final: (cb) => {
-          cb()
+          cb();
         }
       });
     });
@@ -85,7 +88,7 @@ describe('Request', () => {
       _options = options;
       return new WriteStream({
         final: (cb) => {
-          cb()
+          cb();
         }
       });
     });
@@ -99,6 +102,34 @@ describe('Request', () => {
       }, () => {
         try {
           assert((_options.headers as request.Headers)['accept-encoding'].indexOf('gzip') > -1);
+          done();
+        }
+        catch (err) {
+          done(err);
+        }
+      });
+  });
+
+  it('sets access token on all requests', (done) => {
+    sinon.stub(https, 'request').callsFake((options) => {
+      _options = options;
+      return new WriteStream({
+        final: (cb) => {
+          cb();
+        }
+      });
+    });
+
+    _request
+      .get({
+        url: 'https://contoso.sharepoint.com/',
+        headers: {}
+      })
+      .then(() => {
+        done('Error expected');
+      }, () => {
+        try {
+          assert((_options.headers as request.Headers)['authorization'].indexOf('Bearer ABC') > -1);
           done();
         }
         catch (err) {

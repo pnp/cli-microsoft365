@@ -34,7 +34,7 @@ describe('Page', () => {
     });
 
     Page
-      .getPage('page.aspx', 'https://contoso.sharepoint.com', 'abc', cmdInstance, false, false)
+      .getPage('page.aspx', 'https://contoso.sharepoint.com', cmdInstance, false, false)
       .then((page: ClientSidePage): void => {
         done(new Error('Parsing page didn\'t fail while expected'));
       }, (error: any): void => {

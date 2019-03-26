@@ -1,5 +1,3 @@
-import auth from '../../GraphAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
@@ -37,20 +35,16 @@ class GraphTeamsRemoveCommand extends GraphCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const removeTeam: () => void = (): void => {
-      auth
-        .ensureAccessToken(auth.service.resource, cmd, this.debug)
-        .then((): Promise<void> => {
-          const requestOptions: any = {
-            url: `${auth.service.resource}/v1.0/groups/${encodeURIComponent(args.options.teamId)}`,
-            headers: {
-              authorization: `Bearer ${auth.service.accessToken}`,
-              accept: 'application/json;odata.metadata=none'
-            },
-            json: true
-          };
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/groups/${encodeURIComponent(args.options.teamId)}`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        json: true
+      };
 
-          return request.delete(requestOptions);
-        })  
+      request
+        .delete(requestOptions)
         .then((): void => {
           if (this.verbose) {
             cmd.log(vorpal.chalk.green('DONE'));
@@ -111,17 +105,9 @@ class GraphTeamsRemoveCommand extends GraphCommand {
   }
 
   public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to the Microsoft Graph
-    using the ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
-
-    To remove the specified Microsoft Teams team, you have to first
-    log in to the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
+      `  Remarks:
 
     When deleted, Office 365 groups are moved to a temporary container and
     can be restored within 30 days. After that time, they are permanently
@@ -130,10 +116,10 @@ class GraphTeamsRemoveCommand extends GraphCommand {
   Examples:
   
     Removes the specified team 
-      ${chalk.grey(config.delimiter)} ${this.name} --teamId '00000000-0000-0000-0000-000000000000'
+      ${this.name} --teamId '00000000-0000-0000-0000-000000000000'
 
     Removes the specified team without confirmation
-      ${chalk.grey(config.delimiter)} ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --confirm
+      ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --confirm
 
   More information:
 

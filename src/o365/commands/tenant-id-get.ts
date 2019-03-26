@@ -1,4 +1,3 @@
-import config from '../../config';
 import commands from './commands';
 import GlobalOptions from '../../GlobalOptions';
 import request from '../../request';
@@ -75,13 +74,12 @@ class TenantIdGetCommand extends Command {
   }
 
   public commandHelp(args: any, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
     log(vorpal.find(commands.TENANT_ID_GET).helpInformation());
     log(
       `Examples:
   
     Get Office 365 tenant ID for the specified domain
-      ${chalk.grey(config.delimiter)} ${commands.TENANT_ID_GET} --domainName contoso.com
+      ${commands.TENANT_ID_GET} --domainName contoso.com
 `);
   }
 }

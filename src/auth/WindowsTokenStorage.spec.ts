@@ -9,19 +9,19 @@ import * as os from 'os';
 describe('WindowsTokenStorage', () => {
   const windowsCredsManager = new WindowsTokenStorage();
   const prefix: string = 'Office365Cli:target=';
+  const prefixShort: string = 'Office365Cli';
 
   it('executes right command to get password from Windows Credential Manager', (done) => {
     let file = '';
     let args: string[] = [];
     sinon.stub(childProcess, 'execFile').callsFake((f, a) => { file = f; args = a });
-    const service = 'mock';
-    windowsCredsManager.get(service);
+    windowsCredsManager.get();
     try {
       assert.equal(file, path.join(__dirname, '../../bin/windows/creds.exe'));
       assert.deepEqual(args, [
         '-s',
         '-g',
-        '-t', `${prefix}${service}*`
+        '-t', `${prefix}${prefixShort}*`
       ]);
       done();
     }
@@ -36,7 +36,7 @@ describe('WindowsTokenStorage', () => {
   it('correctly handles error when getting password from Windows Credential Manager', (done) => {
     sinon.stub(childProcess, 'execFile').callsArgWith(2, { message: 'An error has occurred' });
     windowsCredsManager
-      .get('mock')
+      .get()
       .then(() => {
         Utils.restore(childProcess.execFile);
         done('Expected failure but passed');
@@ -57,7 +57,7 @@ describe('WindowsTokenStorage', () => {
   it('correctly handles no credentials found in Windows Credential Manager', (done) => {
     sinon.stub(childProcess, 'execFile').callsArgWith(2, null, '', null);
     windowsCredsManager
-      .get('mock')
+      .get()
       .then(() => {
         Utils.restore(childProcess.execFile);
         done('Expected failure but passed');
@@ -81,7 +81,7 @@ describe('WindowsTokenStorage', () => {
       'Credential: ' + new Buffer('ABC', 'utf8').toString('hex')
     ].join(os.EOL), null);
     windowsCredsManager
-      .get('mock')
+      .get()
       .then((password) => {
         try {
           assert.equal(password, 'ABC');
@@ -108,7 +108,7 @@ describe('WindowsTokenStorage', () => {
       'Credential: ' + new Buffer('DEF', 'utf8').toString('hex')
     ].join(os.EOL), null);
     windowsCredsManager
-      .get('mock')
+      .get()
       .then((password) => {
         try {
           assert.equal(password, 'ABCDEF');
@@ -132,7 +132,7 @@ describe('WindowsTokenStorage', () => {
       'Credential: ' + new Buffer('ABC', 'utf8').toString('hex')
     ].join(os.EOL), null);
     windowsCredsManager
-      .get('mock')
+      .get()
       .then(() => {
         Utils.restore(childProcess.execFile);
         done('Expected fail but passed instead');
@@ -159,7 +159,7 @@ describe('WindowsTokenStorage', () => {
       'Credential: DEF',
     ].join(os.EOL), null);
     windowsCredsManager
-      .get('mock')
+      .get()
       .then(() => {
         Utils.restore(childProcess.execFile);
         done('Expected fail but passed instead');
@@ -186,7 +186,7 @@ describe('WindowsTokenStorage', () => {
       'Credential: ' + new Buffer('GHI', 'utf8').toString('hex')
     ].join(os.EOL), null);
     windowsCredsManager
-      .get('mock')
+      .get()
       .then(() => {
         Utils.restore(childProcess.execFile);
         done('Expected fail but passed instead');
@@ -206,9 +206,8 @@ describe('WindowsTokenStorage', () => {
 
   it('clears existing passwords before setting new one in Windows Credential Manager', (done) => {
     const removeStub = sinon.stub(windowsCredsManager, 'remove').callsFake(() => Promise.reject('An error has occurred when removing existing passwords'));
-    const service = 'mock';
     windowsCredsManager
-      .set(service, 'ABC')
+      .set('ABC')
       .then(() => {
         try {
           assert(removeStub.called);
@@ -236,9 +235,8 @@ describe('WindowsTokenStorage', () => {
 
   it('correctly handles error when clearing existing passwords in Windows Credential Manager', (done) => {
     sinon.stub(windowsCredsManager, 'remove').callsFake(() => Promise.reject('An error has occurred when removing existing passwords'));
-    const service = 'mock';
     windowsCredsManager
-      .set(service, 'ABC')
+      .set('ABC')
       .then(() => {
         Utils.restore(windowsCredsManager.remove);
         done('Fail expected but passed instead');
@@ -259,9 +257,8 @@ describe('WindowsTokenStorage', () => {
   it('doesn\'t set new password if clearing existing passwords in Windows Credential Manager failed', (done) => {
     sinon.stub(windowsCredsManager, 'remove').callsFake(() => Promise.reject('An error has occurred when removing existing passwords'));
     const execFileStub = sinon.stub(childProcess, 'execFile').callsFake(() => { });
-    const service = 'mock';
     windowsCredsManager
-      .set(service, 'ABC')
+      .set('ABC')
       .then(() => {
         try {
           assert(execFileStub.notCalled);
@@ -298,15 +295,14 @@ describe('WindowsTokenStorage', () => {
     let args: string[] = [];
     sinon.stub(windowsCredsManager, 'remove').callsFake(() => Promise.resolve());
     sinon.stub(childProcess, 'execFile').callsFake((f, a) => { file = f; args = a }).callsArgWith(2, null, null, null);
-    const service = 'mock';
     windowsCredsManager
-      .set(service, 'ABC')
+      .set('ABC')
       .then(() => {
         try {
           assert.equal(file, path.join(__dirname, '../../bin/windows/creds.exe'));
           assert.deepEqual(args, [
             '-a',
-            '-t', `${prefix}${service}`,
+            '-t', `${prefix}${prefixShort}`,
             '-p', new Buffer('ABC', 'utf8').toString('hex')
           ]);
           done();
@@ -326,9 +322,8 @@ describe('WindowsTokenStorage', () => {
   it('continues when adding short password to Windows Credential Manager succeeded', (done) => {
     sinon.stub(windowsCredsManager, 'remove').callsFake(() => Promise.resolve());
     sinon.stub(childProcess, 'execFile').callsFake(() => { }).callsArgWith(2, null, null, null);
-    const service = 'mock';
     windowsCredsManager
-      .set(service, 'ABC')
+      .set('ABC')
       .then(() => {
         Utils.restore([
           childProcess.execFile,
@@ -347,9 +342,8 @@ describe('WindowsTokenStorage', () => {
   it('continues when adding long password to Windows Credential Manager succeeded', (done) => {
     sinon.stub(windowsCredsManager, 'remove').callsFake(() => Promise.resolve());
     sinon.stub(childProcess, 'execFile').callsFake(() => { }).callsArgWith(2, null, null, null);
-    const service = 'mock';
     windowsCredsManager
-      .set(service, new Array(3000).fill('x').join(''))
+      .set(new Array(3000).fill('x').join(''))
       .then(() => {
         Utils.restore([
           childProcess.execFile,
@@ -368,9 +362,8 @@ describe('WindowsTokenStorage', () => {
   it('creates correct number of chunks for long password to be stored in Windows Credential Manager', (done) => {
     sinon.stub(windowsCredsManager, 'remove').callsFake(() => Promise.resolve());
     const execFileStub = sinon.stub(childProcess, 'execFile').callsFake(() => { }).callsArgWith(2, null, null, null);
-    const service = 'mock';
     windowsCredsManager
-      .set(service, new Array(3000).fill('x').join(''))
+      .set(new Array(3000).fill('x').join(''))
       .then(() => {
         try {
           assert(execFileStub.calledTwice);
@@ -392,13 +385,12 @@ describe('WindowsTokenStorage', () => {
     const names: string[] = [];
     sinon.stub(windowsCredsManager, 'remove').callsFake(() => Promise.resolve());
     sinon.stub(childProcess, 'execFile').callsFake((f, a) => { names.push(a[2]); }).callsArgWith(2, null, null, null);
-    const service = 'mock';
     windowsCredsManager
-      .set(service, new Array(3000).fill('x').join(''))
+      .set(new Array(3000).fill('x').join(''))
       .then(() => {
         try {
-          assert.equal(names[0], 'Office365Cli:target=mock--1-2');
-          assert.equal(names[1], 'Office365Cli:target=mock--2-2');
+          assert.equal(names[0], 'Office365Cli:target=Office365Cli--1-2');
+          assert.equal(names[1], 'Office365Cli:target=Office365Cli--2-2');
           done();
         }
         catch (e) {
@@ -417,9 +409,8 @@ describe('WindowsTokenStorage', () => {
     const names: string[] = [];
     sinon.stub(windowsCredsManager, 'remove').callsFake(() => Promise.resolve());
     sinon.stub(childProcess, 'execFile').callsFake((f, a) => { names.push(a[2]); }).callsArgWith(2, { message: 'An error has occurred' }, null, null);
-    const service = 'mock';
     windowsCredsManager
-      .set(service, 'ABC')
+      .set('ABC')
       .then(() => {
         Utils.restore([
           childProcess.execFile,
@@ -447,16 +438,15 @@ describe('WindowsTokenStorage', () => {
     let file = '';
     let args: string[] = [];
     sinon.stub(childProcess, 'execFile').callsFake((f, a) => { file = f; args = a }).callsArgWith(2, null, null, null);
-    const service = 'mock';
     windowsCredsManager
-      .remove(service)
+      .remove()
       .then(() => {
         try {
           assert.equal(file, path.join(__dirname, '../../bin/windows/creds.exe'));
           assert.deepEqual(args, [
             '-d',
             '-g',
-            '-t', `${prefix}${service}*`
+            '-t', `${prefix}${prefixShort}*`
           ]);
           done();
         }
@@ -475,7 +465,7 @@ describe('WindowsTokenStorage', () => {
   it('correctly handles error when removing password from Windows Credential Manager', (done) => {
     sinon.stub(childProcess, 'execFile').callsArgWith(2, { message: 'An error has occurred' });
     windowsCredsManager
-      .remove('mock')
+      .remove()
       .then(() => {
         Utils.restore(childProcess.execFile);
         done('Expected failure but passed');
@@ -496,7 +486,7 @@ describe('WindowsTokenStorage', () => {
   it('completes when removing password from Windows Credential Manager succeeded', (done) => {
     sinon.stub(childProcess, 'execFile').callsArgWith(2, null, null, null);
     windowsCredsManager
-      .remove('mock')
+      .remove()
       .then(() => {
         Utils.restore(childProcess.execFile);
         done();

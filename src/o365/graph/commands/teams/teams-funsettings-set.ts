@@ -1,6 +1,4 @@
-import auth from '../../GraphAuth';
 import Utils from '../../../../Utils';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import { CommandOption, CommandValidate } from '../../../../Command';
@@ -46,34 +44,30 @@ class GraphTeamsFunSettingsSetCommand extends GraphCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((): Promise<{}> => {
-        const body: any = {
-          funSettings: {}
-        };
-        GraphTeamsFunSettingsSetCommand.booleanProps.forEach(p => {
-          if (typeof (args.options as any)[p] !== 'undefined') {
-            body.funSettings[p] = (args.options as any)[p] === 'true';
-          }
-        });
+    const body: any = {
+      funSettings: {}
+    };
+    GraphTeamsFunSettingsSetCommand.booleanProps.forEach(p => {
+      if (typeof (args.options as any)[p] !== 'undefined') {
+        body.funSettings[p] = (args.options as any)[p] === 'true';
+      }
+    });
 
-        if (args.options.giphyContentRating) {
-          body.funSettings.giphyContentRating = args.options.giphyContentRating;
-        }
+    if (args.options.giphyContentRating) {
+      body.funSettings.giphyContentRating = args.options.giphyContentRating;
+    }
 
-        const requestOptions: any = {
-          url: `${auth.service.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}`,
-          headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
-            accept: 'application/json;odata.metadata=none'
-          },
-          body: body,
-          json: true
-        };
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      body: body,
+      json: true
+    };
 
-        return request.patch(requestOptions);
-      })
+    request
+      .patch(requestOptions)
       .then((): void => {
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
@@ -148,32 +142,22 @@ class GraphTeamsFunSettingsSetCommand extends GraphCommand {
   }
 
   public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to the Microsoft Graph
-    using the ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
-
-    To set fun settings of a Microsoft Teams team, you have to first log in to
-    the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
-
-  Examples:
+      `  Examples:
 
     Allow giphy usage within a given Microsoft Teams team, setting the content
     rating for giphy to Moderate
-      ${chalk.grey(config.delimiter)} ${this.name} --teamId 83cece1e-938d-44a1-8b86-918cf6151957 --allowGiphy true --giphyContentRating Moderate
+      ${this.name} --teamId 83cece1e-938d-44a1-8b86-918cf6151957 --allowGiphy true --giphyContentRating Moderate
     
     Disable usage of giphy within the given Microsoft Teams team
-      ${chalk.grey(config.delimiter)} ${this.name} --teamId 83cece1e-938d-44a1-8b86-918cf6151957 --allowGiphy false
+      ${this.name} --teamId 83cece1e-938d-44a1-8b86-918cf6151957 --allowGiphy false
 
     Allow usage of stickers and memes within a given Microsoft Teams team
-      ${chalk.grey(config.delimiter)} ${this.name} --teamId 83cece1e-938d-44a1-8b86-918cf6151957 --allowStickersAndMemes true
+      ${this.name} --teamId 83cece1e-938d-44a1-8b86-918cf6151957 --allowStickersAndMemes true
 
     Disable usage custom memes within a given Microsoft Teams team
-      ${chalk.grey(config.delimiter)} ${this.name} --teamId 83cece1e-938d-44a1-8b86-918cf6151957 --allowCustomMemes false
+      ${this.name} --teamId 83cece1e-938d-44a1-8b86-918cf6151957 --allowCustomMemes false
 `);
   }
 }

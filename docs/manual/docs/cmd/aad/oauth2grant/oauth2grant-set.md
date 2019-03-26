@@ -19,12 +19,7 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
-!!! important
-    Before using this command, log in to Azure Active Directory Graph, using the [aad login](../login.md) command.
-
 ## Remarks
-
-To update service principal's OAuth2 permissions, you have to first log in to Azure Active Directory Graph using the [aad login](../login.md) command, eg. `aad login`.
 
 Before you can update service principal's OAuth2 permissions, you need to get the `objectId` of the permissions grant to update. You can retrieve it using the [aad oauth2grant list](./oauth2grant-list.md) command.
 

@@ -1,4 +1,3 @@
-import auth from '../../SpoAuth';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -48,19 +47,14 @@ class SpoTermGetCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  protected requiresTenantAdmin(): boolean {
-    return true;
-  }
-
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<ContextInfo> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
+    let spoAdminUrl: string = '';
 
-        return this.getRequestDigest(cmd, this.debug);
+    this
+      .getSpoAdminUrl(cmd, this.debug)
+      .then((_spoAdminUrl: string): Promise<ContextInfo> => {
+        spoAdminUrl = _spoAdminUrl;
+        return this.getRequestDigest(spoAdminUrl);
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
@@ -79,9 +73,8 @@ class SpoTermGetCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+          url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': res.FormDigestValue
           },
           body: body
@@ -199,14 +192,10 @@ class SpoTermGetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.TERM_GET).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to SharePoint Online tenant admin site,
-    using the ${chalk.blue(commands.LOGIN)} command.
-        
+      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
+    the tenant admin site.
+      
   Remarks:
-
-    To get information about a taxonomy term, you have to first log in
-    to a tenant admin site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso-admin.sharepoint.com`)}.
 
     When retrieving term by its ID, it's sufficient to specify just the ID.
     When retrieving it by its name however, you need to specify the parent
@@ -215,15 +204,15 @@ class SpoTermGetCommand extends SpoCommand {
   Examples:
   
     Get information about a taxonomy term using its ID
-      ${chalk.grey(config.delimiter)} ${commands.TERM_GET} --id 0e8f395e-ff58-4d45-9ff7-e331ab728beb
+      ${commands.TERM_GET} --id 0e8f395e-ff58-4d45-9ff7-e331ab728beb
 
     Get information about a taxonomy term using its name, retrieving the parent
     term group and term set using their names
-      ${chalk.grey(config.delimiter)} ${commands.TERM_GET} --name IT --termGroupName People --termSetName Department
+      ${commands.TERM_GET} --name IT --termGroupName People --termSetName Department
 
     Get information about a taxonomy term using its name, retrieving the parent
     term group and term set using their IDs
-      ${chalk.grey(config.delimiter)} ${commands.TERM_GET} --name IT --termGroupId 5c928151-c140-4d48-aab9-54da901c7fef --termSetId 8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f
+      ${commands.TERM_GET} --name IT --termGroupId 5c928151-c140-4d48-aab9-54da901c7fef --termSetId 8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f
 `);
   }
 }

@@ -1,4 +1,3 @@
-import auth from '../../SpoAuth';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -40,14 +39,11 @@ class SpoCdnSetCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  protected requiresTenantAdmin(): boolean {
-    return true;
-  }
-
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     const cdnTypeString: string = args.options.type || 'Public';
     const enabled: boolean = args.options.enabled === 'true';
     let cdnType: number = 0;
+    let spoAdminUrl: string = '';
 
     switch (cdnTypeString) {
       case "Private": {
@@ -64,14 +60,12 @@ class SpoCdnSetCommand extends SpoCommand {
       }
     }
 
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<ContextInfo> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Loading CDN settings for the ${auth.site.url} tenant...`);
-        }
+    this
+      .getSpoAdminUrl(cmd, this.debug)
+      .then((_spoAdminUrl: string): Promise<ContextInfo> => {
+        spoAdminUrl = _spoAdminUrl;
 
-        return this.getRequestDigest(cmd, this.debug);
+        return this.getRequestDigest(spoAdminUrl);
       })
       .then((res: ContextInfo): Promise<string> => {
         let requestBody = '';
@@ -115,9 +109,8 @@ class SpoCdnSetCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+          url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': res.FormDigestValue
           },
           body: requestBody
@@ -186,42 +179,40 @@ class SpoCdnSetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.CDN_SET).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online tenant admin site,
-  using the ${chalk.blue(commands.LOGIN)} command.
+      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
+    the tenant admin site.
         
   Remarks:
 
-    To enable or disable an Office 365 CDN, you have to first log in to a tenant admin site using the
-    ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso-admin.sharepoint.com`)}.
-    If you are logged in to a different site and will try to manage tenant properties,
-    you will get an error.
+    Using the ${chalk.blue('-t, --type')} option you can choose whether you want
+    to manage the settings of the Public (default), Private CDN or both. If you
+    don't use the option, the command will use the Public CDN.
 
-    Using the ${chalk.blue('-t, --type')} option you can choose whether you want to manage the settings of
-    the Public (default), Private CDN or both. If you don't use the option, the command will use
-    the Public CDN.
+    Using the ${chalk.blue('-e, --enabled')} option you can specify whether the given
+    CDN type should be enabled or disabled. Use ${chalk.grey('true')} to enable the specified
+    CDN and ${chalk.grey('false')} to disable it.
 
-    Using the ${chalk.blue('-e, --enabled')} option you can specify whether the given CDN type should be
-    enabled or disabled. Use ${chalk.grey('true')} to enable the specified CDN and ${chalk.grey('false')} to
-    disable it.
-
-    Using the ${chalk.blue('-noDefaultOrigins')} option you can specify to skip the creation of the default origins.  
+    Using the ${chalk.blue('-noDefaultOrigins')} option you can specify to skip
+    the creation of the default origins.  
 
   Examples:
   
     Enable the Office 365 Public CDN on the current tenant
-      ${chalk.grey(config.delimiter)} ${commands.CDN_SET} -t Public -e true
+      ${commands.CDN_SET} --type Public --enabled true
 
     Disable the Office 365 Public CDN on the current tenant
-      ${chalk.grey(config.delimiter)} ${commands.CDN_SET} -t Public -e false
+      ${commands.CDN_SET} --type Public --enabled false
 
     Enable the Office 365 Private CDN on the current tenant
-      ${chalk.grey(config.delimiter)} ${commands.CDN_SET} -t Private -e true
+      ${commands.CDN_SET} --type Private --enabled true
   
-    Enable the Office 365 Private and Public CDN on the current tenant with default origins 
-      ${chalk.grey(config.delimiter)} ${commands.CDN_SET} -t Both -e true 
+    Enable the Office 365 Private and Public CDN on the current tenant with
+    default origins 
+      ${commands.CDN_SET} --type Both --enabled true 
 
-    Enable the Office 365 Private and Public CDN on the current tenant without the default origins 
-      ${chalk.grey(config.delimiter)} ${commands.CDN_SET} -t Both -e true --noDefaultOrigins
+    Enable the Office 365 Private and Public CDN on the current tenant without
+    the default origins 
+      ${commands.CDN_SET} --type Both --enabled true --noDefaultOrigins
 
   More information:
 

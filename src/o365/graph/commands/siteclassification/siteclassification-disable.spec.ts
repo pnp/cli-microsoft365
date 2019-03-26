@@ -2,36 +2,33 @@ import commands from '../../commands';
 import Command, { CommandError, CommandOption } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth from '../../GraphAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./siteclassification-disable');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import { Service } from '../../../../Auth';
-import * as fs from 'fs';
 
 describe(commands.SITECLASSIFICATION_DISABLE, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  let trackEvent: any;
-  let telemetry: any;
   let promptOptions: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
-    sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    auth.service.connected = true;
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       },
@@ -41,8 +38,6 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.service = new Service('https://graph.microsoft.com');
-    telemetry = null;
     promptOptions = undefined;
   });
 
@@ -50,18 +45,16 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
     Utils.restore([
       vorpal.find,
       request.get,
-      request.delete,
-      global.setTimeout
+      request.delete
     ]);
   });
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.ensureAccessToken,
       auth.restoreAuth,
-      fs.readFileSync
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
   });
 
 
@@ -71,47 +64,6 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
 
   it('has a description', () => {
     assert.notEqual(command.description, null);
-  });
-
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.SITECLASSIFICATION_DISABLE);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not connected to the Microsoft Graph', (done) => {
-    auth.service = new Service('https://graph.microsoft.com');
-    auth.service.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to the Microsoft Graph first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 
   it('supports debug mode', () => {
@@ -160,10 +112,6 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
   });
 
   it('prompts before disabling siteclassification when confirm option not passed', (done) => {
-    auth.service = new Service('https://graph.microsoft.com');
-    auth.service.connected = true;
-
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false } }, () => {
       let promptIssued = false;
 
@@ -183,10 +131,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
 
   it('handles Office 365 Tenant siteclassification is not enabled', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.headers.authorization &&
-        opts.headers.authorization.indexOf('Bearer ') === 0 &&
-        opts.url === `https://graph.microsoft.com/beta/settings`) {
-
+      if (opts.url === `https://graph.microsoft.com/beta/settings`) {
         return Promise.resolve({
           value: [
           ]
@@ -196,9 +141,6 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    auth.service = new Service('https://graph.microsoft.com');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, confirm: true } }, (err: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Site classification is not enabled.')));
@@ -213,10 +155,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
 
   it('handles Office 365 Tenant siteclassification missing DirectorySettingTemplate', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.headers.authorization &&
-        opts.headers.authorization.indexOf('Bearer ') === 0 &&
-        opts.url === `https://graph.microsoft.com/beta/settings`) {
-
+      if (opts.url === `https://graph.microsoft.com/beta/settings`) {
         return Promise.resolve({
           value: [
             {
@@ -285,9 +224,6 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    auth.service = new Service('https://graph.microsoft.com');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, confirm: true } }, (err: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("Missing DirectorySettingTemplate for \"Group.Unified\"")));
@@ -302,10 +238,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
 
   it('handles Office 365 Tenant siteclassification missing UnifiedGroupSetting ID', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.headers.authorization &&
-        opts.headers.authorization.indexOf('Bearer ') === 0 &&
-        opts.url === `https://graph.microsoft.com/beta/settings`) {
-
+      if (opts.url === `https://graph.microsoft.com/beta/settings`) {
         return Promise.resolve({
           value: [
             {
@@ -374,9 +307,6 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    auth.service = new Service('https://graph.microsoft.com');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, confirm: true } }, (err: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("Missing UnifiedGroupSettting id")));
@@ -391,10 +321,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
 
   it('handles Office 365 Tenant siteclassification empty UnifiedGroupSetting ID', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.headers.authorization &&
-        opts.headers.authorization.indexOf('Bearer ') === 0 &&
-        opts.url === `https://graph.microsoft.com/beta/settings`) {
-
+      if (opts.url === `https://graph.microsoft.com/beta/settings`) {
         return Promise.resolve({
           value: [
             {
@@ -463,9 +390,6 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    auth.service = new Service('https://graph.microsoft.com');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, confirm: true } }, (err: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("Missing UnifiedGroupSettting id")));
@@ -481,10 +405,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
   it('handles disabling site classification without prompting', (done) => {
     let deleteRequestIssued = false;
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.headers.authorization &&
-        opts.headers.authorization.indexOf('Bearer ') === 0 &&
-        opts.url === `https://graph.microsoft.com/beta/settings`) {
-
+      if (opts.url === `https://graph.microsoft.com/beta/settings`) {
         return Promise.resolve({
           value: [
             {
@@ -554,10 +475,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
     });
 
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.headers.authorization &&
-        opts.headers.authorization.indexOf('Bearer ') === 0 &&
-        opts.url === `https://graph.microsoft.com/beta/settings/d20c475c-6f96-449a-aee8-08146be187d3`) {
-
+      if (opts.url === `https://graph.microsoft.com/beta/settings/d20c475c-6f96-449a-aee8-08146be187d3`) {
         deleteRequestIssued = true;
 
         return Promise.resolve({
@@ -570,9 +488,6 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    auth.service = new Service('https://graph.microsoft.com');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { confirm: true } }, (err: any) => {
       try {
         assert(deleteRequestIssued);
@@ -588,10 +503,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
   it('handles disabling site classification without prompting (debug)', (done) => {
     let deleteRequestIssued = false;
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.headers.authorization &&
-        opts.headers.authorization.indexOf('Bearer ') === 0 &&
-        opts.url === `https://graph.microsoft.com/beta/settings`) {
-
+      if (opts.url === `https://graph.microsoft.com/beta/settings`) {
         return Promise.resolve({
           value: [
             {
@@ -661,25 +573,18 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
     });
 
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.headers.authorization &&
-        opts.headers.authorization.indexOf('Bearer ') === 0 &&
-        opts.url === `https://graph.microsoft.com/beta/settings/d20c475c-6f96-449a-aee8-08146be187d3`) {
-
+      if (opts.url === `https://graph.microsoft.com/beta/settings/d20c475c-6f96-449a-aee8-08146be187d3`) {
         deleteRequestIssued = true;
 
         return Promise.resolve({
           value: [
           ]
-
         });
       }
 
       return Promise.reject('Invalid Request');
     });
 
-    auth.service = new Service('https://graph.microsoft.com');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, confirm: true } }, (err: any) => {
       try {
         assert(deleteRequestIssued && cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
@@ -694,10 +599,6 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
 
   it('aborts removing the group when prompt not confirmed', (done) => {
     const postSpy = sinon.spy(request, 'delete');
-    auth.service = new Service('https://graph.microsoft.com');
-    auth.service.connected = true;
-
-    cmdInstance.action = command.action();
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     };
@@ -716,10 +617,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
     let deleteRequestIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.headers.authorization &&
-        opts.headers.authorization.indexOf('Bearer ') === 0 &&
-        opts.url === `https://graph.microsoft.com/beta/settings`) {
-
+      if (opts.url === `https://graph.microsoft.com/beta/settings`) {
         return Promise.resolve({
           value: [
             {
@@ -789,26 +687,18 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
     });
 
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.headers.authorization &&
-        opts.headers.authorization.indexOf('Bearer ') === 0 &&
-        opts.url === `https://graph.microsoft.com/beta/settings/d20c475c-6f96-449a-aee8-08146be187d3`) {
-
+      if (opts.url === `https://graph.microsoft.com/beta/settings/d20c475c-6f96-449a-aee8-08146be187d3`) {
         deleteRequestIssued = true;
 
         return Promise.resolve({
           value: [
           ]
-
         });
       }
 
       return Promise.reject('Invalid Request');
     });
 
-    auth.service = new Service('https://graph.microsoft.com');
-    auth.service.connected = true;
-
-    cmdInstance.action = command.action();
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     };

@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -9,7 +7,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
-import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -50,58 +47,41 @@ class SpoFileCheckinCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-    let siteAccessToken: string = '';
-
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
+    let type: CheckinType = CheckinType.Major;
+    if (args.options.type) {
+      switch (args.options.type.toLowerCase()) {
+        case 'minor':
+          type = CheckinType.Minor;
+          break;
+        case 'overwrite':
+          type = CheckinType.Overwrite;
+      }
     }
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<void> => {
-        siteAccessToken = accessToken;
+    let comment: string = '';
+    if (args.options.comment) {
+      comment = encodeURIComponent(args.options.comment);
+    }
 
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}.`);
-        }
+    let requestUrl: string = '';
+    if (args.options.id) {
+      requestUrl = `${args.options.webUrl}/_api/web/GetFileById('${encodeURIComponent(args.options.id)}')/checkin(comment='${comment}',checkintype=${type})`;
+    }
 
-        let type: CheckinType = CheckinType.Major;
-        if (args.options.type) {
-          switch (args.options.type.toLowerCase()) {
-            case 'minor':
-              type = CheckinType.Minor;
-              break;
-            case 'overwrite':
-              type = CheckinType.Overwrite;
-          }
-        }
+    if (args.options.fileUrl) {
+      requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${encodeURIComponent(args.options.fileUrl)}')/checkin(comment='${comment}',checkintype=${type})`;
+    }
 
-        let comment: string = '';
-        if (args.options.comment) {
-          comment = encodeURIComponent(args.options.comment);
-        }
+    const requestOptions: any = {
+      url: requestUrl,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      json: true
+    };
 
-        let requestUrl: string = '';
-        if (args.options.id) {
-          requestUrl = `${args.options.webUrl}/_api/web/GetFileById('${encodeURIComponent(args.options.id)}')/checkin(comment='${comment}',checkintype=${type})`;
-        }
-
-        if (args.options.fileUrl) {
-          requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${encodeURIComponent(args.options.fileUrl)}')/checkin(comment='${comment}',checkintype=${type})`;
-        }
-
-        const requestOptions: any = {
-          url: requestUrl,
-          headers: {
-            authorization: `Bearer ${siteAccessToken}`,
-            'accept': 'application/json;odata=nometadata'
-          },
-          json: true
-        };
-
-        return request.post(requestOptions);
-      })
+    request
+      .post(requestOptions)
       .then((): void => {
         if (this.verbose) {
           cmd.log('DONE');
@@ -185,33 +165,25 @@ class SpoFileCheckinCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-    using the ${chalk.blue(commands.LOGIN)} command.
-  
-  Remarks:
-  
-    To get a file, you have to first log in to SharePoint using the
-    ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-        
-  Examples:
+      `  Examples:
   
     Checks in file with UniqueId ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
     located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.FILE_CHECKIN} --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6' 
+      ${commands.FILE_CHECKIN} --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6' 
 
     Checks in file with server-relative url
     ${chalk.grey('/sites/project-x/documents/Test1.docx')} located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.FILE_CHECKIN} --webUrl https://contoso.sharepoint.com/sites/project-x --fileUrl '/sites/project-x/documents/Test1.docx'
+      ${commands.FILE_CHECKIN} --webUrl https://contoso.sharepoint.com/sites/project-x --fileUrl '/sites/project-x/documents/Test1.docx'
 
     Checks in minor version of file with server-relative url
       ${chalk.grey('/sites/project-x/documents/Test1.docx')} located in site
       ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-        ${chalk.grey(config.delimiter)} ${commands.FILE_CHECKIN} --webUrl https://contoso.sharepoint.com/sites/project-x --fileUrl '/sites/project-x/documents/Test1.docx' --type minor
+        ${commands.FILE_CHECKIN} --webUrl https://contoso.sharepoint.com/sites/project-x --fileUrl '/sites/project-x/documents/Test1.docx' --type minor
 
     Checks in file ${chalk.grey('/sites/project-x/documents/Test1.docx')} with comment located in site
       ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-        ${chalk.grey(config.delimiter)} ${commands.FILE_CHECKIN} --webUrl https://contoso.sharepoint.com/sites/project-x --fileUrl '/sites/project-x/documents/Test1.docx' --comment 'approved'
+        ${commands.FILE_CHECKIN} --webUrl https://contoso.sharepoint.com/sites/project-x --fileUrl '/sites/project-x/documents/Test1.docx' --comment 'approved'
       `);
   }
 }

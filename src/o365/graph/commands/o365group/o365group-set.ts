@@ -1,5 +1,3 @@
-import auth from '../../GraphAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -40,46 +38,39 @@ class GraphO365GroupSetCommand extends GraphCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<void> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}.`);
-        }
+    ((): Promise<void> => {
+      if (!args.options.displayName &&
+        !args.options.description &&
+        typeof args.options.isPrivate === 'undefined') {
+        return Promise.resolve();
+      }
 
-        if (!args.options.displayName &&
-          !args.options.description &&
-          typeof args.options.isPrivate === 'undefined') {
-          return Promise.resolve();
-        }
+      if (this.verbose) {
+        cmd.log(`Updating Office 365 Group ${args.options.id}...`);
+      }
 
-        if (this.verbose) {
-          cmd.log(`Updating Office 365 Group ${args.options.id}...`);
-        }
+      const update: any = {};
+      if (args.options.displayName) {
+        update.displayName = args.options.displayName;
+      }
+      if (args.options.description) {
+        update.description = args.options.description;
+      }
+      if (typeof args.options.isPrivate !== 'undefined') {
+        update.visibility = args.options.isPrivate == 'true' ? 'Private' : 'Public'
+      }
 
-        const update: any = {};
-        if (args.options.displayName) {
-          update.displayName = args.options.displayName;
-        }
-        if (args.options.description) {
-          update.description = args.options.description;
-        }
-        if (typeof args.options.isPrivate !== 'undefined') {
-          update.visibility = args.options.isPrivate == 'true' ? 'Private' : 'Public'
-        }
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/groups/${args.options.id}`,
+        headers: {
+          'accept': 'application/json;odata.metadata=none'
+        },
+        json: true,
+        body: update
+      };
 
-        const requestOptions: any = {
-          url: `${auth.service.resource}/v1.0/groups/${args.options.id}`,
-          headers: {
-            authorization: `Bearer ${accessToken}`,
-            'accept': 'application/json;odata.metadata=none'
-          },
-          json: true,
-          body: update
-        };
-
-        return request.patch(requestOptions);
-      })
+      return request.patch(requestOptions);
+    })()
       .then((): Promise<void> => {
         if (!args.options.logoPath) {
           if (this.debug) {
@@ -95,9 +86,8 @@ class GraphO365GroupSetCommand extends GraphCommand {
         }
 
         const requestOptions: any = {
-          url: `${auth.service.resource}/v1.0/groups/${args.options.id}/photo/$value`,
+          url: `${this.resource}/v1.0/groups/${args.options.id}/photo/$value`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             'content-type': this.getImageContentType(fullPath)
           },
           body: fs.readFileSync(fullPath)
@@ -123,9 +113,8 @@ class GraphO365GroupSetCommand extends GraphCommand {
         }
 
         const requestOptions: any = {
-          url: `${auth.service.resource}/v1.0/users?$filter=${owners.map(o => `userPrincipalName eq '${o}'`).join(' or ')}&$select=id`,
+          url: `${this.resource}/v1.0/users?$filter=${owners.map(o => `userPrincipalName eq '${o}'`).join(' or ')}&$select=id`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             'content-type': 'application/json'
           },
           json: true
@@ -139,9 +128,8 @@ class GraphO365GroupSetCommand extends GraphCommand {
         }
 
         return Promise.all(res.value.map(u => request.post({
-          url: `${auth.service.resource}/v1.0/groups/${args.options.id}/owners/$ref`,
+          url: `${this.resource}/v1.0/groups/${args.options.id}/owners/$ref`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             'content-type': 'application/json'
           },
           json: true,
@@ -166,9 +154,8 @@ class GraphO365GroupSetCommand extends GraphCommand {
         }
 
         const requestOptions: any = {
-          url: `${auth.service.resource}/v1.0/users?$filter=${members.map(o => `userPrincipalName eq '${o}'`).join(' or ')}&$select=id`,
+          url: `${this.resource}/v1.0/users?$filter=${members.map(o => `userPrincipalName eq '${o}'`).join(' or ')}&$select=id`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             'content-type': 'application/json'
           },
           json: true
@@ -182,9 +169,8 @@ class GraphO365GroupSetCommand extends GraphCommand {
         }
 
         return Promise.all(res.value.map(u => request.post({
-          url: `${auth.service.resource}/v1.0/groups/${args.options.id}/members/$ref`,
+          url: `${this.resource}/v1.0/groups/${args.options.id}/members/$ref`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             'content-type': 'application/json'
           },
           json: true,
@@ -334,17 +320,10 @@ class GraphO365GroupSetCommand extends GraphCommand {
   }
 
   public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to the Microsoft Graph,
-    using the ${chalk.blue(commands.LOGIN)} command.
-
-  Remarks:
+      `  Remarks:
   
-    To update an Office 365 Group, you have to first log in to the Microsoft
-    Graph using the ${chalk.blue(commands.LOGIN)} command.
-
     When updating group's owners and members, the command will add newly
     specified users to the previously set owners and members. The previously
     set users will not be replaced.
@@ -356,19 +335,19 @@ class GraphO365GroupSetCommand extends GraphCommand {
   Examples:
 
     Update Office 365 Group display name
-      ${chalk.grey(config.delimiter)} ${this.name} --id 28beab62-7540-4db1-a23f-29a6018a3848 --displayName Finance
+      ${this.name} --id 28beab62-7540-4db1-a23f-29a6018a3848 --displayName Finance
 
     Change Office 365 Group visibility to public
-      ${chalk.grey(config.delimiter)} ${this.name} --id 28beab62-7540-4db1-a23f-29a6018a3848 --isPrivate false
+      ${this.name} --id 28beab62-7540-4db1-a23f-29a6018a3848 --isPrivate false
 
     Add new Office 365 Group owners
-      ${chalk.grey(config.delimiter)} ${this.name} --id 28beab62-7540-4db1-a23f-29a6018a3848 --owners DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com
+      ${this.name} --id 28beab62-7540-4db1-a23f-29a6018a3848 --owners DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com
 
     Add new Office 365 Group members
-      ${chalk.grey(config.delimiter)} ${this.name} --id 28beab62-7540-4db1-a23f-29a6018a3848 --members DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com
+      ${this.name} --id 28beab62-7540-4db1-a23f-29a6018a3848 --members DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com
 
     Update Office 365 Group logo
-      ${chalk.grey(config.delimiter)} ${this.name} --id 28beab62-7540-4db1-a23f-29a6018a3848 --logoPath images/logo.png
+      ${this.name} --id 28beab62-7540-4db1-a23f-29a6018a3848 --logoPath images/logo.png
 `);
   }
 }

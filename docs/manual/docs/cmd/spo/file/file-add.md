@@ -27,12 +27,7 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
-!!! important
-    Before using this command, log in to a SharePoint Online site, using the [spo login](../login.md) command.
-
 ## Remarks
-
-To add a file, you have to first connect to SharePoint using the [spo login](../login.md) command, eg. `spo login https://contoso.sharepoint.com`.
 
 This command allows using unknown properties. Each property corresponds to the list item field that should be set when uploading the file.
 

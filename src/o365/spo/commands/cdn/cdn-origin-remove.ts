@@ -1,4 +1,3 @@
-import auth from '../../SpoAuth';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -40,24 +39,23 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  protected requiresTenantAdmin(): boolean {
-    return true;
-  }
-
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     const cdnTypeString: string = args.options.type || 'Public';
     const cdnType: number = cdnTypeString === 'Private' ? 1 : 0;
     const chalk: any = vorpal.chalk;
+    let spoAdminUrl: string = '';
+    let tenantId: string = '';
 
     const removeCdnOrigin = (): void => {
-      if (this.debug) {
-        cmd.log(`Retrieving access token for ${auth.service.resource}...`);
-      }
-
-      auth
-        .ensureAccessToken(auth.service.resource, cmd, this.debug)
-        .then((accessToken: string): Promise<ContextInfo> => {
-          return this.getRequestDigest(cmd, this.debug);
+      this
+        .getTenantId(cmd, this.debug)
+        .then((_tenantId: string): Promise<string> => {
+          tenantId = _tenantId;
+          return this.getSpoAdminUrl(cmd, this.debug);
+        })
+        .then((_spoAdminUrl: string): Promise<ContextInfo> => {
+          spoAdminUrl = _spoAdminUrl;
+          return this.getRequestDigest(spoAdminUrl);
         })
         .then((res: ContextInfo): Promise<string> => {
           if (this.verbose) {
@@ -65,12 +63,11 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
           }
 
           const requestOptions: any = {
-            url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+            url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
             headers: {
-              authorization: `Bearer ${auth.service.accessToken}`,
               'X-RequestDigest': res.FormDigestValue
             },
-            body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="RemoveTenantCdnOrigin" Id="33" ObjectPathId="29"><Parameters><Parameter Type="Enum">${cdnType}</Parameter><Parameter Type="String">${Utils.escapeXml(args.options.origin)}</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="29" Name="${auth.site.tenantId}" /></ObjectPaths></Request>`
+            body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="RemoveTenantCdnOrigin" Id="33" ObjectPathId="29"><Parameters><Parameter Type="Enum">${cdnType}</Parameter><Parameter Type="String">${Utils.escapeXml(args.options.origin)}</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="29" Name="${tenantId}" /></ObjectPaths></Request>`
           };
 
           return request.post(requestOptions);
@@ -151,23 +148,19 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.CDN_ORIGIN_REMOVE).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online tenant admin site,
-  using the ${chalk.blue(commands.LOGIN)} command.
+      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
+    the tenant admin site.
         
   Remarks:
 
-    To remove an origin from an Office 365 CDN, you have to first log in to a tenant admin site using the
-    ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso-admin.sharepoint.com`)}.
-    If you are logged in to a different site and will try to manage tenant properties,
-    you will get an error.
-
-    Using the ${chalk.blue('-t, --type')} option you can choose whether you want to manage the settings of
-    the Public (default) or Private CDN. If you don't use the option, the command will use the Public CDN.
+    Using the ${chalk.blue('-t, --type')} option you can choose whether you want
+    to manage the settings of the Public (default) or Private CDN. If you don't
+    use the option, the command will use the Public CDN.
 
   Examples:
   
     Remove ${chalk.grey('*/CDN')} from the list of origins of the Public CDN
-      ${chalk.grey(config.delimiter)} ${commands.CDN_ORIGIN_REMOVE} -t Public -r */CDN
+      ${commands.CDN_ORIGIN_REMOVE} -t Public -r */CDN
 
   More information:
 

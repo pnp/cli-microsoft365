@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
 import {
@@ -9,7 +7,6 @@ import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import GlobalOptions from '../../../../GlobalOptions';
 import { SiteDesignRun } from './SiteDesignRun';
-import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -38,33 +35,22 @@ class SpoSiteDesignRunListCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
+    const body: any = {};
+    if (args.options.siteDesignId) {
+      body.siteDesignId = args.options.siteDesignId;
+    }
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<{ value: SiteDesignRun[] }> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving site designs applied to the site...`);
-        }
+    const requestOptions: any = {
+      url: `${args.options.webUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignRun`,
+      headers: {
+        accept: 'application/json;odata=nometadata',
+        'content-type': 'application/json;odata=nometadata'
+      },
+      body: body,
+      json: true
+    };
 
-        const body: any = {};
-        if (args.options.siteDesignId) {
-          body.siteDesignId = args.options.siteDesignId;
-        }
-
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignRun`,
-          headers: {
-            authorization: `Bearer ${accessToken}`,
-            accept: 'application/json;odata=nometadata',
-            'content-type': 'application/json;odata=nometadata'
-          },
-          body: body,
-          json: true
-        };
-
-        return request.post(requestOptions);
-      })
+    request.post<{ value: SiteDesignRun[] }>(requestOptions)
       .then((res: { value: SiteDesignRun[] }): void => {
         if (args.options.output === 'json') {
           cmd.log(res.value);
@@ -126,26 +112,16 @@ class SpoSiteDesignRunListCommand extends SpoCommand {
   }
 
   public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site
-    using the ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
-
-    To list information about site designs applied to the specified site,
-    you have to first log in to a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-
-  Examples:
+      `  Examples:
   
     List site designs applied to the specified site
-      ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a
+      ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a
 
     List information about the specified site design applied to the specified
     site
-      ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --siteDesignId 6ec3ca5b-d04b-4381-b169-61378556d76e
+      ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --siteDesignId 6ec3ca5b-d04b-4381-b169-61378556d76e
 
   More information:
 

@@ -1,5 +1,3 @@
-import auth from '../../AadAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -20,7 +18,7 @@ interface Options extends GlobalOptions {
   scope: string;
 }
 
-class Oauth2GrantSetCommand extends AadCommand {
+class AadOAuth2GrantSetCommand extends AadCommand {
   public get name(): string {
     return commands.OAUTH2GRANT_SET;
   }
@@ -30,32 +28,24 @@ class Oauth2GrantSetCommand extends AadCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<{}> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Updating OAuth2 permissions...`);
-        }
+    if (this.verbose) {
+      cmd.log(`Updating OAuth2 permissions...`);
+    }
 
-        if (this.verbose) {
-          cmd.log(`Updating OAuth2 permissions...`);
-        }
+    const requestOptions: any = {
+      url: `${this.resource}/myorganization/oauth2PermissionGrants/${encodeURIComponent(args.options.grantId)}?api-version=1.6`,
+      headers: {
+        'content-type': 'application/json'
+      },
+      json: true,
+      body: {
+        "scope": args.options.scope
+      }
+    };
 
-        const requestOptions: any = {
-          url: `${auth.service.resource}/myorganization/oauth2PermissionGrants/${encodeURIComponent(args.options.grantId)}?api-version=1.6`,
-          headers: {
-            authorization: `Bearer ${accessToken}`,
-            'content-type': 'application/json'
-          },
-          json: true,
-          body: {
-            "scope": args.options.scope
-          }
-        };
-
-        return request.patch(requestOptions);
-      })
-      .then((res: any): void => {
+    request
+      .patch(requestOptions)
+      .then((): void => {
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
         }
@@ -98,14 +88,8 @@ class Oauth2GrantSetCommand extends AadCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.OAUTH2GRANT_SET).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to Azure Active Directory Graph,
-      using the ${chalk.blue(commands.LOGIN)} command.
-
-  Remarks:
+      `  Remarks:
   
-    To update service principal's OAuth2 permissions, you have to first log in
-    to Azure Active Directory Graph using the ${chalk.blue(commands.LOGIN)} command.
-
     Before you can update service principal's OAuth2 permissions, you need to
     get the ${chalk.grey('objectId')} of the permissions grant to update. You can retrieve it
     using the ${chalk.blue(commands.OAUTH2GRANT_LIST)} command.
@@ -119,7 +103,7 @@ class Oauth2GrantSetCommand extends AadCommand {
   
     Update the existing OAuth2 permission grant with ID ${chalk.grey('YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek')}
     to the ${chalk.grey('Calendars.Read Mail.Read')} permissions
-      ${chalk.grey(config.delimiter)} ${commands.OAUTH2GRANT_SET} --grantId YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek --scope "Calendars.Read Mail.Read"
+      ${commands.OAUTH2GRANT_SET} --grantId YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek --scope "Calendars.Read Mail.Read"
 
   More information:
   
@@ -129,4 +113,4 @@ class Oauth2GrantSetCommand extends AadCommand {
   }
 }
 
-module.exports = new Oauth2GrantSetCommand();
+module.exports = new AadOAuth2GrantSetCommand();

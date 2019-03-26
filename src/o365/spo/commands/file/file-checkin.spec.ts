@@ -2,7 +2,7 @@ import commands from '../../commands';
 import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth, { Site } from '../../SpoAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./file-checkin');
 import * as assert from 'assert';
 import request from '../../../../request';
@@ -13,14 +13,8 @@ describe(commands.FILE_CHECKIN, () => {
   let log: any[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  let trackEvent: any;
-  let telemetry: any;
   let stubPostResponses: any = (getFileByServerRelativeUrlResp: any = null, getFileByIdResp: any = null) => {
     return sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/common/oauth2/token') > -1) {
-        return Promise.resolve('abc');
-      }
-
       if (getFileByServerRelativeUrlResp) {
         return getFileByServerRelativeUrlResp;
       } else {
@@ -43,23 +37,23 @@ describe(commands.FILE_CHECKIN, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    auth.service.connected = true;
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.site = new Site();
-    telemetry = null;
   });
 
   afterEach(() => {
@@ -72,11 +66,11 @@ describe(commands.FILE_CHECKIN, () => {
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.getAccessToken,
       auth.restoreAuth,
-      request.post
+      request.post,
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -87,71 +81,15 @@ describe(commands.FILE_CHECKIN, () => {
     assert.notEqual(command.description, null);
   });
 
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.FILE_CHECKIN);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not logged in to a SharePoint site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com' } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('command correctly handles file get reject request', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
     const err = 'Invalid request';
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf('/_api/web/GetFileById') > -1) {
         return Promise.reject(err);
       }
 
       return Promise.reject('Invalid request');
     });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     cmdInstance.action({
       options: {
@@ -167,11 +105,6 @@ describe(commands.FILE_CHECKIN, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore([
-          request.post
-        ]);
-      }
     });
   });
 
@@ -182,11 +115,6 @@ describe(commands.FILE_CHECKIN, () => {
     });
     stubPostResponses(getFileByServerRelativeUrlResp);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const actionId: string = '0CD891EF-AFCE-4E55-B836-FCE03286CCCF';
 
     cmdInstance.action({
@@ -196,18 +124,12 @@ describe(commands.FILE_CHECKIN, () => {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       }
     }, (err: any) => {
-
       try {
         assert.equal(JSON.stringify(err.message), JSON.stringify(expectedError));
         done();
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore([
-          request.post
-        ]);
       }
     });
   });
@@ -219,11 +141,6 @@ describe(commands.FILE_CHECKIN, () => {
     });
     stubPostResponses(null, getFileByIdResp);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const actionId: string = '0CD891EF-AFCE-4E55-B836-FCE03286CCCF';
 
     cmdInstance.action({
@@ -233,7 +150,6 @@ describe(commands.FILE_CHECKIN, () => {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       }
     }, (err: any) => {
-
       try {
         assert.equal(JSON.stringify(err.message), JSON.stringify(expectedError));
         done();
@@ -241,21 +157,11 @@ describe(commands.FILE_CHECKIN, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore([
-          request.post
-        ]);
-      }
     });
   });
 
   it('should call the correct API url when UniqueId option is passed', (done) => {
     const postStub: sinon.SinonStub = stubPostResponses();
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     const actionId: string = '0CD891EF-AFCE-4E55-B836-FCE03286CCCF';
 
@@ -266,30 +172,18 @@ describe(commands.FILE_CHECKIN, () => {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       }
     }, () => {
-
       try {
         assert.equal(postStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileById(\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/checkin(comment=\'\',checkintype=1)');
-        assert.equal(postStub.lastCall.args[0].headers.authorization, 'Bearer ABC');
         done();
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore([
-          request.post
-        ]);
       }
     });
   });
 
   it('should call "DONE" when in verbose', (done) => {
     stubPostResponses();
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     const actionId: string = '0CD891EF-AFCE-4E55-B836-FCE03286CCCF';
 
@@ -300,7 +194,6 @@ describe(commands.FILE_CHECKIN, () => {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       }
     }, () => {
-
       try {
         assert.equal(cmdInstanceLogSpy.lastCall.args[0], 'DONE');
         done();
@@ -308,21 +201,11 @@ describe(commands.FILE_CHECKIN, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore([
-          request.post
-        ]);
-      }
     });
   });
 
   it('should call the correct API url when URL option is passed', (done) => {
     const postStub: sinon.SinonStub = stubPostResponses();
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     cmdInstance.action({
       options: {
@@ -331,30 +214,18 @@ describe(commands.FILE_CHECKIN, () => {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       }
     }, () => {
-
       try {
         assert.equal(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativeUrl('%2Fsites%2Fproject-x%2FDocuments%2FTest1.docx')/checkin(comment='',checkintype=1)");
-        assert.equal(postStub.lastCall.args[0].headers.authorization, 'Bearer ABC');
         done();
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore([
-          request.post
-        ]);
       }
     });
   });
 
   it('should call correctly the API when type is minor', (done) => {
     const postStub: sinon.SinonStub = stubPostResponses();
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     cmdInstance.action({
       options: {
@@ -364,30 +235,18 @@ describe(commands.FILE_CHECKIN, () => {
         type: 'minor'
       }
     }, () => {
-
       try {
         assert.equal(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativeUrl('%2Fsites%2Fproject-x%2FDocuments%2FTest1.docx')/checkin(comment='',checkintype=0)");
-        assert.equal(postStub.lastCall.args[0].headers.authorization, 'Bearer ABC');
         done();
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore([
-          request.post
-        ]);
       }
     });
   });
 
   it('should call correctly the API when type is overwrite', (done) => {
     const postStub: sinon.SinonStub = stubPostResponses();
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     cmdInstance.action({
       options: {
@@ -397,30 +256,18 @@ describe(commands.FILE_CHECKIN, () => {
         type: 'overwrite'
       }
     }, () => {
-
       try {
         assert.equal(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativeUrl('%2Fsites%2Fproject-x%2FDocuments%2FTest1.docx')/checkin(comment='',checkintype=2)");
-        assert.equal(postStub.lastCall.args[0].headers.authorization, 'Bearer ABC');
         done();
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore([
-          request.post
-        ]);
       }
     });
   });
 
   it('should call correctly the API when comment specified', (done) => {
     const postStub: sinon.SinonStub = stubPostResponses();
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     cmdInstance.action({
       options: {
@@ -430,10 +277,8 @@ describe(commands.FILE_CHECKIN, () => {
         comment: 'abc1'
       }
     }, () => {
-
       try {
         assert.equal(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativeUrl('%2Fsites%2Fproject-x%2FDocuments%2FTest1.docx')/checkin(comment='abc1',checkintype=1)");
-        assert.equal(postStub.lastCall.args[0].headers.authorization, 'Bearer ABC');
         done();
       }
       catch (e) {
@@ -450,11 +295,6 @@ describe(commands.FILE_CHECKIN, () => {
   it('should call correctly the API when type is minor (id)', (done) => {
     const postStub: sinon.SinonStub = stubPostResponses();
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     cmdInstance.action({
       options: {
         debug: false,
@@ -463,30 +303,18 @@ describe(commands.FILE_CHECKIN, () => {
         type: 'minor'
       }
     }, () => {
-
       try {
         assert.equal(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileById(\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/checkin(comment='',checkintype=0)");
-        assert.equal(postStub.lastCall.args[0].headers.authorization, 'Bearer ABC');
         done();
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore([
-          request.post
-        ]);
       }
     });
   });
 
   it('should call correctly the API when type is overwrite (id)', (done) => {
     const postStub: sinon.SinonStub = stubPostResponses();
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     cmdInstance.action({
       options: {
@@ -496,30 +324,18 @@ describe(commands.FILE_CHECKIN, () => {
         type: 'overwrite'
       }
     }, () => {
-
       try {
         assert.equal(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileById(\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/checkin(comment='',checkintype=2)");
-        assert.equal(postStub.lastCall.args[0].headers.authorization, 'Bearer ABC');
         done();
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore([
-          request.post
-        ]);
       }
     });
   });
 
   it('should call correctly the API when comment specified (id)', (done) => {
     const postStub: sinon.SinonStub = stubPostResponses();
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     cmdInstance.action({
       options: {
@@ -529,19 +345,12 @@ describe(commands.FILE_CHECKIN, () => {
         comment: 'abc1'
       }
     }, () => {
-
       try {
         assert.equal(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileById(\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/checkin(comment='abc1',checkintype=1)");
-        assert.equal(postStub.lastCall.args[0].headers.authorization, 'Bearer ABC');
         done();
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore([
-          request.post
-        ]);
       }
     });
   });
@@ -665,28 +474,5 @@ describe(commands.FILE_CHECKIN, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.getAccessToken);
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        webUrl: "https://contoso.sharepoint.com",
-        debug: false
-      }
-    }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 });

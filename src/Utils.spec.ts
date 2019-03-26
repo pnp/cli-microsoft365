@@ -800,4 +800,14 @@ describe('Utils', () => {
     const actual = Utils.getUserNameFromAccessToken(accessToken);
     assert.equal(actual, 'Office 365 CLI Contoso');
   });
+
+  it('returns empty user name when access token is undefined available', () => {
+    const actual = Utils.getUserNameFromAccessToken(undefined as any);
+    assert.equal(actual, '');
+  });
+
+  it('returns empty user name when empty access token passed', () => {
+    const actual = Utils.getUserNameFromAccessToken('');
+    assert.equal(actual, '');
+  });
 });

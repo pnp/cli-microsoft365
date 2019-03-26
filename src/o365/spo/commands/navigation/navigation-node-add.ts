@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -8,7 +6,6 @@ import {
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -42,47 +39,30 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-    let siteAccessToken: string = '';
-
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
+    if (this.verbose) {
+      cmd.log(`Adding navigation node...`);
     }
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<any> => {
-        siteAccessToken = accessToken;
+    const nodesCollection: string = args.options.parentNodeId ?
+      `GetNodeById(${args.options.parentNodeId})/Children` :
+      (args.options.location as string).toLowerCase();
 
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}`);
-        }
+    const requestOptions: any = {
+      url: `${args.options.webUrl}/_api/web/navigation/${nodesCollection}`,
+      headers: {
+        accept: 'application/json;odata=nometadata',
+        'content-type': 'application/json;odata=nometadata'
+      },
+      body: {
+        Title: args.options.title,
+        Url: args.options.url,
+        IsExternal: args.options.isExternal === true
+      },
+      json: true
+    };
 
-        if (this.verbose) {
-          cmd.log(`Adding navigation node...`);
-        }
-
-        const nodesCollection: string = args.options.parentNodeId ?
-          `GetNodeById(${args.options.parentNodeId})/Children` :
-          (args.options.location as string).toLowerCase();
-
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/navigation/${nodesCollection}`,
-          headers: {
-            authorization: `Bearer ${siteAccessToken}`,
-            accept: 'application/json;odata=nometadata',
-            'content-type': 'application/json;odata=nometadata'
-          },
-          body: {
-            Title: args.options.title,
-            Url: args.options.url,
-            IsExternal: args.options.isExternal === true
-          },
-          json: true
-        };
-
-        return request.post(requestOptions);
-      })
+    request
+      .post(requestOptions)
       .then((res: any): void => {
         cmd.log(res);
 
@@ -168,28 +148,18 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
   }
 
   public commandHelp(args: CommandArgs, log: (message: string) => void): void {
-    const chalk = vorpal.chalk;
     log(vorpal.find(commands.NAVIGATION_NODE_ADD).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-  using the ${chalk.blue(commands.LOGIN)} command.
-                
-  Remarks:
-
-    To add a navigation node to a site, you have to first log in to
-    a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-
-  Examples:
+      `  Examples:
   
     Add a navigation node pointing to a SharePoint page to the top navigation
-      ${chalk.grey(config.delimiter)} ${commands.NAVIGATION_NODE_ADD} --webUrl https://contoso.sharepoint.com/sites/team-a --location TopNavigationBar --title About --url /sites/team-s/sitepages/about.aspx
+      ${commands.NAVIGATION_NODE_ADD} --webUrl https://contoso.sharepoint.com/sites/team-a --location TopNavigationBar --title About --url /sites/team-s/sitepages/about.aspx
 
     Add a navigation node pointing to an external page to the quick launch
-      ${chalk.grey(config.delimiter)} ${commands.NAVIGATION_NODE_ADD} --webUrl https://contoso.sharepoint.com/sites/team-a --location QuickLaunch --title "About us" --url https://contoso.com/about-us --isExternal
+      ${commands.NAVIGATION_NODE_ADD} --webUrl https://contoso.sharepoint.com/sites/team-a --location QuickLaunch --title "About us" --url https://contoso.com/about-us --isExternal
 
     Add a navigation node below an existing node
-      ${chalk.grey(config.delimiter)} ${commands.NAVIGATION_NODE_ADD} --webUrl https://contoso.sharepoint.com/sites/team-a --parentNodeId 2010 --title About --url /sites/team-s/sitepages/about.aspx
+      ${commands.NAVIGATION_NODE_ADD} --webUrl https://contoso.sharepoint.com/sites/team-a --parentNodeId 2010 --title About --url /sites/team-s/sitepages/about.aspx
 `);
   }
 }

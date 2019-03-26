@@ -2,11 +2,11 @@ import commands from '../../commands';
 import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth, { Site } from '../../SpoAuth';
 const command: Command = require('./web-remove');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import auth from '../../../../Auth';
 
 describe(commands.WEB_REMOVE, () => {
   let vorpal: Vorpal;
@@ -14,23 +14,22 @@ describe(commands.WEB_REMOVE, () => {
   let requests: any[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  let trackEvent: any;
-  let telemetry: any;
   let promptOptions: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    sinon.stub(command as any, 'getRequestDigestForSite').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc' }); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    auth.service.connected = true;
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       },
@@ -41,27 +40,22 @@ describe(commands.WEB_REMOVE, () => {
     };
     requests = [];
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.site = new Site();
-    telemetry = null;
     promptOptions = undefined;
   });
 
   afterEach(() => {
     Utils.restore([
       vorpal.find,
-      request.get,
       request.post
     ]);
   });
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.getAccessToken,
       auth.restoreAuth,
-      request.get,
-      request.post
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -70,47 +64,6 @@ describe(commands.WEB_REMOVE, () => {
 
   it('has a description', () => {
     assert.notEqual(command.description, null);
-  });
-
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.WEB_REMOVE);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not logged in to a SharePoint site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com', title: 'Documents' } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 
   it('supports debug mode', () => {
@@ -136,9 +89,9 @@ describe(commands.WEB_REMOVE, () => {
   it('should fail validation if the webUrl option is not a valid SharePoint site URL', () => {
     const actual = (command.validate() as CommandValidate)({
       options:
-        {
-          webUrl: 'foo'
-        }
+      {
+        webUrl: 'foo'
+      }
     });
     assert.notEqual(actual, true);
   });
@@ -187,11 +140,6 @@ describe(commands.WEB_REMOVE, () => {
   });
 
   it('should prompt before deleting subsite when confirmation argument not passed', (done) => {
-    Utils.restore((command as any).getRequestDigestForSite);
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { webUrl: 'https://contoso.sharepoint.com/subsite' } }, () => {
       let promptIssued = false;
 
@@ -216,16 +164,9 @@ describe(commands.WEB_REMOVE, () => {
       if (opts.url.indexOf('_api/web') > -1) {
         return Promise.resolve(true);
       }
-      if (opts.url.indexOf('contextinfo') > -1) {
-        return Promise.resolve('abc');
-      }
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         webUrl: "https://contoso.sharepoint.com/subsite",
@@ -235,10 +176,8 @@ describe(commands.WEB_REMOVE, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/web`) > -1 &&
-          r.headers.authorization &&
-          r.headers.authorization.indexOf('Bearer ') === 0 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0) {
+          r.headers['X-HTTP-Method'] === 'DELETE' &&
+          r.headers['accept'] === 'application/json;odata=nometadata') {
           correctRequestIssued = true;
         }
       });
@@ -260,16 +199,9 @@ describe(commands.WEB_REMOVE, () => {
       if (opts.url.indexOf('_api/web') > -1) {
         return Promise.resolve(true);
       }
-      if (opts.url.indexOf('contextinfo') > -1) {
-        return Promise.resolve('abc');
-      }
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     };
@@ -281,10 +213,8 @@ describe(commands.WEB_REMOVE, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/web`) > -1 &&
-          r.headers.authorization &&
-          r.headers.authorization.indexOf('Bearer ') === 0 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0) {
+          r.headers['X-HTTP-Method'] === 'DELETE' &&
+          r.headers['accept'] === 'application/json;odata=nometadata') {
           correctRequestIssued = true;
         }
       });
@@ -305,16 +235,9 @@ describe(commands.WEB_REMOVE, () => {
       if (opts.url.indexOf('_api/web') > -1) {
         return Promise.resolve(true);
       }
-      if (opts.url.indexOf('contextinfo') > -1) {
-        return Promise.resolve('abc');
-      }
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         verbose: true,
@@ -325,10 +248,8 @@ describe(commands.WEB_REMOVE, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/web`) > -1 &&
-          r.headers.authorization &&
-          r.headers.authorization.indexOf('Bearer ') === 0 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0) {
+          r.headers['X-HTTP-Method'] === 'DELETE' &&
+          r.headers['accept'] === 'application/json;odata=nometadata') {
           correctRequestIssued = true;
         }
       });
@@ -350,16 +271,9 @@ describe(commands.WEB_REMOVE, () => {
       if (opts.url.indexOf('_api/web') > -1) {
         return Promise.resolve(true);
       }
-      if (opts.url.indexOf('contextinfo') > -1) {
-        return Promise.resolve('abc');
-      }
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         debug: true,
@@ -370,10 +284,8 @@ describe(commands.WEB_REMOVE, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/web`) > -1 &&
-          r.headers.authorization &&
-          r.headers.authorization.indexOf('Bearer ') === 0 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0) {
+          r.headers['X-HTTP-Method'] === 'DELETE' &&
+          r.headers['accept'] === 'application/json;odata=nometadata') {
           correctRequestIssued = true;
         }
       });
@@ -394,16 +306,9 @@ describe(commands.WEB_REMOVE, () => {
       if (opts.url.indexOf('_api/web') > -1) {
         return Promise.reject('An error has occurred');
       }
-      if (opts.url.indexOf('contextinfo') > -1) {
-        return Promise.resolve('abc');
-      }
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         webUrl: "https://contoso.sharepoint.com/subsite",
@@ -418,6 +323,5 @@ describe(commands.WEB_REMOVE, () => {
         done(e);
       }
     });
-
   });
 });

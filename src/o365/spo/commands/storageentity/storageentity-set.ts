@@ -1,4 +1,3 @@
-import auth from '../../SpoAuth';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -35,10 +34,6 @@ class SpoStorageEntitySetCommand extends SpoCommand {
     return 'Sets tenant property on the specified SharePoint Online app catalog';
   }
 
-  protected requiresTenantAdmin(): boolean {
-    return true;
-  }
-
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.description = (!(!args.options.description)).toString();
@@ -47,18 +42,13 @@ class SpoStorageEntitySetCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    if (this.debug) {
-      cmd.log(`key option set. Retrieving access token for ${auth.service.resource}...`);
-    }
+    let spoAdminUrl: string = '';
 
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<ContextInfo> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
-
-        return this.getRequestDigest(cmd, this.debug);
+    this
+      .getSpoAdminUrl(cmd, this.debug)
+      .then((_spoAdminUrl: string): Promise<ContextInfo> => {
+        spoAdminUrl = _spoAdminUrl;
+        return this.getRequestDigest(spoAdminUrl);
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
@@ -66,9 +56,8 @@ class SpoStorageEntitySetCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+          url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': res.FormDigestValue
           },
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="24" ObjectPathId="23" /><ObjectPath Id="26" ObjectPathId="25" /><ObjectPath Id="28" ObjectPathId="27" /><Method Name="SetStorageEntity" Id="29" ObjectPathId="27"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.key)}</Parameter><Parameter Type="String">${Utils.escapeXml(args.options.value)}</Parameter><Parameter Type="String">${Utils.escapeXml(args.options.description || '')}</Parameter><Parameter Type="String">${Utils.escapeXml(args.options.comment || '')}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="23" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="25" ParentId="23" Name="GetSiteByUrl"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.appCatalogUrl)}</Parameter></Parameters></Method><Property Id="27" ParentId="25" Name="RootWeb" /></ObjectPaths></Request>`
@@ -142,26 +131,22 @@ class SpoStorageEntitySetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.STORAGEENTITY_SET).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online tenant admin site,
-  using the ${chalk.blue(commands.LOGIN)} command.
-                
+      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
+    the tenant admin site.
+    
   Remarks:
 
-    To set a tenant property, you have to first log in to a tenant admin site using the
-    ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso-admin.sharepoint.com`)}.
-    If you are logged in to a different site and will try to manage tenant properties,
-    you will get an error.
-
-    Tenant properties are stored in the app catalog site associated with that tenant.
-    To set a property, you have to specify the absolute URL of the app catalog site.
-    If you specify the URL of a site different than the app catalog, you will get an access denied error.
+    Tenant properties are stored in the app catalog site associated with that
+    tenant. To set a property, you have to specify the absolute URL of the app
+    catalog site. If you specify the URL of a site different than the app
+    catalog, you will get an access denied error.
 
   Examples:
   
-    Set ${chalk.grey('123')} as the value of the ${chalk.grey('AnalyticsId')} tenant property. Also include a description
-    and a comment for additional clarification of the usage of the property.
-      ${chalk.grey(config.delimiter)} ${commands.STORAGEENTITY_SET} -k AnalyticsId -v 123 -d 'Web analytics ID' -c 'Use on all sites'
-      -u https://contoso.sharepoint.com/sites/appcatalog
+    Set ${chalk.grey('123')} as the value of the ${chalk.grey('AnalyticsId')} tenant property. Also include
+    a description and a comment for additional clarification of the usage
+    of the property.
+      ${commands.STORAGEENTITY_SET} --key AnalyticsId --value 123 --description 'Web analytics ID' --comment 'Use on all sites' --appCatalogUrl https://contoso.sharepoint.com/sites/appcatalog
 
   More information:
 

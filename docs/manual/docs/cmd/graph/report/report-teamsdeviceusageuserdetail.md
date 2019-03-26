@@ -18,12 +18,7 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
-!!! important
-    Before using this command, log in to the Microsoft Graph, using the [graph login](../login.md) command.
-
 ## Remarks
-
-To get details about Microsoft Teams device usage by user, you have to first log in to the Microsoft Graph using the [graph login](../login.md) command, eg. `graph login`.
 
 As this report is only available for the past 28 days, date parameter value should be a date from that range.
 

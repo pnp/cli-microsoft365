@@ -1,5 +1,3 @@
-import auth from '../../GraphAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -38,27 +36,19 @@ class GraphGroupSettingRemoveCommand extends GraphCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const removeGroupSetting: () => void = (): void => {
-      auth
-        .ensureAccessToken(auth.service.resource, cmd, this.debug)
-        .then((accessToken: string): Promise<void> => {
-          if (this.debug) {
-            cmd.log(`Retrieved access token ${accessToken}.`);
-          }
+      if (this.verbose) {
+        cmd.log(`Removing group setting: ${args.options.id}...`);
+      }
 
-          if (this.verbose) {
-            cmd.log(`Removing group setting: ${args.options.id}...`);
-          }
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/groupSettings/${args.options.id}`,
+        headers: {
+          'accept': 'application/json;odata.metadata=none'
+        },
+      };
 
-          const requestOptions: any = {
-            url: `${auth.service.resource}/v1.0/groupSettings/${args.options.id}`,
-            headers: {
-              authorization: `Bearer ${accessToken}`,
-              'accept': 'application/json;odata.metadata=none'
-            },
-          };
-
-          return request.delete(requestOptions);
-        })
+      request
+        .delete(requestOptions)
         .then((): void => {
           if (this.verbose) {
             cmd.log(vorpal.chalk.green('DONE'));
@@ -121,14 +111,8 @@ class GraphGroupSettingRemoveCommand extends GraphCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to the Microsoft Graph,
-    using the ${chalk.blue(commands.LOGIN)} command.
-
-  Remarks:
+      `  Remarks:
   
-    To remove a group setting, you have to first log in to the Microsoft Graph
-    using the ${chalk.blue(commands.LOGIN)} command.
-
     If the specified ${chalk.grey('id')} doesn't refer to an existing group setting, you will
     get a ${chalk.grey('Resource does not exist')} error.
 
@@ -136,11 +120,11 @@ class GraphGroupSettingRemoveCommand extends GraphCommand {
 
     Remove group setting with ID ${chalk.grey('28beab62-7540-4db1-a23f-29a6018a3848')}.
     Will prompt for confirmation before removing the group setting
-      ${chalk.grey(config.delimiter)} ${this.name} --id 28beab62-7540-4db1-a23f-29a6018a3848
+      ${this.name} --id 28beab62-7540-4db1-a23f-29a6018a3848
 
     Remove group setting with ID ${chalk.grey('28beab62-7540-4db1-a23f-29a6018a3848')} without
     prompting for confirmation
-      ${chalk.grey(config.delimiter)} ${this.name} --id 28beab62-7540-4db1-a23f-29a6018a3848 --confirm
+      ${this.name} --id 28beab62-7540-4db1-a23f-29a6018a3848 --confirm
   `);
   }
 }

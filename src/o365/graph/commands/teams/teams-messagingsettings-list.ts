@@ -1,5 +1,3 @@
-import auth from '../../GraphAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
@@ -31,21 +29,17 @@ class GraphTeamsMessagingSettingsListCommand extends GraphCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((): Promise<Team> => {
-        const requestOptions: any = {
-          url: `${auth.service.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}?$select=messagingSettings`,
-          headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
-            accept: 'application/json;odata.metadata=none'
-          },
-          json: true
-        };
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}?$select=messagingSettings`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      json: true
+    };
 
-        return request.get(requestOptions);
-      })
-      .then((res: Team): void => {        
+    request
+      .get<Team>(requestOptions)
+      .then((res: Team): void => {
         cmd.log(res.messagingSettings);
 
         if (this.verbose) {
@@ -82,22 +76,12 @@ class GraphTeamsMessagingSettingsListCommand extends GraphCommand {
   }
 
   public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to the Microsoft Graph
-    using the ${chalk.blue(commands.LOGIN)} command.
-
-  Remarks:
-
-    To get messaging settings for a Microsoft Teams team, you have to first log
-    in to the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
-
-  Examples:
+      `  Examples:
          
     Get messaging settings for a Microsoft Teams team
-      ${chalk.grey(config.delimiter)} ${commands.TEAMS_MESSAGINGSETTINGS_LIST} --teamId 2609af39-7775-4f94-a3dc-0dd67657e900
+      ${commands.TEAMS_MESSAGINGSETTINGS_LIST} --teamId 2609af39-7775-4f94-a3dc-0dd67657e900
 `);
   }
 }

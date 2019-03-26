@@ -1,12 +1,10 @@
-import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import {
   CommandOption,
-  CommandValidate,
-  CommandError
+  CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
@@ -31,19 +29,14 @@ class SpoThemeGetCommand extends SpoCommand {
     return 'Gets custom theme information';
   }
 
-  protected requiresTenantAdmin(): boolean {
-    return true;
-  }
-
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<ContextInfo> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}`);
-        }
+    let spoAdminUrl: string = '';
 
-        return this.getRequestDigest(cmd, this.debug);
+    this
+      .getSpoAdminUrl(cmd, this.debug)
+      .then((_spoAdminUrl: string): Promise<ContextInfo> => {
+        spoAdminUrl = _spoAdminUrl;
+        return this.getRequestDigest(spoAdminUrl);
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
@@ -51,9 +44,8 @@ class SpoThemeGetCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+          url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': res.FormDigestValue
           },
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="12" ObjectPathId="11" /><ObjectPath Id="14" ObjectPathId="13" /><Query Id="15" ObjectPathId="13"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Constructor Id="11" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="13" ParentId="11" Name="GetTenantTheme"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.name)}</Parameter></Parameters></Method></ObjectPaths></Request>`
@@ -61,16 +53,21 @@ class SpoThemeGetCommand extends SpoCommand {
 
         return request.post(requestOptions);
       })
-      .then((res: string): void => {
+      .then((res: string): Promise<any> => {
         const json: ClientSvcResponse = JSON.parse(res);
-        const response: ClientSvcResponseContents = json[0];
+        const contents: ClientSvcResponseContents = json.find(x => { return x['ErrorInfo']; });
 
-        if (response.ErrorInfo) {
-          cmd.log(new CommandError(response.ErrorInfo.ErrorMessage));
+        if (contents && contents.ErrorInfo) {
+          return Promise.reject(contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error');
         }
-        else {
-          const { _ObjectType_, ...theme } = json[6];
-          cmd.log(theme);
+        return Promise.resolve(json);
+      })
+      .then((json: any): void => {
+        const { _ObjectType_, ...theme } = json[6];
+        cmd.log(theme);
+
+        if (this.verbose) {
+          cmd.log(vorpal.chalk.green('DONE'));
         }
 
         cb();
@@ -101,19 +98,13 @@ class SpoThemeGetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online tenant admin site,
-  using the ${chalk.blue(commands.LOGIN)} command.
-
-  Remarks:
-  
-    To get information about a theme, you have to first log in to a tenant
-    admin site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso-admin.sharepoint.com`)}.
-        
+      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
+    the tenant admin site.
+    
   Examples:
   
     Get information about a theme
-      ${chalk.grey(config.delimiter)} ${commands.THEME_GET} --name Contoso-Blue
+      ${commands.THEME_GET} --name Contoso-Blue
 
   More information:
 

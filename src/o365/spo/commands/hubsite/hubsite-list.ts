@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
 import { CommandOption } from '../../../../Command';
@@ -43,18 +41,16 @@ class SpoHubSiteListCommand extends SpoCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     let hubSites: HubSite[];
+    let spoUrl: string = '';
 
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<{ value: HubSite[]; }> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
+    this
+      .getSpoUrl(cmd, this.debug)
+      .then((_spoUrl: string): Promise<{ value: HubSite[]; }> => {
+        spoUrl = _spoUrl;
 
         const requestOptions: any = {
-          url: `${auth.site.url}/_api/hubsites`,
+          url: `${spoUrl}/_api/hubsites`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             accept: 'application/json;odata=nometadata'
           },
           json: true
@@ -76,9 +72,8 @@ class SpoHubSiteListCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          url: `${auth.site.url}/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/RenderListDataAsStream`,
+          url: `${spoUrl}/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/RenderListDataAsStream`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             accept: 'application/json;odata=nometadata'
           },
           json: true,
@@ -178,17 +173,11 @@ class SpoHubSiteListCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site using
-    the ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
+      `  Remarks:
 
     ${chalk.yellow('Attention:')} This command is based on a SharePoint API that is currently
     in preview and is subject to change once the API reached general
     availability.
-
-    To list hub sites, you have to first log in to a SharePoint site using
-    the ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
 
     When using the text output type (default), the command lists only the
     values of the ${chalk.grey('ID')}, ${chalk.grey('SiteUrl')} and ${chalk.grey('Title')} properties of the hub site. When setting
@@ -198,10 +187,10 @@ class SpoHubSiteListCommand extends SpoCommand {
   Examples:
   
     List hub sites in the current tenant
-      ${chalk.grey(config.delimiter)} ${this.name}
+      ${this.name}
 
     List hub sites, including their associated sites, in the current tenant. Associated site info is only shown in JSON output.
-      ${chalk.grey(config.delimiter)} ${this.name} --includeAssociatedSites --output json
+      ${this.name} --includeAssociatedSites --output json
 
   More information:
 

@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
 import {
@@ -7,7 +5,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import GlobalOptions from '../../../../GlobalOptions';
-import { Auth } from '../../../../Auth';
 import { PageHeader, CustomPageHeader, CustomPageHeaderServerProcessedContent, CustomPageHeaderProperties } from './PageHeader';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -143,43 +140,26 @@ class SpoPageHeaderSetCommand extends SpoCommand {
       }
     };
     let header: PageHeader | CustomPageHeader = defaultPageHeader;
-    let siteAccessToken: string = '';
     let pageFullName: string = args.options.pageName.toLowerCase();
     if (pageFullName.indexOf('.aspx') < 0) {
       pageFullName += '.aspx';
     }
     let title: string;
 
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
+    if (this.verbose) {
+      cmd.log(`Retrieving information about the page...`);
     }
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<{ IsPageCheckedOutToCurrentUser: boolean, Title: string; }> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}`);
-        }
+    const requestOptions: any = {
+      url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')?$select=IsPageCheckedOutToCurrentUser,Title`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      json: true
+    };
 
-        siteAccessToken = accessToken;
-
-        if (this.verbose) {
-          cmd.log(`Retrieving information about the page...`);
-        }
-
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')?$select=IsPageCheckedOutToCurrentUser,Title`,
-          headers: {
-            authorization: `Bearer ${siteAccessToken}`,
-            'accept': 'application/json;odata=nometadata'
-          },
-          json: true
-        };
-
-        return request.get(requestOptions);
-      })
+    request
+      .get<{ IsPageCheckedOutToCurrentUser: boolean, Title: string; }>(requestOptions)
       .then((res: { IsPageCheckedOutToCurrentUser: boolean, Title: string; }): Promise<void> => {
         title = res.Title;
 
@@ -190,7 +170,6 @@ class SpoPageHeaderSetCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/checkoutpage`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata'
           },
           json: true
@@ -253,9 +232,9 @@ class SpoPageHeaderSetCommand extends SpoCommand {
           }
 
           return Promise.all([
-            this.getSiteId(args.options.webUrl, siteAccessToken, this.verbose, this.debug, cmd),
-            this.getWebId(args.options.webUrl, siteAccessToken, this.verbose, this.debug, cmd),
-            this.getImageInfo(args.options.webUrl, args.options.imageUrl as string, siteAccessToken, this.verbose, this.debug, cmd),
+            this.getSiteId(args.options.webUrl, this.verbose, cmd),
+            this.getWebId(args.options.webUrl, this.verbose, cmd),
+            this.getImageInfo(args.options.webUrl, args.options.imageUrl as string, this.verbose, cmd),
           ]);
         }
         else {
@@ -283,7 +262,6 @@ class SpoPageHeaderSetCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/savepage`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata',
             'content-type': 'application/json;odata=nometadata'
           },
@@ -304,7 +282,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
 
-  private getSiteId(siteUrl: string, accessToken: string, verbose: boolean, debug: boolean, cmd: CommandInstance): Promise<any> {
+  private getSiteId(siteUrl: string, verbose: boolean, cmd: CommandInstance): Promise<any> {
     if (verbose) {
       cmd.log(`Retrieving information about the site collection...`);
     }
@@ -312,7 +290,6 @@ class SpoPageHeaderSetCommand extends SpoCommand {
     const requestOptions: any = {
       url: `${siteUrl}/_api/site?$select=Id`,
       headers: {
-        authorization: `Bearer ${accessToken}`,
         accept: 'application/json;odata=nometadata'
       },
       json: true
@@ -321,7 +298,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
     return request.get(requestOptions);
   }
 
-  private getWebId(siteUrl: string, accessToken: string, verbose: boolean, debug: boolean, cmd: CommandInstance): Promise<any> {
+  private getWebId(siteUrl: string, verbose: boolean, cmd: CommandInstance): Promise<any> {
     if (verbose) {
       cmd.log(`Retrieving information about the site...`);
     }
@@ -329,7 +306,6 @@ class SpoPageHeaderSetCommand extends SpoCommand {
     const requestOptions: any = {
       url: `${siteUrl}/_api/web?$select=Id`,
       headers: {
-        authorization: `Bearer ${accessToken}`,
         accept: 'application/json;odata=nometadata'
       },
       json: true
@@ -338,7 +314,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
     return request.get(requestOptions);
   }
 
-  private getImageInfo(siteUrl: string, imageUrl: string, accessToken: string, verbose: boolean, debug: boolean, cmd: CommandInstance): Promise<any> {
+  private getImageInfo(siteUrl: string, imageUrl: string, verbose: boolean, cmd: CommandInstance): Promise<any> {
     if (verbose) {
       cmd.log(`Retrieving information about the header image...`);
     }
@@ -346,7 +322,6 @@ class SpoPageHeaderSetCommand extends SpoCommand {
     const requestOptions: any = {
       url: `${siteUrl}/_api/web/getfilebyserverrelativeurl('${encodeURIComponent(imageUrl)}')?$select=ListId,UniqueId`,
       headers: {
-        authorization: `Bearer ${accessToken}`,
         accept: 'application/json;odata=nometadata'
       },
       json: true
@@ -463,14 +438,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site using 
-    the ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
-
-    To set modern page header, you have to first log in to a SharePoint site
-    using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
+      `  Remarks:
 
     If the specified ${chalk.grey('name')} doesn't refer to an existing modern page, you will get
     a ${chalk.grey('File doesn\'t exists')} error.
@@ -481,13 +449,13 @@ class SpoPageHeaderSetCommand extends SpoCommand {
   Examples:
   
     Reset the page header to default
-      ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --pageName home.aspx
+      ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --pageName home.aspx
 
     Use the specified image focused on the given coordinates in the page header
-      ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --pageName home.aspx --type Custom --imageUrl /sites/team-a/SiteAssets/hero.jpg --altText 'Sunset over the ocean' --translateX 42.3837520042758 --translateY 56.4285714285714
+      ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --pageName home.aspx --type Custom --imageUrl /sites/team-a/SiteAssets/hero.jpg --altText 'Sunset over the ocean' --translateX 42.3837520042758 --translateY 56.4285714285714
 
     Center the page title in the header and show the publishing date
-      ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --pageName home.aspx --textAlignment Center --showPublishDate
+      ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --pageName home.aspx --textAlignment Center --showPublishDate
 `);
   }
 }
