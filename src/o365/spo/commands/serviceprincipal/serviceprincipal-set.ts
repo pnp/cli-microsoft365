@@ -1,4 +1,3 @@
-import auth from '../../SpoAuth';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -41,22 +40,18 @@ class SpoServicePrincipalSetCommand extends SpoCommand {
     return [commands.SP_SET];
   }
 
-  protected requiresTenantAdmin(): boolean {
-    return true;
-  }
-
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     const enabled: boolean = args.options.enabled === 'true';
 
     const toggleServicePrincipal: () => void = (): void => {
-      auth
-        .ensureAccessToken(auth.service.resource, cmd, this.debug)
-        .then((accessToken: string): Promise<ContextInfo> => {
-          if (this.debug) {
-            cmd.log(`Retrieved access token ${accessToken}. Getting request digest...`);
-          }
+      let spoAdminUrl: string = '';
 
-          return this.getRequestDigest(cmd, this.debug);
+      this
+        .getSpoAdminUrl(cmd, this.debug)
+        .then((_spoAdminUrl: string): Promise<ContextInfo> => {
+          spoAdminUrl = _spoAdminUrl;
+
+          return this.getRequestDigest(spoAdminUrl);
         })
         .then((res: ContextInfo): Promise<string> => {
           if (this.verbose) {
@@ -64,9 +59,8 @@ class SpoServicePrincipalSetCommand extends SpoCommand {
           }
 
           const requestOptions: any = {
-            url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+            url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
             headers: {
-              authorization: `Bearer ${auth.service.accessToken}`,
               'X-RequestDigest': res.FormDigestValue
             },
             body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="28" ObjectPathId="27" /><SetProperty Id="29" ObjectPathId="27" Name="AccountEnabled"><Parameter Type="Boolean">${enabled}</Parameter></SetProperty><Method Name="Update" Id="30" ObjectPathId="27" /><Query Id="31" ObjectPathId="27"><Query SelectAllProperties="true"><Properties><Property Name="AccountEnabled" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="27" TypeId="{104e8f06-1e00-4675-99c6-1b9b504ed8d8}" /></ObjectPaths></Request>`
@@ -152,28 +146,25 @@ class SpoServicePrincipalSetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.SERVICEPRINCIPAL_SET).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online tenant admin site,
-  using the ${chalk.blue(commands.LOGIN)} command.
+      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
+    the tenant admin site.
         
   Remarks:
 
-    To enable or disable the service principal, you have to first log in to a tenant admin site using the
-    ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso-admin.sharepoint.com`)}.
-
-    Using the ${chalk.blue('-e, --enabled')} option you can specify whether the service principal should be
-    enabled or disabled. Use ${chalk.grey('true')} to enable the service principal and ${chalk.grey('false')} to
-    disable it.
+    Using the ${chalk.blue('-e, --enabled')} option you can specify whether the service
+    principal should be enabled or disabled. Use ${chalk.grey('true')} to enable the service
+    principal and ${chalk.grey('false')} to disable it.
 
   Examples:
   
     Enable the service principal. Will prompt for confirmation
-      ${chalk.grey(config.delimiter)} ${commands.SERVICEPRINCIPAL_SET} --enabled true
+      ${commands.SERVICEPRINCIPAL_SET} --enabled true
 
     Disable the service principal. Will prompt for confirmation
-      ${chalk.grey(config.delimiter)} ${commands.SERVICEPRINCIPAL_SET} --enabled false
+      ${commands.SERVICEPRINCIPAL_SET} --enabled false
 
     Enable the service principal without prompting for confirmation
-      ${chalk.grey(config.delimiter)} ${commands.SERVICEPRINCIPAL_SET} --enabled true --confirm
+      ${commands.SERVICEPRINCIPAL_SET} --enabled true --confirm
 `);
   }
 }

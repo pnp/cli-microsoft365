@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
 import {
@@ -7,7 +5,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import GlobalOptions from '../../../../GlobalOptions';
-import { Auth } from '../../../../Auth';
 import { CanvasSectionTemplate } from './clientsidepages';
 import { isNumber } from 'util';
 import { Control } from './canvasContent';
@@ -35,42 +32,26 @@ class SpoPageSectionAddCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-    let siteAccessToken: string = '';
     let pageFullName: string = args.options.name.toLowerCase();
     if (pageFullName.indexOf('.aspx') < 0) {
       pageFullName += '.aspx';
     }
     let canvasContent: Control[];
 
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
+    if (this.verbose) {
+      cmd.log(`Retrieving page information...`);
     }
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<{ CanvasContent1: string; IsPageCheckedOutToCurrentUser: boolean }> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}`);
-        }
+    const requestOptions: any = {
+      url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      json: true
+    };
 
-        siteAccessToken = accessToken;
-
-        if (this.verbose) {
-          cmd.log(`Retrieving page information...`);
-        }
-
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`,
-          headers: {
-            authorization: `Bearer ${siteAccessToken}`,
-            'accept': 'application/json;odata=nometadata'
-          },
-          json: true
-        };
-
-        return request.get(requestOptions);
-      })
+    request
+      .get<{ CanvasContent1: string; IsPageCheckedOutToCurrentUser: boolean }>(requestOptions)
       .then((res: { CanvasContent1: string; IsPageCheckedOutToCurrentUser: boolean }): Promise<void> => {
         canvasContent = JSON.parse(res.CanvasContent1 || "[{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]");
 
@@ -81,7 +62,6 @@ class SpoPageSectionAddCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/checkoutpage`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata'
           },
           json: true
@@ -116,7 +96,6 @@ class SpoPageSectionAddCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/savepage`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata',
             'content-type': 'application/json;odata=nometadata'
           },
@@ -262,14 +241,7 @@ class SpoPageSectionAddCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site
-    using the ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
-
-    To add a section to the modern page, you have to first log in to
-    a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
+      `  Remarks:
 
     If the specified ${chalk.grey('name')} doesn't refer to an existing modern 
     page, you will get a ${chalk.grey('File doesn\'t exists')} error.
@@ -277,7 +249,7 @@ class SpoPageSectionAddCommand extends SpoCommand {
   Examples:
   
     Add section to the modern page named ${chalk.grey('home.aspx')}
-      ${chalk.grey(config.delimiter)} ${this.name} --name home.aspx --webUrl https://contoso.sharepoint.com/sites/newsletter  --sectionTemplate OneColumn --order 1
+      ${this.name} --name home.aspx --webUrl https://contoso.sharepoint.com/sites/newsletter  --sectionTemplate OneColumn --order 1
 `);
   }
 }

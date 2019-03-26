@@ -19,11 +19,9 @@ Option|Description
 `--debug`|Runs command with debug logging
 
 !!! important
-    Before using this command, log in to a SharePoint Online tenant admin site, using the [spo login](../login.md) command.
+    To use this command you have to have permissions to access the tenant admin site.
 
 ## Remarks
-
-To view the status of an Office 365 CDN, you have to first log in to a tenant admin site using the [spo login](../login.md) command, eg. `spo login https://contoso-admin.sharepoint.com`. If you are logged in to a different site and will try to manage tenant properties, you will get an error.
 
 Using the `-t, --type` option you can choose whether you want to manage the settings of the Public (default) or Private CDN. If you don't use the option, the command will use the Public CDN.
 

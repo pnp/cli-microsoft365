@@ -1,4 +1,3 @@
-import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import request from '../../../../request';
@@ -20,17 +19,13 @@ interface Options extends GlobalOptions {
   filter?: string;
 }
 
-class SiteListCommand extends SpoCommand {
+class SpoSiteListCommand extends SpoCommand {
   public get name(): string {
     return commands.SITE_LIST;
   }
 
   public get description(): string {
     return 'Lists modern sites of the given type';
-  }
-
-  protected requiresTenantAdmin(): boolean {
-    return true;
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -44,15 +39,14 @@ class SiteListCommand extends SpoCommand {
     const siteType: string = args.options.type || 'TeamSite';
     const webTemplate: string = siteType === 'TeamSite' ? 'GROUP#0' : 'SITEPAGEPUBLISHING#0';
     let startIndex: string = '0';
+    let spoAdminUrl: string 
 
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<ContextInfo> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest for tenant admin at ${auth.site.url}...`);
-        }
+    this
+      .getSpoAdminUrl(cmd, this.debug)
+      .then((_spoAdminUrl: string): Promise<ContextInfo> => {
+        spoAdminUrl = _spoAdminUrl;
 
-        return this.getRequestDigest(cmd, this.debug);
+        return this.getRequestDigest(spoAdminUrl);
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
@@ -60,9 +54,8 @@ class SiteListCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+          url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': res.FormDigestValue
           },
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1" /><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="3" ParentId="1" Name="GetSitePropertiesFromSharePointByFilters"><Parameters><Parameter TypeId="{b92aeee2-c92c-4b67-abcc-024e471bc140}"><Property Name="Filter" Type="String">${Utils.escapeXml(args.options.filter || '')}</Property><Property Name="IncludeDetail" Type="Boolean">false</Property><Property Name="IncludePersonalSite" Type="Enum">0</Property><Property Name="StartIndex" Type="String">${startIndex}</Property><Property Name="Template" Type="String">${webTemplate}</Property></Parameter></Parameters></Method></ObjectPaths></Request>`
@@ -140,15 +133,10 @@ class SiteListCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online tenant admin site,
-      using the ${chalk.blue(commands.LOGIN)} command.
+      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
+    the tenant admin site.
    
   Remarks:
-
-    To list modern sites, you have to first log in to a tenant admin site using the
-    ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso-admin.sharepoint.com`)}.
-    If you are logged in to a different site and will try to list the available sites,
-    you will get an error.
 
     Using the ${chalk.blue('-f, --filter')} option you can specify which sites you want to retrieve.
     For example, to get sites with ${chalk.grey('project')} in their URL, use ${chalk.grey("Url -like 'project'")}
@@ -161,18 +149,18 @@ class SiteListCommand extends SpoCommand {
   Examples:
   
     List all modern team sites in the tenant you're logged in to
-      ${chalk.grey(config.delimiter)} ${commands.SITE_LIST}
+      ${commands.SITE_LIST}
 
     List all modern team sites in the tenant you're logged in to
-      ${chalk.grey(config.delimiter)} ${commands.SITE_LIST} --type TeamSite
+      ${commands.SITE_LIST} --type TeamSite
 
     List all modern communication sites in the tenant you're logged in to
-      ${chalk.grey(config.delimiter)} ${commands.SITE_LIST} --type CommunicationSite
+      ${commands.SITE_LIST} --type CommunicationSite
 
     List all modern team sites that contain 'project' in the URL
-      ${chalk.grey(config.delimiter)} ${commands.SITE_LIST} --type TeamSite --filter "Url -like 'project'"
+      ${commands.SITE_LIST} --type TeamSite --filter "Url -like 'project'"
 `);
   }
 }
 
-module.exports = new SiteListCommand();
+module.exports = new SpoSiteListCommand();

@@ -2,28 +2,26 @@ import commands from '../../commands';
 import Command, { CommandError, CommandOption } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth, { Site } from '../../SpoAuth';
 const command: Command = require('./tenant-appcatalogurl-get');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import auth from '../../../../Auth';
 
 describe(commands.TENANT_APPCATALOGURL_GET, () => {
   let vorpal: Vorpal;
   let log: any[];
   let requests: any[];
   let cmdInstance: any;
-  let trackEvent: any;
-  let telemetry: any;
 
   let cmdInstanceLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'ABC' }));
+    auth.service.connected = true;
+    auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
 
   beforeEach(() => {
@@ -31,31 +29,31 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
     log = [];
     requests = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.site = new Site();
-    telemetry = null;
   });
 
   afterEach(() => {
     Utils.restore([
       vorpal.find,
-      request.get,
-      request.post
+      request.get
     ]);
   });
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.ensureAccessToken,
       auth.restoreAuth,
-      request.get,
-      request.post
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
+    auth.service.spoUrl = undefined;
   });
 
   it('has correct name', () => {
@@ -65,33 +63,6 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
   it('has a description', () => {
     assert.notEqual(command.description, null);
   });
-
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.TENANT_APPCATALOGURL_GET);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
 
   it('supports debug mode', () => {
     const options = (command.options() as CommandOption[]);
@@ -103,7 +74,6 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
     });
     assert(containsDebugOption);
   });
-
 
   it('has help referring to the right command', () => {
     const cmd: any = {
@@ -149,10 +119,6 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
 
@@ -178,10 +144,6 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         debug: true
@@ -207,10 +169,6 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         debug: false
@@ -236,10 +194,6 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         debug: true

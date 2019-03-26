@@ -22,11 +22,9 @@ Option|Description
 `--debug`|Runs command with debug logging
 
 !!! important
-    Before using this command, log in to a SharePoint Online tenant admin site, using the [spo login](../login.md) command.
+    To use this command you have to have permissions to access the tenant admin site.
 
 ## Remarks
-
-To update site collection's properties, you have to first log in to a tenant admin site using the [spo login](../login.md) command, eg. `spo login https://contoso-admin.sharepoint.com`.
 
 If the specified url doesn't refer to an existing site collection, you will get a `404 - "404 FILE NOT FOUND"` error.
 

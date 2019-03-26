@@ -2,7 +2,7 @@ import commands from '../../commands';
 import Command, { CommandOption, CommandError, CommandTypes, CommandValidate } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth, { Site } from '../../SpoAuth';
+import auth from '../../../../Auth';
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
@@ -22,8 +22,6 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  let trackEvent: any;
-  let telemetry: any;
   let promptOptions: any;
 
   const getStubCalls = (opts: any) => {
@@ -132,17 +130,20 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    sinon.stub(command as any, 'getRequestDigestForSite').callsFake(() => Promise.resolve({ FormDigestValue: 'ABC' }));
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'ABC' }));
+    auth.service.connected = true;
+    auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       },
@@ -152,8 +153,6 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.site = new Site();
-    telemetry = null;
     (command as any).requestDigest = '';
     (command as any).webId = '';
     (command as any).siteId = '';
@@ -172,11 +171,12 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.getAccessToken,
       auth.restoreAuth,
-      (command as any).getRequestDigestForSite
+      (command as any).getRequestDigest,
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
+    auth.service.spoUrl = undefined;
   });
 
   it('has correct name', () => {
@@ -185,47 +185,6 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
   it('has a description', () => {
     assert.notEqual(command.description, null);
-  });
-
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.CONTENTTYPE_FIELD_REMOVE);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not logged in to a SharePoint site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 
   it('configures command types', () => {
@@ -268,10 +227,6 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = WEB_URL;
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
@@ -293,10 +248,6 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = WEB_URL;
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
@@ -324,10 +275,6 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = WEB_URL;
-    cmdInstance.action = command.action();
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     };
@@ -351,10 +298,6 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = WEB_URL;
-    cmdInstance.action = command.action();
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     };
@@ -380,10 +323,6 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = WEB_URL;
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
@@ -406,10 +345,6 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = WEB_URL;
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
@@ -436,9 +371,6 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = WEB_URL;
     cmdInstance.action = command.action();
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
@@ -461,14 +393,11 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       }
     });
   });
+
   it('doesnt remove the field link from web content type with debug - prompt: declined', (done) => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = WEB_URL;
-    cmdInstance.action = command.action();
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     };
@@ -494,10 +423,6 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = WEB_URL;
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
@@ -519,10 +444,6 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = WEB_URL;
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
@@ -548,10 +469,6 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = WEB_URL;
-    cmdInstance.action = command.action();
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     };
@@ -576,10 +493,6 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = WEB_URL;
-    cmdInstance.action = command.action();
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     };
@@ -606,10 +519,6 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = WEB_URL;
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
@@ -631,10 +540,6 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = WEB_URL;
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
@@ -657,14 +562,11 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       }
     });
   });
+
   it('doesnt remove the field link from web content type with update child content types with debug - prompt: confirmed', (done) => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = WEB_URL;
-    cmdInstance.action = command.action();
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     };
@@ -685,14 +587,11 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       }
     });
   });
+
   it('doesnt remove the field link from web content type with update child content types with debug - prompt: declined', (done) => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = WEB_URL;
-    cmdInstance.action = command.action();
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     };
@@ -714,16 +613,11 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     });
   });
 
-
   // LIST CT
   it('removes the field link from list content type', (done) => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = WEB_URL;
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
@@ -745,10 +639,6 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = WEB_URL;
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
@@ -770,14 +660,11 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       }
     });
   });
+
   it('removes the field link from list content type - prompt: confirmed', (done) => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = WEB_URL;
-    cmdInstance.action = command.action();
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     };
@@ -799,14 +686,11 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       }
     });
   });
+
   it('removes the field link from list content type - prompt: declined', (done) => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = WEB_URL;
-    cmdInstance.action = command.action();
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     };
@@ -834,10 +718,6 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = WEB_URL;
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
@@ -860,10 +740,6 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = WEB_URL;
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
@@ -889,10 +765,6 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = WEB_URL;
-    cmdInstance.action = command.action();
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     };
@@ -917,10 +789,6 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = WEB_URL;
-    cmdInstance.action = command.action();
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     };
@@ -946,11 +814,6 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     sinon.stub(request, 'post').callsFake(postStubFailedCalls);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = WEB_URL;
-    cmdInstance.action = command.action();
-
     cmdInstance.action({
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
@@ -972,10 +835,6 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     sinon.stub(request, 'post').callsFake(postStubFailedCalls);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = WEB_URL;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID, updateChildContentTypes: true, confirm: true } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Unknown Error')));
@@ -986,14 +845,11 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       }
     });
   });
+
   it('handles error when remove the field link from web content type with update child content types with prompt', (done) => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     sinon.stub(request, 'post').callsFake(postStubFailedCalls);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = WEB_URL;
-    cmdInstance.action = command.action();
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     };
@@ -1015,24 +871,48 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     });
   });
 
+  it('correctly handles a random API error', (done) => {
+    sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
+
+    cmdInstance.action({
+      options: {
+        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
+        updateChildContentTypes: true,
+        confirm: true,
+      }
+    }, (err?: any) => {
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
 
   // Fails validation
   it('fails validation if contentTypeId is not passed', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: WEB_URL, fieldLinkId: FIELD_LINK_ID } });
     assert.notEqual(actual, true);
   });
+
   it('fails validation if fieldLinkId is not passed', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID } });
     assert.notEqual(actual, true);
   });
+
   it('fails validation if webUrl is not passed', () => {
     const actual = (command.validate() as CommandValidate)({ options: { fieldLinkId: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID } });
     assert.notEqual(actual, true);
   });
+
   it('fails validation if webUrl is not correct', () => {
     const actual = (command.validate() as CommandValidate)({ options: { fieldLinkId: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID, webUrl: "test" } });
     assert.notEqual(actual, true);
   });
+
   it('fails validation if fieldLinkId is not valid GUID', () => {
     const actual = (command.validate() as CommandValidate)({ options: { fieldLinkId: 'xxx', webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID } });
     assert.notEqual(actual, true);
@@ -1042,23 +922,5 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
   it('passes validation', () => {
     const actual = (command.validate() as CommandValidate)({ options: { listId: LIST_ID, fieldLinkId: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID, webUrl: WEB_URL, debug: true } });
     assert.equal(actual, true);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.getAccessToken);
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = WEB_URL;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, webUrl: WEB_URL, contentTypeId: '0x0100FF0B2E33A3718B46A3909298D240FD93', fieldLinkId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', confirm: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 });

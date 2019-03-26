@@ -23,11 +23,9 @@ Option|Description
 `--debug`|Runs command with debug logging
 
 !!! important
-    Before using this command, log in to a SharePoint Online tenant admin site, using the [spo login](../login.md) command.
+    To use this command you have to have permissions to access the tenant admin site.
 
 ## Remarks
-
-To set a tenant property, you have to first log in to a tenant admin site using the [spo login](../login.md) command, eg. `spo login https://contoso-admin.sharepoint.com`. If you are logged in to a different site and will try to manage tenant properties, you will get an error.
 
 Tenant properties are stored in the app catalog site associated with that tenant. To set a property, you have to specify the absolute URL of the app catalog site. If you specify the URL of a site different than the app catalog, you will get an access denied error.
 

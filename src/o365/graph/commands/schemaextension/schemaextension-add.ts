@@ -1,5 +1,3 @@
-import auth from '../../GraphAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import request from '../../../../request';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -33,35 +31,31 @@ class GraphSchemaExtensionAdd extends GraphCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((): Promise<{}> => {
-        if (this.verbose) {
-          cmd.log(`Adding schema extension with id '${args.options.id}'...`);
-        }
+    if (this.verbose) {
+      cmd.log(`Adding schema extension with id '${args.options.id}'...`);
+    }
 
-        const targetTypes: string[] = args.options.targetTypes.split(',').map(t => t.trim());
-        const properties: any = JSON.parse(args.options.properties);
+    const targetTypes: string[] = args.options.targetTypes.split(',').map(t => t.trim());
+    const properties: any = JSON.parse(args.options.properties);
 
-        const requestOptions: any = {
-          url: `${auth.service.resource}/v1.0/schemaExtensions`,
-          headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
-            accept: 'application/json;odata.metadata=none',
-            'content-type': 'application/json'
-          },
-          body: {
-            id: args.options.id,
-            description: args.options.description,
-            owner: args.options.owner,
-            targetTypes,
-            properties
-          },
-          json: true
-        };
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/schemaExtensions`,
+      headers: {
+        accept: 'application/json;odata.metadata=none',
+        'content-type': 'application/json'
+      },
+      body: {
+        id: args.options.id,
+        description: args.options.description,
+        owner: args.options.owner,
+        targetTypes,
+        properties
+      },
+      json: true
+    };
 
-        return request.post(requestOptions);
-      })
+    request
+      .post(requestOptions)
       .then((res: any): void => {
         cmd.log(res);
 
@@ -165,14 +159,7 @@ class GraphSchemaExtensionAdd extends GraphCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to the Microsoft Graph
-    using the ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
-
-    To create a schema extension, you have to first log in to
-    the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
+      `  Remarks:
 
     To create a schema extension, you have to specify a unique ID for the schema
     extension. You can assign a value in one of two ways:
@@ -208,13 +195,13 @@ class GraphSchemaExtensionAdd extends GraphCommand {
   Examples:
   
     Create a schema extension
-      ${chalk.grey(config.delimiter)} ${this.name} --id MySchemaExtension --description "My schema extension" --targetTypes Group --owner 62375ab9-6b52-47ed-826b-58e47e0e304b --properties \`"[{""name"":""myProp1"",""type"":""Integer""},{""name"":""myProp2"",""type"":""String""}]\`
+      ${this.name} --id MySchemaExtension --description "My schema extension" --targetTypes Group --owner 62375ab9-6b52-47ed-826b-58e47e0e304b --properties \`"[{""name"":""myProp1"",""type"":""Integer""},{""name"":""myProp2"",""type"":""String""}]\`
 
     Create a schema extension with a verified domain
-      ${chalk.grey(config.delimiter)} ${this.name} --id contoso_MySchemaExtension --description "My schema extension" --targetTypes Group --owner 62375ab9-6b52-47ed-826b-58e47e0e304b --properties \`"[{""name"":""myProp1"",""type"":""Integer""},{""name"":""myProp2"",""type"":""String""}]\`
+      ${this.name} --id contoso_MySchemaExtension --description "My schema extension" --targetTypes Group --owner 62375ab9-6b52-47ed-826b-58e47e0e304b --properties \`"[{""name"":""myProp1"",""type"":""Integer""},{""name"":""myProp2"",""type"":""String""}]\`
 
     Create a schema extension in PowerShell
-      ${chalk.grey(config.delimiter)} ${this.name} --id MySchemaExtension --description "My schema extension" --targetTypes Group --owner 62375ab9-6b52-47ed-826b-58e47e0e304b --% --properties \`"[{""name"":""myProp1"",""type"":""Integer""},{""name"":""myProp2"",""type"":""String""}]\`
+      ${this.name} --id MySchemaExtension --description "My schema extension" --targetTypes Group --owner 62375ab9-6b52-47ed-826b-58e47e0e304b --% --properties \`"[{""name"":""myProp1"",""type"":""Integer""},{""name"":""myProp2"",""type"":""String""}]\`
 `);
   }
 }

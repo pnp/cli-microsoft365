@@ -20,13 +20,6 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
-!!! important
-    Before using this command, log in to a SharePoint Online site, using the [spo login](../login.md) command.
-
-## Remarks
-
-To grant access to a site design, you have to first log in to a SharePoint site using the [spo login](../login.md) command, eg. `spo login https://contoso.sharepoint.com`.
-
 ## Examples
 
 Grant user with alias _PattiF_ view permission to the specified site design

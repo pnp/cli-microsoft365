@@ -1,4 +1,3 @@
-import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import request from '../../../../request';
@@ -30,10 +29,6 @@ class SiteClassicListCommand extends SpoCommand {
     return 'Lists sites of the given type';
   }
 
-  protected requiresTenantAdmin(): boolean {
-    return true;
-  }
-
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.webTemplate = args.options.webTemplate;
@@ -45,15 +40,14 @@ class SiteClassicListCommand extends SpoCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     const webTemplate: string = args.options.webTemplate || '';
     const includeOneDriveSites: boolean = args.options.includeOneDriveSites || false;
+    let spoAdminUrl: string = '';
 
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<ContextInfo> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest for tenant admin at ${auth.site.url}...`);
-        }
+    this
+      .getSpoAdminUrl(cmd, this.debug)
+      .then((_spoAdminUrl: string): Promise<ContextInfo> => {
+        spoAdminUrl = _spoAdminUrl;
 
-        return this.getRequestDigest(cmd, this.debug);
+        return this.getRequestDigest(spoAdminUrl);
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
@@ -63,9 +57,8 @@ class SiteClassicListCommand extends SpoCommand {
         const personalSite: string = includeOneDriveSites === false ? '0' : '1';
 
         const requestOptions: any = {
-          url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+          url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': res.FormDigestValue
           },
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1" /><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="3" ParentId="1" Name="GetSitePropertiesFromSharePointByFilters"><Parameters><Parameter TypeId="{b92aeee2-c92c-4b67-abcc-024e471bc140}"><Property Name="Filter" Type="String">${Utils.escapeXml(args.options.filter || '')}</Property><Property Name="IncludeDetail" Type="Boolean">false</Property><Property Name="IncludePersonalSite" Type="Enum">${personalSite}</Property><Property Name="StartIndex" Type="String">0</Property><Property Name="Template" Type="String">${webTemplate}</Property></Parameter></Parameters></Method></ObjectPaths></Request>`
@@ -133,40 +126,36 @@ class SiteClassicListCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online tenant admin site,
-      using the ${chalk.blue(commands.LOGIN)} command.
+      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
+    the tenant admin site.
    
   Remarks:
 
-    To list classic sites, you have to first log in to a tenant admin site using the
-    ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso-admin.sharepoint.com`)}.
-    If you are logged in to a different site and will try to list the available sites,
-    you will get an error.
+    Using the ${chalk.blue('-t, --webTemplate')} option you can specify which sites you want
+    to retrieve. For example, to get sites with the ${chalk.grey('STS#0')} as their web template,
+    use ${chalk.grey("--webTemplate STS#0")} as the option.
 
-    Using the ${chalk.blue('-t, --webTemplate')} option you can specify which sites you want to retrieve.
-    For example, to get sites with the ${chalk.grey('STS#0')} as their web template, use ${chalk.grey("--webTemplate STS#0")}
-    as the option.
+    Using the ${chalk.blue('-f, --filter')} option you can specify which sites you want
+    to retrieve. For example, to get sites with ${chalk.grey('project')} in their URL, use
+    ${chalk.grey("Url -like 'project'")} as the filter.
 
-    Using the ${chalk.blue('-f, --filter')} option you can specify which sites you want to retrieve.
-    For example, to get sites with ${chalk.grey('project')} in their URL, use ${chalk.grey("Url -like 'project'")}
-    as the filter.
-
-    Using the ${chalk.blue('--includeOneDriveSites')} option you can specify whether you want to retrieve OneDrive sites or not.
-    For example, to retrieve OneDrive sites, add ${chalk.grey('--includeOneDriveSites')} as an option.
+    Using the ${chalk.blue('--includeOneDriveSites')} option you can specify whether you want
+    to retrieve OneDrive sites or not. For example, to retrieve OneDrive sites,
+    add ${chalk.grey('--includeOneDriveSites')} as an option.
   
   Examples:
   
     List all sites in the tenant you're logged in to
-      ${chalk.grey(config.delimiter)} ${commands.SITE_CLASSIC_LIST}
+      ${commands.SITE_CLASSIC_LIST}
 
       List all sites (including OneDrive sites) in the tenant you're logged in to
-      ${chalk.grey(config.delimiter)} ${commands.SITE_CLASSIC_LIST} --includeOneDriveSites    
+      ${commands.SITE_CLASSIC_LIST} --includeOneDriveSites    
 
     List all classic team sites in the tenant you're logged in to
-      ${chalk.grey(config.delimiter)} ${commands.SITE_CLASSIC_LIST} --webTemplate STS#0
+      ${commands.SITE_CLASSIC_LIST} --webTemplate STS#0
 
     List all classic project sites that contain 'project' in the URL
-      ${chalk.grey(config.delimiter)} ${commands.SITE_CLASSIC_LIST} --webTemplate PROJECTSITE#0 --filter "Url -like 'project'"
+      ${commands.SITE_CLASSIC_LIST} --webTemplate PROJECTSITE#0 --filter "Url -like 'project'"
 `);
   }
 }

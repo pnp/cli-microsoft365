@@ -21,11 +21,9 @@ Option|Description
 `--debug`|Runs command with debug logging
 
 !!! important
-    Before using this command, log in to a SharePoint Online tenant admin site, using the [spo login](../login.md) command.
+    To use this command you have to have permissions to access the tenant admin site.
 
 ## Remarks
-
-To list classic sites, you have to first log in to a tenant admin site using the [spo login](../login.md) command, eg. `spo login https://contoso-admin.sharepoint.com`. If you are logged in to a different site and will try to list the available sites, you will get an error.
 
 Using the `-t, --webTemplate` option you can specify which sites you want to retrieve. For example, to get sites with the `STS#0` as their web template, use `--webTemplate STS#0` as the option.
 

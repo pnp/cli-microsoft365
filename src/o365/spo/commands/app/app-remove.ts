@@ -1,6 +1,3 @@
-import auth from '../../SpoAuth';
-import { Auth } from '../../../../Auth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -44,36 +41,21 @@ class SpoAppRemoveCommand extends SpoAppBaseCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
-    let siteAccessToken: string = '';
-    let appCatalogSiteUrl: string = '';
 
     const removeApp: () => void = (): void => {
-      auth
-        .ensureAccessToken(auth.site.url, cmd, this.debug)
-        .then((accessToken: string): Promise<string> => {
-          return this.getAppCatalogSiteUrl(cmd, auth.site.url, accessToken, args)
+      this
+        .getSpoUrl(cmd, this.debug)
+        .then((spoUrl: string): Promise<string> => {
+          return this.getAppCatalogSiteUrl(cmd, spoUrl, args)
         })
-        .then((appCatalogUrl: string): Promise<string> => {
-          appCatalogSiteUrl = appCatalogUrl;
-
+        .then((appCatalogUrl: string): Promise<void> => {
           if (this.debug) {
-            cmd.log(`Retrieved app catalog URL ${appCatalogSiteUrl}`);
-          }
-
-          const resource: string = Auth.getResourceFromUrl(appCatalogSiteUrl);
-          return auth.getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug);
-        })
-        .then((accessToken: string): Promise<void> => {
-          siteAccessToken = accessToken;
-
-          if (this.debug) {
-            cmd.log(`Retrieved access token for the app catalog ${siteAccessToken}. Removing app from the app catalog...`);
+            cmd.log(`Retrieved app catalog URL ${appCatalogUrl}. Removing app from the app catalog...`);
           }
 
           const requestOptions: any = {
-            url: `${appCatalogSiteUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${encodeURIComponent(args.options.id)}')/remove`,
+            url: `${appCatalogUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${encodeURIComponent(args.options.id)}')/remove`,
             headers: {
-              authorization: `Bearer ${siteAccessToken}`,
               accept: 'application/json;odata=nometadata'
             }
           };
@@ -164,15 +146,8 @@ class SpoAppRemoveCommand extends SpoAppBaseCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.APP_REMOVE).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint site,
-    using the ${chalk.blue(commands.LOGIN)} command.
-
-  Remarks:
+      `  Remarks:
   
-    To remove an app from the tenant app catalog, you have to first log in to
-    a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-
     When removing an app from the tenant app catalog, it's not necessary
     to specify the tenant app catalog URL. When the URL is not specified,
     the CLI will try to resolve the URL itself. Specifying the app catalog URL
@@ -192,20 +167,20 @@ class SpoAppRemoveCommand extends SpoAppBaseCommand {
     Remove the specified app from the tenant app catalog. Try to resolve the URL
     of the tenant app catalog automatically. Additionally, will prompt for
     confirmation before actually removing the app.
-      ${chalk.grey(config.delimiter)} ${commands.APP_REMOVE} --id 058140e3-0e37-44fc-a1d3-79c487d371a3
+      ${commands.APP_REMOVE} --id 058140e3-0e37-44fc-a1d3-79c487d371a3
 
     Remove the specified app from the tenant app catalog located at
     ${chalk.grey('https://contoso.sharepoint.com/sites/apps')}. Additionally, will prompt
     for confirmation before actually retracting the app.
-      ${chalk.grey(config.delimiter)} ${commands.APP_REMOVE} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --appCatalogUrl https://contoso.sharepoint.com/sites/apps
+      ${commands.APP_REMOVE} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --appCatalogUrl https://contoso.sharepoint.com/sites/apps
 
     Remove the specified app from the tenant app catalog located at
     ${chalk.grey('https://contoso.sharepoint.com/sites/apps')}. Don't prompt for confirmation.
-      ${chalk.grey(config.delimiter)} ${commands.APP_REMOVE} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --appCatalogUrl https://contoso.sharepoint.com/sites/apps --confirm
+      ${commands.APP_REMOVE} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --appCatalogUrl https://contoso.sharepoint.com/sites/apps --confirm
 
     Remove the specified app from a site collection app catalog 
     of site ${chalk.grey('https://contoso.sharepoint.com/sites/site1')}.
-      ${chalk.grey(config.delimiter)} ${commands.APP_REMOVE} --id d95f8c94-67a1-4615-9af8-361ad33be93c --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
+      ${commands.APP_REMOVE} --id d95f8c94-67a1-4615-9af8-361ad33be93c --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
     
   More information:
   

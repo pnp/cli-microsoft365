@@ -2,7 +2,7 @@ import commands from '../../commands';
 import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth, { Site } from '../../SpoAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./propertybag-remove');
 import * as assert from 'assert';
 import request from '../../../../request';
@@ -15,8 +15,6 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  let trackEvent: any;
-  let telemetry: any;
   let promptOptions: any;
   const stubAllPostRequests = (
     requestObjectIdentityResp: any = null,
@@ -24,16 +22,6 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
     removePropertyResp: any = null
   ): sinon.SinonStub => {
     return sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/common/oauth2/token') > -1) {
-        return Promise.resolve('abc');
-      }
-
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
       // fake requestObjectIdentity
       if (opts.body.indexOf('3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a') > -1) {
         if (requestObjectIdentityResp) {
@@ -95,16 +83,21 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({
+      FormDigestValue: 'abc'
+    }));
+    auth.service.connected = true;
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       },
@@ -114,24 +107,23 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.site = new Site();
-    telemetry = null;
     promptOptions = undefined;
   });
 
   afterEach(() => {
     Utils.restore([
       vorpal.find,
-      request.post
+      request.post,
+      (command as any).removeProperty
     ]);
   });
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.getAccessToken,
-      auth.restoreAuth
+      auth.restoreAuth,
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -142,55 +134,9 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
     assert.notEqual(command.description, null);
   });
 
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {}, appCatalogUrl: 'https://contoso-admin.sharepoint.com' }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { webUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
-      try {
-        assert.equal(telemetry.name, commands.PROPERTYBAG_REMOVE);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not logged in to a SharePoint site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { webUrl: 'https://contoso.sharepoint.com/sites/abc' } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('should remove property without prompting with confirmation argument', (done) => {
     stubAllPostRequests();
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         verbose: false,
@@ -212,11 +158,6 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   it('should property be removed successfully (verbose) without prompting with confirmation argument', (done) => {
     stubAllPostRequests();
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         verbose: true,
@@ -236,10 +177,6 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   });
 
   it('should prompt before removing property when confirmation argument not passed', (done) => {
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options:
         {
@@ -266,10 +203,6 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   it('should abort property remove when prompt not confirmed', (done) => {
     const postCallsSpy: sinon.SinonStub = stubAllPostRequests();
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     };
@@ -293,10 +226,6 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
     const postCallsSpy: sinon.SinonStub = stubAllPostRequests();
     const removePropertySpy = sinon.spy((command as any), 'removeProperty');
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     };
@@ -308,26 +237,18 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       }
     }, () => {
       try {
-        assert(postCallsSpy.calledThrice === true);
+        assert(postCallsSpy.calledTwice === true);
         assert(removePropertySpy.calledOnce === true);
         done();
       }
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore((command as any)['removeProperty']);
-      }
     });
   });
 
   it('should call removeProperty when folder is not specified', (done) => {
     stubAllPostRequests();
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const removePropertySpy = sinon.spy((command as any), 'removeProperty');
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -341,7 +262,6 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         assert(removePropertySpy.calledWith(objIdentity, options));
         assert(removePropertySpy.calledOnce === true);
@@ -349,10 +269,6 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore(request.post);
-        Utils.restore((command as any)['removeProperty']);
       }
     });
   });
@@ -370,11 +286,6 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
         "ServerRelativeUrl": "\u002f"
       }]));
     }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const removePropertySpy = sinon.spy((command as any), 'removeProperty');
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -388,7 +299,6 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         assert(removePropertySpy.calledWith(objIdentity, options));
         assert(removePropertySpy.calledOnce === true);
@@ -397,20 +307,11 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-        Utils.restore((command as any)['removeProperty']);
-      }
     });
   });
 
   it('should call removeProperty when list folder is specified', (done) => {
     stubAllPostRequests();
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const removePropertySpy = sinon.spy((command as any), 'removeProperty');
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com/sites/abc',
@@ -424,7 +325,6 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         assert(removePropertySpy.calledWith(objIdentity, options));
         assert(removePropertySpy.calledOnce === true);
@@ -433,20 +333,11 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-        Utils.restore((command as any)['removeProperty']);
-      }
     });
   });
 
   it('should send correct remove request body when folder is not specified', (done) => {
     const requestStub: sinon.SinonStub  = stubAllPostRequests();
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
@@ -458,7 +349,6 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         const bodyPayload = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetFieldValue" Id="206" ObjectPathId="205"><Parameters><Parameter Type="String">${(options as any).key}</Parameter><Parameter Type="Null" /></Parameters></Method><Method Name="Update" Id="207" ObjectPathId="198" /></Actions><ObjectPaths><Property Id="205" ParentId="198" Name="AllProperties" /><Identity Id="198" Name="${objIdentity.objectIdentity}" /></ObjectPaths></Request>`
         assert(requestStub.calledWith(sinon.match({body:bodyPayload})));
@@ -467,19 +357,11 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should send correct remove request body when folder is specified', (done) => {
     const requestStub: sinon.SinonStub  = stubAllPostRequests();
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
@@ -492,7 +374,6 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         const bodyPayload = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetFieldValue" Id="206" ObjectPathId="205"><Parameters><Parameter Type="String">${(options as any).key}</Parameter><Parameter Type="Null" /></Parameters></Method><Method Name="Update" Id="207" ObjectPathId="198" /></Actions><ObjectPaths><Property Id="205" ParentId="198" Name="Properties" /><Identity Id="198" Name="${objIdentity.objectIdentity}" /></ObjectPaths></Request>`
         assert(requestStub.calledWith(sinon.match({body:bodyPayload})));
@@ -501,19 +382,11 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should correctly handle requestObjectIdentity reject promise', (done) => {
     stubAllPostRequests(new Promise<any>((resolve, reject) => { return reject('requestObjectIdentity error'); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
@@ -529,20 +402,12 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should correctly handle requestObjectIdentity ClientSvc error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "requestObjectIdentity ClientSvc error" } }]);
     stubAllPostRequests(new Promise<any>((resolve, reject) => { return resolve(error); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
@@ -558,19 +423,11 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should correctly handle requestFolderObjectIdentity reject promise', (done) => {
     stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return reject('abc'); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
@@ -587,19 +444,12 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should correctly handle requestFolderObjectIdentity ClientSvc error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "requestFolderObjectIdentity error" } }]);
     stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return resolve(error); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
@@ -615,19 +465,12 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should correctly handle requestFolderObjectIdentity ClientSvc empty error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "" } }]);
     stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return resolve(error); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
@@ -643,18 +486,11 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should requestFolderObjectIdentity reject promise if _ObjectIdentity_ not found', (done) => {
     stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return resolve('[{}]') }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
@@ -670,18 +506,11 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should correctly handle removeProperty reject promise response', (done) => {
     stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return reject('removeProperty promise error'); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const removePropertySpy = sinon.spy((command as any), 'removeProperty');
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -699,19 +528,12 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should correctly handle removeProperty ClientSvc error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "removeProperty error" } }]);
     stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return resolve(error); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
@@ -727,19 +549,12 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.post);
-      }
     });
   });
 
   it('should correctly handle removeProperty ClientSvc empty error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "" } }]);
     stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return resolve(error); }));
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
@@ -754,9 +569,6 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore(request.post);
       }
     });
   });
@@ -883,32 +695,5 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.getAccessToken);
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        webUrl: 'https://contoso.sharepoint.com',
-        key: 'key1',
-        confirm: true
-      }
-    }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        Utils.restore(auth.getAccessToken);
-      }
-    });
   });
 });

@@ -24,13 +24,6 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
-!!! important
-    Before using this command, log in to a SharePoint Online site, using the [spo login](../login.md) command.
-
-## Remarks
-
-To remove a field, you have to first log in to a SharePoint Online site using the [spo login](../login.md) command, eg. `spo login https://contoso.sharepoint.com`.
-
 ## Examples
 
 Remove the site column with the specified ID, located in site _https://contoso.sharepoint.com/sites/contoso-sales_

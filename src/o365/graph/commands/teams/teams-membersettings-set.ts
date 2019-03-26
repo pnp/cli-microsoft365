@@ -1,5 +1,3 @@
-import auth from '../../GraphAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
@@ -50,30 +48,26 @@ class GraphTeamsMemberSettingsSetCommand extends GraphCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((): Promise<{}> => {
-        const body: any = {
-          memberSettings: {}
-        };
-        GraphTeamsMemberSettingsSetCommand.props.forEach(p => {
-          if (typeof (args.options as any)[p] !== 'undefined') {
-            body.memberSettings[p] = (args.options as any)[p] === 'true';
-          }
-        });
+    const body: any = {
+      memberSettings: {}
+    };
+    GraphTeamsMemberSettingsSetCommand.props.forEach(p => {
+      if (typeof (args.options as any)[p] !== 'undefined') {
+        body.memberSettings[p] = (args.options as any)[p] === 'true';
+      }
+    });
 
-        const requestOptions: any = {
-          url: `${auth.service.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}`,
-          headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
-            accept: 'application/json;odata.metadata=none'
-          },
-          body: body,
-          json: true
-        };
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      body: body,
+      json: true
+    };
 
-        return request.patch(requestOptions);
-      })
+    request
+      .patch(requestOptions)
       .then((): void => {
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
@@ -144,25 +138,15 @@ class GraphTeamsMemberSettingsSetCommand extends GraphCommand {
   }
 
   public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to the Microsoft Graph
-    using the ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
-
-    To update member settings of the specified Microsoft Teams team, you have to
-    first log in to the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
-
-  Examples:
+      `  Examples:
   
     Allow members to create and edit channels
-      ${chalk.grey(config.delimiter)} ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --allowCreateUpdateChannels true
+      ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --allowCreateUpdateChannels true
 
     Disallow members to add and remove apps
-      ${chalk.grey(config.delimiter)} ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --allowAddRemoveApps false
+      ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --allowAddRemoveApps false
 `);
   }
 }

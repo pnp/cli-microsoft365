@@ -1,18 +1,17 @@
-import auth from '../GraphAuth';
-import config from '../../../config';
-import commands from '../commands';
-import GlobalOptions from '../../../GlobalOptions';
+import auth from '../../Auth';
+import commands from './commands';
+import GlobalOptions from '../../GlobalOptions';
 import Command, {
   CommandCancel,
   CommandOption,
   CommandValidate,
-  CommandError
-} from '../../../Command';
-import appInsights from '../../../appInsights';
-import { AuthType } from '../../../Auth';
+  CommandError,
+  CommandAction
+} from '../../Command';
+import { AuthType } from '../../Auth';
 import * as fs from 'fs';
 
-const vorpal: Vorpal = require('../../../vorpal-init');
+const vorpal: Vorpal = require('../../vorpal-init');
 
 interface CommandArgs {
   options: Options;
@@ -26,36 +25,25 @@ interface Options extends GlobalOptions {
   thumbprint?: string;
 }
 
-class GraphLoginCommand extends Command {
+class LoginCommand extends Command {
   public get name(): string {
     return `${commands.LOGIN}`;
   }
 
   public get description(): string {
-    return 'Log in to the Microsoft Graph';
-  }
-
-  public alias(): string[] | undefined {
-    return [commands.CONNECT];
+    return 'Log in to Office 365';
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     const chalk: any = vorpal.chalk;
 
-    this.showDeprecationWarning(cmd, commands.CONNECT, commands.LOGIN);
-
-    appInsights.trackEvent({
-      name: this.getUsedCommandName(cmd)
-    });
-
     // disconnect before re-connecting
     if (this.debug) {
-      cmd.log(`Logging out from Microsoft Graph...`);
+      cmd.log(`Logging out from Office 365...`);
     }
 
     const logout: () => void = (): void => {
       auth.service.logout();
-      auth.service.resource = 'https://graph.microsoft.com';
       if (this.verbose) {
         cmd.log(chalk.green('DONE'));
       }
@@ -63,7 +51,7 @@ class GraphLoginCommand extends Command {
 
     const login: () => void = (): void => {
       if (this.verbose) {
-        cmd.log(`Authenticating with Microsoft Graph...`);
+        cmd.log(`Signing in to Office 365...`);
       }
 
       switch (args.options.authType) {
@@ -80,16 +68,13 @@ class GraphLoginCommand extends Command {
       }
 
       auth
-        .ensureAccessToken(auth.service.resource, cmd, this.debug)
-        .then((accessToken: string): Promise<void> => {
+        .ensureAccessToken(auth.defaultResource, cmd, this.debug)
+        .then((): void => {
           if (this.verbose) {
             cmd.log(chalk.green('DONE'));
           }
 
           auth.service.connected = true;
-          return auth.storeConnectionInfo();
-        })
-        .then((): void => {
           cb();
         }, (rej: string): void => {
           if (this.debug) {
@@ -119,6 +104,22 @@ class GraphLoginCommand extends Command {
         logout();
         login();
       });
+  }
+
+  public action(): CommandAction {
+    const cmd: Command = this;
+    return function (this: CommandInstance, args: CommandArgs, cb: (err?: any) => void) {
+      auth
+        .restoreAuth()
+        .then((): void => {
+          args = (cmd as any).processArgs(args);
+          (cmd as any).initAction(args, this);
+
+          cmd.commandAction(this, args, cb);
+        }, (error: any): void => {
+          cb(new CommandError(error));
+        });
+    }
   }
 
   public cancel(): CommandCancel {
@@ -192,7 +193,7 @@ class GraphLoginCommand extends Command {
     log(
       `  Remarks:
     
-    Using the ${chalk.blue(commands.LOGIN)} command you can log in to the Microsoft Graph.
+    Using the ${chalk.blue(commands.LOGIN)} command you log in to Office 365.
 
     By default, the ${chalk.blue(commands.LOGIN)} command uses device code OAuth flow
     to log in to the Microsoft Graph. Alternatively, you can
@@ -200,47 +201,46 @@ class GraphLoginCommand extends Command {
     convenient for CI/CD scenarios, but which come with their own limitations.
     See the Office 365 CLI manual for more information.
     
-    When logging in to the Microsoft Graph, the ${chalk.blue(commands.LOGIN)} command stores
+    When logging in to Office 365, the ${chalk.blue(commands.LOGIN)} command stores
     in memory the access token and the refresh token. Both tokens are cleared
     from memory after exiting the CLI or by calling the ${chalk.blue(commands.LOGOUT)}
     command.
 
-    When logging in to the Microsoft Graph using the user name and
-    password, next to the access and refresh token, the Office 365 CLI will
-    store the user credentials so that it can automatically re-authenticate if
-    necessary. Similarly to the tokens, the credentials are removed by
-    re-authenticating using the device code or by calling the ${chalk.blue(commands.LOGOUT)}
-    command.
+    When logging in to Office 365 using the user name and password, next to the
+    access and refresh token, the Office 365 CLI will store the user credentials
+    so that it can automatically re-authenticate if necessary. Similarly to the
+    tokens, the credentials are removed by re-authenticating using the device
+    code or by calling the ${chalk.blue(commands.LOGOUT)} command.
 
-    When logging in to the Microsoft Graph using a certificate,
-    the Office 365 CLI will store the contents of the certificate so that it can
-    automatically re-authenticate if necessary. The contents of the certificate
-    are removed by re-authenticating using the device code or by calling
+    When logging in to the Office 365 using a certificate, the Office 365 CLI
+    will store the contents of the certificate so that it can automatically
+    re-authenticate if necessary. The contents of the certificate are removed
+    by re-authenticating using the device code or by calling
     the ${chalk.blue(commands.LOGOUT)} command.
 
-    To log in to the Microsoft Graph using a certificate, you will typically
-    create a custom Azure AD application. To use this application
-    with the Office 365 CLI, you will set the ${chalk.grey('OFFICE365CLI_AADAADAPPID')}
+    To log in to Office 365 using a certificate, you will typically create
+    a custom Azure AD application. To use this application with
+    the Office 365 CLI, you will set the ${chalk.grey('OFFICE365CLI_AADAPPID')}
     environment variable to the application's ID and the ${chalk.grey('OFFICE365CLI_TENANT')}
     environment variable to the ID of the Azure AD tenant, where you created
     the Azure AD application.
 
   Examples:
   
-    Log in to the Microsoft Graph using the device code
-      ${chalk.grey(config.delimiter)} ${commands.LOGIN}
+    Log in to Office 365 using the device code
+      ${commands.LOGIN}
 
-    Log in to the Microsoft Graph using the device code in debug mode including
-    detailed debug information in the console output
-      ${chalk.grey(config.delimiter)} ${commands.LOGIN} --debug
+    Log in to Office 365 using the device code in debug mode including detailed
+    debug information in the console output
+      ${commands.LOGIN} --debug
 
-    Log in to the Microsoft Graph using a user name and password
-      ${chalk.grey(config.delimiter)} ${commands.LOGIN} --authType password --userName user@contoso.com --password pass@word1
+    Log in to Office 365 using a user name and password
+      ${commands.LOGIN} --authType password --userName user@contoso.com --password pass@word1
 
-    Log in to the Microsoft Graph using a certificate
-      ${chalk.grey(config.delimiter)} ${commands.LOGIN} --authType certificate --certificateFile /Users/user/dev/localhost.pfx --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1
+    Log in to Office 365 using a certificate
+      ${commands.LOGIN} --authType certificate --certificateFile /Users/user/dev/localhost.pfx --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1
 `);
   }
 }
 
-module.exports = new GraphLoginCommand();
+module.exports = new LoginCommand();

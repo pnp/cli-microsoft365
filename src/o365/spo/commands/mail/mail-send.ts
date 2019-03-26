@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -8,7 +6,6 @@ import {
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -46,72 +43,55 @@ class SpoMailSendCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-    let siteAccessToken: string = '';
+    const params: any = {
+      properties: {
+        __metadata: { "type": "SP.Utilities.EmailProperties" },
+        Body: args.options.body,
+        Subject: args.options.subject,
+        To: { results: args.options.to.replace(/\s+/g, '').split(',') }
+      }
+    };
 
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
+    if (args.options.from && args.options.from.length > 0) {
+      params.properties.From = args.options.from;
     }
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<void> => {
-        siteAccessToken = accessToken;
+    if (args.options.cc && args.options.cc.length > 0) {
+      params.properties.CC = { results: args.options.cc.replace(/\s+/g, '').split(',') };
+    }
 
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${siteAccessToken}.`);
-        }
+    if (args.options.bcc && args.options.bcc.length > 0) {
+      params.properties.BCC = { results: args.options.bcc.replace(/\s+/g, '').split(',') };
+    }
 
-        const params: any = {
-          properties: {
-            __metadata: { "type": "SP.Utilities.EmailProperties" },
-            Body: args.options.body,
-            Subject: args.options.subject,
-            To: { results: args.options.to.replace(/\s+/g, '').split(',') }
+    if (args.options.additionalHeaders) {
+      const h = JSON.parse(args.options.additionalHeaders);
+      params.properties.AdditionalHeaders = {
+        __metadata: { "type": "Collection(SP.KeyValue)" },
+        results: Object.keys(h).map(key => {
+          return {
+            __metadata: {
+              type: 'SP.KeyValue'
+            },
+            Key: key,
+            Value: h[key],
+            ValueType: 'Edm.String'
           }
-        };
+        })
+      };
+    }
 
-        if (args.options.from && args.options.from.length > 0) {
-          params.properties.From = args.options.from;
-        }
+    const requestOptions: any = {
+      url: `${args.options.webUrl}/_api/SP.Utilities.Utility.SendEmail`,
+      headers: {
+        'content-type': 'application/json;odata=verbose'
+      },
+      json: true,
+      body: params
+    };
 
-        if (args.options.cc && args.options.cc.length > 0) {
-          params.properties.CC = { results: args.options.cc.replace(/\s+/g, '').split(',') };
-        }
-
-        if (args.options.bcc && args.options.bcc.length > 0) {
-          params.properties.BCC = { results: args.options.bcc.replace(/\s+/g, '').split(',') };
-        }
-
-        if (args.options.additionalHeaders) {
-          const h = JSON.parse(args.options.additionalHeaders);
-          params.properties.AdditionalHeaders = {
-            __metadata: { "type": "Collection(SP.KeyValue)" },
-            results: Object.keys(h).map(key => {
-              return {
-                __metadata: {
-                  type: 'SP.KeyValue'
-                },
-                Key: key,
-                Value: h[key],
-                ValueType: 'Edm.String'
-              }
-            })
-          };
-        }
-
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/SP.Utilities.Utility.SendEmail`,
-          headers: {
-            authorization: `Bearer ${siteAccessToken}`,
-            'content-type': 'application/json;odata=verbose'
-          },
-          json: true,
-          body: params
-        };
-
-        return request.post(requestOptions);
-      })
+    request
+      .post(requestOptions)
       .then((): void => {
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
@@ -192,27 +172,21 @@ class SpoMailSendCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site using
-    the ${chalk.blue(commands.LOGIN)} command.
+      `  Remarks:
   
-  Remarks:
-  
-    To send an email, you have to first log in to a SharePoint Online site using
-    the ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-
     All recipients (internal and external) have to have access to the target
     SharePoint site.
         
   Examples:
   
     Send an e-mail to ${chalk.grey('user@contoso.com')} 
-      ${chalk.grey(config.delimiter)} ${commands.MAIL_SEND} --webUrl https://contoso.sharepoint.com/sites/project-x --to 'user@contoso.com' --subject 'Email sent via Office 365 CLI' --body '<h1>Office 365 CLI</h1>Email sent via <b>command</b>.'
+      ${commands.MAIL_SEND} --webUrl https://contoso.sharepoint.com/sites/project-x --to 'user@contoso.com' --subject 'Email sent via Office 365 CLI' --body '<h1>Office 365 CLI</h1>Email sent via <b>command</b>.'
     
     Send an e-mail to multiples addresses
-      ${chalk.grey(config.delimiter)} ${commands.MAIL_SEND} --webUrl https://contoso.sharepoint.com/sites/project-x --to 'user1@contoso.com,user2@contoso.com' --subject 'Email sent via Office 365 CLI' --body '<h1>Office 365 CLI</h1>Email sent via <b>command</b>.' --cc 'user3@contoso.com' --bcc 'user4@contoso.com'
+      ${commands.MAIL_SEND} --webUrl https://contoso.sharepoint.com/sites/project-x --to 'user1@contoso.com,user2@contoso.com' --subject 'Email sent via Office 365 CLI' --body '<h1>Office 365 CLI</h1>Email sent via <b>command</b>.' --cc 'user3@contoso.com' --bcc 'user4@contoso.com'
     
     Send an e-mail to ${chalk.grey('user@contoso.com')} with additional headers
-      ${chalk.grey(config.delimiter)} ${commands.MAIL_SEND} --webUrl https://contoso.sharepoint.com/sites/project-x --to 'user@contoso.com' --subject 'Email sent via Office 365 CLI' --body '<h1>Office 365 CLI</h1>Email sent via <b>command</b>.' --additionalHeaders "'{\"X-MC-Tags\":\"Office 365 CLI\"}'"
+      ${commands.MAIL_SEND} --webUrl https://contoso.sharepoint.com/sites/project-x --to 'user@contoso.com' --subject 'Email sent via Office 365 CLI' --body '<h1>Office 365 CLI</h1>Email sent via <b>command</b>.' --additionalHeaders "'{\"X-MC-Tags\":\"Office 365 CLI\"}'"
       `);
   }
 }

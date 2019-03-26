@@ -1,4 +1,3 @@
-import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import request from '../../../../request';
@@ -25,7 +24,7 @@ interface Options extends GlobalOptions {
 
 class SpoSiteClassicRemoveCommand extends SpoCommand {
   private context?: FormDigestInfo;
-  private accessToken?: string;
+  private spoAdminUrl?: string;
   private dots?: string;
   private timeout?: NodeJS.Timer;
 
@@ -35,10 +34,6 @@ class SpoSiteClassicRemoveCommand extends SpoCommand {
 
   public get description(): string {
     return 'Removes the specified site';
-  }
-
-  protected requiresTenantAdmin(): boolean {
-    return true;
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -54,16 +49,12 @@ class SpoSiteClassicRemoveCommand extends SpoCommand {
     const removeSite = (): void => {
       this.dots = '';
 
-      auth
-        .ensureAccessToken(auth.service.resource, cmd, this.debug)
-        .then((accessToken: string): Promise<FormDigestInfo> => {
-          if (this.debug) {
-            cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest for tenant admin at ${auth.site.url}...`);
-          }
+      this
+        .getSpoAdminUrl(cmd, this.debug)
+        .then((_spoAdminUrl: string): Promise<FormDigestInfo> => {
+          this.spoAdminUrl = _spoAdminUrl;
 
-          this.accessToken = accessToken;
-
-          return this.ensureFormDigest(cmd, this.context, this.debug);
+          return this.ensureFormDigest(this.spoAdminUrl, cmd, this.context, this.debug);
         })
         .then((res: FormDigestInfo): Promise<void> => {
           this.context = res;
@@ -73,14 +64,14 @@ class SpoSiteClassicRemoveCommand extends SpoCommand {
               cmd.log(`Deleting site collection from recycle bin ${args.options.url}...`);
             }
 
-            return this.deleteSiteFromTheRecycleBin(args.options.url, args.options.wait, this.accessToken as string, cmd);
+            return this.deleteSiteFromTheRecycleBin(args.options.url, args.options.wait, cmd);
           }
           else {
             if (this.verbose) {
               cmd.log(`Deleting site collection ${args.options.url}...`);
             }
 
-            return this.deleteSite(args.options.url, args.options.wait, this.accessToken as string, cmd);
+            return this.deleteSite(args.options.url, args.options.wait, cmd);
           }
         })
         .then((): Promise<void> => {
@@ -88,7 +79,7 @@ class SpoSiteClassicRemoveCommand extends SpoCommand {
             if (this.verbose) {
               cmd.log(`Also deleting site collection from recycle bin ${args.options.url}...`)
             }
-            return this.deleteSiteFromTheRecycleBin(args.options.url, args.options.wait, this.accessToken as string, cmd);
+            return this.deleteSiteFromTheRecycleBin(args.options.url, args.options.wait, cmd);
           }
           else {
             return Promise.resolve();
@@ -131,10 +122,10 @@ class SpoSiteClassicRemoveCommand extends SpoCommand {
     }
   }
 
-  private deleteSite(url: string, wait: boolean, accessToken: string, cmd: CommandInstance): Promise<void> {
+  private deleteSite(url: string, wait: boolean, cmd: CommandInstance): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       this
-        .ensureFormDigest(cmd, this.context, this.debug)
+        .ensureFormDigest(this.spoAdminUrl as string, cmd, this.context, this.debug)
         .then((res: FormDigestInfo): Promise<string> => {
           this.context = res;
 
@@ -143,9 +134,8 @@ class SpoSiteClassicRemoveCommand extends SpoCommand {
           }
 
           const requestOptions: any = {
-            url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+            url: `${this.spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
             headers: {
-              authorization: `Bearer ${auth.service.accessToken}`,
               'X-RequestDigest': this.context.FormDigestValue
             },
             body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="55" ObjectPathId="54"/><ObjectPath Id="57" ObjectPathId="56"/><Query Id="58" ObjectPathId="54"><Query SelectAllProperties="true"><Properties/></Query></Query><Query Id="59" ObjectPathId="56"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true"/><Property Name="PollingInterval" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="54" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="56" ParentId="54" Name="RemoveSite"><Parameters><Parameter Type="String">${Utils.escapeXml(url)}</Parameter></Parameters></Method></ObjectPaths></Request>`
@@ -168,17 +158,17 @@ class SpoSiteClassicRemoveCommand extends SpoCommand {
             }
 
             setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), resolve, reject, accessToken, cmd, this.context as FormDigestInfo, this.dots, this.timeout);
+              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, cmd, this.context as FormDigestInfo, this.dots, this.timeout);
             }, operation.PollingInterval);
           }
         });
     });
   }
 
-  private deleteSiteFromTheRecycleBin(url: string, wait: boolean, accessToken: string, cmd: CommandInstance): Promise<void> {
+  private deleteSiteFromTheRecycleBin(url: string, wait: boolean, cmd: CommandInstance): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       this
-        .ensureFormDigest(cmd, this.context, this.debug)
+        .ensureFormDigest(this.spoAdminUrl as string, cmd, this.context, this.debug)
         .then((res: FormDigestInfo): Promise<string> => {
           this.context = res;
           if (this.verbose) {
@@ -186,9 +176,8 @@ class SpoSiteClassicRemoveCommand extends SpoCommand {
           }
 
           const requestOptions: any = {
-            url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+            url: `${this.spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
             headers: {
-              authorization: `Bearer ${auth.service.accessToken}`,
               'X-RequestDigest': this.context.FormDigestValue
             },
             body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="185" ObjectPathId="184" /><Query Id="186" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Method Id="184" ParentId="175" Name="RemoveDeletedSite"><Parameters><Parameter Type="String">${Utils.escapeXml(url)}</Parameter></Parameters></Method><Constructor Id="175" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
@@ -211,7 +200,7 @@ class SpoSiteClassicRemoveCommand extends SpoCommand {
             }
 
             setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), resolve, reject, accessToken, cmd, this.context as FormDigestInfo, this.dots, this.timeout);
+              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, cmd, this.context as FormDigestInfo, this.dots, this.timeout);
             }, operation.PollingInterval);
           }
         });
@@ -265,14 +254,10 @@ class SpoSiteClassicRemoveCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online tenant admin site,
-    using the ${chalk.blue(commands.LOGIN)} command.
+      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
+    the tenant admin site.
 
   Remarks:
-
-    To remove a classic site, you have to first log in to a tenant
-    admin site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso-admin.sharepoint.com`)}.
 
     Deleting and creating classic site collections is by default asynchronous
     and depending on the current state of Office 365, might take up to few
@@ -284,16 +269,16 @@ class SpoSiteClassicRemoveCommand extends SpoCommand {
   Examples:
 
     Remove the specified site and place it in the Recycle Bin
-      ${chalk.grey(config.delimiter)} ${commands.SITE_CLASSIC_REMOVE} --url https://contoso.sharepoint.com/sites/demosite 
+      ${commands.SITE_CLASSIC_REMOVE} --url https://contoso.sharepoint.com/sites/demosite 
 
     Remove the site without moving it to the Recycle Bin
-      ${chalk.grey(config.delimiter)} ${commands.SITE_CLASSIC_REMOVE} --url https://contoso.sharepoint.com/sites/demosite --skipRecycleBin
+      ${commands.SITE_CLASSIC_REMOVE} --url https://contoso.sharepoint.com/sites/demosite --skipRecycleBin
 
     Remove the previously deleted site from the Recycle Bin
-      ${chalk.grey(config.delimiter)} ${commands.SITE_CLASSIC_REMOVE} --url https://contoso.sharepoint.com/sites/demosite --fromRecycleBin
+      ${commands.SITE_CLASSIC_REMOVE} --url https://contoso.sharepoint.com/sites/demosite --fromRecycleBin
 
     Remove the site without moving it to the Recycle Bin and wait for completion 
-      ${chalk.grey(config.delimiter)} ${commands.SITE_CLASSIC_REMOVE} --url https://contoso.sharepoint.com/sites/demosite --wait --skipRecycleBin
+      ${commands.SITE_CLASSIC_REMOVE} --url https://contoso.sharepoint.com/sites/demosite --wait --skipRecycleBin
 `);
   }
 }

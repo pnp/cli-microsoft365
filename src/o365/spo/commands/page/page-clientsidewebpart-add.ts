@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
 import { CommandOption, CommandValidate } from '../../../../Command';
@@ -7,7 +5,6 @@ const uuidv4 = require('uuid/v4');
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import GlobalOptions from '../../../../GlobalOptions';
-import { Auth } from '../../../../Auth';
 import {
   ClientSideWebpart,
   ClientSidePageComponent
@@ -56,8 +53,6 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-    let siteAccessToken: string = '';
     let canvasContent: Control[];
 
     let pageFullName: string = args.options.pageName;
@@ -65,34 +60,20 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
       pageFullName += '.aspx';
     }
 
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
+    if (this.verbose) {
+      cmd.log(`Retrieving page information...`);
     }
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<{ CanvasContent1: string; IsPageCheckedOutToCurrentUser: boolean }> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}`);
-        }
+    const requestOptions: any = {
+      url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      json: true
+    };
 
-        siteAccessToken = accessToken;
-
-        if (this.verbose) {
-          cmd.log(`Retrieving page information...`);
-        }
-
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`,
-          headers: {
-            authorization: `Bearer ${siteAccessToken}`,
-            'accept': 'application/json;odata=nometadata'
-          },
-          json: true
-        };
-
-        return request.get(requestOptions);
-      })
+    request
+      .get<{ CanvasContent1: string; IsPageCheckedOutToCurrentUser: boolean }>(requestOptions)
       .then((res: { CanvasContent1: string; IsPageCheckedOutToCurrentUser: boolean }): Promise<void> => {
         canvasContent = JSON.parse(res.CanvasContent1 || "[{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]");
 
@@ -103,7 +84,6 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/checkoutpage`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata'
           },
           json: true
@@ -119,7 +99,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
           );
         }
         // Get the WebPart according to arguments
-        return this.getWebPart(cmd, args, siteAccessToken);
+        return this.getWebPart(cmd, args);
       })
       .then((webPart: ClientSideWebpart): Promise<void> => {
         if (this.verbose) {
@@ -229,7 +209,6 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/savepage`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata',
             'content-type': 'application/json;odata=nometadata'
           },
@@ -250,7 +229,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
       .catch((err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
 
-  private getWebPart(cmd: CommandInstance, args: CommandArgs, accessToken: string): Promise<any> {
+  private getWebPart(cmd: CommandInstance, args: CommandArgs): Promise<any> {
     return new Promise<any>((resolve: (webPart: any) => void, reject: (error: any) => void): void => {
       const standardWebPart: string | undefined = args.options.standardWebPart;
 
@@ -266,7 +245,6 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
       const requestOptions: any = {
         url: `${args.options.webUrl}/_api/web/getclientsidewebparts()`,
         headers: {
-          authorization: `Bearer ${accessToken}`,
           accept: 'application/json;odata=nometadata'
         },
         json: true
@@ -471,14 +449,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site
-    using the ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
-
-    To add a client-side web part to a modern page, you have to first log in
-    to a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
+      `  Remarks:
 
     If the specified ${chalk.grey('pageName')} doesn't refer to an existing modern page,
     you will get a ${chalk.grey("File doesn't exists")} error.
@@ -499,22 +470,22 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
   Examples:
 
     Add the standard Bing Map web part to a modern page in the first available location on the page
-      ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --standardWebPart BingMap
+      ${this.name} --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --standardWebPart BingMap
 
     Add the standard Bing Map web part to a modern page in the third column of the second section
-      ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --standardWebPart BingMap --section 2 --column 3
+      ${this.name} --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --standardWebPart BingMap --section 2 --column 3
 
     Add a custom web part to the modern page
-      ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --webPartId 3ede60d3-dc2c-438b-b5bf-cc40bb2351e1
+      ${this.name} --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --webPartId 3ede60d3-dc2c-438b-b5bf-cc40bb2351e1
 
     Using PowerShell, add the standard Bing Map web part with the specific properties to a modern page
-      ${chalk.grey(config.delimiter)} --% ${this.name} --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --standardWebPart BingMap --webPartProperties \`"{""Title"":""Foo location""}"\`
+      --% ${this.name} --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --standardWebPart BingMap --webPartProperties \`"{""Title"":""Foo location""}"\`
 
     Using Windows command line, add the standard Bing Map web part with the specific properties to a modern page
-      ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --standardWebPart BingMap --webPartProperties \`"{""Title"":""Foo location""}"\`
+      ${this.name} --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --standardWebPart BingMap --webPartProperties \`"{""Title"":""Foo location""}"\`
 
     Add the standard Image web part with the preconfigured image
-      ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --standardWebPart Image --webPartData '\`{ "dataVersion": "1.8", "serverProcessedContent": {"htmlStrings":{},"searchablePlainTexts":{"captionText":""},"imageSources":{"imageSource":"/sites/team-a/SiteAssets/work-life-balance.png"},"links":{}}, "properties": {"imageSourceType":2,"altText":"a group of people on a beach","overlayText":"Work life balance","fileName":"48146-OFF12_Justice_01.png","siteId":"27664b85-067d-4be9-a7d7-89b2e804d09f","webId":"a7664b85-067d-4be9-a7d7-89b2e804d09f","listId":"37664b85-067d-4be9-a7d7-89b2e804d09f","uniqueId":"67664b85-067d-4be9-a7d7-89b2e804d09f","imgWidth":650,"imgHeight":433,"fixAspectRatio":false,"isOverlayTextEnabled":true}}\`'
+      ${this.name} --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --standardWebPart Image --webPartData '\`{ "dataVersion": "1.8", "serverProcessedContent": {"htmlStrings":{},"searchablePlainTexts":{"captionText":""},"imageSources":{"imageSource":"/sites/team-a/SiteAssets/work-life-balance.png"},"links":{}}, "properties": {"imageSourceType":2,"altText":"a group of people on a beach","overlayText":"Work life balance","fileName":"48146-OFF12_Justice_01.png","siteId":"27664b85-067d-4be9-a7d7-89b2e804d09f","webId":"a7664b85-067d-4be9-a7d7-89b2e804d09f","listId":"37664b85-067d-4be9-a7d7-89b2e804d09f","uniqueId":"67664b85-067d-4be9-a7d7-89b2e804d09f","imgWidth":650,"imgHeight":433,"fixAspectRatio":false,"isOverlayTextEnabled":true}}\`'
       `
     );
   }

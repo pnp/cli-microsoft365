@@ -1,7 +1,6 @@
-import config from '../../../../config';
 import commands from '../../commands';
 import Command, {
-  CommandOption, CommandError
+  CommandOption, CommandError, CommandAction
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import * as path from 'path';
@@ -72,6 +71,15 @@ class SpfxProjectUpgradeCommand extends Command {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.toVersion = args.options.toVersion || this.supportedVersions[this.supportedVersions.length - 1];
     return telemetryProps;
+  }
+
+  public action(): CommandAction {
+    const cmd: Command = this;
+    return function (this: CommandInstance, args: CommandArgs, cb: (err?: any) => void) {
+      args = (cmd as any).processArgs(args);
+      (cmd as any).initAction(args, this);
+      cmd.commandAction(this, args, cb);
+    }
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
@@ -612,16 +620,16 @@ ${f.resolution}
   
     Get instructions to upgrade the current SharePoint Framework project to
     SharePoint Framework version 1.5.0 and save the findings in a Markdown file
-      ${chalk.grey(config.delimiter)} ${this.name} --toVersion 1.5.0 --output md > upgrade-report.md
+      ${this.name} --toVersion 1.5.0 --output md > upgrade-report.md
 
     Get instructions to Upgrade the current SharePoint Framework project to
     SharePoint Framework version 1.5.0 and show the summary of the findings
     in the shell
-      ${chalk.grey(config.delimiter)} ${this.name} --toVersion 1.5.0
+      ${this.name} --toVersion 1.5.0
 
     Get instructions to upgrade the current SharePoint Framework project to the
     latest SharePoint Framework version supported by the Office 365 CLI
-      ${chalk.grey(config.delimiter)} ${this.name}
+      ${this.name}
 `);
   }
 }

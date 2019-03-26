@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
 import {
@@ -47,7 +45,6 @@ class SpoPageSetCommand extends SpoCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-    let siteAccessToken: string = '';
     let requestDigest: string = '';
     let pageName: string = args.options.name;
     if (!pageName.endsWith('.aspx')) {
@@ -55,21 +52,8 @@ class SpoPageSetCommand extends SpoCommand {
     }
     const serverRelativeSiteUrl: string = `${args.options.webUrl.substr(args.options.webUrl.indexOf('/', 8))}/sitepages/${pageName}`;
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<ContextInfo> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
-
-        siteAccessToken = accessToken;
-
-        if (this.verbose) {
-          cmd.log(`Retrieving request digest...`);
-        }
-
-        return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
-      })
+    this
+      .getRequestDigest(args.options.webUrl)
       .then((res: ContextInfo): Promise<void> => {
         requestDigest = res.FormDigestValue;
 
@@ -80,7 +64,6 @@ class SpoPageSetCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeSiteUrl}')/ListItemAllFields`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             'X-RequestDigest': requestDigest,
             'content-type': 'application/json;odata=nometadata',
             'X-HTTP-Method': 'MERGE',
@@ -116,7 +99,6 @@ class SpoPageSetCommand extends SpoCommand {
           case 'HomePage':
             requestOptions.url = `${args.options.webUrl}/_api/web/rootfolder`;
             requestOptions.headers = {
-              authorization: `Bearer ${siteAccessToken}`,
               'X-RequestDigest': requestDigest,
               'X-HTTP-Method': 'MERGE',
               'IF-MATCH': '*',
@@ -130,7 +112,6 @@ class SpoPageSetCommand extends SpoCommand {
           case 'NewsPage':
             requestOptions.url = `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeSiteUrl}')/ListItemAllFields`;
             requestOptions.headers = {
-              authorization: `Bearer ${siteAccessToken}`,
               'X-RequestDigest': requestDigest,
               'X-HTTP-Method': 'MERGE',
               'IF-MATCH': '*',
@@ -154,7 +135,6 @@ class SpoPageSetCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeSiteUrl}')/ListItemAllFields/SetCommentsDisabled(${args.options.commentsEnabled === 'false'})`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             'X-RequestDigest': requestDigest,
             'content-type': 'application/json;odata=nometadata',
             accept: 'application/json;odata=nometadata'
@@ -172,7 +152,6 @@ class SpoPageSetCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeSiteUrl}')/Publish('${encodeURIComponent(args.options.publishMessage || '').replace(/'/g, '%39')}')`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             'X-RequestDigest': requestDigest,
             'content-type': 'application/json;odata=nometadata',
             accept: 'application/json;odata=nometadata'
@@ -279,13 +258,7 @@ class SpoPageSetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site using the
-    ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
-
-    To update a modern page, you have to first log in to a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
+      `  Remarks:
 
     If you try to create a page with a name of a page that already exists, you
     will get a ${chalk.grey('The file doesn\'t exists')} error.
@@ -297,19 +270,19 @@ class SpoPageSetCommand extends SpoCommand {
   Examples:
 
     Change the layout of the existing page to Article
-      ${chalk.grey(config.delimiter)} ${this.name} --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --layoutType Article
+      ${this.name} --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --layoutType Article
 
     Promote the existing article page as a news article
-      ${chalk.grey(config.delimiter)} ${this.name} --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --promoteAs NewsPage
+      ${this.name} --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --promoteAs NewsPage
 
     Change the page's layout to Home and set it as the site's home page
-      ${chalk.grey(config.delimiter)} ${this.name} --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --layoutType Home --promoteAs HomePage
+      ${this.name} --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --layoutType Home --promoteAs HomePage
 
     Enable comments on the existing page
-      ${chalk.grey(config.delimiter)} ${this.name} --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --commentsEnabled true
+      ${this.name} --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --commentsEnabled true
 
     Publish existing page
-      ${chalk.grey(config.delimiter)} ${this.name} --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --publish
+      ${this.name} --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --publish
 `);
   }
 }

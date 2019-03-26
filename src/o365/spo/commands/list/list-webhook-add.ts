@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -9,7 +7,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
-import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 const expirationDateTimeMaxDays = 180;
@@ -49,60 +46,43 @@ class SpoListWebhookAddCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-    let siteAccessToken: string = '';
-
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
+    if (this.verbose) {
+      cmd.log(`Adding webhook to list ${args.options.listId ? encodeURIComponent(args.options.listId) : encodeURIComponent(args.options.listTitle as string)} located at site ${args.options.webUrl}...`);
     }
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<any> => {
-        siteAccessToken = accessToken;
+    let requestUrl: string = '';
 
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Adding webhook to the specified list...`);
-        }
+    if (args.options.listId) {
+      requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.listId)}')/Subscriptions')`;
+    }
+    else {
+      requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.listTitle as string)}')/Subscriptions')`;
+    }
 
-        if (this.verbose) {
-          cmd.log(`Adding webhook to list ${args.options.listId ? encodeURIComponent(args.options.listId) : encodeURIComponent(args.options.listTitle as string)} located at site ${args.options.webUrl}...`);
-        }
+    const requestBody: any = {};
+    requestBody.resource = args.options.listId ? args.options.listId : args.options.listTitle;
+    requestBody.notificationUrl = args.options.notificationUrl;
+    // If no expiration date has been provided we will default to the
+    // maximum expiration date of 180 days from now 
+    requestBody.expirationDateTime = args.options.expirationDateTime
+      ? new Date(args.options.expirationDateTime).toISOString()
+      : maxExpirationDateTime.toISOString();
+    if (args.options.clientState) {
+      requestBody.clientState = args.options.clientState;
+    }
 
-        let requestUrl: string = '';
+    const requestOptions: any = {
+      url: requestUrl,
+      method: 'POST',
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      body: requestBody,
+      json: true
+    };
 
-        if (args.options.listId) {
-          requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.listId)}')/Subscriptions')`;
-        }
-        else {
-          requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.listTitle as string)}')/Subscriptions')`;
-        }
-
-        const requestBody: any = {};
-        requestBody.resource = args.options.listId ? args.options.listId : args.options.listTitle;
-        requestBody.notificationUrl = args.options.notificationUrl;
-        // If no expiration date has been provided we will default to the
-        // maximum expiration date of 180 days from now 
-        requestBody.expirationDateTime = args.options.expirationDateTime
-          ? new Date(args.options.expirationDateTime).toISOString()
-          : maxExpirationDateTime.toISOString();
-        if (args.options.clientState) {
-          requestBody.clientState = args.options.clientState;
-        }
-
-        const requestOptions: any = {
-          url: requestUrl,
-          method: 'POST',
-          headers: {
-            authorization: `Bearer ${siteAccessToken}`,
-            'accept': 'application/json;odata=nometadata'
-          },
-          body: requestBody,
-          json: true
-        };
-
-        return request.post(requestOptions);
-      })
+    request
+      .post(requestOptions)
       .then((res: any): void => {
         cmd.log(res);
 
@@ -194,32 +174,23 @@ class SpoListWebhookAddCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to SharePoint,
-    using the ${chalk.blue(commands.LOGIN)} command.
-  
-  Remarks:
-  
-    To add a webhook, you have to first log in to SharePoint
-    using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-        
-  Examples:
+      `  Examples:
   
     Add a web hook to the list ${chalk.grey('Documents')} located in site 
     ${chalk.grey('https://contoso.sharepoint.com/sites/ninja')} with the notification url 
     ${chalk.grey('https://contoso-functions.azurewebsites.net/webhook')} and the default expiration date
-    ${chalk.grey(config.delimiter)} ${commands.LIST_WEBHOOK_ADD} --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --notificationUrl https://contoso-functions.azurewebsites.net/webhook
+    ${commands.LIST_WEBHOOK_ADD} --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --notificationUrl https://contoso-functions.azurewebsites.net/webhook
 
     Add a web hook to the list ${chalk.grey('Documents')} located in site 
     ${chalk.grey('https://contoso.sharepoint.com/sites/ninja')} with the notification url 
     ${chalk.grey('https://contoso-functions.azurewebsites.net/webhook')} and an expiration date of ${chalk.grey('January 21st, 2019')}
-    ${chalk.grey(config.delimiter)} ${commands.LIST_WEBHOOK_ADD} --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --notificationUrl https://contoso-functions.azurewebsites.net/webhook --expirationDateTime 2019-01-21
+    ${commands.LIST_WEBHOOK_ADD} --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --notificationUrl https://contoso-functions.azurewebsites.net/webhook --expirationDateTime 2019-01-21
     
     Add a web hook to the list ${chalk.grey('Documents')} located in site 
     ${chalk.grey('https://contoso.sharepoint.com/sites/ninja')} with the notification url 
     ${chalk.grey('https://contoso-functions.azurewebsites.net/webhook')}, a very specific expiration date
     of ${chalk.grey('6:15 PM on March 2nd, 2019')} and a client state
-    ${chalk.grey(config.delimiter)} ${commands.LIST_WEBHOOK_ADD} --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --notificationUrl https://contoso-functions.azurewebsites.net/webhook --expirationDateTime '2019-03-02T18:15' --clientState "Hello State!"
+    ${commands.LIST_WEBHOOK_ADD} --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --notificationUrl https://contoso-functions.azurewebsites.net/webhook --expirationDateTime '2019-03-02T18:15' --clientState "Hello State!"
       `);
   }
 }

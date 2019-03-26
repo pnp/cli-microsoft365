@@ -2,9 +2,6 @@
 
 Registers the specified site collection as a hub site
 
-!!! attention
-    This command is based on a SharePoint API that is currently in preview and is subject to change once the API reached general availability.
-
 ## Usage
 
 ```sh
@@ -21,12 +18,10 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
-!!! important
-    Before using this command, log in to a SharePoint Online site, using the [spo login](../login.md) command.
-
 ## Remarks
 
-To register a site collection as a hub site, you have to first log in to a SharePoint site using the [spo login](../login.md) command, eg. `spo login https://contoso.sharepoint.com`.
+!!! attention
+    This command is based on a SharePoint API that is currently in preview and is subject to change once the API reached general availability.
 
 If the specified site collection is already registered as a hub site, you will get a `This site is already a HubSite.` error.
 

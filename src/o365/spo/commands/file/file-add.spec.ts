@@ -2,7 +2,7 @@ import commands from '../../commands';
 import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth, { Site } from '../../SpoAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./file-add');
 import * as assert from 'assert';
 import request from '../../../../request';
@@ -15,8 +15,6 @@ describe(commands.FILE_ADD, () => {
   let log: any[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  let trackEvent: any;
-  let telemetry: any;
   let ensureFolderStub: sinon.SinonStub;
 
   let stubPostResponses: any = (
@@ -29,12 +27,7 @@ describe(commands.FILE_ADD, () => {
     checkinResp: any = null
   ) => {
     return sinon.stub(request, 'post').callsFake((opts) => {
-
-      if (opts.url.indexOf('/common/oauth2/token') > -1) {
-
-        return Promise.resolve('abc');
-
-      } else if (opts.url.indexOf('/_api/web/GetFolderByServerRelativeUrl(') > -1) {
+      if (opts.url.indexOf('/_api/web/GetFolderByServerRelativeUrl(') > -1) {
 
         if (opts.url.indexOf('/CheckOut') > -1) {
 
@@ -145,24 +138,23 @@ describe(commands.FILE_ADD, () => {
     sinon.stub(fs, 'readFileSync').returns(new Buffer('abc'));
     ensureFolderStub = sinon.stub(FolderExtensions.prototype, 'ensureFolder').resolves();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
-
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    auth.service.connected = true;
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.site = new Site();
-    telemetry = null;
   });
 
   afterEach(() => {
@@ -176,13 +168,13 @@ describe(commands.FILE_ADD, () => {
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.getAccessToken,
       auth.restoreAuth,
       fs.readFileSync,
       fs.existsSync,
-      FolderExtensions.prototype.ensureFolder
+      FolderExtensions.prototype.ensureFolder,
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -198,47 +190,6 @@ describe(commands.FILE_ADD, () => {
     assert.notEqual(command.description, null);
   });
 
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.FILE_ADD);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not logged in to a SharePoint site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com' } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('should call ensure folder when folder not found', (done) => {
     const expectedError: any = JSON.stringify({"odata.error":{"code":"-2130575338, Microsoft.SharePoint.SPException","message":{"lang":"en-US","value":"Error: Not Found."}}});
     const getFolderByServerRelativeUrlResp: any = new Promise<any>((resolve, reject) => {
@@ -246,11 +197,6 @@ describe(commands.FILE_ADD, () => {
     });
     stubPostResponses();
     stubGetResponses(getFolderByServerRelativeUrlResp);
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     cmdInstance.action({
       options: {
@@ -261,7 +207,6 @@ describe(commands.FILE_ADD, () => {
         verbose: true
       }
     }, () => {
-
       try {
         assert.equal(ensureFolderStub.called, true);
         done();
@@ -280,11 +225,6 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses();
     stubGetResponses(null, fileNotFoundResp);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     cmdInstance.action({
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
@@ -292,7 +232,6 @@ describe(commands.FILE_ADD, () => {
         path: 'C:\Users\Velin\Desktop\MS365.jpg',
         checkOut: true
       }}, () => {
-
       try {
         assert.equal(cmdInstanceLogSpy.notCalled, true);
         done();
@@ -310,11 +249,6 @@ describe(commands.FILE_ADD, () => {
     });
     stubPostResponses(checkoutResp);
     stubGetResponses();
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     cmdInstance.action({
       options: {
@@ -343,11 +277,6 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses(null, fileAddResp);
     stubGetResponses();
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     cmdInstance.action({
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
@@ -374,11 +303,6 @@ describe(commands.FILE_ADD, () => {
     });
     stubPostResponses();
     stubGetResponses(null, null, listResp);
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     cmdInstance.action({
       options: {
@@ -407,11 +331,6 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses();
     stubGetResponses(null, null, null, contentTypeResp);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     cmdInstance.action({
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
@@ -437,11 +356,6 @@ describe(commands.FILE_ADD, () => {
 
     const folderServerRelativePath: string = '/sites/project-x/Shared%20Documents/t1';
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     cmdInstance.action({
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
@@ -464,11 +378,6 @@ describe(commands.FILE_ADD, () => {
   it('should handle non existing content type', (done) => {
     stubPostResponses();
     stubGetResponses();
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     cmdInstance.action({
       options: {
@@ -497,11 +406,6 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses(null, null, validateUpdateListItemResp);
     stubGetResponses();
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     cmdInstance.action({
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
@@ -529,11 +433,6 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses(null, null, validateUpdateListItemResp);
     stubGetResponses();
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     cmdInstance.action({
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
@@ -542,7 +441,6 @@ describe(commands.FILE_ADD, () => {
         contentType: 'Picture',
         debug: true
       }}, (err: any) => {
-
       try {
         const error: string = `Update field value error: ${JSON.stringify(expectedResult.value)}`;
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(error)));
@@ -561,11 +459,6 @@ describe(commands.FILE_ADD, () => {
     });
     stubPostResponses(null, null, null, null, null, null, checkinResp);
     stubGetResponses();
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     cmdInstance.action({
       options: {
@@ -595,11 +488,6 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses(null, null, null, aproveResp);
     stubGetResponses();
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     cmdInstance.action({
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
@@ -609,7 +497,6 @@ describe(commands.FILE_ADD, () => {
         verbose: true,
         debug: true
       }}, (err: any) => {
-
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(expectedError)));
         done();
@@ -628,11 +515,6 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses(null, null, null, null, publishResp);
     stubGetResponses();
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     cmdInstance.action({
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
@@ -642,7 +524,6 @@ describe(commands.FILE_ADD, () => {
         verbose: true,
         debug: true
       }}, (err: any) => {
-
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(expectedError)));
         done();
@@ -661,11 +542,6 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses();
     stubGetResponses(null, null, listSettingsResp);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     cmdInstance.action({
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
@@ -673,7 +549,6 @@ describe(commands.FILE_ADD, () => {
         path: 'C:\Users\Velin\Desktop\MS365.jpg',
         publish: true
       }}, (err: any) => {
-
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('The file cannot be published without approval. Moderation for this list is enabled. Use the --approve option instead of --publish to approve and publish the file')));
         done();
@@ -688,11 +563,6 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses();
     stubGetResponses();
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     cmdInstance.action({
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
@@ -702,7 +572,6 @@ describe(commands.FILE_ADD, () => {
         verbose: true
       }
     }, () => {
-
       try {
         assert.equal(cmdInstanceLogSpy.lastCall.args[0], 'DONE');
         done();
@@ -717,11 +586,6 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses();
     stubGetResponses();
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     cmdInstance.action({
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
@@ -734,7 +598,6 @@ describe(commands.FILE_ADD, () => {
         debug: true
       }
     }, () => {
-
       try {
         assert.equal(cmdInstanceLogSpy.lastCall.args[0], 'DONE');
         done();
@@ -749,11 +612,6 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses();
     stubGetResponses();
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     cmdInstance.action({
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
@@ -764,7 +622,6 @@ describe(commands.FILE_ADD, () => {
         publish: true
       }
     }, () => {
-
       try {
         assert.equal(cmdInstanceLogSpy.notCalled, true);
         done();
@@ -779,11 +636,6 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses();
     stubGetResponses();
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     cmdInstance.action({
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
@@ -791,7 +643,6 @@ describe(commands.FILE_ADD, () => {
         path: 'C:\Users\Velin\Desktop\MS365.jpg',
         approve: true
       }}, (err: any) => {
-
       try {
         assert.equal(cmdInstanceLogSpy.notCalled, true);
         done();
@@ -806,11 +657,6 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses();
     stubGetResponses();
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     cmdInstance.action({
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
@@ -818,7 +664,6 @@ describe(commands.FILE_ADD, () => {
         path: 'C:\Users\Velin\Desktop\MS365.jpg',
         checkOut: true
       }}, (err: any) => {
-
       try {
         assert.equal(cmdInstanceLogSpy.notCalled, true);
         done();
@@ -830,7 +675,6 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('should error if cannot rollback checkout (verbose)', (done) => {
-
     const expectedFileAddError: any = JSON.stringify({"odata.error":{"code":"-2130575338, Microsoft.SharePoint.SPException","message":{"lang":"en-US","value":"Error: File add error."}}});
     const fileAddResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedFileAddError);
@@ -843,11 +687,6 @@ describe(commands.FILE_ADD, () => {
 
     stubPostResponses(null, fileAddResp, null, null, null, rollbackCheckoutResp);
     stubGetResponses();
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     cmdInstance.action({
       options: {
@@ -858,9 +697,7 @@ describe(commands.FILE_ADD, () => {
         debug: true,
         verbose: true
       }}, (err: any) => {
-
       try {
-        //assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(expectedFileAddError)));
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(expectedFileAddError)));
         done();
       }
@@ -871,7 +708,6 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('should error if cannot rollback checkout', (done) => {
-
     const expectedFileAddError: any = JSON.stringify({"odata.error":{"code":"-2130575338, Microsoft.SharePoint.SPException","message":{"lang":"en-US","value":"Error: File add error."}}});
     const fileAddResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedFileAddError);
@@ -885,11 +721,6 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses(null, fileAddResp, null, null, null, rollbackCheckoutResp);
     stubGetResponses();
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     cmdInstance.action({
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
@@ -897,9 +728,7 @@ describe(commands.FILE_ADD, () => {
         path: 'C:\Users\Velin\Desktop\MS365.jpg',
         checkOut: true,
       }}, (err: any) => {
-
       try {
-        //assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(expectedFileAddError)));
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(expectedFileAddError)));
         done();
       }
@@ -928,7 +757,6 @@ describe(commands.FILE_ADD, () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', path: 'abc'} });
     assert.notEqual(actual, true);
   });
-
 
   it('fails validation if the wrong path option specified', () => {
     sinon.stub(fs, 'existsSync').returns(false);
@@ -1026,30 +854,5 @@ describe(commands.FILE_ADD, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.getAccessToken);
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-        folder: 'Shared%20Documents/t1',
-        path: 'C:\Users\Velin\Desktop\MS365.jpg',
-        debug: false
-      }
-    }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 });

@@ -1,9 +1,7 @@
 import request from '../../../../request';
 import * as fs from 'fs';
 import * as path from 'path';
-import auth from '../../GraphAuth';
 import Utils from '../../../../Utils';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import { CommandOption, CommandValidate } from '../../../../Command';
@@ -32,26 +30,22 @@ class GraphTeamsAppUpdateCommand extends GraphCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const { id: appId, filePath } = args.options;
 
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((): Promise<string> => {
-        const fullPath: string = path.resolve(filePath);
-        if (this.verbose) {
-          cmd.log(`Updating app with id '${appId}' and file '${fullPath}' in the app catalog...`);
-        }
+    const fullPath: string = path.resolve(filePath);
+    if (this.verbose) {
+      cmd.log(`Updating app with id '${appId}' and file '${fullPath}' in the app catalog...`);
+    }
 
-        const requestOptions: any = {
-          url: `${auth.service.resource}/v1.0/appCatalogs/teamsApps/${appId}`,
-          headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
-            "content-type": "application/zip"
-          },
-          body: fs.readFileSync(fullPath)
-        };
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/appCatalogs/teamsApps/${appId}`,
+      headers: {
+        "content-type": "application/zip"
+      },
+      body: fs.readFileSync(fullPath)
+    };
 
-        return request.put(requestOptions);
-      })
-      .then((res: string): void => {
+    request
+      .put(requestOptions)
+      .then((): void => {
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
         }
@@ -108,14 +102,7 @@ class GraphTeamsAppUpdateCommand extends GraphCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to the Microsoft Graph
-    using the ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
-
-    To update Microsoft Teams apps, you have to first log in to
-    the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
+      `  Remarks:
 
     You can only update a Teams app as a global administrator.
 
@@ -123,7 +110,7 @@ class GraphTeamsAppUpdateCommand extends GraphCommand {
 
     Update the Teams app with ID ${chalk.grey('83cece1e-938d-44a1-8b86-918cf6151957')}
     from file ${chalk.grey('teams-manifest.zip')}
-      ${chalk.grey(config.delimiter)} ${this.name} --id 83cece1e-938d-44a1-8b86-918cf6151957 --filePath ./teams-manifest.zip
+      ${this.name} --id 83cece1e-938d-44a1-8b86-918cf6151957 --filePath ./teams-manifest.zip
 `);
   }
 }

@@ -24,12 +24,7 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
-!!! important
-    Before using this command, log in to the Microsoft Graph, using the [graph login](../login.md) command.
-
 ## Remarks
-
-To update an Office 365 Group, you have to first log in to the Microsoft Graph using the [graph login](../login.md) command, eg. `graph login`.
 
 When updating group's owners and members, the command will add newly specified users to the previously set owners and members. The previously set users will not be replaced.
 

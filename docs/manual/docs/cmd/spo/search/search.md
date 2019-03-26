@@ -41,13 +41,6 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
-!!! important
-    Before using this command, log in to a SharePoint Online site, using the [spo login](../login.md) command.
-
-## Remarks
-
-To execute a search query, you have to first log in to SharePoint Online using the [spo login](../login.md) command, eg. `spo login https://contoso.sharepoint.com`.
-
 ## Examples
 
 Execute search query to retrieve all Document Sets (ContentTypeId = _0x0120D520_) for the English locale

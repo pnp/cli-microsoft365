@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
 import {
@@ -47,28 +45,14 @@ class SpoPageAddCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-    let siteAccessToken: string = '';
+    let resource = Auth.getResourceFromUrl(args.options.webUrl);
     let requestDigest: string = '';
     let itemId: string = '';
     let pageName: string = args.options.name;
     const serverRelativeSiteUrl: string = args.options.webUrl.substr(args.options.webUrl.indexOf('/', 8));
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<ContextInfo> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
-
-        siteAccessToken = accessToken;
-
-        if (this.verbose) {
-          cmd.log(`Retrieving request digest...`);
-        }
-
-        return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
-      })
+    this
+      .getRequestDigest(args.options.webUrl)
       .then((res: ContextInfo): Promise<{ UniqueId: string }> => {
         requestDigest = res.FormDigestValue;
 
@@ -79,7 +63,6 @@ class SpoPageAddCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/getfolderbyserverrelativeurl('${serverRelativeSiteUrl}/sitepages')/files/AddTemplateFile`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             'X-RequestDigest': requestDigest,
             'content-type': 'application/json;odata=nometadata',
             accept: 'application/json;odata=nometadata'
@@ -100,7 +83,6 @@ class SpoPageAddCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/getfilebyid('${itemId}')/ListItemAllFields`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             'X-RequestDigest': requestDigest,
             'X-HTTP-Method': 'MERGE',
             'IF-MATCH': '*',
@@ -139,7 +121,6 @@ class SpoPageAddCommand extends SpoCommand {
           case 'HomePage':
             requestOptions.url = `${args.options.webUrl}/_api/web/rootfolder`;
             requestOptions.headers = {
-              authorization: `Bearer ${siteAccessToken}`,
               'X-RequestDigest': requestDigest,
               'X-HTTP-Method': 'MERGE',
               'IF-MATCH': '*',
@@ -153,7 +134,6 @@ class SpoPageAddCommand extends SpoCommand {
           case 'NewsPage':
             requestOptions.url = `${args.options.webUrl}/_api/web/getfilebyid('${itemId}')/ListItemAllFields`;
             requestOptions.headers = {
-              authorization: `Bearer ${siteAccessToken}`,
               'X-RequestDigest': requestDigest,
               'X-HTTP-Method': 'MERGE',
               'IF-MATCH': '*',
@@ -173,7 +153,6 @@ class SpoPageAddCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/getfilebyid('${itemId}')/ListItemAllFields/SetCommentsDisabled(${!args.options.commentsEnabled})`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             'X-RequestDigest': requestDigest,
             'content-type': 'application/json;odata=nometadata',
             accept: 'application/json;odata=nometadata'
@@ -191,7 +170,6 @@ class SpoPageAddCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/getfilebyid('${itemId}')/Publish('${encodeURIComponent(args.options.publishMessage || '').replace(/'/g, '%39')}')`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             'X-RequestDigest': requestDigest,
             'content-type': 'application/json;odata=nometadata',
             accept: 'application/json;odata=nometadata'
@@ -295,13 +273,7 @@ class SpoPageAddCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site using the
-      ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
-
-    To create new modern page, you have to first log in to a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
+      `  Remarks:
 
     If you try to create a page with a name of a page that already exists, you
     will get a ${chalk.grey('The file exists')} error.
@@ -313,26 +285,26 @@ class SpoPageAddCommand extends SpoCommand {
   Examples:
 
     Create new modern page. Use the Article layout
-      ${chalk.grey(config.delimiter)} ${this.name} --name new-page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team
+      ${this.name} --name new-page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team
 
     Create new modern page and set its title
-      ${chalk.grey(config.delimiter)} ${this.name} --name new-page.aspx --title 'My page' --webUrl https://contoso.sharepoint.com/sites/a-team
+      ${this.name} --name new-page.aspx --title 'My page' --webUrl https://contoso.sharepoint.com/sites/a-team
 
     Create new modern page. Use the Home page layout and include the default set
     of web parts 
-      ${chalk.grey(config.delimiter)} ${this.name} --name new-page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --layoutType Home
+      ${this.name} --name new-page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --layoutType Home
 
     Create new article page and promote it as a news article
-      ${chalk.grey(config.delimiter)} ${this.name} --name new-page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --promoteAs NewsPage
+      ${this.name} --name new-page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --promoteAs NewsPage
 
     Create new page and set it as the site's home page
-      ${chalk.grey(config.delimiter)} ${this.name} --name new-page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --layoutType Home --promoteAs HomePage
+      ${this.name} --name new-page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --layoutType Home --promoteAs HomePage
 
     Create new article page and enable comments on the page
-      ${chalk.grey(config.delimiter)} ${this.name} --name new-page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --commentsEnabled
+      ${this.name} --name new-page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --commentsEnabled
 
     Create new article page and publish it
-      ${chalk.grey(config.delimiter)} ${this.name} --name new-page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --publish
+      ${this.name} --name new-page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --publish
 `);
   }
 }

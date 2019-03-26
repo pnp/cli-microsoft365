@@ -1,4 +1,3 @@
-import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import request from '../../../../request';
@@ -34,7 +33,7 @@ interface Options extends GlobalOptions {
 
 class SpoSiteClassicAddCommand extends SpoCommand {
   private context?: FormDigestInfo;
-  private accessToken?: string;
+  private spoAdminUrl?: string;
   private dots?: string;
   private timeout?: NodeJS.Timer;
 
@@ -44,10 +43,6 @@ class SpoSiteClassicAddCommand extends SpoCommand {
 
   public get description(): string {
     return 'Creates new classic site';
-  }
-
-  protected requiresTenantAdmin(): boolean {
-    return true;
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -66,22 +61,18 @@ class SpoSiteClassicAddCommand extends SpoCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     this.dots = '';
 
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<FormDigestInfo> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest for tenant admin at ${auth.site.url}...`);
-        }
+    this
+      .getSpoAdminUrl(cmd, this.debug)
+      .then((_spoAdminUrl: string): Promise<FormDigestInfo> => {
+        this.spoAdminUrl = _spoAdminUrl;
 
-        this.accessToken = accessToken;
-
-        return this.ensureFormDigest(cmd, this.context, this.debug);
+        return this.ensureFormDigest(this.spoAdminUrl, cmd, this.context, this.debug);
       })
       .then((res: FormDigestInfo): Promise<boolean> => {
         this.context = res;
 
         if (args.options.removeDeletedSite) {
-          return this.siteExistsInTheRecycleBin(args.options.url, this.accessToken as string, cmd);
+          return this.siteExistsInTheRecycleBin(args.options.url, cmd);
         }
         else {
           // assume site doesn't exist
@@ -94,7 +85,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
             cmd.log('Site exists in the recycle bin');
           }
 
-          return this.deleteSiteFromTheRecycleBin(args.options.url, args.options.wait, this.accessToken as string, cmd);
+          return this.deleteSiteFromTheRecycleBin(args.options.url, args.options.wait, cmd);
         }
         else {
           if (this.verbose) {
@@ -105,7 +96,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
         }
       })
       .then((): Promise<FormDigestInfo> => {
-        return this.ensureFormDigest(cmd, this.context, this.debug);
+        return this.ensureFormDigest(this.spoAdminUrl as string, cmd, this.context, this.debug);
       })
       .then((res: FormDigestInfo): Promise<string> => {
         this.context = res;
@@ -122,9 +113,8 @@ class SpoSiteClassicAddCommand extends SpoCommand {
         const webTemplate: string = args.options.webTemplate || 'STS#0';
 
         const requestOptions: any = {
-          url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+          url: `${this.spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': this.context.FormDigestValue
           },
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><ObjectPath Id="6" ObjectPathId="5" /><Query Id="7" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query></Query><Query Id="8" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="5" ParentId="3" Name="CreateSite"><Parameters><Parameter TypeId="{11f84fff-b8cf-47b6-8b50-34e692656606}"><Property Name="CompatibilityLevel" Type="Int32">0</Property><Property Name="Lcid" Type="UInt32">${lcid}</Property><Property Name="Owner" Type="String">${Utils.escapeXml(args.options.owner)}</Property><Property Name="StorageMaximumLevel" Type="Int64">${storageQuota}</Property><Property Name="StorageWarningLevel" Type="Int64">${storageQuotaWarningLevel}</Property><Property Name="Template" Type="String">${Utils.escapeXml(webTemplate)}</Property><Property Name="TimeZoneId" Type="Int32">${args.options.timeZone}</Property><Property Name="Title" Type="String">${Utils.escapeXml(args.options.title)}</Property><Property Name="Url" Type="String">${Utils.escapeXml(args.options.url)}</Property><Property Name="UserCodeMaximumLevel" Type="Double">${resourceQuota}</Property><Property Name="UserCodeWarningLevel" Type="Double">${resourceQuotaWarningLevel}</Property></Parameter></Parameters></Method></ObjectPaths></Request>`
@@ -148,8 +138,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
             }
 
             this.timeout = setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), resolve, reject, this.accessToken as string, cmd, this.context as FormDigestInfo, this.dots, this.timeout);
-
+              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, cmd, this.context as FormDigestInfo, this.dots, this.timeout);
             }, operation.PollingInterval);
           }
         });
@@ -171,10 +160,10 @@ class SpoSiteClassicAddCommand extends SpoCommand {
     }
   }
 
-  private siteExistsInTheRecycleBin(url: string, accessToken: string, cmd: CommandInstance): Promise<boolean> {
+  private siteExistsInTheRecycleBin(url: string, cmd: CommandInstance): Promise<boolean> {
     return new Promise<boolean>((resolve: (exists: boolean) => void, reject: (error: any) => void): void => {
       this
-        .ensureFormDigest(cmd, this.context, this.debug)
+        .ensureFormDigest(this.spoAdminUrl as string, cmd, this.context, this.debug)
         .then((res: FormDigestInfo): Promise<string> => {
           this.context = res;
 
@@ -183,9 +172,8 @@ class SpoSiteClassicAddCommand extends SpoCommand {
           }
 
           const requestOptions: any = {
-            url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+            url: `${this.spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
             headers: {
-              authorization: `Bearer ${auth.service.accessToken}`,
               'X-RequestDigest': this.context.FormDigestValue
             },
             body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="197" ObjectPathId="196" /><ObjectPath Id="199" ObjectPathId="198" /><Query Id="200" ObjectPathId="198"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Constructor Id="196" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="198" ParentId="196" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">${Utils.escapeXml(url)}</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></ObjectPaths></Request>`
@@ -220,9 +208,8 @@ class SpoSiteClassicAddCommand extends SpoCommand {
           }
 
           const requestOptions: any = {
-            url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+            url: `${this.spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
             headers: {
-              authorization: `Bearer ${auth.service.accessToken}`,
               'X-RequestDigest': (this.context as FormDigestInfo).FormDigestValue
             },
             body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="181" ObjectPathId="180" /><Query Id="182" ObjectPathId="180"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Method Id="180" ParentId="175" Name="GetDeletedSitePropertiesByUrl"><Parameters><Parameter Type="String">${Utils.escapeXml(url)}</Parameter></Parameters></Method><Constructor Id="175" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
@@ -231,12 +218,6 @@ class SpoSiteClassicAddCommand extends SpoCommand {
           return request.post(requestOptions);
         })
         .then((res: string): void => {
-          if (this.debug) {
-            cmd.log('Response:');
-            cmd.log(res);
-            cmd.log('');
-          }
-
           const json: ClientSvcResponse = JSON.parse(res);
           const response: ClientSvcResponseContents = json[0];
           if (response.ErrorInfo) {
@@ -267,10 +248,10 @@ class SpoSiteClassicAddCommand extends SpoCommand {
     });
   }
 
-  private deleteSiteFromTheRecycleBin(url: string, wait: boolean, accessToken: string, cmd: CommandInstance): Promise<void> {
+  private deleteSiteFromTheRecycleBin(url: string, wait: boolean, cmd: CommandInstance): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       this
-        .ensureFormDigest(cmd, this.context, this.debug)
+        .ensureFormDigest(this.spoAdminUrl as string, cmd, this.context, this.debug)
         .then((res: FormDigestInfo): Promise<string> => {
           this.context = res;
 
@@ -279,9 +260,8 @@ class SpoSiteClassicAddCommand extends SpoCommand {
           }
 
           const requestOptions: any = {
-            url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+            url: `${this.spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
             headers: {
-              authorization: `Bearer ${auth.service.accessToken}`,
               'X-RequestDigest': this.context.FormDigestValue
             },
             body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="185" ObjectPathId="184" /><Query Id="186" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Method Id="184" ParentId="175" Name="RemoveDeletedSite"><Parameters><Parameter Type="String">${Utils.escapeXml(url)}</Parameter></Parameters></Method><Constructor Id="175" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
@@ -304,7 +284,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
             }
 
             setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), resolve, reject, accessToken, cmd, this.context as FormDigestInfo, this.dots, this.timeout);
+              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, cmd, this.context as FormDigestInfo, this.dots, this.timeout);
             }, operation.PollingInterval);
           }
         });
@@ -445,14 +425,10 @@ class SpoSiteClassicAddCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online tenant admin site,
-    using the ${chalk.blue(commands.LOGIN)} command.
+      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
+    the tenant admin site.
    
   Remarks:
-
-    To create a new classic site, you have to first log in to a tenant admin
-    site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso-admin.sharepoint.com`)}.
 
     Using the ${chalk.blue('-z, --timeZone')} option you have to specify the
     time zone of the site. For more information about the valid values see
@@ -498,16 +474,16 @@ class SpoSiteClassicAddCommand extends SpoCommand {
 
     Create new classic site collection using the Team site template. Set time
     zone to UTC+01:00. Don't wait for the site provisioning to complete
-      ${chalk.grey(config.delimiter)} ${this.getCommandName()} --url https://contoso.sharepoint.com/sites/team --title Team --owner admin@contoso.onmicrosoft.com --timeZone 4
+      ${this.getCommandName()} --url https://contoso.sharepoint.com/sites/team --title Team --owner admin@contoso.onmicrosoft.com --timeZone 4
 
     Create new classic site collection using the Team site template. Set time
     zone to UTC+01:00. Wait for the site provisioning to complete
-      ${chalk.grey(config.delimiter)} ${this.getCommandName()} --url https://contoso.sharepoint.com/sites/team --title Team --owner admin@contoso.onmicrosoft.com --timeZone 4 --webTemplate STS#0 --wait
+      ${this.getCommandName()} --url https://contoso.sharepoint.com/sites/team --title Team --owner admin@contoso.onmicrosoft.com --timeZone 4 --webTemplate STS#0 --wait
 
     Create new classic site collection using the Team site template. Set time
     zone to UTC+01:00. If a site with the same URL is in the recycle bin, delete
     it. Wait for the site provisioning to complete
-      ${chalk.grey(config.delimiter)} ${this.getCommandName()} --url https://contoso.sharepoint.com/sites/team --title Team --owner admin@contoso.onmicrosoft.com --timeZone 4 --webTemplate STS#0 --removeDeletedSite --wait
+      ${this.getCommandName()} --url https://contoso.sharepoint.com/sites/team --title Team --owner admin@contoso.onmicrosoft.com --timeZone 4 --webTemplate STS#0 --removeDeletedSite --wait
 `);
   }
 }

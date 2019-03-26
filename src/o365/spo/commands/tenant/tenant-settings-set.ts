@@ -1,4 +1,3 @@
-import auth from '../../SpoAuth';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import request from '../../../../request';
 import config from '../../../../config';
@@ -111,10 +110,6 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
     return 'Sets tenant global settings';
   }
 
-  protected requiresTenantAdmin(): boolean {
-    return true;
-  }
-
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.MinCompatibilityLevel = (!(!args.options.MinCompatibilityLevel)).toString();
@@ -217,22 +212,22 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
   private getSPOLimitedAccessFileType(): string[] { return ['OfficeOnlineFilesOnly', 'WebPreviewableFiles', 'OtherFiles']; }
 
   public commandAction(cmd: CommandInstance, args: any, cb: (err?: any) => void): void {
-    let accessToken = '';
     let formDigestValue = '';
+    let spoAdminUrl: string = '';
+    let tenantId: string = '';
 
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((resp: string): Promise<ContextInfo> => {
-        accessToken = resp;
-
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}.`);
-        }
-
-        return this.getRequestDigest(cmd, this.debug);
+    this
+      .getTenantId(cmd, this.debug)
+      .then((_tenantId: string): Promise<string> => {
+        tenantId = _tenantId;
+        return this.getSpoAdminUrl(cmd, this.debug);
       })
-      .then((contextResponse: ContextInfo): Promise<string> => {
-        formDigestValue = contextResponse.FormDigestValue;
+      .then((_spoAdminUrl: string): Promise<ContextInfo> => {
+        spoAdminUrl = _spoAdminUrl;
+        return this.getRequestDigest(spoAdminUrl);
+      })
+      .then((res: ContextInfo): Promise<string> => {
+        formDigestValue = res.FormDigestValue;
 
         // map the args.options to XML Properties
         let propsXml: string = '';
@@ -270,12 +265,11 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
         };
 
         const requestOptions: any = {
-          url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+          url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': formDigestValue
           },
-          body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${propsXml}</Actions><ObjectPaths><Identity Id="7" Name="${auth.site.tenantId}" /></ObjectPaths></Request>`
+          body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${propsXml}</Actions><ObjectPaths><Identity Id="7" Name="${tenantId}" /></ObjectPaths></Request>`
         };
 
         return request.post(requestOptions);
@@ -763,16 +757,16 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, connect to a SharePoint Online
-    tenant admin site, using the ${chalk.blue(commands.CONNECT)} command.
-
+      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
+    the tenant admin site.
+    
   Examples:
   
     Sets single tenant global setting
-      ${chalk.grey(config.delimiter)} ${commands.TENANT_SETTINGS_SET} --UserVoiceForFeedbackEnabled true
+      ${commands.TENANT_SETTINGS_SET} --UserVoiceForFeedbackEnabled true
 
     Sets multiple tenant global settings at once
-      ${chalk.grey(config.delimiter)} ${commands.TENANT_SETTINGS_SET} --UserVoiceForFeedbackEnabled true --HideSyncButtonOnODB true --DisabledWebPartIds c9b1909e-901a-0000-2cdb-e91c3f46320a,c9b1909e-901a-0000-2cdb-e91c3f463201
+      ${commands.TENANT_SETTINGS_SET} --UserVoiceForFeedbackEnabled true --HideSyncButtonOnODB true --DisabledWebPartIds c9b1909e-901a-0000-2cdb-e91c3f46320a,c9b1909e-901a-0000-2cdb-e91c3f463201
   ` );
   }
 }

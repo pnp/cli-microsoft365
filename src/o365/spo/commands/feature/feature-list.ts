@@ -1,6 +1,3 @@
-import auth from '../../SpoAuth';
-import { Auth } from '../../../../Auth';
-import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -39,28 +36,16 @@ class SpoFeatureListCommand extends SpoCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const scope: string = (args.options.scope) ? args.options.scope : 'Web';
-    const resource: string = Auth.getResourceFromUrl(args.options.url);
-    let siteAccessToken: string = '';
+    const requestOptions: any = {
+      url: `${args.options.url}/_api/${scope}/Features?$select=DisplayName,DefinitionId`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      json: true
+    };
 
-    auth.getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<{ value: Feature[]; }> => {
-        siteAccessToken = accessToken;
-
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving Features activated in ${scope}...`);
-        }
-
-        const requestOptions: any = {
-          url: `${args.options.url}/_api/${scope}/Features?$select=DisplayName,DefinitionId`,
-          headers: {
-            authorization: `Bearer ${siteAccessToken}`,
-            accept: 'application/json;odata=nometadata'
-          },
-          json: true
-        };
-
-        return request.get(requestOptions);
-      })
+    request
+      .get<{ value: Feature[] }>(requestOptions)
       .then((features: { value: Feature[] }): void => {
         if (features.value && features.value.length > 0) {
           cmd.log(features.value);
@@ -109,25 +94,15 @@ class SpoFeatureListCommand extends SpoCommand {
   }
 
   public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
     log(vorpal.find(commands.FEATURE_LIST).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-    using the ${chalk.blue(commands.LOGIN)} command.
-                      
-  Remarks:
-  
-    To retrieve list of activated Features, you have to first log in to
-    a SharePoint Online site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-  
-  Examples:
+      `  Examples:
   
     Return details about Features activated in the specified site collection
-      ${chalk.grey(config.delimiter)} ${commands.FEATURE_LIST} --url https://contoso.sharepoint.com/sites/test --scope Site
+      ${commands.FEATURE_LIST} --url https://contoso.sharepoint.com/sites/test --scope Site
 
     Return details about Features activated in the specified site
-      ${chalk.grey(config.delimiter)} ${commands.FEATURE_LIST} --url https://contoso.sharepoint.com/sites/test --scope Web
+      ${commands.FEATURE_LIST} --url https://contoso.sharepoint.com/sites/test --scope Web
       `);
   }
 }

@@ -2,38 +2,35 @@ import commands from '../../commands';
 import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth from '../../GraphAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./teams-user-set');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import { Service } from '../../../../Auth';
 
 describe(commands.TEAMS_USER_SET, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
-  let trackEvent: any;
-  let telemetry: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    auth.service.connected = true;
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    auth.service = new Service();
-    telemetry = null;
     (command as any).items = [];
   });
 
@@ -48,10 +45,10 @@ describe(commands.TEAMS_USER_SET, () => {
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.ensureAccessToken,
-      auth.restoreAuth
+      auth.restoreAuth,
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -60,32 +57,6 @@ describe(commands.TEAMS_USER_SET, () => {
 
   it('has a description', () => {
     assert.notEqual(command.description, null);
-  });
-
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.TEAMS_USER_SET);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 
   it('fails validation if the teamId is not a valid guid.', (done) => {
@@ -170,12 +141,7 @@ describe(commands.TEAMS_USER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", userName: 'notpresent.karl.matteson@contoso.onmicrosoft.com', role: 'Member' } }, (err?: any) => {
-
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("The specified user does not belong to the given Microsoft Teams team. Please use the 'graph teams user add' command to add new users.")));
         done();
@@ -202,12 +168,7 @@ describe(commands.TEAMS_USER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", userName: 'karl.matteson@contoso.onmicrosoft.com', role: 'Member' } }, (err?: any) => {
-
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('The specified user is already a member in the specified team, and thus cannot be demoted.')));
         done();
@@ -234,12 +195,7 @@ describe(commands.TEAMS_USER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", userName: 'anne.matthews@contoso.onmicrosoft.com', role: 'Owner' } }, (err?: any) => {
-
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('The specified user is already an owner in the specified team, and thus cannot be promoted.')));
         done();
@@ -272,15 +228,13 @@ describe(commands.TEAMS_USER_SET, () => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners/$ref` &&
         JSON.stringify(opts.body) === `{"@odata.id":"https://graph.microsoft.com/v1.0/directoryObjects/00000000-0000-0000-0000-000000000001"}`) {
         promoteMemberIssued = true;
+        return Promise.resolve();
       }
+
+      return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", userName: 'karl.matteson@contoso.onmicrosoft.com', role: 'Owner' } }, (err?: any) => {
-
       try {
         assert(promoteMemberIssued);
         done();
@@ -313,15 +267,13 @@ describe(commands.TEAMS_USER_SET, () => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners/$ref` &&
         JSON.stringify(opts.body) === `{"@odata.id":"https://graph.microsoft.com/v1.0/directoryObjects/00000000-0000-0000-0000-000000000001"}`) {
         promoteMemberIssued = true;
+        return Promise.resolve();
       }
+    
+      return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000", userName: 'karl.matteson@contoso.onmicrosoft.com', role: 'Owner' } }, (err?: any) => {
-
       try {
         assert(promoteMemberIssued);
         done();
@@ -353,15 +305,13 @@ describe(commands.TEAMS_USER_SET, () => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners/00000000-0000-0000-0000-000000000000/$ref`) {
         demoteOwnerIssued = true;
+        return Promise.resolve();
       }
+
+      return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", userName: 'anne.matthews@contoso.onmicrosoft.com', role: 'Member' } }, (err?: any) => {
-
       try {
         assert(demoteOwnerIssued);
         done();
@@ -393,36 +343,15 @@ describe(commands.TEAMS_USER_SET, () => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners/00000000-0000-0000-0000-000000000000/$ref`) {
         demoteOwnerIssued = true;
+        return Promise.resolve();
       }
+
+      return Promise.reject('Invalid request');      
     });
 
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000", userName: 'anne.matthews@contoso.onmicrosoft.com', role: 'Member' } }, (err?: any) => {
-
       try {
         assert(demoteOwnerIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-  // Succesfully sets Owner when user is Member 
-  // Succesfully sets Member when user is Owner 
-  // throws error when team not found ?
-  // everything with debug :) 
-
-  it('aborts when not logged in to Microsoft Graph', (done) => {
-    auth.service = new Service();
-    auth.service.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to the Microsoft Graph first')));
         done();
       }
       catch (e) {
@@ -474,23 +403,5 @@ describe(commands.TEAMS_USER_SET, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.ensureAccessToken);
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 });

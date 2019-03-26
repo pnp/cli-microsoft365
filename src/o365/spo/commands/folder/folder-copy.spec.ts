@@ -2,7 +2,7 @@ import commands from '../../commands';
 import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth, { Site } from '../../SpoAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./folder-copy');
 import * as assert from 'assert';
 import request from '../../../../request';
@@ -13,34 +13,13 @@ describe(commands.FOLDER_COPY, () => {
   let log: any[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  let trackEvent: any;
-  let telemetry: any;
 
   let stubAllPostRequests: any = (
-    getAccessToken: any = null,
-    getRequestDigestForSite: any = null,
     recycleFolder: any = null,
     createCopyJobs: any = null,
     waitForJobResult: any = null
   ) => {
     return sinon.stub(request, 'post').callsFake((opts) => {
-
-      if (opts.url.indexOf('/common/oauth2/token') > -1) {
-        if (getAccessToken) {
-          return getAccessToken;
-        }
-        return Promise.resolve('abc');
-      }
-
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        if (getRequestDigestForSite) {
-          return getRequestDigestForSite;
-        }
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
-      }
-
       if (opts.url.indexOf('/recycle()') > -1) {
         if (recycleFolder) {
           return recycleFolder;
@@ -70,9 +49,7 @@ describe(commands.FOLDER_COPY, () => {
   }
 
   let stubAllGetRequests: any = (folderExists: any = null) => {
-
     return sinon.stub(request, 'get').callsFake((opts) => {
-
       if (opts.url.indexOf('GetFolderByServerRelativeUrl') > -1) {
         if (folderExists) {
           return folderExists;
@@ -86,23 +63,23 @@ describe(commands.FOLDER_COPY, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    auth.service.connected = true;
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.site = new Site();
-    telemetry = null;
   });
 
   afterEach(() => {
@@ -115,10 +92,10 @@ describe(commands.FOLDER_COPY, () => {
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.getAccessToken,
-      auth.restoreAuth
+      auth.restoreAuth,
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -129,55 +106,9 @@ describe(commands.FOLDER_COPY, () => {
     assert.notEqual(command.description, null);
   });
 
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.FOLDER_COPY);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not logged in to a SharePoint site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com' } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('should command complete successfully (verbose)', (done) => {
     stubAllPostRequests();
     stubAllGetRequests();
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     cmdInstance.action({
       options: {
@@ -201,11 +132,6 @@ describe(commands.FOLDER_COPY, () => {
     stubAllPostRequests();
     stubAllGetRequests();
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     cmdInstance.action({
       options: {
         webUrl: 'https://contoso.sharepoint.com',
@@ -228,13 +154,8 @@ describe(commands.FOLDER_COPY, () => {
       const log = JSON.stringify({ Event: 'JobError', Message: 'error1' });
       return resolve({ Logs: [log] });
     });
-    stubAllPostRequests(null, null, null, null, waitForJobResult);
+    stubAllPostRequests(null, null, waitForJobResult);
     stubAllGetRequests();
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     cmdInstance.action({
       options: {
@@ -259,13 +180,8 @@ describe(commands.FOLDER_COPY, () => {
       const log = JSON.stringify({ Event: 'JobFatalError', Message: 'error2' });
       return resolve({ JobState: 0, Logs: [log] });
     });
-    stubAllPostRequests(null, null, null, null, waitForJobResult);
+    stubAllPostRequests(null, null, waitForJobResult);
     stubAllGetRequests();
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     cmdInstance.action({
       options: {
@@ -480,11 +396,6 @@ describe(commands.FOLDER_COPY, () => {
 
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     cmdInstance.action({
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team-a/',
@@ -529,11 +440,6 @@ describe(commands.FOLDER_COPY, () => {
 
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     cmdInstance.action({
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team-a/',
@@ -577,11 +483,6 @@ describe(commands.FOLDER_COPY, () => {
       return Promise.reject('Invalid request');
 
     });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     cmdInstance.action({
       options: {
@@ -679,28 +580,5 @@ describe(commands.FOLDER_COPY, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.getAccessToken);
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        webUrl: "https://contoso.sharepoint.com",
-        debug: false
-      }
-    }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 });

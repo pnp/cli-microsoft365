@@ -1,5 +1,3 @@
-import auth from '../../GraphAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import request from '../../../../request';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -33,28 +31,23 @@ class GraphO365GroupGetCommand extends GraphCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     let group: Group;
 
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((): Promise<Group> => {
-        const requestOptions: any = {
-          url: `${auth.service.resource}/v1.0/groups/${args.options.id}`,
-          headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
-            accept: 'application/json;odata.metadata=none'
-          },
-          json: true
-        };
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/groups/${args.options.id}`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      json: true
+    };
 
-        return request.get(requestOptions);
-      })
+    request
+      .get<Group>(requestOptions)
       .then((res: Group): Promise<{ webUrl: string }> => {
         group = res;
 
         if (args.options.includeSiteUrl) {
           const requestOptions: any = {
-            url: `${auth.service.resource}/v1.0/groups/${group.id}/drive?$select=webUrl`,
+            url: `${this.resource}/v1.0/groups/${group.id}/drive?$select=webUrl`,
             headers: {
-              authorization: `Bearer ${auth.service.accessToken}`,
               accept: 'application/json;odata.metadata=none'
             },
             json: true
@@ -115,23 +108,14 @@ class GraphO365GroupGetCommand extends GraphCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to the Microsoft Graph
-    using the ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
-
-    To get information about a Office 365 Group, you have to first log in to
-    the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
-
-  Examples:
+      `  Examples:
   
     Get information about the Office 365 Group with id ${chalk.grey(`1caf7dcd-7e83-4c3a-94f7-932a1299c844`)}
-      ${chalk.grey(config.delimiter)} ${this.name} --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844
+      ${this.name} --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844
 
     Get information about the Office 365 Group with id ${chalk.grey(`1caf7dcd-7e83-4c3a-94f7-932a1299c844`)}
     and also retrieve the URL of the corresponding SharePoint site
-      ${chalk.grey(config.delimiter)} ${this.name} --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --includeSiteUrl
+      ${this.name} --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --includeSiteUrl
 `);
   }
 }

@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import request from '../../../../request';
 import {
@@ -8,7 +6,6 @@ import {
 } from '../../../../Command';
 import { AppMetadata } from './AppMetadata';
 import GlobalOptions from '../../../../GlobalOptions';
-import { Auth } from '../../../../Auth';
 import { SpoAppBaseCommand } from './SpoAppBaseCommand';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -31,10 +28,6 @@ class SpoAppListCommand extends SpoAppBaseCommand {
     return 'Lists apps from the specified app catalog';
   }
 
-  protected requiresTenantAdmin(): boolean {
-    return false;
-  }
-
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.appCatalogUrl = (!(!args.options.appCatalogUrl)).toString();
@@ -44,26 +37,17 @@ class SpoAppListCommand extends SpoAppBaseCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
-    let siteAccessToken: string = '';
     let appCatalogSiteUrl: string = '';
+    let spoUrl: string = '';
 
-    auth
-      .ensureAccessToken(auth.site.url, cmd, this.debug)
-      .then((accessToken: string): Promise<string> => {
-        return this.getAppCatalogSiteUrl(cmd, auth.site.url, accessToken, args)
+    this
+      .getSpoUrl(cmd, this.debug)
+      .then((_spoUrl: string): Promise<string> => {
+        spoUrl = _spoUrl;
+        return this.getAppCatalogSiteUrl(cmd, spoUrl, args)
       })
-      .then((appCatalogUrl: string): Promise<string> => {
+      .then((appCatalogUrl: string): Promise<{ value: AppMetadata[] }> => {
         appCatalogSiteUrl = appCatalogUrl;
-
-        const resource: string = Auth.getResourceFromUrl(appCatalogSiteUrl);
-        return auth.getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug);
-      })
-      .then((accessToken: string): Promise<{ value: AppMetadata[] }> => {
-        siteAccessToken = accessToken;
-
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}...`);
-        }
 
         if (this.verbose) {
           cmd.log(`Retrieving apps...`);
@@ -72,7 +56,6 @@ class SpoAppListCommand extends SpoAppBaseCommand {
         const requestOptions: any = {
           url: `${appCatalogSiteUrl}/_api/web/${scope}appcatalog/AvailableApps`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata'
           },
           json: true
@@ -149,14 +132,7 @@ class SpoAppListCommand extends SpoAppBaseCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.APP_LIST).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site, using
-    the ${chalk.blue(commands.LOGIN)} command.
-
-  Remarks:
-
-    To list apps from the specified app catalog, you have to first log in
-    to a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
+      `  Remarks:
 
     When listing information about apps available in the tenant app catalog,
     it's not necessary to specify the tenant app catalog URL. When the URL
@@ -178,11 +154,11 @@ class SpoAppListCommand extends SpoAppBaseCommand {
   
     Return the list of available apps from the tenant app catalog.
     Show the installed version in the site if applicable.
-      ${chalk.grey(config.delimiter)} ${commands.APP_LIST}
+      ${commands.APP_LIST}
 
     Return the list of available apps from a site collection app catalog
     of site ${chalk.grey('https://contoso.sharepoint.com/sites/site1')}.
-      ${chalk.grey(config.delimiter)} ${commands.APP_LIST} --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
+      ${commands.APP_LIST} --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
 
   More information:
   

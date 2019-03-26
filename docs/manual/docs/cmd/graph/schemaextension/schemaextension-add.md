@@ -22,18 +22,13 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
-!!! important
-    Before using this command, log in to the Microsoft Graph, using the [graph login](../login.md) command.
-
 ## Remarks
-
-To create a schema extension, you have to first log in to the Microsoft Graph using the [graph login](../login.md) command, eg. `graph login`.
 
 To create a schema extension, you have to specify a unique ID for the schema extension. You can assign a value in one of two ways:
 
 - concatenate the name of one of your verified domains with a name for the schema extension to form a unique string in this format, `{domainName}_{schemaName}`, eg. `contoso_mySchema`.
 
-    NOTE: Only verified domains under the following top-level domains are supported: .com,.net, .gov, .edu or .org.
+    NOTE: Only verified domains under the following top-level domains are supported: .com, .net, .gov, .edu or .org.
 
 - Provide a schema name, and let Microsoft Graph use that schema name to complete the id assignment in this format: `ext{8-random-alphanumeric-chars}_{schema-name}`, eg. `extkvbmkofy_mySchema`.
 

@@ -1,5 +1,3 @@
-import auth from '../../AzmgmtAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
@@ -35,7 +33,7 @@ class AzmgmtFlowListCommand extends AzmgmtItemsListCommand<{ name: string, prope
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const url: string = `${auth.service.resource}providers/Microsoft.ProcessSimple${args.options.asAdmin ? '/scopes/admin' : ''}/environments/${encodeURIComponent(args.options.environment)}/flows?api-version=2016-11-01`;
+    const url: string = `${this.resource}providers/Microsoft.ProcessSimple${args.options.asAdmin ? '/scopes/admin' : ''}/environments/${encodeURIComponent(args.options.environment)}/flows?api-version=2016-11-01`;
 
     this
       .getAllItems(url, cmd, true)
@@ -93,18 +91,12 @@ class AzmgmtFlowListCommand extends AzmgmtItemsListCommand<{ name: string, prope
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.FLOW_LIST).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to the Azure Management Service,
-    using the ${chalk.blue(commands.LOGIN)} command.
-
-  Remarks:
+      `  Remarks:
 
     ${chalk.yellow('Attention:')} This command is based on an API that is currently
     in preview and is subject to change once the API reached general
     availability.
   
-    To list Microsoft Flows in the given environment, you have to first log in
-    to the Azure Management Service using the ${chalk.blue(commands.LOGIN)} command.
-
     If the environment with the name you specified doesn't exist, you will get
     the ${chalk.grey('Access to the environment \'xyz\' is denied.')} error.
 
@@ -114,10 +106,10 @@ class AzmgmtFlowListCommand extends AzmgmtItemsListCommand<{ name: string, prope
   Examples:
   
     List all your Flows in the given environment
-      ${chalk.grey(config.delimiter)} ${this.getCommandName()} --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5
+      ${this.getCommandName()} --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5
 
     List all Flows in the given environment
-      ${chalk.grey(config.delimiter)} ${this.getCommandName()} --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --asAdmin
+      ${this.getCommandName()} --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --asAdmin
 `);
   }
 }

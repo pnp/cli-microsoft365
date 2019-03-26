@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
 import {
@@ -39,24 +37,18 @@ class SpoSiteDesignRightsRevokeCommand extends SpoCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const revokePermissions: () => void = (): void => {
-      auth
-        .ensureAccessToken(auth.service.resource, cmd, this.debug)
-        .then((accessToken: string): Promise<ContextInfo> => {
-          if (this.debug) {
-            cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-          }
+      let spoUrl: string = '';
 
-          if (this.verbose) {
-            cmd.log(`Retrieving request digest...`);
-          }
-
-          return this.getRequestDigest(cmd, this.debug);
+      this
+        .getSpoUrl(cmd, this.debug)
+        .then((_spoUrl: string): Promise<ContextInfo> => {
+          spoUrl = _spoUrl;
+          return this.getRequestDigest(spoUrl);
         })
         .then((res: ContextInfo): Promise<void> => {
           const requestOptions: any = {
-            url: `${auth.site.url}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.RevokeSiteDesignRights`,
+            url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.RevokeSiteDesignRights`,
             headers: {
-              authorization: `Bearer ${auth.service.accessToken}`,
               'X-RequestDigest': res.FormDigestValue,
               'content-type': 'application/json;charset=utf-8',
               accept: 'application/json;odata=nometadata'
@@ -141,31 +133,29 @@ class SpoSiteDesignRightsRevokeCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site using the
-      ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
-
-    To revoke access to a site design, you have to first log in to a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
+      `  Remarks:
 
     If the specified ${chalk.grey('id')} doesn't refer to an existing site design, you will get
     a ${chalk.grey('File not found')} error.
 
-    If all principals have rights revoked on the site design, the site design becomes viewable to everyone.
+    If all principals have rights revoked on the site design, the site design
+    becomes viewable to everyone.
 
-    If you try to revoke access for a user that doesn't have access granted to the specified site design
-    you will get a ${chalk.grey('The specified user or domain group was not found')} error.
+    If you try to revoke access for a user that doesn't have access granted
+    to the specified site design you will get a
+    ${chalk.grey('The specified user or domain group was not found')} error.
 
   Examples:
   
-    Revoke access to the site design with ID ${chalk.grey('2c1ba4c4-cd9b-4417-832f-92a34bc34b2a')} from user
-    with alias ${chalk.grey('PattiF')}. Will prompt for confirmation before revoking the access
-      ${chalk.grey(config.delimiter)} ${this.name} --id 2c1ba4c4-cd9b-4417-832f-92a34bc34b2a --principals PattiF
+    Revoke access to the site design with ID
+    ${chalk.grey('2c1ba4c4-cd9b-4417-832f-92a34bc34b2a')} from user with alias ${chalk.grey('PattiF')}.
+    Will prompt for confirmation before revoking the access
+      ${this.name} --id 2c1ba4c4-cd9b-4417-832f-92a34bc34b2a --principals PattiF
 
-    Revoke access to the site design with ID ${chalk.grey('2c1ba4c4-cd9b-4417-832f-92a34bc34b2a')} from users
-    with aliases ${chalk.grey('PattiF')} and ${chalk.grey('AdeleV')} without prompting for confirmation
-      ${chalk.grey(config.delimiter)} ${this.name} --id 2c1ba4c4-cd9b-4417-832f-92a34bc34b2a --principals PattiF,AdeleV --confirm
+    Revoke access to the site design with ID
+    ${chalk.grey('2c1ba4c4-cd9b-4417-832f-92a34bc34b2a')} from users with aliases ${chalk.grey('PattiF')} and
+    ${chalk.grey('AdeleV')} without prompting for confirmation
+      ${this.name} --id 2c1ba4c4-cd9b-4417-832f-92a34bc34b2a --principals PattiF,AdeleV --confirm
 
   More information:
 

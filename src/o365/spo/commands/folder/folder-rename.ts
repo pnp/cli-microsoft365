@@ -1,4 +1,3 @@
-import auth from '../../SpoAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -9,7 +8,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
-import { Auth } from '../../../../Auth';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import { ClientSvc, IdentityResponse } from '../../common/ClientSvc';
 
@@ -36,29 +34,18 @@ class SpoFolderRenameCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
     const clientSvc: ClientSvc = new ClientSvc(cmd, this.debug);
-    let siteAccessToken: string = '';
     let formDigestValue: string = '';
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<ContextInfo> => {
-        siteAccessToken = accessToken;
-
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
-
-        return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
-      })
+    this
+      .getRequestDigest(args.options.webUrl)
       .then((contextResponse: ContextInfo): Promise<IdentityResponse> => {
         formDigestValue = contextResponse.FormDigestValue;
 
-        return clientSvc.getCurrentWebIdentity(args.options.webUrl, siteAccessToken, formDigestValue);
+        return clientSvc.getCurrentWebIdentity(args.options.webUrl, formDigestValue);
       })
       .then((webIdentityResp: IdentityResponse): Promise<IdentityResponse> => {
-        return clientSvc.getFolderIdentity(webIdentityResp.objectIdentity, args.options.webUrl, args.options.folderUrl, siteAccessToken, formDigestValue);
+        return clientSvc.getFolderIdentity(webIdentityResp.objectIdentity, args.options.webUrl, args.options.folderUrl, formDigestValue);
       })
       .then((folderObjectIdentity: IdentityResponse): Promise<void> => {
         if (this.verbose) {
@@ -72,7 +59,6 @@ class SpoFolderRenameCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             'X-RequestDigest': formDigestValue
           },
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="MoveTo" Id="32" ObjectPathId="26"><Parameters><Parameter Type="String">${renamedServerRelativeUrl}</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="26" Name="${folderObjectIdentity.objectIdentity}" /></ObjectPaths></Request>`
@@ -90,7 +76,7 @@ class SpoFolderRenameCommand extends SpoCommand {
           }, (err: any): void => { reject(err); });
         });
       })
-      .then((resp: any): void => {
+      .then((): void => {
         if (this.verbose) {
           cmd.log('DONE');
         }
@@ -146,19 +132,11 @@ class SpoFolderRenameCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-    using the ${chalk.blue(commands.LOGIN)} command.
-  
-  Remarks:
-  
-    To rename a folder, you have to first log in to SharePoint using the
-    ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-        
-  Examples:
+      `  Examples:
   
     Renames a folder with site-relative URL ${chalk.grey('/Shared Documents/My Folder 1')}
     located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.FOLDER_RENAME} --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl '/Shared Documents/My Folder 1' --name 'My Folder 2'
+      ${commands.FOLDER_RENAME} --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl '/Shared Documents/My Folder 1' --name 'My Folder 2'
     `);
   }
 }

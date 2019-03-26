@@ -2,7 +2,7 @@ import * as sinon from 'sinon';
 import * as assert from 'assert';
 import SpoCommand from './SpoCommand';
 import request from '../../request';
-import auth, { Site } from './SpoAuth';
+import auth from './../../Auth';
 import Utils from '../../Utils';
 import { CommandError } from '../../Command';
 import { FormDigestInfo } from './spo';
@@ -28,6 +28,10 @@ describe('SpoCommand', () => {
   let cmdInstance: any;
   let log: string[];
 
+  before(() => {
+    auth.service.connected = true;
+  })
+
   beforeEach(() => {
     log = [];
     cmdInstance = {
@@ -41,16 +45,19 @@ describe('SpoCommand', () => {
 
   afterEach(() => {
     Utils.restore([
+      request.get,
       request.post,
+      auth.storeConnectionInfo
     ]);
+    auth.service.spoUrl = undefined;
+    auth.service.tenantId = undefined;
   });
 
   after(() => {
     Utils.restore([
-      request.post,
-      auth.ensureAccessToken,
       auth.restoreAuth
     ]);
+    auth.service.connected = false;
   });
 
   it('correctly reports an error while restoring auth info', (done) => {
@@ -126,11 +133,6 @@ describe('SpoCommand', () => {
       action: command.action()
     };
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    auth.site.tenantId = 'abc';
-
     let futureDate = new Date();
     futureDate.setSeconds(futureDate.getSeconds() + 1800);
 
@@ -141,7 +143,7 @@ describe('SpoCommand', () => {
       WebFullUrl: 'https://contoso.sharepoint.com'
     }
 
-    command.ensureFormDigest(cmdInstance, ctx, false);
+    command.ensureFormDigest('https://contoso.sharepoint.com', cmdInstance, ctx, false);
 
     try {
       assert(cmdInstanceLogSpy.notCalled);
@@ -172,11 +174,6 @@ describe('SpoCommand', () => {
       action: command.action()
     };
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    auth.site.tenantId = 'abc';
-
     let futureDate = new Date();
     futureDate.setSeconds(futureDate.getSeconds() + 1800);
 
@@ -187,7 +184,7 @@ describe('SpoCommand', () => {
       WebFullUrl: 'https://contoso.sharepoint.com'
     }
 
-    command.ensureFormDigest(cmdInstance, ctx, true);
+    command.ensureFormDigest('https://contoso.sharepoint.com', cmdInstance, ctx, true);
 
     try {
       assert(cmdInstanceLogSpy.notCalled);
@@ -218,13 +215,8 @@ describe('SpoCommand', () => {
       action: command.action()
     };
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    auth.site.tenantId = 'abc';
-
     command
-      .ensureFormDigest(cmdInstance, undefined, false)
+      .ensureFormDigest('https://contoso.sharepoint.com', cmdInstance, undefined, false)
       .then(ctx => {
         try {
           assert.notEqual(typeof ctx, 'undefined');
@@ -258,11 +250,6 @@ describe('SpoCommand', () => {
       action: command.action()
     };
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    auth.site.tenantId = 'abc';
-
     let pastDate = new Date();
     pastDate.setSeconds(pastDate.getSeconds() - 1800);
 
@@ -273,7 +260,7 @@ describe('SpoCommand', () => {
       WebFullUrl: 'https://contoso.sharepoint.com'
     }
 
-    command.ensureFormDigest(cmdInstance, ctx, false);
+    command.ensureFormDigest('https://contoso.sharepoint.com', cmdInstance, ctx, false);
 
     try {
       assert(cmdInstanceLogSpy.notCalled);
@@ -304,11 +291,6 @@ describe('SpoCommand', () => {
       action: command.action()
     };
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    auth.site.tenantId = 'abc';
-
     let pastDate = new Date();
     pastDate.setSeconds(pastDate.getSeconds() - 1800);
 
@@ -319,7 +301,7 @@ describe('SpoCommand', () => {
       WebFullUrl: 'https://contoso.sharepoint.com'
     }
 
-    command.ensureFormDigest(cmdInstance, ctx, true);
+    command.ensureFormDigest('https://contoso.sharepoint.com', cmdInstance, ctx, true);
 
     try {
       assert(cmdInstanceLogSpy.notCalled);
@@ -348,11 +330,6 @@ describe('SpoCommand', () => {
       action: command.action()
     };
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    auth.site.tenantId = 'abc';
-
     let pastDate = new Date();
     pastDate.setSeconds(pastDate.getSeconds() - 1800);
 
@@ -363,7 +340,7 @@ describe('SpoCommand', () => {
       WebFullUrl: 'https://contoso.sharepoint.com'
     }
 
-    command.ensureFormDigest(cmdInstance, ctx, true).catch((err?: any) => {
+    command.ensureFormDigest('https://contoso.sharepoint.com', cmdInstance, ctx, true).catch((err?: any) => {
       try {
         assert(err === "Invalid request");
         done();
@@ -371,6 +348,307 @@ describe('SpoCommand', () => {
       catch (e) {
         done(e);
       }
-    })
+    });
+  });
+
+  it('retrieves SPO URL from MS Graph when not retrieved previously', (done) => {
+    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/sites/root?$select=webUrl') {
+        return Promise.resolve({ webUrl: 'https://contoso.sharepoint.com' });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    const command = new MockCommand();
+    const cmdInstance = {
+      commandWrapper: {
+        command: 'spo command'
+      },
+      log: (msg: any) => { },
+      prompt: () => { },
+      action: command.action()
+    };
+
+    (command as any)
+      .getSpoUrl(cmdInstance, false)
+      .then((spoUrl: string) => {
+        try {
+          assert.equal(spoUrl, 'https://contoso.sharepoint.com');
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
+  });
+
+  it('retrieves SPO URL from MS Graph when not retrieved previously (debug)', (done) => {
+    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/sites/root?$select=webUrl') {
+        return Promise.resolve({ webUrl: 'https://contoso.sharepoint.com' });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    const command = new MockCommand();
+    const cmdInstance = {
+      commandWrapper: {
+        command: 'spo command'
+      },
+      log: (msg: any) => { },
+      prompt: () => { },
+      action: command.action()
+    };
+
+    (command as any)
+      .getSpoUrl(cmdInstance, true)
+      .then((spoUrl: string) => {
+        try {
+          assert.equal(spoUrl, 'https://contoso.sharepoint.com');
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
+  });
+
+  it('returns retrieved SPO URL when persisting connection info failed', (done) => {
+    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.reject());
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/sites/root?$select=webUrl') {
+        return Promise.resolve({ webUrl: 'https://contoso.sharepoint.com' });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    const command = new MockCommand();
+    const cmdInstance = {
+      commandWrapper: {
+        command: 'spo command'
+      },
+      log: (msg: any) => { },
+      prompt: () => { },
+      action: command.action()
+    };
+
+    (command as any)
+      .getSpoUrl(cmdInstance, false)
+      .then((spoUrl: string) => {
+        try {
+          assert.equal(spoUrl, 'https://contoso.sharepoint.com');
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
+  });
+
+  it('returns error when retrieving SPO URL failed', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/sites/root?$select=webUrl') {
+        return Promise.reject('An error has occurred');
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    const command = new MockCommand();
+    const cmdInstance = {
+      commandWrapper: {
+        command: 'spo command'
+      },
+      log: (msg: any) => { },
+      prompt: () => { },
+      action: command.action()
+    };
+
+    (command as any)
+      .getSpoUrl(cmdInstance, false)
+      .then(() => {
+        done('Expected error');
+      }, (err: string) => {
+        try {
+          assert.equal(err, 'An error has occurred');
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
+  });
+
+  it('returns error when retrieving SPO admin URL failed', (done) => {
+    const command = new MockCommand();
+    const cmdInstance = {
+      commandWrapper: {
+        command: 'spo command'
+      },
+      log: (msg: any) => { },
+      prompt: () => { },
+      action: command.action()
+    };
+    sinon.stub(command as any, 'getSpoUrl').callsFake(() => Promise.reject('An error has occurred'));
+
+    (command as any)
+      .getSpoAdminUrl(cmdInstance, false)
+      .then(() => {
+        done('Expected error');
+      }, (err: string) => {
+        try {
+          assert.equal(err, 'An error has occurred');
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
+  });
+
+  it('retrieves tenant ID when not retrieved previously', (done) => {
+    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery') {
+        return Promise.resolve(JSON.stringify([{
+          _ObjectIdentity_: 'tenantId'
+        }]));
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    const command = new MockCommand();
+    const cmdInstance = {
+      commandWrapper: {
+        command: 'spo command'
+      },
+      log: (msg: any) => { },
+      prompt: () => { },
+      action: command.action()
+    };
+    sinon.stub(command as any, 'getSpoAdminUrl').callsFake(() => Promise.resolve('https://contoso-admin.sharepoint.com'));
+    sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'abc' }));
+
+    (command as any)
+      .getTenantId(cmdInstance, false)
+      .then((tenantId: string) => {
+        try {
+          assert.equal(tenantId, 'tenantId');
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
+  });
+
+  it('retrieves tenant ID when not retrieved previously (debug)', (done) => {
+    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery') {
+        return Promise.resolve(JSON.stringify([{
+          _ObjectIdentity_: 'tenantId'
+        }]));
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    const command = new MockCommand();
+    const cmdInstance = {
+      commandWrapper: {
+        command: 'spo command'
+      },
+      log: (msg: any) => { },
+      prompt: () => { },
+      action: command.action()
+    };
+    sinon.stub(command as any, 'getSpoAdminUrl').callsFake(() => Promise.resolve('https://contoso-admin.sharepoint.com'));
+    sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'abc' }));
+
+    (command as any)
+      .getTenantId(cmdInstance, true)
+      .then((tenantId: string) => {
+        try {
+          assert.equal(tenantId, 'tenantId');
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
+  });
+
+  it('returns retrieved tenant ID when persisting connection info failed', (done) => {
+    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery') {
+        return Promise.resolve(JSON.stringify([{
+          _ObjectIdentity_: 'tenantId'
+        }]));
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    const command = new MockCommand();
+    const cmdInstance = {
+      commandWrapper: {
+        command: 'spo command'
+      },
+      log: (msg: any) => { },
+      prompt: () => { },
+      action: command.action()
+    };
+    sinon.stub(command as any, 'getSpoAdminUrl').callsFake(() => Promise.resolve('https://contoso-admin.sharepoint.com'));
+    sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'abc' }));
+
+    (command as any)
+      .getTenantId(cmdInstance, false)
+      .then((tenantId: string) => {
+        try {
+          assert.equal(tenantId, 'tenantId');
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
+  });
+
+  it('returns error when retrieving tenant ID failed', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => Promise.reject('An error has occurred'));
+
+    const command = new MockCommand();
+    const cmdInstance = {
+      commandWrapper: {
+        command: 'spo command'
+      },
+      log: (msg: any) => { },
+      prompt: () => { },
+      action: command.action()
+    };
+    sinon.stub(command as any, 'getSpoAdminUrl').callsFake(() => Promise.resolve('https://contoso-admin.sharepoint.com'));
+    sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'abc' }));
+
+    (command as any)
+      .getTenantId(cmdInstance, false)
+      .then(() => {
+        done('Error expected');
+      }, (err: any) => {
+        try {
+          assert.equal(err, 'An error has occurred');
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
   });
 });

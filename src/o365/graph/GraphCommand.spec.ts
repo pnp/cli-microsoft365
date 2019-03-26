@@ -1,10 +1,9 @@
 import * as sinon from 'sinon';
 import * as assert from 'assert';
 import GraphCommand from './GraphCommand';
-import auth from './GraphAuth';
+import auth from './../../Auth';
 import Utils from '../../Utils';
 import { CommandError } from '../../Command';
-import { Service } from '../../Auth';
 import appInsights from '../../appInsights';
 
 class MockCommand extends GraphCommand {
@@ -26,7 +25,7 @@ class MockCommand extends GraphCommand {
 
 describe('GraphCommand', () => {
   before(() => {
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
   });
 
   afterEach(() => {
@@ -44,11 +43,11 @@ describe('GraphCommand', () => {
       commandWrapper: {
         command: 'graph command'
       },
-      log: (msg: any) => {},
-      prompt: () => {},
+      log: (msg: any) => { },
+      prompt: () => { },
       action: command.action()
     };
-    cmdInstance.action({options:{}}, (err?: any) => {
+    cmdInstance.action({ options: {} }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -66,12 +65,12 @@ describe('GraphCommand', () => {
       commandWrapper: {
         command: 'graph command'
       },
-      log: (msg: any) => {},
-      prompt: () => {},
+      log: (msg: any) => { },
+      prompt: () => { },
       action: command.action()
     };
     const commandCommandActionSpy = sinon.spy(command, 'commandAction');
-    cmdInstance.action({options:{}}, () => {
+    cmdInstance.action({ options: {} }, () => {
       try {
         assert(commandCommandActionSpy.notCalled);
         done();
@@ -89,14 +88,13 @@ describe('GraphCommand', () => {
       commandWrapper: {
         command: 'graph command'
       },
-      log: (msg: any) => {},
-      prompt: () => {},
+      log: (msg: any) => { },
+      prompt: () => { },
       action: command.action()
     };
-    auth.service = new Service('https://graph.microsoft.com');
     auth.service.connected = false;
     const commandCommandActionSpy = sinon.spy(command, 'commandAction');
-    cmdInstance.action({options:{}}, () => {
+    cmdInstance.action({ options: {} }, () => {
       try {
         assert(commandCommandActionSpy.notCalled);
         done();
@@ -114,14 +112,13 @@ describe('GraphCommand', () => {
       commandWrapper: {
         command: 'graph command'
       },
-      log: (msg: any) => {},
-      prompt: () => {},
+      log: (msg: any) => { },
+      prompt: () => { },
       action: command.action()
     };
-    auth.service = new Service('https://graph.microsoft.com');
     auth.service.connected = true;
     const commandCommandActionSpy = sinon.spy(command, 'commandAction');
-    cmdInstance.action({options:{}}, () => {
+    cmdInstance.action({ options: {} }, () => {
       try {
         assert(commandCommandActionSpy.called);
         done();
@@ -130,5 +127,10 @@ describe('GraphCommand', () => {
         done(e);
       }
     });
+  });
+
+  it('returns correct resource', () => {
+    const command = new MockCommand();
+    assert.equal((command as any).resource, 'https://graph.microsoft.com');
   });
 });

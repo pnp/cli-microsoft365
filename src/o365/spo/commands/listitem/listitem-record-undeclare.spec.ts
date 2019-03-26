@@ -1,8 +1,8 @@
 import commands from '../../commands';
-import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
+import Command, { CommandValidate, CommandOption } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth, { Site } from '../../SpoAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./listitem-record-undeclare');
 import * as assert from 'assert';
 import request from '../../../../request';
@@ -12,21 +12,9 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
   let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
-  let trackEvent: any;
-  let telemetry: any;
   const expectedId = 147;
   let actualId = 0;
   let postFakes = (opts: any) => {
-    if (opts.url.indexOf('/common/oauth2/token') > -1) {
-      return Promise.resolve('abc');
-    }
-
-    if (opts.url.indexOf('/_api/contextinfo') > -1) {
-      return Promise.resolve({
-        FormDigestValue: 'abc'
-      });
-    }
-
     if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
 
       // requestObjectIdentity mock
@@ -71,6 +59,7 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
     }
     return Promise.reject('Invalid request');
   }
+
   let getFakes = (opts: any) => {
     if (opts.url.indexOf('/id') > -1) {
       return Promise.resolve({ value: "f64041f2-9818-4b67-92ff-3bc5dbbef27e" });
@@ -78,42 +67,44 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
     return Promise.reject('Invalid request');
   }
 
-
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({
+      FormDigestValue: 'abc'
+    }));
+    auth.service.connected = true;
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    auth.site = new Site();
-    telemetry = null;
-
   });
 
   afterEach(() => {
     Utils.restore([
       vorpal.find,
-      request.post
+      request.post,
+      request.get
     ]);
   });
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.getAccessToken,
       auth.restoreAuth,
-      request.post
+      (command as any).getRequestDigest,
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -124,56 +115,10 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
     assert.notEqual(command.description, null);
   });
 
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.LISTITEM_RECORD_UNDECLARE);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not logged in to a SharePoint site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents', id: 1 } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('fails to get _ObjecttIdentity_ when an error is returned by the _ObjectIdentity_ CSOM request', (done) => {
-
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     actualId = 0;
     let options: any = {
       debug: false,
@@ -183,7 +128,6 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         done();
       }
@@ -191,22 +135,12 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
         assert(actualId !== expectedId);
         done(e);
       }
-      finally {
-        Utils.restore(request.get);
-        Utils.restore(request.post);
-      }
     });
 
   });
   it('correctly undeclares list item as a record when listTitle is passes', (done) => {
-
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     command.allowUnknownOptions();
 
@@ -217,29 +151,18 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
       webUrl: 'https://contoso.sharepoint.com/sites/project-x'
     }
     cmdInstance.action({ options: options }, () => {
-
       try {
         done();
       }
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.get);
-        Utils.restore(request.post);
-      }
     });
 
   });
   it('correctly undeclares list item as a record when listId is passed', (done) => {
-
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     command.allowUnknownOptions();
 
@@ -250,31 +173,20 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
       webUrl: 'https://contoso.sharepoint.com/sites/project-x'
     }
     cmdInstance.action({ options: options }, () => {
-
       try {
         done();
       }
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.get);
-        Utils.restore(request.post);
-      }
     });
 
   });
   it('fails to undeclare a list item as a record when \'reject me\' values are used', (done) => {
-
     actualId = 0;
 
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     let options: any = {
       debug: false,
@@ -284,16 +196,11 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         done();
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore(request.get);
-        Utils.restore(request.post);
       }
     });
 
@@ -397,30 +304,5 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.getAccessToken);
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        id: 1,
-        listId: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-        webUrl: "https://contoso.sharepoint.com",
-        debug: false
-      }
-    }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 });

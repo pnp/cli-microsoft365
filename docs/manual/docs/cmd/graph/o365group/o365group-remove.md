@@ -19,12 +19,7 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
-!!! important
-    Before using this command, log in to the Microsoft Graph, using the [graph login](../login.md) command.
-
 ## Remarks
-
-To remove an Office 365 Group, you have to first log in to the Microsoft Graph using the [graph login](../login.md) command, eg. `graph login`.
 
 If the specified _id_ doesn't refer to an existing group, you will get a `Resource does not exist` error.
 

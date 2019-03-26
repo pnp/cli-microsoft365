@@ -1,4 +1,3 @@
-import auth from '../../SpoAuth';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -12,7 +11,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
-import { Auth } from '../../../../Auth';
 import { FieldLink } from './FieldLink';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -65,34 +63,22 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-    let siteAccessToken: string = '';
     let schemaXmlWithResourceTokens: string = '';
 
     if (this.verbose) {
-      cmd.log(`Retrieving access token for ${resource}...`);
+      cmd.log(`Retrieving field link for field ${args.options.fieldId}...`);
     }
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<FieldLink> => {
-        siteAccessToken = accessToken;
+    const requestOptions: any = {
+      url: `${args.options.webUrl}/_api/web/contenttypes('${encodeURIComponent(args.options.contentTypeId)}')/fieldlinks('${args.options.fieldId}')`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      json: true
+    }
 
-        if (this.verbose) {
-          cmd.log(`Retrieving field link for field ${args.options.fieldId}...`);
-        }
-
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/contenttypes('${encodeURIComponent(args.options.contentTypeId)}')/fieldlinks('${args.options.fieldId}')`,
-          headers: {
-            authorization: `Bearer ${siteAccessToken}`,
-            accept: 'application/json;odata=nometadata'
-          },
-          json: true
-        }
-
-        return request.get(requestOptions);
-      })
+    request
+      .get<FieldLink>(requestOptions)
       .then((res: FieldLink): Promise<{ SchemaXmlWithResourceTokens: string; }> => {
         if (res["odata.null"] !== true) {
           if (this.verbose) {
@@ -110,7 +96,6 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/fields('${args.options.fieldId}')?$select=SchemaXmlWithResourceTokens`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata'
           },
           json: true
@@ -124,7 +109,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         }
 
         schemaXmlWithResourceTokens = res.SchemaXmlWithResourceTokens;
-        return this.createFieldLink(cmd, args, schemaXmlWithResourceTokens, siteAccessToken);
+        return this.createFieldLink(cmd, args, schemaXmlWithResourceTokens);
       })
       .then((): Promise<FieldLink> => {
         if (this.fieldLink) {
@@ -138,7 +123,6 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/contenttypes('${encodeURIComponent(args.options.contentTypeId)}')/fieldlinks('${args.options.fieldId}')`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata'
           },
           json: true
@@ -184,7 +168,6 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/site?$select=Id`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata'
           },
           json: true
@@ -208,7 +191,6 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web?$select=Id`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata'
           },
           json: true
@@ -233,7 +215,6 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             'X-RequestDigest': this.requestDigest
           },
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${requiredProperty}${hiddenProperty}<Method Name="Update" Id="124" ObjectPathId="19"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="121" Name="716a7b9e-3012-0000-22fb-84acfcc67d04|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${this.siteId}:web:${this.webId}:contenttype:${Utils.escapeXml(args.options.contentTypeId)}:fl:${(this.fieldLink as FieldLink).Id}" /><Identity Id="19" Name="716a7b9e-3012-0000-22fb-84acfcc67d04|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${this.siteId}:web:${this.webId}:contenttype:${Utils.escapeXml(args.options.contentTypeId)}" /></ObjectPaths></Request>`
@@ -266,7 +247,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
       });
   }
 
-  private createFieldLink(cmd: CommandInstance, args: CommandArgs, schemaXmlWithResourceTokens: string, siteAccessToken: string): Promise<void> {
+  private createFieldLink(cmd: CommandInstance, args: CommandArgs, schemaXmlWithResourceTokens: string): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       let requiresUpdate: boolean = false;
       const match: RegExpExecArray = /(<Field[^>]+>)(.*)/.exec(schemaXmlWithResourceTokens) as RegExpExecArray;
@@ -284,7 +265,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
       }
 
       this
-        .updateField(xField, requiresUpdate, siteAccessToken, cmd, args)
+        .updateField(xField, requiresUpdate, cmd, args)
         .then((): Promise<{ Id: string; }> => {
           if (this.verbose) {
             cmd.log(`Retrieving site collection id...`);
@@ -293,7 +274,6 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
           const requestOptions: any = {
             url: `${args.options.webUrl}/_api/site?$select=Id`,
             headers: {
-              authorization: `Bearer ${siteAccessToken}`,
               accept: 'application/json;odata=nometadata'
             },
             json: true
@@ -311,7 +291,6 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
           const requestOptions: any = {
             url: `${args.options.webUrl}/_api/web?$select=Id`,
             headers: {
-              authorization: `Bearer ${siteAccessToken}`,
               accept: 'application/json;odata=nometadata'
             },
             json: true
@@ -322,13 +301,12 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         .then((res: { Id: string }): Promise<void> => {
           this.webId = res.Id;
 
-          return this.ensureRequestDigest(args.options.webUrl, siteAccessToken, cmd);
+          return this.ensureRequestDigest(args.options.webUrl, cmd);
         })
         .then((): Promise<string> => {
           const requestOptions: any = {
             url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
             headers: {
-              authorization: `Bearer ${siteAccessToken}`,
               'X-RequestDigest': this.requestDigest
             },
             body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="5" ObjectPathId="4" /><ObjectIdentityQuery Id="6" ObjectPathId="4" /><Method Name="Update" Id="7" ObjectPathId="1"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="2" Name="d6667b9e-50fb-0000-2693-032ae7a0df25|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${this.siteId}:web:${this.webId}:field:${args.options.fieldId}" /><Method Id="4" ParentId="3" Name="Add"><Parameters><Parameter TypeId="{63fb2c92-8f65-4bbb-a658-b6cd294403f4}"><Property Name="Field" ObjectPathId="2" /></Parameter></Parameters></Method><Identity Id="1" Name="d6667b9e-80f4-0000-2693-05528ff416bf|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${this.siteId}:web:${this.webId}:contenttype:${Utils.escapeXml(args.options.contentTypeId)}" /><Property Id="3" ParentId="1" Name="FieldLinks" /></ObjectPaths></Request>`
@@ -351,7 +329,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
     });
   }
 
-  private updateField(schemaXml: string, requiresUpdate: boolean, siteAccessToken: string, cmd: CommandInstance, args: CommandArgs): Promise<void> {
+  private updateField(schemaXml: string, requiresUpdate: boolean, cmd: CommandInstance, args: CommandArgs): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       if (!requiresUpdate) {
         if (this.verbose) {
@@ -362,7 +340,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
       }
 
       this
-        .ensureRequestDigest(args.options.webUrl, siteAccessToken, cmd)
+        .ensureRequestDigest(args.options.webUrl, cmd)
         .then((): Promise<void> => {
           if (this.verbose) {
             cmd.log(`Updating field schema...`);
@@ -371,7 +349,6 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
           const requestOptions: any = {
             url: `${args.options.webUrl}/_api/web/fields('${args.options.fieldId}')`,
             headers: {
-              authorization: `Bearer ${siteAccessToken}`,
               accept: 'application/json;odata=nometadata',
               'content-type': 'application/json;odata=nometadata',
               'X-HTTP-Method': 'MERGE',
@@ -393,7 +370,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
     });
   }
 
-  private ensureRequestDigest(siteUrl: string, siteAccessToken: string, cmd: CommandInstance): Promise<void> {
+  private ensureRequestDigest(siteUrl: string, cmd: CommandInstance): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       if (this.requestDigest) {
         if (this.debug) {
@@ -408,7 +385,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
       }
 
       this
-        .getRequestDigestForSite(siteUrl, siteAccessToken, cmd, this.debug)
+        .getRequestDigest(siteUrl)
         .then((res: ContextInfo): void => {
           this.requestDigest = res.FormDigestValue;
           resolve();
@@ -486,14 +463,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.CONTENTTYPE_FIELD_SET).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint site,
-    using the ${chalk.blue(commands.LOGIN)} command.
-                
-  Remarks:
-
-    To add a field reference to a content type, you have to first log in
-    to a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
+      `  Remarks:
 
     If the field reference already exists, the command will update its ${chalk.grey(`required`)}
     and ${chalk.grey(`hidden`)} properties as specified in the command.
@@ -502,15 +472,15 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
   
     Add the specified site column to the specified content type as an optional
     and visible field
-      ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/sites/portal --contentTypeId 0x01007926A45D687BA842B947286090B8F67D --fieldId ebe7e498-44ff-43da-a7e5-99b444f656a5
+      ${this.name} --webUrl https://contoso.sharepoint.com/sites/portal --contentTypeId 0x01007926A45D687BA842B947286090B8F67D --fieldId ebe7e498-44ff-43da-a7e5-99b444f656a5
 
     Add the specified site column to the specified content type as a required
     field
-      ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/sites/portal --contentTypeId 0x01007926A45D687BA842B947286090B8F67D --fieldId ebe7e498-44ff-43da-a7e5-99b444f656a5 --required true
+      ${this.name} --webUrl https://contoso.sharepoint.com/sites/portal --contentTypeId 0x01007926A45D687BA842B947286090B8F67D --fieldId ebe7e498-44ff-43da-a7e5-99b444f656a5 --required true
 
     Update the existing site column reference in the specified content type
     to optional
-      ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/sites/portal --contentTypeId 0x01007926A45D687BA842B947286090B8F67D --fieldId ebe7e498-44ff-43da-a7e5-99b444f656a5 --required false
+      ${this.name} --webUrl https://contoso.sharepoint.com/sites/portal --contentTypeId 0x01007926A45D687BA842B947286090B8F67D --fieldId ebe7e498-44ff-43da-a7e5-99b444f656a5 --required false
 `);
   }
 }

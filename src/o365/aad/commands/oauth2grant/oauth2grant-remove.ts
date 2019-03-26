@@ -1,5 +1,3 @@
-import auth from '../../AadAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -19,7 +17,7 @@ interface Options extends GlobalOptions {
   grantId: string;
 }
 
-class Oauth2GrantRemoveCommand extends AadCommand {
+class AadOAuth2GrantRemoveCommand extends AadCommand {
   public get name(): string {
     return commands.OAUTH2GRANT_REMOVE;
   }
@@ -29,28 +27,18 @@ class Oauth2GrantRemoveCommand extends AadCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<{}> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Removing OAuth2 permissions...`);
-        }
+    if (this.verbose) {
+      cmd.log(`Removing OAuth2 permissions...`);
+    }
 
-        if (this.verbose) {
-          cmd.log(`Removing OAuth2 permissions...`);
-        }
+    const requestOptions: any = {
+      url: `${this.resource}/myorganization/oauth2PermissionGrants/${encodeURIComponent(args.options.grantId)}?api-version=1.6`,
+      json: true
+    };
 
-        const requestOptions: any = {
-          url: `${auth.service.resource}/myorganization/oauth2PermissionGrants/${encodeURIComponent(args.options.grantId)}?api-version=1.6`,
-          headers: {
-            authorization: `Bearer ${accessToken}`
-          },
-          json: true
-        };
-
-        return request.delete(requestOptions);
-      })
-      .then((res: any): void => {
+    request
+      .delete(requestOptions)
+      .then((): void => {
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
         }
@@ -85,14 +73,8 @@ class Oauth2GrantRemoveCommand extends AadCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.OAUTH2GRANT_REMOVE).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to Azure Active Directory Graph,
-      using the ${chalk.blue(commands.LOGIN)} command.
-
-  Remarks:
+      `  Remarks:
   
-    To remove service principal's OAuth2 permissions, you have to first log in
-    to Azure Active Directory Graph using the ${chalk.blue(commands.LOGIN)} command.
-
     Before you can remove service principal's OAuth2 permissions, you need to
     get the ${chalk.grey('objectId')} of the permissions grant to remove. You can retrieve it
     using the ${chalk.blue(commands.OAUTH2GRANT_LIST)} command.
@@ -105,7 +87,7 @@ class Oauth2GrantRemoveCommand extends AadCommand {
   Examples:
   
     Remove the OAuth2 permission grant with ID ${chalk.grey('YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek')}
-      ${chalk.grey(config.delimiter)} ${commands.OAUTH2GRANT_REMOVE} --grantId YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek
+      ${commands.OAUTH2GRANT_REMOVE} --grantId YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek
 
   More information:
   
@@ -115,4 +97,4 @@ class Oauth2GrantRemoveCommand extends AadCommand {
   }
 }
 
-module.exports = new Oauth2GrantRemoveCommand();
+module.exports = new AadOAuth2GrantRemoveCommand();

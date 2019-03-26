@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -29,21 +27,12 @@ class SpoStorageEntityGetCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${auth.service.resource}...`);
-    }
-
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<TenantProperty> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Loading details for the ${args.options.key} tenant property...`);
-        }
-
+    this
+      .getSpoUrl(cmd, this.debug)
+      .then((spoUrl: string): Promise<TenantProperty> => {
         const requestOptions: any = {
-          url: `${auth.site.url}/_api/web/GetStorageEntity('${encodeURIComponent(args.options.key)}')`,
+          url: `${spoUrl}/_api/web/GetStorageEntity('${encodeURIComponent(args.options.key)}')`,
           headers: {
-            authorization: `Bearer ${accessToken}`,
             accept: 'application/json;odata=nometadata'
           },
           json: true
@@ -83,22 +72,17 @@ class SpoStorageEntityGetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.STORAGEENTITY_GET).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site using the
-        ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
+      `  Remarks:
 
-    To get details of a tenant property, you have to first log in to a SharePoint site using the
-    ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-
-    Tenant properties are stored in the app catalog site associated with the site to which you are
-    currently logged in. When retrieving the specified tenant property, SharePoint will automatically
-    find the associated app catalog and try to retrieve the property from it.
+    Tenant properties are stored in the app catalog site associated with
+    the site to which you are currently logged in. When retrieving the specified
+    tenant property, SharePoint will automatically find the associated app
+    catalog and try to retrieve the property from it.
 
   Examples:
   
     Show the value, description and comment of the ${chalk.grey('AnalyticsId')} tenant property
-      ${chalk.grey(config.delimiter)} ${commands.STORAGEENTITY_GET} -k AnalyticsId
+      ${commands.STORAGEENTITY_GET} --key AnalyticsId
 
   More information:
 
