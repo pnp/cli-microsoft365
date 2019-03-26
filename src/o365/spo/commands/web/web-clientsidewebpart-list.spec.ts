@@ -2,58 +2,52 @@ import commands from '../../commands';
 import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth, { Site } from '../../SpoAuth';
 const command: Command = require('./web-clientsidewebpart-list');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import auth from '../../../../Auth';
 
 describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
   let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  let trackEvent: any;
-  let telemetry: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    sinon.stub(command as any, 'getRequestDigestForSite').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc' }); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    auth.service.connected = true;
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.site = new Site();
-    telemetry = null;
   });
 
   afterEach(() => {
     Utils.restore([
       vorpal.find,
-      request.get,
-      request.post
+      request.get
     ]);
   });
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.getAccessToken,
       auth.restoreAuth,
-      request.get,
-      request.post
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -62,32 +56,6 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
 
   it('has a description', () => {
     assert.notEqual(command.description, null);
-  });
-
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.WEB_CLIENTSIDEWEBPART_LIST);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 
   it('has help with examples', () => {
@@ -135,9 +103,9 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
   it('should fail validation if the webUrl option is not a valid SharePoint site URL', () => {
     const actual = (command.validate() as CommandValidate)({
       options:
-        {
-          webUrl: 'foo'
-        }
+      {
+        webUrl: 'foo'
+      }
     });
     assert.notEqual(actual, true);
   });
@@ -149,6 +117,31 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
       }
     });
     assert.equal(actual, true);
+  });
+
+  it('handles error when calling client side webparts', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('/_api/web/GetClientSideWebParts') > -1) {
+        return Promise.reject("Error");
+      }
+      return Promise.resolve('abc');
+    });
+
+    cmdInstance.action({
+      options: {
+        output: 'json',
+        debug: false,
+        webUrl: 'https://contoso.sharepoint.com'
+      }
+    }, (err?: any) => {
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 
   it('handles no client side webparts', (done) => {
@@ -180,11 +173,6 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
       return Promise.resolve('abc');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         output: 'json',
@@ -202,6 +190,7 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
       }
     });
   });
+
 
   it('handles no client side webparts (debug)', (done) => {
     let clientsideWebPartRsp = {
@@ -232,11 +221,6 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
       return Promise.resolve('abc');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         output: 'json',
@@ -284,11 +268,6 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
       return Promise.resolve('abc');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         output: 'json',
@@ -352,11 +331,6 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
       return Promise.resolve('abc');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         output: 'json',
@@ -389,44 +363,4 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
       }
     });
   });
-
-  it('correctly handles the getAccessToken error', (done) => {
-    Utils.restore(auth.getAccessToken);
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        webUrl: "https://contoso.sharepoint.com",
-        debug: false
-      }
-    }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not logged in to a SharePoint site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com', title: 'Documents' } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-
 }); 

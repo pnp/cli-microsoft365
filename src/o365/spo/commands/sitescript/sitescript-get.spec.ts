@@ -2,40 +2,39 @@ import commands from '../../commands';
 import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth, { Site } from '../../SpoAuth';
 const command: Command = require('./sitescript-get');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import auth from '../../../../Auth';
 
 describe(commands.SITESCRIPT_GET, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  let trackEvent: any;
-  let telemetry: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
     sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'ABC' }));
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    auth.service.connected = true;
+    auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.site = new Site();
-    telemetry = null;
   });
 
   afterEach(() => {
@@ -47,11 +46,12 @@ describe(commands.SITESCRIPT_GET, () => {
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.ensureAccessToken,
       auth.restoreAuth,
-      (command as any).getRequestDigest
+      (command as any).getRequestDigest,
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
+    auth.service.spoUrl = undefined;
   });
 
   it('has correct name', () => {
@@ -60,47 +60,6 @@ describe(commands.SITESCRIPT_GET, () => {
 
   it('has a description', () => {
     assert.notEqual(command.description, null);
-  });
-
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.SITESCRIPT_GET);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not logged in to a SharePoint site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 
   it('gets information about the specified site script', (done) => {
@@ -118,7 +77,7 @@ describe(commands.SITESCRIPT_GET, () => {
                 "themeName": "Contoso Theme"
               }
             ],
-            "bindata": { },
+            "bindata": {},
             "version": 1
           }),
           "Description": "My contoso script",
@@ -131,10 +90,6 @@ describe(commands.SITESCRIPT_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({
@@ -146,7 +101,7 @@ describe(commands.SITESCRIPT_GET, () => {
                 "themeName": "Contoso Theme"
               }
             ],
-            "bindata": { },
+            "bindata": {},
             "version": 1
           }),
           "Description": "My contoso script",
@@ -177,7 +132,7 @@ describe(commands.SITESCRIPT_GET, () => {
                 "themeName": "Contoso Theme"
               }
             ],
-            "bindata": { },
+            "bindata": {},
             "version": 1
           }),
           "Description": "My contoso script",
@@ -190,10 +145,6 @@ describe(commands.SITESCRIPT_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({
@@ -205,7 +156,7 @@ describe(commands.SITESCRIPT_GET, () => {
                 "themeName": "Contoso Theme"
               }
             ],
-            "bindata": { },
+            "bindata": {},
             "version": 1
           }),
           "Description": "My contoso script",
@@ -226,10 +177,6 @@ describe(commands.SITESCRIPT_GET, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('File Not Found.')));
@@ -310,23 +257,5 @@ describe(commands.SITESCRIPT_GET, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.ensureAccessToken);
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 });

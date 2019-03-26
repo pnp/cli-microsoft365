@@ -1,4 +1,3 @@
-import auth from "../../SpoAuth";
 import config from "../../../../config";
 import commands from "../../commands";
 import GlobalOptions from "../../../../GlobalOptions";
@@ -10,7 +9,6 @@ import {
 } from "../../../../Command";
 import SpoCommand from "../../SpoCommand";
 import Utils from "../../../../Utils";
-import { Auth } from "../../../../Auth";
 import {
   ContextInfo,
   ClientSvcResponse,
@@ -50,9 +48,7 @@ class SpoListItemRecordDeclareCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
     const clientSvc: ClientSvc = new ClientSvc(cmd, this.debug);
-    let siteAccessToken: string = '';
     let formDigestValue: string = '';
     let webIdentity: string = '';
     let listId: string = '';
@@ -61,25 +57,12 @@ class SpoListItemRecordDeclareCommand extends SpoCommand {
       ? `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.listId)}')`
       : `${args.options.webUrl}/_api/web/lists/getByTitle('${encodeURIComponent(args.options.listTitle as string)}')`;
 
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
-    }
-
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<ContextInfo> => {
-        siteAccessToken = accessToken;
-
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
-
-        return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
-      })
+    this
+      .getRequestDigest(args.options.webUrl)
       .then((contextResponse: ContextInfo): Promise<IdentityResponse> => {
         formDigestValue = contextResponse.FormDigestValue;
 
-        return clientSvc.getCurrentWebIdentity(args.options.webUrl, siteAccessToken, formDigestValue);
+        return clientSvc.getCurrentWebIdentity(args.options.webUrl, formDigestValue);
       })
       .then((webIdentityResp: IdentityResponse): Promise<{ Id: string }> => {
         webIdentity = webIdentityResp.objectIdentity;
@@ -91,7 +74,6 @@ class SpoListItemRecordDeclareCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${listRestUrl}?$select=Id`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata'
           },
           json: true
@@ -106,7 +88,6 @@ class SpoListItemRecordDeclareCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             'Content-Type': 'text/xml',
             'X-RequestDigest': formDigestValue
           },
@@ -218,34 +199,26 @@ class SpoListItemRecordDeclareCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-    using the ${chalk.blue(commands.LOGIN)} command.
-  
-  Remarks:
-  
-    To declare an item as a record, you have to first log in to SharePoint using
-    the ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-        
-  Examples:
+      `  Examples:
   
     Declare a document with id ${chalk.grey("1")} as a record in list with title ${chalk.grey("Demo List")}
     located in site ${chalk.grey("https://contoso.sharepoint.com/sites/project-x")}
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_RECORD_DECLARE} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle "Demo List" --id 1
+      ${commands.LISTITEM_RECORD_DECLARE} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle "Demo List" --id 1
 
     Declare a document with id ${chalk.grey("1")} as a record in list with id
     ${chalk.grey("ea8e1109-2013-1a69-bc05-1403201257fc")} located in site
     ${chalk.grey("https://contoso.sharepoint.com/sites/project-x")}
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_RECORD_DECLARE} --webUrl https://contoso.sharepoint.com/sites/project-x --listId ea8e1109-2013-1a69-bc05-1403201257fc --id 1
+      ${commands.LISTITEM_RECORD_DECLARE} --webUrl https://contoso.sharepoint.com/sites/project-x --listId ea8e1109-2013-1a69-bc05-1403201257fc --id 1
   
     Declare a document with id ${chalk.grey("1")} as a record with record declaration date
     ${chalk.grey("March 14, 2012")} in list with title ${chalk.grey("Demo List")} located in site
     ${chalk.grey("https://contoso.sharepoint.com/sites/project-x")}
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_RECORD_DECLARE} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle "Demo List" --id 1 --date 2012-03-14
+      ${commands.LISTITEM_RECORD_DECLARE} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle "Demo List" --id 1 --date 2012-03-14
 
     Declare a document with id ${chalk.grey("1")} as a record with record declaration date
     ${chalk.grey("September 3, 2013")} in list with id ${chalk.grey("ea8e1356-5910-abc9-bc05-2408198057fc")}
     located in site ${chalk.grey("https://contoso.sharepoint.com/sites/project-x")}
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_RECORD_DECLARE} --webUrl https://contoso.sharepoint.com/sites/project-x --listId ea8e1356-5910-abc9-bc05-2408198057fc --id 1 --date 2013-09-03
+      ${commands.LISTITEM_RECORD_DECLARE} --webUrl https://contoso.sharepoint.com/sites/project-x --listId ea8e1356-5910-abc9-bc05-2408198057fc --id 1 --date 2013-09-03
    `
     );
   }

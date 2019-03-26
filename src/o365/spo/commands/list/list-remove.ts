@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -9,7 +7,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
-import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -42,46 +39,33 @@ class SpoListRemoveCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-    let siteAccessToken: string = '';
-
     const removeList: () => void = (): void => {
-      if (this.debug) {
-        cmd.log(`Retrieving access token for ${resource}...`);
+      if (this.verbose) {
+        cmd.log(`Removing list in site at ${args.options.webUrl}...`);
       }
 
-      auth
-        .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-        .then((accessToken: string): Promise<void> => {
-          siteAccessToken = accessToken;
+      let requestUrl: string = '';
 
-          if (this.verbose) {
-            cmd.log(`Removing list in site at ${args.options.webUrl}...`);
-          }
+      if (args.options.id) {
+        requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.id)}')`;
+      }
+      else {
+        requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.title as string)}')`;
+      }
 
-          let requestUrl: string = '';
+      const requestOptions: any = {
+        url: requestUrl,
+        method: 'POST',
+        headers: {
+          'X-HTTP-Method': 'DELETE',
+          'If-Match': '*',
+          'accept': 'application/json;odata=nometadata'
+        },
+        json: true
+      };
 
-          if (args.options.id) {
-            requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.id)}')`;
-          }
-          else {
-            requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.title as string)}')`;
-          }
-
-          const requestOptions: any = {
-            url: requestUrl,
-            method: 'POST',
-            headers: {
-              authorization: `Bearer ${siteAccessToken}`,
-              'X-HTTP-Method': 'DELETE',
-              'If-Match': '*',
-              'accept': 'application/json;odata=nometadata'
-            },
-            json: true
-          };
-
-          return request.post(requestOptions);
-        })
+      request
+        .post(requestOptions)
         .then((): void => {
           // REST post call doesn't return anything
           cb();
@@ -164,23 +148,15 @@ class SpoListRemoveCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-    using the ${chalk.blue(commands.LOGIN)} command.
-  
-  Remarks:
-  
-    To remove a list, you have to first log in to SharePoint using the
-    ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-        
-  Examples:
+      `  Examples:
   
     Remove the list with ID ${chalk.grey('0cd891ef-afce-4e55-b836-fce03286cccf')} located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LIST_REMOVE} --webUrl https://contoso.sharepoint.com/sites/project-x --id 0cd891ef-afce-4e55-b836-fce03286cccf
+      ${commands.LIST_REMOVE} --webUrl https://contoso.sharepoint.com/sites/project-x --id 0cd891ef-afce-4e55-b836-fce03286cccf
 
     Remove the list with title ${chalk.grey('List 1')} located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
-      ${chalk.grey(config.delimiter)} ${commands.LIST_REMOVE} --webUrl https://contoso.sharepoint.com/sites/project-x --title 'List 1'
+      ${commands.LIST_REMOVE} --webUrl https://contoso.sharepoint.com/sites/project-x --title 'List 1'
       `);
   }
 }

@@ -1,13 +1,13 @@
-import commands from '../commands';
-import Command, { CommandCancel, CommandError, CommandOption, CommandValidate } from '../../../Command';
+import commands from './commands';
+import Command, { CommandCancel, CommandOption, CommandValidate, CommandError } from '../../Command';
 import * as sinon from 'sinon';
-import appInsights from '../../../appInsights';
-import auth from '../AzmgmtAuth';
+import appInsights from '../../appInsights';
+import auth from '../../Auth';
 const command: Command = require('./login');
 import * as assert from 'assert';
-import request from '../../../request';
-import Utils from '../../../Utils';
-import { Service, AuthType } from '../../../Auth';
+import * as request from 'request-promise-native';
+import Utils from '../../Utils';
+import { AuthType } from '../../Auth';
 import * as fs from 'fs';
 
 describe(commands.LOGIN, () => {
@@ -15,34 +15,28 @@ describe(commands.LOGIN, () => {
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  let trackEvent: any;
-  let telemetry: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
     sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.resolve());
     sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
   });
 
   beforeEach(() => {
-    vorpal = require('../../../vorpal-init');
+    vorpal = require('../../vorpal-init');
     log = [];
     cmdInstance = {
+      action: command.action(),
       commandWrapper: {
-        command: 'azmgmt login'
+        command: 'login'
       },
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.service = new Service('https://management.azure.com/');
     sinon.stub(auth.service, 'logout').callsFake(() => { });
-    telemetry = null;
   });
 
   afterEach(() => {
@@ -50,18 +44,19 @@ describe(commands.LOGIN, () => {
       vorpal.find,
       auth.cancel,
       fs.existsSync,
-      fs.readFileSync
+      fs.readFileSync,
+      auth.service.logout,
+      auth.ensureAccessToken
     ]);
   });
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.ensureAccessToken,
       auth.restoreAuth,
       auth.clearConnectionInfo,
       auth.storeConnectionInfo,
-      request.post
+      request.post,
+      appInsights.trackEvent
     ]);
   });
 
@@ -73,35 +68,8 @@ describe(commands.LOGIN, () => {
     assert.notEqual(command.description, null);
   });
 
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, command.name);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs in to Azure Management Service', (done) => {
-    auth.service = new Service('https://management.azure.com/');
-    cmdInstance.action = command.action();
+  it('logs in to Office 365', (done) => {
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve());
     cmdInstance.action({ options: { debug: false } }, () => {
       try {
         assert(auth.service.connected);
@@ -113,9 +81,8 @@ describe(commands.LOGIN, () => {
     });
   });
 
-  it('logs in to Azure Management Service (debug)', (done) => {
-    auth.service = new Service('https://management.azure.com/');
-    cmdInstance.action = command.action();
+  it('logs in to Office 365 (debug)', (done) => {
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve());
     cmdInstance.action({ options: { debug: true } }, () => {
       try {
         assert(auth.service.connected);
@@ -127,9 +94,8 @@ describe(commands.LOGIN, () => {
     });
   });
 
-  it('logs in to Azure Management Service using username and password when authType password set', (done) => {
-    auth.service = new Service('https://management.azure.com/');
-    cmdInstance.action = command.action();
+  it('logs in to Office 365 using username and password when authType password set', (done) => {
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve());
     cmdInstance.action({ options: { debug: false, authType: 'password', userName: 'user', password: 'password' } }, () => {
       try {
         assert.equal(auth.service.authType, AuthType.Password, 'Incorrect authType set');
@@ -143,11 +109,9 @@ describe(commands.LOGIN, () => {
     });
   });
 
-  it('logs in to AAD Graph using certificate when authType certificate set', (done) => {
+  it('logs in to Office 365 using certificate when authType certificate set', (done) => {
     sinon.stub(fs, 'readFileSync').callsFake(() => 'certificate');
 
-    auth.service = new Service('https://management.azure.com/');
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, authType: 'certificate', certificateFile: 'certificateFile', thumbprint: 'thumbprint' } }, () => {
       try {
         assert.equal(auth.service.authType, AuthType.Certificate, 'Incorrect authType set');
@@ -166,7 +130,7 @@ describe(commands.LOGIN, () => {
   });
 
   it('clears pending connection on cancel', () => {
-    const authCancelStub = sinon.stub(auth, 'cancel').callsFake(() => {});
+    const authCancelStub = sinon.stub(auth, 'cancel').callsFake(() => { });
     (command.cancel() as CommandCancel)();
     assert(authCancelStub.called);
   });
@@ -236,6 +200,12 @@ describe(commands.LOGIN, () => {
     assert.notEqual(actual, true);
   });
 
+  it('passes validation if authType is set to certificate and certificateFile and thumbprint are specified', () => {
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    const actual = (command.validate() as CommandValidate)({ options: { authType: 'certificate', certificateFile: 'certificate', thumbprint: 'thumbprint' } });
+    assert.equal(actual, true);
+  });
+
   it('passes validation if authType is set to password and userName and password specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { authType: 'password', userName: 'user', password: 'password' } });
     assert.equal(actual, true);
@@ -247,30 +217,19 @@ describe(commands.LOGIN, () => {
   });
 
   it('passes validation if authType is not set and userName and password not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { } });
+    const actual = (command.validate() as CommandValidate)({ options: {} });
     assert.equal(actual, true);
-  });
-
-  it('passes validation if authType is set to certificate and certificateFile and thumbprint are specified', () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    const actual = (command.validate() as CommandValidate)({ options: { authType: 'certificate', certificateFile: 'certificate', thumbprint: 'thumbprint' } });
-    assert.equal(actual, true);
-  });
-
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notEqual(typeof alias, 'undefined');
   });
 
   it('has help referring to the right command', () => {
     const cmd: any = {
-      log: (msg: string) => {},
-      prompt: () => {},
-      helpInformation: () => {}
+      log: (msg: string) => { },
+      prompt: () => { },
+      helpInformation: () => { }
     };
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
-    cmd.help({}, () => {});
+    cmd.help({}, () => { });
     assert(find.calledWith(commands.LOGIN));
   });
 
@@ -280,12 +239,12 @@ describe(commands.LOGIN, () => {
       log: (msg: string) => {
         _log.push(msg);
       },
-      prompt: () => {},
-      helpInformation: () => {}
+      prompt: () => { },
+      helpInformation: () => { }
     };
     sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
-    cmd.help({}, () => {});
+    cmd.help({}, () => { });
     let containsExamples: boolean = false;
     _log.forEach(l => {
       if (l && l.indexOf('Examples:') > -1) {
@@ -296,46 +255,8 @@ describe(commands.LOGIN, () => {
     assert(containsExamples);
   });
 
-  it('correctly handles lack of valid access token when logging in to Azure Management Service', (done) => {
-    Utils.restore(auth.ensureAccessToken);
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject('Error getting access token'); });
-    auth.service = new Service('https://management.azure.com/');
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('correctly handles lack of valid access token when logging in to Azure Management Service (debug)', (done) => {
-    Utils.restore(auth.ensureAccessToken);
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject('Error getting access token'); });
-    auth.service = new Service('https://management.azure.com/');
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        Utils.restore(auth.ensureAccessToken);
-      }
-    });
-  });
-
   it('ignores the error raised by cancelling device code auth flow', (done) => {
-    Utils.restore(auth.ensureAccessToken);
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject('Polling_Request_Cancelled'); });
-    auth.service = new Service('https://management.azure.com/');
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
@@ -344,8 +265,18 @@ describe(commands.LOGIN, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(auth.ensureAccessToken);
+    });
+  });
+
+  it('ignores the error raised by cancelling device code auth flow (debug)', (done) => {
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject('Polling_Request_Cancelled'); });
+    cmdInstance.action({ options: { debug: true } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith('Polling_Request_Cancelled'));
+        done();
+      }
+      catch (e) {
+        done(e);
       }
     });
   });
@@ -357,7 +288,6 @@ describe(commands.LOGIN, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, () => {
       try {
-        
         done();
       }
       catch (e) {
@@ -365,8 +295,7 @@ describe(commands.LOGIN, () => {
       }
       finally {
         Utils.restore([
-          auth.clearConnectionInfo,
-          auth.ensureAccessToken
+          auth.clearConnectionInfo
         ]);
       }
     });
@@ -377,9 +306,8 @@ describe(commands.LOGIN, () => {
     Utils.restore(auth.clearConnectionInfo);
     sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true }, url: 'https://contoso-admin.sharepoint.com' }, () => {
+    cmdInstance.action({ options: { debug: true } }, () => {
       try {
-        
         done();
       }
       catch (e) {
@@ -387,8 +315,27 @@ describe(commands.LOGIN, () => {
       }
       finally {
         Utils.restore([
-          auth.clearConnectionInfo,
-          auth.ensureAccessToken
+          auth.clearConnectionInfo
+        ]);
+      }
+    });
+  });
+
+  it('correctly handles error when restoring auth information', (done) => {
+    Utils.restore(auth.restoreAuth);
+    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore([
+          auth.clearConnectionInfo
         ]);
       }
     });

@@ -2,7 +2,7 @@ import commands from '../../commands';
 import Command, { CommandValidate, CommandError, CommandOption } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth, { Site } from '../../SpoAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./list-webhook-list');
 import * as assert from 'assert';
 import request from '../../../../request';
@@ -13,28 +13,26 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
   let log: any[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  let trackEvent: any;
-  let telemetry: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    auth.service.connected = true;
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.site = new Site();
-    telemetry = null;
   });
 
   afterEach(() => {
@@ -46,11 +44,10 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.getAccessToken,
       auth.restoreAuth,
-      request.get
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -61,53 +58,10 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
     assert.notEqual(command.description, null);
   });
 
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.LIST_WEBHOOK_LIST);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not connected to a SharePoint site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', title: 'Documents' } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('retrieves all webhooks of the specific list if title option is passed (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
+        if (opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
             "value": [
@@ -134,11 +88,6 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         debug: true,
@@ -172,9 +121,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
   it('retrieves all webhooks of the specific list if listTitle option is passed (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
+        if (opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
             "value": [
@@ -201,11 +148,6 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         debug: true,
@@ -239,9 +181,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
   it('retrieves all webhooks of the specific list if title option is passed', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
+        if (opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
             "value": [
@@ -268,11 +208,6 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         debug: false,
@@ -306,9 +241,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
   it('retrieves all webhooks of the specific list if listTitle option is passed', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
+        if (opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
             "value": [
@@ -335,11 +268,6 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         debug: false,
@@ -373,9 +301,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
   it('retrieves all webhooks of the specific list if id option is passed (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
+        if (opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
             "value": [
@@ -402,11 +328,6 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         debug: true,
@@ -440,9 +361,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
   it('retrieves all webhooks of the specific list if listId option is passed (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
+        if (opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
             "value": [
@@ -469,11 +388,6 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         debug: true,
@@ -507,9 +421,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
   it('retrieves all webhooks of the specific list if id option is passed', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
+        if (opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
             "value": [
@@ -536,11 +448,6 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         debug: false,
@@ -574,9 +481,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
   it('retrieves all webhooks of the specific list if listId option is passed', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
+        if (opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
             "value": [
@@ -603,11 +508,6 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         debug: false,
@@ -641,9 +541,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
   it('renders empty string for clientState, if no value for clientState was specified in the webhook', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
+        if (opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
             "value": [
@@ -670,11 +568,6 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         debug: false,
@@ -708,9 +601,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
   it('outputs user-friendly message when no webhooks found in verbose mode', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
+        if (opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
             "value": []
@@ -721,11 +612,6 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         verbose: true,
@@ -746,9 +632,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
   it('outputs all properties when output is JSON', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions`) > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
+        if (opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
             "value": [
@@ -775,11 +659,6 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         debug: false,
@@ -836,11 +715,6 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const actionTitle: string = 'Documents';
 
     cmdInstance.action({
@@ -869,11 +743,6 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     const actionId: string = '0CD891EF-AFCE-4E55-B836-FCE03286CCCF';
 
     cmdInstance.action({
@@ -883,7 +752,6 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
         webUrl: 'https://contoso.sharepoint.com',
       }
     }, () => {
-
       try {
         assert(1 === 1);
         done();
@@ -892,7 +760,6 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
         done(e);
       }
     });
-
   });
 
   it('fails validation if the url option not specified', () => {
@@ -988,29 +855,5 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.getAccessToken);
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-        webUrl: "https://contoso.sharepoint.com",
-        debug: false
-      }
-    }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 });

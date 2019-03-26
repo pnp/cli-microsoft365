@@ -12,25 +12,24 @@ describe(commands.TENANT_ID_GET, () => {
   let log: any[];
   let cmdInstanceLogSpy: sinon.SinonSpy;
   let cmdInstance: any;
-  let trackEvent: any;
-  let telemetry: any;
 
   before(() => {
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
   });
 
   beforeEach(() => {
     vorpal = require('../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: any) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    telemetry = null;
   });
 
   afterEach(() => {
@@ -54,32 +53,6 @@ describe(commands.TENANT_ID_GET, () => {
     assert.notEqual(command.description, null);
   });
 
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.TENANT_ID_GET);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('fails validation if domainName is not passed', () => {
     const actual = (command.validate() as CommandValidate)({ options: {} });
     assert.notEqual(actual, true);
@@ -100,7 +73,7 @@ describe(commands.TENANT_ID_GET, () => {
     assert.equal(actual, true);
   });
 
-  it('Gets Office 365 tenant ID with correct domain name', (done) => {
+  it('gets Office 365 tenant ID with correct domain name', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://login.windows.net/contoso.com/.well-known/openid-configuration`) {
         return Promise.resolve(
@@ -172,7 +145,6 @@ describe(commands.TENANT_ID_GET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, domainName: 'contoso.com' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith('6babcaad-604b-40ac-a9d7-9fd97c0b779f'));
@@ -184,7 +156,7 @@ describe(commands.TENANT_ID_GET, () => {
     });
   });
 
-  it('Returns errors when trying to retrieve ID for a non-existant tenant', (done) => {
+  it('returns errors when trying to retrieve ID for a non-existant tenant', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://login.windows.net/xyz.com/.well-known/openid-configuration`) {
         return Promise.resolve(
@@ -204,10 +176,23 @@ describe(commands.TENANT_ID_GET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, domainName: 'xyz.com' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("AADSTS90002: Tenant 'xyz.com' not found. This may happen if there are no active subscriptions for the tenant. Check with your subscription administrator.\r\nTrace ID: 8c0e5644-738f-460f-900c-edb4c918b100\r\nCorrelation ID: 69a7237f-1f84-4b88-aae7-8f7fd46d685a\r\nTimestamp: 2019-06-15 15:41:39Z")));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly handles random API error', (done) => {
+    sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
+
+    cmdInstance.action({ options: { debug: false, domainName: 'xyz.com' } }, (err?: any) => {
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {

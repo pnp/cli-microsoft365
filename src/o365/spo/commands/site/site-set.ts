@@ -1,4 +1,3 @@
-import auth from '../../SpoAuth';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -12,7 +11,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
-import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -44,40 +42,29 @@ class SpoSiteSetCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  protected requiresTenantAdmin(): boolean {
-    return true;
-  }
-
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.url);
-    let siteAccessToken: string = '';
     let siteId: string = '';
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<{ Id: string }> => {
-        siteAccessToken = accessToken;
+    ((): Promise<{ Id: string }> => {
+      if (this.debug) {
+        cmd.log(`Retrieving site ID...`);
+      }
 
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving site ID...`);
-        }
+      if (args.options.id) {
+        return Promise.resolve({ Id: args.options.id });
+      }
+      else {
+        const requestOptions: any = {
+          url: `${args.options.url}/_api/site?$select=Id`,
+          headers: {
+            accept: 'application/json;odata=nometadata'
+          },
+          json: true
+        };
 
-        if (args.options.id) {
-          return Promise.resolve({ Id: args.options.id });
-        }
-        else {
-          const requestOptions: any = {
-            url: `${args.options.url}/_api/site?$select=Id`,
-            headers: {
-              authorization: `Bearer ${siteAccessToken}`,
-              accept: 'application/json;odata=nometadata'
-            },
-            json: true
-          };
-
-          return request.get(requestOptions);
-        }
-      })
+        return request.get(requestOptions);
+      }
+    })()
       .then((res: { Id: string }): Promise<ContextInfo> => {
         siteId = res.Id;
 
@@ -85,7 +72,7 @@ class SpoSiteSetCommand extends SpoCommand {
           cmd.log(`Retrieving request digest...`);
         }
 
-        return this.getRequestDigestForSite(args.options.url, siteAccessToken, cmd, this.debug);
+        return this.getRequestDigest(args.options.url);
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
@@ -98,7 +85,6 @@ class SpoSiteSetCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${args.options.url}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             'X-RequestDigest': res.FormDigestValue
           },
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${classification}${disableFlows}</Actions><ObjectPaths><Identity Id="5" Name="e10a459e-60c8-4000-8240-a68d6a12d39e|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${siteId}" /></ObjectPaths></Request>`
@@ -188,14 +174,7 @@ class SpoSiteSetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.SITE_SET).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online tenant
-    admin site, using the ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
-
-    To update site collection's properties, you have to first log in to
-    a tenant admin site using the ${chalk.blue(commands.LOGIN)} command, eg.
-    ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso-admin.sharepoint.com`)}.
+      `  Remarks:
 
     If the specified ${chalk.grey('url')} doesn't refer to an existing site collection,
     you will get a ${chalk.grey('404 - "404 FILE NOT FOUND"')} error.
@@ -209,14 +188,14 @@ class SpoSiteSetCommand extends SpoCommand {
   
     Update site collection's classification. Will automatically retrieve the ID
     of the site collection
-      ${chalk.grey(config.delimiter)} ${this.name} --url https://contoso.sharepoint.com/sites/sales --classification MBI
+      ${this.name} --url https://contoso.sharepoint.com/sites/sales --classification MBI
 
     Reset site collection's classification.
-      ${chalk.grey(config.delimiter)} ${this.name} --url https://contoso.sharepoint.com/sites/sales --id 255a50b2-527f-4413-8485-57f4c17a24d1 --classification
+      ${this.name} --url https://contoso.sharepoint.com/sites/sales --id 255a50b2-527f-4413-8485-57f4c17a24d1 --classification
 
     Disable using Microsoft Flow on the site collection. Will automatically retrieve the
     ID of the site collection
-      ${chalk.grey(config.delimiter)} ${this.name} --url https://contoso.sharepoint.com/sites/sales --disableFlows true
+      ${this.name} --url https://contoso.sharepoint.com/sites/sales --disableFlows true
 `);
   }
 }

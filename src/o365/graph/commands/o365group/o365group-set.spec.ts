@@ -2,12 +2,11 @@ import commands from '../../commands';
 import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth from '../../GraphAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./o365group-set');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import { Service } from '../../../../Auth';
 import * as fs from 'fs';
 
 describe(commands.O365GROUP_SET, () => {
@@ -15,29 +14,27 @@ describe(commands.O365GROUP_SET, () => {
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  let trackEvent: any;
-  let telemetry: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
     sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
+    auth.service.connected = true;
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.service = new Service('https://graph.microsoft.com');
-    telemetry = null;
   });
 
   afterEach(() => {
@@ -53,11 +50,11 @@ describe(commands.O365GROUP_SET, () => {
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.ensureAccessToken,
       auth.restoreAuth,
-      fs.readFileSync
+      fs.readFileSync,
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -66,47 +63,6 @@ describe(commands.O365GROUP_SET, () => {
 
   it('has a description', () => {
     assert.notEqual(command.description, null);
-  });
-
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.O365GROUP_SET);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not logged in to the Microsoft Graph', (done) => {
-    auth.service = new Service('https://graph.microsoft.com');
-    auth.service.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to the Microsoft Graph first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 
   it('updates Office 365 Group display name', (done) => {
@@ -122,9 +78,6 @@ describe(commands.O365GROUP_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service('https://graph.microsoft.com');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848', displayName: 'My group' } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
@@ -149,9 +102,6 @@ describe(commands.O365GROUP_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service('https://graph.microsoft.com');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848', description: 'My group' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
@@ -176,9 +126,6 @@ describe(commands.O365GROUP_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service('https://graph.microsoft.com');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848', isPrivate: 'false' } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
@@ -203,9 +150,6 @@ describe(commands.O365GROUP_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service('https://graph.microsoft.com');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848', isPrivate: 'true' } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
@@ -227,9 +171,6 @@ describe(commands.O365GROUP_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service('https://graph.microsoft.com');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'logo.png' } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
@@ -251,9 +192,6 @@ describe(commands.O365GROUP_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service('https://graph.microsoft.com');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', logoPath: 'logo.jpg' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
@@ -275,9 +213,6 @@ describe(commands.O365GROUP_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service('https://graph.microsoft.com');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', logoPath: 'logo.gif' } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
@@ -301,9 +236,6 @@ describe(commands.O365GROUP_SET, () => {
       fn();
     });
 
-    auth.service = new Service('https://graph.microsoft.com');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', logoPath: 'logo.png' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
@@ -327,9 +259,6 @@ describe(commands.O365GROUP_SET, () => {
       fn();
     });
 
-    auth.service = new Service('https://graph.microsoft.com');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', logoPath: 'logo.png' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
@@ -364,9 +293,6 @@ describe(commands.O365GROUP_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service('https://graph.microsoft.com');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', owners: 'user@contoso.onmicrosoft.com' } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
@@ -409,9 +335,6 @@ describe(commands.O365GROUP_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service('https://graph.microsoft.com');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', owners: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
@@ -446,9 +369,6 @@ describe(commands.O365GROUP_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service('https://graph.microsoft.com');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', members: 'user@contoso.onmicrosoft.com' } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
@@ -488,9 +408,6 @@ describe(commands.O365GROUP_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service('https://graph.microsoft.com');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', members: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
@@ -516,9 +433,6 @@ describe(commands.O365GROUP_SET, () => {
       });
     });
 
-    auth.service = new Service('https://graph.microsoft.com');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848', displayName: 'My group' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
@@ -763,22 +677,5 @@ describe(commands.O365GROUP_SET, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.ensureAccessToken);
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.service = new Service('https://graph.microsoft.com');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 });

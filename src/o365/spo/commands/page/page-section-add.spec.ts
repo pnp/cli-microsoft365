@@ -2,7 +2,7 @@ import commands from '../../commands';
 import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth, { Site } from '../../SpoAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./page-section-add');
 import * as assert from 'assert';
 import request from '../../../../request';
@@ -12,29 +12,25 @@ describe(commands.PAGE_SECTION_ADD, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
-  let trackEvent: any;
-  let telemetry: any;
-
+  
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'getAccessToken').callsFake(() => {
-      return Promise.resolve('ABC');
-    });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    auth.service.connected = true;
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    auth.site = new Site();
-    telemetry = null;
   });
 
   afterEach(() => {
@@ -43,10 +39,10 @@ describe(commands.PAGE_SECTION_ADD, () => {
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.getAccessToken,
-      auth.restoreAuth
+      auth.restoreAuth,
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -55,47 +51,6 @@ describe(commands.PAGE_SECTION_ADD, () => {
 
   it('has a description', () => {
     assert.notEqual(command.description, null);
-  });
-
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      } catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.PAGE_SECTION_ADD);
-        done();
-      } catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not connected to a SharePoint site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(
-          JSON.stringify(err),
-          JSON.stringify(new CommandError('Log in to a SharePoint Online site first'))
-        );
-        done();
-      } catch (e) {
-        done(e);
-      }
-    });
   });
 
   it('checks out page if not checked out by the current user', (done) => {
@@ -124,10 +79,6 @@ describe(commands.PAGE_SECTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com/sites/newsletter';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         debug: true,
@@ -172,10 +123,6 @@ describe(commands.PAGE_SECTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com/sites/newsletter';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         name: 'home.aspx',
@@ -215,10 +162,6 @@ describe(commands.PAGE_SECTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com/sites/newsletter';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options:
       {
@@ -259,10 +202,6 @@ describe(commands.PAGE_SECTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com/sites/newsletter';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options:
       {
@@ -304,10 +243,6 @@ describe(commands.PAGE_SECTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com/sites/newsletter';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options:
       {
@@ -348,10 +283,6 @@ describe(commands.PAGE_SECTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com/sites/newsletter';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options:
       {
@@ -393,10 +324,6 @@ describe(commands.PAGE_SECTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com/sites/newsletter';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options:
       {
@@ -438,10 +365,6 @@ describe(commands.PAGE_SECTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com/sites/newsletter';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options:
       {
@@ -482,10 +405,6 @@ describe(commands.PAGE_SECTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com/sites/newsletter';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options:
       {
@@ -527,10 +446,6 @@ describe(commands.PAGE_SECTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com/sites/newsletter';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options:
       {
@@ -572,10 +487,6 @@ describe(commands.PAGE_SECTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com/sites/newsletter';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options:
       {
@@ -617,10 +528,6 @@ describe(commands.PAGE_SECTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com/sites/newsletter';
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options:
       {
@@ -632,6 +539,30 @@ describe(commands.PAGE_SECTION_ADD, () => {
     }, () => {
       try {
         assert.equal(body, JSON.stringify({ "CanvasContent1": "[{\"displayMode\":2,\"position\":{\"zoneIndex\":0.5,\"sectionIndex\":1,\"sectionFactor\":6,\"layoutIndex\":1},\"emphasis\":{}},{\"displayMode\":2,\"position\":{\"zoneIndex\":0.5,\"sectionIndex\":2,\"sectionFactor\":6,\"layoutIndex\":1},\"emphasis\":{}},{\"displayMode\":2,\"position\":{\"zoneIndex\":0.75,\"sectionIndex\":1,\"sectionFactor\":6,\"layoutIndex\":1},\"emphasis\":{}},{\"displayMode\":2,\"position\":{\"zoneIndex\":0.75,\"sectionIndex\":2,\"sectionFactor\":6,\"layoutIndex\":1},\"emphasis\":{}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"sectionFactor\":12,\"layoutIndex\":1},\"emphasis\":{}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1.5,\"sectionIndex\":1,\"sectionFactor\":4,\"layoutIndex\":1},\"emphasis\":{}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1.5,\"sectionIndex\":2,\"sectionFactor\":4,\"layoutIndex\":1},\"emphasis\":{}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1.5,\"sectionIndex\":3,\"sectionFactor\":4,\"layoutIndex\":1},\"emphasis\":{}},{\"displayMode\":2,\"position\":{\"zoneIndex\":2,\"sectionIndex\":1,\"sectionFactor\":4,\"layoutIndex\":1},\"emphasis\":{}},{\"displayMode\":2,\"position\":{\"zoneIndex\":2,\"sectionIndex\":2,\"sectionFactor\":8,\"layoutIndex\":1},\"emphasis\":{}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]" }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly handles random API error', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      return Promise.reject('An error has occurred');
+    });
+
+    cmdInstance.action({
+      options:
+      {
+        name: 'home.aspx',
+        webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
+        sectionTemplate: 'TwoColumn',
+        order: 2
+      }
+    }, (err?: any) => {
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -832,27 +763,5 @@ describe(commands.PAGE_SECTION_ADD, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.getAccessToken);
-    sinon.stub(auth, 'getAccessToken').callsFake(() => {
-      return Promise.reject(new Error('Error getting access token'));
-    });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action(
-      { options: { debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com' } },
-      (err?: any) => {
-        try {
-          assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-          done();
-        } catch (e) {
-          done(e);
-        }
-      }
-    );
   });
 });

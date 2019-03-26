@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -34,26 +32,17 @@ class SpoHideDefaultThemesSetCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  protected requiresTenantAdmin(): boolean {
-    return true;
-  }
-
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<void> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}`);
-        }
-
+    this
+      .getSpoAdminUrl(cmd, this.debug)
+      .then((spoAdminUrl: string): Promise<void> => {
         if (this.verbose) {
           cmd.log(`Setting the value of the HideDefaultThemes setting to ${args.options.hideDefaultThemes}...`);
         }
 
         const requestOptions: any = {
-          url: `${auth.site.url}/_api/thememanager/SetHideDefaultThemes`,
+          url: `${spoAdminUrl}/_api/thememanager/SetHideDefaultThemes`,
           headers: {
-            authorization: `Bearer ${accessToken}`,
             'accept': 'application/json;odata=nometadata'
           },
           body: {
@@ -104,19 +93,13 @@ class SpoHideDefaultThemesSetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online tenant
-    admin site, using the ${chalk.blue(commands.LOGIN)} command.
+      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
+    the tenant admin site.
   
-  Remarks:
-  
-    To set the value of the HideDefaultThemes setting, you have to first log in
-    to a tenant admin site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso-admin.sharepoint.com`)}.
-        
   Examples:
 
     Hide default themes and allow users to use organization themes only
-      ${chalk.grey(config.delimiter)} ${commands.HIDEDEFAULTTHEMES_SET} --hideDefaultThemes true
+      ${commands.HIDEDEFAULTTHEMES_SET} --hideDefaultThemes true
 
   More information:
 

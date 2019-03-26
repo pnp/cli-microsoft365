@@ -3,31 +3,21 @@ import Command from '../../../../Command';
 import { CommandValidate, CommandOption, CommandError, CommandTypes } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth, { Site } from '../../SpoAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./listitem-get');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.LISTITEM_GET, () => {
-
   let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
-  let trackEvent: any;
-  let telemetry: any;
 
   const expectedTitle = `List Item 1`;
 
   const expectedId = 147;
   let actualId = 0;
-
-  let postFakes = (opts: any) => {
-    if (opts.url.indexOf('/common/oauth2/token') > -1) {
-      return Promise.resolve('abc');
-    }
-    return Promise.reject('Invalid request');
-  }
 
   let getFakes = (opts: any) => {
     if (opts.url.indexOf('/items(') > -1) {
@@ -49,41 +39,39 @@ describe(commands.LISTITEM_GET, () => {
     return Promise.reject('Invalid request');
   }
   
-
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
-
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    auth.service.connected = true;
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    auth.site = new Site();
-    telemetry = null;
   });
 
   afterEach(() => {
     Utils.restore([
       vorpal.find,
-      request.post
+      request.get
     ]);
   });
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.getAccessToken,
-      auth.restoreAuth
+      auth.restoreAuth,
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -92,47 +80,6 @@ describe(commands.LISTITEM_GET, () => {
 
   it('has a description', () => {
     assert.notEqual(command.description, null);
-  });
-
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.LISTITEM_GET);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not logged in to a SharePoint site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', id: expectedId } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 
   it('supports debug mode', () => {
@@ -208,14 +155,7 @@ describe(commands.LISTITEM_GET, () => {
   });
 
   it('returns listItemInstance object when list item is requested', (done) => {
-
     sinon.stub(request, 'get').callsFake(getFakes);
-    sinon.stub(request, 'post').callsFake(postFakes);
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     command.allowUnknownOptions();
 
@@ -227,7 +167,6 @@ describe(commands.LISTITEM_GET, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         assert.equal(actualId, expectedId);
         done();
@@ -235,23 +174,11 @@ describe(commands.LISTITEM_GET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.get);
-        Utils.restore(request.post);
-      }
     });
-    
   });
 
   it('returns listItemInstance object when list item is requested with an output type of json, and a list of fields are specified', (done) => {
-
     sinon.stub(request, 'get').callsFake(getFakes);
-    sinon.stub(request, 'post').callsFake(postFakes);
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     command.allowUnknownOptions();
 
@@ -265,7 +192,6 @@ describe(commands.LISTITEM_GET, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         assert.equal(actualId, expectedId);
         done();
@@ -273,23 +199,11 @@ describe(commands.LISTITEM_GET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.get);
-        Utils.restore(request.post);
-      }
     });
-    
   });
 
   it('returns listItemInstance object when list item is requested with an output type of text, and no list of fields', (done) => {
-
     sinon.stub(request, 'get').callsFake(getFakes);
-    sinon.stub(request, 'post').callsFake(postFakes);
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     command.allowUnknownOptions();
 
@@ -302,7 +216,6 @@ describe(commands.LISTITEM_GET, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         assert.equal(actualId, expectedId);
         done();
@@ -310,36 +223,23 @@ describe(commands.LISTITEM_GET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.get);
-        Utils.restore(request.post);
-      }
     });
-    
   });
 
   it('returns listItemInstance object when list item is requested with an output type of text, and a list of fields specified', (done) => {
-
     sinon.stub(request, 'get').callsFake(getFakes);
-    sinon.stub(request, 'post').callsFake(postFakes);
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     command.allowUnknownOptions();
 
     let options: any = { 
       debug: false, 
-      listTitle: 'Demo List', 
+      listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', 
       webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
       id: expectedId,
       output: "json"
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         assert.equal(actualId, expectedId);
         done();
@@ -347,12 +247,29 @@ describe(commands.LISTITEM_GET, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.get);
-        Utils.restore(request.post);
+    });    
+  });
+
+  it('correctly handles random API error', (done) => {
+    sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
+
+    let options: any = { 
+      debug: false, 
+      listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', 
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
+      id: expectedId,
+      output: "json"
+    }
+
+    cmdInstance.action({ options: options }, (err?: any) => {
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        done();
       }
-    });
-    
+      catch (e) {
+        done(e);
+      }
+    });    
   });
 
   it('has help referring to the right command', () => {
@@ -388,30 +305,4 @@ describe(commands.LISTITEM_GET, () => {
     Utils.restore(vorpal.find);
     assert(containsExamples);
   });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.getAccessToken);
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        id: 1,
-        listId: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-        webUrl: "https://contoso.sharepoint.com",
-        debug: false
-      }
-    }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
 });

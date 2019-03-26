@@ -58,9 +58,19 @@ const loadCommandFromArgs = (args: string[], rootFolder: string): void => {
     cliArgs = cliArgs.slice(0, pos);
   }
 
-  const commandFilePath: string = cliArgs.length === 2 ?
-    path.join(rootFolder, 'o365', cliArgs[0], 'commands', `${cliArgs[1]}.js`) :
-    path.join(rootFolder, 'o365', cliArgs[0], 'commands', cliArgs[1], cliArgs.slice(1).join('-') + '.js');
+  let commandFilePath = '';
+  if (cliArgs.length === 1) {
+    commandFilePath = path.join(rootFolder, 'o365', 'commands', `${cliArgs[0]}.js`);
+  }
+  else {
+    if (cliArgs.length === 2) {
+      commandFilePath = path.join(rootFolder, 'o365', cliArgs[0], 'commands', `${cliArgs[1]}.js`);
+    }
+    else {
+      commandFilePath = path.join(rootFolder, 'o365', cliArgs[0], 'commands', cliArgs[1], cliArgs.slice(1).join('-') + '.js');
+    }
+  }
+
   if (!fs.existsSync(commandFilePath)) {
     loadAllCommands(rootFolder);
     return;
@@ -104,7 +114,7 @@ fs.realpath(__dirname, (err: NodeJS.ErrnoException | null, resolvedPath: string)
     process.exit();
   }
   if (process.argv.indexOf('--reconsent') > -1) {
-    console.log(`To reconsent the PnP Office 365 Management Shell Azure AD application navigate in your web browser to https://login.microsoftonline.com/common/oauth2/authorize?client_id=${config.cliAadAppId}&response_type=code&prompt=admin_consent`);
+    console.log(`To reconsent the PnP Office 365 Management Shell Azure AD application navigate in your web browser to https://login.microsoftonline.com/${config.tenant}/oauth2/authorize?client_id=${config.cliAadAppId}&response_type=code&prompt=admin_consent`);
     process.exit();
   }
 

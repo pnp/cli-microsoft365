@@ -1,4 +1,3 @@
-import auth from '../../SpoAuth';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -43,22 +42,16 @@ class SpoTermGroupAddCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  protected requiresTenantAdmin(): boolean {
-    return true;
-  }
-
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     let formDigest: string = '';
     let termGroup: TermGroup;
+    let spoAdminUrl: string = '';
 
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<ContextInfo> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
-
-        return this.getRequestDigest(cmd, this.debug);
+    this
+      .getSpoAdminUrl(cmd, this.debug)
+      .then((_spoAdminUrl: string): Promise<ContextInfo> => {
+        spoAdminUrl = _spoAdminUrl;
+        return this.getRequestDigest(spoAdminUrl);
       })
       .then((res: ContextInfo): Promise<string> => {
         formDigest = res.FormDigestValue;
@@ -68,9 +61,8 @@ class SpoTermGroupAddCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+          url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': res.FormDigestValue
           },
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><ObjectIdentityQuery Id="5" ObjectPathId="3" /><ObjectPath Id="7" ObjectPathId="6" /><ObjectIdentityQuery Id="8" ObjectPathId="6" /><Query Id="9" ObjectPathId="6"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><StaticMethod Id="3" Name="GetTaxonomySession" TypeId="{981cbc68-9edc-4f8d-872f-71146fcbb84f}" /><Method Id="6" ParentId="3" Name="GetDefaultSiteCollectionTermStore" /></ObjectPaths></Request>`
@@ -93,9 +85,8 @@ class SpoTermGroupAddCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+          url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': formDigest
           },
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="14" ObjectPathId="13" /><ObjectIdentityQuery Id="15" ObjectPathId="13" /><Query Id="16" ObjectPathId="13"><Query SelectAllProperties="false"><Properties><Property Name="Name" ScalarProperty="true" /><Property Name="Id" ScalarProperty="true" /><Property Name="Description" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Method Id="13" ParentId="6" Name="CreateGroup"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.name)}</Parameter><Parameter Type="Guid">{${termGroupId}}</Parameter></Parameters></Method><Identity Id="6" Name="${termStore._ObjectIdentity_}" /></ObjectPaths></Request>`
@@ -121,9 +112,8 @@ class SpoTermGroupAddCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+          url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': formDigest
           },
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="51" ObjectPathId="45" Name="Description"><Parameter Type="String">${Utils.escapeXml(args.options.description)}</Parameter></SetProperty></Actions><ObjectPaths><Identity Id="45" Name="${termGroup._ObjectIdentity_}" /></ObjectPaths></Request>`
@@ -190,25 +180,19 @@ class SpoTermGroupAddCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.TERM_GROUP_ADD).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to SharePoint Online tenant admin site,
-    using the ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
-
-    To add a taxonomy term group, you have to first log in to a tenant admin
-    site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso-admin.sharepoint.com`)}.
-
+      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
+    the tenant admin site.
+  
   Examples:
   
     Add a new taxonomy term group with the specified name
-      ${chalk.grey(config.delimiter)} ${commands.TERM_GROUP_ADD} --name PnPTermSets
+      ${commands.TERM_GROUP_ADD} --name PnPTermSets
 
     Add a new taxonomy term group with the specified name and id
-      ${chalk.grey(config.delimiter)} ${commands.TERM_GROUP_ADD} --name PnPTermSets --id 0e8f395e-ff58-4d45-9ff7-e331ab728beb
+      ${commands.TERM_GROUP_ADD} --name PnPTermSets --id 0e8f395e-ff58-4d45-9ff7-e331ab728beb
 
     Add a new taxonomy term group with the specified name and description
-      ${chalk.grey(config.delimiter)} ${commands.TERM_GROUP_ADD} --name PnPTermSets --description 'Term sets for PnP'
+      ${commands.TERM_GROUP_ADD} --name PnPTermSets --description 'Term sets for PnP'
 `);
   }
 }

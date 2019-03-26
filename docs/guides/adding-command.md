@@ -71,7 +71,7 @@ class MyCommand extends Command {
 
   Examples:
 
-    ${chalk.grey(config.delimiter)} ${commands.MYCOMMAND}
+    ${commands.MYCOMMAND}
       example one of using the command
 `);
   }
@@ -80,7 +80,7 @@ class MyCommand extends Command {
 module.exports = new MyCommand();
 ```
 
-Depending on your command and the service for which you're building the command, there might be a base class that you can use to simplify the implementation. For example for SPO, you can inherit from the [SpoCommand](../../src/o365/spo/SpoCommand.ts) base class. This class automatically checks if the user logged in to SharePoint Online before running the command, simplifying your implementation.
+Depending on your command and the service for which you're building the command, there might be a base class that you can use to simplify the implementation. For example for SPO, you can inherit from the [SpoCommand](../../src/o365/spo/SpoCommand.ts) base class. This class contains a number of helper methods simplifying your implementation.
 
 ### Tracking command usage
 
@@ -159,7 +159,7 @@ class SpoMyCommand extends Command {
 
   Examples:
 
-    ${chalk.grey(config.delimiter)} ${commands.MYCOMMAND}
+    ${commands.MYCOMMAND}
       example one of using the command
 `);
   }
@@ -199,7 +199,7 @@ Each command has a corresponding manual page. The contents of this page are almo
 Start filling the help page contents by starting the Office 365 CLI and requesting help for your command:
 
 ```sh
-o365$ help spo my-command
+o365$ spo my-command --help
 ```
 
 Copy the output of the command and use as a starting point for creating the documentation page. The main difference between the help displayed in the CLI and the manual page is the formatting. In the command line, the CLI uses chalk to emphasize information. The manual uses Markdown to format the output. To maintain consistency, refer to other manual pages to see how they are structured and how the information is presented.

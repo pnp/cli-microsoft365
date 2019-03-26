@@ -1,4 +1,3 @@
-import auth from '../../SpoAuth';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -40,19 +39,14 @@ class SpoTermGroupGetCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  protected requiresTenantAdmin(): boolean {
-    return true;
-  }
-
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<ContextInfo> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
+    let spoAdminUrl: string = '';
 
-        return this.getRequestDigest(cmd, this.debug);
+    this
+      .getSpoAdminUrl(cmd, this.debug)
+      .then((_spoAdminUrl: string): Promise<ContextInfo> => {
+        spoAdminUrl = _spoAdminUrl;
+        return this.getRequestDigest(spoAdminUrl);
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
@@ -62,9 +56,8 @@ class SpoTermGroupGetCommand extends SpoCommand {
         const query: string = args.options.id ? `<Method Id="32" ParentId="30" Name="GetById"><Parameters><Parameter Type="Guid">{${Utils.escapeXml(args.options.id)}}</Parameter></Parameters></Method>` : `<Method Id="32" ParentId="30" Name="GetByName"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.name)}</Parameter></Parameters></Method>`;
 
         const requestOptions: any = {
-          url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+          url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': res.FormDigestValue
           },
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="25" ObjectPathId="24" /><ObjectIdentityQuery Id="26" ObjectPathId="24" /><ObjectPath Id="28" ObjectPathId="27" /><ObjectIdentityQuery Id="29" ObjectPathId="27" /><ObjectPath Id="31" ObjectPathId="30" /><ObjectPath Id="33" ObjectPathId="32" /><ObjectIdentityQuery Id="34" ObjectPathId="32" /><Query Id="35" ObjectPathId="32"><Query SelectAllProperties="true"><Properties><Property Name="Name" ScalarProperty="true" /><Property Name="Id" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><StaticMethod Id="24" Name="GetTaxonomySession" TypeId="{981cbc68-9edc-4f8d-872f-71146fcbb84f}" /><Method Id="27" ParentId="24" Name="GetDefaultSiteCollectionTermStore" /><Property Id="30" ParentId="27" Name="Groups" />${query}</ObjectPaths></Request>`
@@ -131,22 +124,16 @@ class SpoTermGroupGetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.TERM_GROUP_GET).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to SharePoint Online tenant admin site,
-    using the ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
-
-    To get information about a taxonomy term group, you have to first log in
-    to a tenant admin site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso-admin.sharepoint.com`)}.
-
+      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
+    the tenant admin site.
+    
   Examples:
   
     Get information about a taxonomy term group using its ID
-      ${chalk.grey(config.delimiter)} ${commands.TERM_GROUP_GET} --id 0e8f395e-ff58-4d45-9ff7-e331ab728beb
+      ${commands.TERM_GROUP_GET} --id 0e8f395e-ff58-4d45-9ff7-e331ab728beb
 
     Get information about a taxonomy term group using its name
-      ${chalk.grey(config.delimiter)} ${commands.TERM_GROUP_GET} --name PnPTermSets
+      ${commands.TERM_GROUP_GET} --name PnPTermSets
 `);
   }
 }

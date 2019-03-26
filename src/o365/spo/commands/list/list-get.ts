@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -10,7 +8,6 @@ import {
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import { ListInstance } from "./ListInstance";
-import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -41,47 +38,30 @@ class ListGetCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-    let siteAccessToken: string = '';
-
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
+    if (this.verbose) {
+      cmd.log(`Retrieving information for list in site at ${args.options.webUrl}...`);
     }
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<ListInstance> => {
-        siteAccessToken = accessToken;
+    let requestUrl: string = '';
 
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}`);
-        }
+    if (args.options.id) {
+      requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.id)}')`;
+    }
+    else {
+      requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.title as string)}')`;
+    }
 
-        if (this.verbose) {
-          cmd.log(`Retrieving information for list in site at ${args.options.webUrl}...`);
-        }
+    const requestOptions: any = {
+      url: requestUrl,
+      method: 'GET',
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      json: true
+    };
 
-        let requestUrl: string = '';
-
-        if (args.options.id) {
-          requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.id)}')`;
-        }
-        else {
-          requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.title as string)}')`;
-        }
-
-        const requestOptions: any = {
-          url: requestUrl,
-          method: 'GET',
-          headers: {
-            authorization: `Bearer ${siteAccessToken}`,
-            'accept': 'application/json;odata=nometadata'
-          },
-          json: true
-        };
-
-        return request.get(requestOptions);
-      })
+    request
+      .get<ListInstance>(requestOptions)
       .then((listInstance: ListInstance): void => {
         cmd.log(listInstance);
 
@@ -142,23 +122,15 @@ class ListGetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-      using the ${chalk.blue(commands.LOGIN)} command.
-  
-  Remarks:
-  
-    To get information about a list, you have to first log in to SharePoint using the
-    ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-        
-  Examples:
+      `  Examples:
   
     Return information about a list with ID ${chalk.grey('0cd891ef-afce-4e55-b836-fce03286cccf')}
     located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LIST_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --id 0cd891ef-afce-4e55-b836-fce03286cccf
+      ${commands.LIST_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --id 0cd891ef-afce-4e55-b836-fce03286cccf
 
     Return information about a list with title ${chalk.grey('Documents')} located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LIST_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --title Documents
+      ${commands.LIST_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --title Documents
       `);
   }
 }

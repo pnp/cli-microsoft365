@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -9,7 +7,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
-import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -44,62 +41,45 @@ class SpoListWebhookListCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-    let siteAccessToken: string = '';
-
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
+    if (args.options.title && this.verbose) {
+      cmd.log(vorpal.chalk.yellow(`Option 'title' is deprecated. Please use 'listTitle' instead`));
     }
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<{ value: [{ id: string, clientState: string, expirationDateTime: Date, resource: string }] }> => {
-        siteAccessToken = accessToken;
+    if (args.options.id && this.verbose) {
+      cmd.log(vorpal.chalk.yellow(`Option 'id' is deprecated. Please use 'listId' instead`));
+    }
 
-        if (args.options.title && this.verbose) {
-          cmd.log(vorpal.chalk.yellow(`Option 'title' is deprecated. Please use 'listTitle' instead`));
-        }
+    if (this.verbose) {
+      const list: string = args.options.id ? encodeURIComponent(args.options.id as string) : (args.options.listId ? encodeURIComponent(args.options.listId as string) : (args.options.title ? encodeURIComponent(args.options.title as string) : encodeURIComponent(args.options.listTitle as string)));
+      cmd.log(`Retrieving webhook information for list ${list} in site at ${args.options.webUrl}...`);
+    }
 
-        if (args.options.id && this.verbose) {
-          cmd.log(vorpal.chalk.yellow(`Option 'id' is deprecated. Please use 'listId' instead`));
-        }
+    let requestUrl: string = '';
 
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving information about webhooks...`);
-        }
+    if (args.options.id) {
+      requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.id)}')/Subscriptions`;
+    }
+    else if (args.options.listId) {
+      requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.listId)}')/Subscriptions`;
+    }
+    else if (args.options.listTitle) {
+      requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.listTitle as string)}')/Subscriptions`;
+    }
+    else {
+      requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.title as string)}')/Subscriptions`;
+    }
 
-        if (this.verbose) {
-          const list: string = args.options.id ? encodeURIComponent(args.options.id as string) : (args.options.listId ? encodeURIComponent(args.options.listId as string) : (args.options.title ? encodeURIComponent(args.options.title as string) : encodeURIComponent(args.options.listTitle as string)));
-          cmd.log(`Retrieving webhook information for list ${list} in site at ${args.options.webUrl}...`);
-        }
+    const requestOptions: any = {
+      url: requestUrl,
+      method: 'GET',
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      json: true
+    };
 
-        let requestUrl: string = '';
-
-        if (args.options.id) {
-          requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.id)}')/Subscriptions`;
-        }
-        else if (args.options.listId) {
-          requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.listId)}')/Subscriptions`;
-        }
-        else if (args.options.listTitle) {
-          requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.listTitle as string)}')/Subscriptions`;
-        }
-        else {
-          requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.title as string)}')/Subscriptions`;
-        }
-
-        const requestOptions: any = {
-          url: requestUrl,
-          method: 'GET',
-          headers: {
-            authorization: `Bearer ${siteAccessToken}`,
-            'accept': 'application/json;odata=nometadata'
-          },
-          json: true
-        };
-
-        return request.get(requestOptions);
-      })
+    request
+      .get<{ value: [{ id: string, clientState: string, expirationDateTime: Date, resource: string }] }>(requestOptions)
       .then((res: { value: [{ id: string, clientState: string, expirationDateTime: Date, resource: string }] }): void => {
         if (res.value && res.value.length > 0) {
           if (args.options.output === 'json') {
@@ -199,24 +179,15 @@ class SpoListWebhookListCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to SharePoint,
-    using the ${chalk.blue(commands.LOGIN)} command.
-  
-  Remarks:
-  
-    To list all webhooks for a list, you have to first log in to SharePoint
-    using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-        
-  Examples:
+      `  Examples:
   
     List all webhooks for a list with ID ${chalk.grey('0cd891ef-afce-4e55-b836-fce03286cccf')}
     located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LIST_WEBHOOK_LIST} --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf
+      ${commands.LIST_WEBHOOK_LIST} --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf
 
     List all webhooks for a list with title ${chalk.grey('Documents')} located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${commands.LIST_WEBHOOK_LIST} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents
+      ${commands.LIST_WEBHOOK_LIST} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents
       `);
   }
 }

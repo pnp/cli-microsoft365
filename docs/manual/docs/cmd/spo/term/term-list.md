@@ -22,11 +22,7 @@ Option|Description
 `--debug`|Runs command with debug logging
 
 !!! important
-    Before using this command, log in to a SharePoint Online tenant admin site, using the [spo login](../login.md) command.
-
-## Remarks
-
-To list taxonomy terms, you have to first log in to a tenant admin site using the [spo login](../login.md) command, eg. `spo connect https://contoso-admin.sharepoint.com`.
+    To use this command you have to have permissions to access the tenant admin site.
 
 ## Examples
 

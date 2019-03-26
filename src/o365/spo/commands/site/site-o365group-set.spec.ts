@@ -2,7 +2,7 @@ import commands from '../../commands';
 import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth, { Site } from '../../SpoAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./site-o365group-set');
 import * as assert from 'assert';
 import request from '../../../../request';
@@ -13,28 +13,26 @@ describe(commands.SITE_O365GROUP_SET, () => {
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  let trackEvent: any;
-  let telemetry: any;
-
+  
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    auth.service.connected = true;
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.site = new Site();
-    telemetry = null;
   });
 
   afterEach(() => {
@@ -46,10 +44,10 @@ describe(commands.SITE_O365GROUP_SET, () => {
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.getAccessToken,
-      auth.restoreAuth
+      auth.restoreAuth,
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -63,47 +61,6 @@ describe(commands.SITE_O365GROUP_SET, () => {
   it('defines alias', () => {
     const alias = command.alias();
     assert.notEqual(typeof alias, 'undefined');
-  });
-
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.SITE_O365GROUP_SET);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not logged in to a SharePoint site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 
   it('connects site to an Office 365 Group', (done) => {
@@ -127,10 +84,6 @@ describe(commands.SITE_O365GROUP_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({
@@ -169,10 +122,6 @@ describe(commands.SITE_O365GROUP_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({
@@ -211,10 +160,6 @@ describe(commands.SITE_O365GROUP_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A', isPublic: true } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({
@@ -255,10 +200,6 @@ describe(commands.SITE_O365GROUP_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A', description: 'Team A space' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({
@@ -299,10 +240,6 @@ describe(commands.SITE_O365GROUP_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A', classification: 'HBI' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({
@@ -343,10 +280,6 @@ describe(commands.SITE_O365GROUP_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A', keepOldHomepage: true } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({
@@ -379,10 +312,6 @@ describe(commands.SITE_O365GROUP_SET, () => {
       });
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('The group alias already exists.')));
@@ -409,10 +338,6 @@ describe(commands.SITE_O365GROUP_SET, () => {
       });
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('This site already has an O365 Group attached.')));
@@ -429,10 +354,6 @@ describe(commands.SITE_O365GROUP_SET, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
@@ -517,23 +438,5 @@ describe(commands.SITE_O365GROUP_SET, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.getAccessToken);
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 });

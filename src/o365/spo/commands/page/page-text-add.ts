@@ -1,11 +1,8 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
 import { CommandOption, CommandValidate } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import GlobalOptions from '../../../../GlobalOptions';
-import { Auth } from '../../../../Auth';
 import {
   ClientSidePage,
   ClientSideText
@@ -47,8 +44,6 @@ class SpoPageTextAddCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-    let siteAccessToken: string = '';
     let requestDigest: string = '';
 
     let pageName: string = args.options.pageName;
@@ -56,25 +51,12 @@ class SpoPageTextAddCommand extends SpoCommand {
       pageName += '.aspx';
     }
 
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
+    if (this.verbose) {
+      cmd.log(`Retrieving request digest...`);
     }
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<ContextInfo> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
-
-        siteAccessToken = accessToken;
-
-        if (this.verbose) {
-          cmd.log(`Retrieving request digest...`);
-        }
-
-        return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
-      })
+    this
+      .getRequestDigest(args.options.webUrl)
       .then((res: ContextInfo): Promise<ClientSidePage> => {
         // Keep the reference of request digest for subsequent requests
         requestDigest = res.FormDigestValue;
@@ -83,7 +65,7 @@ class SpoPageTextAddCommand extends SpoCommand {
           cmd.log(`Retrieving modern page ${pageName}...`);
         }
         // Get Client Side Page
-        return Page.getPage(pageName, args.options.webUrl, siteAccessToken, cmd, this.debug, this.verbose);
+        return Page.getPage(pageName, args.options.webUrl, cmd, this.debug, this.verbose);
       })
       .then((page: ClientSidePage): Promise<void> => {
         const section: number = (args.options.section || 1) - 1;
@@ -109,7 +91,7 @@ class SpoPageTextAddCommand extends SpoCommand {
         }
 
         // Save the Client Side Page with updated information
-        return this.saveClientSidePage(page, cmd, args, pageName, siteAccessToken, requestDigest);
+        return this.saveClientSidePage(page, cmd, args, pageName, requestDigest);
       })
       .then((): void => {
         if (this.verbose) {
@@ -125,7 +107,6 @@ class SpoPageTextAddCommand extends SpoCommand {
     cmd: CommandInstance,
     args: CommandArgs,
     pageName: string,
-    accessToken: string,
     requestDigest: string
   ): Promise<void> {
     const serverRelativeSiteUrl: string = `${args.options.webUrl.substr(
@@ -144,7 +125,6 @@ class SpoPageTextAddCommand extends SpoCommand {
       url: `${args.options
         .webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeSiteUrl}')/ListItemAllFields`,
       headers: {
-        authorization: `Bearer ${accessToken}`,
         'X-RequestDigest': requestDigest,
         'content-type': 'application/json;odata=nometadata',
         'X-HTTP-Method': 'MERGE',
@@ -222,14 +202,7 @@ class SpoPageTextAddCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site
-    using the ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
-
-    To add text to a modern page, you have to first log in to a SharePoint site
-    using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
+      `  Remarks:
 
     If the specified ${chalk.grey('pageName')} doesn't refer to an existing modern page,
     you will get a ${chalk.grey("File doesn't exists")} error.
@@ -237,13 +210,13 @@ class SpoPageTextAddCommand extends SpoCommand {
   Examples:
 
     Add text to a modern page in the first available location on the page
-      ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --text 'Hello world'
+      ${this.name} --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --text 'Hello world'
 
     Add text to a modern page in the third column of the second section
-      ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --text 'Hello world' --section 2 --column 3
+      ${this.name} --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --text 'Hello world' --section 2 --column 3
 
     Add text at the beginning of the default column on a modern page
-      ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --text 'Hello world' --order 1
+      ${this.name} --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --text 'Hello world' --order 1
       `
     );
   }

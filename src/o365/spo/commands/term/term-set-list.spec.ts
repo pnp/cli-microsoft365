@@ -2,41 +2,40 @@ import commands from '../../commands';
 import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth, { Site } from '../../SpoAuth';
 const command: Command = require('./term-set-list');
 import * as assert from 'assert';
 import request from '../../../../request';
 import config from '../../../../config';
 import Utils from '../../../../Utils';
+import auth from '../../../../Auth';
 
 describe(commands.TERM_SET_LIST, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  let trackEvent: any;
-  let telemetry: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
     sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'ABC' }));
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    auth.service.connected = true;
+    auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.site = new Site();
-    telemetry = null;
   });
 
   afterEach(() => {
@@ -48,11 +47,12 @@ describe(commands.TERM_SET_LIST, () => {
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.ensureAccessToken,
       auth.restoreAuth,
-      (command as any).getRequestDigest
+      (command as any).getRequestDigest,
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
+    auth.service.spoUrl = undefined;
   });
 
   it('has correct name', () => {
@@ -63,68 +63,9 @@ describe(commands.TERM_SET_LIST, () => {
     assert.notEqual(command.description, null);
   });
 
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {}, url: 'https://contoso-admin.sharepoint.com' }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {}, url: 'https://contoso-admin.sharepoint.com' }, () => {
-      try {
-        assert.equal(telemetry.name, commands.TERM_SET_LIST);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not connected to a SharePoint site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not connected to a SharePoint tenant admin site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`${auth.site.url} is not a tenant admin site. Log in to your tenant admin site and try again`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('lists taxonomy term sets from the term group specified using id (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-        opts.headers.authorization &&
-        opts.headers.authorization.indexOf('Bearer ') === 0 &&
         opts.headers['X-RequestDigest'] &&
         opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="55" ObjectPathId="54" /><ObjectIdentityQuery Id="56" ObjectPathId="54" /><ObjectPath Id="58" ObjectPathId="57" /><ObjectIdentityQuery Id="59" ObjectPathId="57" /><ObjectPath Id="61" ObjectPathId="60" /><ObjectPath Id="63" ObjectPathId="62" /><ObjectIdentityQuery Id="64" ObjectPathId="62" /><ObjectPath Id="66" ObjectPathId="65" /><Query Id="67" ObjectPathId="65"><Query SelectAllProperties="false"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties><Property Name="Name" ScalarProperty="true" /><Property Name="Id" ScalarProperty="true" /></Properties></ChildItemQuery></Query></Actions><ObjectPaths><StaticMethod Id="54" Name="GetTaxonomySession" TypeId="{981cbc68-9edc-4f8d-872f-71146fcbb84f}" /><Method Id="57" ParentId="54" Name="GetDefaultSiteCollectionTermStore" /><Property Id="60" ParentId="57" Name="Groups" /><Method Id="62" ParentId="60" Name="GetById"><Parameters><Parameter Type="Guid">{0e8f395e-ff58-4d45-9ff7-e331ab728beb}</Parameter></Parameters></Method><Property Id="65" ParentId="62" Name="TermSets" /></ObjectPaths></Request>`) {
         return Promise.resolve(JSON.stringify([
@@ -172,10 +113,6 @@ describe(commands.TERM_SET_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith([
@@ -193,8 +130,6 @@ describe(commands.TERM_SET_LIST, () => {
   it('lists taxonomy term sets from the term group specified using name', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-        opts.headers.authorization &&
-        opts.headers.authorization.indexOf('Bearer ') === 0 &&
         opts.headers['X-RequestDigest'] &&
         opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="55" ObjectPathId="54" /><ObjectIdentityQuery Id="56" ObjectPathId="54" /><ObjectPath Id="58" ObjectPathId="57" /><ObjectIdentityQuery Id="59" ObjectPathId="57" /><ObjectPath Id="61" ObjectPathId="60" /><ObjectPath Id="63" ObjectPathId="62" /><ObjectIdentityQuery Id="64" ObjectPathId="62" /><ObjectPath Id="66" ObjectPathId="65" /><Query Id="67" ObjectPathId="65"><Query SelectAllProperties="false"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties><Property Name="Name" ScalarProperty="true" /><Property Name="Id" ScalarProperty="true" /></Properties></ChildItemQuery></Query></Actions><ObjectPaths><StaticMethod Id="54" Name="GetTaxonomySession" TypeId="{981cbc68-9edc-4f8d-872f-71146fcbb84f}" /><Method Id="57" ParentId="54" Name="GetDefaultSiteCollectionTermStore" /><Property Id="60" ParentId="57" Name="Groups" /><Method Id="62" ParentId="60" Name="GetByName"><Parameters><Parameter Type="String">PnPTermSets</Parameter></Parameters></Method><Property Id="65" ParentId="62" Name="TermSets" /></ObjectPaths></Request>`) {
         return Promise.resolve(JSON.stringify([
@@ -242,10 +177,6 @@ describe(commands.TERM_SET_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, termGroupName: 'PnPTermSets' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith([
@@ -263,8 +194,6 @@ describe(commands.TERM_SET_LIST, () => {
   it('escapes XML in term group name', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-        opts.headers.authorization &&
-        opts.headers.authorization.indexOf('Bearer ') === 0 &&
         opts.headers['X-RequestDigest'] &&
         opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="55" ObjectPathId="54" /><ObjectIdentityQuery Id="56" ObjectPathId="54" /><ObjectPath Id="58" ObjectPathId="57" /><ObjectIdentityQuery Id="59" ObjectPathId="57" /><ObjectPath Id="61" ObjectPathId="60" /><ObjectPath Id="63" ObjectPathId="62" /><ObjectIdentityQuery Id="64" ObjectPathId="62" /><ObjectPath Id="66" ObjectPathId="65" /><Query Id="67" ObjectPathId="65"><Query SelectAllProperties="false"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties><Property Name="Name" ScalarProperty="true" /><Property Name="Id" ScalarProperty="true" /></Properties></ChildItemQuery></Query></Actions><ObjectPaths><StaticMethod Id="54" Name="GetTaxonomySession" TypeId="{981cbc68-9edc-4f8d-872f-71146fcbb84f}" /><Method Id="57" ParentId="54" Name="GetDefaultSiteCollectionTermStore" /><Property Id="60" ParentId="57" Name="Groups" /><Method Id="62" ParentId="60" Name="GetByName"><Parameters><Parameter Type="String">PnPTermSets&gt;</Parameter></Parameters></Method><Property Id="65" ParentId="62" Name="TermSets" /></ObjectPaths></Request>`) {
         return Promise.resolve(JSON.stringify([
@@ -312,10 +241,6 @@ describe(commands.TERM_SET_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, termGroupName: 'PnPTermSets>' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith([
@@ -333,8 +258,6 @@ describe(commands.TERM_SET_LIST, () => {
   it('lists taxonomy term sets with all properties when output is JSON', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-        opts.headers.authorization &&
-        opts.headers.authorization.indexOf('Bearer ') === 0 &&
         opts.headers['X-RequestDigest'] &&
         opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="55" ObjectPathId="54" /><ObjectIdentityQuery Id="56" ObjectPathId="54" /><ObjectPath Id="58" ObjectPathId="57" /><ObjectIdentityQuery Id="59" ObjectPathId="57" /><ObjectPath Id="61" ObjectPathId="60" /><ObjectPath Id="63" ObjectPathId="62" /><ObjectIdentityQuery Id="64" ObjectPathId="62" /><ObjectPath Id="66" ObjectPathId="65" /><Query Id="67" ObjectPathId="65"><Query SelectAllProperties="false"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties><Property Name="Name" ScalarProperty="true" /><Property Name="Id" ScalarProperty="true" /></Properties></ChildItemQuery></Query></Actions><ObjectPaths><StaticMethod Id="54" Name="GetTaxonomySession" TypeId="{981cbc68-9edc-4f8d-872f-71146fcbb84f}" /><Method Id="57" ParentId="54" Name="GetDefaultSiteCollectionTermStore" /><Property Id="60" ParentId="57" Name="Groups" /><Method Id="62" ParentId="60" Name="GetByName"><Parameters><Parameter Type="String">PnPTermSets</Parameter></Parameters></Method><Property Id="65" ParentId="62" Name="TermSets" /></ObjectPaths></Request>`) {
         return Promise.resolve(JSON.stringify([
@@ -382,10 +305,6 @@ describe(commands.TERM_SET_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { output: 'json', termGroupName: 'PnPTermSets' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith([{ "_ObjectType_": "SP.Taxonomy.TermSet", "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+tHfBZ6NyvQQZTQ6WLBpPLt", "CreatedDate": "2018-09-13T11:52:53.337Z", "Id": "7a167c47-2b37-41d0-94d0-e962c1a4f2ed", "LastModifiedDate": "2018-09-13T12:13:46.883Z", "Name": "PnP-CollabFooter-SharedLinks", "CustomProperties": { "_Sys_Nav_IsNavigationTermSet": "True" }, "CustomSortOrder": "a359ee29-cf72-4235-a4ef-1ed96bf4eaea:60d165e6-8cb1-4c20-8fad-80067c4ca767:da7bfb84-008b-48ff-b61f-bfe40da2602f", "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com", "Contact": "", "Description": "", "IsOpenForTermCreation": false, "Names": { "1033": "PnP-CollabFooter-SharedLinks" }, "Stakeholders": [] }, { "_ObjectType_": "SP.Taxonomy.TermSet", "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+ts4nkUgBOoQZGDcrxallG7", "CreatedDate": "2018-09-13T11:52:55.147Z", "Id": "1479e26c-1380-41a8-9183-72bc5a9651bb", "LastModifiedDate": "2018-09-13T12:13:47.383Z", "Name": "PnP-Organizations", "CustomProperties": {}, "CustomSortOrder": "02cf219e-8ce9-4e85-ac04-a913a44a5d2b:247543b6-45f2-4232-b9e8-66c5bf53c31e:ffc3608f-1250-4d28-b388-381fad8d4602", "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com", "Contact": "", "Description": "", "IsOpenForTermCreation": false, "Names": { "1033": "PnP-Organizations" }, "Stakeholders": [] }]));
@@ -400,8 +319,6 @@ describe(commands.TERM_SET_LIST, () => {
   it('correctly handles no term sets found', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-        opts.headers.authorization &&
-        opts.headers.authorization.indexOf('Bearer ') === 0 &&
         opts.headers['X-RequestDigest'] &&
         opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="55" ObjectPathId="54" /><ObjectIdentityQuery Id="56" ObjectPathId="54" /><ObjectPath Id="58" ObjectPathId="57" /><ObjectIdentityQuery Id="59" ObjectPathId="57" /><ObjectPath Id="61" ObjectPathId="60" /><ObjectPath Id="63" ObjectPathId="62" /><ObjectIdentityQuery Id="64" ObjectPathId="62" /><ObjectPath Id="66" ObjectPathId="65" /><Query Id="67" ObjectPathId="65"><Query SelectAllProperties="false"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties><Property Name="Name" ScalarProperty="true" /><Property Name="Id" ScalarProperty="true" /></Properties></ChildItemQuery></Query></Actions><ObjectPaths><StaticMethod Id="54" Name="GetTaxonomySession" TypeId="{981cbc68-9edc-4f8d-872f-71146fcbb84f}" /><Method Id="57" ParentId="54" Name="GetDefaultSiteCollectionTermStore" /><Property Id="60" ParentId="57" Name="Groups" /><Method Id="62" ParentId="60" Name="GetById"><Parameters><Parameter Type="Guid">{0e8f395e-ff58-4d45-9ff7-e331ab728beb}</Parameter></Parameters></Method><Property Id="65" ParentId="62" Name="TermSets" /></ObjectPaths></Request>`) {
         return Promise.resolve(JSON.stringify([
@@ -441,10 +358,6 @@ describe(commands.TERM_SET_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
@@ -466,10 +379,6 @@ describe(commands.TERM_SET_LIST, () => {
         }
       ]));
     });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('File Not Found.')));
@@ -491,10 +400,6 @@ describe(commands.TERM_SET_LIST, () => {
         }
       ]));
     });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index')));
@@ -516,10 +421,6 @@ describe(commands.TERM_SET_LIST, () => {
         }
       ]));
     });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, termGroupName: 'PnPTermSets' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index')));
@@ -601,16 +502,15 @@ describe(commands.TERM_SET_LIST, () => {
     assert(containsExamples);
   });
 
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.ensureAccessToken);
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
+  it('handles promise rejection', (done) => {
+    Utils.restore((command as any).getRequestDigest);
+    sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.reject('getRequestDigest error'));
+    
+    cmdInstance.action({
+      options: { debug: false, termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' }
+    }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('getRequestDigest error')));
         done();
       }
       catch (e) {

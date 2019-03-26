@@ -22,12 +22,7 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
-!!! important
-    Before using this command, log in to the Microsoft Graph, using the [graph login](../login.md) command.
-
 ## Remarks
-
-To list available Office 365 Groups, you have to first log in to the Microsoft Graph using the [graph login](../login.md) command, eg. `graph login`.
 
 Using the `--includeSiteUrl` option, you can retrieve the URL of the site associated with the particular Office 365 Group. If you however retrieve too many groups and will try to get their site URLs, you will most likely get an error as the command will get throttled, issuing too many requests, too frequently. If you get an error, consider narrowing down the result set using the `--displayName` and `--mailNickname` filters.
 

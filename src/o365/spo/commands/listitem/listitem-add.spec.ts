@@ -1,9 +1,9 @@
 import commands from '../../commands';
 import Command from '../../../../Command';
-import { CommandValidate, CommandOption, CommandError, CommandTypes } from '../../../../Command';
+import { CommandValidate, CommandOption, CommandTypes } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth, { Site } from '../../SpoAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./listitem-add');
 import * as assert from 'assert';
 import request from '../../../../request';
@@ -11,12 +11,9 @@ import Utils from '../../../../Utils';
 import { FolderExtensions } from '../folder/FolderExtensions';
 
 describe(commands.LISTITEM_ADD, () => {
-
   let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
-  let trackEvent: any;
-  let telemetry: any;
   let ensureFolderStub: sinon.SinonStub;
 
   const expectedTitle = `List Item 1`;
@@ -28,18 +25,14 @@ describe(commands.LISTITEM_ADD, () => {
   let actualContentType = '';
 
   let postFakes = (opts: any) => {
-    if (opts.url.indexOf('/common/oauth2/token') > -1) {
-      return Promise.resolve('abc');
-    }
     if (opts.url.indexOf('AddValidateUpdateItemUsingPath') > -1) {
-
       const bodyString = JSON.stringify(opts.body);
       const ctMatch = bodyString.match(/\"?FieldName\"?:\s*\"?ContentType\"?,\s*\"?FieldValue\"?:\s*\"?(\w*)\"?/i);
       actualContentType = ctMatch ? ctMatch[1] : "";
       if (bodyString.indexOf("fail adding me") > -1) return Promise.resolve({ value: [] })
       return Promise.resolve({ value: [ { FieldName: "Id", FieldValue: expectedId }] });
-
     }
+    
     return Promise.reject('Invalid request');
   }
 
@@ -68,27 +61,26 @@ describe(commands.LISTITEM_ADD, () => {
     }
     return Promise.reject('Invalid request');
   }
-  
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
     ensureFolderStub = sinon.stub(FolderExtensions.prototype, 'ensureFolder').resolves();
+    auth.service.connected = true;
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    auth.site = new Site();
-    telemetry = null;
   });
 
   afterEach(() => {
@@ -101,11 +93,11 @@ describe(commands.LISTITEM_ADD, () => {
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.getAccessToken,
       auth.restoreAuth,
-      FolderExtensions.prototype.ensureFolder
+      FolderExtensions.prototype.ensureFolder,
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -114,47 +106,6 @@ describe(commands.LISTITEM_ADD, () => {
 
   it('has a description', () => {
     assert.notEqual(command.description, null);
-  });
-
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.LISTITEM_ADD);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not logged in to a SharePoint site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List' } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 
   it('supports debug mode', () => {
@@ -220,16 +171,10 @@ describe(commands.LISTITEM_ADD, () => {
   });
 
   it('fails to create a list item when \'fail me\' values are used', (done) => {
-
     actualId = 0;
     
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     let options: any = { 
       debug: false, 
@@ -239,7 +184,6 @@ describe(commands.LISTITEM_ADD, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         assert.equal(actualId, 0);
         done();
@@ -247,23 +191,13 @@ describe(commands.LISTITEM_ADD, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.get);
-        Utils.restore(request.post);
-      }
     });
     
   });
 
   it('returns listItemInstance object when list item is added with correct values', (done) => {
-
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     command.allowUnknownOptions();
 
@@ -275,7 +209,6 @@ describe(commands.LISTITEM_ADD, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         assert.equal(actualId, expectedId);
         done();
@@ -283,23 +216,33 @@ describe(commands.LISTITEM_ADD, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.get);
-        Utils.restore(request.post);
-      }
     });
-    
   });
 
-  it('attempts to create the listitem with the contenttype of \'Item\' when content type option 0x01 is specified', (done) => {
-
+  it('creates list item in the list specified using ID', (done) => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
+    const options: any = { 
+      listId: 'cf8c72a1-0207-40ee-aebd-fca67d20bc8a',
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+      Title: expectedTitle
+    }
+
+    cmdInstance.action({ options: options }, () => {
+      try {
+        assert.equal(actualId, expectedId);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('attempts to create the listitem with the contenttype of \'Item\' when content type option 0x01 is specified', (done) => {
+    sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'post').callsFake(postFakes);
 
     let options: any = { 
       debug: true, 
@@ -310,7 +253,6 @@ describe(commands.LISTITEM_ADD, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         assert(expectedContentType == actualContentType);
         done();
@@ -318,23 +260,13 @@ describe(commands.LISTITEM_ADD, () => {
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.get);
-        Utils.restore(request.post);
-      }
     });
 
   });
 
   it('fails to create the listitem when the specified contentType doesn\'t exist in the target list', (done) => {
-
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     let options: any = { 
       debug: false, 
@@ -345,17 +277,12 @@ describe(commands.LISTITEM_ADD, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         assert(expectedContentType == actualContentType);
         done();
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore(request.get);
-        Utils.restore(request.post);
       }
     });
 
@@ -364,11 +291,6 @@ describe(commands.LISTITEM_ADD, () => {
   it('should call ensure folder when folder arg specified', (done) => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
 
     cmdInstance.action({
       options: {
@@ -380,11 +302,9 @@ describe(commands.LISTITEM_ADD, () => {
         folder: "InsideFolder2"
       }
     }, () => {
-
       try {
         assert.equal(ensureFolderStub.lastCall.args[0], 'https://contoso.sharepoint.com/sites/project-x');
         assert.equal(ensureFolderStub.lastCall.args[1], '/sites/project-xxx/Lists/Demo%20List/InsideFolder2');
-        assert.equal(ensureFolderStub.lastCall.args[2], 'ABC');
         done();
       }
       catch (e) {
@@ -397,11 +317,6 @@ describe(commands.LISTITEM_ADD, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     cmdInstance.action({
       options: {
         debug: true, 
@@ -412,11 +327,9 @@ describe(commands.LISTITEM_ADD, () => {
         folder: "InsideFolder2/Folder3"
       }
     }, () => {
-
       try {
         assert.equal(ensureFolderStub.lastCall.args[0], 'https://contoso.sharepoint.com/sites/project-x');
         assert.equal(ensureFolderStub.lastCall.args[1], '/sites/project-xxx/Lists/Demo%20List/InsideFolder2/Folder3');
-        assert.equal(ensureFolderStub.lastCall.args[2], 'ABC');
         done();
       }
       catch (e) {
@@ -429,11 +342,6 @@ describe(commands.LISTITEM_ADD, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     const postStubs = sinon.stub(request, 'post').callsFake(postFakes);
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-
     cmdInstance.action({
       options: {
         debug: true, 
@@ -444,7 +352,6 @@ describe(commands.LISTITEM_ADD, () => {
         folder: "InsideFolder2/Folder3/"
       }
     }, () => {
-
       try {
         const addValidateUpdateItemUsingPathRequest = postStubs.getCall(postStubs.callCount - 1).args[0];
         const info = addValidateUpdateItemUsingPathRequest.body.listItemCreateInfo;
@@ -490,29 +397,4 @@ describe(commands.LISTITEM_ADD, () => {
     Utils.restore(vorpal.find);
     assert(containsExamples);
   });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.getAccessToken);
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        listId: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-        webUrl: "https://contoso.sharepoint.com",
-        debug: false
-      }
-    }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
 });

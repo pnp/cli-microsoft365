@@ -2,40 +2,37 @@ import commands from '../../commands';
 import Command, { CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth from '../../GraphAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./user-list');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import { Service } from '../../../../Auth';
 
 describe(commands.USER_LIST, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  let trackEvent: any;
-  let telemetry: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    auth.service.connected = true;
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.service = new Service();
-    telemetry = null;
     (command as any).items = [];
   });
 
@@ -48,10 +45,10 @@ describe(commands.USER_LIST, () => {
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.ensureAccessToken,
-      auth.restoreAuth
+      auth.restoreAuth,
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -60,47 +57,6 @@ describe(commands.USER_LIST, () => {
 
   it('has a description', () => {
     assert.notEqual(command.description, null);
-  });
-
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.USER_LIST);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not logged in to Microsoft Graph', (done) => {
-    auth.service = new Service();
-    auth.service.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to the Microsoft Graph first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 
   it('lists users in the tenant with the default properties', (done) => {
@@ -115,10 +71,6 @@ describe(commands.USER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith([
@@ -144,10 +96,6 @@ describe(commands.USER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith([
@@ -173,10 +121,6 @@ describe(commands.USER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, properties: 'displayName' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith([
@@ -202,10 +146,6 @@ describe(commands.USER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, properties: 'displayName,mail' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith([
@@ -231,10 +171,6 @@ describe(commands.USER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, surname: 'M' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith([
@@ -260,10 +196,6 @@ describe(commands.USER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, surname: 'M', givenName: 'A' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith([
@@ -287,10 +219,6 @@ describe(commands.USER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, displayName: 'O\'Brien' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith([]));
@@ -319,10 +247,6 @@ describe(commands.USER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
@@ -382,23 +306,5 @@ describe(commands.USER_LIST, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.ensureAccessToken);
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 });

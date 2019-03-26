@@ -20,12 +20,7 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
-!!! important
-    Before using this command, log in to a SharePoint Online tenant admin site, using the [spo login](../login.md) command.
-
 ## Remarks
-
-To retrieve information about a content type, you have to first log in to a SharePoint site using the [spo login](../login.md) command, eg. `spo login https://contoso.sharepoint.com`.
 
 If no content type with the specified is found in the site or the list, you will get the _Content type with ID 0x010012 not found_ error.
 

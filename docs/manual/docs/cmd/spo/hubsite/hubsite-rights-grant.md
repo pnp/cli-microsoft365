@@ -2,9 +2,6 @@
 
 Grants permissions to join the hub site for one or more principals
 
-!!! attention
-    This command is based on a SharePoint API that is currently in preview and is subject to change once the API reached general availability.
-
 ## Usage
 
 ```sh
@@ -24,11 +21,12 @@ Option|Description
 `--debug`|Runs command with debug logging
 
 !!! important
-    Before using this command, log in to a SharePoint Online tenant admin site, using the [spo login](../login.md) command.
+    To use this command you have to have permissions to access the tenant admin site.
 
 ## Remarks
 
-To grant permissions to join the hub site, you have to first log in to a tenant admin site using the [spo login](../login.md) command, eg. `spo login https://contoso-admin.sharepoint.com`. If you are logged in to a different site and will try to grant permissions to join the hub site, you will get an error.
+!!! attention
+    This command is based on a SharePoint API that is currently in preview and is subject to change once the API reached general availability.
 
 ## Examples
 

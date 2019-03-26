@@ -35,12 +35,7 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
-!!! important
-    Before using this command, log in to a SharePoint Online site, using the [spo login](../login.md) command.
-
 ## Remarks
-
-To create custom action, you have to first log in to a SharePoint Online site using the [spo login](../login.md) command, eg. `spo login https://contoso.sharepoint.com`.
 
 Running this command from the Windows Command Shell (cmd.exe) or PowerShell for Windows OS XP, 7, 8, 8.1 without bash installed might require additional formatting for command options that have JSON, XML or JavaScript values because the command shell treat quotes differently. For example, this is how ApplicationCustomizer user custom action can be created from the Windows cmd.exe:
 

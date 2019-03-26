@@ -2,21 +2,18 @@ import commands from '../../commands';
 import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth from '../../AzmgmtAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./flow-export');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import * as fs from 'fs';
-import { Service } from '../../../../Auth';
 
 describe(commands.FLOW_EXPORT, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  let trackEvent: any;
-  let telemetry: any;
 
   const actualFilename = `20180916t000000zba9d7134cc81499e9884bf70642afac7_20180916042428.zip`
   const actualFileUrl = `https://bapfeblobprodml.blob.core.windows.net/20180916t000000zb5faa82a53cb4cd29f2a20fde7dbb785/${actualFilename}?sv=2017-04-17&sr=c&sig=AOp0fzKc0dLpY2yovI%2BSHJnQ92GxaMvbWgxyCX5Wwno%3D&se=2018-09-16T12%3A24%3A28Z&sp=rl`;
@@ -120,23 +117,23 @@ describe(commands.FLOW_EXPORT, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    auth.service.connected = true;
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.service = new Service('https://management.azure.com/');
-    telemetry = null;
   });
 
   afterEach(() => {
@@ -150,10 +147,10 @@ describe(commands.FLOW_EXPORT, () => {
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.ensureAccessToken,
-      auth.restoreAuth
+      auth.restoreAuth,
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -164,55 +161,11 @@ describe(commands.FLOW_EXPORT, () => {
     assert.notEqual(command.description, null);
   });
 
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.FLOW_EXPORT);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not connected to the Azure Management Service', (done) => {
-    auth.service = new Service('https://management.azure.com/');
-    auth.service.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to the Azure Management Service first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('exports the specified flow (debug)', (done) => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    auth.service = new Service('https://management.azure.com/');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'zip' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(`File saved to path './${actualFilename}'`));
@@ -229,9 +182,6 @@ describe(commands.FLOW_EXPORT, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    auth.service = new Service('https://management.azure.com/');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, id: `${nonZipFileFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'zip', path: './output.zip', verbose: true } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(`File saved to path './output.zip'`));
@@ -248,9 +198,6 @@ describe(commands.FLOW_EXPORT, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    auth.service = new Service('https://management.azure.com/');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'json' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(`./${flowDisplayName}.json`));
@@ -267,9 +214,6 @@ describe(commands.FLOW_EXPORT, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    auth.service = new Service('https://management.azure.com/');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'json' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(`File saved to path './${flowDisplayName}.json'`));
@@ -282,14 +226,10 @@ describe(commands.FLOW_EXPORT, () => {
   });
 
   it('returns ZIP file location when format specified as ZIP', (done) => {
-
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    auth.service = new Service('https://management.azure.com/');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'zip' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(`./${actualFilename}`));
@@ -302,14 +242,10 @@ describe(commands.FLOW_EXPORT, () => {
   });
 
   it('nothing returned when path parameter is specified', (done) => {
-
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    auth.service = new Service('https://management.azure.com/');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'zip', path: './output.zip' } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
@@ -322,13 +258,9 @@ describe(commands.FLOW_EXPORT, () => {
   });
 
   it('correctly handles no environment found', (done) => {
-
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    auth.service = new Service('https://management.azure.com/');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, environment: `Default-${notFoundEnvironmentId}`, id: `${foundFlowId}` } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Access to the environment 'Default-${notFoundEnvironmentId}' is denied.`)));
@@ -341,13 +273,9 @@ describe(commands.FLOW_EXPORT, () => {
   });
 
   it('correctly handles Flow not found', (done) => {
-
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    auth.service = new Service('https://management.azure.com/');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, environment: `Default-${foundEnvironmentId}`, id: notFoundFlowId } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`The caller with object id '${foundEnvironmentId}' does not have permission for connection '${notFoundFlowId}' under Api 'shared_logicflows'.`)));
@@ -536,22 +464,5 @@ describe(commands.FLOW_EXPORT, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.ensureAccessToken);
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.service = new Service('https://management.azure.com/');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 });

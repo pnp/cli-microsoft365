@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -10,7 +8,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
-import { Auth } from '../../../../Auth';
 import { ListItemInstanceCollection } from './ListItemInstanceCollection';
 import { ContextInfo } from '../../spo';
 
@@ -53,11 +50,9 @@ class SpoListItemListCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
     const listIdArgument = args.options.id || '';
     const listTitleArgument = args.options.title || '';
 
-    let siteAccessToken: string = '';
     let formDigestValue: string = '';
 
     const fieldsArray: string[] = args.options.fields ? args.options.fields.split(",")
@@ -67,26 +62,18 @@ class SpoListItemListCommand extends SpoCommand {
       `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(listIdArgument)}')`
       : `${args.options.webUrl}/_api/web/lists/getByTitle('${encodeURIComponent(listTitleArgument)}')`);
 
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
-    }
-
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<any> => {
-        siteAccessToken = accessToken;
-
-        if (args.options.query) {
-          if (this.debug) {
-            cmd.log(`getting request digest for query request`);
-          }
-
-          return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
+    ((): Promise<any> => {
+      if (args.options.query) {
+        if (this.debug) {
+          cmd.log(`getting request digest for query request`);
         }
-        else {
-          return Promise.resolve();
-        }
-      })
+
+        return this.getRequestDigest(args.options.webUrl);
+      }
+      else {
+        return Promise.resolve();
+      }
+    })()
       .then((res: ContextInfo): Promise<any> => {
         formDigestValue = args.options.query ? res.FormDigestValue : '';
 
@@ -98,7 +85,6 @@ class SpoListItemListCommand extends SpoCommand {
           const requestOptions: any = {
             url: `${listRestUrl}/items${fieldSelect}`,
             headers: {
-              authorization: `Bearer ${siteAccessToken}`,
               'accept': 'application/json;odata=nometadata',
               'X-RequestDigest': formDigestValue
             },
@@ -130,7 +116,6 @@ class SpoListItemListCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${listRestUrl}/${args.options.query ? `GetItems` : `items${fieldSelect}`}`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             'accept': 'application/json;odata=nometadata',
             'X-RequestDigest': formDigestValue
           },
@@ -265,40 +250,33 @@ class SpoListItemListCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-    using the ${chalk.blue(commands.LOGIN)} command.
+      `  Remarks:
   
-  Remarks:
-  
-    To get a list of items from a list, you have to first log in to SharePoint
-    using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-
     ${chalk.grey('pageNumber')} is specified as a 0-based index. A value of ${chalk.grey('2')} returns the third
     page of items.
         
   Examples:
   
     Get all items from a list named ${chalk.grey('Demo List')}
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_LIST} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x
+      ${commands.LISTITEM_LIST} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x
 
     From a list named ${chalk.grey('Demo List')} get all items with title ${chalk.grey('Demo list item')}
     using a CAML query
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_LIST} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --query "<View><Query><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo list item</Value></Eq></Where></Query></View>"
+      ${commands.LISTITEM_LIST} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --query "<View><Query><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo list item</Value></Eq></Where></Query></View>"
     
     Get all items from a list with ID ${chalk.grey('935c13a0-cc53-4103-8b48-c1d0828eaa7f')} 
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_LIST} --id 935c13a0-cc53-4103-8b48-c1d0828eaa7f --webUrl https://contoso.sharepoint.com/sites/project-x
+      ${commands.LISTITEM_LIST} --id 935c13a0-cc53-4103-8b48-c1d0828eaa7f --webUrl https://contoso.sharepoint.com/sites/project-x
 
     Get all items from list named ${chalk.grey('Demo List')}. For each item, retrieve the value
     of the ${chalk.grey('ID')}, ${chalk.grey('Title')} and ${chalk.grey('Modified')} fields
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_LIST} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --fields "ID,Title,Modified"
+      ${commands.LISTITEM_LIST} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --fields "ID,Title,Modified"
 
     From a list named ${chalk.grey('Demo List')} get all items with title ${chalk.grey('Demo list item')}
     using an OData filter 
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_LIST} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --filter "Title eq 'Demo list item'"
+      ${commands.LISTITEM_LIST} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --filter "Title eq 'Demo list item'"
 
     From a list named ${chalk.grey('Demo List')} get the third batch of 10 items
-      ${chalk.grey(config.delimiter)} ${commands.LISTITEM_LIST} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --pageSize 10 --pageNumber 2
+      ${commands.LISTITEM_LIST} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --pageSize 10 --pageNumber 2
    `);
   }
 }

@@ -1,8 +1,6 @@
-import auth from '../../GraphAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import { GraphItemsListCommand } from '../GraphItemsListCommand';
+import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
 import { Task } from './Task';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -22,7 +20,7 @@ class GraphPlannerTaskListCommand extends GraphItemsListCommand<Task> {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     this
-      .getAllItems(`${auth.service.resource}/v1.0/me/planner/tasks`, cmd, true)
+      .getAllItems(`${this.resource}/v1.0/me/planner/tasks`, cmd, true)
       .then((): void => {
         if (args.options.output === 'json') {
           cmd.log(this.items);
@@ -48,22 +46,12 @@ class GraphPlannerTaskListCommand extends GraphItemsListCommand<Task> {
   }
 
   public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to the Microsoft Graph
-    using the ${ chalk.blue(commands.LOGIN)} command.
-
-  Remarks:
-
-    To list Planner tasks for the currently logged in user, you have to first
-    log in to the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
-
-  Examples:
+      `  Examples:
 
     List tasks for the currently logged in user
-      ${chalk.grey(config.delimiter)} ${this.name}`
+      ${this.name}`
 );
   }
 }

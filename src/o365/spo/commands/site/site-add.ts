@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -50,10 +48,6 @@ class SpoSiteAddCommand extends SpoCommand {
     return 'Creates new modern site';
   }
 
-  protected requiresTenantAdmin(): boolean {
-    return false;
-  }
-
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     const isTeamSite: boolean = args.options.type === 'TeamSite';
@@ -75,16 +69,15 @@ class SpoSiteAddCommand extends SpoCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     const isTeamSite: boolean = args.options.type !== 'CommunicationSite';
+    let spoUrl: string = '';
 
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<CreateGroupExResponse> => {
+    this
+      .getSpoUrl(cmd, this.debug)
+      .then((_spoUrl: string): Promise<CreateGroupExResponse> => {
+        spoUrl = _spoUrl;
+
         if (args.options.allowFileSharingForGuestUsers && this.verbose) {
           cmd.log(vorpal.chalk.yellow(`Option 'allowFileSharingForGuestUsers' is deprecated. Please use 'shareByEmailEnabled' instead`));
-        }
-
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}`);
         }
 
         if (this.verbose) {
@@ -95,9 +88,8 @@ class SpoSiteAddCommand extends SpoCommand {
 
         if (isTeamSite) {
           requestOptions = {
-            url: `${auth.site.url}/_api/GroupSiteManager/CreateGroupEx`,
+            url: `${spoUrl}/_api/GroupSiteManager/CreateGroupEx`,
             headers: {
-              authorization: `Bearer ${auth.service.accessToken}`,
               'content-type': 'application/json; odata=verbose; charset=utf-8',
               accept: 'application/json;odata=nometadata'
             },
@@ -151,9 +143,8 @@ class SpoSiteAddCommand extends SpoCommand {
           }
 
           requestOptions = {
-            url: `${auth.site.url}/_api/SPSiteManager/Create`,
+            url: `${spoUrl}/_api/SPSiteManager/Create`,
             headers: {
-              authorization: `Bearer ${auth.service.accessToken}`,
               'content-type': 'application/json;odata=nometadata',
               accept: 'application/json;odata=nometadata'
             },
@@ -334,45 +325,36 @@ class SpoSiteAddCommand extends SpoCommand {
   }
 
   public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-      using the ${chalk.blue(commands.LOGIN)} command.
-
-  Remarks:
-  
-    To create a modern site, you have to first log in to SharePoint using the
-    ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-   
-  Examples:
+      `  Examples:
   
     Create modern team site with private group
-      ${chalk.grey(config.delimiter)} ${commands.SITE_ADD} --alias team1 --title Team 1
+      ${commands.SITE_ADD} --alias team1 --title Team 1
 
     Create modern team site with description and classification
-      ${chalk.grey(config.delimiter)} ${commands.SITE_ADD} --type TeamSite --alias team1 --title Team 1 --description Site of team 1 --classification LBI
+      ${commands.SITE_ADD} --type TeamSite --alias team1 --title Team 1 --description Site of team 1 --classification LBI
 
     Create modern team site with public group
-      ${chalk.grey(config.delimiter)} ${commands.SITE_ADD} --type TeamSite --alias team1 --title Team 1 --isPublic
+      ${commands.SITE_ADD} --type TeamSite --alias team1 --title Team 1 --isPublic
 
     Create modern team site using the Dutch language
-      ${chalk.grey(config.delimiter)} ${commands.SITE_ADD} --alias team1 --title Team 1 --lcid 1043
+      ${commands.SITE_ADD} --alias team1 --title Team 1 --lcid 1043
 
     Create modern team site with the specified users as owners
-      ${chalk.grey(config.delimiter)} ${commands.SITE_ADD} --alias team1 --title Team 1 --owners 'steve@contoso.com, bob@contoso.com'
+      ${commands.SITE_ADD} --alias team1 --title Team 1 --owners 'steve@contoso.com, bob@contoso.com'
 
     Create communication site using the Topic design
-      ${chalk.grey(config.delimiter)} ${commands.SITE_ADD} --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing
+      ${commands.SITE_ADD} --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing
 
     Create communication site using the Showcase design
-      ${chalk.grey(config.delimiter)} ${commands.SITE_ADD} --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing --siteDesign Showcase
+      ${commands.SITE_ADD} --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing --siteDesign Showcase
 
     Create communication site using a custom site design
-      ${chalk.grey(config.delimiter)} ${commands.SITE_ADD} --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing --siteDesignId 99f410fe-dd79-4b9d-8531-f2270c9c621c
+      ${commands.SITE_ADD} --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing --siteDesignId 99f410fe-dd79-4b9d-8531-f2270c9c621c
 
     Create communication site using the Blank design with description and classification
-      ${chalk.grey(config.delimiter)} ${commands.SITE_ADD} --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing --description Site of the marketing department --classification MBI --siteDesign Blank
+      ${commands.SITE_ADD} --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing --description Site of the marketing department --classification MBI --siteDesign Blank
   
   More information
     

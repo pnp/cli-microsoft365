@@ -1,7 +1,5 @@
 import request from '../../../../request';
-import auth from '../../GraphAuth';
 import Utils from '../../../../Utils';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import { CommandOption, CommandValidate } from '../../../../Command';
@@ -34,25 +32,21 @@ class GraphTeamsArchiveCommand extends GraphCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((): Promise<{}> => {
-        const siteReadOnlyForMembers: boolean = args.options.shouldSetSpoSiteReadOnlyForMembers === true;
-        const requestOptions: any = {
-          url: `${auth.service.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/archive`,
-          headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
-            'content-type': 'application/json;odata=nometadata',
-            'accept': 'application/json;odata.metadata=none'
-          },
-          json: true,
-          body: {
-            shouldSetSpoSiteReadOnlyForMembers: siteReadOnlyForMembers
-          }
-        };
+    const siteReadOnlyForMembers: boolean = args.options.shouldSetSpoSiteReadOnlyForMembers === true;
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/archive`,
+      headers: {
+        'content-type': 'application/json;odata=nometadata',
+        'accept': 'application/json;odata.metadata=none'
+      },
+      json: true,
+      body: {
+        shouldSetSpoSiteReadOnlyForMembers: siteReadOnlyForMembers
+      }
+    };
 
-        return request.post(requestOptions);
-      })
+    request
+      .post(requestOptions)
       .then((): void => {
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
@@ -93,16 +87,9 @@ class GraphTeamsArchiveCommand extends GraphCommand {
   }
 
   public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} Before using this command, log in to the Microsoft Graph,
-    using the ${chalk.blue(commands.LOGIN)} command.
-          
-  Remarks:
-          
-    To archive a Microsoft Teams team, you have to first log in to the Microsoft
-    Graph using the ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
+      `  Remarks:
 
     Using this command, global admins and Microsoft Teams service admins can
     access teams that they are not a member of.
@@ -115,11 +102,11 @@ class GraphTeamsArchiveCommand extends GraphCommand {
   Examples:
     
     Archive the specified Microsoft Teams team
-      ${chalk.grey(config.delimiter)} ${commands.TEAMS_ARCHIVE} --teamId 6f6fd3f7-9ba5-4488-bbe6-a789004d0d55
+      ${commands.TEAMS_ARCHIVE} --teamId 6f6fd3f7-9ba5-4488-bbe6-a789004d0d55
     
     Archive the specified Microsoft Teams team and set permissions for team
     members to read-only on the SharePoint Online site associated with the team
-      ${chalk.grey(config.delimiter)} ${commands.TEAMS_ARCHIVE} --teamId 6f6fd3f7-9ba5-4488-bbe6-a789004d0d55 --shouldSetSpoSiteReadOnlyForMembers
+      ${commands.TEAMS_ARCHIVE} --teamId 6f6fd3f7-9ba5-4488-bbe6-a789004d0d55 --shouldSetSpoSiteReadOnlyForMembers
     `);
   }
 }

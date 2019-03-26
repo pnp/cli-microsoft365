@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
 import {
@@ -37,22 +35,17 @@ class SpoSiteDesignApplyCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<any> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Applying site design...`);
-        }
-
+    this
+      .getSpoUrl(cmd, this.debug)
+      .then((spoUrl: string): Promise<any> => {
         const requestBody: any = {
           siteDesignId: args.options.id,
           webUrl: args.options.webUrl
         };
 
         const requestOptions: any = {
-          url: `${auth.site.url}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.${args.options.asTask ? 'AddSiteDesignTask' : 'ApplySiteDesign'}`,
+          url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.${args.options.asTask ? 'AddSiteDesignTask' : 'ApplySiteDesign'}`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             'content-type': 'application/json;charset=utf-8',
             accept: 'application/json;odata=nometadata'
           },
@@ -126,23 +119,14 @@ class SpoSiteDesignApplyCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site
-    using the ${chalk.blue(commands.LOGIN)} command.
-
-  Remarks:
-
-    To apply a site design to an existing site collection, you have to first
-    log in to a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-
-  Examples:
+      `  Examples:
 
     Apply the site design with ID ${chalk.grey('9b142c22-037f-4a7f-9017-e9d8c0e34b98')}
     to the site collection ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${chalk.grey(config.delimiter)} ${this.name} --id 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --webUrl https://contoso.sharepoint.com/sites/project-x
+      ${this.name} --id 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --webUrl https://contoso.sharepoint.com/sites/project-x
 
     Apply large site design to the specified site
-      ${chalk.grey(config.delimiter)} ${this.name} --id 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --webUrl https://contoso.sharepoint.com/sites/project-x --asTask
+      ${this.name} --id 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --webUrl https://contoso.sharepoint.com/sites/project-x --asTask
 
   More information:
 

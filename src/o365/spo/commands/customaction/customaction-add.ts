@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -10,7 +8,6 @@ import {
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import { CustomAction } from './customaction';
-import { Auth } from '../../../../Auth';
 import { BasePermissions, PermissionKind } from './../../common/base-permissions';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -85,36 +82,23 @@ class SpoCustomActionAddCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.url);
-    let siteAccessToken: string = '';
-
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
+    if (!args.options.scope) {
+      args.options.scope = 'Web';
     }
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<CustomAction> => {
-        siteAccessToken = accessToken;
+    const requestBody: any = this.mapRequestBody(args.options);
 
-        if (!args.options.scope) {
-          args.options.scope = 'Web';
-        }
+    const requestOptions: any = {
+      url: `${args.options.url}/_api/${args.options.scope}/UserCustomActions`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      body: requestBody,
+      json: true
+    };
 
-        const requestBody: any = this.mapRequestBody(args.options);
-
-        const requestOptions: any = {
-          url: `${args.options.url}/_api/${args.options.scope}/UserCustomActions`,
-          headers: {
-            authorization: `Bearer ${siteAccessToken}`,
-            accept: 'application/json;odata=nometadata'
-          },
-          body: requestBody,
-          json: true
-        };
-
-        return request.post(requestOptions);
-      })
+    request
+      .post<CustomAction>(requestOptions)
       .then((customAction: CustomAction): void => {
         if (this.verbose) {
           cmd.log({
@@ -318,14 +302,8 @@ class SpoCustomActionAddCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.CUSTOMACTION_ADD).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-        using the ${chalk.blue(commands.LOGIN)} command.
+      `  Remarks:
           
-  Remarks:
-          
-    To create custom action, you have to first log in to a SharePoint Online site using the
-    ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-
     Running this command from the Windows Command Shell (cmd.exe) or PowerShell for Windows OS XP,
     7, 8, 8.1 without bash installed might require additional formatting for command options that have
     JSON, XML or JavaScript values, because the command shell treat quotes differently. For example,
@@ -343,34 +321,34 @@ class SpoCustomActionAddCommand extends SpoCommand {
     
     Adds tenant-wide SharePoint Framework Application Customizer extension in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.CUSTOMACTION_ADD} -u https://contoso.sharepoint.com/sites/test -t "YourAppCustomizer" -n "YourName" -l "ClientSideExtension.ApplicationCustomizer" -c b41916e7-e69d-467f-b37f-ff8ecf8f99f2 -p '{"testMessage":"Test message"}'
+      ${commands.CUSTOMACTION_ADD} -u https://contoso.sharepoint.com/sites/test -t "YourAppCustomizer" -n "YourName" -l "ClientSideExtension.ApplicationCustomizer" -c b41916e7-e69d-467f-b37f-ff8ecf8f99f2 -p '{"testMessage":"Test message"}'
     
     Adds tenant-wide SharePoint Framework ${chalk.blue('modern list view')} Command Set extension in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.CUSTOMACTION_ADD} -u https://contoso.sharepoint.com/sites/test -t "YourCommandSet" -n "YourName" -l "ClientSideExtension.ListViewCommandSet" -c db3e6e35-363c-42b9-a254-ca661e437848 -p '{"sampleTextOne":"One item is selected in the list.", "sampleTextTwo":"This command is always visible."}' --registrationId 100 --registrationType List
+      ${commands.CUSTOMACTION_ADD} -u https://contoso.sharepoint.com/sites/test -t "YourCommandSet" -n "YourName" -l "ClientSideExtension.ListViewCommandSet" -c db3e6e35-363c-42b9-a254-ca661e437848 -p '{"sampleTextOne":"One item is selected in the list.", "sampleTextTwo":"This command is always visible."}' --registrationId 100 --registrationType List
     
     Creates url custom action in the SiteActions menu in site ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.CUSTOMACTION_ADD} -u https://contoso.sharepoint.com/sites/test -t "YourTitle" -n "YourName" -l "Microsoft.SharePoint.StandardMenu" -g "SiteActions" --actionUrl "~site/SitePages/Home.aspx" --sequence 100
+      ${commands.CUSTOMACTION_ADD} -u https://contoso.sharepoint.com/sites/test -t "YourTitle" -n "YourName" -l "Microsoft.SharePoint.StandardMenu" -g "SiteActions" --actionUrl "~site/SitePages/Home.aspx" --sequence 100
     
     Creates custom action in ${chalk.blue('classic')} Document Library edit context menu in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.CUSTOMACTION_ADD} -u https://contoso.sharepoint.com/sites/test -t "YourTitle" -n "YourName" -l "EditControlBlock" --actionUrl "javascript:(function(){ return console.log('office365-cli rocks!'); })();" --registrationId 101 --registrationType List
+      ${commands.CUSTOMACTION_ADD} -u https://contoso.sharepoint.com/sites/test -t "YourTitle" -n "YourName" -l "EditControlBlock" --actionUrl "javascript:(function(){ return console.log('office365-cli rocks!'); })();" --registrationId 101 --registrationType List
     
     Creates ScriptLink custom action with script source in ${chalk.blue('classic pages')} in
     site collection ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.CUSTOMACTION_ADD} -u https://contoso.sharepoint.com/sites/test -t "YourTitle" -n "YourName" -l "ScriptLink" --scriptSrc "~sitecollection/SiteAssets/YourScript.js" --sequence 101 -s Site
+      ${commands.CUSTOMACTION_ADD} -u https://contoso.sharepoint.com/sites/test -t "YourTitle" -n "YourName" -l "ScriptLink" --scriptSrc "~sitecollection/SiteAssets/YourScript.js" --sequence 101 -s Site
     
     Creates ScriptLink custom action with script block in ${chalk.blue('classic pages')} in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.CUSTOMACTION_ADD} -u https://contoso.sharepoint.com/sites/test -t "YourTitle" -n "YourName" -l "ScriptLink" --scriptBlock "(function(){ return console.log('Hello office365-cli!'); })();" --sequence 102
+      ${commands.CUSTOMACTION_ADD} -u https://contoso.sharepoint.com/sites/test -t "YourTitle" -n "YourName" -l "ScriptLink" --scriptBlock "(function(){ return console.log('Hello office365-cli!'); })();" --sequence 102
     
     Creates ${chalk.blue('classic List View')} custom action located in the Ribbon in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.CUSTOMACTION_ADD} -u https://contoso.sharepoint.com/sites/test -t "YourTitle" -n "YourName" -l "CommandUI.Ribbon" --commandUIExtension '<CommandUIExtension><CommandUIDefinitions><CommandUIDefinition Location="Ribbon.List.Share.Controls._children"><Button Id="Ribbon.List.Share.GetItemsCountButton" Alt="Get list items count" Sequence="11" Command="Invoke_GetItemsCountButtonRequest" LabelText="Get Items Count" TemplateAlias="o1" Image32by32="_layouts/15/images/placeholder32x32.png" Image16by16="_layouts/15/images/placeholder16x16.png" /></CommandUIDefinition></CommandUIDefinitions><CommandUIHandlers><CommandUIHandler Command="Invoke_GetItemsCountButtonRequest" CommandAction="javascript: alert(ctx.TotalListItems);" EnabledScript="javascript: function checkEnable() { return (true);} checkEnable();"/></CommandUIHandlers></CommandUIExtension>'
+      ${commands.CUSTOMACTION_ADD} -u https://contoso.sharepoint.com/sites/test -t "YourTitle" -n "YourName" -l "CommandUI.Ribbon" --commandUIExtension '<CommandUIExtension><CommandUIDefinitions><CommandUIDefinition Location="Ribbon.List.Share.Controls._children"><Button Id="Ribbon.List.Share.GetItemsCountButton" Alt="Get list items count" Sequence="11" Command="Invoke_GetItemsCountButtonRequest" LabelText="Get Items Count" TemplateAlias="o1" Image32by32="_layouts/15/images/placeholder32x32.png" Image16by16="_layouts/15/images/placeholder16x16.png" /></CommandUIDefinition></CommandUIDefinitions><CommandUIHandlers><CommandUIHandler Command="Invoke_GetItemsCountButtonRequest" CommandAction="javascript: alert(ctx.TotalListItems);" EnabledScript="javascript: function checkEnable() { return (true);} checkEnable();"/></CommandUIHandlers></CommandUIExtension>'
     
     Creates custom action with delegated rights in the SiteActions menu in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.CUSTOMACTION_ADD} -u https://contoso.sharepoint.com/sites/test -t "YourTitle" -n "YourName" -l "Microsoft.SharePoint.StandardMenu" -g "SiteActions" --actionUrl "~site/SitePages/Home.aspx" --rights "AddListItems,DeleteListItems,ManageLists"
+      ${commands.CUSTOMACTION_ADD} -u https://contoso.sharepoint.com/sites/test -t "YourTitle" -n "YourName" -l "Microsoft.SharePoint.StandardMenu" -g "SiteActions" --actionUrl "~site/SitePages/Home.aspx" --rights "AddListItems,DeleteListItems,ManageLists"
   
   More information:
 

@@ -1,8 +1,6 @@
 const prefix: string = 'graph';
 
 export default {
-  CONNECT: `${prefix} connect`,
-  DISCONNECT: `${prefix} disconnect`,
   GROUPSETTING_ADD: `${prefix} groupsetting add`,
   GROUPSETTING_GET: `${prefix} groupsetting get`,
   GROUPSETTING_LIST: `${prefix} groupsetting list`,
@@ -10,8 +8,6 @@ export default {
   GROUPSETTING_SET: `${prefix} groupsetting set`,
   GROUPSETTINGTEMPLATE_GET: `${prefix} groupsettingtemplate get`,
   GROUPSETTINGTEMPLATE_LIST: `${prefix} groupsettingtemplate list`,
-  LOGIN: `${prefix} login`,
-  LOGOUT: `${prefix} logout`,
   O365GROUP_ADD: `${prefix} o365group add`,
   O365GROUP_GET: `${prefix} o365group get`,
   O365GROUP_LIST: `${prefix} o365group list`,
@@ -30,7 +26,6 @@ export default {
   SITECLASSIFICATION_ENABLE: `${prefix} siteclassification enable`,
   SITECLASSIFICATION_GET: `${prefix} siteclassification get`,
   SITECLASSIFICATION_SET: `${prefix} siteclassification set`,
-  STATUS: `${prefix} status`,
   TEAMS_ADD: `${prefix} teams add`,
   TEAMS_APP_INSTALL: `${prefix} teams app install`,
   TEAMS_APP_LIST: `${prefix} teams app list`,
@@ -66,5 +61,5 @@ export default {
   TEAMS_USER_SET: `${prefix} teams user set`,
   USER_GET: `${prefix} user get`,
   USER_LIST: `${prefix} user list`,
-  USER_SENDMAIL: `${prefix} user sendmail`,
+  USER_SENDMAIL: `${prefix} user sendmail`
 };

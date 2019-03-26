@@ -23,13 +23,6 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
-!!! important
-    Before using this command, log in to a SharePoint Online site, using the [spo login](../login.md) command.
-
-## Remarks
-
-To update an item in a list, you have to first log in to a SharePoint Online site using the [spo login](../login.md) command, eg. `spo login https://contoso.sharepoint.com`.
-
 ## Examples
 
 Update an item with id _147_ with title _Demo Item_ and content type name _Item_ in list with title _Demo List_ in site _https://contoso.sharepoint.com/sites/project-x_

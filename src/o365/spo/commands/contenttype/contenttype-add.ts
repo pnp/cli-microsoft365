@@ -1,4 +1,3 @@
-import auth from '../../SpoAuth';
 import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
@@ -9,7 +8,6 @@ import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import GlobalOptions from '../../../../GlobalOptions';
-import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -42,21 +40,10 @@ class SpoContentTypeAddCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-    let siteAccessToken: string = '';
     let parentInfo: string = '';
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<string> => {
-        siteAccessToken = accessToken;
-
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving information about the parent object...`);
-        }
-
-        return this.getParentInfo(args.options.listTitle, args.options.webUrl, siteAccessToken, cmd);
-      })
+    this
+      .getParentInfo(args.options.listTitle, args.options.webUrl, cmd)
       .then((parent: string): Promise<ContextInfo> => {
         parentInfo = parent;
 
@@ -64,7 +51,7 @@ class SpoContentTypeAddCommand extends SpoCommand {
           cmd.log(`Retrieving request digest...`);
         }
 
-        return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
+        return this.getRequestDigest(args.options.webUrl);
       })
       .then((res: ContextInfo): Promise<string> => {
         const description: string = args.options.description ?
@@ -77,7 +64,6 @@ class SpoContentTypeAddCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             'X-RequestDigest': res.FormDigestValue
           },
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="8" ObjectPathId="7" /><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /></Actions><ObjectPaths><Property Id="7" ParentId="5" Name="ContentTypes" /><Method Id="9" ParentId="7" Name="Add"><Parameters><Parameter TypeId="{168f3091-4554-4f14-8866-b20d48e45b54}">${description}${group}<Property Name="Id" Type="String">${Utils.escapeXml(args.options.id)}</Property><Property Name="Name" Type="String">${Utils.escapeXml(args.options.name)}</Property><Property Name="ParentContentType" Type="Null" /></Parameter></Parameters></Method>${parentInfo}</ObjectPaths></Request>`
@@ -101,7 +87,7 @@ class SpoContentTypeAddCommand extends SpoCommand {
       }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
   }
 
-  private getParentInfo(listTitle: string | undefined, webUrl: string, siteAccessToken: string, cmd: CommandInstance): Promise<string> {
+  private getParentInfo(listTitle: string | undefined, webUrl: string, cmd: CommandInstance): Promise<string> {
     return new Promise<string>((resolve: (parentInfo: string) => void, reject: (error: any) => void): void => {
       if (!listTitle) {
         resolve('<Property Id="5" ParentId="3" Name="Web" /><StaticProperty Id="3" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" />');
@@ -119,7 +105,6 @@ class SpoContentTypeAddCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${webUrl}/_api/site?$select=Id`,
           headers: {
-            authorization: `Bearer ${siteAccessToken}`,
             accept: 'application/json;odata=nometadata'
           },
           json: true
@@ -137,7 +122,6 @@ class SpoContentTypeAddCommand extends SpoCommand {
           const requestOptions: any = {
             url: `${webUrl}/_api/web?$select=Id`,
             headers: {
-              authorization: `Bearer ${siteAccessToken}`,
               accept: 'application/json;odata=nometadata'
             },
             json: true
@@ -155,7 +139,6 @@ class SpoContentTypeAddCommand extends SpoCommand {
           const requestOptions: any = {
             url: `${webUrl}/_api/web/lists/getByTitle('${encodeURIComponent(listTitle)}')?$select=Id`,
             headers: {
-              authorization: `Bearer ${siteAccessToken}`,
               accept: 'application/json;odata=nometadata'
             },
             json: true
@@ -230,14 +213,7 @@ class SpoContentTypeAddCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site
-    using the ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
-
-    To create a content type, you have to first log in to a SharePoint site
-    using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
+      `  Remarks:
 
     If the specified content type already exists, you will get a
     ${chalk.grey('A duplicate content type "Your Content Type" was found.')} error.
@@ -248,10 +224,10 @@ class SpoContentTypeAddCommand extends SpoCommand {
   Examples:
   
     Create a site content type that inherits from the List item content type
-      ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --name 'PnP Alert' --id 0x01007926A45D687BA842B947286090B8F67D --group 'PnP Content Types'
+      ${this.name} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --name 'PnP Alert' --id 0x01007926A45D687BA842B947286090B8F67D --group 'PnP Content Types'
     
     Create a list content type that inherits from the List item content type
-      ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listTitle Alerts --name 'PnP Alert' --id 0x01007926A45D687BA842B947286090B8F67D
+      ${this.name} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listTitle Alerts --name 'PnP Alert' --id 0x01007926A45D687BA842B947286090B8F67D
 
   More information:
 

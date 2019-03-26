@@ -26,15 +26,10 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
-!!! important
-    Before using this command, log in to the Microsoft Graph, using the [graph login](../login.md) command.
-
 ## Remarks
 
 !!! attention
     This command is based on an API that is currently in preview and is subject to change once the API reached general availability.
-
-To retrieve a message from a Microsoft Teams channel, you have to first log in to the Microsoft Graph using the [graph login](../login.md) command, eg. `graph login`.
 
 You can only retrieve a message from a Microsoft Teams team if you are a member of that team.
 

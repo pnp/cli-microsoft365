@@ -1,5 +1,3 @@
-import auth from '../../AadAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -22,7 +20,7 @@ interface Options extends GlobalOptions {
   scope: string;
 }
 
-class Oauth2GrantAddCommand extends AadCommand {
+class AadOAuth2GrantAddCommand extends AadCommand {
   public get name(): string {
     return commands.OAUTH2GRANT_ADD;
   }
@@ -32,39 +30,31 @@ class Oauth2GrantAddCommand extends AadCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): Promise<{}> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Granting the specified service principal OAuth2 permissions...`);
-        }
+    if (this.verbose) {
+      cmd.log(`Granting the service principal specified permissions...`);
+    }
 
-        if (this.verbose) {
-          cmd.log(`Granting the service principal specified permissions...`);
-        }
+    const requestOptions: any = {
+      url: `${this.resource}/myorganization/oauth2PermissionGrants?api-version=1.6`,
+      headers: {
+        'content-type': 'application/json'
+      },
+      json: true,
+      body: {
+        "odata.type": "Microsoft.DirectoryServices.OAuth2PermissionGrant",
+        "clientId": args.options.clientId,
+        "consentType": "AllPrincipals",
+        "principalId": null,
+        "resourceId": args.options.resourceId,
+        "scope": args.options.scope,
+        "startTime": "0001-01-01T00:00:00",
+        "expiryTime": "9000-01-01T00:00:00"
+      }
+    };
 
-        const requestOptions: any = {
-          url: `${auth.service.resource}/myorganization/oauth2PermissionGrants?api-version=1.6`,
-          headers: {
-            authorization: `Bearer ${accessToken}`,
-            'content-type': 'application/json'
-          },
-          json: true,
-          body: {
-            "odata.type": "Microsoft.DirectoryServices.OAuth2PermissionGrant",
-            "clientId": args.options.clientId,
-            "consentType": "AllPrincipals",
-            "principalId": null,
-            "resourceId": args.options.resourceId,
-            "scope": args.options.scope,
-            "startTime": "0001-01-01T00:00:00",
-            "expiryTime": "9000-01-01T00:00:00"
-          }
-        };
-
-        return request.post(requestOptions);
-      })
-      .then((res: any): void => {
+    request
+      .post<void>(requestOptions)
+      .then((): void => {
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
         }
@@ -123,14 +113,8 @@ class Oauth2GrantAddCommand extends AadCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.OAUTH2GRANT_ADD).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to Azure Active Directory Graph,
-      using the ${chalk.blue(commands.LOGIN)} command.
-
-  Remarks:
+      `  Remarks:
   
-    To grant service principal OAuth2 permissions, you have to first log in to Azure Active Directory
-    Graph using the ${chalk.blue(commands.LOGIN)} command.
-
     Before you can grant service principal OAuth2 permissions, you need its ${chalk.grey('objectId')}.
     You can retrieve it using the ${chalk.blue(commands.SP_GET)} command.
 
@@ -154,11 +138,11 @@ class Oauth2GrantAddCommand extends AadCommand {
   
     Grant the service principal ${chalk.grey('d03a0062-1aa6-43e1-8f49-d73e969c5812')} the
     ${chalk.grey('Calendars.Read')} OAuth2 permissions to the ${chalk.grey('c2af2474-2c95-423a-b0e5-e4895f22f9e9')} resource.
-      ${chalk.grey(config.delimiter)} ${commands.OAUTH2GRANT_ADD} --clientId d03a0062-1aa6-43e1-8f49-d73e969c5812 --resourceId c2af2474-2c95-423a-b0e5-e4895f22f9e9 --scope Calendars.Read
+      ${commands.OAUTH2GRANT_ADD} --clientId d03a0062-1aa6-43e1-8f49-d73e969c5812 --resourceId c2af2474-2c95-423a-b0e5-e4895f22f9e9 --scope Calendars.Read
 
     Grant the service principal ${chalk.grey('d03a0062-1aa6-43e1-8f49-d73e969c5812')} the
     ${chalk.grey('Calendars.Read')} and ${chalk.grey('Mail.Read')} OAuth2 permissions to the ${chalk.grey('c2af2474-2c95-423a-b0e5-e4895f22f9e9')} resource.
-      ${chalk.grey(config.delimiter)} ${commands.OAUTH2GRANT_ADD} --clientId d03a0062-1aa6-43e1-8f49-d73e969c5812 --resourceId c2af2474-2c95-423a-b0e5-e4895f22f9e9 --scope "Calendars.Read Mail.Read"
+      ${commands.OAUTH2GRANT_ADD} --clientId d03a0062-1aa6-43e1-8f49-d73e969c5812 --resourceId c2af2474-2c95-423a-b0e5-e4895f22f9e9 --scope "Calendars.Read Mail.Read"
 
   More information:
   
@@ -168,4 +152,4 @@ class Oauth2GrantAddCommand extends AadCommand {
   }
 }
 
-module.exports = new Oauth2GrantAddCommand();
+module.exports = new AadOAuth2GrantAddCommand();

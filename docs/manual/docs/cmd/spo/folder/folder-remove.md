@@ -21,12 +21,7 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
-!!! important
-    Before using this command, log in to a SharePoint Online site, using the [spo login](../login.md) command.
-
 ## Remarks
-
-To delete a folder, you have to first log in to SharePoint using the [spo login](../login.md) command, eg. `spo login https://contoso.sharepoint.com`.
 
 The `spo folder remove` command will remove folder only if it is empty. If the folder contains any files, deleting the folder will fail.
 

@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -9,7 +7,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import { WebPropertiesCollection } from "./WebPropertiesCollection";
-import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -31,34 +28,16 @@ class SpoWebGetCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
+    const requestOptions: any = {
+      url: `${args.options.webUrl}/_api/web/`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      json: true
+    };
 
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
-    }
-
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<WebPropertiesCollection> => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}.`);
-        }
-
-        if (this.verbose) {
-          cmd.log(`Retrieving web information in site at ${args.options.webUrl}...`);
-        }
-
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/`,
-          headers: {
-            authorization: `Bearer ${accessToken}`,
-            'accept': 'application/json;odata=nometadata'
-          },
-          json: true
-        };
-
-        return request.get(requestOptions);
-      })
+    request
+      .get<WebPropertiesCollection>(requestOptions)
       .then((webProperties: WebPropertiesCollection): void => {
         cmd.log(webProperties);
         cb();
@@ -96,18 +75,10 @@ class SpoWebGetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-    using the ${chalk.blue(commands.LOGIN)} command.
-  
-  Remarks:
-  
-    To retrieve information about a site, you have to first log in to SharePoint using the
-    ${chalk.blue(commands.LOGIN)} command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-        
-  Examples:
+      `  Examples:
   
     Retrieve information about the site ${chalk.grey('https://contoso.sharepoint.com/subsite')}
-      ${chalk.grey(config.delimiter)} ${commands.WEB_GET} --webUrl https://contoso.sharepoint.com/subsite
+      ${commands.WEB_GET} --webUrl https://contoso.sharepoint.com/subsite
       `);
   }
 }

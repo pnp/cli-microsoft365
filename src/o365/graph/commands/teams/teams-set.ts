@@ -1,4 +1,3 @@
-import auth from '../../GraphAuth';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -70,23 +69,19 @@ class GraphTeamsSetCommand extends GraphCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((): Promise<{}> => {
-        const body: any = this.mapRequestBody(args.options);
+    const body: any = this.mapRequestBody(args.options);
 
-        const requestOptions: any = {
-          url: `${auth.service.resource}/beta/groups/${encodeURIComponent(args.options.teamId)}`,
-          headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
-            accept: 'application/json;odata.metadata=none'
-          },
-          body: body,
-          json: true
-        };
+    const requestOptions: any = {
+      url: `${this.resource}/beta/groups/${encodeURIComponent(args.options.teamId)}`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      body: body,
+      json: true
+    };
 
-        return request.patch(requestOptions);
-      })
+    request
+      .patch(requestOptions)
       .then((): void => {
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
@@ -153,17 +148,10 @@ class GraphTeamsSetCommand extends GraphCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to the Microsoft Graph
-    using the ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
+      `  Remarks:
 
     ${chalk.yellow('Attention:')} This command is based on an API that is currently in preview
     and is subject to change once the API reached general availability.
-
-    To update the settings of the specified Microsoft Teams team, you have to
-    first log in to the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
 
   Examples:
   

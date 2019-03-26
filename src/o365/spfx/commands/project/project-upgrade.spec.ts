@@ -32,6 +32,9 @@ describe(commands.PROJECT_UPGRADE, () => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
       log: (msg: string) => {
         log.push(msg);
       }

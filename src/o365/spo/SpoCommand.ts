@@ -1,20 +1,16 @@
 import Command, { CommandAction, CommandError } from '../../Command';
-import auth from './SpoAuth';
+import auth, { Logger } from '../../Auth';
 import request from '../../request';
 import { SpoOperation } from './commands/site/SpoOperation';
 import config from '../../config';
-import { FormDigestInfo, ClientSvcResponse, ClientSvcResponseContents } from './spo';
+import { FormDigestInfo, ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from './spo';
 
 export interface FormDigest {
-  formDigestValue: string; 
-  formDigestExpiresAt: Date; 
+  formDigestValue: string;
+  formDigestExpiresAt: Date;
 }
 
 export default abstract class SpoCommand extends Command {
-  protected requiresTenantAdmin(): boolean {
-    return false;
-  }
-
   public action(): CommandAction {
     const cmd: SpoCommand = this;
 
@@ -23,19 +19,6 @@ export default abstract class SpoCommand extends Command {
         .restoreAuth()
         .then((): void => {
           cmd.initAction(args, this);
-
-          if (!auth.site.connected) {
-            cb(new CommandError('Log in to a SharePoint Online site first'));
-            return;
-          }
-
-          if (cmd.requiresTenantAdmin()) {
-            if (!auth.site.isTenantAdminSite()) {
-              cb(new CommandError(`${auth.site.url} is not a tenant admin site. Log in to your tenant admin site and try again`));
-              return;
-            }
-          }
-
           cmd.commandAction(this, args, cb);
         }, (error: any): void => {
           cb(new CommandError(error));
@@ -43,15 +26,10 @@ export default abstract class SpoCommand extends Command {
     }
   }
 
-  protected getRequestDigest(cmd: CommandInstance, debug: boolean): Promise<FormDigestInfo> {
-    return this.getRequestDigestForSite(auth.site.url, auth.site.accessToken, cmd, debug);
-  }
-
-  protected getRequestDigestForSite(siteUrl: string, accessToken: string, cmd: CommandInstance, debug: boolean): Promise<FormDigestInfo> {
+  protected getRequestDigest(siteUrl: string): Promise<FormDigestInfo> {
     const requestOptions: any = {
       url: `${siteUrl}/_api/contextinfo`,
       headers: {
-        authorization: `Bearer ${accessToken}`,
         accept: 'application/json;odata=nometadata'
       },
       json: true
@@ -73,7 +51,7 @@ export default abstract class SpoCommand extends Command {
     }
   }
 
-  public ensureFormDigest(cmd: CommandInstance, context: FormDigestInfo | undefined, debug: boolean): Promise<FormDigestInfo> {
+  public ensureFormDigest(siteUrl: string, cmd: CommandInstance, context: FormDigestInfo | undefined, debug: boolean): Promise<FormDigestInfo> {
     return new Promise<FormDigestInfo>((resolve: (context: FormDigestInfo) => void, reject: (error: any) => void): void => {
       if (this.isValidFormDigest(context)) {
         if (debug) {
@@ -81,11 +59,11 @@ export default abstract class SpoCommand extends Command {
         }
 
         resolve(context as FormDigestInfo);
-        return; 
+        return;
       }
 
       this
-        .getRequestDigest(cmd, debug)
+        .getRequestDigest(siteUrl)
         .then((res: FormDigestInfo): void => {
           const now: Date = new Date();
           now.setSeconds(now.getSeconds() + res.FormDigestTimeoutSeconds - 5);
@@ -116,9 +94,9 @@ export default abstract class SpoCommand extends Command {
     return false;
   }
 
-  protected waitUntilFinished(operationId: string, resolve: () => void, reject: (error: any) => void, accessToken: string, cmd: CommandInstance, currentContext: FormDigestInfo, dots?: string, timeout?: NodeJS.Timer): void {
+  protected waitUntilFinished(operationId: string, siteUrl: string, resolve: () => void, reject: (error: any) => void, cmd: CommandInstance, currentContext: FormDigestInfo, dots?: string, timeout?: NodeJS.Timer): void {
     this
-      .ensureFormDigest(cmd, currentContext, this.debug)
+      .ensureFormDigest(siteUrl, cmd, currentContext, this.debug)
       .then((res: FormDigestInfo): Promise<string> => {
         currentContext = res;
 
@@ -132,9 +110,8 @@ export default abstract class SpoCommand extends Command {
         }
 
         const requestOptions: any = {
-          url: `${auth.site.url}/_vti_bin/client.svc/ProcessQuery`,
+          url: `${siteUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
             'X-RequestDigest': currentContext.FormDigestValue
           },
           body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="188" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="184" Name="${operationId.replace(/\\n/g, '&#xA;').replace(/"/g, '')}" /></ObjectPaths></Request>`
@@ -161,9 +138,114 @@ export default abstract class SpoCommand extends Command {
           }
 
           timeout = setTimeout(() => {
-            this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), resolve, reject, accessToken, cmd, currentContext, dots);
+            this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), siteUrl, resolve, reject, cmd, currentContext, dots);
           }, operation.PollingInterval);
         }
       });
+  }
+
+  protected getSpoUrl(stdout: Logger, debug: boolean): Promise<string> {
+    if (auth.service.spoUrl) {
+      if (debug) {
+        stdout.log(`SPO URL previously retrieved ${auth.service.spoUrl}. Returning...`);
+      }
+
+      return Promise.resolve(auth.service.spoUrl);
+    }
+
+    return new Promise<string>((resolve: (spoUrl: string) => void, reject: (error: any) => void): void => {
+      if (debug) {
+        stdout.log(`No SPO URL available. Retrieving from MS Graph...`);
+      }
+
+      const requestOptions: any = {
+        url: `https://graph.microsoft.com/v1.0/sites/root?$select=webUrl`,
+        headers: {
+          'accept': 'application/json;odata.metadata=none'
+        },
+        json: true
+      };
+
+      request
+        .get<{ webUrl: string }>(requestOptions)
+        .then((res: { webUrl: string }): Promise<void> => {
+          auth.service.spoUrl = res.webUrl;
+          return auth.storeConnectionInfo();
+        })
+        .then((): void => {
+          resolve(auth.service.spoUrl as string);
+        }, (err: any): void => {
+          if (auth.service.spoUrl) {
+            resolve(auth.service.spoUrl);
+          }
+          else {
+            reject(err);
+          }
+        });
+    });
+  }
+
+  protected getSpoAdminUrl(stdout: Logger, debug: boolean): Promise<string> {
+    return new Promise<string>((resolve: (spoAdminUrl: string) => void, reject: (error: any) => void): void => {
+      this
+        .getSpoUrl(stdout, debug)
+        .then((spoUrl: string): void => {
+          resolve(spoUrl.replace(/(https:\/\/)([^\.]+)(.*)/, '$1$2-admin$3'));
+        }, (error: any): void => {
+          reject(error);
+        });
+    });
+  }
+
+  protected getTenantId(stdout: Logger, debug: boolean): Promise<string> {
+    if (auth.service.tenantId) {
+      if (debug) {
+        stdout.log(`SPO Tenant ID previously retrieved ${auth.service.tenantId}. Returning...`);
+      }
+
+      return Promise.resolve(auth.service.tenantId);
+    }
+
+    return new Promise<string>((resolve: (spoUrl: string) => void, reject: (error: any) => void): void => {
+      if (debug) {
+        stdout.log(`No SPO Tenant ID available. Retrieving...`);
+      }
+
+      let spoAdminUrl: string = '';
+
+      this
+        .getSpoAdminUrl(stdout, debug)
+        .then((_spoAdminUrl: string): Promise<ContextInfo> => {
+          spoAdminUrl = _spoAdminUrl;
+          return this.getRequestDigest(spoAdminUrl);
+        })
+        .then((contextInfo: ContextInfo): Promise<string> => {
+          const tenantInfoRequestOptions = {
+            url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+            headers: {
+              'X-RequestDigest': contextInfo.FormDigestValue,
+              accept: 'application/json;odata=nometadata'
+            },
+            body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
+          };
+
+          return request.post(tenantInfoRequestOptions);
+        })
+        .then((res: string): Promise<void> => {
+          const json: string[] = JSON.parse(res);
+          auth.service.tenantId = (json[json.length - 1] as any)._ObjectIdentity_.replace('\n', '&#xA;');
+          return auth.storeConnectionInfo();
+        })
+        .then((): void => {
+          resolve(auth.service.tenantId as string);
+        }, (err: any): void => {
+          if (auth.service.tenantId) {
+            resolve(auth.service.tenantId);
+          }
+          else {
+            reject(err);
+          }
+        });
+    });
   }
 }

@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
 import {
@@ -7,7 +5,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import GlobalOptions from '../../../../GlobalOptions';
-import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -46,8 +43,6 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-    let siteAccessToken: string = '';
     let contentTypeId: string = '';
 
     const contentTypeIdentifierLabel: string = args.options.id ?
@@ -55,34 +50,29 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
       `with name ${args.options.name}`;
 
     const removeContentType = (): void => {
-      auth
-        .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-        .then((accessToken: string): Promise<any> => {
-          siteAccessToken = accessToken;
+      ((): Promise<any> => {
+        if (this.debug) {
+          cmd.log(`Retrieving information about the content type ${contentTypeIdentifierLabel}...`);
+        }
 
-          if (this.debug) {
-            cmd.log(`Retrieved access token ${accessToken}. Retrieving information about the content type ${contentTypeIdentifierLabel}...`);
-          }
+        if (args.options.id) {
+          return Promise.resolve({ "value": [{ "StringId": args.options.id }] });
+        }
 
-          if (args.options.id) {
-            return Promise.resolve({ "value": [{ "StringId": args.options.id }] });
-          }
+        if (this.verbose) {
+          cmd.log(`Looking up the ID of content type ${contentTypeIdentifierLabel}...`);
+        }
 
-          if (this.verbose) {
-            cmd.log(`Looking up the ID of content type ${contentTypeIdentifierLabel}...`);
-          }
+        const requestOptions: any = {
+          url: `${args.options.webUrl}/_api/web/availableContentTypes?$filter=(Name eq '${encodeURIComponent(args.options.name as string)}')`,
+          headers: {
+            accept: 'application/json;odata=nometadata'
+          },
+          json: true
+        };
 
-          const requestOptions: any = {
-            url: `${args.options.webUrl}/_api/web/availableContentTypes?$filter=(Name eq '${encodeURIComponent(args.options.name as string)}')`,
-            headers: {
-              authorization: `Bearer ${siteAccessToken}`,
-              accept: 'application/json;odata=nometadata'
-            },
-            json: true
-          };
-
-          return request.get(requestOptions);
-        })
+        return request.get(requestOptions);
+      })()
         .then((contentTypeIdResult: { value: { StringId: string }[] }): Promise<any> => {
           if (contentTypeIdResult &&
             contentTypeIdResult.value &&
@@ -93,7 +83,6 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
             const requestOptions: any = {
               url: `${args.options.webUrl}/_api/web/contenttypes('${encodeURIComponent(contentTypeId)}')`,
               headers: {
-                authorization: `Bearer ${siteAccessToken}`,
                 'X-HTTP-Method': 'DELETE',
                 'If-Match': '*',
                 'accept': 'application/json;odata=nometadata'
@@ -190,14 +179,7 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site
-    using the ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
-
-    To remove a content type, you have to first log in to a SharePoint site
-    using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
+      `  Remarks:
 
     If the specified content type is in use by a list and cannot be removed, 
     you will be returned the error:
@@ -212,13 +194,13 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
   Examples:
   
     Remove a site content type by ID
-      ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --id 0x01007926A45D687BA842B947286090B8F67D
+      ${this.name} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --id 0x01007926A45D687BA842B947286090B8F67D
     
     Remove a site content type by Name
-      ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --name 'My Content Type'
+      ${this.name} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --name 'My Content Type'
 
     Remove a site content type without prompting for confirmation
-      ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --name 'My Content Type' --confirm
+      ${this.name} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --name 'My Content Type' --confirm
     `);
   }
 }

@@ -26,12 +26,7 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
-!!! important
-    Before using this command, log in to the Microsoft Graph, using the [graph login](../login.md) command.
-
 ## Remarks
-
-To remove a user from the specified Office 365 Group or Microsoft Teams team, you have to first log in to the Microsoft Graph using the [graph login](../login.md) command, eg. `graph login`.
 
 You can remove users from a Office 365 Group or Microsoft Teams team if you are owner of that group or team.
 

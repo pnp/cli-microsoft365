@@ -1,7 +1,7 @@
 import commands from '../../commands';
 import Command, { CommandError, CommandOption } from '../../../../Command';
 import * as sinon from 'sinon';
-import auth, { Site } from '../../SpoAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./homesite-get');
 import * as assert from 'assert';
 import request from '../../../../request';
@@ -16,20 +16,24 @@ describe(commands.HOMESITE_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    auth.service.connected = true;
+    auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.site = new Site();
   });
 
   afterEach(() => {
@@ -41,10 +45,11 @@ describe(commands.HOMESITE_GET, () => {
 
   after(() => {
     Utils.restore([
-      auth.ensureAccessToken,
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
+    auth.service.connected = false;
+    auth.service.spoUrl = undefined;
   });
 
   it('has correct name', () => {
@@ -55,24 +60,9 @@ describe(commands.HOMESITE_GET, () => {
     assert.notEqual(command.description, null);
   });
 
-  it('aborts when not logged in to a SharePoint site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('gets information about the Home Site', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SP.SPHSite/Details') {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/SP.SPHSite/Details') {
         return Promise.resolve({
           "SiteId": "53ad95dc-5d2c-42a3-a63c-716f7b8014f5",
           "WebId": "288ce497-483c-4cd5-b8a2-27b726d002e2",
@@ -85,11 +75,6 @@ describe(commands.HOMESITE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, (err?: any) => {
       try {
         assert(cmdInstanceLogSpy.calledWith({
@@ -109,7 +94,7 @@ describe(commands.HOMESITE_GET, () => {
 
   it('gets information about the Home Site (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SP.SPHSite/Details') {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/SP.SPHSite/Details') {
         return Promise.resolve({
           "SiteId": "53ad95dc-5d2c-42a3-a63c-716f7b8014f5",
           "WebId": "288ce497-483c-4cd5-b8a2-27b726d002e2",
@@ -122,11 +107,6 @@ describe(commands.HOMESITE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, (err?: any) => {
       try {
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
@@ -149,11 +129,6 @@ describe(commands.HOMESITE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, (err?: any) => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
@@ -168,11 +143,6 @@ describe(commands.HOMESITE_GET, () => {
   it('correctly handles random API error', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => Promise.reject('An error has occurred'));
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`An error has occurred`)));
@@ -227,23 +197,5 @@ describe(commands.HOMESITE_GET, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.ensureAccessToken);
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 });

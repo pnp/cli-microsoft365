@@ -24,11 +24,9 @@ Option|Description
 `--debug`|Runs command with debug logging
 
 !!! important
-    Before using this command, log in to a SharePoint Online tenant admin site, using the [spo login](../login.md) command.
+    To use this command you have to have permissions to access the tenant admin site.
 
 ## Remarks
-
-To get information about a taxonomy term, you have to first log in to a tenant admin site using the [spo login](../login.md) command, eg. `spo login https://contoso-admin.sharepoint.com`.
 
 When retrieving term by its ID, it's sufficient to specify just the ID. When retrieving it by its name however, you need to specify the parent term group and term set using either their names or IDs.
 

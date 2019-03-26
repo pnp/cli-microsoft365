@@ -1,12 +1,9 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import {
   CommandOption, CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import GlobalOptions from '../../../../GlobalOptions';
-import { Auth } from '../../../../Auth';
 import { ClientSidePage, CanvasSection } from './clientsidepages';
 import { Page } from './Page';
 
@@ -33,17 +30,8 @@ class SpoPageColumnGetCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
-    }
-
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<ClientSidePage> => {
-        return Page.getPage(args.options.name, args.options.webUrl, accessToken, cmd, this.debug, this.verbose);
-      })
+    Page
+      .getPage(args.options.name, args.options.webUrl, cmd, this.debug, this.verbose)
       .then((clientSidePage: ClientSidePage): void => {
         const sections: CanvasSection[] = clientSidePage.sections
           .filter(section => section.order === args.options.section);
@@ -132,14 +120,7 @@ class SpoPageColumnGetCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site
-    using the ${chalk.blue(commands.LOGIN)} command.
-        
-  Remarks:
-
-    To get information about the specific column of a modern page, you have to
-    first log in to a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
+      `  Remarks:
 
     If the specified ${chalk.grey('name')} doesn't refer to an existing modern page,
     you will get a ${chalk.grey('File doesn\'t exists')} error.
@@ -148,7 +129,7 @@ class SpoPageColumnGetCommand extends SpoCommand {
   
     Get information about the first column in the first section of a modern page
     with name ${chalk.grey('home.aspx')}
-      ${chalk.grey(config.delimiter)} ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx --section 1 --column 1
+      ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx --section 1 --column 1
 `);
   }
 }

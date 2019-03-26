@@ -26,13 +26,6 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
-!!! important
-    Before using this command, log in to the Microsoft Graph, using the [graph login](../login.md) command.
-
-## Remarks
-
-To list users in the specified Office 365 Group or Microsoft Teams team, you have to first log in to the Microsoft Graph using the [graph login](../login.md) command, eg. `graph login`.
-
 ## Examples
 
 List all users and their role in the specified Office 365 group

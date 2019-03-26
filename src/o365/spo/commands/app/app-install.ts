@@ -1,6 +1,3 @@
-import auth from '../../SpoAuth';
-import { Auth } from '../../../../Auth';
-import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -40,32 +37,20 @@ class SpoAppInstallCommand extends SpoCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
-    const resource: string = Auth.getResourceFromUrl(args.options.siteUrl);
-    let siteAccessToken: string = '';
 
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<void> => {
-        siteAccessToken = accessToken;
+    if (this.verbose) {
+      cmd.log(`Installing app '${args.options.id}' in site '${args.options.siteUrl}'...`);
+    }
 
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}.`);
-        }
+    const requestOptions: any = {
+      url: `${args.options.siteUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${encodeURIComponent(args.options.id)}')/install`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      }
+    };
 
-        if (this.verbose) {
-          cmd.log(`Installing app '${args.options.id}' in site '${args.options.siteUrl}'...`);
-        }
-
-        const requestOptions: any = {
-          url: `${args.options.siteUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${encodeURIComponent(args.options.id)}')/install`,
-          headers: {
-            authorization: `Bearer ${siteAccessToken}`,
-            accept: 'application/json;odata=nometadata'
-          }
-        };
-
-        return request.post(requestOptions);
-      })
+    request
+      .post(requestOptions)
       .then((): void => {
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
@@ -116,7 +101,7 @@ class SpoAppInstallCommand extends SpoCommand {
       if (!args.options.siteUrl) {
         return 'Required parameter siteUrl missing';
       }
-      
+
       return SpoCommand.isValidSharePointUrl(args.options.siteUrl);
     };
   }
@@ -125,15 +110,8 @@ class SpoAppInstallCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.APP_INSTALL).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-    using the ${chalk.blue(commands.LOGIN)} command.
-
-  Remarks:
+      `  Remarks:
   
-    To install an app from the tenant or site collection app catalog in a site,
-    you have to first log in to a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-
     If the app with the specified ID doesn't exist in the app catalog,
     the command will fail with an error. Before you can install app in a site,
     you have to add it to the tenant or site collection app catalog first
@@ -143,11 +121,11 @@ class SpoAppInstallCommand extends SpoCommand {
   
     Install the app with ID ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
     in the ${chalk.grey('https://contoso.sharepoint.com')} site.
-      ${chalk.grey(config.delimiter)} ${commands.APP_INSTALL} --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com
+      ${commands.APP_INSTALL} --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com
 
     Install the app with ID ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
     in the ${chalk.grey('https://contoso.sharepoint.com')} site from site collection app catalog.
-      ${chalk.grey(config.delimiter)} ${commands.APP_INSTALL} --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com --scope sitecollection
+      ${commands.APP_INSTALL} --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com --scope sitecollection
 
   More information:
   

@@ -2,56 +2,52 @@ import commands from '../../commands';
 import Command, { CommandError, CommandOption, CommandValidate } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth from '../../GraphAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./teams-message-list');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import { Service } from '../../../../Auth';
 
 describe(commands.TEAMS_MESSAGE_LIST, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  let trackEvent: any;
-  let telemetry: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    auth.service.connected = true;
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.service = new Service('https://graph.microsoft.com');
-    telemetry = null;
   });
 
   afterEach(() => {
     Utils.restore([
       vorpal.find,
-      request.get,
-      global.setTimeout
+      request.get
     ]);
   });
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.ensureAccessToken,
-      auth.restoreAuth
+      auth.restoreAuth,
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -61,48 +57,6 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
   it('has a description', () => {
     assert.notEqual(command.description, null);
   });
-
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
-      try {
-        assert.equal(telemetry.name, commands.TEAMS_MESSAGE_LIST);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not logged in to the Microsoft Graph', (done) => {
-    auth.service = new Service('https://graph.microsoft.com');
-    auth.service.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to the Microsoft Graph first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
 
   it('has help referring to the right command', () => {
     const cmd: any = {
@@ -321,9 +275,6 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
       return Promise.reject('Invalid Request');
     });
 
-    auth.service = new Service('https://graph.microsoft.com');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         debug: true,
@@ -432,9 +383,6 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
       return Promise.reject('Invalid Request');
     });
 
-    auth.service = new Service('https://graph.microsoft.com');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         debug: false,
@@ -538,9 +486,6 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
       return Promise.reject('Invalid Request');
     });
 
-    auth.service = new Service('https://graph.microsoft.com');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
         debug: false,
@@ -623,15 +568,20 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
     });
   });
 
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.ensureAccessToken);
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.service = new Service('https://graph.microsoft.com');
-    auth.service.connected = true;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
+  it('correctly handles error when listing messages', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      return Promise.reject('An error has occurred');
+    });
+
+    cmdInstance.action({
+      options: {
+        debug: false,
+        teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
+        channelId: "19:eb30973b42a847a2a1df92d91e37c76a@thread.skype"
+      }
+    }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -639,5 +589,4 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
       }
     });
   });
-
 });

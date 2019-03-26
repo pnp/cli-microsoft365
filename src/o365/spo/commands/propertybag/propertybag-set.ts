@@ -1,5 +1,3 @@
-import auth from '../../SpoAuth';
-import config from '../../../../config';
 import commands from '../../commands';
 import SpoCommand from '../../SpoCommand';
 import {
@@ -7,7 +5,6 @@ import {
   CommandValidate
 } from '../../../../Command';
 import { ContextInfo } from '../../spo';
-import { Auth } from '../../../../Auth';
 import { SpoPropertyBagBaseCommand } from './propertybag-base';
 import GlobalOptions from '../../../../GlobalOptions';
 import { ClientSvc, IdentityResponse } from '../../common/ClientSvc';
@@ -41,30 +38,16 @@ class SpoPropertyBagSetCommand extends SpoPropertyBagBaseCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
     const clientSvcCommons: ClientSvc = new ClientSvc(cmd, this.debug);
-    
+
     let webIdentityResp: IdentityResponse;
 
-    if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
-    }
-
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): Promise<ContextInfo> => {
-        this.siteAccessToken = accessToken;
-
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
-
-        return this.getRequestDigestForSite(args.options.webUrl, this.siteAccessToken, cmd, this.debug);
-      })
+    this
+      .getRequestDigest(args.options.webUrl)
       .then((contextResponse: ContextInfo): Promise<IdentityResponse> => {
         this.formDigestValue = contextResponse.FormDigestValue;
 
-        return clientSvcCommons.getCurrentWebIdentity(args.options.webUrl, this.siteAccessToken, this.formDigestValue);
+        return clientSvcCommons.getCurrentWebIdentity(args.options.webUrl, this.formDigestValue);
       })
       .then((identityResp: IdentityResponse): Promise<boolean> => {
         webIdentityResp = identityResp;
@@ -81,7 +64,7 @@ class SpoPropertyBagSetCommand extends SpoPropertyBagBaseCommand {
         const opts: Options = args.options;
         if (opts.folder) {
           // get the folder guid instead of the web guid
-          return clientSvcCommons.getFolderIdentity(webIdentityResp.objectIdentity, opts.webUrl, opts.folder, this.siteAccessToken, this.formDigestValue);
+          return clientSvcCommons.getFolderIdentity(webIdentityResp.objectIdentity, opts.webUrl, opts.folder, this.formDigestValue);
         }
 
         return new Promise<IdentityResponse>(resolve => { return resolve(webIdentityResp); });
@@ -99,11 +82,11 @@ class SpoPropertyBagSetCommand extends SpoPropertyBagBaseCommand {
   }
 
   private setProperty(identityResp: IdentityResponse, options: Options, cmd: CommandInstance): Promise<any> {
-    return SpoPropertyBagBaseCommand.setProperty(options.key, options.value, options.webUrl, this.formDigestValue, this.siteAccessToken, identityResp, cmd, this.debug, options.folder);
+    return SpoPropertyBagBaseCommand.setProperty(options.key, options.value, options.webUrl, this.formDigestValue, identityResp, cmd, this.debug, options.folder);
   }
 
   private isNoScriptSite(webIdentityResp: IdentityResponse, options: Options, clientSvcCommons: ClientSvc): Promise<boolean> {
-    return SpoPropertyBagBaseCommand.isNoScriptSite(options.webUrl, this.formDigestValue, this.siteAccessToken, webIdentityResp, clientSvcCommons);
+    return SpoPropertyBagBaseCommand.isNoScriptSite(options.webUrl, this.formDigestValue, webIdentityResp, clientSvcCommons);
   }
 
   public options(): CommandOption[] {
@@ -152,37 +135,28 @@ class SpoPropertyBagSetCommand extends SpoPropertyBagBaseCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.PROPERTYBAG_SET).helpInformation());
     log(
-      `  ${chalk.yellow('Important:')} before using this command, log in to a SharePoint Online site,
-    using the ${chalk.blue(commands.LOGIN)} command.
-                       
-  Remarks:
-
-    To set property bag value, you have to first log in to a SharePoint
-    Online site using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
-
-  Examples:
+      `  Examples:
 
     Sets the value of the ${chalk.grey('key1')} property in the property bag of site
     ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.PROPERTYBAG_SET} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --value value1
+      ${commands.PROPERTYBAG_SET} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --value value1
 
     Sets the value of the ${chalk.grey('key1')} property in the property bag of the root folder
     of site ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.PROPERTYBAG_SET} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --value value1 --folder /
+      ${commands.PROPERTYBAG_SET} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --value value1 --folder /
 
     Sets the value of the ${chalk.grey('key1')} property in the property bag of a document
     library located in site ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.PROPERTYBAG_SET} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --value value1 --folder '/Shared Documents'
+      ${commands.PROPERTYBAG_SET} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --value value1 --folder '/Shared Documents'
     
     Sets the value of the ${chalk.grey('key1')} property in the property bag of a folder
     in a document library located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.PROPERTYBAG_SET} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --value value1 --folder '/Shared Documents/MyFolder'
+      ${commands.PROPERTYBAG_SET} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --value value1 --folder '/Shared Documents/MyFolder'
 
     Sets the value of the ${chalk.grey('key1')} property in the property bag of a list in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${chalk.grey(config.delimiter)} ${commands.PROPERTYBAG_SET} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --value value1 --folder /Lists/MyList
+      ${commands.PROPERTYBAG_SET} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --value value1 --folder /Lists/MyList
     `);
   }
 }

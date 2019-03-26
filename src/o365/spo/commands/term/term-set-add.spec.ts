@@ -2,41 +2,40 @@ import commands from '../../commands';
 import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth, { Site } from '../../SpoAuth';
 const command: Command = require('./term-set-add');
 import * as assert from 'assert';
 import request from '../../../../request';
 import config from '../../../../config';
 import Utils from '../../../../Utils';
+import auth from '../../../../Auth';
 
 describe(commands.TERM_SET_ADD, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  let trackEvent: any;
-  let telemetry: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
     sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'ABC' }));
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
-    });
+    auth.service.connected = true;
+    auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      action: command.action(),
       log: (msg: string) => {
         log.push(msg);
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.site = new Site();
-    telemetry = null;
   });
 
   afterEach(() => {
@@ -48,11 +47,12 @@ describe(commands.TERM_SET_ADD, () => {
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent,
-      auth.ensureAccessToken,
       auth.restoreAuth,
-      (command as any).getRequestDigest
+      (command as any).getRequestDigest,
+      appInsights.trackEvent
     ]);
+    auth.service.connected = false;
+    auth.service.spoUrl = undefined;
   });
 
   it('has correct name', () => {
@@ -61,63 +61,6 @@ describe(commands.TERM_SET_ADD, () => {
 
   it('has a description', () => {
     assert.notEqual(command.description, null);
-  });
-
-  it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {}, url: 'https://contoso-admin.sharepoint.com' }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {}, url: 'https://contoso-admin.sharepoint.com' }, () => {
-      try {
-        assert.equal(telemetry.name, commands.TERM_SET_ADD);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not connected to a SharePoint site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('aborts when not connected to a SharePoint tenant admin site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`${auth.site.url} is not a tenant admin site. Log in to your tenant admin site and try again`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 
   it('adds term set to term group specified with id', (done) => {
@@ -160,10 +103,6 @@ describe(commands.TERM_SET_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, name: 'PnP-Organizations', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({
@@ -229,10 +168,6 @@ describe(commands.TERM_SET_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, name: 'PnP-Organizations', termGroupName: 'PnPTermSets' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({
@@ -298,10 +233,6 @@ describe(commands.TERM_SET_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, name: 'PnP-Organizations', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb', id: 'b53f9aa1-1d35-4b39-8498-7e4705e57301' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({
@@ -375,10 +306,6 @@ describe(commands.TERM_SET_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, name: 'PnP-Organizations', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb', description: 'List of organizations' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({
@@ -452,10 +379,6 @@ describe(commands.TERM_SET_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, name: 'PnP-Organizations', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb', customProperties: JSON.stringify({ Prop1: 'Value 1', Prop2: 'Value 2' }) } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({
@@ -500,10 +423,6 @@ describe(commands.TERM_SET_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, name: 'PnP-Organizations', termGroupName: 'PnPTermSets' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
@@ -531,10 +450,6 @@ describe(commands.TERM_SET_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, name: 'PnP-Organizations', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index')));
@@ -562,10 +477,6 @@ describe(commands.TERM_SET_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, name: 'PnP-Organizations', termGroupName: 'PnPTermSets' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index')));
@@ -593,10 +504,6 @@ describe(commands.TERM_SET_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, name: 'PnP-Organizations', termGroupName: 'PnPTermSets' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('A term set already exists with the name specified.')));
@@ -624,10 +531,6 @@ describe(commands.TERM_SET_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, name: 'PnP-Organizations', id: 'aca21974-139c-44fd-813c-6bbe6f25e658', termGroupName: 'PnPTermSets' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Failed to read from or write to database. Refresh and try again. If the problem persists, please contact the administrator.')));
@@ -689,10 +592,6 @@ describe(commands.TERM_SET_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, name: 'PnP-Organizations', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb', description: 'List of organizations' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
@@ -754,10 +653,6 @@ describe(commands.TERM_SET_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, name: 'PnP-Organizations', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb', customProperties: JSON.stringify({ Prop1: 'Value 1', Prop2: 'Value 2' }) } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
@@ -809,10 +704,6 @@ describe(commands.TERM_SET_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, name: 'PnP-Organizations', termGroupName: 'PnPTermSets>' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({
@@ -878,10 +769,6 @@ describe(commands.TERM_SET_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, name: 'PnP-Organizations>', termGroupName: 'PnPTermSets' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({
@@ -955,10 +842,6 @@ describe(commands.TERM_SET_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, name: 'PnP-Organizations', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb', description: 'List of organizations>' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({
@@ -1032,10 +915,6 @@ describe(commands.TERM_SET_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, name: 'PnP-Organizations', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb', customProperties: JSON.stringify({ Prop1: '<Value 1', Prop2: 'Value 2>' }) } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({
@@ -1157,23 +1036,5 @@ describe(commands.TERM_SET_ADD, () => {
     });
     Utils.restore(vorpal.find);
     assert(containsExamples);
-  });
-
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.ensureAccessToken);
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 });

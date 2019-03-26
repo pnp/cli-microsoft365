@@ -21,13 +21,6 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`| Runs command with debug logging
 
-!!! important
-    Before using this command, log in to a SharePoint Online site, using the [spo login](../login.md) command.
-
-## Remarks
-
-To declare an item as a record, you have to first log in to a SharePoint site using the [spo login](../login.md) command, eg. `spo login https://contoso.sharepoint.com`.
-
 ## Examples
 
 Declare a document with id _1_ as a record in list with title _Demo List_ located in site _https://contoso.sharepoint.com/sites/project-x_
