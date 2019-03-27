@@ -70,4 +70,4 @@ spo site o365group set --siteUrl https://contoso.sharepoin.com/sites/team-a --al
 
 ## More information
 
-- Overview of the "Log in to new Office 365 group" feature: [hhttps://docs.microsoft.com/en-us/sharepoint/dev/features/groupify/groupify-overview](hhttps://docs.microsoft.com/en-us/sharepoint/dev/features/groupify/groupify-overview)
+- Overview of the "Log in to new Office 365 group" feature: [https://docs.microsoft.com/en-us/sharepoint/dev/features/groupify/groupify-overview](https://docs.microsoft.com/en-us/sharepoint/dev/features/groupify/groupify-overview)
