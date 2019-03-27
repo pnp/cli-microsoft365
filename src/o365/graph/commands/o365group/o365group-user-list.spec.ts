@@ -433,6 +433,31 @@ describe(commands.O365GROUP_USER_LIST, () => {
     });
   });
 
+  it('correctly handles error when owners cannot be retrieved', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/missing-0000-0000-0000-000000000000/owners?$select=id,displayName,userPrincipalName,userType`) {
+        return Promise.reject({ error: { 'odata.error': { message: { value: 'Invalid object identifier' } } } });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.service = new Service();
+    auth.service.connected = true;
+    auth.service.resource = 'https://graph.microsoft.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, groupId: "missing-0000-0000-0000-000000000000", role: "Owner" } }, (err?: any) => {
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Invalid object identifier')));
+
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('aborts when not logged in to Microsoft Graph', (done) => {
     auth.service = new Service();
     auth.service.connected = false;
