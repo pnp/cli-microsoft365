@@ -43,6 +43,7 @@ export default {
   TEAMS_USER_LIST: `${prefix} teams user list`,
   TEAMS_USER_REMOVE: `${prefix} teams user remove`,
   TEAMS_USER_SET: `${prefix} teams user set`,
+  TEAMS_TAB_LIST: `${prefix} teams tab list`,
   USER_GET: `${prefix} user get`,
   USER_LIST: `${prefix} user list`,
   USER_SENDMAIL: `${prefix} user sendmail`,
