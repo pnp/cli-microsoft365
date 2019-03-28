@@ -31,6 +31,9 @@ class GraphTeamsAddCommand extends GraphCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.groupId = typeof args.options.groupId !== 'undefined';
+    telemetryProps.name = typeof args.options.name !== 'undefined';
+    telemetryProps.description = typeof args.options.description !== 'undefined';
     return telemetryProps;
   }
 
@@ -43,8 +46,12 @@ class GraphTeamsAddCommand extends GraphCommand {
       })
       .then((res: any): void => {
         // get the teams id from the response header.
-        var teamsId = this.GetTeamsIdFromResponse(res, args);
-        cmd.log({Team:teamsId});
+        const teamsRspHdrRegEx : any = /teams?\('([^']+)'\)/i.exec(res.headers.location);
+
+        if(teamsRspHdrRegEx != null && teamsRspHdrRegEx.length > 0)
+        {
+          cmd.log({Team:teamsRspHdrRegEx[1]});
+        }
 
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
@@ -53,23 +60,6 @@ class GraphTeamsAddCommand extends GraphCommand {
       }, (err: any): void =>{ 
         this.handleRejectedODataJsonPromise(err, cmd, cb)
       });
-  }
-
-  private GetTeamsIdFromResponse(res:any, args: CommandArgs) : string {
-    let teamsRspHdrRegEx;
-    if(!args.options.groupId) {
-      teamsRspHdrRegEx = /(teams\(')([0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12})('\))/i.exec(res.headers.location);
-    }
-    else {
-      teamsRspHdrRegEx = /(team\(')([0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12})('\))/i.exec(res.headers.location);
-    }
-
-    if(teamsRspHdrRegEx != null && teamsRspHdrRegEx.length == 4)
-    {
-      return teamsRspHdrRegEx[2];
-    }
-
-    return '';
   }
 
   private CreateTeamRequest(cmd : CommandInstance, args: CommandArgs) : request.RequestPromise {
@@ -113,7 +103,6 @@ class GraphTeamsAddCommand extends GraphCommand {
         accept: 'application/json;odata.metadata=none',
         'content-type': 'application/json;odata=nometadata'
       }),
-      body: {},
       json: true
     };
 
@@ -130,7 +119,7 @@ class GraphTeamsAddCommand extends GraphCommand {
     const options: CommandOption[] = [
       {
         option: '-n, --name [name]',
-        description: 'Display name for the Microsoft Teams team'
+        description: 'Display name for the Microsoft Teams team. It is not required, if groupId is specified.'
       },
       {
         option: '-d, --description [description]',
@@ -149,14 +138,6 @@ class GraphTeamsAddCommand extends GraphCommand {
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
 
-      if (args.options.groupId && (args.options.name || args.options.description)) {
-        return `Please specify either a groupId or Name`;
-      }
-
-      if (args.options.groupId && !Utils.isValidGuid(args.options.groupId as string)) {
-        return `${args.options.groupId} is not a valid GUID`;
-      }
-
       if(!args.options.groupId)
       {
         if(!args.options.name) {
@@ -164,6 +145,16 @@ class GraphTeamsAddCommand extends GraphCommand {
         }
         if(!args.options.description) {
           return `Required parameter description missing`
+        }
+      }
+      else 
+      {
+        if (args.options.name || args.options.description) {
+          return `Please specify either a groupId or Name`;
+        }
+  
+        if (!Utils.isValidGuid(args.options.groupId as string)) {
+          return `${args.options.groupId} is not a valid GUID`;
         }
       }
      
@@ -179,6 +170,9 @@ class GraphTeamsAddCommand extends GraphCommand {
     using the ${chalk.blue(commands.LOGIN)} command.
         
   Remarks:
+    ${chalk.yellow('Attention:')} This command is based on a Microsoft Graph API that is currently
+    in preview and is subject to change once the API reached general
+    availability.
 
     To add a new Microsoft Teams team, you have to first
     log in to the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
