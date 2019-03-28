@@ -41,8 +41,8 @@ class GraphTeamsAddCommand extends GraphCommand {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
       .then((): request.RequestPromise => {
-        return args.options.groupId ? this.CreateGroupTeamRequest(cmd,args) : 
-                                      this.CreateTeamRequest(cmd,args);
+        return args.options.groupId ? this.CreateTeamForGroup(cmd,args) : 
+                                      this.CreateTeam(cmd,args);
       })
       .then((res: any): void => {
         // get the teams id from the response header.
@@ -62,7 +62,7 @@ class GraphTeamsAddCommand extends GraphCommand {
       });
   }
 
-  private CreateTeamRequest(cmd : CommandInstance, args: CommandArgs) : request.RequestPromise {
+  private CreateTeam(cmd : CommandInstance, args: CommandArgs) : request.RequestPromise {
     const teamsEndpoint: string = `${auth.service.resource}/beta/teams`;
     const teamsRequestBody = {
       'template@odata.bind': 'https://graph.microsoft.com/beta/teamsTemplates/standard',
@@ -92,7 +92,7 @@ class GraphTeamsAddCommand extends GraphCommand {
     return request.post(requestOptions);
   }
 
-  private CreateGroupTeamRequest(cmd : CommandInstance, args: CommandArgs) : request.RequestPromise {
+  private CreateTeamForGroup(cmd : CommandInstance, args: CommandArgs) : request.RequestPromise {
     const groupTeamsEndpoint: string = `${auth.service.resource}/beta/groups/${args.options.groupId}/team`;
    
     const requestOptions: any = {
@@ -103,6 +103,7 @@ class GraphTeamsAddCommand extends GraphCommand {
         accept: 'application/json;odata.metadata=none',
         'content-type': 'application/json;odata=nometadata'
       }),
+      body: {},
       json: true
     };
 
