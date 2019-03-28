@@ -7,6 +7,12 @@
       "type": "npm",
       "script": "build",
       "problemMatcher": []
+    },
+    {
+      "type": "npm",
+      "script": "build",
+      "path": "src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-100-webpart-ko/",
+      "problemMatcher": []
     }
   ]
 }

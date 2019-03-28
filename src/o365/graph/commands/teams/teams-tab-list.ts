@@ -3,12 +3,11 @@ import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
-  CommandOption
+  CommandOption, CommandValidate
 } from '../../../../Command';
-
+import Utils from '../../../../Utils';
 import { Tab } from './Tab';
 import { GraphItemsListCommand } from '../GraphItemsListCommand';
-
 
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -29,7 +28,7 @@ class TabListCommand extends GraphItemsListCommand<Tab> {
   }
 
   public get description(): string {
-    return 'Lists Microsoft Teams in the current tenant TGO TEST VERSION';
+    return 'Lists Tabs in a Microsoft Teams team.';
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -39,32 +38,24 @@ class TabListCommand extends GraphItemsListCommand<Tab> {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-   
-    let endpoint: string = `${auth.service.resource}/V1.0/teams/${args.options.teamId}/channels/${args.options.channelId}/tabs?$expand=teamsApp`;
-    if (args.options.joined) {
-      endpoint += `?$filter=distributionMethod eq 'organization'`;
-    }
-    this
-    .getAllItems(endpoint, cmd, true)
-    .then((): void => {
-      if (args.options.output === 'json') {
-        cmd.log(this.items);
-      }
-      else {
-        cmd.log(this.items.map(t => {
-          return {
-            id: t.id,
-            displayName: t.displayName,
-            webUrl: t.webUrl,
-            sortOrderIndex: t.sortOrderIndex,
-            teamsAppId: t.teamsAppId,
-            configuration: t.configuration,
-            teamsApp: t.teamsApp            
-          }
-        }));
-      }
 
-        //cmd.log(this.items);
+    let endpoint: string = `${auth.service.resource}/V1.0/teams/${args.options.teamId}/channels/${args.options.channelId}/tabs?$expand=teamsApp`;
+
+    this
+      .getAllItems(endpoint, cmd, true)
+      .then((): void => {
+        if (args.options.output === 'json') {
+          cmd.log(this.items);
+        }
+        else {
+          cmd.log(this.items.map(t => {
+            return {
+              id: t.id,   
+              displayName: t.displayName,                         
+              teamsAppTabId: t.teamsApp.id,
+            }
+          }));
+        }
 
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
@@ -73,54 +64,7 @@ class TabListCommand extends GraphItemsListCommand<Tab> {
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
-/*
-  private getTeamFromGroup(group: { id: string, displayName: string, description: string }, cmd: CommandInstance): Promise<Team> {
-    return new Promise<Team>((resolve: (team: Team) => void, reject: (error: any) => void): void => {
-      auth
-        .ensureAccessToken(auth.service.resource, cmd, this.debug)
-        .then((): request.RequestPromise => {
-          const requestOptions: any = {
-            url: `${auth.service.resource}/V1.0/teams/${group.id}`,
-            headers: Utils.getRequestHeaders({
-              authorization: `Bearer ${auth.service.accessToken}`,
-              accept: 'application/json;odata.metadata=none'
-            }),
-            json: true
-          };
 
-          if (this.debug) {
-            cmd.log('Executing web request...');
-            cmd.log(requestOptions);
-            cmd.log('');
-          }
-
-          return request.get(requestOptions);
-        })
-        .then((res: any): void => {
-          resolve({
-            id: group.id,
-            displayName: group.displayName,
-            isArchived: res.isArchived,
-            description: group.description
-          });
-        }, (err: any): void => {
-          // If the user is not member of the team he/she cannot access it
-          if (err.statusCode === 403) {
-            resolve({
-              id: group.id,
-              displayName: group.displayName,
-              description: group.description,
-              isArchived: undefined
-            });
-          }
-          else {
-            reject(err);
-          }
-        });
-    });
-  }
-
-*/
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
@@ -137,6 +81,24 @@ class TabListCommand extends GraphItemsListCommand<Tab> {
     return options.concat(parentOptions);
   }
 
+  public validate(): CommandValidate {
+    return (args: CommandArgs): boolean | string => {
+      if (!args.options.teamId) {
+        return 'Required parameter teamId missing';
+      }
+
+      if (!Utils.isValidGuid(args.options.teamId as string)) {
+        return `${args.options.teamId} is not a valid GUID`;
+      }
+
+      if (!args.options.channelId) {
+        return 'Required parameter channelId missing';
+      }
+
+      return true;
+    };
+  }
+
   public commandHelp(args: {}, log: (help: string) => void): void {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
@@ -146,20 +108,28 @@ class TabListCommand extends GraphItemsListCommand<Tab> {
         
   Remarks:
 
-    To list available Microsoft Teams, you have to first log in to
+    To list available tabs in a specific Microsoft Teams team, you have to first log in to
     the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
     eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
 
-    You can only see the details or archived status of the Microsoft Teams
-    you are a member of.
+    You can only see the tab list of a team you are a member of.
+
+    The tabs Conversations and Files are present in every team and therefor not provided as a
+    tab in the response from the graph call. 
 
   Examples:
   
-    List all Microsoft Teams in the tenant
-      ${chalk.grey(config.delimiter)} ${this.name}
+    List all tabs in a Microsoft Teams team
+      ${chalk.grey(config.delimiter)} ${this.name} --teamId <teamId> --channelId <channelId>
 
-    List all Microsoft Teams in the tenant you are a member of
-      ${chalk.grey(config.delimiter)} ${this.name} --joined
+    Include the all the values from the tab configuration and associated teams app
+      ${chalk.grey(config.delimiter)} ${this.name} --teamId <teamId> --channelId <channelId> --output json
+
+  Details:
+    
+    The command uses Microsoft Graph to retrive the tab information. More details on the underlying
+    graph endpoint can be found at:
+    https://docs.microsoft.com/en-us/graph/api/teamstab-list?view=graph-rest-1.0
 `);
   }
 }
