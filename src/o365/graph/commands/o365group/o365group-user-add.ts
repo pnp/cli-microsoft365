@@ -22,7 +22,7 @@ interface Options extends GlobalOptions {
   userName: string;
 }
 
-class GraphO365GroupUserAddCommand  extends GraphCommand {
+class GraphO365GroupUserAddCommand extends GraphCommand {
   public get name(): string {
     return `${commands.O365GROUP_USER_ADD}`;
   }
@@ -38,6 +38,8 @@ class GraphO365GroupUserAddCommand  extends GraphCommand {
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.role = args.options.role;
+    telemetryProps.teamId = typeof args.options.teamId !== 'undefined';
+    telemetryProps.groupId = typeof args.options.groupId !== 'undefined';
     return telemetryProps;
   }
 
@@ -71,7 +73,7 @@ class GraphO365GroupUserAddCommand  extends GraphCommand {
           cmd.log('');
         }
 
-        const endpoint: string = `${auth.service.resource}/v1.0/groups/${providedGroupId}/${args.options.role === 'Owner' ? 'owners' : 'members'}/$ref`;
+        const endpoint: string = `${auth.service.resource}/v1.0/groups/${providedGroupId}/${((typeof args.options.role !== 'undefined') ? args.options.role : '').toLowerCase() === 'owner' ? 'owners' : 'members'}/$ref`;
 
         const requestOptions: any = {
           url: endpoint,
@@ -107,14 +109,19 @@ class GraphO365GroupUserAddCommand  extends GraphCommand {
         description: "The ID of the Office 365 group to which to add the user"
       },
       {
-        option: "--teamdId [teamdId]",
+        option: "--teamId [teamId]",
         description: "The ID of the Teams team to which to add the user"
+      },
+      {
+        option: '-n, --userName <userName>',
+        description: 'User\'s UPN (user principal name), eg. johndoe@example.com'
       },
       {
         option: '-r, --role [role]',
         description: 'The role to be assigned to the new user: Owner|Member. Default Member',
         autocomplete: ['Owner', 'Member']
       }
+
     ];
 
     const parentOptions: CommandOption[] = super.options();
@@ -144,7 +151,7 @@ class GraphO365GroupUserAddCommand  extends GraphCommand {
       }
 
       if (args.options.role) {
-        if (['Owner', 'Member'].indexOf(args.options.role) === -1) {
+        if (['owner', 'member'].indexOf(args.options.role.toLowerCase()) === -1) {
           return `${args.options.role} is not a valid role value. Allowed values Owner|Member`;
         }
       }
@@ -162,7 +169,7 @@ class GraphO365GroupUserAddCommand  extends GraphCommand {
 
   Remarks:
 
-    To add user to the specified Microsoft Teams team, you have to first
+    To add user to the specified Office 365 Group or Microsoft Teams team, you have to first
     log in to the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
     eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
 
@@ -175,7 +182,7 @@ class GraphO365GroupUserAddCommand  extends GraphCommand {
       ${chalk.grey(config.delimiter)} ${this.name} --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner
 
     Add a new member to the specified Microsoft Teams team
-      ${chalk.grey(config.delimiter)} ${this.alias} --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com'
+      ${chalk.grey(config.delimiter)} ${(this.alias() as string[])[0]} --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com'
 
       `);
   }

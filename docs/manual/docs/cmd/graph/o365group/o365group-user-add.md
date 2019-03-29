@@ -19,8 +19,8 @@ graph teams user add [options]
 Option|Description
 ------|-----------
 `--help`|output usage information
-`-i, --groupId [groupId]`|The ID of the Office 365 group for which to list users
-`--teamId [teamId]`|The ID of the Microsoft Teams team for which to list users
+`-i, --groupId [groupId]`|The ID of the Office 365 group to which to add the user
+`--teamId [teamId]`|The ID of the Teams team to which to add the user
 `-n, --userName <userName>`|User's UPN (user principal name, eg. johndoe@example.com)
 `-r, --role [role]`|The role to be assigned to the new user: `Owner|Member`. Default `Member`
 `-o, --output [output]`|Output type. `json|text`. Default `text`
@@ -39,17 +39,17 @@ To add user to the specified Office 365 Group or Microsoft Teams team, you have 
 Add a new member to the specified Office 365 Group
 
 ```sh
-graph teams user add --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com'
+graph o365group user add --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com'
 ```
 
 Add a new owner to the specified Office 365 Group
 
 ```sh
-graph teams user list --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner
+graph o365group user add --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner
 ```
 
 Add a new member to the specified Microsoft Teams team
 
 ```sh
-graph teams user list --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com'
+graph teams user add --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com'
 ```
