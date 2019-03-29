@@ -631,5 +631,5 @@ Set-TeamChannel|MicrosoftTeams|[graph teams channel set](../cmd/graph/teams/team
 Set-TeamFunSettings|MicrosoftTeams|
 Set-TeamGuestSettings|MicrosoftTeams|[graph teams guestsettings set](../cmd/graph/teams/teams-guestsettings-set.md)
 Set-TeamMemberSettings|MicrosoftTeams|[graph teams membersettings set](../cmd/graph/teams/teams-membersettings-set.md)
-Set-TeamMessagingSettings|MicrosoftTeams|
+Set-TeamMessagingSettings|MicrosoftTeams|[graph teams messagingsettings set](../cmd/graph/teams/teams-messagingsettings-set.md)
 Set-TeamPicture|MicrosoftTeams|
