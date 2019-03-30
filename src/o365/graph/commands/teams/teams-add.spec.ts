@@ -202,9 +202,7 @@ describe(commands.TEAMS_ADD, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
-          'Team': 'f9526e6a-1d0d-4421-8882-88a70975a00c'
-        }));
+        assert(cmdInstanceLogSpy.calledWith('f9526e6a-1d0d-4421-8882-88a70975a00c'));
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
 
         done();
@@ -238,9 +236,7 @@ describe(commands.TEAMS_ADD, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
-          'Team': 'f9526e6a-1d0d-4421-8882-88a70975a00c'
-        }));
+        assert(cmdInstanceLogSpy.calledWith('f9526e6a-1d0d-4421-8882-88a70975a00c'));
 
         done();
       }
@@ -274,9 +270,7 @@ describe(commands.TEAMS_ADD, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
-          'Team': '0ee1db97-37e3-4223-a44f-f389400ad1a0'
-        }));
+        assert(cmdInstanceLogSpy.calledWith('0ee1db97-37e3-4223-a44f-f389400ad1a0'));
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
 
         done();

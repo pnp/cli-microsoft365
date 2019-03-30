@@ -50,7 +50,7 @@ class GraphTeamsAddCommand extends GraphCommand {
 
         if(teamsRspHdrRegEx != null && teamsRspHdrRegEx.length > 0)
         {
-          cmd.log({Team:teamsRspHdrRegEx[1]});
+          cmd.log(teamsRspHdrRegEx[1]);
         }
 
         if (this.verbose) {
