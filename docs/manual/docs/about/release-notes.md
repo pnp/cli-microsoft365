@@ -4,10 +4,19 @@
 
 ### New commands
 
+**SharePoint Online:**
+
+- [spo listitem record declare](../cmd/spo/listitem/listitem-record-declare.md) - declares the specified list item as a record [#769](https://github.com/pnp/office365-cli/issues/769)
+
 **Microsoft Graph:**
 
+- [graph o365group user add](../cmd/graph/o365group/o365group-user-add.md) - adds user to specified Office 365 Group or Microsoft Teams team [#847](https://github.com/pnp/office365-cli/issues/847)
+- [graph schemaextension add](../cmd/graph/schemaextension/schemaextension-add.md) - creates a Microsoft Graph schema extension [#13](https://github.com/pnp/office365-cli/issues/13)
+- [graph teams add](../cmd/graph/teams/teams-add.md) - adds a new Microsoft Teams team [#615](https://github.com/pnp/office365-cli/issues/615)
+- [graph teams app uninstall](../cmd/graph/teams/teams-app-uninstall.md) - uninstalls an app from a Microsoft Team team [#843](https://github.com/pnp/office365-cli/issues/843)
 - [graph teams channel set](../cmd/graph/teams/teams-channel-set.md) - updates properties of the specified channel in the given Microsoft Teams team [#816](https://github.com/pnp/office365-cli/issues/816)
 - [graph teams guestsettings set](../cmd/graph/teams/teams-guestsettings-set.md) - updates guest settings of a Microsoft Teams team [#818](https://github.com/pnp/office365-cli/issues/818)
+- [graph teams tab list](../cmd/graph/teams/teams-tab-list.md) - lists tabs in the specified Microsoft Teams channel [#849](https://github.com/pnp/office365-cli/issues/849)
 
 ### Changes
 
