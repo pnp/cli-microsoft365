@@ -245,6 +245,7 @@ nav:
         - teams list: 'cmd/graph/teams/teams-list.md'
         - teams app install: 'cmd/graph/teams/teams-app-install.md'
         - teams app list: 'cmd/graph/teams/teams-app-list.md'
+        - teams archive: 'cmd/graph/teams/teams-archive.md'
         - teams app publish: 'cmd/graph/teams/teams-app-publish.md'
         - teams app remove: 'cmd/graph/teams/teams-app-remove.md'
         - teams app update: 'cmd/graph/teams/teams-app-update.md'
