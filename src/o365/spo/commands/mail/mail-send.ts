@@ -1,5 +1,4 @@
 import auth from '../../SpoAuth';
-import { ContextInfo } from '../../spo';
 import config from '../../../../config';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -10,21 +9,27 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
+import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
+
+export interface TypedHash<T> {
+  [key: string]: T;
+}
 
 interface CommandArgs {
   options: Options;
 }
 
 interface Options extends GlobalOptions {
+  webUrl: string;
   to: string;
   subject: string;
   body: string;
   from?: string;
   cc?: string;
   bcc?: string;
-  additionalHeaders?: string;
+  additionalHeaders?: TypedHash<string>;
 }
 
 class SpoMailSendCommand extends SpoCommand {
@@ -38,9 +43,6 @@ class SpoMailSendCommand extends SpoCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.to = typeof args.options.to !== 'undefined';
-    telemetryProps.subject = typeof args.options.subject !== 'undefined';
-    telemetryProps.body = typeof args.options.body !== 'undefined';
     telemetryProps.from = typeof args.options.from !== 'undefined';
     telemetryProps.cc = typeof args.options.cc !== 'undefined';
     telemetryProps.bcc = typeof args.options.bcc !== 'undefined';
@@ -49,24 +51,23 @@ class SpoMailSendCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
+    let siteAccessToken: string = '';
+
     if (this.debug) {
-      cmd.log(`Retrieving access token for the site collection ${auth.service.resource}...`);
+      cmd.log(`Retrieving access token for ${resource}...`);
     }
 
     auth
-      .ensureAccessToken(auth.service.resource, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
-        if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
-        }
+      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
+      .then((accessToken: string): request.RequestPromise | Promise<void> => {
+        siteAccessToken = accessToken;
 
-        return this.getRequestDigest(cmd, this.debug);
-      })
-      .then((res: ContextInfo): request.RequestPromise => {
         if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
+          cmd.log(`Retrieved access token ${siteAccessToken}.`);
+          cmd.log(``);
+          cmd.log(`auth object:`);
+          cmd.log(auth);
         }
 
         const params: any = {};
@@ -111,12 +112,11 @@ class SpoMailSendCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${auth.site.url}/_api/SP.Utilities.Utility.SendEmail`,
           headers: Utils.getRequestHeaders({
-            authorization: `Bearer ${auth.service.accessToken}`,
-            'X-RequestDigest': res.FormDigestValue,
-            'Accept': 'application/json;odata=verbose',
+            authorization: `Bearer ${siteAccessToken}`,
             'content-type': 'application/json;odata=verbose'
           }),
-          body: JSON.stringify(params)
+          json: true,
+          body: params
         };
 
         if (this.debug) {
@@ -127,14 +127,27 @@ class SpoMailSendCommand extends SpoCommand {
 
         return request.post(requestOptions);
       })
-      .then((): void => {
-        // REST post call doesn't return anything
+      .then((rawRes: string): void => {
+        if (this.debug) {
+          cmd.log('Response:');
+          cmd.log(rawRes);
+          cmd.log('');
+        }
+
+        if (this.verbose) {
+          cmd.log(vorpal.chalk.green('DONE'));
+        }
+
         cb();
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, cmd, cb));
   }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
+      {
+        option: '-u, --webUrl <webUrl>',
+        description: 'Absolute URL of the site where the content type is located'
+      },
       {
         option: '--to <to>',
         description: 'Recipient\'s email address (separate recipients by comma)'
@@ -171,6 +184,15 @@ class SpoMailSendCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
+      if (!args.options.webUrl) {
+        return 'Required parameter webUrl missing';
+      }
+
+      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+      if (isValidSharePointUrl !== true) {
+        return isValidSharePointUrl;
+      }
+
       if (!args.options.to) {
         return 'Specify at least one recipient, is required';
       }
@@ -203,10 +225,10 @@ class SpoMailSendCommand extends SpoCommand {
   Examples:
   
     Send an email to ${chalk.grey('user@contoso.com')} 
-      ${chalk.grey(config.delimiter)} ${commands.MAIL_SEND} --to 'user@contoso.com' --subject 'Email send via Office365-CLI' --body '<h1>Office365-CLI</h1>Email send via <b>cmdlet</b>.'
+      ${chalk.grey(config.delimiter)} ${commands.MAIL_SEND} --webUrl https://contoso.sharepoint.com/sites/project-x --to 'user@contoso.com' --subject 'Email send via Office365-CLI' --body '<h1>Office365-CLI</h1>Email send via <b>cmdlet</b>.'
     
     Send an email to multiples addresses
-      ${chalk.grey(config.delimiter)} ${commands.MAIL_SEND} --to 'user1@contoso.com,user2@contoso.com' --subject 'Email send via Office365-CLI' --body '<h1>Office365-CLI</h1>Email send via <b>cmdlet</b>.' --cc 'user3@contoso.com' --bcc 'user4@contoso.com'
+      ${chalk.grey(config.delimiter)} ${commands.MAIL_SEND} --webUrl https://contoso.sharepoint.com/sites/project-x --to 'user1@contoso.com,user2@contoso.com' --subject 'Email send via Office365-CLI' --body '<h1>Office365-CLI</h1>Email send via <b>cmdlet</b>.' --cc 'user3@contoso.com' --bcc 'user4@contoso.com'
       `);
   }
 }

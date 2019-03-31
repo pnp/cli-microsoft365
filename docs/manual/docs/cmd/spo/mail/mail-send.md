@@ -13,6 +13,7 @@ spo mail send [options]
 Option|Description
 ------|-----------
 `--help`|output usage information
+`-u, --webUrl <webUrl>`|Absolute URL of the site where the field should be created
 `--to <to>`|Recipient's email address (separate recipients by comma)
 `--subject <subject>`|Subject of the email
 `--body <body>`|Content of the email
@@ -31,18 +32,19 @@ Option|Description
 
 To send an email, you have to first log in to a SharePoint Online site using the [spo login](../login.md) command, eg. `spo login https://contoso.sharepoint.com`.
 
-All recipients (internal and external) have to have access to the target SharePoint site.
+!!! important
+    All recipients (internal and external) have to have access to the target SharePoint site.
 
 ## Examples
 
 Send an email to _user@contoso.com_
 
 ```sh
-spo mail send --to 'user@contoso.com' --subject 'Email send via Office365-CLI' --body '<h1>Office365-CLI</h1>Email send via <b>cmdlet</b>.'
+spo mail send --webUrl https://contoso.sharepoint.com/sites/project-x --to 'user@contoso.com' --subject 'Email send via Office365-CLI' --body '<h1>Office365-CLI</h1>Email send via <b>cmdlet</b>.'
 ```
 
 Send an email to multiples addresses
 
 ```sh
-spo mail send --to 'user1@contoso.com,user2@contoso.com' --subject 'Email send via Office365-CLI' --body '<h1>Office365-CLI</h1>Email send via <b>cmdlet</b>.' --cc 'user3@contoso.com' --bcc 'user4@contoso.com'
+spo mail send --webUrl https://contoso.sharepoint.com/sites/project-x --to 'user1@contoso.com,user2@contoso.com' --subject 'Email send via Office365-CLI' --body '<h1>Office365-CLI</h1>Email send via <b>cmdlet</b>.' --cc 'user3@contoso.com' --bcc 'user4@contoso.com'
 ```

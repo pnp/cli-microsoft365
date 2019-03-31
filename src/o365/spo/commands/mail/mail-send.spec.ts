@@ -1,5 +1,5 @@
 import commands from '../../commands';
-import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
+import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth, { Site } from '../../SpoAuth';
@@ -18,8 +18,7 @@ describe(commands.MAIL_SEND, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('abc'); });
-    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('abc'); });
+    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
       telemetry = t;
     });
@@ -50,9 +49,7 @@ describe(commands.MAIL_SEND, () => {
     Utils.restore([
       appInsights.trackEvent,
       auth.getAccessToken,
-      auth.restoreAuth,
-      auth.ensureAccessToken,
-      (command as any).getRequestDigest
+      auth.restoreAuth
     ]);
   });
 
@@ -94,7 +91,7 @@ describe(commands.MAIL_SEND, () => {
     auth.site = new Site();
     auth.site.connected = false;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: false, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Log in to a SharePoint Online site first')));
         done();
@@ -108,14 +105,6 @@ describe(commands.MAIL_SEND, () => {
   it('Send an email to one recipient (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve({ FormDigestValue: 'abc' });
-        }
-      }
       if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
         return Promise.resolve();
       }
@@ -127,14 +116,13 @@ describe(commands.MAIL_SEND, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email' } }, () => {
+    cmdInstance.action({ options: { debug: true, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email' } }, () => {
       let correctRequestIssued = false;
+      console.log(requests);
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
-          r.headers.Accept &&
-          r.headers.Accept.indexOf('application/json') === 0 &&
           r.body) {
           correctRequestIssued = true;
         }
@@ -153,14 +141,6 @@ describe(commands.MAIL_SEND, () => {
   it('Send an email to one recipient', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve({ FormDigestValue: 'abc' });
-        }
-      }
       if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
         return Promise.resolve();
       }
@@ -172,14 +152,12 @@ describe(commands.MAIL_SEND, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email' } }, () => {
+    cmdInstance.action({ options: { debug: false, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
-          r.headers.Accept &&
-          r.headers.Accept.indexOf('application/json') === 0 &&
           r.body) {
           correctRequestIssued = true;
         }
@@ -198,14 +176,6 @@ describe(commands.MAIL_SEND, () => {
   it('Send an email to one recipient and from someone (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve({ FormDigestValue: 'abc' });
-        }
-      }
       if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
         return Promise.resolve();
       }
@@ -217,14 +187,12 @@ describe(commands.MAIL_SEND, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', from: 'someone@contoso.com', verbose: true } }, () => {
+    cmdInstance.action({ options: { debug: true, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', from: 'someone@contoso.com', verbose: true } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
-          r.headers.Accept &&
-          r.headers.Accept.indexOf('application/json') === 0 &&
           r.body) {
           correctRequestIssued = true;
         }
@@ -243,14 +211,6 @@ describe(commands.MAIL_SEND, () => {
   it('Send an email to one recipient and from someone', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve({ FormDigestValue: 'abc' });
-        }
-      }
       if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
         return Promise.resolve();
       }
@@ -262,14 +222,12 @@ describe(commands.MAIL_SEND, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', from: 'someone@contoso.com' } }, () => {
+    cmdInstance.action({ options: { debug: false, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', from: 'someone@contoso.com' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
-          r.headers.Accept &&
-          r.headers.Accept.indexOf('application/json') === 0 &&
           r.body) {
           correctRequestIssued = true;
         }
@@ -288,14 +246,6 @@ describe(commands.MAIL_SEND, () => {
   it('Send an email to one recipient and from some peoples (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve({ FormDigestValue: 'abc' });
-        }
-      }
       if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
         return Promise.resolve();
       }
@@ -307,14 +257,12 @@ describe(commands.MAIL_SEND, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', from: 'user@contoso.com,someone@consotos.com', verbose: true } }, () => {
+    cmdInstance.action({ options: { debug: true, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', from: 'user@contoso.com,someone@consotos.com', verbose: true } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
-          r.headers.Accept &&
-          r.headers.Accept.indexOf('application/json') === 0 &&
           r.body) {
           correctRequestIssued = true;
         }
@@ -333,14 +281,6 @@ describe(commands.MAIL_SEND, () => {
   it('Send an email to one recipient and from some peoples', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve({ FormDigestValue: 'abc' });
-        }
-      }
       if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
         return Promise.resolve();
       }
@@ -352,14 +292,12 @@ describe(commands.MAIL_SEND, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', from: 'user@contoso.com,someone@consotos.com' } }, () => {
+    cmdInstance.action({ options: { debug: false, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', from: 'user@contoso.com,someone@consotos.com' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
-          r.headers.Accept &&
-          r.headers.Accept.indexOf('application/json') === 0 &&
           r.body) {
           correctRequestIssued = true;
         }
@@ -378,14 +316,6 @@ describe(commands.MAIL_SEND, () => {
   it('Send an email to one recipient and CC someone (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve({ FormDigestValue: 'abc' });
-        }
-      }
       if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
         return Promise.resolve();
       }
@@ -397,14 +327,12 @@ describe(commands.MAIL_SEND, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', cc: 'someone@contoso.com', verbose: true } }, () => {
+    cmdInstance.action({ options: { debug: true, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', cc: 'someone@contoso.com', verbose: true } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
-          r.headers.Accept &&
-          r.headers.Accept.indexOf('application/json') === 0 &&
           r.body) {
           correctRequestIssued = true;
         }
@@ -423,14 +351,6 @@ describe(commands.MAIL_SEND, () => {
   it('Send an email to one recipient and CC someone', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve({ FormDigestValue: 'abc' });
-        }
-      }
       if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
         return Promise.resolve();
       }
@@ -442,14 +362,12 @@ describe(commands.MAIL_SEND, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', cc: 'someone@contoso.com' } }, () => {
+    cmdInstance.action({ options: { debug: false, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', cc: 'someone@contoso.com' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
-          r.headers.Accept &&
-          r.headers.Accept.indexOf('application/json') === 0 &&
           r.body) {
           correctRequestIssued = true;
         }
@@ -468,14 +386,6 @@ describe(commands.MAIL_SEND, () => {
   it('Send an email to one recipient and BCC someone (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve({ FormDigestValue: 'abc' });
-        }
-      }
       if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
         return Promise.resolve();
       }
@@ -487,14 +397,12 @@ describe(commands.MAIL_SEND, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', bcc: 'someone@contoso.com', verbose: true } }, () => {
+    cmdInstance.action({ options: { debug: true, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', bcc: 'someone@contoso.com', verbose: true } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
-          r.headers.Accept &&
-          r.headers.Accept.indexOf('application/json') === 0 &&
           r.body) {
           correctRequestIssued = true;
         }
@@ -513,14 +421,6 @@ describe(commands.MAIL_SEND, () => {
   it('Send an email to one recipient and BCC someone', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve({ FormDigestValue: 'abc' });
-        }
-      }
       if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
         return Promise.resolve();
       }
@@ -532,14 +432,12 @@ describe(commands.MAIL_SEND, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', bcc: 'someone@contoso.com' } }, () => {
+    cmdInstance.action({ options: { debug: false, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', bcc: 'someone@contoso.com' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
-          r.headers.Accept &&
-          r.headers.Accept.indexOf('application/json') === 0 &&
           r.body) {
           correctRequestIssued = true;
         }
@@ -558,14 +456,6 @@ describe(commands.MAIL_SEND, () => {
   it('Send an email to one recipient with additional header (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve({ FormDigestValue: 'abc' });
-        }
-      }
       if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
         return Promise.resolve();
       }
@@ -577,14 +467,12 @@ describe(commands.MAIL_SEND, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', additionalHeaders: '{"X-Custom": "My Custom Header Value"}', verbose: true } }, () => {
+    cmdInstance.action({ options: { debug: true, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', additionalHeaders: '{"X-Custom": "My Custom Header Value"}', verbose: true } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
-          r.headers.Accept &&
-          r.headers.Accept.indexOf('application/json') === 0 &&
           r.body) {
           correctRequestIssued = true;
         }
@@ -603,14 +491,6 @@ describe(commands.MAIL_SEND, () => {
   it('Send an email to one recipient with additional header', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        if (opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve({ FormDigestValue: 'abc' });
-        }
-      }
       if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
         return Promise.resolve();
       }
@@ -622,14 +502,12 @@ describe(commands.MAIL_SEND, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', additionalHeaders: '{"X-Custom": "My Custom Header Value"}' } }, () => {
+    cmdInstance.action({ options: { debug: false, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', additionalHeaders: '{"X-Custom": "My Custom Header Value"}' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
-          r.headers.Accept &&
-          r.headers.Accept.indexOf('application/json') === 0 &&
           r.body) {
           correctRequestIssued = true;
         }
@@ -656,35 +534,45 @@ describe(commands.MAIL_SEND, () => {
     assert(containsDebugOption);
   });
 
-  it('supports verbose mode', () => {
-    const options = command.options() as CommandOption[];
-    let containsOption = false;
-    options.forEach((o) => {
-      if (o.option === '--verbose') {
-        containsOption = true;
+  it('supports specifying URL', () => {
+    const options = (command.options() as CommandOption[]);
+    let containsTypeOption = false;
+    options.forEach(o => {
+      if (o.option.indexOf('<webUrl>') > -1) {
+        containsTypeOption = true;
       }
     });
-    assert(containsOption);
+    assert(containsTypeOption);
+  });
+
+  it('fails validation if the webUrl option not specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'foo', to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email' } });
+    assert.notEqual(actual, true);
   });
 
   it('fails validation if the \'to\' option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { subject: 'Subject of the email', body: 'Content of the email' } });
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', subject: 'Subject of the email', body: 'Content of the email' } });
     assert.notEqual(actual, true);
   });
 
   it('fails validation if the \'subject\' option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { to: 'user@contoso.com', body: 'Content of the email' } });
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', to: 'user@contoso.com', body: 'Content of the email' } });
     assert.notEqual(actual, true);
   });
 
   it('fails validation if the \'body\' option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { to: 'user@contoso.com', subject: 'Subject of the email' } });
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', to: 'user@contoso.com', subject: 'Subject of the email' } });
     assert.notEqual(actual, true);
   });
 
-  it('passes validation if at least the \'to\', \'subject\' and \'body\' are sprecified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email' } });
-    assert(actual);
+  it('passes validation if at least the webUrl \'to\', \'subject\' and \'body\' are sprecified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email' } });
+    assert.equal(actual, true);
   });
 
   it('has help referring to the right command', () => {
@@ -722,14 +610,15 @@ describe(commands.MAIL_SEND, () => {
   });
 
   it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.ensureAccessToken);
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-
+    Utils.restore(auth.getAccessToken);
+    sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email' } }, (err?: any) => {
+    cmdInstance.action({
+      options: { debug: false, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email' }
+    }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
         done();
