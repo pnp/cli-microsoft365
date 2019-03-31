@@ -42,7 +42,7 @@ class GraphTeamsArchiveCommand extends GraphCommand {
           }),
           json: true,
           body: {
-            'shouldSetSpoSiteReadOnlyForMembers': `${args.options.shouldSetSpoSiteReadOnlyForMembers ? args.options.shouldSetSpoSiteReadOnlyForMembers : false}`
+            'shouldSetSpoSiteReadOnlyForMembers': args.options.shouldSetSpoSiteReadOnlyForMembers || false
           }
         };
 
