@@ -16,27 +16,36 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  role?: string;
-  teamId: string;
   userName: string;
+  role?: string;
+  teamId?: string;
+  groupId?: string;
 }
 
-class GraphTeamsUserAddCommand extends GraphCommand {
+class GraphO365GroupUserAddCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.TEAMS_USER_ADD}`;
+    return `${commands.O365GROUP_USER_ADD}`;
   }
 
   public get description(): string {
-    return 'Adds user to the specified Microsoft Teams team';
+    return 'Adds user to specified Office 365 Group or Microsoft Teams team';
+  }
+
+  public alias(): string[] | undefined {
+    return [commands.TEAMS_USER_ADD];
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.role = args.options.role;
+    telemetryProps.teamId = typeof args.options.teamId !== 'undefined';
+    telemetryProps.groupId = typeof args.options.groupId !== 'undefined';
     return telemetryProps;
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    const providedGroupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string
+
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
       .then((): request.RequestPromise => {
@@ -64,7 +73,7 @@ class GraphTeamsUserAddCommand extends GraphCommand {
           cmd.log('');
         }
 
-        const endpoint: string = `${auth.service.resource}/v1.0/groups/${args.options.teamId}/${args.options.role === 'Owner' ? 'owners' : 'members'}/$ref`;
+        const endpoint: string = `${auth.service.resource}/v1.0/groups/${providedGroupId}/${((typeof args.options.role !== 'undefined') ? args.options.role : '').toLowerCase() === 'owner' ? 'owners' : 'members'}/$ref`;
 
         const requestOptions: any = {
           url: endpoint,
@@ -96,12 +105,16 @@ class GraphTeamsUserAddCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --teamId <teamId>',
-        description: 'The ID of the Teams team to which to add the user'
-      },
-      {
         option: '-n, --userName <userName>',
         description: 'User\'s UPN (user principal name, eg. johndoe@example.com)'
+      },
+      {
+        option: "-i, --groupId [groupId]",
+        description: "The ID of the Office 365 Group to which to add the user"
+      },
+      {
+        option: "--teamId [teamId]",
+        description: "The ID of the Teams team to which to add the user"
       },
       {
         option: '-r, --role [role]',
@@ -116,12 +129,20 @@ class GraphTeamsUserAddCommand extends GraphCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.teamId) {
-        return 'Required parameter teamId missing';
+      if (!args.options.groupId && !args.options.teamId) {
+        return 'Please provide one of the following parameters: groupId or teamId';
       }
 
-      if (!Utils.isValidGuid(args.options.teamId)) {
+      if (args.options.groupId && args.options.teamId) {
+        return 'You cannot provide both a groupId and teamId parameter, please provide only one';
+      }
+
+      if (args.options.teamId && !Utils.isValidGuid(args.options.teamId as string)) {
         return `${args.options.teamId} is not a valid GUID`;
+      }
+
+      if (args.options.groupId && !Utils.isValidGuid(args.options.groupId as string)) {
+        return `${args.options.groupId} is not a valid GUID`;
       }
 
       if (!args.options.userName) {
@@ -129,7 +150,7 @@ class GraphTeamsUserAddCommand extends GraphCommand {
       }
 
       if (args.options.role) {
-        if (['Owner', 'Member'].indexOf(args.options.role) === -1) {
+        if (['owner', 'member'].indexOf(args.options.role.toLowerCase()) === -1) {
           return `${args.options.role} is not a valid role value. Allowed values Owner|Member`;
         }
       }
@@ -144,22 +165,25 @@ class GraphTeamsUserAddCommand extends GraphCommand {
     log(
       `  ${chalk.yellow('Important:')} before using this command, log in to the Microsoft Graph
     using the ${chalk.blue(commands.LOGIN)} command.
-        
+
   Remarks:
 
-    To add user to the specified Microsoft Teams team, you have to first
-    log in to the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
+    To add user to the specified Office 365 Group or Microsoft Teams team,
+    you have to first log in to the Microsoft Graph using the ${chalk.blue(commands.LOGIN)}
+    command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
 
   Examples:
-  
-    Add a new member to the specified team 
-      ${chalk.grey(config.delimiter)} ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com'
 
-    Add a new owner to the specified team 
-      ${chalk.grey(config.delimiter)} ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner 
+    Add a new member to the specified Office 365 Group
+      ${chalk.grey(config.delimiter)} ${this.name} --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com'
+
+    Add a new owner to the specified Office 365 Group
+      ${chalk.grey(config.delimiter)} ${this.name} --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner
+
+    Add a new member to the specified Microsoft Teams team
+      ${chalk.grey(config.delimiter)} ${(this.alias() as string[])[0]} --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com'
 `);
   }
 }
 
-module.exports = new GraphTeamsUserAddCommand();
+module.exports = new GraphO365GroupUserAddCommand();

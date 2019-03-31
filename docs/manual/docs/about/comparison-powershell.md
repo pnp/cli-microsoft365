@@ -468,7 +468,7 @@ Set-PnPInPlaceRecordsManagement|SharePointPnPPowerShellOnline|[spo site inplacer
 Set-PnPLabel|SharePointPnPPowerShellOnline|[spo list label set](../cmd/spo/list/list-label-set.md)
 Set-PnPList|SharePointPnPPowerShellOnline|[spo list set](../cmd/spo/list/list-set.md)
 Set-PnPListItem|SharePointPnPPowerShellOnline|[spo listitem set](../cmd/spo/listitem/listitem-set.md)
-Set-PnPListItemAsRecord|SharePointPnPPowerShellOnline|
+Set-PnPListItemAsRecord|SharePointPnPPowerShellOnline|[spo listitem record declare](../cmd/spo/listitem/listitem-record-declare.md)
 Set-PnPListItemPermission|SharePointPnPPowerShellOnline|
 Set-PnPListPermission|SharePointPnPPowerShellOnline|
 Set-PnPListRecordDeclaration|SharePointPnPPowerShellOnline|
@@ -610,7 +610,7 @@ Set-AdminPowerAppEnvironmentRoleAssignment|Microsoft.PowerApps.Administration.Po
 Set-AdminPowerAppOwner|Microsoft.PowerApps.Administration.PowerShell|
 Set-AdminPowerAppRoleAssignment|Microsoft.PowerApps.Administration.PowerShell|
 Test-PowerAppsAccount|Microsoft.PowerApps.Administration.PowerShell|
-Add-TeamUser|MicrosoftTeams|[graph teams user add](../cmd/graph/teams/teams-user-add.md)
+Add-TeamUser|MicrosoftTeams|[graph teams user add](../cmd/graph/o365group/o365group-user-add.md)
 Connect-MicrosoftTeams|MicrosoftTeams|[graph login](../cmd/graph/login.md)
 Disconnect-MicrosoftTeams|MicrosoftTeams|[graph logout](../cmd/graph/logout.md)
 Get-Team|MicrosoftTeams|[graph teams list](../cmd/graph/teams/teams-list.md)
@@ -621,7 +621,7 @@ Get-TeamHelp|MicrosoftTeams|
 Get-TeamMemberSettings|MicrosoftTeams|[graph teams membersettings list](../cmd/graph/teams/teams-membersettings-list.md)
 Get-TeamMessagingSettings|MicrosoftTeams|[graph teams messagingsettings list](../cmd/graph/teams/teams-messagingsettings-list.md)
 Get-TeamUser|MicrosoftTeams|[graph teams user list](../cmd/graph/teams/teams-user-list.md)
-New-Team|MicrosoftTeams|
+New-Team|MicrosoftTeams|[graph teams add](../cmd/graph/teams/teams-add.md)
 New-TeamChannel|MicrosoftTeams|[graph teams channel add](../cmd/graph/teams/teams-channel-add.md)
 Remove-Team|MicrosoftTeams|
 Remove-TeamChannel|MicrosoftTeams|
