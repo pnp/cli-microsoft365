@@ -30,7 +30,7 @@ To archive a Microsoft Team, specify that team's ID using the `teamId` option.
 
 Set `shouldSetSpoSiteReadOnlyForMembers` option to `true` to set permissions for team members to read-only on the Sharepoint Online site associated with the team.
 
-You can only archive a Team as a global administrator.
+This API supports admin permissions. Global admins and Microsoft Teams service admins can access teams that they are not a member of.
 
 ## Examples
 
