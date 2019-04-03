@@ -9,10 +9,9 @@ import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import GlobalOptions from '../../../../GlobalOptions';
 import { Auth } from '../../../../Auth';
-import { ClientSidePage, CanvasSectionTemplate } from './clientsidepages';
-import { ContextInfo } from '../../spo';
-import { Page } from './Page';
+import { CanvasSectionTemplate } from './clientsidepages';
 import { isNumber } from 'util';
+import { Control } from './canvasContent';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -23,7 +22,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   name: string;
   webUrl: string;
-  sectionTemplate: CanvasSectionTemplate;
+  sectionTemplate: string;
   order?: number;
 }
 
@@ -39,11 +38,11 @@ class SpoPageSectionAddCommand extends SpoCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
     let siteAccessToken: string = '';
-    let requestDigest: string = '';
     let pageFullName: string = args.options.name.toLowerCase();
     if (pageFullName.indexOf('.aspx') < 0) {
       pageFullName += '.aspx';
     }
+    let canvasContent: Control[];
 
     if (this.debug) {
       cmd.log(`Retrieving access token for ${resource}...`);
@@ -53,37 +52,106 @@ class SpoPageSectionAddCommand extends SpoCommand {
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
       .then((accessToken: string): request.RequestPromise => {
         if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
+          cmd.log(`Retrieved access token ${accessToken}`);
         }
 
         siteAccessToken = accessToken;
+
         if (this.verbose) {
-          cmd.log(`Retrieving request digest...`);
+          cmd.log(`Retrieving page information...`);
         }
 
-        return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
-      })
-      .then((res: ContextInfo): Promise<ClientSidePage> => {
+        const requestOptions: any = {
+          url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`,
+          headers: Utils.getRequestHeaders({
+            authorization: `Bearer ${siteAccessToken}`,
+            'accept': 'application/json;odata=nometadata'
+          }),
+          json: true
+        };
+
         if (this.debug) {
-          cmd.log('Response:');
+          cmd.log('Executing web request...');
+          cmd.log(requestOptions);
+          cmd.log('');
+        }
+
+        return request.get(requestOptions);
+      })
+      .then((res: { CanvasContent1: string; IsPageCheckedOutToCurrentUser: boolean }): Promise<void> | request.RequestPromise => {
+        if (this.debug) {
+          cmd.log('Response:')
           cmd.log(res);
           cmd.log('');
         }
 
-        // Keep the reference of request digest for subsequent requests
-        requestDigest = res.FormDigestValue;
+        canvasContent = JSON.parse(res.CanvasContent1 || "[{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]");
 
-        if (this.verbose) {
-          cmd.log(`Retrieving modern page ${args.options.name}...`);
+        if (res.IsPageCheckedOutToCurrentUser) {
+          return Promise.resolve();
         }
-        // Get Client Side Page
-        return Page.getPage(pageFullName, args.options.webUrl, siteAccessToken, cmd, this.debug, this.verbose);
-      })
-      .then((clientSidePage: ClientSidePage): request.RequestPromise => {
-        clientSidePage.addSection(args.options.sectionTemplate, args.options.order);
 
-        // Save the Client Side Page with updated section
-        return this.saveClientSidePage(clientSidePage as ClientSidePage, cmd, args, pageFullName, siteAccessToken, requestDigest);
+        const requestOptions: any = {
+          url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/checkoutpage`,
+          headers: Utils.getRequestHeaders({
+            authorization: `Bearer ${siteAccessToken}`,
+            'accept': 'application/json;odata=nometadata'
+          }),
+          json: true
+        };
+
+        if (this.debug) {
+          cmd.log('Executing web request...');
+          cmd.log(requestOptions);
+          cmd.log('');
+        }
+
+        return request.post(requestOptions);
+      })
+      .then((): request.RequestPromise | Promise<void> => {
+        // get columns
+        const columns: Control[] = canvasContent
+          .filter(c => typeof c.controlType === 'undefined');
+        // get unique zoneIndex values given each section can have 1 or more
+        // columns each assigned to the zoneIndex of the corresponding section
+        const zoneIndices: number[] = columns
+          .map(c => c.position.zoneIndex)
+          .filter((value: number, index: number, array: number[]): boolean => {
+            return array.indexOf(value) === index;
+          })
+          .sort();
+        // zoneIndex for the new section to add
+        const zoneIndex: number = this.getSectionIndex(zoneIndices, args.options.order);
+        // get the list of columns to insert based on the selected template
+        const columnsToAdd: Control[] = this.getColumns(zoneIndex, args.options.sectionTemplate);
+        // insert the column in the right place in the array so that
+        // it stays sorted ascending by zoneIndex
+        let pos: number = canvasContent.findIndex(c => typeof c.controlType === 'undefined' && c.position.zoneIndex > zoneIndex);
+        if (pos === -1) {
+          pos = canvasContent.length - 1;
+        }
+        canvasContent.splice(pos, 0, ...columnsToAdd);
+
+        const requestOptions: any = {
+          url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/savepage`,
+          headers: Utils.getRequestHeaders({
+            authorization: `Bearer ${siteAccessToken}`,
+            'accept': 'application/json;odata=nometadata',
+            'content-type': 'application/json;odata=nometadata'
+          }),
+          body: {
+            CanvasContent1: JSON.stringify(canvasContent)
+          },
+          json: true
+        };
+
+        if (this.debug) {
+          cmd.log('Executing web request...');
+          cmd.log(requestOptions);
+          cmd.log('');
+        }
+
+        return request.post(requestOptions);
       })
       .then((res: any): void => {
         if (this.debug) {
@@ -102,50 +170,69 @@ class SpoPageSectionAddCommand extends SpoCommand {
       });
   }
 
-  private saveClientSidePage(
-    clientSidePage: ClientSidePage,
-    cmd: CommandInstance,
-    args: CommandArgs,
-    name: string,
-    accessToken: string,
-    requestDigest: string
-  ): request.RequestPromise<any> {
-    const serverRelativeSiteUrl: string = `${args.options.webUrl.substr(
-      args.options.webUrl.indexOf('/', 8)
-    )}/sitepages/${name}`;
-
-    const updatedContent: string = clientSidePage.toHtml();
-
-    if (this.debug) {
-      cmd.log('Updated canvas content: ');
-      cmd.log(updatedContent);
-      cmd.log('');
+  private getSectionIndex(zoneIndices: number[], order?: number): number {
+    // zoneIndex of the first column on the page
+    const minIndex: number = zoneIndices.length === 0 ? 0 : zoneIndices[0];
+    // zoneIndex of the last column on the page
+    const maxIndex: number = zoneIndices.length === 0 ? 0 : zoneIndices[zoneIndices.length - 1];
+    if (!order || order > zoneIndices.length) {
+      // no order specified, add section to the end
+      return maxIndex === 0 ? 1 : maxIndex * 2;
     }
 
-    const requestOptions: any = {
-      url: `${args.options
-        .webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeSiteUrl}')/ListItemAllFields`,
-      headers: Utils.getRequestHeaders({
-        authorization: `Bearer ${accessToken}`,
-        'X-RequestDigest': requestDigest,
-        'content-type': 'application/json;odata=nometadata',
-        'X-HTTP-Method': 'MERGE',
-        'IF-MATCH': '*',
-        accept: 'application/json;odata=nometadata'
-      }),
-      body: {
-        CanvasContent1: updatedContent
+    // add to the beginning
+    if (order === 1) {
+      return minIndex / 2;
+    }
+
+    return zoneIndices[order - 2] + ((zoneIndices[order - 1] - zoneIndices[order - 2]) / 2);
+  }
+
+  private getColumns(zoneIndex: number, sectionTemplate: string): Control[] {
+    const columns: Control[] = [];
+    let sectionIndex: number = 1;
+
+    switch (sectionTemplate) {
+      case 'OneColumnFullWidth':
+        columns.push(this.getColumn(zoneIndex, sectionIndex++, 0));
+        break;
+      case 'TwoColumn':
+        columns.push(this.getColumn(zoneIndex, sectionIndex++, 6));
+        columns.push(this.getColumn(zoneIndex, sectionIndex++, 6));
+        break;
+      case 'ThreeColumn':
+        columns.push(this.getColumn(zoneIndex, sectionIndex++, 4));
+        columns.push(this.getColumn(zoneIndex, sectionIndex++, 4));
+        columns.push(this.getColumn(zoneIndex, sectionIndex++, 4));
+        break;
+      case 'TwoColumnLeft':
+        columns.push(this.getColumn(zoneIndex, sectionIndex++, 8));
+        columns.push(this.getColumn(zoneIndex, sectionIndex++, 4));
+        break;
+      case 'TwoColumnRight':
+        columns.push(this.getColumn(zoneIndex, sectionIndex++, 4));
+        columns.push(this.getColumn(zoneIndex, sectionIndex++, 8));
+        break;
+      case 'OneColumn':
+      default:
+        columns.push(this.getColumn(zoneIndex, sectionIndex++, 12));
+        break;
+    }
+
+    return columns;
+  }
+
+  private getColumn(zoneIndex: number, sectionIndex: number, sectionFactor: number): Control {
+    return {
+      displayMode: 2,
+      position: {
+        zoneIndex: zoneIndex,
+        sectionIndex: sectionIndex,
+        sectionFactor: sectionFactor,
+        layoutIndex: 1
       },
-      json: true
+      emphasis: {}
     };
-
-    if (this.debug) {
-      cmd.log('Executing web request...');
-      cmd.log(requestOptions);
-      cmd.log('');
-    }
-
-    return request.post(requestOptions);
   }
 
   public options(): CommandOption[] {
@@ -191,7 +278,7 @@ class SpoPageSectionAddCommand extends SpoCommand {
         }
       }
 
-      if (args.options.order) {
+      if (typeof args.options.order !== 'undefined') {
         if (!isNumber(args.options.order) || args.options.order < 1) {
           return 'The value of parameter order must be 1 or higher';
         }
