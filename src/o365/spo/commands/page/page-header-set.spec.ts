@@ -12,9 +12,9 @@ describe(commands.PAGE_HEADER_SET, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
   let trackEvent: any;
   let telemetry: any;
+  let body: string;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -32,17 +32,35 @@ describe(commands.PAGE_HEADER_SET, () => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
     auth.site = new Site();
     telemetry = null;
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
+        return Promise.resolve({
+          IsPageCheckedOutToCurrentUser: true,
+          Title: 'Page'
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/savepage`) > -1) {
+        body = opts.body;
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
   });
 
   afterEach(() => {
     Utils.restore([
       vorpal.find,
       request.get,
-      request.patch
+      request.post
     ]);
+    body = '';
   });
 
   after(() => {
@@ -102,22 +120,28 @@ describe(commands.PAGE_HEADER_SET, () => {
     });
   });
 
-  it('sets page header to default when no type specified', (done) => {
+  it('checks out page if not checked out by the current user', (done) => {
+    Utils.restore([request.get, request.post]);
+    let checkedOut = false;
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')/ListItemAllFields`) > -1) {
+      if (opts.url.indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
         return Promise.resolve({
-          Id: 1,
-          ID: 1,
+          IsPageCheckedOutToCurrentUser: false,
           Title: 'Page'
         });
       }
 
       return Promise.reject('Invalid request');
     });
-    sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists/getByTitle('Site Pages')/items(1)`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({ "LayoutWebpartsContent": "<div><div data-sp-canvascontrol=\"\" data-sp-canvasdataversion=\"1.4\" data-sp-controldata=\"&#123;&quot;id&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;instanceId&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;title&quot;&#58;&quot;Title Region&quot;,&quot;description&quot;&#58;&quot;Title Region Description&quot;,&quot;serverProcessedContent&quot;&#58;&#123;&quot;htmlStrings&quot;&#58;&#123;&#125;,&quot;searchablePlainTexts&quot;&#58;&#123;&#125;,&quot;imageSources&quot;&#58;&#123;&#125;,&quot;links&quot;&#58;&#123;&#125;&#125;,&quot;dataVersion&quot;&#58;&quot;1.4&quot;,&quot;properties&quot;&#58;&#123;&quot;title&quot;&#58;&quot;Page&quot;,&quot;imageSourceType&quot;&#58;4,&quot;layoutType&quot;&#58;&quot;FullWidthImage&quot;,&quot;textAlignment&quot;&#58;&quot;Left&quot;,&quot;showKicker&quot;&#58;false,&quot;showPublishDate&quot;&#58;false,&quot;kicker&quot;&#58;&quot;&quot;&#125;&#125;\"></div></div>" })) {
-        return Promise.resolve();
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/checkoutpage`) > -1) {
+        checkedOut = true;
+        return Promise.resolve({});
+      }
+
+      if (opts.url.indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`) > -1) {
+        return Promise.resolve({});
       }
 
       return Promise.reject('Invalid request');
@@ -125,11 +149,103 @@ describe(commands.PAGE_HEADER_SET, () => {
 
     auth.site = new Site();
     auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com/sites/newsletter';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        debug: true,
+        pageName: 'home',
+        webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
+      }
+    }, () => {
+      try {
+        assert.deepEqual(checkedOut, true);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('doesn\'t check out page if not checked out by the current user', (done) => {
+    Utils.restore([request.get, request.post]);
+    let checkingOut = false;
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
+        return Promise.resolve({
+          IsPageCheckedOutToCurrentUser: true,
+          Title: 'Page'
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/checkoutpage`) > -1) {
+        checkingOut = true;
+        return Promise.resolve({});
+      }
+
+      if (opts.url.indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`) > -1) {
+        return Promise.resolve({});
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com/sites/newsletter';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        pageName: 'home.aspx',
+        webUrl: 'https://contoso.sharepoint.com/sites/newsletter'
+      }
+    }, () => {
+      try {
+        assert.deepEqual(checkingOut, false);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets page header to default when no type specified', (done) => {
+    auth.site = new Site();
+    auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert.equal(JSON.stringify(body), JSON.stringify({
+          LayoutWebpartsContent: JSON.stringify([{
+            "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+            "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+            "title": "Title Region",
+            "description": "Title Region Description",
+            "serverProcessedContent": {
+              "htmlStrings": {},
+              "searchablePlainTexts": {},
+              "imageSources": {},
+              "links": {}
+            },
+            "dataVersion": "1.4",
+            "properties": {
+              "title": "Page",
+              "imageSourceType": 4,
+              "layoutType": "FullWidthImage",
+              "textAlignment": "Left",
+              "showKicker": false,
+              "showPublishDate": false,
+              "kicker": ""
+            }
+          }])
+        }));
         done();
       }
       catch (e) {
@@ -139,33 +255,36 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('sets page header to default when default type specified', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')/ListItemAllFields`) > -1) {
-        return Promise.resolve({
-          Id: 1,
-          ID: 1,
-          Title: 'Page'
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-    sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists/getByTitle('Site Pages')/items(1)`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({ "LayoutWebpartsContent": "<div><div data-sp-canvascontrol=\"\" data-sp-canvasdataversion=\"1.4\" data-sp-controldata=\"&#123;&quot;id&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;instanceId&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;title&quot;&#58;&quot;Title Region&quot;,&quot;description&quot;&#58;&quot;Title Region Description&quot;,&quot;serverProcessedContent&quot;&#58;&#123;&quot;htmlStrings&quot;&#58;&#123;&#125;,&quot;searchablePlainTexts&quot;&#58;&#123;&#125;,&quot;imageSources&quot;&#58;&#123;&#125;,&quot;links&quot;&#58;&#123;&#125;&#125;,&quot;dataVersion&quot;&#58;&quot;1.4&quot;,&quot;properties&quot;&#58;&#123;&quot;title&quot;&#58;&quot;Page&quot;,&quot;imageSourceType&quot;&#58;4,&quot;layoutType&quot;&#58;&quot;FullWidthImage&quot;,&quot;textAlignment&quot;&#58;&quot;Left&quot;,&quot;showKicker&quot;&#58;false,&quot;showPublishDate&quot;&#58;false,&quot;kicker&quot;&#58;&quot;&quot;&#125;&#125;\"></div></div>" })) {
-        return Promise.resolve();
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert.equal(JSON.stringify(body), JSON.stringify({
+          LayoutWebpartsContent: JSON.stringify([{
+            "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+            "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+            "title": "Title Region",
+            "description": "Title Region Description",
+            "serverProcessedContent": {
+              "htmlStrings": {},
+              "searchablePlainTexts": {},
+              "imageSources": {},
+              "links": {}
+            },
+            "dataVersion": "1.4",
+            "properties": {
+              "title": "Page",
+              "imageSourceType": 4,
+              "layoutType": "FullWidthImage",
+              "textAlignment": "Left",
+              "showKicker": false,
+              "showPublishDate": false,
+              "kicker": ""
+            }
+          }])
+        }));
         done();
       }
       catch (e) {
@@ -175,33 +294,36 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('sets page header to none when none specified', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')/ListItemAllFields`) > -1) {
-        return Promise.resolve({
-          Id: 1,
-          ID: 1,
-          Title: 'Page'
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-    sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists/getByTitle('Site Pages')/items(1)`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({ "LayoutWebpartsContent": "<div><div data-sp-canvascontrol=\"\" data-sp-canvasdataversion=\"1.4\" data-sp-controldata=\"&#123;&quot;id&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;instanceId&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;title&quot;&#58;&quot;Title Region&quot;,&quot;description&quot;&#58;&quot;Title Region Description&quot;,&quot;serverProcessedContent&quot;&#58;&#123;&quot;htmlStrings&quot;&#58;&#123;&#125;,&quot;searchablePlainTexts&quot;&#58;&#123;&#125;,&quot;imageSources&quot;&#58;&#123;&#125;,&quot;links&quot;&#58;&#123;&#125;&#125;,&quot;dataVersion&quot;&#58;&quot;1.4&quot;,&quot;properties&quot;&#58;&#123;&quot;title&quot;&#58;&quot;Page&quot;,&quot;imageSourceType&quot;&#58;4,&quot;layoutType&quot;&#58;&quot;NoImage&quot;,&quot;textAlignment&quot;&#58;&quot;Left&quot;,&quot;showKicker&quot;&#58;false,&quot;showPublishDate&quot;&#58;false,&quot;kicker&quot;&#58;&quot;&quot;&#125;&#125;\"></div></div>" })) {
-        return Promise.resolve();
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'None' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert.equal(JSON.stringify(body), JSON.stringify({
+          LayoutWebpartsContent: JSON.stringify([{
+            "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+            "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+            "title": "Title Region",
+            "description": "Title Region Description",
+            "serverProcessedContent": {
+              "htmlStrings": {},
+              "searchablePlainTexts": {},
+              "imageSources": {},
+              "links": {}
+            },
+            "dataVersion": "1.4",
+            "properties": {
+              "title": "Page",
+              "imageSourceType": 4,
+              "layoutType": "NoImage",
+              "textAlignment": "Left",
+              "showKicker": false,
+              "showPublishDate": false,
+              "kicker": ""
+            }
+          }])
+        }));
         done();
       }
       catch (e) {
@@ -211,11 +333,11 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('sets page header to custom when custom type specified', (done) => {
+    Utils.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')/ListItemAllFields`) > -1) {
+      if (opts.url.indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
         return Promise.resolve({
-          Id: 1,
-          ID: 1,
+          IsPageCheckedOutToCurrentUser: true,
           Title: 'Page'
         });
       }
@@ -237,14 +359,6 @@ describe(commands.PAGE_HEADER_SET, () => {
           ListId: 'e1557527-d333-49f2-9d60-ea8a3003fda8',
           UniqueId: '102f496d-23a2-415f-803a-232b8a6c7613'
         });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-    sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists/SitePages/items(1)`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({ "LayoutWebpartsContent": "<div><div data-sp-canvascontrol=\"\" data-sp-canvasdataversion=\"1.4\" data-sp-controldata=\"&#123;&quot;id&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;instanceId&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;title&quot;&#58;&quot;Title Region&quot;,&quot;description&quot;&#58;&quot;Title Region Description&quot;,&quot;serverProcessedContent&quot;&#58;&#123;&quot;htmlStrings&quot;&#58;&#123;&#125;,&quot;searchablePlainTexts&quot;&#58;&#123;&#125;,&quot;imageSources&quot;&#58;&#123;&quot;imageSource&quot;&#58;&quot;/sites/team-a/siteassets/hero.jpg&quot;&#125;,&quot;links&quot;&#58;&#123;&#125;,&quot;customMetadata&quot;&#58;&#123;&quot;imageSource&quot;&#58;&#123;&quot;listId&quot;&#58;&quot;e1557527-d333-49f2-9d60-ea8a3003fda8&quot;,&quot;siteId&quot;&#58;&quot;c7678ab2-c9dc-454b-b2ee-7fcffb983d4e&quot;,&quot;uniqueId&quot;&#58;&quot;102f496d-23a2-415f-803a-232b8a6c7613&quot;,&quot;webId&quot;&#58;&quot;0df4d2d2-5ecf-45e9-94f5-c638106bfc65&quot;&#125;&#125;&#125;,&quot;dataVersion&quot;&#58;&quot;1.4&quot;,&quot;properties&quot;&#58;&#123;&quot;title&quot;&#58;&quot;Page&quot;,&quot;imageSourceType&quot;&#58;2,&quot;layoutType&quot;&#58;&quot;FullWidthImage&quot;,&quot;textAlignment&quot;&#58;&quot;Left&quot;,&quot;showKicker&quot;&#58;false,&quot;showPublishDate&quot;&#58;false,&quot;kicker&quot;&#58;&quot;&quot;,&quot;authors&quot;&#58;[],&quot;altText&quot;&#58;&quot;&quot;,&quot;webId&quot;&#58;&quot;0df4d2d2-5ecf-45e9-94f5-c638106bfc65&quot;,&quot;siteId&quot;&#58;&quot;c7678ab2-c9dc-454b-b2ee-7fcffb983d4e&quot;,&quot;listId&quot;&#58;&quot;e1557527-d333-49f2-9d60-ea8a3003fda8&quot;,&quot;uniqueId&quot;&#58;&quot;102f496d-23a2-415f-803a-232b8a6c7613&quot;,&quot;translateX&quot;&#58;42.3837520042758,&quot;translateY&quot;&#58;56.4285714285714&#125;&#125;\"></div></div>" })) {
-        return Promise.resolve();
       }
 
       return Promise.reject('Invalid request');
@@ -256,7 +370,48 @@ describe(commands.PAGE_HEADER_SET, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', imageUrl: '/sites/team-a/siteassets/hero.jpg', translateX: 42.3837520042758, translateY: 56.4285714285714 } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert.equal(JSON.stringify(body), JSON.stringify({
+          LayoutWebpartsContent: JSON.stringify([{
+            "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+            "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+            "title": "Title Region",
+            "description": "Title Region Description",
+            "serverProcessedContent": {
+              "htmlStrings": {},
+              "searchablePlainTexts": {},
+              "imageSources": {
+                "imageSource": "/sites/team-a/siteassets/hero.jpg"
+              },
+              "links": {},
+              "customMetadata": {
+                "imageSource": {
+                  "siteId": "c7678ab2-c9dc-454b-b2ee-7fcffb983d4e",
+                  "webId": "0df4d2d2-5ecf-45e9-94f5-c638106bfc65",
+                  "listId": "e1557527-d333-49f2-9d60-ea8a3003fda8",
+                  "uniqueId": "102f496d-23a2-415f-803a-232b8a6c7613"
+                }
+              }
+            },
+            "dataVersion": "1.4",
+            "properties": {
+              "title": "Page",
+              "imageSourceType": 2,
+              "layoutType": "FullWidthImage",
+              "textAlignment": "Left",
+              "showKicker": false,
+              "showPublishDate": false,
+              "kicker": "",
+              "authors": [],
+              "altText": "",
+              "webId": "0df4d2d2-5ecf-45e9-94f5-c638106bfc65",
+              "siteId": "c7678ab2-c9dc-454b-b2ee-7fcffb983d4e",
+              "listId": "e1557527-d333-49f2-9d60-ea8a3003fda8",
+              "uniqueId": "102f496d-23a2-415f-803a-232b8a6c7613",
+              "translateX": 42.3837520042758,
+              "translateY": 56.4285714285714
+            }
+          }])
+        }));
         done();
       }
       catch (e) {
@@ -266,11 +421,11 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('sets page header to custom when custom type specified (debug)', (done) => {
+    Utils.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')/ListItemAllFields`) > -1) {
+      if (opts.url.indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
         return Promise.resolve({
-          Id: 1,
-          ID: 1,
+          IsPageCheckedOutToCurrentUser: true,
           Title: 'Page'
         });
       }
@@ -292,14 +447,6 @@ describe(commands.PAGE_HEADER_SET, () => {
           ListId: 'e1557527-d333-49f2-9d60-ea8a3003fda8',
           UniqueId: '102f496d-23a2-415f-803a-232b8a6c7613'
         });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-    sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists/SitePages/items(1)`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({ "LayoutWebpartsContent": "<div><div data-sp-canvascontrol=\"\" data-sp-canvasdataversion=\"1.4\" data-sp-controldata=\"&#123;&quot;id&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;instanceId&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;title&quot;&#58;&quot;Title Region&quot;,&quot;description&quot;&#58;&quot;Title Region Description&quot;,&quot;serverProcessedContent&quot;&#58;&#123;&quot;htmlStrings&quot;&#58;&#123;&#125;,&quot;searchablePlainTexts&quot;&#58;&#123;&#125;,&quot;imageSources&quot;&#58;&#123;&quot;imageSource&quot;&#58;&quot;/sites/team-a/siteassets/hero.jpg&quot;&#125;,&quot;links&quot;&#58;&#123;&#125;,&quot;customMetadata&quot;&#58;&#123;&quot;imageSource&quot;&#58;&#123;&quot;listId&quot;&#58;&quot;e1557527-d333-49f2-9d60-ea8a3003fda8&quot;,&quot;siteId&quot;&#58;&quot;c7678ab2-c9dc-454b-b2ee-7fcffb983d4e&quot;,&quot;uniqueId&quot;&#58;&quot;102f496d-23a2-415f-803a-232b8a6c7613&quot;,&quot;webId&quot;&#58;&quot;0df4d2d2-5ecf-45e9-94f5-c638106bfc65&quot;&#125;&#125;&#125;,&quot;dataVersion&quot;&#58;&quot;1.4&quot;,&quot;properties&quot;&#58;&#123;&quot;title&quot;&#58;&quot;Page&quot;,&quot;imageSourceType&quot;&#58;2,&quot;layoutType&quot;&#58;&quot;FullWidthImage&quot;,&quot;textAlignment&quot;&#58;&quot;Left&quot;,&quot;showKicker&quot;&#58;false,&quot;showPublishDate&quot;&#58;false,&quot;kicker&quot;&#58;&quot;&quot;,&quot;authors&quot;&#58;[],&quot;altText&quot;&#58;&quot;&quot;,&quot;webId&quot;&#58;&quot;0df4d2d2-5ecf-45e9-94f5-c638106bfc65&quot;,&quot;siteId&quot;&#58;&quot;c7678ab2-c9dc-454b-b2ee-7fcffb983d4e&quot;,&quot;listId&quot;&#58;&quot;e1557527-d333-49f2-9d60-ea8a3003fda8&quot;,&quot;uniqueId&quot;&#58;&quot;102f496d-23a2-415f-803a-232b8a6c7613&quot;,&quot;translateX&quot;&#58;42.3837520042758,&quot;translateY&quot;&#58;56.4285714285714&#125;&#125;\"></div></div>" })) {
-        return Promise.resolve();
       }
 
       return Promise.reject('Invalid request');
@@ -311,7 +458,48 @@ describe(commands.PAGE_HEADER_SET, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', imageUrl: '/sites/team-a/siteassets/hero.jpg', translateX: 42.3837520042758, translateY: 56.4285714285714 } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert.equal(JSON.stringify(body), JSON.stringify({
+          LayoutWebpartsContent: JSON.stringify([{
+            "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+            "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+            "title": "Title Region",
+            "description": "Title Region Description",
+            "serverProcessedContent": {
+              "htmlStrings": {},
+              "searchablePlainTexts": {},
+              "imageSources": {
+                "imageSource": "/sites/team-a/siteassets/hero.jpg"
+              },
+              "links": {},
+              "customMetadata": {
+                "imageSource": {
+                  "siteId": "c7678ab2-c9dc-454b-b2ee-7fcffb983d4e",
+                  "webId": "0df4d2d2-5ecf-45e9-94f5-c638106bfc65",
+                  "listId": "e1557527-d333-49f2-9d60-ea8a3003fda8",
+                  "uniqueId": "102f496d-23a2-415f-803a-232b8a6c7613"
+                }
+              }
+            },
+            "dataVersion": "1.4",
+            "properties": {
+              "title": "Page",
+              "imageSourceType": 2,
+              "layoutType": "FullWidthImage",
+              "textAlignment": "Left",
+              "showKicker": false,
+              "showPublishDate": false,
+              "kicker": "",
+              "authors": [],
+              "altText": "",
+              "webId": "0df4d2d2-5ecf-45e9-94f5-c638106bfc65",
+              "siteId": "c7678ab2-c9dc-454b-b2ee-7fcffb983d4e",
+              "listId": "e1557527-d333-49f2-9d60-ea8a3003fda8",
+              "uniqueId": "102f496d-23a2-415f-803a-232b8a6c7613",
+              "translateX": 42.3837520042758,
+              "translateY": 56.4285714285714
+            }
+          }])
+        }));
         done();
       }
       catch (e) {
@@ -321,33 +509,54 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('sets image to empty when header set to custom and no image specified', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')/ListItemAllFields`) > -1) {
-        return Promise.resolve({
-          Id: 1,
-          ID: 1,
-          Title: 'Page'
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-    sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists/getByTitle('Site Pages')/items(1)`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({ "LayoutWebpartsContent": "<div><div data-sp-canvascontrol=\"\" data-sp-canvasdataversion=\"1.4\" data-sp-controldata=\"&#123;&quot;id&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;instanceId&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;title&quot;&#58;&quot;Title Region&quot;,&quot;description&quot;&#58;&quot;Title Region Description&quot;,&quot;serverProcessedContent&quot;&#58;&#123;&quot;htmlStrings&quot;&#58;&#123;&#125;,&quot;searchablePlainTexts&quot;&#58;&#123;&#125;,&quot;imageSources&quot;&#58;&#123;&quot;imageSource&quot;&#58;&quot;&quot;&#125;,&quot;links&quot;&#58;&#123;&#125;,&quot;customMetadata&quot;&#58;&#123;&quot;imageSource&quot;&#58;&#123;&quot;listId&quot;&#58;&quot;&quot;,&quot;siteId&quot;&#58;&quot;&quot;,&quot;uniqueId&quot;&#58;&quot;&quot;,&quot;webId&quot;&#58;&quot;&quot;&#125;&#125;&#125;,&quot;dataVersion&quot;&#58;&quot;1.4&quot;,&quot;properties&quot;&#58;&#123;&quot;title&quot;&#58;&quot;Page&quot;,&quot;imageSourceType&quot;&#58;2,&quot;layoutType&quot;&#58;&quot;FullWidthImage&quot;,&quot;textAlignment&quot;&#58;&quot;Left&quot;,&quot;showKicker&quot;&#58;false,&quot;showPublishDate&quot;&#58;false,&quot;kicker&quot;&#58;&quot;&quot;,&quot;authors&quot;&#58;[],&quot;altText&quot;&#58;&quot;&quot;,&quot;webId&quot;&#58;&quot;&quot;,&quot;siteId&quot;&#58;&quot;&quot;,&quot;listId&quot;&#58;&quot;&quot;,&quot;uniqueId&quot;&#58;&quot;&quot;,&quot;translateX&quot;&#58;0,&quot;translateY&quot;&#58;0&#125;&#125;\"></div></div>" })) {
-        return Promise.resolve();
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert.equal(JSON.stringify(body), JSON.stringify({
+          LayoutWebpartsContent: JSON.stringify([{
+            "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+            "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+            "title": "Title Region",
+            "description": "Title Region Description",
+            "serverProcessedContent": {
+              "htmlStrings": {},
+              "searchablePlainTexts": {},
+              "imageSources": {
+                "imageSource": ""
+              },
+              "links": {},
+              "customMetadata": {
+                "imageSource": {
+                  "siteId": "",
+                  "webId": "",
+                  "listId": "",
+                  "uniqueId": ""
+                }
+              }
+            },
+            "dataVersion": "1.4",
+            "properties": {
+              "title": "Page",
+              "imageSourceType": 2,
+              "layoutType": "FullWidthImage",
+              "textAlignment": "Left",
+              "showKicker": false,
+              "showPublishDate": false,
+              "kicker": "",
+              "authors": [],
+              "altText": "",
+              "webId": "",
+              "siteId": "",
+              "listId": "",
+              "uniqueId": "",
+              "translateX": 0,
+              "translateY": 0
+            }
+          }])
+        }));
         done();
       }
       catch (e) {
@@ -357,11 +566,11 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('sets focus coordinates to 0 0 if none specified', (done) => {
+    Utils.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')/ListItemAllFields`) > -1) {
+      if (opts.url.indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
         return Promise.resolve({
-          Id: 1,
-          ID: 1,
+          IsPageCheckedOutToCurrentUser: true,
           Title: 'Page'
         });
       }
@@ -387,14 +596,6 @@ describe(commands.PAGE_HEADER_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-    sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists/getByTitle('Site Pages')/items(1)`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({ "LayoutWebpartsContent": "<div><div data-sp-canvascontrol=\"\" data-sp-canvasdataversion=\"1.4\" data-sp-controldata=\"&#123;&quot;id&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;instanceId&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;title&quot;&#58;&quot;Title Region&quot;,&quot;description&quot;&#58;&quot;Title Region Description&quot;,&quot;serverProcessedContent&quot;&#58;&#123;&quot;htmlStrings&quot;&#58;&#123;&#125;,&quot;searchablePlainTexts&quot;&#58;&#123;&#125;,&quot;imageSources&quot;&#58;&#123;&quot;imageSource&quot;&#58;&quot;/sites/team-a/siteassets/hero.jpg&quot;&#125;,&quot;links&quot;&#58;&#123;&#125;,&quot;customMetadata&quot;&#58;&#123;&quot;imageSource&quot;&#58;&#123;&quot;listId&quot;&#58;&quot;e1557527-d333-49f2-9d60-ea8a3003fda8&quot;,&quot;siteId&quot;&#58;&quot;c7678ab2-c9dc-454b-b2ee-7fcffb983d4e&quot;,&quot;uniqueId&quot;&#58;&quot;102f496d-23a2-415f-803a-232b8a6c7613&quot;,&quot;webId&quot;&#58;&quot;0df4d2d2-5ecf-45e9-94f5-c638106bfc65&quot;&#125;&#125;&#125;,&quot;dataVersion&quot;&#58;&quot;1.4&quot;,&quot;properties&quot;&#58;&#123;&quot;title&quot;&#58;&quot;Page&quot;,&quot;imageSourceType&quot;&#58;2,&quot;layoutType&quot;&#58;&quot;FullWidthImage&quot;,&quot;textAlignment&quot;&#58;&quot;Left&quot;,&quot;showKicker&quot;&#58;false,&quot;showPublishDate&quot;&#58;false,&quot;kicker&quot;&#58;&quot;&quot;,&quot;authors&quot;&#58;[],&quot;altText&quot;&#58;&quot;&quot;,&quot;webId&quot;&#58;&quot;0df4d2d2-5ecf-45e9-94f5-c638106bfc65&quot;,&quot;siteId&quot;&#58;&quot;c7678ab2-c9dc-454b-b2ee-7fcffb983d4e&quot;,&quot;listId&quot;&#58;&quot;e1557527-d333-49f2-9d60-ea8a3003fda8&quot;,&quot;uniqueId&quot;&#58;&quot;102f496d-23a2-415f-803a-232b8a6c7613&quot;,&quot;translateX&quot;&#58;0,&quot;translateY&quot;&#58;0&#125;&#125;\"></div></div>" })) {
-        return Promise.resolve();
-      }
-
-      return Promise.reject('Invalid request');
-    });
 
     auth.site = new Site();
     auth.site.connected = true;
@@ -402,7 +603,48 @@ describe(commands.PAGE_HEADER_SET, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', imageUrl: '/sites/team-a/siteassets/hero.jpg' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert.equal(JSON.stringify(body), JSON.stringify({
+          LayoutWebpartsContent: JSON.stringify([{
+            "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+            "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+            "title": "Title Region",
+            "description": "Title Region Description",
+            "serverProcessedContent": {
+              "htmlStrings": {},
+              "searchablePlainTexts": {},
+              "imageSources": {
+                "imageSource": "/sites/team-a/siteassets/hero.jpg"
+              },
+              "links": {},
+              "customMetadata": {
+                "imageSource": {
+                  "siteId": "c7678ab2-c9dc-454b-b2ee-7fcffb983d4e",
+                  "webId": "0df4d2d2-5ecf-45e9-94f5-c638106bfc65",
+                  "listId": "e1557527-d333-49f2-9d60-ea8a3003fda8",
+                  "uniqueId": "102f496d-23a2-415f-803a-232b8a6c7613"
+                }
+              }
+            },
+            "dataVersion": "1.4",
+            "properties": {
+              "title": "Page",
+              "imageSourceType": 2,
+              "layoutType": "FullWidthImage",
+              "textAlignment": "Left",
+              "showKicker": false,
+              "showPublishDate": false,
+              "kicker": "",
+              "authors": [],
+              "altText": "",
+              "webId": "0df4d2d2-5ecf-45e9-94f5-c638106bfc65",
+              "siteId": "c7678ab2-c9dc-454b-b2ee-7fcffb983d4e",
+              "listId": "e1557527-d333-49f2-9d60-ea8a3003fda8",
+              "uniqueId": "102f496d-23a2-415f-803a-232b8a6c7613",
+              "translateX": 0,
+              "translateY": 0
+            }
+          }])
+        }));
         done();
       }
       catch (e) {
@@ -412,33 +654,36 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('centers text when textAlignment set to Center', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')/ListItemAllFields`) > -1) {
-        return Promise.resolve({
-          Id: 1,
-          ID: 1,
-          Title: 'Page'
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-    sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists/getByTitle('Site Pages')/items(1)`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({ "LayoutWebpartsContent": "<div><div data-sp-canvascontrol=\"\" data-sp-canvasdataversion=\"1.4\" data-sp-controldata=\"&#123;&quot;id&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;instanceId&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;title&quot;&#58;&quot;Title Region&quot;,&quot;description&quot;&#58;&quot;Title Region Description&quot;,&quot;serverProcessedContent&quot;&#58;&#123;&quot;htmlStrings&quot;&#58;&#123;&#125;,&quot;searchablePlainTexts&quot;&#58;&#123;&#125;,&quot;imageSources&quot;&#58;&#123;&#125;,&quot;links&quot;&#58;&#123;&#125;&#125;,&quot;dataVersion&quot;&#58;&quot;1.4&quot;,&quot;properties&quot;&#58;&#123;&quot;title&quot;&#58;&quot;Page&quot;,&quot;imageSourceType&quot;&#58;4,&quot;layoutType&quot;&#58;&quot;FullWidthImage&quot;,&quot;textAlignment&quot;&#58;&quot;Center&quot;,&quot;showKicker&quot;&#58;false,&quot;showPublishDate&quot;&#58;false,&quot;kicker&quot;&#58;&quot;&quot;&#125;&#125;\"></div></div>" })) {
-        return Promise.resolve();
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default', textAlignment: 'Center' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert.equal(JSON.stringify(body), JSON.stringify({
+          LayoutWebpartsContent: JSON.stringify([{
+            "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+            "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+            "title": "Title Region",
+            "description": "Title Region Description",
+            "serverProcessedContent": {
+              "htmlStrings": {},
+              "searchablePlainTexts": {},
+              "imageSources": {},
+              "links": {}
+            },
+            "dataVersion": "1.4",
+            "properties": {
+              "title": "Page",
+              "imageSourceType": 4,
+              "layoutType": "FullWidthImage",
+              "textAlignment": "Center",
+              "showKicker": false,
+              "showPublishDate": false,
+              "kicker": ""
+            }
+          }])
+        }));
         done();
       }
       catch (e) {
@@ -448,33 +693,36 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('shows kicker with the specified kicker text', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')/ListItemAllFields`) > -1) {
-        return Promise.resolve({
-          Id: 1,
-          ID: 1,
-          Title: 'Page'
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-    sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists/getByTitle('Site Pages')/items(1)`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({ "LayoutWebpartsContent": "<div><div data-sp-canvascontrol=\"\" data-sp-canvasdataversion=\"1.4\" data-sp-controldata=\"&#123;&quot;id&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;instanceId&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;title&quot;&#58;&quot;Title Region&quot;,&quot;description&quot;&#58;&quot;Title Region Description&quot;,&quot;serverProcessedContent&quot;&#58;&#123;&quot;htmlStrings&quot;&#58;&#123;&#125;,&quot;searchablePlainTexts&quot;&#58;&#123;&#125;,&quot;imageSources&quot;&#58;&#123;&#125;,&quot;links&quot;&#58;&#123;&#125;&#125;,&quot;dataVersion&quot;&#58;&quot;1.4&quot;,&quot;properties&quot;&#58;&#123;&quot;title&quot;&#58;&quot;Page&quot;,&quot;imageSourceType&quot;&#58;4,&quot;layoutType&quot;&#58;&quot;FullWidthImage&quot;,&quot;textAlignment&quot;&#58;&quot;Left&quot;,&quot;showKicker&quot;&#58;true,&quot;showPublishDate&quot;&#58;false,&quot;kicker&quot;&#58;&quot;Team Awesome&quot;&#125;&#125;\"></div></div>" })) {
-        return Promise.resolve();
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default', showKicker: true, kicker: 'Team Awesome' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert.equal(JSON.stringify(body), JSON.stringify({
+          LayoutWebpartsContent: JSON.stringify([{
+            "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+            "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+            "title": "Title Region",
+            "description": "Title Region Description",
+            "serverProcessedContent": {
+              "htmlStrings": {},
+              "searchablePlainTexts": {},
+              "imageSources": {},
+              "links": {}
+            },
+            "dataVersion": "1.4",
+            "properties": {
+              "title": "Page",
+              "imageSourceType": 4,
+              "layoutType": "FullWidthImage",
+              "textAlignment": "Left",
+              "showKicker": true,
+              "showPublishDate": false,
+              "kicker": "Team Awesome"
+            }
+          }])
+        }));
         done();
       }
       catch (e) {
@@ -484,33 +732,36 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('shows publish date', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')/ListItemAllFields`) > -1) {
-        return Promise.resolve({
-          Id: 1,
-          ID: 1,
-          Title: 'Page'
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-    sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists/getByTitle('Site Pages')/items(1)`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({ "LayoutWebpartsContent": "<div><div data-sp-canvascontrol=\"\" data-sp-canvasdataversion=\"1.4\" data-sp-controldata=\"&#123;&quot;id&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;instanceId&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;title&quot;&#58;&quot;Title Region&quot;,&quot;description&quot;&#58;&quot;Title Region Description&quot;,&quot;serverProcessedContent&quot;&#58;&#123;&quot;htmlStrings&quot;&#58;&#123;&#125;,&quot;searchablePlainTexts&quot;&#58;&#123;&#125;,&quot;imageSources&quot;&#58;&#123;&#125;,&quot;links&quot;&#58;&#123;&#125;&#125;,&quot;dataVersion&quot;&#58;&quot;1.4&quot;,&quot;properties&quot;&#58;&#123;&quot;title&quot;&#58;&quot;Page&quot;,&quot;imageSourceType&quot;&#58;4,&quot;layoutType&quot;&#58;&quot;FullWidthImage&quot;,&quot;textAlignment&quot;&#58;&quot;Left&quot;,&quot;showKicker&quot;&#58;false,&quot;showPublishDate&quot;&#58;true,&quot;kicker&quot;&#58;&quot;&quot;&#125;&#125;\"></div></div>" })) {
-        return Promise.resolve();
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default', showPublishDate: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert.equal(JSON.stringify(body), JSON.stringify({
+          LayoutWebpartsContent: JSON.stringify([{
+            "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+            "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+            "title": "Title Region",
+            "description": "Title Region Description",
+            "serverProcessedContent": {
+              "htmlStrings": {},
+              "searchablePlainTexts": {},
+              "imageSources": {},
+              "links": {}
+            },
+            "dataVersion": "1.4",
+            "properties": {
+              "title": "Page",
+              "imageSourceType": 4,
+              "layoutType": "FullWidthImage",
+              "textAlignment": "Left",
+              "showKicker": false,
+              "showPublishDate": true,
+              "kicker": ""
+            }
+          }])
+        }));
         done();
       }
       catch (e) {
@@ -520,33 +771,54 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('shows page authors', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')/ListItemAllFields`) > -1) {
-        return Promise.resolve({
-          Id: 1,
-          ID: 1,
-          Title: 'Page'
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-    sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists/getByTitle('Site Pages')/items(1)`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({ "LayoutWebpartsContent": "<div><div data-sp-canvascontrol=\"\" data-sp-canvasdataversion=\"1.4\" data-sp-controldata=\"&#123;&quot;id&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;instanceId&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;title&quot;&#58;&quot;Title Region&quot;,&quot;description&quot;&#58;&quot;Title Region Description&quot;,&quot;serverProcessedContent&quot;&#58;&#123;&quot;htmlStrings&quot;&#58;&#123;&#125;,&quot;searchablePlainTexts&quot;&#58;&#123;&#125;,&quot;imageSources&quot;&#58;&#123;&quot;imageSource&quot;&#58;&quot;&quot;&#125;,&quot;links&quot;&#58;&#123;&#125;,&quot;customMetadata&quot;&#58;&#123;&quot;imageSource&quot;&#58;&#123;&quot;listId&quot;&#58;&quot;&quot;,&quot;siteId&quot;&#58;&quot;&quot;,&quot;uniqueId&quot;&#58;&quot;&quot;,&quot;webId&quot;&#58;&quot;&quot;&#125;&#125;&#125;,&quot;dataVersion&quot;&#58;&quot;1.4&quot;,&quot;properties&quot;&#58;&#123;&quot;title&quot;&#58;&quot;About Us&quot;,&quot;imageSourceType&quot;&#58;2,&quot;layoutType&quot;&#58;&quot;FullWidthImage&quot;,&quot;textAlignment&quot;&#58;&quot;Left&quot;,&quot;showKicker&quot;&#58;false,&quot;showPublishDate&quot;&#58;false,&quot;kicker&quot;&#58;&quot;&quot;,&quot;authors&quot;&#58;[&quot;Joe Doe&quot;,&quot;Jane Doe&quot;],&quot;altText&quot;&#58;&quot;&quot;,&quot;webId&quot;&#58;&quot;&quot;,&quot;siteId&quot;&#58;&quot;&quot;,&quot;listId&quot;&#58;&quot;&quot;,&quot;uniqueId&quot;&#58;&quot;&quot;,&quot;translateX&quot;&#58;0,&quot;translateY&quot;&#58;0&#125;&#125;\"></div></div>" })) {
-        return Promise.resolve();
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', authors: 'Joe Doe, Jane Doe' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert.equal(JSON.stringify(body), JSON.stringify({
+          LayoutWebpartsContent: JSON.stringify([{
+            "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+            "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+            "title": "Title Region",
+            "description": "Title Region Description",
+            "serverProcessedContent": {
+              "htmlStrings": {},
+              "searchablePlainTexts": {},
+              "imageSources": {
+                "imageSource": ""
+              },
+              "links": {},
+              "customMetadata": {
+                "imageSource": {
+                  "siteId": "",
+                  "webId": "",
+                  "listId": "",
+                  "uniqueId": ""
+                }
+              }
+            },
+            "dataVersion": "1.4",
+            "properties": {
+              "title": "Page",
+              "imageSourceType": 2,
+              "layoutType": "FullWidthImage",
+              "textAlignment": "Left",
+              "showKicker": false,
+              "showPublishDate": false,
+              "kicker": "",
+              "authors": ['Joe Doe', 'Jane Doe'],
+              "altText": "",
+              "webId": "",
+              "siteId": "",
+              "listId": "",
+              "uniqueId": "",
+              "translateX": 0,
+              "translateY": 0
+            }
+          }])
+        }));
         done();
       }
       catch (e) {
@@ -556,33 +828,13 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('automatically appends the .aspx extension', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')/ListItemAllFields`) > -1) {
-        return Promise.resolve({
-          Id: 1,
-          ID: 1,
-          Title: 'Page'
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-    sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists/getByTitle('Site Pages')/items(1)`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({ "LayoutWebpartsContent": "<div><div data-sp-canvascontrol=\"\" data-sp-canvasdataversion=\"1.4\" data-sp-controldata=\"&#123;&quot;id&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;instanceId&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;title&quot;&#58;&quot;Title Region&quot;,&quot;description&quot;&#58;&quot;Title Region Description&quot;,&quot;serverProcessedContent&quot;&#58;&#123;&quot;htmlStrings&quot;&#58;&#123;&#125;,&quot;searchablePlainTexts&quot;&#58;&#123;&#125;,&quot;imageSources&quot;&#58;&#123;&#125;,&quot;links&quot;&#58;&#123;&#125;&#125;,&quot;dataVersion&quot;&#58;&quot;1.4&quot;,&quot;properties&quot;&#58;&#123;&quot;title&quot;&#58;&quot;Page&quot;,&quot;imageSourceType&quot;&#58;4,&quot;layoutType&quot;&#58;&quot;FullWidthImage&quot;,&quot;textAlignment&quot;&#58;&quot;Left&quot;,&quot;showKicker&quot;&#58;false,&quot;showPublishDate&quot;&#58;false,&quot;kicker&quot;&#58;&quot;&quot;&#125;&#125;\"></div></div>" })) {
-        return Promise.resolve();
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
     auth.site = new Site();
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, pageName: 'page', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
+    cmdInstance.action({ options: { debug: false, pageName: 'page', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert.equal(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -591,7 +843,8 @@ describe(commands.PAGE_HEADER_SET, () => {
     });
   });
 
-  it('correctly handles OData error when creating modern page', (done) => {
+  it('correctly handles OData error when retrieving modern page', (done) => {
+    Utils.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
@@ -612,11 +865,11 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('correctly handles error when the specified image doesn\'t exist', (done) => {
+    Utils.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')/ListItemAllFields`) > -1) {
+      if (opts.url.indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
         return Promise.resolve({
-          Id: 1,
-          ID: 1,
+          IsPageCheckedOutToCurrentUser: true,
           Title: 'Page'
         });
       }
@@ -797,7 +1050,7 @@ describe(commands.PAGE_HEADER_SET, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com', name: 'page.aspx' } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com', pageName: 'page.aspx' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
         done();
