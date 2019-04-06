@@ -248,6 +248,7 @@ nav:
       - teams:
         - teams add: 'cmd/graph/teams/teams-add.md'
         - teams list: 'cmd/graph/teams/teams-list.md'
+        - teams unarchive: 'cmd/graph/teams/teams-unarchive.md' 
         - teams app install: 'cmd/graph/teams/teams-app-install.md'
         - teams app list: 'cmd/graph/teams/teams-app-list.md'
         - teams app publish: 'cmd/graph/teams/teams-app-publish.md'
