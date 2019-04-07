@@ -22,6 +22,8 @@
 
 - extended 'graph teams app list' [#859](https://github.com/pnp/office365-cli/issues/859)
 - added 'spo site groupify' alias [#873](https://github.com/pnp/office365-cli/issues/873)
+- fixed the 'spo page section add' command [#908](https://github.com/pnp/office365-cli/issues/908)
+- fixed the 'spo page header set' command [#911](https://github.com/pnp/office365-cli/issues/911)
 
 ## [v1.15.0](https://github.com/pnp/office365-cli/releases/tag/v1.15.0)
 
