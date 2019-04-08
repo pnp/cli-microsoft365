@@ -24,6 +24,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
   let cmdInstanceLogSpy: sinon.SinonSpy;
   let trackEvent: any;
   let telemetry: any;
+  let promptOptions: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -40,6 +41,10 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     cmdInstance = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      prompt: (options: any, cb: (result: { continue: boolean }) => void) => {
+        promptOptions = options;
+        cb({ continue: false });
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
@@ -50,6 +55,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     (command as any).siteId = '';
     (command as any).listId = '';
     (command as any).fieldLinkId = '';
+    promptOptions = undefined;
   });
 
   afterEach(() => {
@@ -191,7 +197,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     auth.site.connected = true;
     auth.site.url = WEB_URL;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID, updateChildContentTypes: true } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: false, webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID, updateChildContentTypes: true, confirm: true } }, (err?: any) => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
         done();
@@ -201,6 +207,220 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       }
     });
   });
+
+  it('removes the field link from web content type with update child content types with confirm', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf(`_api/site?$select=Id`) > -1) {
+        return Promise.resolve({
+          "Id": SITE_ID
+        });
+      }
+      if (opts.url.indexOf(`_api/web?$select=Id`) > -1) {
+        return Promise.resolve({
+          "Id": WEB_ID
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName=".NET Library" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="77" ObjectPathId="76" /><ObjectPath Id="79" ObjectPathId="78" /><Method Name="DeleteObject" Id="80" ObjectPathId="78" /><Method Name="Update" Id="81" ObjectPathId="24"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Property Id="76" ParentId="24" Name="FieldLinks" /><Method Id="78" ParentId="76" Name="GetById"><Parameters><Parameter Type="Guid">{${FIELD_LINK_ID}}</Parameter></Parameters></Method><Identity Id="24" Name="6b3ec69e-00a7-0000-55a3-61f8d779d2b3|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${SITE_ID}:web:${WEB_ID}:contenttype:${CONTENT_TYPE_ID}" /></ObjectPaths></Request>`) {
+          return Promise.resolve(`[
+              {
+                "SchemaVersion": "15.0.0.0",
+                "LibraryVersion": "16.0.7911.1206",
+                "ErrorInfo": null,
+                "TraceCorrelationId": "73557d9e-007f-0000-22fb-89971360c85c"
+              }
+            ]`);
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = WEB_URL;
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID, updateChildContentTypes: true, confirm: false } }, (err?: any) => {
+      try {
+        let promptIssued = false;
+
+        if (promptOptions && promptOptions.type === 'confirm') {
+          promptIssued = true;
+        }
+        assert(promptIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+  it('removes the field link from web content type with update child content types with prompt confirmed', (done) => {
+    let removeFieldLinkCalled = false;
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf(`_api/site?$select=Id`) > -1) {
+        return Promise.resolve({
+          "Id": SITE_ID
+        });
+      }
+      if (opts.url.indexOf(`_api/web?$select=Id`) > -1) {
+        return Promise.resolve({
+          "Id": WEB_ID
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      removeFieldLinkCalled = true;
+      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName=".NET Library" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="77" ObjectPathId="76" /><ObjectPath Id="79" ObjectPathId="78" /><Method Name="DeleteObject" Id="80" ObjectPathId="78" /><Method Name="Update" Id="81" ObjectPathId="24"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Property Id="76" ParentId="24" Name="FieldLinks" /><Method Id="78" ParentId="76" Name="GetById"><Parameters><Parameter Type="Guid">{${FIELD_LINK_ID}}</Parameter></Parameters></Method><Identity Id="24" Name="6b3ec69e-00a7-0000-55a3-61f8d779d2b3|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${SITE_ID}:web:${WEB_ID}:contenttype:${CONTENT_TYPE_ID}" /></ObjectPaths></Request>`) {
+          return Promise.resolve(`[
+              {
+                "SchemaVersion": "15.0.0.0",
+                "LibraryVersion": "16.0.7911.1206",
+                "ErrorInfo": null,
+                "TraceCorrelationId": "73557d9e-007f-0000-22fb-89971360c85c"
+              }
+            ]`);
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = WEB_URL;
+    cmdInstance.action = command.action();
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
+    cmdInstance.action({ options: { debug: false, webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID, updateChildContentTypes: true } }, (err?: any) => {
+      try {
+        assert(removeFieldLinkCalled === true);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+  it('removes the field link from web content type with update child content types with prompt declined', (done) => {
+    let removeFieldLinkCalled = false;
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf(`_api/site?$select=Id`) > -1) {
+        return Promise.resolve({
+          "Id": SITE_ID
+        });
+      }
+      if (opts.url.indexOf(`_api/web?$select=Id`) > -1) {
+        return Promise.resolve({
+          "Id": WEB_ID
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      removeFieldLinkCalled = true;
+      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName=".NET Library" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="77" ObjectPathId="76" /><ObjectPath Id="79" ObjectPathId="78" /><Method Name="DeleteObject" Id="80" ObjectPathId="78" /><Method Name="Update" Id="81" ObjectPathId="24"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Property Id="76" ParentId="24" Name="FieldLinks" /><Method Id="78" ParentId="76" Name="GetById"><Parameters><Parameter Type="Guid">{${FIELD_LINK_ID}}</Parameter></Parameters></Method><Identity Id="24" Name="6b3ec69e-00a7-0000-55a3-61f8d779d2b3|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${SITE_ID}:web:${WEB_ID}:contenttype:${CONTENT_TYPE_ID}" /></ObjectPaths></Request>`) {
+          return Promise.resolve(`[
+              {
+                "SchemaVersion": "15.0.0.0",
+                "LibraryVersion": "16.0.7911.1206",
+                "ErrorInfo": null,
+                "TraceCorrelationId": "73557d9e-007f-0000-22fb-89971360c85c"
+              }
+            ]`);
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = WEB_URL;
+    cmdInstance.action = command.action();
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: false });
+    };
+    cmdInstance.action({ options: { debug: false, webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID, updateChildContentTypes: true } }, (err?: any) => {
+      try {
+        assert(removeFieldLinkCalled === false);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('removes the field link from web content type with update child content types with prompt (no argument)', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf(`_api/site?$select=Id`) > -1) {
+        return Promise.resolve({
+          "Id": SITE_ID
+        });
+      }
+      if (opts.url.indexOf(`_api/web?$select=Id`) > -1) {
+        return Promise.resolve({
+          "Id": WEB_ID
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName=".NET Library" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="77" ObjectPathId="76" /><ObjectPath Id="79" ObjectPathId="78" /><Method Name="DeleteObject" Id="80" ObjectPathId="78" /><Method Name="Update" Id="81" ObjectPathId="24"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Property Id="76" ParentId="24" Name="FieldLinks" /><Method Id="78" ParentId="76" Name="GetById"><Parameters><Parameter Type="Guid">{${FIELD_LINK_ID}}</Parameter></Parameters></Method><Identity Id="24" Name="6b3ec69e-00a7-0000-55a3-61f8d779d2b3|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${SITE_ID}:web:${WEB_ID}:contenttype:${CONTENT_TYPE_ID}" /></ObjectPaths></Request>`) {
+          return Promise.resolve(`[
+              {
+                "SchemaVersion": "15.0.0.0",
+                "LibraryVersion": "16.0.7911.1206",
+                "ErrorInfo": null,
+                "TraceCorrelationId": "73557d9e-007f-0000-22fb-89971360c85c"
+              }
+            ]`);
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = WEB_URL;
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID, updateChildContentTypes: true } }, (err?: any) => {
+      let promptIssued = false;
+
+      if (promptOptions && promptOptions.type === 'confirm') {
+        promptIssued = true;
+      }
+
+      try {
+        assert(promptIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('removes the field link from web content type with update child content types (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`_api/site?$select=Id`) > -1) {
@@ -239,7 +459,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     auth.site.connected = true;
     auth.site.url = WEB_URL;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID, updateChildContentTypes: true } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: true, webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID, updateChildContentTypes: true, confirm: true } }, (err?: any) => {
       try {
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
         done();
@@ -288,7 +508,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     auth.site.connected = true;
     auth.site.url = WEB_URL;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID, updateChildContentTypes: false } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: false, webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID, updateChildContentTypes: false, confirm: true } }, (err?: any) => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
         done();
@@ -316,7 +536,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        const expectedBody = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName=".NET Library" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="77" ObjectPathId="76" /><ObjectPath Id="79" ObjectPathId="78" /><Method Name="DeleteObject" Id="80" ObjectPathId="78" /><Method Name="Update" Id="81" ObjectPathId="24"><Parameters><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Property Id="76" ParentId="24" Name="FieldLinks" /><Method Id="78" ParentId="76" Name="GetById"><Parameters><Parameter Type="Guid">{${FIELD_LINK_ID}}</Parameter></Parameters></Method><Identity Id="24" Name="6b3ec69e-00a7-0000-55a3-61f8d779d2b3|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${SITE_ID}:web:${WEB_ID}:contenttype:${CONTENT_TYPE_ID}" /></ObjectPaths></Request>` 
+        const expectedBody = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName=".NET Library" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="77" ObjectPathId="76" /><ObjectPath Id="79" ObjectPathId="78" /><Method Name="DeleteObject" Id="80" ObjectPathId="78" /><Method Name="Update" Id="81" ObjectPathId="24"><Parameters><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Property Id="76" ParentId="24" Name="FieldLinks" /><Method Id="78" ParentId="76" Name="GetById"><Parameters><Parameter Type="Guid">{${FIELD_LINK_ID}}</Parameter></Parameters></Method><Identity Id="24" Name="6b3ec69e-00a7-0000-55a3-61f8d779d2b3|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${SITE_ID}:web:${WEB_ID}:contenttype:${CONTENT_TYPE_ID}" /></ObjectPaths></Request>`
         if (opts.body === expectedBody) {
           return Promise.resolve(`[
               {
@@ -337,7 +557,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     auth.site.connected = true;
     auth.site.url = WEB_URL;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID, updateChildContentTypes: false } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: true, webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID, updateChildContentTypes: false, confirm: true } }, (err?: any) => {
       try {
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
         done();
@@ -393,7 +613,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     auth.site.connected = true;
     auth.site.url = WEB_URL;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID, updateChildContentTypes: false } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: false, webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID, updateChildContentTypes: false, confirm: true } }, (err?: any) => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
         done();
@@ -448,7 +668,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     auth.site.connected = true;
     auth.site.url = WEB_URL;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID, updateChildContentTypes: false } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: true, webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID, updateChildContentTypes: false, confirm: true } }, (err?: any) => {
       try {
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
         done();
@@ -458,7 +678,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       }
     });
   });
-  
+
   it('handles error when remove the field link from web content type with update child content types', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`_api/site?$select=Id`) > -1) {
@@ -500,7 +720,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     auth.site.connected = true;
     auth.site.url = WEB_URL;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID, updateChildContentTypes: true } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: false, webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID, updateChildContentTypes: true, confirm: true } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Unknown Error')));
         done();
@@ -541,7 +761,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
               }
             ]`);
         }
-      } 
+      }
 
       return Promise.reject(`Invalid request`);
     });
@@ -551,7 +771,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     auth.site.connected = true;
     auth.site.url = WEB_URL;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID, updateChildContentTypes: true } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: true, webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID, updateChildContentTypes: true, confirm: true } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Unknown Error')));
         done();
@@ -584,7 +804,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     const actual = (command.validate() as CommandValidate)({ options: { listId: LIST_ID, fieldLinkId: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID, webUrl: WEB_URL, debug: true } });
     assert.equal(actual, true);
   });
-  
+
   it('correctly handles lack of valid access token', (done) => {
     Utils.restore(auth.getAccessToken);
     sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
@@ -592,7 +812,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     auth.site.connected = true;
     auth.site.url = WEB_URL;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, webUrl: WEB_URL, contentTypeId: '0x0100FF0B2E33A3718B46A3909298D240FD93', fieldLinkId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b' } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: true, webUrl: WEB_URL, contentTypeId: '0x0100FF0B2E33A3718B46A3909298D240FD93', fieldLinkId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', confirm: true } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
         done();

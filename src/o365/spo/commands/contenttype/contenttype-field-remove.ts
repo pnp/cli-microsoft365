@@ -1,30 +1,18 @@
 import auth from '../../SpoAuth';
-// import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
-// import config from '../../../../config';
 import * as request from 'request-promise-native';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
-import {
-  CommandOption, // CommandValidate, CommandTypes,
-  CommandTypes,
-  CommandValidate,
-  CommandError
-} from '../../../../Command';
+import { CommandOption, CommandTypes, CommandValidate, CommandError } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
 import Utils from '../../../../Utils';
 import { Auth } from '../../../../Auth';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import config from '../../../../config';
-// import { FieldLink } from './FieldLink';
-// REST URL
-// POST http://<sitecollection>/<site>/_api/web/lists(listid)/contenttypes(contenttypeidcontenttypeid})/fieldlinks(fieldlinkid)/deleteObject()
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
-
 interface CommandArgs {
   options: Options;
 }
-
 
 interface Options extends GlobalOptions {
   contentTypeId: string;
@@ -32,10 +20,10 @@ interface Options extends GlobalOptions {
   webUrl: string;
   listTitle?: string;
   updateChildContentTypes?: boolean;
+  confirm?: boolean;
 }
 
 class SpoContentTypeFieldRemoveCommand extends SpoCommand {
-  private requestDigest: string = '';
   private webId: string = '';
   private siteId: string = '';
   private siteAccessToken: string = '';
@@ -51,78 +39,80 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
 
   public types(): CommandTypes | undefined {
     return {
-      string: ['i', 'contentTypeId', 'f', 'fieldLinkId']
+      string: ['i', 'contentTypeId']
     };
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-    auth
-      .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
-      .then((accessToken: string): request.RequestPromise => {
-        this.siteAccessToken = accessToken;
+    const removeFieldLink = (): void => {
+      const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
+      auth
+        .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
+        .then((accessToken: string): request.RequestPromise => {
+          this.siteAccessToken = accessToken;
 
-        if (this.debug) {
-          cmd.log(`Get SiteId required by ProcessQuery endpoint.`);
-        }
+          if (this.debug) {
+            cmd.log(`Get SiteId required by ProcessQuery endpoint.`);
+          }
 
-        // GET SiteId
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/site?$select=Id`,
-          headers: Utils.getRequestHeaders({
-            authorization: `Bearer ${this.siteAccessToken}`,
-            accept: 'application/json;odata=nometadata'
-          }),
-          json: true
-        }
+          // GET SiteId
+          const requestOptions: any = {
+            url: `${args.options.webUrl}/_api/site?$select=Id`,
+            headers: Utils.getRequestHeaders({
+              authorization: `Bearer ${this.siteAccessToken}`,
+              accept: 'application/json;odata=nometadata'
+            }),
+            json: true
+          }
 
-        if (this.debug) {
-          cmd.log('Executing web request:');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
+          if (this.debug) {
+            cmd.log('Executing web request:');
+            cmd.log(requestOptions);
+            cmd.log('');
+          }
 
-        return request.get(requestOptions);
-      })
-      .then((res: { Id: string }) => {
-        this.siteId = res.Id;
+          return request.get(requestOptions);
+        })
+        .then((res: { Id: string }) => {
+          this.siteId = res.Id;
 
-        if (this.debug) {
-          cmd.log(`SiteId: ${this.siteId}`);
-          cmd.log(`Get WebId required by ProcessQuery endpoint.`);
-        }
+          if (this.debug) {
+            cmd.log(`SiteId: ${this.siteId}`);
+            cmd.log(`Get WebId required by ProcessQuery endpoint.`);
+          }
 
-        // GET WebId
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web?$select=Id`,
-          headers: Utils.getRequestHeaders({
-            authorization: `Bearer ${this.siteAccessToken}`,
-            accept: 'application/json;odata=nometadata'
-          }),
-          json: true
-        }
-
-        if (this.debug) {
-          cmd.log('Executing web request:');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
-        return request.get(requestOptions);
-      })
-      .then((res: { Id: string }) => {
-        this.webId = res.Id;
-
-        if (this.debug) {
-          cmd.log(`WebId: ${this.webId}`);
-        }
-
-        // If ListTitle is provided
-        if (args.options.listTitle) {
-          // request for the list title Id
           // GET WebId
           const requestOptions: any = {
-            url: `${args.options.webUrl}/_api/lists/GetByTitle('${args.options.listTitle}')?$select=Id`,
+            url: `${args.options.webUrl}/_api/web?$select=Id`,
+            headers: Utils.getRequestHeaders({
+              authorization: `Bearer ${this.siteAccessToken}`,
+              accept: 'application/json;odata=nometadata'
+            }),
+            json: true
+          }
+
+          if (this.debug) {
+            cmd.log('Executing web request:');
+            cmd.log(requestOptions);
+            cmd.log('');
+          }
+
+          return request.get(requestOptions);
+        })
+        .then((res: { Id: string }) => {
+          this.webId = res.Id;
+
+          if (this.debug) {
+            cmd.log(`WebId: ${this.webId}`);
+          }
+
+          // If ListTitle is provided
+          if (!args.options.listTitle) {
+            return Promise.resolve(null);
+          }
+          // Request for the ListId
+          const requestOptions: any = {
+            url: `${args.options.webUrl}/_api/lists/GetByTitle('${encodeURIComponent(args.options.listTitle)}')?$select=Id`,
             headers: Utils.getRequestHeaders({
               authorization: `Bearer ${this.siteAccessToken}`,
               accept: 'application/json;odata=nometadata'
@@ -136,88 +126,105 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
             cmd.log('');
           }
           return request.get(requestOptions);
-        } 
-        else {
-          return Promise.resolve(null);
-        }
-      })
-      .then((res: { Id: string }) => {
-        if (res) {
-          this.listId = res.Id;
+        })
+        .then((res: { Id: string }) => {
+          if (res) {
+            this.listId = res.Id;
+
+            if (this.debug) {
+              cmd.log(`ListId: ${this.listId}`);
+            }
+          }
+
+          return this.getRequestDigestForSite(args.options.webUrl, this.siteAccessToken, cmd, this.debug)
+        })
+        .then((res: ContextInfo) => {
+          if (this.debug) {
+            cmd.log(`Form digest='${res.FormDigestValue}`);
+            cmd.log('');
+          }
+          const requestDigest: string = res.FormDigestValue;
+
+          const updateChildContentTypes: boolean = args.options.listTitle ? false : args.options.updateChildContentTypes === true;
 
           if (this.debug) {
-            cmd.log(`ListId: ${this.listId}`);
+            const additionalLog = args.options.listTitle ? `; ListTitle='${args.options.listTitle}'` : ` ; UpdateChildContentTypes='${updateChildContentTypes}`;
+            cmd.log(`Remove FieldLink from ContentType. FieldLinkId='${args.options.fieldLinkId}' ; ContentTypeId='${args.options.contentTypeId}' ${additionalLog}`);
+            cmd.log(`Execute ProcessQuery.`);
+            cmd.log('');
           }
-        }
 
-        return this.getRequestDigestForSite(args.options.webUrl, this.siteAccessToken, cmd, this.debug)
-      })
-      .then((res: ContextInfo) => {
-        if (this.debug) {
-          cmd.log(`Form digest='${res.FormDigestValue}`);
-          cmd.log('');
-        }
-        this.requestDigest = res.FormDigestValue;
+          let requestBody: string = '';
+          if (this.listId) {
+            requestBody = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName=".NET Library" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="18" ObjectPathId="17" /><ObjectPath Id="20" ObjectPathId="19" /><Method Name="DeleteObject" Id="21" ObjectPathId="19" /><Method Name="Update" Id="22" ObjectPathId="15"><Parameters><Parameter Type="Boolean">${updateChildContentTypes}</Parameter></Parameters></Method></Actions><ObjectPaths><Property Id="17" ParentId="15" Name="FieldLinks" /><Method Id="19" ParentId="17" Name="GetById"><Parameters><Parameter Type="Guid">{${Utils.escapeXml(args.options.fieldLinkId)}}</Parameter></Parameters></Method><Identity Id="15" Name="09eec89e-709b-0000-558c-c222dcaf9162|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${this.siteId}:web:${this.webId}:list:${this.listId}:contenttype:${Utils.escapeXml(args.options.contentTypeId)}" /></ObjectPaths></Request>`;
+          }
+          else {
+            requestBody = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName=".NET Library" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="77" ObjectPathId="76" /><ObjectPath Id="79" ObjectPathId="78" /><Method Name="DeleteObject" Id="80" ObjectPathId="78" /><Method Name="Update" Id="81" ObjectPathId="24"><Parameters><Parameter Type="Boolean">${updateChildContentTypes}</Parameter></Parameters></Method></Actions><ObjectPaths><Property Id="76" ParentId="24" Name="FieldLinks" /><Method Id="78" ParentId="76" Name="GetById"><Parameters><Parameter Type="Guid">{${Utils.escapeXml(args.options.fieldLinkId)}}</Parameter></Parameters></Method><Identity Id="24" Name="6b3ec69e-00a7-0000-55a3-61f8d779d2b3|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${this.siteId}:web:${this.webId}:contenttype:${Utils.escapeXml(args.options.contentTypeId)}" /></ObjectPaths></Request>`
+          }
 
-        const updateChildContentTypes = args.options.listTitle ? false : args.options.updateChildContentTypes;
+          const requestOptions: any = {
+            url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
+            headers: Utils.getRequestHeaders({
+              authorization: `Bearer ${this.siteAccessToken}`,
+              'X-RequestDigest': requestDigest
+            }),
+            body: requestBody
+          };
 
-        if (this.debug) {
-          let additionalLog = args.options.listTitle ? `; ListTitle='${args.options.listTitle}'` : ` ; UpdateChildContentTypes='${updateChildContentTypes}`;
-          cmd.log(`Remove FieldLink from ContentType. FieldLinkId='${args.options.fieldLinkId}' ; ContentTypeId='${args.options.contentTypeId}' ${additionalLog}`);
-          cmd.log(`Execute ProcessQuery.`);
-          cmd.log('');
-        }
+          if (this.debug) {
+            cmd.log('Executing web request.');
+            cmd.log(requestOptions);
+            cmd.log('');
+          }
 
-        let requestBody = '';
-        if (this.listId) {
-          requestBody = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName=".NET Library" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="18" ObjectPathId="17" /><ObjectPath Id="20" ObjectPathId="19" /><Method Name="DeleteObject" Id="21" ObjectPathId="19" /><Method Name="Update" Id="22" ObjectPathId="15"><Parameters><Parameter Type="Boolean">${updateChildContentTypes}</Parameter></Parameters></Method></Actions><ObjectPaths><Property Id="17" ParentId="15" Name="FieldLinks" /><Method Id="19" ParentId="17" Name="GetById"><Parameters><Parameter Type="Guid">{${args.options.fieldLinkId}}</Parameter></Parameters></Method><Identity Id="15" Name="09eec89e-709b-0000-558c-c222dcaf9162|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${this.siteId}:web:${this.webId}:list:${this.listId}:contenttype:${args.options.contentTypeId}" /></ObjectPaths></Request>`;
+          return request.post(requestOptions);
+        })
+        .then((res: any): void => {
+          if (this.debug) {
+            cmd.log('Response:');
+            cmd.log(res);
+            cmd.log('');
+          }
+
+          const json: ClientSvcResponse = JSON.parse(res);
+          const response: ClientSvcResponseContents = json[0];
+          if (response.ErrorInfo) {
+            cb(new CommandError(response.ErrorInfo.ErrorMessage));
+            return;
+          }
+          if (this.verbose) {
+            cmd.log(vorpal.chalk.green('DONE'));
+          }
+          cb();
+        }, (error: any): void => {
+          this.handleRejectedODataJsonPromise(error, cmd, cb);
+        });
+    }
+
+    if (args.options.confirm) {
+      removeFieldLink();
+    }
+    else {
+      cmd.prompt({
+        type: 'confirm',
+        name: 'continue',
+        default: false,
+        message: `Are you sure you want to remove the ${args.options.fieldLinkId} from content type ${args.options.contentTypeId}?`,
+      }, (result: { continue: boolean }): void => {
+        if (!result.continue) {
+          cb();
         }
         else {
-          requestBody =  `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName=".NET Library" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="77" ObjectPathId="76" /><ObjectPath Id="79" ObjectPathId="78" /><Method Name="DeleteObject" Id="80" ObjectPathId="78" /><Method Name="Update" Id="81" ObjectPathId="24"><Parameters><Parameter Type="Boolean">${updateChildContentTypes}</Parameter></Parameters></Method></Actions><ObjectPaths><Property Id="76" ParentId="24" Name="FieldLinks" /><Method Id="78" ParentId="76" Name="GetById"><Parameters><Parameter Type="Guid">{${args.options.fieldLinkId}}</Parameter></Parameters></Method><Identity Id="24" Name="6b3ec69e-00a7-0000-55a3-61f8d779d2b3|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${this.siteId}:web:${this.webId}:contenttype:${args.options.contentTypeId}" /></ObjectPaths></Request>`
+          removeFieldLink();
         }
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
-          headers: Utils.getRequestHeaders({
-            authorization: `Bearer ${this.siteAccessToken}`,
-            'X-RequestDigest': this.requestDigest
-          }),
-          body: requestBody
-        };
-
-        if (this.debug) {
-          cmd.log('Executing web request.');
-          cmd.log(requestOptions);
-          cmd.log('');
-        }
-
-        return request.post(requestOptions);
-      })
-      .then((res: any): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
-        const json: ClientSvcResponse = JSON.parse(res);
-        const response: ClientSvcResponseContents = json[0];
-        if (response.ErrorInfo) {
-          cb(new CommandError(response.ErrorInfo.ErrorMessage));
-          return;
-        }
-        if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
-        }
-        cb();
-      }, (error: any): void => {
-        this.handleRejectedODataJsonPromise(error, cmd, cb);
       });
+    }
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.contentTypeId = (!(!args.options.contentTypeId)).toString();
-    telemetryProps.fieldLinkId = (!(!args.options.fieldLinkId)).toString();
+    telemetryProps.listTitle = (!(!args.options.listTitle)).toString();
+    telemetryProps.updateChildContentTypes = (!(!args.options.updateChildContentTypes)).toString();
     return telemetryProps;
   }
 
@@ -232,16 +239,20 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
         description: 'Title of the list where the content type is located (if it is a list content type)'
       },
       {
-        option: '-i, --contentTypeId <id>',
+        option: '-i, --contentTypeId <contentTypeId>',
         description: 'The ID of the content type to process'
       },
       {
-        option: '-f, --fieldLinkId <id>',
+        option: '-f, --fieldLinkId <fieldLinkId>',
         description: 'The ID of the field to remove'
       },
       {
-        option: '-c, --updateChildContentTypes <updateChildContentTypes>',
+        option: '-c, --updateChildContentTypes',
         description: 'Update child content types'
+      },
+      {
+        option: '--confirm',
+        description: 'Don\'t prompt for confirming removal of a field link from content type'
       }
     ];
 
@@ -290,17 +301,16 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
   
     Remove fieldLink with ID ${chalk.grey('2c1ba4c4-cd9b-4417-832f-92a34bc34b2a')} from content type with ID ${chalk.grey('0x0100CA0FA0F5DAEF784494B9C6020C3020A6')}
     from web with Url ${chalk.grey('https://contoso.sharepoint.com')}
-      ${chalk.grey(config.delimiter)} ${this.name}  -i "0x0100CA0FA0F5DAEF784494B9C6020C3020A6" -f "880d2f46-fccb-43ca-9def-f88e722cef80" -u https://contoso.sharepoint.com
+      ${chalk.grey(config.delimiter)} ${this.name}  --contentTypeId "0x0100CA0FA0F5DAEF784494B9C6020C3020A6" --fieldLinkId "880d2f46-fccb-43ca-9def-f88e722cef80" --webUrl https://contoso.sharepoint.com --confirm
 
     Remove fieldLink with ID ${chalk.grey('2c1ba4c4-cd9b-4417-832f-92a34bc34b2a')} from content type with ID ${chalk.grey('0x0100CA0FA0F5DAEF784494B9C6020C3020A6')}
     from web with Url ${chalk.grey('https://contoso.sharepoint.com')} with child content types update
-      ${chalk.grey(config.delimiter)} ${this.name}  -i "0x0100CA0FA0F5DAEF784494B9C6020C3020A6" -f "880d2f46-fccb-43ca-9def-f88e722cef80" -u https://contoso.sharepoint.com -updateChildContentTypes true
+      ${chalk.grey(config.delimiter)} ${this.name}  --contentTypeId "0x0100CA0FA0F5DAEF784494B9C6020C3020A6" --fieldLinkId "880d2f46-fccb-43ca-9def-f88e722cef80" --webUrl https://contoso.sharepoint.com --updateChildContentTypes 
 
     Remove fieldLink with ID ${chalk.grey('2c1ba4c4-cd9b-4417-832f-92a34bc34b2a')} from list content type with ID ${chalk.grey('0x0100CA0FA0F5DAEF784494B9C6020C3020A6')}
     from web with Url ${chalk.grey('https://contoso.sharepoint.com')} 
-      ${chalk.grey(config.delimiter)} ${this.name}  -i "0x0100CA0FA0F5DAEF784494B9C6020C3020A60062F089A38C867747942DB2C3FC50FF6A" -f "880d2f46-fccb-43ca-9def-f88e722cef80" -u https://contoso.sharepoint.com -listTitle "Documents"
-
-`);
+      ${chalk.grey(config.delimiter)} ${this.name}  --contentTypeId "0x0100CA0FA0F5DAEF784494B9C6020C3020A60062F089A38C867747942DB2C3FC50FF6A" --fieldLinkId "880d2f46-fccb-43ca-9def-f88e722cef80" --webUrl https://contoso.sharepoint.com --listTitle "Documents"
+      `);
   }
 }
 
