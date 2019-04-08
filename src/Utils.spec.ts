@@ -48,6 +48,51 @@ describe('Utils', () => {
     assert(result == false);
   });
 
+  it('isValidTeamsChannelId returns true if valid channelId', () => {
+    const result = Utils.isValidTeamsChannelId('19:0000000000000000000000000000000@thread.skype');
+    assert(result == true);
+  });
+
+  it('isValidTeamsChannelId returns true if valid channelId', () => {
+    const result = Utils.isValidTeamsChannelId('19:ABZTZ000000000000000000000rstfv@thread.skype');
+    assert(result == true);
+  });
+
+  it('isValidTeamsChannelId returns false if invalid channelId', () => {
+    const result = Utils.isValidTeamsChannelId('190000000000000000000000000000000@thread.skype');
+    assert(result == false);
+  });
+
+  it('isValidTeamsChannelId returns false if invalid channelId', () => {
+    const result = Utils.isValidTeamsChannelId('1:0000000000000000000000000000000@thread.skype');
+    assert(result == false);
+  });
+
+  it('isValidTeamsChannelId returns false if invalid channelId', () => {
+    const result = Utils.isValidTeamsChannelId('18:0000000000000000000000000000000@thread.skype');
+    assert(result == false);
+  });
+
+  it('isValidTeamsChannelId returns false if invalid channelId', () => {
+    const result = Utils.isValidTeamsChannelId('18:0000000000000000000000000000000thread.skype');
+    assert(result == false);
+  });
+
+  it('isValidTeamsChannelId returns false if invalid channelId', () => {
+    const result = Utils.isValidTeamsChannelId('19:0000000000000000000000000000000thread.skype');
+    assert(result == false);
+  });
+
+  it('isValidTeamsChannelId returns false if invalid channelId', () => {
+    const result = Utils.isValidTeamsChannelId('19:0000000000000000000000000000000@thread.skype1');
+    assert(result == false);
+  });
+
+  it('isValidTeamsChannelId returns false if invalid channelId', () => {
+    const result = Utils.isValidTeamsChannelId('19:0000000000000000000000000000000@threadskype');
+    assert(result == false);
+  });
+
   it('isValidBoolean returns true if valid boolean', () => {
     const result = Utils.isValidBoolean('true');
     assert.equal(result, true);
