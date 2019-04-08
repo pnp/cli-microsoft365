@@ -39,6 +39,9 @@ If you are using the Office 365 CLI for the first time, you will be also prompte
 
 The device code flow is the recommended approach for command-line tools to authenticate with resources secured with Azure AD. Because the authentication process is handled in the browser by Azure AD itself, it allows you to benefit of rich security features such as multi-factor authentication or conditional access. The device code flow is interactive and requires user interaction which might be limiting if you want to use the Office 365 CLI in your continuous deployment setup which is fully automated and doesn't involve user interaction.
 
+!!! attention
+    When you decide to use your own custom Azure AD application make sure that you activate the application to be a "public client". Even though the it says "public", the application will not be publically accessible. Furthermore, it enables the possibility to use the device flow for your own application. Without activating this setting it is not possible to login!
+
 #### Log in using user name and password
 
 An alternative way to log in to an Office 365 service in the Office 365 CLI is by using a user name and password. To use this way of authenticating, set the `authType` option to `password` and specify your credentials using the `userName` and `password` options.
