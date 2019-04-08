@@ -167,6 +167,28 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
     assert.notEqual(actual, true);
   });
 
+  it('fails validates for a incorrect channelId missing leading 19:.', (done) => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        teamId: '00000000-0000-0000-0000-000000000000',
+        channelId: '552b7125655c46d5b5b86db02ee7bfdf@thread.skype',
+      }
+    });
+    assert.notEqual(actual, true);
+    done();
+  });
+
+  it('fails validates for a incorrect channelId missing trailing @thread.skpye.', (done) => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        teamId: '00000000-0000-0000-0000-000000000000',
+        channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread',
+      }
+    });
+    assert.notEqual(actual, true);
+    done();
+  });
+
   it('supports debug mode', () => {
     const options = (command.options() as CommandOption[]);
     let containsOption = false;

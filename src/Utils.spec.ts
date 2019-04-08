@@ -7,7 +7,6 @@ import { CommandError } from './Command';
 import * as os from 'os';
 
 describe('Utils', () => {
-
   it('isValidISODate returns true if value is in ISO Date format with - seperator', () => {
     const result = Utils.isValidISODate("2019-03-22");
     assert.equal(result, true);
@@ -46,6 +45,51 @@ describe('Utils', () => {
   it('isValidGuid returns false if invalid guid', () => {
     const result = Utils.isValidGuid('b2307a39-e878-458b-bc90-03bc578531dw');
     assert(result == false);
+  });
+
+  it('isValidTeamsChannelId returns true if valid channelId (all numbers)', () => {
+    const result = Utils.isValidTeamsChannelId('19:0000000000000000000000000000000@thread.skype');
+    assert.strictEqual(result, true);
+  });
+
+  it('isValidTeamsChannelId returns true if valid channelId (numbers and letters)', () => {
+    const result = Utils.isValidTeamsChannelId('19:ABZTZ000000000000000000000rstfv@thread.skype');
+    assert.strictEqual(result, true);
+  });
+
+  it('isValidTeamsChannelId returns false if invalid channelId (missing colon)', () => {
+    const result = Utils.isValidTeamsChannelId('190000000000000000000000000000000@thread.skype');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidTeamsChannelId returns false if invalid channelId (starting with one digit)', () => {
+    const result = Utils.isValidTeamsChannelId('1:0000000000000000000000000000000@thread.skype');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidTeamsChannelId returns false if invalid channelId (starting with two digits but not 19)', () => {
+    const result = Utils.isValidTeamsChannelId('18:0000000000000000000000000000000@thread.skype');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidTeamsChannelId returns false if invalid channelId (missing @)', () => {
+    const result = Utils.isValidTeamsChannelId('19:0000000000000000000000000000000thread.skype');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidTeamsChannelId returns false if invalid channelId (doesn\'t end with skype)', () => {
+    const result = Utils.isValidTeamsChannelId('19:0000000000000000000000000000000@thread.skype1');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidTeamsChannelId returns false if invalid channelId (no . between thread and skype)', () => {
+    const result = Utils.isValidTeamsChannelId('19:0000000000000000000000000000000@threadskype');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidTeamsChannelId returns false if invalid channelId (doesn\'t end with thread.skype)', () => {
+    const result = Utils.isValidTeamsChannelId('19:0000000000000000000000000000000@threadaskype');
+    assert.strictEqual(result, false);
   });
 
   it('isValidBoolean returns true if valid boolean', () => {

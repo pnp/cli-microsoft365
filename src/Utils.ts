@@ -65,6 +65,12 @@ export default class Utils {
     return guidRegEx.test(guid);
   }
 
+  public static isValidTeamsChannelId(guid: string): boolean {
+    const guidRegEx: RegExp = new RegExp(/^19:[0-9a-zA-Z]+@thread\.skype$/i);
+
+    return guidRegEx.test(guid);
+  }
+
   public static isValidISODate(date: string): boolean {
     const dateRegEx: RegExp = new RegExp(
       /^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/i
