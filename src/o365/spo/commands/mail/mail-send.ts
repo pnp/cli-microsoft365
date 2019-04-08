@@ -110,7 +110,7 @@ class SpoMailSendCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          url: `${auth.site.url}/_api/SP.Utilities.Utility.SendEmail`,
+          url: `${args.options.webUrl}/_api/SP.Utilities.Utility.SendEmail`,
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${siteAccessToken}`,
             'content-type': 'application/json;odata=verbose'
