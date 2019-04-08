@@ -22,6 +22,10 @@ There are a number of ways in which you can authenticate and authorize with Offi
 
 Office 365 CLI gets access to Office 365 through a custom Azure AD application named _PnP Office 365 Management Shell_. If you don't want to consent this application in your tenant, you can use a different application instead.
 
+!!! important
+    When you decide to use your own Azure AD application, you need to choose the application to be a **public client**. Despite the setting's description, the application will not be publicly accessible. This setting enables the use of the device flow for your own application. Without activating this setting, it is not possible to complete the authentication process. The option is currently only available in the preview blade for managing for Azure AD applications.
+    [![The 'public client' enabled for an Azure AD application](../images/activate-public-client-aad-app.png)](../images/activate-public-client-aad-app.png)
+
 When specifying a custom Azure AD application to be used by the Office 365 CLI, you can either choose to use one application for all Office 365 services or a separate application for each service. To use one Azure AD application for all Office 365 CLI commands, set the `OFFICE365CLI_AADAPPID` environment variable to the ID of your Azure AD application. If you want to use a different Azure AD application for each Office 365 service use the following environment variables:
 
 - `OFFICE365CLI_AADAADAPPID` - for the ID of the Azure AD application to communicate with Azure AD Graph
