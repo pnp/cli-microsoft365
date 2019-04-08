@@ -1,5 +1,15 @@
 # Release notes
 
+## [v1.17.0](https://github.com/pnp/office365-cli/releases/tag/v1.17.0)
+
+### New commands
+
+**Microsoft Graph:**
+
+- [graph teams channel get](../cmd/graph/teams/teams-channel-get.md) - gets information about the specific Microsoft Teams team channel [#808](https://github.com/pnp/office365-cli/issues/808)
+- [graph teams messagingsettings set](../cmd/graph/teams/teams-messagingsettings-set.md) - updates messaging settings of a Microsoft Teams team [#820](https://github.com/pnp/office365-cli/issues/820)
+- [graph teams unarchive](../cmd/graph/teams/teams-unarchive.md) - restores an archived Microsoft Teams team [#900](https://github.com/pnp/office365-cli/issues/900)
+
 ## [v1.16.0](https://github.com/pnp/office365-cli/releases/tag/v1.16.0)
 
 ### New commands
