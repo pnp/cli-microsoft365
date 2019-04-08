@@ -59,7 +59,6 @@ class SpoPageHeaderSetCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    const headerTemplate: string = '<div><div data-sp-canvascontrol="" data-sp-canvasdataversion="1.4" data-sp-controldata="$data$"></div></div>';
     const noPageHeader: PageHeader = {
       "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
       "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
@@ -146,7 +145,11 @@ class SpoPageHeaderSetCommand extends SpoCommand {
     };
     let header: PageHeader | CustomPageHeader = defaultPageHeader;
     let siteAccessToken: string = '';
-    let pageItemId: number = 0;
+    let pageFullName: string = args.options.pageName.toLowerCase();
+    if (pageFullName.indexOf('.aspx') < 0) {
+      pageFullName += '.aspx';
+    }
+    let title: string;
 
     const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
 
@@ -167,16 +170,11 @@ class SpoPageHeaderSetCommand extends SpoCommand {
           cmd.log(`Retrieving information about the page...`);
         }
 
-        let pageName: string = args.options.pageName;
-        if (args.options.pageName.indexOf('.aspx') < 0) {
-          pageName += '.aspx';
-        }
-
         const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${args.options.webUrl.substr(args.options.webUrl.indexOf('/', 8))}/SitePages/${encodeURIComponent(pageName)}')/ListItemAllFields?$select=Id,Title`,
+          url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')?$select=IsPageCheckedOutToCurrentUser,Title`,
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${siteAccessToken}`,
-            accept: 'application/json;odata=nometadata'
+            'accept': 'application/json;odata=nometadata'
           }),
           json: true
         };
@@ -189,15 +187,37 @@ class SpoPageHeaderSetCommand extends SpoCommand {
 
         return request.get(requestOptions);
       })
-      .then((res: { Id: number, Title: string }): Promise<any[] | void> => {
+      .then((res: { IsPageCheckedOutToCurrentUser: boolean, Title: string; }): Promise<void> | request.RequestPromise => {
         if (this.debug) {
-          cmd.log('Response:');
+          cmd.log('Response:')
           cmd.log(res);
           cmd.log('');
         }
 
-        pageItemId = res.Id;
+        title = res.Title;
 
+        if (res.IsPageCheckedOutToCurrentUser) {
+          return Promise.resolve();
+        }
+
+        const requestOptions: any = {
+          url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/checkoutpage`,
+          headers: Utils.getRequestHeaders({
+            authorization: `Bearer ${siteAccessToken}`,
+            'accept': 'application/json;odata=nometadata'
+          }),
+          json: true
+        };
+
+        if (this.debug) {
+          cmd.log('Executing web request...');
+          cmd.log(requestOptions);
+          cmd.log('');
+        }
+
+        return request.post(requestOptions);
+      })
+      .then((): Promise<any[] | void> => {
         switch (args.options.type) {
           case 'None':
             header = noPageHeader;
@@ -212,7 +232,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
             header = defaultPageHeader;
         }
 
-        header.properties.title = res.Title;
+        header.properties.title = title;
         header.properties.textAlignment = args.options.textAlignment as any || 'Left';
         header.properties.showKicker = args.options.showKicker || false;
         header.properties.kicker = args.options.kicker || '';
@@ -236,10 +256,10 @@ class SpoPageHeaderSetCommand extends SpoCommand {
           if (!args.options.imageUrl) {
             (header.serverProcessedContent as CustomPageHeaderServerProcessedContent).customMetadata = {
               imageSource: {
-                listId: '',
                 siteId: '',
-                uniqueId: '',
-                webId: ''
+                webId: '',
+                listId: '',
+                uniqueId: ''
               }
             };
             properties.listId = '';
@@ -271,10 +291,10 @@ class SpoPageHeaderSetCommand extends SpoCommand {
 
           (header.serverProcessedContent as CustomPageHeaderServerProcessedContent).customMetadata = {
             imageSource: {
-              listId: res[2].ListId,
               siteId: res[0].Id,
-              uniqueId: res[2].UniqueId,
-              webId: res[1].Id
+              webId: res[1].Id,
+              listId: res[2].ListId,
+              uniqueId: res[2].UniqueId
             }
           };
           const properties: CustomPageHeaderProperties = header.properties as CustomPageHeaderProperties;
@@ -286,16 +306,16 @@ class SpoPageHeaderSetCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/lists/SitePages/items(${pageItemId})`,
+          url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/savepage`,
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${siteAccessToken}`,
-            accept: 'application/json;odata=nometadata',
-            'If-Match': '*',
+            'accept': 'application/json;odata=nometadata',
+            'content-type': 'application/json;odata=nometadata'
           }),
-          json: true,
           body: {
-            LayoutWebpartsContent: headerTemplate.replace('$data$', this.encodeHeaderInfo(JSON.stringify(header)))
-          }
+            LayoutWebpartsContent: JSON.stringify([header])
+          },
+          json: true
         };
 
         if (this.debug) {
@@ -304,7 +324,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
           cmd.log('');
         }
 
-        return request.patch(requestOptions);
+        return request.post(requestOptions);
       })
       .then((res: any): void => {
         if (this.verbose) {
@@ -382,14 +402,6 @@ class SpoPageHeaderSetCommand extends SpoCommand {
     }
 
     return request.get(requestOptions);
-  }
-
-  private encodeHeaderInfo(headerInfo: string): string {
-    return headerInfo.replace(/&/g, '&amp;')
-      .replace(/"/g, '&quot;')
-      .replace(/:/g, '&#58;')
-      .replace(/{/g, '&#123;')
-      .replace(/}/g, '&#125;');
   }
 
   public options(): CommandOption[] {
