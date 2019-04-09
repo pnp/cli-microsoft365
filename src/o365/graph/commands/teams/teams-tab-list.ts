@@ -78,13 +78,17 @@ class GraphTeamsTabListCommand extends GraphItemsListCommand<Tab> {
         return 'Required parameter teamId missing';
       }
 
+      if (!args.options.channelId) {
+        return 'Required parameter channelId missing';
+      }
+
       if (!Utils.isValidGuid(args.options.teamId as string)) {
         return `${args.options.teamId} is not a valid GUID`;
       }
 
-      if (!args.options.channelId) {
-        return 'Required parameter channelId missing';
-      }
+      if (!Utils.isValidTeamsChannelId(args.options.channelId as string)) {
+        return `${args.options.channelId} is not a valid Teams ChannelId`;
+      } 
 
       return true;
     };
