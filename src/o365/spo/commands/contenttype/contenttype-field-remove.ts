@@ -192,7 +192,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
             cb(new CommandError(response.ErrorInfo.ErrorMessage));
             return;
           }
-          if (this.verbose) {
+          if (this.debug) {
             cmd.log(vorpal.chalk.green('DONE'));
           }
           cb();
@@ -261,6 +261,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
   }
 
   public validate(): CommandValidate {
+    
     return (args: CommandArgs): boolean | string => {
       if (!args.options.contentTypeId) {
         return 'Required parameter contentTypeId missing';
@@ -268,6 +269,9 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
 
       if (!args.options.webUrl) {
         return 'Required parameter webUrl missing';
+      }
+      if (SpoCommand.isValidSharePointUrl(args.options.webUrl) !== true) {
+        return 'Incorrect url';
       }
 
       if (!args.options.fieldLinkId) {
