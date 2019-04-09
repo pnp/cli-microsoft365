@@ -240,6 +240,9 @@ class SpoMailSendCommand extends SpoCommand {
     
     Send an email to multiples addresses
       ${chalk.grey(config.delimiter)} ${commands.MAIL_SEND} --webUrl https://contoso.sharepoint.com/sites/project-x --to 'user1@contoso.com,user2@contoso.com' --subject 'Email send via Office365-CLI' --body '<h1>Office365-CLI</h1>Email send via <b>cmdlet</b>.' --cc 'user3@contoso.com' --bcc 'user4@contoso.com'
+    
+    Send an email to ${chalk.grey('user@contoso.com')} with additional headers
+      ${chalk.grey(config.delimiter)} ${commands.MAIL_SEND} --webUrl https://contoso.sharepoint.com/sites/project-x --to 'user@contoso.com' --subject 'Email send via Office365-CLI' --body '<h1>Office365-CLI</h1>Email send via <b>cmdlet</b>.' --additionalHeaders "'{\"X-MC-Tags\":\"Office365-CLI\"}'"
       `);
   }
 }
