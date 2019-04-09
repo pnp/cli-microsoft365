@@ -623,7 +623,7 @@ Get-TeamMessagingSettings|MicrosoftTeams|[graph teams messagingsettings list](..
 Get-TeamUser|MicrosoftTeams|[graph teams user list](../cmd/graph/teams/teams-user-list.md)
 New-Team|MicrosoftTeams|[graph teams add](../cmd/graph/teams/teams-add.md)
 New-TeamChannel|MicrosoftTeams|[graph teams channel add](../cmd/graph/teams/teams-channel-add.md)
-Remove-Team|MicrosoftTeams|
+Remove-Team|MicrosoftTeams|[graph teams remove](../cmd/graph/teams/teams-remove.md)
 Remove-TeamChannel|MicrosoftTeams|
 Remove-TeamUser|MicrosoftTeams|[graph teams user remove](../cmd/graph/teams/teams-user-remove.md)
 Set-Team|MicrosoftTeams|

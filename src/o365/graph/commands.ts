@@ -48,6 +48,7 @@ export default {
   TEAMS_MESSAGE_LIST: `${prefix} teams message list`,
   TEAMS_MESSAGINGSETTINGS_LIST: `${prefix} teams messagingsettings list`,
   TEAMS_MESSAGINGSETTINGS_SET: `${prefix} teams messagingsettings set`,
+  TEAMS_REMOVE: `${prefix} teams remove`,
   TEAMS_TAB_LIST: `${prefix} teams tab list`,
   TEAMS_UNARCHIVE: `${prefix} teams unarchive`, 
   TEAMS_USER_ADD: `${prefix} teams user add`,
