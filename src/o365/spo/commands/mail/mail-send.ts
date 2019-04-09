@@ -13,10 +13,6 @@ import { Auth } from '../../../../Auth';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
-export interface TypedHash<T> {
-  [key: string]: T;
-}
-
 interface CommandArgs {
   options: Options;
 }
@@ -29,7 +25,7 @@ interface Options extends GlobalOptions {
   from?: string;
   cc?: string;
   bcc?: string;
-  additionalHeaders?: TypedHash<string>;
+  additionalHeaders?: string;
 }
 
 class SpoMailSendCommand extends SpoCommand {
@@ -70,42 +66,57 @@ class SpoMailSendCommand extends SpoCommand {
           cmd.log(auth);
         }
 
-        const params: any = {};
-        params.properties = {};
-        params.properties.__metadata = { "type": "SP.Utilities.EmailProperties" };
-        params.properties.Body = args.options.body;
-        params.properties.Subject = args.options.subject
-
-        params.properties.To = { results: args.options.to.replace(/\s+/g, '').split(',') };
-        if (this.verbose) {
+        const params: any = {
+          properties: {
+            __metadata: { "type": "SP.Utilities.EmailProperties" },
+            Body: args.options.body,
+            Subject: args.options.subject,
+            To: { results: args.options.to.replace(/\s+/g, '').split(',') }
+          }
+        };
+        
+        if (this.debug) {
           cmd.log(`List of recipients: ${args.options.to}...`);
         }
 
         if (args.options.from && args.options.from.length > 0) {
           params.properties.From = args.options.from;
-          if (this.verbose) {
+          if (this.debug) {
             cmd.log(`Mail will send from: ${args.options.from}...`);
           }
         }
 
         if (args.options.cc && args.options.cc.length > 0) {
           params.properties.CC = { results: args.options.cc.replace(/\s+/g, '').split(',') };
-          if (this.verbose) {
-            cmd.log(`List of addresses to which a carbon copy: ${args.options.cc}...`);
+          if (this.debug) {
+            cmd.log(`List of carbon copy recipients: ${args.options.cc}...`);
           }
         }
 
         if (args.options.bcc && args.options.bcc.length > 0) {
           params.properties.BCC = { results: args.options.bcc.replace(/\s+/g, '').split(',') };
-          if (this.verbose) {
+          if (this.debug) {
             cmd.log(`List of addresses that receive a copy of the mail but are not listed as recipients: ${args.options.bcc}...`);
           }
         }
 
         if (args.options.additionalHeaders) {
-          params.properties.AdditionalHeaders = args.options.additionalHeaders;
-          if (this.verbose) {
-            cmd.log(`Additional headers informaitons: ${args.options.additionalHeaders}...`);
+          const h = JSON.parse(args.options.additionalHeaders);
+          params.properties.AdditionalHeaders = {
+            __metadata: { "type": "Collection(SP.KeyValue)" },
+            results: Object.keys(h).map(key => {
+              return {
+                __metadata: {
+                  type: 'SP.KeyValue'
+                },
+                Key: key,
+                Value: h[key],
+                ValueType: 'Edm.String'
+              }
+            })
+        };
+          if (this.debug) {
+            cmd.log(`Additional headers informations: ${args.options.additionalHeaders}...`);
           }
         }
 
@@ -146,7 +157,7 @@ class SpoMailSendCommand extends SpoCommand {
     const options: CommandOption[] = [
       {
         option: '-u, --webUrl <webUrl>',
-        description: 'Absolute URL of the site where the content type is located'
+        description: 'Absolute URL of the site from which the email will be sent'
       },
       {
         option: '--to <to>',

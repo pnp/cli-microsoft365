@@ -13,7 +13,7 @@ spo mail send [options]
 Option|Description
 ------|-----------
 `--help`|output usage information
-`-u, --webUrl <webUrl>`|Absolute URL of the site where the field should be created
+`-u, --webUrl <webUrl>`|Absolute URL of the site from which the email will be sent
 `--to <to>`|Recipient's email address (separate recipients by comma)
 `--subject <subject>`|Subject of the email
 `--body <body>`|Content of the email
