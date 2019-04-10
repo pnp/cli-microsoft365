@@ -108,7 +108,7 @@ describe(commands.O365GROUP_RESTORE, () => {
 
   it('restores the specified group', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === 'https://graph.microsoft.com/beta/directory/deleteditems/28beab62-7540-4db1-a23f-29a6018a3848/restore/') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/directory/deleteditems/28beab62-7540-4db1-a23f-29a6018a3848/restore/') {
           return Promise.resolve();
       }
 
@@ -131,7 +131,7 @@ describe(commands.O365GROUP_RESTORE, () => {
 
   it('restores the specified group (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === 'https://graph.microsoft.com/beta/directory/deleteditems/28beab62-7540-4db1-a23f-29a6018a3848/restore/') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/directory/deleteditems/28beab62-7540-4db1-a23f-29a6018a3848/restore/') {
           return Promise.resolve();
       }
 

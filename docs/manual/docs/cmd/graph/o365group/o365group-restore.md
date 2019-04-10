@@ -22,9 +22,6 @@ Option|Description
 
 ## Remarks
 
-!!! attention
-    This command is based on a Microsoft Graph API that is currently in preview and is subject to change once the API reached general availability.
-
 To restore a deleted Office 365 Group, you have to first log in to the Microsoft Graph using the [graph login](../login.md) command, eg. `graph login`.
 
 ## Examples
