@@ -24,10 +24,7 @@ interface Options extends GlobalOptions {
 }
 
 class SpoContentTypeFieldRemoveCommand extends SpoCommand {
-  private webId: string = '';
-  private siteId: string = '';
-  private siteAccessToken: string = '';
-  private listId: string = '';
+  
 
   public get name(): string {
     return `${commands.CONTENTTYPE_FIELD_REMOVE}`;
@@ -44,12 +41,17 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+    let webId: string = '';
+    let siteId: string = '';
+    let siteAccessToken: string = '';
+    let listId: string = '';
+    
     const removeFieldLink = (): void => {
       const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
       auth
         .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
         .then((accessToken: string): request.RequestPromise => {
-          this.siteAccessToken = accessToken;
+          siteAccessToken = accessToken;
 
           if (this.debug) {
             cmd.log(`Get SiteId required by ProcessQuery endpoint.`);
@@ -59,7 +61,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
           const requestOptions: any = {
             url: `${args.options.webUrl}/_api/site?$select=Id`,
             headers: Utils.getRequestHeaders({
-              authorization: `Bearer ${this.siteAccessToken}`,
+              authorization: `Bearer ${siteAccessToken}`,
               accept: 'application/json;odata=nometadata'
             }),
             json: true
@@ -74,10 +76,10 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
           return request.get(requestOptions);
         })
         .then((res: { Id: string }) => {
-          this.siteId = res.Id;
+          siteId = res.Id;
 
           if (this.debug) {
-            cmd.log(`SiteId: ${this.siteId}`);
+            cmd.log(`SiteId: ${siteId}`);
             cmd.log(`Get WebId required by ProcessQuery endpoint.`);
           }
 
@@ -85,7 +87,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
           const requestOptions: any = {
             url: `${args.options.webUrl}/_api/web?$select=Id`,
             headers: Utils.getRequestHeaders({
-              authorization: `Bearer ${this.siteAccessToken}`,
+              authorization: `Bearer ${siteAccessToken}`,
               accept: 'application/json;odata=nometadata'
             }),
             json: true
@@ -100,10 +102,10 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
           return request.get(requestOptions);
         })
         .then((res: { Id: string }) => {
-          this.webId = res.Id;
+          webId = res.Id;
 
           if (this.debug) {
-            cmd.log(`WebId: ${this.webId}`);
+            cmd.log(`WebId: ${webId}`);
           }
 
           // If ListTitle is provided
@@ -114,7 +116,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
           const requestOptions: any = {
             url: `${args.options.webUrl}/_api/lists/GetByTitle('${encodeURIComponent(args.options.listTitle)}')?$select=Id`,
             headers: Utils.getRequestHeaders({
-              authorization: `Bearer ${this.siteAccessToken}`,
+              authorization: `Bearer ${siteAccessToken}`,
               accept: 'application/json;odata=nometadata'
             }),
             json: true
@@ -129,14 +131,14 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
         })
         .then((res: { Id: string }) => {
           if (res) {
-            this.listId = res.Id;
+            listId = res.Id;
 
             if (this.debug) {
-              cmd.log(`ListId: ${this.listId}`);
+              cmd.log(`ListId: ${listId}`);
             }
           }
 
-          return this.getRequestDigestForSite(args.options.webUrl, this.siteAccessToken, cmd, this.debug)
+          return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug)
         })
         .then((res: ContextInfo) => {
           if (this.debug) {
@@ -155,17 +157,17 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
           }
 
           let requestBody: string = '';
-          if (this.listId) {
-            requestBody = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName=".NET Library" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="18" ObjectPathId="17" /><ObjectPath Id="20" ObjectPathId="19" /><Method Name="DeleteObject" Id="21" ObjectPathId="19" /><Method Name="Update" Id="22" ObjectPathId="15"><Parameters><Parameter Type="Boolean">${updateChildContentTypes}</Parameter></Parameters></Method></Actions><ObjectPaths><Property Id="17" ParentId="15" Name="FieldLinks" /><Method Id="19" ParentId="17" Name="GetById"><Parameters><Parameter Type="Guid">{${Utils.escapeXml(args.options.fieldLinkId)}}</Parameter></Parameters></Method><Identity Id="15" Name="09eec89e-709b-0000-558c-c222dcaf9162|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${this.siteId}:web:${this.webId}:list:${this.listId}:contenttype:${Utils.escapeXml(args.options.contentTypeId)}" /></ObjectPaths></Request>`;
+          if (listId) {
+            requestBody = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName=".NET Library" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="18" ObjectPathId="17" /><ObjectPath Id="20" ObjectPathId="19" /><Method Name="DeleteObject" Id="21" ObjectPathId="19" /><Method Name="Update" Id="22" ObjectPathId="15"><Parameters><Parameter Type="Boolean">${updateChildContentTypes}</Parameter></Parameters></Method></Actions><ObjectPaths><Property Id="17" ParentId="15" Name="FieldLinks" /><Method Id="19" ParentId="17" Name="GetById"><Parameters><Parameter Type="Guid">{${Utils.escapeXml(args.options.fieldLinkId)}}</Parameter></Parameters></Method><Identity Id="15" Name="09eec89e-709b-0000-558c-c222dcaf9162|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${siteId}:web:${webId}:list:${listId}:contenttype:${Utils.escapeXml(args.options.contentTypeId)}" /></ObjectPaths></Request>`;
           }
           else {
-            requestBody = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName=".NET Library" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="77" ObjectPathId="76" /><ObjectPath Id="79" ObjectPathId="78" /><Method Name="DeleteObject" Id="80" ObjectPathId="78" /><Method Name="Update" Id="81" ObjectPathId="24"><Parameters><Parameter Type="Boolean">${updateChildContentTypes}</Parameter></Parameters></Method></Actions><ObjectPaths><Property Id="76" ParentId="24" Name="FieldLinks" /><Method Id="78" ParentId="76" Name="GetById"><Parameters><Parameter Type="Guid">{${Utils.escapeXml(args.options.fieldLinkId)}}</Parameter></Parameters></Method><Identity Id="24" Name="6b3ec69e-00a7-0000-55a3-61f8d779d2b3|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${this.siteId}:web:${this.webId}:contenttype:${Utils.escapeXml(args.options.contentTypeId)}" /></ObjectPaths></Request>`
+            requestBody = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName=".NET Library" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="77" ObjectPathId="76" /><ObjectPath Id="79" ObjectPathId="78" /><Method Name="DeleteObject" Id="80" ObjectPathId="78" /><Method Name="Update" Id="81" ObjectPathId="24"><Parameters><Parameter Type="Boolean">${updateChildContentTypes}</Parameter></Parameters></Method></Actions><ObjectPaths><Property Id="76" ParentId="24" Name="FieldLinks" /><Method Id="78" ParentId="76" Name="GetById"><Parameters><Parameter Type="Guid">{${Utils.escapeXml(args.options.fieldLinkId)}}</Parameter></Parameters></Method><Identity Id="24" Name="6b3ec69e-00a7-0000-55a3-61f8d779d2b3|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${siteId}:web:${webId}:contenttype:${Utils.escapeXml(args.options.contentTypeId)}" /></ObjectPaths></Request>`
           }
 
           const requestOptions: any = {
             url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
             headers: Utils.getRequestHeaders({
-              authorization: `Bearer ${this.siteAccessToken}`,
+              authorization: `Bearer ${siteAccessToken}`,
               'X-RequestDigest': requestDigest
             }),
             body: requestBody
