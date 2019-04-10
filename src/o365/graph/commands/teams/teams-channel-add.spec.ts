@@ -149,7 +149,7 @@ describe(commands.TEAMS_CHANNEL_ADD, () => {
 
   it('creates channel within the Microsoft Teams team in the tenant with description', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/teams/6703ac8a-c49b-4fd4-8223-28f0ac3a6402/channels`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/6703ac8a-c49b-4fd4-8223-28f0ac3a6402/channels`) {
         return Promise.resolve({
           "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
           "displayName": "Architecture Discussion",
@@ -189,7 +189,7 @@ describe(commands.TEAMS_CHANNEL_ADD, () => {
 
   it('creates channel within the Microsoft Teams team in the tenant without description', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/teams/6703ac8a-c49b-4fd4-8223-28f0ac3a6402/channels`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/6703ac8a-c49b-4fd4-8223-28f0ac3a6402/channels`) {
         return Promise.resolve({
           "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
           "displayName": "Architecture Discussion",

@@ -41,7 +41,7 @@ class GraphTeamsChannelAddCommand extends GraphCommand {
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
       .then((): request.RequestPromise => {
         const requestOptions: any = {
-          url: `${auth.service.resource}/beta/teams/${args.options.teamId}/channels`,
+          url: `${auth.service.resource}/v1.0/teams/${args.options.teamId}/channels`,
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${auth.service.accessToken}`,
             accept: 'application/json;odata.metadata=none',
@@ -124,10 +124,6 @@ class GraphTeamsChannelAddCommand extends GraphCommand {
     using the ${chalk.blue(commands.LOGIN)} command.
           
   Remarks:
-
-    ${chalk.yellow('Attention:')} This command is based on an API that is currently
-    in preview and is subject to change once the API reached general
-    availability.
 
     To add a channel top Microsoft Teams team, you have to first log in to
     the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,

@@ -49,7 +49,7 @@ class GraphO365GroupRestoreCommand extends GraphCommand {
         }
 
         const requestOptions: any = {
-          url: `${auth.service.resource}/beta/directory/deleteditems/${args.options.id}/restore/`,
+          url: `${auth.service.resource}/v1.0/directory/deleteditems/${args.options.id}/restore/`,
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${accessToken}`,
             'accept': 'application/json;odata.metadata=none'
@@ -108,10 +108,6 @@ class GraphO365GroupRestoreCommand extends GraphCommand {
 
   Remarks:
 
-    ${chalk.yellow('Attention:')} This command is based on a Microsoft Graph API that is currently
-    in preview and is subject to change once the API reached general
-    availability.
-  
     To restore a deleted Office 365 Group, you have to first log in to
     the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command.
 

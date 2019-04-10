@@ -25,9 +25,6 @@ Option|Description
 
 ## Remarks
 
-!!! attention
-    This command is based on an API that is currently in preview and is subject to change once the API reached general availability.
-
 To add a channel top Microsoft Teams team, you have to first log in to the Microsoft Graph using the [graph login](../login.md) command, eg. `graph login`.
 
 You can only add a channel to the Microsoft Teams team you are a member of.

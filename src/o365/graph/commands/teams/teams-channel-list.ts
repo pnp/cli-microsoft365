@@ -29,7 +29,7 @@ class GraphTeamsChannelListCommand extends GraphItemsListCommand<Channel>{
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const endpoint: string = `${auth.service.resource}/beta/teams/${args.options.teamId}/channels`;
+    const endpoint: string = `${auth.service.resource}/v1.0/teams/${args.options.teamId}/channels`;
     
     this
       .getAllItems(endpoint, cmd, true)
@@ -86,10 +86,6 @@ class GraphTeamsChannelListCommand extends GraphItemsListCommand<Channel>{
     using the ${chalk.blue(commands.LOGIN)} command.
           
   Remarks:
-
-    ${chalk.yellow('Attention:')} This command is based on an API that is currently
-    in preview and is subject to change once the API reached general
-    availability.
 
     To list the channels in a Microsoft Teams team, you have to first log in to
     the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,

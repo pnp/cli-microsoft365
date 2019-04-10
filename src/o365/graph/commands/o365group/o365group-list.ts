@@ -49,11 +49,7 @@ class GraphO365GroupListCommand extends GraphItemsListCommand<Group> {
     let endpoint: string = `${auth.service.resource}/v1.0/groups${groupFilter}${displayNameFilter}${mailNicknameFilter}${topCount}`;
 
     if (args.options.deleted) {
-      if (this.debug) {
-        cmd.log('Switch to BETA endpoint to retrieve deleted items');
-      }
-
-      endpoint = `${auth.service.resource}/beta/directory/deletedItems/Microsoft.Graph.Group${groupFilter}${displayNameFilter}${mailNicknameFilter}${topCount}`;
+      endpoint = `${auth.service.resource}/v1.0/directory/deletedItems/Microsoft.Graph.Group${groupFilter}${displayNameFilter}${mailNicknameFilter}${topCount}`;
     }
 
     this
