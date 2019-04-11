@@ -118,7 +118,7 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.MinCompatibilityLevel = (!(!args.options.MinCompatibilityLevel)).toString();
-    telemetryProps.MinCompatibilityLevel = (!(!args.options.MaxCompatibilityLevel)).toString();
+    telemetryProps.MaxCompatibilityLevel = (!(!args.options.MaxCompatibilityLevel)).toString();
     telemetryProps.ExternalServicesEnabled = (!(!args.options.ExternalServicesEnabled)).toString();
     telemetryProps.NoAccessRedirectUrl = (!(!args.options.NoAccessRedirectUrl)).toString();
     telemetryProps.SharingCapability = (!(!args.options.SharingCapability)).toString();
@@ -321,7 +321,7 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
         description: 'Specifies the lower bound on the compatibility level for new sites'
       },
       {
-        option: '--MinCompatibilityLevel [MinCompatibilityLevel]',
+        option: '--MaxCompatibilityLevel [MaxCompatibilityLevel]',
         description: 'Specifies the upper bound on the compatibility level for new sites'
       },
       {
