@@ -16,7 +16,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
   let trackEvent: any;
   let telemetry: any;
   // Our test date: December 1st, 2018. This will be the value returned by new Date()
-  const now: Date = new Date(Date.UTC(2018,11,1));
+  const now: Date = new Date(Date.UTC(2018, 11, 1));
   let clock: sinon.SinonFakeTimers;
 
   before(() => {
@@ -435,7 +435,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
       }
     });
-    assert.strictEqual(typeof(actual), 'string');
+    assert.strictEqual(typeof (actual), 'string');
   });
 
   it('passes validation if the url option is a valid SharePoint site URL', () => {
@@ -470,7 +470,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
       }
     });
-    assert.strictEqual(typeof(actual), 'string');
+    assert.strictEqual(typeof (actual), 'string');
   });
 
   it('passes validation if the listid option is a valid GUID', () => {
@@ -499,26 +499,32 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
   });
 
   it('fails validation if the expirationDateTime is in the past', () => {
+    const currentDate: Date = new Date();
+    const dateString: string = (currentDate.getFullYear() - 1) + "-" + currentDate.getMonth() + "-01";
+
     const actual = (command.validate() as CommandValidate)({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'Documents',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
-        expirationDateTime: '2017-12-25'
+        expirationDateTime: dateString
       }
     });
     assert.strictEqual(actual, 'Provide an expiration date which is a date time in the future and within 6 months from now');
   });
 
   it('fails validation if the expirationDateTime more than six months from now', () => {
+    const currentDate: Date = new Date();
+    const dateString: string = (currentDate.getFullYear() + 1) + "-" + currentDate.getMonth() + "-01";
+
     const actual = (command.validate() as CommandValidate)({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'Documents',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
-        expirationDateTime: '2019-10-09'
+        expirationDateTime: dateString
       }
     });
     assert.strictEqual(actual, 'Provide an expiration date which is a date time in the future and within 6 months from now');
@@ -547,7 +553,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         expirationDateTime: '2018-X-09'
       }
     });
-    assert.strictEqual(typeof(actual), 'string');
+    assert.strictEqual(typeof (actual), 'string');
   });
 
   it('fails validation if the expirationDateTime option is not a valid date string (json output)', () => {
@@ -561,7 +567,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         output: 'json'
       }
     });
-    assert.strictEqual(typeof(actual), 'string');
+    assert.strictEqual(typeof (actual), 'string');
   });
 
   it('supports verbose mode', () => {
