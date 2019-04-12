@@ -165,7 +165,7 @@ class GraphO365GroupUserRemoveCommand extends GraphCommand {
       },
       {
         option: '--confirm',
-        description: 'Don\'t prompt for confirming removing user from the specified team'
+        description: 'Don\'t prompt for confirming removing user from the specified O365 Group or Microsoft Teams team'
       }
     ];
 

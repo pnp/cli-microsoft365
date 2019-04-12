@@ -263,9 +263,16 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
 
 
     sinon.stub(request, 'delete').callsFake((opts) => {
+      memberDeleteCallIssued = true;
+
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners/00000000-0000-0000-0000-000000000001/$ref`) {
-        memberDeleteCallIssued = true;
+        return Promise.resolve({
+          "value": [{ "id": "00000000-0000-0000-0000-000000000000" }]
+        });
       }
+
+      return Promise.reject('Invalid request');
+
     });
 
     auth.service = new Service('https://graph.microsoft.com');
@@ -286,7 +293,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
     });
   });
 
-  it('removes the specified user from the members specified Office 365 Group when prompt confirmed (debug)', (done) => {
+  it('removes the specified user from the members specified Office 365 Group when prompt confirmed (verbose)', (done) => {
     let memberDeleteCallIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -308,6 +315,10 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/members/00000000-0000-0000-0000-000000000002/$ref`) {
         memberDeleteCallIssued = true;
+
+        return Promise.resolve({
+          "value": [{ "id": "00000000-0000-0000-0000-000000000000" }]
+        });
       }
 
       return Promise.reject('Invalid request');
