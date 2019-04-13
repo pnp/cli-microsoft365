@@ -1542,6 +1542,16 @@ describe(commands.PROJECT_UPGRADE, () => {
       assert.equal(findings.length, 19);
     });
   });
+
+  it('e2e: shows correct number of findings for upgrading react web part 1.7.1 project to 1.8.0 with typescript flat', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-171-webpart-react'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.8.0', toTypeScriptVersion: '3.3', output: 'json' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 19);
+    });
+  });
   //#endregion
 
   it('shows all information with output format json', () => {
