@@ -16,9 +16,8 @@ export class FN002010_DEVDEP_microsoft_rush_stack_compiler extends DependencyRul
     this.packageName = `@microsoft/rush-stack-compiler-${tsVersion}`;
   }
 
-  set packageVersion(packageVersion: string) {
-    // BREAKS EVERYTHING
-    // this.packageVersion = `${packageVersion}`;
+  set rushPackageVersion(pkgVersion: string) {
+    this.packageVersion = `${pkgVersion}`;
   }
 
 }

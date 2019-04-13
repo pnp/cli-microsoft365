@@ -31,7 +31,7 @@ interface Options extends GlobalOptions {
 class SpfxProjectUpgradeCommand extends Command {
   private projectVersion: string | undefined;
   private toVersion: string = '';
-  private toTypeScriptVersion: string = '';
+  private toTypeScriptVersion: string | undefined = '';
   private projectRootPath: string | null = null;
   private allFindings: Finding[] = [];
   private supportedVersions: string[] = [
@@ -64,7 +64,6 @@ class SpfxProjectUpgradeCommand extends Command {
     { version: '3.0', packageVersion: '0.5.9' },
     { version: '3.3', packageVersion: '0.1.6' },
   ];
-  private defaultTypeScriptVersion: string = '2.7';
 
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
   public static ERROR_UNSUPPORTED_TO_VERSION: number = 2;
@@ -98,7 +97,7 @@ class SpfxProjectUpgradeCommand extends Command {
     this.toVersion = args.options.toVersion 
       ? args.options.toVersion 
       : this.supportedVersions[this.supportedVersions.length - 1];
-    this.toTypeScriptVersion = args.options.toTypeScriptVersion || this.defaultTypeScriptVersion;
+    this.toTypeScriptVersion = args.options.toTypeScriptVersion;
 
     if (this.supportedVersions.indexOf(this.toVersion) < 0) {
       cb(new CommandError(`Office 365 CLI doesn't support upgrading SharePoint Framework projects to version ${this.toVersion}. Supported versions are ${this.supportedVersions.join(', ')}`, SpfxProjectUpgradeCommand.ERROR_UNSUPPORTED_TO_VERSION));
@@ -123,26 +122,29 @@ class SpfxProjectUpgradeCommand extends Command {
       return;
     }
 
-    const toVersionLessThan180 = this.toVersion < '1.8.0';
-    if (toVersionLessThan180) {
-      cb(new CommandError(`Versions of SPFx prior to 1.8.0 do not support upgrading TypeScript`, SpfxProjectUpgradeCommand.ERROR_UNSUPPORTED_TYPSCRIPT_VERSION));
-      return;
-    }
-
-    let isSupportedVersion: boolean = false;
     let supportedTscVersion: { version: string, packageVersion: string } = this.supportedTypeScriptVersions[0];
-    for (let i = 0; i < this.supportedTypeScriptVersions.length; i++) {
-      const sv = this.supportedTypeScriptVersions[i];
-      if (`${sv.version}` === `${this.toTypeScriptVersion}`) {
-        supportedTscVersion = sv;
-        isSupportedVersion = true;
-        break;
+
+    if (!!this.toTypeScriptVersion) {
+      const toVersionLessThan180 = this.toVersion < '1.8.0';
+      if (toVersionLessThan180) {
+        cb(new CommandError(`Versions of SPFx prior to 1.8.0 do not support upgrading TypeScript`, SpfxProjectUpgradeCommand.ERROR_UNSUPPORTED_TYPSCRIPT_VERSION));
+        return;
       }
-    }
-    if (!isSupportedVersion) {
-      const supportedTscVersions = this.supportedTypeScriptVersions.map(sv => sv.version).join(", ")
-      cb(new CommandError(`Office 365 CLI doesn't support upgrading projects to TypeScript ${this.toTypeScriptVersion}. Supported versions are ${supportedTscVersions}`, SpfxProjectUpgradeCommand.ERROR_UNSUPPORTED_TYPSCRIPT_VERSION));
-      return;
+
+      let isSupportedVersion: boolean = false;
+      for (let i = 0; i < this.supportedTypeScriptVersions.length; i++) {
+        const sv = this.supportedTypeScriptVersions[i];
+        if (`${sv.version}` === `${this.toTypeScriptVersion}`) {
+          supportedTscVersion = sv;
+          isSupportedVersion = true;
+          break;
+        }
+      }
+      if (!isSupportedVersion) {
+        const supportedTscVersions = this.supportedTypeScriptVersions.map(sv => sv.version).join(", ")
+        cb(new CommandError(`Office 365 CLI doesn't support upgrading projects to TypeScript ${this.toTypeScriptVersion}. Supported versions are ${supportedTscVersions}`, SpfxProjectUpgradeCommand.ERROR_UNSUPPORTED_TYPSCRIPT_VERSION));
+        return;
+      }
     }
 
     if (pos === posTo) {
@@ -172,7 +174,7 @@ class SpfxProjectUpgradeCommand extends Command {
           } 
           else if (r instanceof FN002010_DEVDEP_microsoft_rush_stack_compiler) {
             r.tscVersion = supportedTscVersion.version.toString();
-            r.packageVersion = supportedTscVersion.packageVersion;
+            r.rushPackageVersion = supportedTscVersion.packageVersion;
           }
           r.visit(project, this.allFindings);
         });
