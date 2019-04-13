@@ -32,6 +32,7 @@ export default {
   TEAMS_APP_REMOVE: `${prefix} teams app remove`,
   TEAMS_APP_UNINSTALL: `${prefix} teams app uninstall`,
   TEAMS_APP_UPDATE: `${prefix} teams app update`,
+  TEAMS_ARCHIVE: `${prefix} teams archive`,
   TEAMS_GUESTSETTINGS_SET: `${prefix} teams guestsettings set`,
   TEAMS_LIST: `${prefix} teams list`,
   TEAMS_CHANNEL_ADD: `${prefix} teams channel add`,
