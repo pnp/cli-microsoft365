@@ -120,7 +120,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.0', toTypeScriptVersion: '1.0' } }, (err?: any) => {
-      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Office 365 CLI doesn't support upgrading projects to TypeScript v1.0`, 7)));
+      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Office 365 CLI doesn't support upgrading projects to TypeScript 1.0. Supported versions are 2.7, 2.9, 3.0, 3.3`, 7)));
     });
   });
 
