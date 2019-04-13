@@ -23,8 +23,8 @@ export class FN012017_TSC_extends extends Rule {
 
   get resolution(): string {
     return `{
-  "extends": "${this._extends}"
-}`;
+      "extends": "${this._extends}"
+    }`;
   };
 
   get resolutionType(): string {

@@ -129,7 +129,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.1', toTypeScriptVersion: '3.3' } }, (err?: any) => {
-      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Office 365 CLI doesn't support upgrading projects to TypeScript v1.0`, 7)));
+      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Versions of SPFx prior to 1.8.0 do not support upgrading TypeScript`, 7)));
     });
   });
 
