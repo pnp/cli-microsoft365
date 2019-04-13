@@ -57,7 +57,10 @@ class SpfxProjectUpgradeCommand extends Command {
 
   private supportedTypeScriptVersions: string[] = [
     '2.7',
-    '3.3'
+    '3.1',
+    '3.2',
+    '3.3',
+    '3.4'
   ];
 
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
@@ -119,12 +122,20 @@ class SpfxProjectUpgradeCommand extends Command {
       return;
     }
 
-    const tsPosTo: number = this.supportedTypeScriptVersions.indexOf(this.toTypeScriptVersion);
-    if (tsPosTo < 0) {
-      cb(new CommandError(`Office 365 CLI doesn't support upgrading projects to TypeScript v${this.toTypeScriptVersion}`, SpfxProjectUpgradeCommand.ERROR_UNSUPPORTED_TYPSCRIPT_VERSION));
-      return;
-    }
+    if (!!this.toTypeScriptVersion) {
+      const toVersionLessThan180 = this.toVersion < '1.8.0';
+      if (toVersionLessThan180) {
+        cb(new CommandError(`Versions of SPFx prior to 1.8.0 do not support upgrading TypeScript`, SpfxProjectUpgradeCommand.ERROR_UNSUPPORTED_TYPSCRIPT_VERSION));
+        return;
+      }
 
+      const tsPosTo: number = this.supportedTypeScriptVersions.indexOf(this.toTypeScriptVersion);
+      if (tsPosTo < 0) {
+        cb(new CommandError(`Office 365 CLI doesn't support upgrading projects to TypeScript v${this.toTypeScriptVersion}`, SpfxProjectUpgradeCommand.ERROR_UNSUPPORTED_TYPSCRIPT_VERSION));
+        return;
+      }
+    }
+    
     if (pos === posTo) {
       cb(new CommandError('Project doesn\'t need to be upgraded', SpfxProjectUpgradeCommand.ERROR_PROJECT_UP_TO_DATE));
       return;
@@ -147,7 +158,7 @@ class SpfxProjectUpgradeCommand extends Command {
       try {
         const rules: Rule[] = require(`./project-upgrade/upgrade-${v}`);
         rules.forEach(r => {
-          if (r instanceof FN012017_TSC_extends){
+          if (!!this.toTypeScriptVersion && r instanceof FN012017_TSC_extends){
             r.tscVersion = this.toTypeScriptVersion;
           }
           r.visit(project, this.allFindings);
