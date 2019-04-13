@@ -14,6 +14,7 @@ import { FindingToReport } from './project-upgrade/FindingToReport';
 import { FN017001_MISC_npm_dedupe } from './project-upgrade/rules/FN017001_MISC_npm_dedupe';
 import { ReportData, ReportDataModification } from './ReportData';
 import { FN012017_TSC_extends } from './project-upgrade/rules/FN012017_TSC_extends';
+import { FN002010_DEVDEP_microsoft_rush_stack_compiler } from './project-upgrade/rules/FN002010_DEVDEP_microsoft_rush_stack_compiler';
 // import { strictEqual } from 'assert';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -55,13 +56,15 @@ class SpfxProjectUpgradeCommand extends Command {
     '1.8.0'
   ];
 
-  private supportedTypeScriptVersions: string[] = [
-    '2.7',
-    '3.1',
-    '3.2',
-    '3.3',
-    '3.4'
+  // https://github.com/SharePoint/sp-dev-docs/wiki/SharePoint-Framework-v1.8-release-notes
+  // [...] version 0.5.7 of the rush-stack-compiler-2.7 package works, version 0.6.8 of the rush-stack-compiler-2.9 package works, 0.5.9 of the rush-stack-compiler-3.0 package works, and 0.1.6 of the rush-stack-compiler-3.3 package works.
+  private supportedTypeScriptVersions: { version: string, packageVersion: string }[] = [
+    { version: '2.7', packageVersion: '0.5.7' },
+    { version: '2.9', packageVersion: '0.6.8' },
+    { version: '3.0', packageVersion: '0.5.9' },
+    { version: '3.3', packageVersion: '0.1.6' },
   ];
+  private defaultTypeScriptVersion: string = '2.7';
 
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
   public static ERROR_UNSUPPORTED_TO_VERSION: number = 2;
@@ -95,9 +98,7 @@ class SpfxProjectUpgradeCommand extends Command {
     this.toVersion = args.options.toVersion 
       ? args.options.toVersion 
       : this.supportedVersions[this.supportedVersions.length - 1];
-    this.toTypeScriptVersion = args.options.toTypeScriptVersion 
-      ? args.options.toTypeScriptVersion 
-      : this.supportedTypeScriptVersions[this.supportedTypeScriptVersions.length - 1];
+    this.toTypeScriptVersion = args.options.toTypeScriptVersion || this.defaultTypeScriptVersion;
 
     if (this.supportedVersions.indexOf(this.toVersion) < 0) {
       cb(new CommandError(`Office 365 CLI doesn't support upgrading SharePoint Framework projects to version ${this.toVersion}. Supported versions are ${this.supportedVersions.join(', ')}`, SpfxProjectUpgradeCommand.ERROR_UNSUPPORTED_TO_VERSION));
@@ -122,20 +123,28 @@ class SpfxProjectUpgradeCommand extends Command {
       return;
     }
 
-    if (!!this.toTypeScriptVersion) {
-      const toVersionLessThan180 = this.toVersion < '1.8.0';
-      if (toVersionLessThan180) {
-        cb(new CommandError(`Versions of SPFx prior to 1.8.0 do not support upgrading TypeScript`, SpfxProjectUpgradeCommand.ERROR_UNSUPPORTED_TYPSCRIPT_VERSION));
-        return;
-      }
+    const toVersionLessThan180 = this.toVersion < '1.8.0';
+    if (toVersionLessThan180) {
+      cb(new CommandError(`Versions of SPFx prior to 1.8.0 do not support upgrading TypeScript`, SpfxProjectUpgradeCommand.ERROR_UNSUPPORTED_TYPSCRIPT_VERSION));
+      return;
+    }
 
-      const tsPosTo: number = this.supportedTypeScriptVersions.indexOf(this.toTypeScriptVersion);
-      if (tsPosTo < 0) {
-        cb(new CommandError(`Office 365 CLI doesn't support upgrading projects to TypeScript v${this.toTypeScriptVersion}`, SpfxProjectUpgradeCommand.ERROR_UNSUPPORTED_TYPSCRIPT_VERSION));
-        return;
+    let isSupportedVersion: boolean = false;
+    let supportedTscVersion: { version: string, packageVersion: string } = this.supportedTypeScriptVersions[0];
+    for (let i = 0; i < this.supportedTypeScriptVersions.length; i++) {
+      const sv = this.supportedTypeScriptVersions[i];
+      if (`${sv.version}` === `${this.toTypeScriptVersion}`) {
+        supportedTscVersion = sv;
+        isSupportedVersion = true;
+        break;
       }
     }
-    
+    if (!isSupportedVersion) {
+      const supportedTscVersions = this.supportedTypeScriptVersions.map(sv => sv.version).join(", ")
+      cb(new CommandError(`Office 365 CLI doesn't support upgrading projects to TypeScript ${this.toTypeScriptVersion}. Supported versions are ${supportedTscVersions}`, SpfxProjectUpgradeCommand.ERROR_UNSUPPORTED_TYPSCRIPT_VERSION));
+      return;
+    }
+
     if (pos === posTo) {
       cb(new CommandError('Project doesn\'t need to be upgraded', SpfxProjectUpgradeCommand.ERROR_PROJECT_UP_TO_DATE));
       return;
@@ -158,8 +167,12 @@ class SpfxProjectUpgradeCommand extends Command {
       try {
         const rules: Rule[] = require(`./project-upgrade/upgrade-${v}`);
         rules.forEach(r => {
-          if (!!this.toTypeScriptVersion && r instanceof FN012017_TSC_extends){
-            r.tscVersion = this.toTypeScriptVersion;
+          if (r instanceof FN012017_TSC_extends) {
+            r.tscVersion = supportedTscVersion.version.toString();
+          } 
+          else if (r instanceof FN002010_DEVDEP_microsoft_rush_stack_compiler) {
+            r.tscVersion = supportedTscVersion.version.toString();
+            r.packageVersion = supportedTscVersion.packageVersion;
           }
           r.visit(project, this.allFindings);
         });

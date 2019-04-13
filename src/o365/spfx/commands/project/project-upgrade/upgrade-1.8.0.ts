@@ -13,7 +13,7 @@ import { FN010001_YORC_version } from "./rules/FN010001_YORC_version";
 import { FN002009_DEVDEP_microsoft_sp_tslint_rules } from "./rules/FN002009_DEVDEP_microsoft_sp_tslint_rules";
 import { FN001008_DEP_react } from "./rules/FN001008_DEP_react";
 import { FN001009_DEP_react_dom } from "./rules/FN001009_DEP_react_dom";
-import { FN002010_DEVDEP_microsoft_rush_stack_compiler_2_7 } from "./rules/FN002010_DEVDEP_microsoft_rush_stack_compiler_2_7";
+import { FN002010_DEVDEP_microsoft_rush_stack_compiler } from "./rules/FN002010_DEVDEP_microsoft_rush_stack_compiler";
 import { FN011011_MAN_webpart_supportedHosts } from "./rules/FN011011_MAN_webpart_supportedHosts";
 import { FN012014_TSC_inlineSources } from "./rules/FN012014_TSC_inlineSources";
 import { FN012015_TSC_strictNullChecks } from "./rules/FN012015_TSC_strictNullChecks";
@@ -38,7 +38,7 @@ module.exports = [
   new FN002002_DEVDEP_microsoft_sp_module_interfaces('1.8.0'),
   new FN002003_DEVDEP_microsoft_sp_webpart_workbench('1.8.0'),
   new FN002009_DEVDEP_microsoft_sp_tslint_rules('1.8.0'),
-  new FN002010_DEVDEP_microsoft_rush_stack_compiler_2_7('0.4.0'),
+  new FN002010_DEVDEP_microsoft_rush_stack_compiler(),
   new FN010001_YORC_version('1.8.0'),
   new FN011011_MAN_webpart_supportedHosts(true),
   new FN012014_TSC_inlineSources(false),
