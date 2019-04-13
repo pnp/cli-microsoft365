@@ -14,6 +14,7 @@ Option|Description
 ------|-----------
 `--help`|output usage information
 `-v, --toVersion [toVersion]`|The version of SharePoint Framework to which upgrade the project
+`-tsv, --toTypeScriptVersion [toTypeScriptVersion]`|The version of TypeScript to which upgrade the project
 `-o, --output [output]`|Output type. `json|text|md`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
@@ -35,6 +36,12 @@ Get instructions to upgrade the current SharePoint Framework project to SharePoi
 
 ```sh
 spfx project upgrade --toVersion 1.5.0 --output md > upgrade-report.md
+```
+
+Get instructions to upgrade the current SharePoint Framework project to SharePoint Framework version 1.8.0 using TypeScript version 3.1 and save the findings in a Markdown file
+
+```sh
+spfx project upgrade --toVersion 1.8.0 --toTypeScriptVersion 3.1 --output md > upgrade-report.md
 ```
 
 Get instructions to Upgrade the current SharePoint Framework project to SharePoint Framework version 1.5.0 and show the summary of the findings in the shell
