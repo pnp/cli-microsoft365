@@ -15,7 +15,6 @@ import { FN017001_MISC_npm_dedupe } from './project-upgrade/rules/FN017001_MISC_
 import { ReportData, ReportDataModification } from './ReportData';
 import { FN012017_TSC_extends } from './project-upgrade/rules/FN012017_TSC_extends';
 import { FN002010_DEVDEP_microsoft_rush_stack_compiler } from './project-upgrade/rules/FN002010_DEVDEP_microsoft_rush_stack_compiler';
-// import { strictEqual } from 'assert';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -58,11 +57,11 @@ class SpfxProjectUpgradeCommand extends Command {
 
   // https://github.com/SharePoint/sp-dev-docs/wiki/SharePoint-Framework-v1.8-release-notes
   // [...] version 0.5.7 of the rush-stack-compiler-2.7 package works, version 0.6.8 of the rush-stack-compiler-2.9 package works, 0.5.9 of the rush-stack-compiler-3.0 package works, and 0.1.6 of the rush-stack-compiler-3.3 package works.
-  private supportedTypeScriptVersions: { version: string, packageVersion: string }[] = [
-    { version: '2.7', packageVersion: '0.5.7' },
-    { version: '2.9', packageVersion: '0.6.8' },
-    { version: '3.0', packageVersion: '0.5.9' },
-    { version: '3.3', packageVersion: '0.1.6' },
+  private supportedTypeScriptVersions: { tscVersion: string, rushPackageVersion: string }[] = [
+    { tscVersion: '2.7', rushPackageVersion: '0.5.7' },
+    { tscVersion: '2.9', rushPackageVersion: '0.6.8' },
+    { tscVersion: '3.0', rushPackageVersion: '0.5.9' },
+    { tscVersion: '3.3', rushPackageVersion: '0.1.6' },
   ];
 
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
@@ -94,9 +93,7 @@ class SpfxProjectUpgradeCommand extends Command {
       return;
     }
 
-    this.toVersion = args.options.toVersion 
-      ? args.options.toVersion 
-      : this.supportedVersions[this.supportedVersions.length - 1];
+    this.toVersion = args.options.toVersion ? args.options.toVersion : this.supportedVersions[this.supportedVersions.length - 1];
     this.toTypeScriptVersion = args.options.toTypeScriptVersion;
 
     if (this.supportedVersions.indexOf(this.toVersion) < 0) {
@@ -122,7 +119,7 @@ class SpfxProjectUpgradeCommand extends Command {
       return;
     }
 
-    let supportedTscVersion: { version: string, packageVersion: string } = this.supportedTypeScriptVersions[0];
+    let supportedTscVersion: { tscVersion: string, rushPackageVersion: string } = this.supportedTypeScriptVersions[0];
 
     if (!!this.toTypeScriptVersion) {
       const toVersionLessThan180 = this.toVersion < '1.8.0';
@@ -134,14 +131,14 @@ class SpfxProjectUpgradeCommand extends Command {
       let isSupportedVersion: boolean = false;
       for (let i = 0; i < this.supportedTypeScriptVersions.length; i++) {
         const sv = this.supportedTypeScriptVersions[i];
-        if (`${sv.version}` === `${this.toTypeScriptVersion}`) {
+        if (`${sv.tscVersion}` === `${this.toTypeScriptVersion}`) {
           supportedTscVersion = sv;
           isSupportedVersion = true;
           break;
         }
       }
       if (!isSupportedVersion) {
-        const supportedTscVersions = this.supportedTypeScriptVersions.map(sv => sv.version).join(", ")
+        const supportedTscVersions = this.supportedTypeScriptVersions.map(sv => sv.tscVersion).join(", ")
         cb(new CommandError(`Office 365 CLI doesn't support upgrading projects to TypeScript ${this.toTypeScriptVersion}. Supported versions are ${supportedTscVersions}`, SpfxProjectUpgradeCommand.ERROR_UNSUPPORTED_TYPSCRIPT_VERSION));
         return;
       }
@@ -170,11 +167,11 @@ class SpfxProjectUpgradeCommand extends Command {
         const rules: Rule[] = require(`./project-upgrade/upgrade-${v}`);
         rules.forEach(r => {
           if (r instanceof FN012017_TSC_extends) {
-            r.tscVersion = supportedTscVersion.version.toString();
+            r.tscVersion = supportedTscVersion.tscVersion.toString();
           } 
           else if (r instanceof FN002010_DEVDEP_microsoft_rush_stack_compiler) {
-            r.tscVersion = supportedTscVersion.version.toString();
-            r.rushPackageVersion = supportedTscVersion.packageVersion;
+            r.tscVersion = supportedTscVersion.tscVersion.toString();
+            r.rushPackageVersion = supportedTscVersion.rushPackageVersion;
           }
           r.visit(project, this.allFindings);
         });
