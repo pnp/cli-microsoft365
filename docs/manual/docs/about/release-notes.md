@@ -4,11 +4,26 @@
 
 ### New commands
 
+**SharePoint Online:**
+
+- [spo contenttype field remove](../cmd/spo/contenttype/contenttype-field-remove.md) - removes a column from a site- or list content type [#673](https://github.com/pnp/office365-cli/issues/673)
+- [spo mail send](../cmd/spo/mail/mail-send.md) - sends an e-mail from SharePoint [#753](https://github.com/pnp/office365-cli/issues/753)
+
 **Microsoft Graph:**
 
+- [graph teams archive](../cmd/graph/teams/teams-archive.md) - archives specified Microsoft Teams team [#899](https://github.com/pnp/office365-cli/issues/899)
 - [graph teams channel get](../cmd/graph/teams/teams-channel-get.md) - gets information about the specific Microsoft Teams team channel [#808](https://github.com/pnp/office365-cli/issues/808)
 - [graph teams messagingsettings set](../cmd/graph/teams/teams-messagingsettings-set.md) - updates messaging settings of a Microsoft Teams team [#820](https://github.com/pnp/office365-cli/issues/820)
+- [graph teams remove](../cmd/graph/teams/teams-remove.md) - removes the specified Microsoft Teams team [#813](https://github.com/pnp/office365-cli/issues/813)
 - [graph teams unarchive](../cmd/graph/teams/teams-unarchive.md) - restores an archived Microsoft Teams team [#900](https://github.com/pnp/office365-cli/issues/900)
+
+### Changes
+
+- updated documentation on using custom AAD app [#895](https://github.com/pnp/office365-cli/issues/895)
+- added validation for Teams channel IDs [#909](https://github.com/pnp/office365-cli/issues/909)
+- fixed the 'spo page clientsidewebpart add' command [#913](https://github.com/pnp/office365-cli/issues/913)
+- fixed typo in the 'spo tenant settings set' command options [#923](https://github.com/pnp/office365-cli/issues/923)
+- updated commands to use MS Graph v1.0 endpoint [#865](https://github.com/pnp/office365-cli/issues/865)
 
 ## [v1.16.0](https://github.com/pnp/office365-cli/releases/tag/v1.16.0)
 
