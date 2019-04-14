@@ -518,7 +518,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'Documents',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
-        expirationDateTime: '2019-10-09'
+        expirationDateTime: '2020-10-09'
       }
     });
     assert.strictEqual(actual, 'Provide an expiration date which is a date time in the future and within 6 months from now');
