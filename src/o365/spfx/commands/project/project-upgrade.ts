@@ -614,7 +614,7 @@ ${f.resolution}
         description: 'The version of SharePoint Framework to which upgrade the project'
       },
       {
-        option: '--toTypeScriptVersion [toTypeScriptVersion]',
+        option: '-tsv, --toTypeScriptVersion [toTypeScriptVersion]',
         description: 'The version of TypeScript to which upgrade the project'
       }
     ];
