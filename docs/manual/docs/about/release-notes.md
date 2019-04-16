@@ -24,6 +24,7 @@
 - fixed the 'spo page clientsidewebpart add' command [#913](https://github.com/pnp/office365-cli/issues/913)
 - fixed typo in the 'spo tenant settings set' command options [#923](https://github.com/pnp/office365-cli/issues/923)
 - updated commands to use MS Graph v1.0 endpoint [#865](https://github.com/pnp/office365-cli/issues/865)
+- added support for upgrading projects built using SharePoint Framework v1.8.0 [#932](https://github.com/pnp/office365-cli/issues/932)
 
 ## [v1.16.0](https://github.com/pnp/office365-cli/releases/tag/v1.16.0)
 
