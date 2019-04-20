@@ -267,6 +267,7 @@ nav:
         - teams channel get: 'cmd/graph/teams/teams-channel-get.md'
         - teams channel list: 'cmd/graph/teams/teams-channel-list.md'
         - teams channel set: 'cmd/graph/teams/teams-channel-set.md'
+        - teams clone: 'cmd/graph/teams/teams-clone.md'
         - teams funsettings list: 'cmd/graph/teams/teams-funsettings-list.md'
         - teams guestsettings list: 'cmd/graph/teams/teams-guestsettings-list.md'
         - teams guestsettings set: 'cmd/graph/teams/teams-guestsettings-set.md'
