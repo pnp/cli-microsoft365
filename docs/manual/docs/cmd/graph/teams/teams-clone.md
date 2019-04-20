@@ -1,0 +1,49 @@
+# graph teams clone
+
+Creates a copy of a Microsoft Teams team
+
+## Usage
+
+```sh
+graph teams clone [options]
+```
+
+## Options
+
+Option|Description
+------|-----------
+`--help`|output usage information
+`-i, --teamId <teamId>`|The ID of the Microsoft Teams team to clone 
+`-n, --displayName <displayName>`|The display name for the new Microsoft Teams Team 
+`-m, --mailNickname <mailNickname>`|The mail alias for the new Microsoft Teams Team 
+`-p, --partsToClone <partsToClone>`|A comma-seperated list of the parts to clone. Allowed values are apps|channels|members|settings|tabs 
+`-d, --description <description>`|The description for the new Microsoft Teams Team. Will be left blank if not specified
+`-c, --classification <classification>`|The classification for the new Microsoft Teams Team. If not specified, will be copied from the original Microsoft Teams Team 
+`-v, --visibility <visibility>`|Specify the visibility of the new Microsoft Teams Team. Allowed values are Private|Public. If not specified, the visibility will be copied from the original Microsoft Teams Team 
+`-o, --output [output]`|Output type. `json|text`. Default `text`
+`--verbose`|Runs command with verbose logging
+`--debug`|Runs command with debug logging
+
+!!! important
+    Before using this command, log in to the Microsoft Graph, using the [graph login](../login.md) command.
+
+## Remarks
+
+To clone a Microsoft Teams team, you have to first log in to the Microsoft Graph using the [graph login](../login.md) command, eg. `graph login`.
+
+Using this command, global admins and Microsoft Teams service admins can access teams that they are not a member of.
+
+When tabs are cloned, they are put into an unconfigured state and they are displayed on the tab bar in Microsoft Teams, and the first time you open them, you'll go through the configuration screen. (If the person opening the tab does not have permission to configure apps, they will see a message explaining that the tab hasn't been configured.)
+
+## Examples
+
+Creates a copy of a Microsoft Teams team
+
+```sh
+graph teams clone --teamId 3d471997-0557-4443-b8d2-40e63a09cf69 --displayName "Library Assist" --mailNickname "libassist" --partsToClone "apps,tabs,settings,channels,members"
+```
+Create a copy of a Microsoft Teams team
+
+```sh
+graph teams clone --teamId 3d471997-0557-4443-b8d2-40e63a09cf69 --displayName "Library Assist" --mailNickname "libassist" --partsToClone "apps,tabs,settings,channels,members" --description "Self help community for library" --classification "Library" --visibility "public"
+```
