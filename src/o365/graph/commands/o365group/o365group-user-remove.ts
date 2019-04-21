@@ -16,28 +16,36 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  teamId: string;
+  teamId?: string;
+  groupId?: string;
   userName: string;
   confirm?: boolean;
 }
 
-class GraphTeamsUserRemoveCommand extends GraphCommand {
+class GraphO365GroupUserRemoveCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.TEAMS_USER_REMOVE}`;
+    return `${commands.O365GROUP_USER_REMOVE}`;
   }
 
   public get description(): string {
-    return 'Removes the specified user from the specified Microsoft Teams team';
+    return 'Removes the specified user from specified Office 365 Group or Microsoft Teams team';
+  }
+
+  public alias(): string[] | undefined {
+    return [commands.TEAMS_USER_REMOVE];
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.confirm = (!(!args.options.confirm)).toString();
+    telemetryProps.teamId = typeof args.options.teamId !== 'undefined';
+    telemetryProps.groupId = typeof args.options.groupId !== 'undefined';
     return telemetryProps;
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     let userId = '';
+    const groupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string
 
     const removeUser: () => void = (): void => {
       auth
@@ -54,11 +62,11 @@ class GraphTeamsUserRemoveCommand extends GraphCommand {
 
           return request.get(requestOptions);
         })
-        .then((res: { value: string; }): Promise<{}> => {
+        .then((res: { value: string; }): Promise<any> => {
           userId = res.value;
 
           const requestOptions: any = {
-            url: `${auth.service.resource}/v1.0/groups/${args.options.teamId}/owners?$select=id,displayName,userPrincipalName,userType`,
+            url: `${auth.service.resource}/v1.0/groups/${groupId}/owners?$select=id,displayName,userPrincipalName,userType`,
             headers: {
               authorization: `Bearer ${auth.service.accessToken}`,
               accept: 'application/json;odata.metadata=none'
@@ -70,8 +78,7 @@ class GraphTeamsUserRemoveCommand extends GraphCommand {
         })
         .then((res: any): Promise<void> => {
           const userIsOwner: boolean = (res.value.filter((i: any) => i.userPrincipalName === args.options.userName).length > 0);
-
-          const endpoint: string = `${auth.service.resource}/v1.0/groups/${args.options.teamId}/${userIsOwner ? 'owners' : 'members'}/${userId}/$ref`;
+          const endpoint: string = `${auth.service.resource}/v1.0/groups/${groupId}/${userIsOwner ? 'owners' : 'members'}/${userId}/$ref`;
 
           const requestOptions: any = {
             url: endpoint,
@@ -100,7 +107,7 @@ class GraphTeamsUserRemoveCommand extends GraphCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove ${args.options.userName} from the team ${args.options.teamId}?`,
+        message: `Are you sure you want to remove ${args.options.userName} from the ${(typeof args.options.groupId !== 'undefined' ? 'group' : 'team')} ${groupId}?`,
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();
@@ -115,8 +122,12 @@ class GraphTeamsUserRemoveCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --teamId <teamId>',
-        description: 'The ID of the Teams team from which to remove the user'
+        option: "-i, --groupId [groupId]",
+        description: "The ID of the Office 365 Group from which to remove the user"
+      },
+      {
+        option: "--teamId [teamId]",
+        description: "The ID of the Microsoft Teams team from which to remove the user"
       },
       {
         option: '-n, --userName <userName>',
@@ -124,7 +135,7 @@ class GraphTeamsUserRemoveCommand extends GraphCommand {
       },
       {
         option: '--confirm',
-        description: 'Don\'t prompt for confirming removing user from the specified team'
+        description: 'Don\'t prompt for confirming removing user from the specified Office 365 Group or Microsoft Teams team'
       }
     ];
 
@@ -134,12 +145,20 @@ class GraphTeamsUserRemoveCommand extends GraphCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.teamId) {
-        return 'Required parameter teamId missing';
+      if (!args.options.groupId && !args.options.teamId) {
+        return 'Please provide one of the following parameters: groupId or teamId';
       }
 
-      if (!Utils.isValidGuid(args.options.teamId)) {
+      if (args.options.groupId && args.options.teamId) {
+        return 'You cannot provide both a groupId and teamId parameter, please provide only one';
+      }
+
+      if (args.options.teamId && !Utils.isValidGuid(args.options.teamId as string)) {
         return `${args.options.teamId} is not a valid GUID`;
+      }
+
+      if (args.options.groupId && !Utils.isValidGuid(args.options.groupId as string)) {
+        return `${args.options.groupId} is not a valid GUID`;
       }
 
       if (!args.options.userName) {
@@ -156,25 +175,28 @@ class GraphTeamsUserRemoveCommand extends GraphCommand {
     log(
       `  ${chalk.yellow('Important:')} before using this command, log in to the Microsoft Graph
     using the ${chalk.blue(commands.LOGIN)} command.
-        
+
   Remarks:
 
-    To remove a user from the specified Microsoft Teams team, you have to first
-    log in to the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
-    eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
+    To remove a user from the specified Office 365 Group or Microsoft Teams
+    team, you have to first log in to the Microsoft Graph using the ${chalk.blue(commands.LOGIN)}
+    command, eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
 
-    You can remove users from a Microsoft Teams team if you are owner of that
-    team.
+    You can remove users from a Office 365 Group or Microsoft Teams team if you
+    are owner of that group or team.
 
   Examples:
-  
-    Removes user from the specified team 
-      ${chalk.grey(config.delimiter)} ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com'
 
-    Removes user from the specified team without confirmation
-      ${chalk.grey(config.delimiter)} ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --confirm 
-  `);
+    Removes user from the specified Office 365 Group
+      ${chalk.grey(config.delimiter)} ${this.name} --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com'
+
+    Removes user from the specified Office 365 Group without confirmation
+      ${chalk.grey(config.delimiter)} ${this.name} --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --confirm
+
+    Removes user from the specified Microsoft Teams team
+      ${chalk.grey(config.delimiter)} ${(this.alias() as string[])[0]} --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com'
+`);
   }
 }
 
-module.exports = new GraphTeamsUserRemoveCommand();
+module.exports = new GraphO365GroupUserRemoveCommand();

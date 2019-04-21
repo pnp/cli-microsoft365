@@ -3,14 +3,14 @@ import Command, { CommandOption, CommandError, CommandValidate } from '../../../
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../GraphAuth';
-const command: Command = require('./teams-user-remove');
+const command: Command = require('./o365group-user-remove');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import { Service } from '../../../../Auth';
 import * as fs from 'fs';
 
-describe(commands.TEAMS_USER_REMOVE, () => {
+describe(commands.O365GROUP_USER_REMOVE, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
@@ -63,11 +63,21 @@ describe(commands.TEAMS_USER_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.TEAMS_USER_REMOVE), true);
+    assert.equal(command.name.startsWith(commands.O365GROUP_USER_REMOVE), true);
   });
 
   it('has a description', () => {
     assert.notEqual(command.description, null);
+  });
+
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notEqual(typeof alias, 'undefined');
+  });
+
+  it('defines correct alias', () => {
+    const alias = command.alias();
+    assert.equal((alias && alias.indexOf(commands.TEAMS_USER_REMOVE) > -1), true);
   });
 
   it('calls telemetry', (done) => {
@@ -87,7 +97,7 @@ describe(commands.TEAMS_USER_REMOVE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, () => {
       try {
-        assert.equal(telemetry.name, commands.TEAMS_USER_REMOVE);
+        assert.equal(telemetry.name, commands.O365GROUP_USER_REMOVE);
         done();
       }
       catch (e) {
@@ -96,30 +106,40 @@ describe(commands.TEAMS_USER_REMOVE, () => {
     });
   });
 
+  it('fails validation if the groupId is not a valid guid.', (done) => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        groupId: 'not-c49b-4fd4-8223-28f0ac3a6402'
+      }
+    });
+    assert.notEqual(actual, true);
+    done();
+  });
+
   it('fails validation if the teamId is not a valid guid.', (done) => {
     const actual = (command.validate() as CommandValidate)({
       options: {
-        teamId: '61703ac8a-c49b-4fd4-8223-28f0ac3a6402'
+        teamId: 'not-c49b-4fd4-8223-28f0ac3a6402'
       }
     });
     assert.notEqual(actual, true);
     done();
   });
 
-  it('fails validation if the teamId is not provided.', (done) => {
+  it('fails validation if the groupId is not provided.', (done) => {
     const actual = (command.validate() as CommandValidate)({
       options: {
-        role: 'Member'
+        userName: 'anne.matthews@contoso.onmicrosoft.com'
       }
     });
     assert.notEqual(actual, true);
     done();
   });
 
-  it('fails validation if the userName is not provided.', (done) => {
+  it('fails validation when both groupId and teamId are specified', (done) => {
     const actual = (command.validate() as CommandValidate)({
       options: {
-        role: 'Member',
+        groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
       }
     });
@@ -127,7 +147,17 @@ describe(commands.TEAMS_USER_REMOVE, () => {
     done();
   });
 
-  it('passes validation when valid teamId and userName are specified', (done) => {
+  it('fails validation when the userName is not specified', (done) => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
+      }
+    });
+    assert.notEqual(actual, true);
+    done();
+  });
+
+  it('passes validation when valid groupId and userName are specified', (done) => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
@@ -138,12 +168,12 @@ describe(commands.TEAMS_USER_REMOVE, () => {
     done();
   });
 
-  it('prompts before removing the specified user from the specified team when confirm option not passed', (done) => {
+  it('prompts before removing the specified user from the specified Office 365 Group when confirm option not passed', (done) => {
     auth.service = new Service('https://graph.microsoft.com');
     auth.service.connected = true;
 
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } }, () => {
+    cmdInstance.action({ options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } }, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -160,7 +190,7 @@ describe(commands.TEAMS_USER_REMOVE, () => {
     });
   });
 
-  it('prompts before removing the specified user from the specified team when confirm option not passed (debug)', (done) => {
+  it('prompts before removing the specified user from the specified Team when confirm option not passed (debug)', (done) => {
     auth.service = new Service('https://graph.microsoft.com');
     auth.service.connected = true;
 
@@ -182,7 +212,7 @@ describe(commands.TEAMS_USER_REMOVE, () => {
     });
   });
 
-  it('aborts removing the specified user from the specified team when confirm option not passed and prompt not confirmed', (done) => {
+  it('aborts removing the specified user from the specified Office 365 Group when confirm option not passed and prompt not confirmed', (done) => {
     const postSpy = sinon.spy(request, 'delete');
     auth.service = new Service('https://graph.microsoft.com');
     auth.service.connected = true;
@@ -191,7 +221,7 @@ describe(commands.TEAMS_USER_REMOVE, () => {
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     };
-    cmdInstance.action({ options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } }, () => {
+    cmdInstance.action({ options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } }, () => {
       try {
         assert(postSpy.notCalled);
         done();
@@ -202,7 +232,7 @@ describe(commands.TEAMS_USER_REMOVE, () => {
     });
   });
 
-  it('aborts removing the specified user from the specified team when confirm option not passed and prompt not confirmed (debug)', (done) => {
+  it('aborts removing the specified user from the specified Office 365 Group when confirm option not passed and prompt not confirmed (debug)', (done) => {
     const postSpy = sinon.spy(request, 'delete');
     auth.service = new Service('https://graph.microsoft.com');
     auth.service.connected = true;
@@ -211,7 +241,7 @@ describe(commands.TEAMS_USER_REMOVE, () => {
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     };
-    cmdInstance.action({ options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } }, () => {
+    cmdInstance.action({ options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } }, () => {
       try {
         assert(postSpy.notCalled);
         done();
@@ -222,7 +252,7 @@ describe(commands.TEAMS_USER_REMOVE, () => {
     });
   });
 
-  it('removes the specified owner from owners endpoint of the specified team when prompt confirmed', (done) => {
+  it('removes the specified owner from owners endpoint of the specified Office 365 Group when prompt confirmed', (done) => {
     let memberDeleteCallIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -243,9 +273,16 @@ describe(commands.TEAMS_USER_REMOVE, () => {
 
 
     sinon.stub(request, 'delete').callsFake((opts) => {
+      memberDeleteCallIssued = true;
+
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners/00000000-0000-0000-0000-000000000001/$ref`) {
-        memberDeleteCallIssued = true;
+        return Promise.resolve({
+          "value": [{ "id": "00000000-0000-0000-0000-000000000000" }]
+        });
       }
+
+      return Promise.reject('Invalid request');
+
     });
 
     auth.service = new Service('https://graph.microsoft.com');
@@ -255,7 +292,7 @@ describe(commands.TEAMS_USER_REMOVE, () => {
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     };
-    cmdInstance.action({ options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } }, () => {
+    cmdInstance.action({ options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } }, () => {
       try {
         assert(memberDeleteCallIssued);
         done();
@@ -266,7 +303,7 @@ describe(commands.TEAMS_USER_REMOVE, () => {
     });
   });
 
-  it('removes the specified user from the members specified team when prompt confirmed (debug)', (done) => {
+  it('removes the specified user from the members specified Office 365 Group when prompt confirmed (verbose)', (done) => {
     let memberDeleteCallIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -288,7 +325,13 @@ describe(commands.TEAMS_USER_REMOVE, () => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/members/00000000-0000-0000-0000-000000000002/$ref`) {
         memberDeleteCallIssued = true;
+
+        return Promise.resolve({
+          "value": [{ "id": "00000000-0000-0000-0000-000000000000" }]
+        });
       }
+
+      return Promise.reject('Invalid request');
     });
 
     auth.service = new Service('https://graph.microsoft.com');
@@ -298,12 +341,55 @@ describe(commands.TEAMS_USER_REMOVE, () => {
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     };
-    cmdInstance.action({ options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000", userName: "karl.matteson@contoso.onmicrosoft.com" } }, () => {
+    cmdInstance.action({ options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000", userName: "karl.matteson@contoso.onmicrosoft.com" } }, () => {
       try {
         assert(memberDeleteCallIssued);
         done();
       }
       catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly retrieves user and handle error removing member from specified Office 365 group', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/anne.matthews%40contoso.onmicrosoft.com/id`) {
+        return Promise.resolve({
+          "value": "00000000-0000-0000-0000-000000000001"
+        });
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners?$select=id,displayName,userPrincipalName,userType`) {
+        return Promise.resolve({
+          "value": [{ "id": "00000000-0000-0000-0000-000000000000", "displayName": "Anne Matthews", "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com", "userType": "Member" }]
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(request, 'delete').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners/00000000-0000-0000-0000-000000000001/$ref`) {
+        return Promise.reject({ error: { 'odata.error': { message: { value: 'Invalid object identifier' } } } });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.service = new Service();
+    auth.service.connected = true;
+    auth.service.resource = 'https://graph.microsoft.com';
+    cmdInstance.action = command.action();
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
+    cmdInstance.action({ options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } }, (err?: any) => {
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Invalid object identifier'))); done();
+      }
+      catch (e) {
+
         done(e);
       }
     });
@@ -335,7 +421,7 @@ describe(commands.TEAMS_USER_REMOVE, () => {
       cb({ continue: true });
     };
 
-    cmdInstance.action({ options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } }, () => {
+    cmdInstance.action({ options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } }, () => {
       try {
         assert(memberDeleteCallIssued === false);
         done();
@@ -382,7 +468,7 @@ describe(commands.TEAMS_USER_REMOVE, () => {
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
     cmd.help({}, () => { });
-    assert(find.calledWith(commands.TEAMS_USER_REMOVE));
+    assert(find.calledWith(commands.O365GROUP_USER_REMOVE));
   });
 
   it('has help with examples', () => {

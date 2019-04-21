@@ -625,7 +625,7 @@ New-Team|MicrosoftTeams|[graph teams add](../cmd/graph/teams/teams-add.md)
 New-TeamChannel|MicrosoftTeams|[graph teams channel add](../cmd/graph/teams/teams-channel-add.md)
 Remove-Team|MicrosoftTeams|[graph teams remove](../cmd/graph/teams/teams-remove.md)
 Remove-TeamChannel|MicrosoftTeams|
-Remove-TeamUser|MicrosoftTeams|[graph teams user remove](../cmd/graph/teams/teams-user-remove.md)
+Remove-TeamUser|MicrosoftTeams|[graph teams user remove](../cmd/graph/o365group/o365group-user-remove.md)
 Set-Team|MicrosoftTeams|
 Set-TeamChannel|MicrosoftTeams|[graph teams channel set](../cmd/graph/teams/teams-channel-set.md)
 Set-TeamFunSettings|MicrosoftTeams|
