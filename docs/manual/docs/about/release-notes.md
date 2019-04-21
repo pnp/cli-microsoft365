@@ -1,5 +1,18 @@
 # Release notes
 
+## [v1.18.0](https://github.com/pnp/office365-cli/releases/tag/v1.17.0)
+
+### New commands
+
+**Microsoft Graph:**
+
+- [graph o365group renew](../cmd/graph/o365group/o365group-renew.md) - renews Office 365 group's expiration [#870](https://github.com/pnp/office365-cli/issues/870)
+- [graph o365group user remove](../cmd/graph/o365group/o365group-user-remove.md) - removes the specified user from specified Office 365 Group or Microsoft Teams team [#846](https://github.com/pnp/office365-cli/issues/846)
+
+### Changes
+
+- centralized executing HTTP requests solving [#888](https://github.com/pnp/office365-cli/issues/888)
+
 ## [v1.17.0](https://github.com/pnp/office365-cli/releases/tag/v1.17.0)
 
 ### New commands
