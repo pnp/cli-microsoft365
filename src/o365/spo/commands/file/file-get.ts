@@ -110,7 +110,7 @@ class SpoFileGetCommand extends SpoCommand {
         }
         else if (args.options.asFile) {
           if (args.options.path) {
-            fs.writeFileSync(file, args.options.path);
+            fs.writeFileSync(args.options.path, file);
             if (this.verbose) {
               cmd.log(`File saved to path ${args.options.path}`);
             }
