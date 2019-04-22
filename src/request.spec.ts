@@ -29,7 +29,8 @@ describe('Request', () => {
     Utils.restore([
       global.setTimeout,
       https.request,
-      (_request as any).req
+      (_request as any).req,
+      cmdInstance.log
     ]);
   });
 
@@ -523,7 +524,36 @@ describe('Request', () => {
       })
       .then(() => {
         try {
-          assert(logSpy.calledWith('Request throttled. Waiting 10sec before retrying...'))
+          assert(logSpy.calledWith('Request throttled. Waiting 10sec before retrying...'));
+          done();
+        }
+        catch (err) {
+          done(err);
+        }
+      }, (err: any) => {
+        done(err);
+      });
+  });
+
+  it('logs response body in debug mode', (done) => {
+    _request.debug = true;
+    const logSpy: sinon.SinonSpy = sinon.spy(cmdInstance, 'log');
+
+    sinon.stub(_request as any, 'req').callsFake(() => {
+      return Promise.resolve({
+        hello: 'world'
+      });
+    });
+
+    _request
+      .get({
+        url: 'https://contoso.sharepoint.com/'
+      })
+      .then(() => {
+        try {
+          assert(logSpy.calledWith(JSON.stringify({
+            hello: 'world'
+          })));
           done();
         }
         catch (err) {
