@@ -37,12 +37,12 @@ When tabs are cloned, they are put into an unconfigured state and they are displ
 
 ## Examples
 
-Creates a copy of a Microsoft Teams team
+Creates a copy of a Microsoft Teams team with mandatory parameters
 
 ```sh
 graph teams clone --teamId 3d471997-0557-4443-b8d2-40e63a09cf69 --displayName "Library Assist" --mailNickname "libassist" --partsToClone "apps,tabs,settings,channels,members"
 ```
-Create a copy of a Microsoft Teams team
+Create a copy of a Microsoft Teams team with mandatory and optional parameters
 
 ```sh
 graph teams clone --teamId 3d471997-0557-4443-b8d2-40e63a09cf69 --displayName "Library Assist" --mailNickname "libassist" --partsToClone "apps,tabs,settings,channels,members" --description "Self help community for library" --classification "Library" --visibility "public"

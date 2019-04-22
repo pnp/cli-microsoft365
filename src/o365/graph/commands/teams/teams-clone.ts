@@ -83,13 +83,13 @@ class GraphTeamsCloneCommand extends GraphCommand {
 
         return request.post(requestOptions);
       })
-      .then((): void => {
+      .then((res: any): void => {
+        cmd.log(res);
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
         }
-
         cb();
-      }, (res: any): void => this.handleRejectedODataJsonPromise(res, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
 
   public options(): CommandOption[] {
@@ -99,7 +99,7 @@ class GraphTeamsCloneCommand extends GraphCommand {
         description: 'The ID of the Microsoft Teams team to clone'
       },
       {
-        option: '-n, --displayName',
+        option: '-n, --displayName <displayName>',
         description: 'The display name for the new Microsoft Teams Team'
       },
       {
@@ -208,10 +208,10 @@ class GraphTeamsCloneCommand extends GraphCommand {
 
   Examples:
     
-    Creates a copy of a Microsoft Teams team
+    Creates a copy of a Microsoft Teams team with mandatory parameters
       ${chalk.grey(config.delimiter)} ${commands.TEAMS_CLONE} --teamId 6f6fd3f7-9ba5-4488-bbe6-a789004d0d55 --displayName "Library Assist" --mailNickname "libassist" --partsToClone "apps,tabs,settings,channels,members" 
     
-    Creates a copy of a Microsoft Teams team
+    Creates a copy of a Microsoft Teams team with mandatory and optional parameters
       ${chalk.grey(config.delimiter)} ${commands.TEAMS_CLONE} --teamId 6f6fd3f7-9ba5-4488-bbe6-a789004d0d55 --displayName "Library Assist" --mailNickname "libassist" --partsToClone "apps,tabs,settings,channels,members" --description "Self help community for library" --classification "Library" --visibility "public"
       
     `);
