@@ -57,6 +57,10 @@ class Request {
       this
         .req(options)
         .then((res: TResponse): void => {
+          if (request.debug && res) {
+            (this._cmd as CommandInstance).log('REQUEST response body');
+            (this._cmd as CommandInstance).log(JSON.stringify(res));
+          }
           if (resolve) {
             resolve(res);
           }
