@@ -25,8 +25,8 @@ const loadAllCommands = (rootFolder: string): void => {
 
   files.forEach(file => {
     if (file.indexOf(`${path.sep}commands${path.sep}`) > -1 &&
-      file.indexOf('.spec.js') === -1 &&
-      file.indexOf('.js.map') === -1) {
+      file.endsWith('.js') &&
+      !file.endsWith('.spec.js')) {
       try {
         const cmd: any = require(file);
         if (cmd instanceof Command) {
