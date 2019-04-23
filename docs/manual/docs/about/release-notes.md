@@ -12,6 +12,7 @@
 ### Changes
 
 - centralized executing HTTP requests solving [#888](https://github.com/pnp/office365-cli/issues/888)
+- fixed bug in loading commands [#942](https://github.com/pnp/office365-cli/issues/942)
 
 ## [v1.17.0](https://github.com/pnp/office365-cli/releases/tag/v1.17.0)
 
