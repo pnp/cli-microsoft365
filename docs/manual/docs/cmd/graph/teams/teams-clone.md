@@ -17,9 +17,9 @@ Option|Description
 `-n, --displayName <displayName>`|The display name for the new Microsoft Teams Team 
 `-m, --mailNickname <mailNickname>`|The mail alias for the new Microsoft Teams Team 
 `-p, --partsToClone <partsToClone>`|A comma-seperated list of the parts to clone. Allowed values are apps|channels|members|settings|tabs 
-`-d, --description <description>`|The description for the new Microsoft Teams Team. Will be left blank if not specified
-`-c, --classification <classification>`|The classification for the new Microsoft Teams Team. If not specified, will be copied from the original Microsoft Teams Team 
-`-v, --visibility <visibility>`|Specify the visibility of the new Microsoft Teams Team. Allowed values are Private|Public. If not specified, the visibility will be copied from the original Microsoft Teams Team 
+`-d, --description [description]`|The description for the new Microsoft Teams Team. Will be left blank if not specified
+`-c, --classification [classification]`|The classification for the new Microsoft Teams Team. If not specified, will be copied from the original Microsoft Teams Team 
+`-v, --visibility [visibility]`|Specify the visibility of the new Microsoft Teams Team. Allowed values are Private|Public. If not specified, the visibility will be copied from the original Microsoft Teams Team 
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

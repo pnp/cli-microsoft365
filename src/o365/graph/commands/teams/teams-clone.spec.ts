@@ -164,6 +164,37 @@ describe(commands.TEAMS_CLONE, () => {
     done();
   });
 
+  it('fails validation on invalid visibility', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { visibility: 'abc' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('passes validation on valid \'private\' visibility', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+        displayName: "Library Assist",
+        mailNickname: "libassist",
+        partsToClone: "apps,tabs,settings,channels,members",
+        visibility: 'private'
+      }
+    });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation on valid \'public\' visibility', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+        displayName: "Library Assist",
+        mailNickname: "libassist",
+        partsToClone: "apps,tabs,settings,channels,members",
+        visibility: 'public'
+      }
+    });
+    assert.equal(actual, true);
+  });
+
   it('passes validation when the input is correct with mandatory parameters', () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
@@ -194,9 +225,12 @@ describe(commands.TEAMS_CLONE, () => {
   it('creates a copy of a Microsoft Teams team with mandatory parameters', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/f5dba91d-6494-4d5e-89a7-ad832f6946d6/clone`) {
-        return Promise.resolve();
+        return Promise.resolve({
+          headers : {
+            location: "/teams('f9526e6a-1d0d-4421-8882-88a70975a00c')/operations('6cf64f96-08c3-4173-9919-eaf7684aae9a')"
+          }
+        });
       }
-
       return Promise.reject('Invalid request');
     });
 
@@ -213,79 +247,9 @@ describe(commands.TEAMS_CLONE, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
+        assert(cmdInstanceLogSpy.calledWith('f9526e6a-1d0d-4421-8882-88a70975a00c'));
+        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
 
-  it('creates a copy of a Microsoft Teams team with mandatory and optional parameters', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/f5dba91d-6494-4d5e-89a7-ad832f6946d6/clone`) {
-        return Promise.resolve();
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
-        displayName: "Library Assist",
-        mailNickname: "libassist",
-        partsToClone: "apps,tabs,settings,channels,members",
-        description: "Self help community for library",
-        visibility: "public",
-        classification: "public"
-      }
-    }, () => {
-      try {
-        assert(cmdInstanceLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('should correctly handle graph error response', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/f5dba91d-6494-4d5e-89a7-ad832f6946d6/clone`) {
-        return Promise.reject(
-          {
-            "error": {
-              "code": "ItemNotFound",
-              "message": "No team found with Group Id f5dba91d-6494-4d5e-89a7-ad832f6946d6",
-              "innerError": {
-                "request-id": "ad0c0a4f-a4fc-4567-8ae1-1150db48b620",
-                "date": "2019-04-05T15:51:43"
-              }
-            }
-          });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        teamId: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6'
-      }
-    }, (err?: any) => {
-      try {
-        assert.equal(err.message, 'No team found with Group Id f5dba91d-6494-4d5e-89a7-ad832f6946d6');
         done();
       }
       catch (e) {
@@ -297,7 +261,11 @@ describe(commands.TEAMS_CLONE, () => {
   it('creates a copy of a Microsoft Teams team with mandatory parameters (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/f5dba91d-6494-4d5e-89a7-ad832f6946d6/clone`) {
-        return Promise.resolve();
+        return Promise.resolve({
+          headers : {
+            location: "/teams('f9526e6a-1d0d-4421-8882-88a70975a00c')/operations('6cf64f96-08c3-4173-9919-eaf7684aae9a')"
+          }
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -317,7 +285,48 @@ describe(commands.TEAMS_CLONE, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.called);
+        assert(cmdInstanceLogSpy.calledWith('f9526e6a-1d0d-4421-8882-88a70975a00c'));
+        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('creates a copy of a Microsoft Teams team with mandatory parameters', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/f5dba91d-6494-4d5e-89a7-ad832f6946d6/clone`) {
+        return Promise.resolve({
+          headers : {
+            location: "/teams('f9526e6a-1d0d-4421-8882-88a70975a00c')/operations('6cf64f96-08c3-4173-9919-eaf7684aae9a')"
+          }
+        });
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    auth.service = new Service();
+    auth.service.connected = true;
+    auth.service.resource = 'https://graph.microsoft.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+        displayName: "Library Assist",
+        mailNickname: "libassist",
+        partsToClone: "apps,tabs,settings,channels,members",
+        description: "Self help community for library",
+        visibility: "public",
+        classification: "public"
+      }
+    }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith('f9526e6a-1d0d-4421-8882-88a70975a00c'));
+        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+
         done();
       }
       catch (e) {
@@ -329,7 +338,11 @@ describe(commands.TEAMS_CLONE, () => {
   it('creates a copy of a Microsoft Teams team with mandatory and optional parameters (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/f5dba91d-6494-4d5e-89a7-ad832f6946d6/clone`) {
-        return Promise.resolve();
+        return Promise.resolve({
+          headers : {
+            location: "/teams('f9526e6a-1d0d-4421-8882-88a70975a00c')/operations('6cf64f96-08c3-4173-9919-eaf7684aae9a')"
+          }
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -352,7 +365,9 @@ describe(commands.TEAMS_CLONE, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.called);
+        assert(cmdInstanceLogSpy.calledWith('f9526e6a-1d0d-4421-8882-88a70975a00c'));
+        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+
         done();
       }
       catch (e) {

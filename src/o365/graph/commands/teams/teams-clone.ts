@@ -42,6 +42,7 @@ class GraphTeamsCloneCommand extends GraphCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
       .then((): request.RequestPromise => {
@@ -52,20 +53,24 @@ class GraphTeamsCloneCommand extends GraphCommand {
         body.mailNickname = args.options.mailNickname;
         body.partsToClone = args.options.partsToClone;
 
-        if (args.options.description) {
+        if(args.options.description)
+        {
           body.description = args.options.description;
         }
 
-        if (args.options.classification) {
+        if(args.options.classification)
+        {
           body.classification = args.options.classification;
         }
 
-        if (args.options.visibility) {
+        if(args.options.visibility)
+        {
           body.visibility = args.options.visibility;
         }
 
         const requestOptions: any = {
           url: `${auth.service.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/clone`,
+          resolveWithFullResponse: true,
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${auth.service.accessToken}`,
             'content-type': 'application/json;odata=nometadata',
@@ -82,14 +87,7 @@ class GraphTeamsCloneCommand extends GraphCommand {
         }
 
         return request.post(requestOptions);
-      })
-      .then((res: any): void => {
-        cmd.log(res);
-        if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
-        }
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      });
   }
 
   public options(): CommandOption[] {
@@ -111,16 +109,17 @@ class GraphTeamsCloneCommand extends GraphCommand {
         description: 'A comma-seperated list of the parts to clone. Allowed values are apps|channels|members|settings|tabs'
       },
       {
-        option: '-d --description <description>',
+        option: '-d --description [description]',
         description: 'The description for the new Microsoft Teams Team. Will be left blank if not specified'
       },
       {
-        option: '-c --classification <classification>',
+        option: '-c --classification [classification]',
         description: 'The classification for the new Microsoft Teams Team. If not specified, will be copied from the original Microsoft Teams Team'
       },
       {
-        option: '-v --visibility <visibility>',
-        description: 'Specify the visibility of the new Microsoft Teams Team. Allowed values are Private|Public. If not specified, the visibility will be copied from the original Microsoft Teams Team'
+        option: '-v --visibility [visibility]',
+        description: 'Specify the visibility of the new Microsoft Teams Team. Allowed values are Private|Public. If not specified, the visibility will be copied from the original Microsoft Teams Team',
+        autocomplete: ['Private', 'Public']
       }
     ];
 
@@ -149,36 +148,6 @@ class GraphTeamsCloneCommand extends GraphCommand {
 
       if (!args.options.partsToClone) {
         return 'Required option partsToClone missing';
-      }
-
-      if (args.options.partsToClone) {
-        let partsToClone: string[] = args.options.partsToClone.split(',').map(p => p.trim());
-
-        for (let partToClone of partsToClone) {
-
-          if (!partToClone) {
-            return `partsToClone can not have empty/blank value. Allowed values are apps|channels|members|settings|tabs`;
-          }
-
-          let part: string = partToClone.toLowerCase();
-
-          if (part !== 'apps' &&
-            part !== 'channels' &&
-            part !== 'members' &&
-            part !== 'settings' &&
-            part !== 'tabs') {
-            return `${part} is not a valid partsToClone. Allowed values are apps|channels|members|settings|tabs`;
-          }
-        }
-      }
-
-      if (args.options.visibility) {
-        const visibility: string = args.options.visibility.trim().toLowerCase();
-
-        if (visibility !== 'private' &&
-          visibility !== 'public') {
-          return `${args.options.visibility} is not a valid visibility type. Allowed values are Private|Public`;
-        }
       }
 
       return true;
