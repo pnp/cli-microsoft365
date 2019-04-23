@@ -22,6 +22,7 @@ ConvertTo-SPOMigrationTargetedPackage|Microsoft.Online.SharePoint.PowerShell|
 Deny-SPOTenantServicePrincipalPermissionRequest|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal permissionrequest deny](../cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-deny.md)
 Disable-SPOTenantServicePrincipal|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal set](../cmd/spo/serviceprincipal/serviceprincipal-set.md)
 Disconnect-SPOService|Microsoft.Online.SharePoint.PowerShell|[spo logout](../cmd/spo/logout.md)
+Enable-SPOCommSite|Microsoft.Online.SharePoint.PowerShell|[spo site commsite enable](../cmd/spo/site/site-commsite-enable.md)
 Enable-SPOTenantServicePrincipal|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal set](../cmd/spo/serviceprincipal/serviceprincipal-set.md)
 Export-SPOUserInfo|Microsoft.Online.SharePoint.PowerShell|
 Export-SPOUserProfile|Microsoft.Online.SharePoint.PowerShell|

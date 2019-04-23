@@ -132,6 +132,7 @@ export default {
   SITE_CLASSIC_LIST: `${prefix} site classic list`,
   SITE_CLASSIC_SET: `${prefix} site classic set`,
   SITE_CLASSIC_REMOVE: `${prefix} site classic remove`,
+  SITE_COMMSITE_ENABLE: `${prefix} site commsite enable`,
   SITE_GET: `${prefix} site get`,
   SITE_GROUPIFY: `${prefix} site groupify`,
   SITE_LIST: `${prefix} site list`,
