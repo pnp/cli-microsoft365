@@ -24,7 +24,6 @@ interface Options extends GlobalOptions {
 }
 
 class GraphTeamsCloneCommand extends GraphCommand {
-
   public get name(): string {
     return `${commands.TEAMS_CLONE}`;
   }
@@ -42,41 +41,25 @@ class GraphTeamsCloneCommand extends GraphCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
       .then((): request.RequestPromise => {
-
         let body: any = {};
 
         body.displayName = args.options.displayName;
         body.mailNickname = args.options.mailNickname;
         body.partsToClone = args.options.partsToClone;
-
-        if(args.options.description)
-        {
-          body.description = args.options.description;
-        }
-
-        if(args.options.classification)
-        {
-          body.classification = args.options.classification;
-        }
-
-        if(args.options.visibility)
-        {
-          body.visibility = args.options.visibility;
-        }
+        body.description = args.options.description || undefined;
+        body.classification = args.options.classification || undefined;
+        body.visibility = args.options.visibility || undefined;
 
         const requestOptions: any = {
           url: `${auth.service.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/clone`,
-          resolveWithFullResponse: true,
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${auth.service.accessToken}`,
-            'content-type': 'application/json;odata=nometadata',
-            'accept': 'application/json;odata.metadata=none'
+            "content-type": "application/zip",
+            accept: 'application/json;odata.metadata=none'
           }),
-          json: true,
           body: body
         };
 
@@ -87,7 +70,20 @@ class GraphTeamsCloneCommand extends GraphCommand {
         }
 
         return request.post(requestOptions);
-      });
+      })
+      .then((res: any): void => {
+        if (this.debug) {
+          cmd.log('Response:');
+          cmd.log(res);
+          cmd.log('');
+        }
+
+        if (this.verbose) {
+          cmd.log(vorpal.chalk.green('DONE'));
+        }
+
+        cb();
+      }, (res: any): void => this.handleRejectedODataJsonPromise(res, cmd, cb));
   }
 
   public options(): CommandOption[] {
@@ -188,3 +184,4 @@ class GraphTeamsCloneCommand extends GraphCommand {
 }
 
 module.exports = new GraphTeamsCloneCommand();
+

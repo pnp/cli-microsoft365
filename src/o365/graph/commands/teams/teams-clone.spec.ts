@@ -226,11 +226,10 @@ describe(commands.TEAMS_CLONE, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/f5dba91d-6494-4d5e-89a7-ad832f6946d6/clone`) {
         return Promise.resolve({
-          headers : {
-            location: "/teams('f9526e6a-1d0d-4421-8882-88a70975a00c')/operations('6cf64f96-08c3-4173-9919-eaf7684aae9a')"
-          }
+          "location": "/teams('f9526e6a-1d0d-4421-8882-88a70975a00c')/operations('6cf64f96-08c3-4173-9919-eaf7684aae9a')"
         });
       }
+
       return Promise.reject('Invalid request');
     });
 
@@ -240,6 +239,7 @@ describe(commands.TEAMS_CLONE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
+        debug: false,
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         displayName: "Library Assist",
         mailNickname: "libassist",
@@ -247,12 +247,11 @@ describe(commands.TEAMS_CLONE, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith('f9526e6a-1d0d-4421-8882-88a70975a00c'));
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
 
+        assert(cmdInstanceLogSpy.notCalled);
         done();
-      }
-      catch (e) {
+
+      } catch (e) {
         done(e);
       }
     });
@@ -262,9 +261,7 @@ describe(commands.TEAMS_CLONE, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/f5dba91d-6494-4d5e-89a7-ad832f6946d6/clone`) {
         return Promise.resolve({
-          headers : {
-            location: "/teams('f9526e6a-1d0d-4421-8882-88a70975a00c')/operations('6cf64f96-08c3-4173-9919-eaf7684aae9a')"
-          }
+          "location": "/teams('f9526e6a-1d0d-4421-8882-88a70975a00c')/operations('6cf64f96-08c3-4173-9919-eaf7684aae9a')"
         });
       }
 
@@ -277,97 +274,15 @@ describe(commands.TEAMS_CLONE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
+        debug: true,
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         displayName: "Library Assist",
         mailNickname: "libassist",
-        partsToClone: "apps,tabs,settings,channels,members",
-        debug: true
+        partsToClone: "apps,tabs,settings,channels,members"
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith('f9526e6a-1d0d-4421-8882-88a70975a00c'));
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
-
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('creates a copy of a Microsoft Teams team with mandatory parameters', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/f5dba91d-6494-4d5e-89a7-ad832f6946d6/clone`) {
-        return Promise.resolve({
-          headers : {
-            location: "/teams('f9526e6a-1d0d-4421-8882-88a70975a00c')/operations('6cf64f96-08c3-4173-9919-eaf7684aae9a')"
-          }
-        });
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
-        displayName: "Library Assist",
-        mailNickname: "libassist",
-        partsToClone: "apps,tabs,settings,channels,members",
-        description: "Self help community for library",
-        visibility: "public",
-        classification: "public"
-      }
-    }, () => {
-      try {
-        assert(cmdInstanceLogSpy.calledWith('f9526e6a-1d0d-4421-8882-88a70975a00c'));
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
-
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('creates a copy of a Microsoft Teams team with mandatory and optional parameters (debug)', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/f5dba91d-6494-4d5e-89a7-ad832f6946d6/clone`) {
-        return Promise.resolve({
-          headers : {
-            location: "/teams('f9526e6a-1d0d-4421-8882-88a70975a00c')/operations('6cf64f96-08c3-4173-9919-eaf7684aae9a')"
-          }
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    auth.service = new Service();
-    auth.service.connected = true;
-    auth.service.resource = 'https://graph.microsoft.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
-        displayName: "Library Assist",
-        mailNickname: "libassist",
-        partsToClone: "apps,tabs,settings,channels,members",
-        description: "Self help community for library",
-        visibility: "public",
-        classification: "public",
-        debug: true
-      }
-    }, () => {
-      try {
-        assert(cmdInstanceLogSpy.calledWith('f9526e6a-1d0d-4421-8882-88a70975a00c'));
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
-
+        assert(cmdInstanceLogSpy.called);
         done();
       }
       catch (e) {
