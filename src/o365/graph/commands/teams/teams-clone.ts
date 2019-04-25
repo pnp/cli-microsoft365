@@ -44,14 +44,6 @@ class GraphTeamsCloneCommand extends GraphCommand {
     auth
       .ensureAccessToken(auth.service.resource, cmd, this.debug)
       .then((): request.RequestPromise => {
-        let body: any = {};
-
-        body.displayName = args.options.displayName;
-        body.mailNickname = args.options.mailNickname;
-        body.partsToClone = args.options.partsToClone;
-        body.description = args.options.description || undefined;
-        body.classification = args.options.classification || undefined;
-        body.visibility = args.options.visibility || undefined;
 
         const requestOptions: any = {
           url: `${auth.service.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/clone`,
@@ -60,7 +52,15 @@ class GraphTeamsCloneCommand extends GraphCommand {
             "content-type": "application/zip",
             accept: 'application/json;odata.metadata=none'
           }),
-          body: body
+          json: true,
+          body: {
+            displayName : args.options.displayName,
+            mailNickname : args.options.mailNickname,
+            partsToClone : args.options.partsToClone,
+            description : args.options.description || undefined,
+            classification : args.options.classification || undefined,
+            visibility : args.options.visibility || undefined,
+          }
         };
 
         if (this.debug) {
@@ -174,10 +174,10 @@ class GraphTeamsCloneCommand extends GraphCommand {
   Examples:
     
     Creates a copy of a Microsoft Teams team with mandatory parameters
-      ${chalk.grey(config.delimiter)} ${commands.TEAMS_CLONE} --teamId 6f6fd3f7-9ba5-4488-bbe6-a789004d0d55 --displayName "Library Assist" --mailNickname "libassist" --partsToClone "apps,tabs,settings,channels,members" 
+      ${chalk.grey(config.delimiter)} ${commands.TEAMS_CLONE} --teamId 15d7a78e-fd77-4599-97a5-dbb6372846c5 --displayName "Library Assist" --mailNickname "libassist" --partsToClone "apps,tabs,settings,channels,members" 
     
     Creates a copy of a Microsoft Teams team with mandatory and optional parameters
-      ${chalk.grey(config.delimiter)} ${commands.TEAMS_CLONE} --teamId 6f6fd3f7-9ba5-4488-bbe6-a789004d0d55 --displayName "Library Assist" --mailNickname "libassist" --partsToClone "apps,tabs,settings,channels,members" --description "Self help community for library" --classification "Library" --visibility "public"
+      ${chalk.grey(config.delimiter)} ${commands.TEAMS_CLONE} --teamId 15d7a78e-fd77-4599-97a5-dbb6372846c5 --displayName "Library Assist" --mailNickname "libassist" --partsToClone "apps,tabs,settings,channels,members" --description "Self help community for library" --classification "Library" --visibility "public"
       
     `);
   }

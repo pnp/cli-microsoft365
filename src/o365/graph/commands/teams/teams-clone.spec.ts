@@ -131,7 +131,7 @@ describe(commands.TEAMS_CLONE, () => {
   it('fails validation if the displayName is not provided.', (done) => {
     const actual = (command.validate() as CommandValidate)({
       options: {
-        teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55',
+        teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         mailNickname: "libassist",
         partsToClone: "apps,tabs,settings,channels,members"
       }
@@ -143,7 +143,7 @@ describe(commands.TEAMS_CLONE, () => {
   it('fails validation if the mailNickname is not provided.', (done) => {
     const actual = (command.validate() as CommandValidate)({
       options: {
-        teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55',
+        teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         displayName: "Library Assist",
         partsToClone: "apps,tabs,settings,channels,members"
       }
@@ -155,7 +155,7 @@ describe(commands.TEAMS_CLONE, () => {
   it('fails validation if the partsToClone is not provided.', (done) => {
     const actual = (command.validate() as CommandValidate)({
       options: {
-        teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55',
+        teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         displayName: "Library Assist",
         mailNickname: "libassist"
       }
@@ -224,7 +224,7 @@ describe(commands.TEAMS_CLONE, () => {
 
   it('creates a copy of a Microsoft Teams team with mandatory parameters', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/f5dba91d-6494-4d5e-89a7-ad832f6946d6/clone`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/15d7a78e-fd77-4599-97a5-dbb6372846c5/clone`) {
         return Promise.resolve({
           "location": "/teams('f9526e6a-1d0d-4421-8882-88a70975a00c')/operations('6cf64f96-08c3-4173-9919-eaf7684aae9a')"
         });
@@ -259,7 +259,7 @@ describe(commands.TEAMS_CLONE, () => {
 
   it('creates a copy of a Microsoft Teams team with mandatory parameters (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/f5dba91d-6494-4d5e-89a7-ad832f6946d6/clone`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/15d7a78e-fd77-4599-97a5-dbb6372846c5/clone`) {
         return Promise.resolve({
           "location": "/teams('f9526e6a-1d0d-4421-8882-88a70975a00c')/operations('6cf64f96-08c3-4173-9919-eaf7684aae9a')"
         });

@@ -40,10 +40,10 @@ When tabs are cloned, they are put into an unconfigured state and they are displ
 Creates a copy of a Microsoft Teams team with mandatory parameters
 
 ```sh
-graph teams clone --teamId 3d471997-0557-4443-b8d2-40e63a09cf69 --displayName "Library Assist" --mailNickname "libassist" --partsToClone "apps,tabs,settings,channels,members"
+graph teams clone --teamId 15d7a78e-fd77-4599-97a5-dbb6372846c5 --displayName "Library Assist" --mailNickname "libassist" --partsToClone "apps,tabs,settings,channels,members"
 ```
 Create a copy of a Microsoft Teams team with mandatory and optional parameters
 
 ```sh
-graph teams clone --teamId 3d471997-0557-4443-b8d2-40e63a09cf69 --displayName "Library Assist" --mailNickname "libassist" --partsToClone "apps,tabs,settings,channels,members" --description "Self help community for library" --classification "Library" --visibility "public"
+graph teams clone --teamId 15d7a78e-fd77-4599-97a5-dbb6372846c5 --displayName "Library Assist" --mailNickname "libassist" --partsToClone "apps,tabs,settings,channels,members" --description "Self help community for library" --classification "Library" --visibility "public"
 ```
