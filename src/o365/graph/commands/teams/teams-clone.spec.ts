@@ -222,7 +222,56 @@ describe(commands.TEAMS_CLONE, () => {
     assert.equal(actual, true);
   });
 
-  it('creates a copy of a Microsoft Teams team with mandatory parameters', (done) => {
+  it('fails validation if visibility is set to private', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+        displayName: "Library Assist",
+        mailNickname: "libassist",
+        partsToClone: "apps,tabs,settings,channels,members",
+        visibility: "abc"
+      }
+    });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation if partsToClone is set to invalid value', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+        displayName: "Library Assist",
+        mailNickname: "libassist",
+        partsToClone: "abc"
+      }
+    });
+    assert.notEqual(actual, true);
+  });
+
+  it('passes validation if visibility is set to private', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+        displayName: "Library Assist",
+        mailNickname: "libassist",
+        partsToClone: "apps,tabs,settings,channels,members",
+        visibility: "private"
+      }
+    });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation if visibility is set to private', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { 
+      teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+        displayName: "Library Assist",
+        mailNickname: "libassist",
+        partsToClone: "apps,tabs,settings,channels,members",
+        visibility: "private"
+     } });
+    assert.equal(actual, true);
+  });
+
+  it('creates a clone of a Microsoft Teams team with mandatory parameters', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/15d7a78e-fd77-4599-97a5-dbb6372846c5/clone`) {
         return Promise.resolve({
@@ -257,7 +306,7 @@ describe(commands.TEAMS_CLONE, () => {
     });
   });
 
-  it('creates a copy of a Microsoft Teams team with mandatory parameters (debug)', (done) => {
+  it('creates a clone of a Microsoft Teams team with mandatory parameters (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/15d7a78e-fd77-4599-97a5-dbb6372846c5/clone`) {
         return Promise.resolve({

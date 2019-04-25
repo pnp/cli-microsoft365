@@ -29,7 +29,7 @@ class GraphTeamsCloneCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Creates a copy of a Microsoft Teams team';
+    return 'Creates a clone of a Microsoft Teams team';
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -49,7 +49,7 @@ class GraphTeamsCloneCommand extends GraphCommand {
           url: `${auth.service.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/clone`,
           headers: Utils.getRequestHeaders({
             authorization: `Bearer ${auth.service.accessToken}`,
-            "content-type": "application/zip",
+            "content-type": "application/json",
             accept: 'application/json;odata.metadata=none'
           }),
           json: true,
@@ -72,12 +72,6 @@ class GraphTeamsCloneCommand extends GraphCommand {
         return request.post(requestOptions);
       })
       .then((res: any): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
         }
@@ -101,19 +95,20 @@ class GraphTeamsCloneCommand extends GraphCommand {
         description: 'The mail alias for the new Microsoft Teams Team'
       },
       {
-        option: '-p --partsToClone <partsToClone>',
-        description: 'A comma-seperated list of the parts to clone. Allowed values are apps|channels|members|settings|tabs'
+        option: '-p, --partsToClone <partsToClone>',
+        description: 'A comma-seperated list of the parts to clone. Allowed values are apps|channels|members|settings|tabs',
+        autocomplete: ['apps','channels','members','settings','tabs']
       },
       {
-        option: '-d --description [description]',
+        option: '-d, --description [description]',
         description: 'The description for the new Microsoft Teams Team. Will be left blank if not specified'
       },
       {
-        option: '-c --classification [classification]',
+        option: '-c, --classification [classification]',
         description: 'The classification for the new Microsoft Teams Team. If not specified, will be copied from the original Microsoft Teams Team'
       },
       {
-        option: '-v --visibility [visibility]',
+        option: '-v, --visibility [visibility]',
         description: 'Specify the visibility of the new Microsoft Teams Team. Allowed values are Private|Public. If not specified, the visibility will be copied from the original Microsoft Teams Team',
         autocomplete: ['Private', 'Public']
       }
@@ -146,6 +141,32 @@ class GraphTeamsCloneCommand extends GraphCommand {
         return 'Required option partsToClone missing';
       }
 
+      if (args.options.partsToClone) {
+        let partsToClone: string[] = args.options.partsToClone.split(',');
+
+        for (let partToClone of partsToClone) {
+
+          let part: string = partToClone.toLowerCase();
+
+          if (part !== 'apps' &&
+            part !== 'channels' &&
+            part !== 'members' &&
+            part !== 'settings' &&
+            part !== 'tabs') {
+            return `${part} is not a valid partsToClone. Allowed values are apps|channels|members|settings|tabs`;
+          }
+        }
+      }
+
+      if (args.options.visibility) {
+        const visibility: string = args.options.visibility.toLowerCase();
+
+        if (visibility !== 'private' &&
+          visibility !== 'public') {
+          return `${args.options.visibility} is not a valid visibility type. Allowed values are Private|Public`;
+        }
+      }
+
       return true;
     };
   }
@@ -173,10 +194,10 @@ class GraphTeamsCloneCommand extends GraphCommand {
 
   Examples:
     
-    Creates a copy of a Microsoft Teams team with mandatory parameters
+    Creates a clone of a Microsoft Teams team with mandatory parameters
       ${chalk.grey(config.delimiter)} ${commands.TEAMS_CLONE} --teamId 15d7a78e-fd77-4599-97a5-dbb6372846c5 --displayName "Library Assist" --mailNickname "libassist" --partsToClone "apps,tabs,settings,channels,members" 
     
-    Creates a copy of a Microsoft Teams team with mandatory and optional parameters
+    Creates a clone of a Microsoft Teams team with mandatory and optional parameters
       ${chalk.grey(config.delimiter)} ${commands.TEAMS_CLONE} --teamId 15d7a78e-fd77-4599-97a5-dbb6372846c5 --displayName "Library Assist" --mailNickname "libassist" --partsToClone "apps,tabs,settings,channels,members" --description "Self help community for library" --classification "Library" --visibility "public"
       
     `);
