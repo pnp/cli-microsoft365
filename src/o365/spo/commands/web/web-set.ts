@@ -24,6 +24,7 @@ interface Options extends GlobalOptions {
   siteLogoUrl?: string;
   title?: string;
   webUrl: string;
+  footerEnabled?: string;
 }
 
 class SpoWebSetCommand extends SpoCommand {
@@ -44,6 +45,7 @@ class SpoWebSetCommand extends SpoCommand {
     telemetryProps.siteLogoUrl = typeof args.options.siteLogoUrl !== 'undefined';
     telemetryProps.title = typeof args.options.title !== 'undefined';
     telemetryProps.quickLaunchEnabled = typeof args.options.quickLaunchEnabled !== 'undefined';
+    telemetryProps.footerEnabled = typeof args.options.footerEnabled !== 'undefined';
     return telemetryProps;
   }
 
@@ -78,6 +80,9 @@ class SpoWebSetCommand extends SpoCommand {
         }
         if (typeof args.options.megaMenuEnabled !== 'undefined') {
           payload.MegaMenuEnabled = args.options.megaMenuEnabled === 'true';
+        }
+        if (typeof args.options.footerEnabled !== 'undefined') {
+          payload.FooterEnabled = args.options.footerEnabled === 'true';
         }
 
         const requestOptions: any = {
@@ -142,6 +147,11 @@ class SpoWebSetCommand extends SpoCommand {
         option: '--megaMenuEnabled [megaMenuEnabled]',
         description: 'Set to \'true\' to change the menu style to megamenu. Set to \'false\' to use the cascading menu style',
         autocomplete: ['true', 'false']
+      },
+      {
+        option: '--footerEnabled [footerEnabled]',
+        description: 'Set to \'true\' to enable footer and to \'false\' to disable it',
+        autocomplete: ['true', 'false']
       }
     ];
 
@@ -190,6 +200,13 @@ class SpoWebSetCommand extends SpoCommand {
         }
       }
 
+      if (typeof args.options.footerEnabled !== 'undefined') {
+        if (args.options.footerEnabled !== 'true' &&
+          args.options.footerEnabled !== 'false') {
+          return `${args.options.footerEnabled} is not a valid boolean value`;
+        }
+      }
+
       return true;
     };
   }
@@ -218,11 +235,14 @@ class SpoWebSetCommand extends SpoCommand {
     Set site header layout to compact
       ${chalk.grey(config.delimiter)} ${commands.WEB_SET} --webUrl https://contoso.sharepoint.com/sites/team-a --headerLayout compact
 
-    Set site header color to primary theme backround color
+    Set site header color to primary theme background color
       ${chalk.grey(config.delimiter)} ${commands.WEB_SET} --webUrl https://contoso.sharepoint.com/sites/team-a --headerEmphasis 0
 
     Enable megamenu in the site
       ${chalk.grey(config.delimiter)} ${commands.WEB_SET} --webUrl https://contoso.sharepoint.com/sites/team-a --megaMenuEnabled true
+    
+    Hide footer in the site
+      ${chalk.grey(config.delimiter)} ${commands.WEB_SET} --webUrl https://contoso.sharepoint.com/sites/team-a --footerEnabled false
   ` );
   }
 }

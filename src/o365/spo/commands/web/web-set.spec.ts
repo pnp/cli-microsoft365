@@ -448,7 +448,8 @@ describe(commands.WEB_SET, () => {
         QuickLaunchEnabled: true,
         HeaderEmphasis: 2,
         HeaderLayout: 2,
-        MegaMenuEnabled: true
+        MegaMenuEnabled: true,
+        FooterEnabled: true
       })) {
         return Promise.resolve();
       }
@@ -460,7 +461,7 @@ describe(commands.WEB_SET, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', title: 'New title', description: 'New description', siteLogoUrl: 'image.png', quickLaunchEnabled: 'true', headerLayout: 'compact', headerEmphasis: 1, megaMenuEnabled: 'true' } }, () => {
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', title: 'New title', description: 'New description', siteLogoUrl: 'image.png', quickLaunchEnabled: 'true', headerLayout: 'compact', headerEmphasis: 1, megaMenuEnabled: 'true', footerEnabled: 'true' } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
         done();
@@ -652,6 +653,73 @@ describe(commands.WEB_SET, () => {
     cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails validation if footerEnabled is not a valid boolean', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: 'invalid' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('passes validation if footerEnabled is set to true', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: 'true' } });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation if footerEnabled is set to false', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: 'false' } });
+    assert.equal(actual, true);
+  });
+
+  it('enables footer', (done) => {
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (JSON.stringify(opts.body) === JSON.stringify({
+        FooterEnabled: true
+      })) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: 'true' } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('disables footer', (done) => {
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (JSON.stringify(opts.body) === JSON.stringify({
+        FooterEnabled: false
+      })) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: 'false' } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.notCalled);
         done();
       }
       catch (e) {
