@@ -4,6 +4,10 @@
 
 ### New commands
 
+**SharePoint Online:**
+
+- [spo site commsite enable](../cmd/spo/site/site-commsite-enable.md) - enables communication site features on the specified site [#937](https://github.com/pnp/office365-cli/issues/937)
+
 **Microsoft Graph:**
 
 - [graph o365group renew](../cmd/graph/o365group/o365group-renew.md) - renews Office 365 group's expiration [#870](https://github.com/pnp/office365-cli/issues/870)
@@ -13,6 +17,8 @@
 
 - centralized executing HTTP requests solving [#888](https://github.com/pnp/office365-cli/issues/888)
 - fixed bug in loading commands [#942](https://github.com/pnp/office365-cli/issues/942)
+- fixed saving files in 'spo file get' [#931](https://github.com/pnp/office365-cli/issues/931)
+- extended 'spo web set' to control footer visibility [#946](https://github.com/pnp/office365-cli/issues/946)
 
 ## [v1.17.0](https://github.com/pnp/office365-cli/releases/tag/v1.17.0)
 
