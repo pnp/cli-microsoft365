@@ -39,6 +39,12 @@ class AadLoginCommand extends Command {
     return [commands.CONNECT];
   }
 
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.authType = args.options.authType || 'deviceCode';
+    return telemetryProps;
+  }
+
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const chalk: any = vorpal.chalk;
 
