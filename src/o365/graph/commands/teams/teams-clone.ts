@@ -101,7 +101,7 @@ class GraphTeamsCloneCommand extends GraphCommand {
       },
       {
         option: '-d, --description [description]',
-        description: 'The description for the new Microsoft Teams Team. Will be left blank if not specified'
+        description: 'The description for the new Microsoft Teams Team.'
       },
       {
         option: '-c, --classification [classification]',
@@ -109,7 +109,7 @@ class GraphTeamsCloneCommand extends GraphCommand {
       },
       {
         option: '-v, --visibility [visibility]',
-        description: 'Specify the visibility of the new Microsoft Teams Team. Allowed values are Private|Public. If not specified, the visibility will be copied from the original Microsoft Teams Team',
+        description: 'Specify the visibility of the new Microsoft Teams Team. Allowed values are Private|Public.',
         autocomplete: ['Private', 'Public']
       }
     ];
