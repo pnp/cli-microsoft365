@@ -226,6 +226,56 @@ describe(commands.THEME_APPLY, () => {
     });
   });
 
+  it('applies SharePoint theme when correct values are passed', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+      if (opts.url.indexOf('/_api/ThemeManager/ApplyTheme') > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+            return Promise.resolve("Theme Blue applied to https://contoso.sharepoint.com/sites/project-x");
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action({
+      options: {
+        debug: false,
+        name: 'Blue',
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        sharePointTheme: true
+      }
+    }, () => {
+
+      requests.forEach(r => {
+        if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.body) {
+        }
+      });
+      try {
+        assert(cmdInstanceLogSpy.calledWith(true));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore([
+          request.post
+        ]);
+      }
+    });
+    
+  });
+
   it('handles error command error correctly', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
@@ -387,5 +437,10 @@ describe(commands.THEME_APPLY, () => {
   it('passes validation when webUrl is passed', () => {
     const actual = (command.validate() as CommandValidate)({ options: { name: 'Contoso-Blue', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert(actual);
+  });
+
+  it('fails validation if name is not a valid SharePoint theme name', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { name: 'invalid', webUrl: 'https://contoso.sharepoint.com/sites/project-x', sharePointTheme: true } });
+    assert.notEqual(actual, true);
   });
 });

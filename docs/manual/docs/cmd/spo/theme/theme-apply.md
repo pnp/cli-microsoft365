@@ -15,6 +15,7 @@ Option|Description
 `--help`|output usage information
 `-n, --name <name>`|Name of the theme to apply
 `-u, --webUrl <webUrl>`|URL of the site to which the theme should be applied
+`--sharePointTheme`|Set to specify if the supplied theme name is an out of the box theme
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
@@ -32,6 +33,12 @@ Apply theme to the specified site
 
 ```sh
 spo theme apply --name Contoso-Blue --webUrl https://contoso.sharepoint.com/sites/project-x
+```
+
+Apply SharePoint theme to the specified site
+
+```sh
+spo theme apply --name Blue --webUrl https://contoso.sharepoint.com/sites/project-x --sharePointTheme
 ```
 
 ## More information
