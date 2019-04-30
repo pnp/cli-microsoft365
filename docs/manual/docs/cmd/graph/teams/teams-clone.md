@@ -15,7 +15,7 @@ Option|Description
 `--help`|output usage information
 `-i, --teamId <teamId>`|The ID of the Microsoft Teams team to clone 
 `-n, --displayName <displayName>`|The display name for the new Microsoft Teams Team 
-`-m, --mailNickname <mailNickname>`|The mail alias for the new Microsoft Teams Team 
+`-m, --mailNickname <mailNickname>`|The mail alias for the new Microsoft Teams Team. Known issue: mailNickname property is currently ignored. 
 `-p, --partsToClone <partsToClone>`|A comma-seperated list of the parts to clone. Allowed values are `apps|channels|members|settings|tabs` 
 `-d, --description [description]`|The description for the new Microsoft Teams Team.
 `-c, --classification [classification]`|The classification for the new Microsoft Teams Team. If not specified, will be copied from the original Microsoft Teams Team 
