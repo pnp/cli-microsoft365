@@ -16,7 +16,6 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   teamId: string;
   displayName: string;
-  mailNickname: string;
   partsToClone: string;
   description?: string;
   classification?: string;
@@ -55,7 +54,7 @@ class GraphTeamsCloneCommand extends GraphCommand {
           json: true,
           body: {
             displayName : args.options.displayName,
-            mailNickname : args.options.mailNickname,
+            mailNickname : "TBD",
             partsToClone : args.options.partsToClone,
             description : args.options.description || undefined,
             classification : args.options.classification || undefined,
@@ -89,10 +88,6 @@ class GraphTeamsCloneCommand extends GraphCommand {
       {
         option: '-n, --displayName <displayName>',
         description: 'The display name for the new Microsoft Teams Team'
-      },
-      {
-        option: '-m, --mailNickname <mailNickname>',
-        description: 'The mail alias for the new Microsoft Teams Team'
       },
       {
         option: '-p, --partsToClone <partsToClone>',
@@ -131,10 +126,6 @@ class GraphTeamsCloneCommand extends GraphCommand {
 
       if (!args.options.displayName) {
         return 'Required option displayName missing';
-      }
-
-      if (!args.options.mailNickname) {
-        return 'Required option mailNickname missing';
       }
 
       if (!args.options.partsToClone) {
@@ -195,10 +186,10 @@ class GraphTeamsCloneCommand extends GraphCommand {
   Examples:
     
     Creates a clone of a Microsoft Teams team with mandatory parameters
-      ${chalk.grey(config.delimiter)} ${commands.TEAMS_CLONE} --teamId 15d7a78e-fd77-4599-97a5-dbb6372846c5 --displayName "Library Assist" --mailNickname "libassist" --partsToClone "apps,tabs,settings,channels,members" 
+      ${chalk.grey(config.delimiter)} ${commands.TEAMS_CLONE} --teamId 15d7a78e-fd77-4599-97a5-dbb6372846c5 --displayName "Library Assist" --partsToClone "apps,tabs,settings,channels,members" 
     
     Creates a clone of a Microsoft Teams team with mandatory and optional parameters
-      ${chalk.grey(config.delimiter)} ${commands.TEAMS_CLONE} --teamId 15d7a78e-fd77-4599-97a5-dbb6372846c5 --displayName "Library Assist" --mailNickname "libassist" --partsToClone "apps,tabs,settings,channels,members" --description "Self help community for library" --classification "Library" --visibility "public"
+      ${chalk.grey(config.delimiter)} ${commands.TEAMS_CLONE} --teamId 15d7a78e-fd77-4599-97a5-dbb6372846c5 --displayName "Library Assist" --partsToClone "apps,tabs,settings,channels,members" --description "Self help community for library" --classification "Library" --visibility "public"
       
     `);
   }

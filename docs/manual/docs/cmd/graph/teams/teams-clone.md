@@ -15,7 +15,6 @@ Option|Description
 `--help`|output usage information
 `-i, --teamId <teamId>`|The ID of the Microsoft Teams team to clone 
 `-n, --displayName <displayName>`|The display name for the new Microsoft Teams Team 
-`-m, --mailNickname <mailNickname>`|The mail alias for the new Microsoft Teams Team. Known issue: mailNickname property is currently ignored. 
 `-p, --partsToClone <partsToClone>`|A comma-seperated list of the parts to clone. Allowed values are `apps|channels|members|settings|tabs` 
 `-d, --description [description]`|The description for the new Microsoft Teams Team.
 `-c, --classification [classification]`|The classification for the new Microsoft Teams Team. If not specified, will be copied from the original Microsoft Teams Team 
@@ -40,10 +39,10 @@ When tabs are cloned, they are put into an unconfigured state and they are displ
 Creates a clone of a Microsoft Teams team with mandatory parameters
 
 ```sh
-graph teams clone --teamId 15d7a78e-fd77-4599-97a5-dbb6372846c5 --displayName "Library Assist" --mailNickname "libassist" --partsToClone "apps,tabs,settings,channels,members"
+graph teams clone --teamId 15d7a78e-fd77-4599-97a5-dbb6372846c5 --displayName "Library Assist" --partsToClone "apps,tabs,settings,channels,members"
 ```
 Create a clone of a Microsoft Teams team with mandatory and optional parameters
 
 ```sh
-graph teams clone --teamId 15d7a78e-fd77-4599-97a5-dbb6372846c5 --displayName "Library Assist" --mailNickname "libassist" --partsToClone "apps,tabs,settings,channels,members" --description "Self help community for library" --classification "Library" --visibility "public"
+graph teams clone --teamId 15d7a78e-fd77-4599-97a5-dbb6372846c5 --displayName "Library Assist" --partsToClone "apps,tabs,settings,channels,members" --description "Self help community for library" --classification "Library" --visibility "public"
 ```

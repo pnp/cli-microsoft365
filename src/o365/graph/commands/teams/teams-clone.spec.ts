@@ -107,7 +107,6 @@ describe(commands.TEAMS_CLONE, () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         displayName: "Library Assist",
-        mailNickname: "libassist",
         partsToClone: "apps,tabs,settings,channels,members"
       }
     });
@@ -120,7 +119,6 @@ describe(commands.TEAMS_CLONE, () => {
       options: {
         teamId: 'invalid',
         displayName: "Library Assist",
-        mailNickname: "libassist",
         partsToClone: "apps,tabs,settings,channels,members"
       }
     });
@@ -132,19 +130,6 @@ describe(commands.TEAMS_CLONE, () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
-        mailNickname: "libassist",
-        partsToClone: "apps,tabs,settings,channels,members"
-      }
-    });
-    assert.notEqual(actual, true);
-    done();
-  });
-
-  it('fails validation if the mailNickname is not provided.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
-        displayName: "Library Assist",
         partsToClone: "apps,tabs,settings,channels,members"
       }
     });
@@ -156,8 +141,7 @@ describe(commands.TEAMS_CLONE, () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
-        displayName: "Library Assist",
-        mailNickname: "libassist"
+        displayName: "Library Assist"
       }
     });
     assert.notEqual(actual, true);
@@ -174,7 +158,6 @@ describe(commands.TEAMS_CLONE, () => {
       options: {
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         displayName: "Library Assist",
-        mailNickname: "libassist",
         partsToClone: "apps,tabs,settings,channels,members",
         visibility: 'private'
       }
@@ -187,7 +170,6 @@ describe(commands.TEAMS_CLONE, () => {
       options: {
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         displayName: "Library Assist",
-        mailNickname: "libassist",
         partsToClone: "apps,tabs,settings,channels,members",
         visibility: 'public'
       }
@@ -200,7 +182,6 @@ describe(commands.TEAMS_CLONE, () => {
       options: {
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         displayName: "Library Assist",
-        mailNickname: "libassist",
         partsToClone: "apps,tabs,settings,channels,members"
       }
     });
@@ -212,7 +193,6 @@ describe(commands.TEAMS_CLONE, () => {
       options: {
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         displayName: "Library Assist",
-        mailNickname: "libassist",
         partsToClone: "apps,tabs,settings,channels,members",
         description: "Self help community for library",
         visibility: "public",
@@ -227,7 +207,6 @@ describe(commands.TEAMS_CLONE, () => {
       options: {
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         displayName: "Library Assist",
-        mailNickname: "libassist",
         partsToClone: "apps,tabs,settings,channels,members",
         visibility: "abc"
       }
@@ -240,7 +219,6 @@ describe(commands.TEAMS_CLONE, () => {
       options: {
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         displayName: "Library Assist",
-        mailNickname: "libassist",
         partsToClone: "abc"
       }
     });
@@ -252,7 +230,6 @@ describe(commands.TEAMS_CLONE, () => {
       options: {
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         displayName: "Library Assist",
-        mailNickname: "libassist",
         partsToClone: "apps,tabs,settings,channels,members",
         visibility: "private"
       }
@@ -264,7 +241,6 @@ describe(commands.TEAMS_CLONE, () => {
     const actual = (command.validate() as CommandValidate)({ options: { 
       teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         displayName: "Library Assist",
-        mailNickname: "libassist",
         partsToClone: "apps,tabs,settings,channels,members",
         visibility: "private"
      } });
@@ -291,7 +267,6 @@ describe(commands.TEAMS_CLONE, () => {
         debug: false,
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         displayName: "Library Assist",
-        mailNickname: "libassist",
         partsToClone: "apps,tabs,settings,channels,members"
       }
     }, () => {
@@ -326,7 +301,6 @@ describe(commands.TEAMS_CLONE, () => {
         debug: true,
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         displayName: "Library Assist",
-        mailNickname: "libassist",
         partsToClone: "apps,tabs,settings,channels,members"
       }
     }, () => {
