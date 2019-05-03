@@ -17,7 +17,8 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   role?: string;
-  groupId: string;
+  teamId?: string;
+  groupId?: string;
 }
 
 class GraphO365GroupUserListCommand extends GraphItemsListCommand<GroupUser> {
@@ -36,18 +37,22 @@ class GraphO365GroupUserListCommand extends GraphItemsListCommand<GroupUser> {
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.role = args.options.role;
+    telemetryProps.teamId = typeof args.options.teamId !== 'undefined';
+    telemetryProps.groupId = typeof args.options.groupId !== 'undefined';
     return telemetryProps;
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    const providedGroupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string
+
     this
-      .getOwners(cmd, args.options.groupId)
+      .getOwners(cmd, providedGroupId)
       .then((): Promise<void> => {
         if (args.options.role === "Owner") {
           return Promise.resolve();
         }
 
-        return this.getMembersAndGuests(cmd, args.options.groupId);
+        return this.getMembersAndGuests(cmd, providedGroupId);
       })
       .then(
         (): void => {
@@ -96,8 +101,12 @@ class GraphO365GroupUserListCommand extends GraphItemsListCommand<GroupUser> {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: "-i, --groupId <groupId>",
-        description: "The ID of the Office 365 group or team for which to list users"
+        option: "-i, --groupId [groupId]",
+        description: "The ID of the Office 365 Group to which to add the user"
+      },
+      {
+        option: "--teamId [teamId]",
+        description: "The ID of the Teams team to which to add the user"
       },
       {
         option: "-r, --role [type]",
@@ -113,11 +122,19 @@ class GraphO365GroupUserListCommand extends GraphItemsListCommand<GroupUser> {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.groupId) {
-        return 'Required parameter groupId missing';
+      if (!args.options.groupId && !args.options.teamId) {
+        return 'Please provide one of the following parameters: groupId or teamId';
       }
 
-      if (!Utils.isValidGuid(args.options.groupId as string)) {
+      if (args.options.groupId && args.options.teamId) {
+        return 'You cannot provide both a groupId and teamId parameter, please provide only one';
+      }
+
+      if (args.options.teamId && !Utils.isValidGuid(args.options.teamId as string)) {
+        return `${args.options.teamId} is not a valid GUID`;
+      }
+
+      if (args.options.groupId && !Utils.isValidGuid(args.options.groupId as string)) {
         return `${args.options.groupId} is not a valid GUID`;
       }
 
@@ -156,10 +173,10 @@ class GraphO365GroupUserListCommand extends GraphItemsListCommand<GroupUser> {
       ${chalk.grey(config.delimiter)} ${this.name} --groupId '00000000-0000-0000-0000-000000000000' --role Guest
 
     List all users and their role in the specified team
-      ${chalk.grey(config.delimiter)} ${this.alias} --groupId '00000000-0000-0000-0000-000000000000'
+      ${chalk.grey(config.delimiter)} ${this.alias} --teamId '00000000-0000-0000-0000-000000000000'
 
     List all owners and their role in the specified team
-      ${chalk.grey(config.delimiter)} ${this.alias} --groupId '00000000-0000-0000-0000-000000000000' --role Owner
+      ${chalk.grey(config.delimiter)} ${this.alias} --teamId '00000000-0000-0000-0000-000000000000' --role Owner
 
 `);
   }

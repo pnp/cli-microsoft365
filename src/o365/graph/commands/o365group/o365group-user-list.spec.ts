@@ -63,6 +63,11 @@ describe(commands.O365GROUP_USER_LIST, () => {
     assert.notEqual(typeof alias, 'undefined');
   });
 
+  it('defines correct alias', () => {
+    const alias = command.alias();
+    assert.equal((alias && alias.indexOf(commands.TEAMS_USER_LIST) > -1), true);
+  });
+
   it('has a description', () => {
     assert.notEqual(command.description, null);
   });
@@ -96,7 +101,17 @@ describe(commands.O365GROUP_USER_LIST, () => {
   it('fails validation if the groupId is not a valid guid.', (done) => {
     const actual = (command.validate() as CommandValidate)({
       options: {
-        groupId: '61703ac8a-c49b-4fd4-8223-28f0ac3a6402'
+        groupId: 'not-c49b-4fd4-8223-28f0ac3a6402'
+      }
+    });
+    assert.notEqual(actual, true);
+    done();
+  });
+
+  it('fails validation if the teamId is not a valid guid.', (done) => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        teamId: 'not-c49b-4fd4-8223-28f0ac3a6402'
       }
     });
     assert.notEqual(actual, true);
@@ -107,6 +122,17 @@ describe(commands.O365GROUP_USER_LIST, () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         role: 'Member'
+      }
+    });
+    assert.notEqual(actual, true);
+    done();
+  });
+
+  it('fails validation when both groupId and teamId are specified', (done) => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
       }
     });
     assert.notEqual(actual, true);
