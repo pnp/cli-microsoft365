@@ -22,7 +22,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   name: string;
   webUrl: string;
-  sharePointTheme: boolean;
+  sharePointTheme?: boolean;
 }
 
 const SharePointThemes ={
@@ -102,16 +102,13 @@ class SpoThemeApplyCommand extends SpoCommand {
 
         if (isSharePointTheme) {
           
-          if(this.debug){
-            cmd.log(res);
-          }
           const json: any = JSON.parse(res);
           
           if(json.error) {
             cmd.log(new CommandError(json.error));
           }
           else{
-            cmd.log(`Theme ${args.options.name} applied to the ${args.options.webUrl} site.`);
+            cmd.log(json.value);
           }
 
         } else {
@@ -173,7 +170,7 @@ class SpoThemeApplyCommand extends SpoCommand {
 
   private getSharePointTheme(themeName: string): any {
     let palette: any = ""
-
+ 
     switch (themeName)
     {
         case SharePointThemes.Blue:
