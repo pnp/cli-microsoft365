@@ -1,6 +1,12 @@
 # Release notes
 
-## [v1.18.0](https://github.com/pnp/office365-cli/releases/tag/v1.17.0)
+## [v1.19.0](https://github.com/pnp/office365-cli/releases/tag/v1.19.0)
+
+### Changes
+
+- added support for upgrading projects built using SharePoint Framework v1.8.1 [#934](https://github.com/pnp/office365-cli/issues/934)
+
+## [v1.18.0](https://github.com/pnp/office365-cli/releases/tag/v1.18.0)
 
 ### New commands
 
