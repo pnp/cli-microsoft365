@@ -15,18 +15,12 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
   let cmdInstanceLogSpy: sinon.SinonSpy;
   let trackEvent: any;
   let telemetry: any;
-  // Our test date: December 1st, 2018. This will be the value returned by new Date()
-  const now: Date = new Date(Date.UTC(2018, 11, 1));
-  let clock: sinon.SinonFakeTimers;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
       telemetry = t;
-    });
-    clock = sinon.useFakeTimers({
-      now: now.getTime()
     });
   });
 
@@ -57,7 +51,6 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
       auth.restoreAuth,
       request.post
     ]);
-    clock.restore();
   });
 
   it('has correct name', () => {
@@ -530,14 +523,17 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
     assert.strictEqual(actual, 'Provide an expiration date which is a date time in the future and within 6 months from now');
   });
 
-  it('passes validation if the expirationDateTime is in the furture but no more than six months from now', () => {
+  it('passes validation if the expirationDateTime is in the future but no more than six months from now', () => {
+    const currentDate: Date = new Date();
+    const dateString: string = currentDate.getFullYear() + "-" + (currentDate.getMonth() + 4) + "-01";
+
     const actual = (command.validate() as CommandValidate)({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'Documents',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
-        expirationDateTime: '2018-12-25'
+        expirationDateTime: dateString
       }
     });
     assert.strictEqual(actual, true);
