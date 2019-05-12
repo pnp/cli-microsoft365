@@ -1,5 +1,22 @@
 # Release notes
 
+## [v1.20.0](https://github.com/pnp/office365-cli/releases/tag/v1.20.0)
+
+### New commands
+
+**SharePoint Online:**
+
+- [spo contenttype remove](../cmd/spo/contenttype/contenttype-remove.md) - deletes site content type [#904](https://github.com/pnp/office365-cli/issues/904)
+
+**Microsoft Graph:**
+
+- [graph o365group user list](../cmd/graph/o365group/o365group-user-list.md) - lists users for the specified Office 365 group or Microsoft Teams team [#802](https://github.com/pnp/office365-cli/issues/802)
+- [graph teams clone](../cmd/graph/teams/teams-clone.md) - creates a clone of a Microsoft Teams team [#924](https://github.com/pnp/office365-cli/issues/924)
+
+### Changes
+
+- extended 'spo theme apply' with support for applying standard themes [#920](https://github.com/pnp/office365-cli/issues/920)
+
 ## [v1.19.0](https://github.com/pnp/office365-cli/releases/tag/v1.19.0)
 
 ### Changes
