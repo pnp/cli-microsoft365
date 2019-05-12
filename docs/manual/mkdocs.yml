@@ -243,6 +243,7 @@ nav:
         - o365group restore: 'cmd/graph/o365group/o365group-restore.md'
         - o365group set: 'cmd/graph/o365group/o365group-set.md'
         - o365group user add: 'cmd/graph/o365group/o365group-user-add.md'
+        - o365group user list: 'cmd/graph/o365group/o365group-user-list.md'
         - o365group user remove: 'cmd/graph/o365group/o365group-user-remove.md'
       - schemaextension:
         - schemaextension add: 'cmd/graph/schemaextension/schemaextension-add.md'
@@ -279,7 +280,7 @@ nav:
         - teams remove: 'cmd/graph/teams/teams-remove.md'
         - teams tab list: 'cmd/graph/teams/teams-tab-list.md'
         - teams user add: 'cmd/graph/o365group/o365group-user-add.md'
-        - teams user list: 'cmd/graph/teams/teams-user-list.md'
+        - teams user list: 'cmd/graph/o365group/o365group-user-list.md'
         - teams user remove: 'cmd/graph/o365group/o365group-user-remove.md'
         - teams user set: 'cmd/graph/teams/teams-user-set.md'
       - user:

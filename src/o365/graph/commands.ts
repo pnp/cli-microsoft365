@@ -20,6 +20,7 @@ export default {
   O365GROUP_RENEW: `${prefix} o365group renew`,
   O365GROUP_RESTORE: `${prefix} o365group restore`,
   O365GROUP_USER_ADD: `${prefix} o365group user add`,
+  O365GROUP_USER_LIST: `${prefix} o365group user list`,
   O365GROUP_USER_REMOVE: `${prefix} o365group user remove`,
   SCHEMAEXTENSION_ADD: `${prefix} schemaextension add`,
   SITECLASSIFICATION_DISABLE: `${prefix} siteclassification disable`,

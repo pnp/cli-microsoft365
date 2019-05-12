@@ -154,7 +154,7 @@
 
 - [graph teams message list](../cmd/graph/teams/teams-message-list.md) - lists all messages from a channel in a Microsoft Teams team [#588](https://github.com/pnp/office365-cli/issues/588)
 - [graph teams user add](../cmd/graph/o365group/o365group-user-add.md) - adds user to the specified Microsoft Teams team [#690](https://github.com/pnp/office365-cli/issues/690)
-- [graph teams user list](../cmd/graph/teams/teams-user-list.md) - lists users for the specified Microsoft Teams team [#689](https://github.com/pnp/office365-cli/issues/689)
+- [graph teams user list](../cmd/graph/o365group/o365group-user-list.md) - lists users for the specified Microsoft Teams team [#689](https://github.com/pnp/office365-cli/issues/689)
 
 ### Changes
 
