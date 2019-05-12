@@ -32,6 +32,7 @@ nav:
       - contenttype:
         - contenttype add: 'cmd/spo/contenttype/contenttype-add.md'
         - contenttype get: 'cmd/spo/contenttype/contenttype-get.md'
+        - contenttype remove: 'cmd/spo/contenttype/contenttype-remove.md'
         - contenttype field remove: 'cmd/spo/contenttype/contenttype-field-remove.md'
         - contenttype field set: 'cmd/spo/contenttype/contenttype-field-set.md'
       - customaction:

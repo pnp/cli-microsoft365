@@ -390,7 +390,7 @@ Register-PnPHubSite|SharePointPnPPowerShellOnline|[spo hubsite register](../cmd/
 Remove-PnPApp|SharePointPnPPowerShellOnline|[spo app remove](../cmd/spo/app/app-remove.md)
 Remove-PnPClientSideComponent|SharePointPnPPowerShellOnline|
 Remove-PnPClientSidePage|SharePointPnPPowerShellOnline|[spo page remove](../cmd/spo/page/page-remove.md)
-Remove-PnPContentType|SharePointPnPPowerShellOnline|
+Remove-PnPContentType|SharePointPnPPowerShellOnline|[spo contenttype remove](../cmd/spo/contenttype/contenttype-remove.md)
 Remove-PnPContentTypeFromDocumentSet|SharePointPnPPowerShellOnline|
 Remove-PnPContentTypeFromList|SharePointPnPPowerShellOnline|[spo list contenttype remove](../cmd/spo/list/list-contenttype-remove.md)
 Remove-PnPCustomAction|SharePointPnPPowerShellOnline|[spo customaction remove](../cmd/spo/customaction/customaction-remove.md)
