@@ -15,14 +15,18 @@ export class Utils {
   }
 
   public static isReactProject(project: Project): boolean {
-    return typeof project.yoRcJson !== 'undefined' &&
+    return (typeof project.yoRcJson !== 'undefined' &&
       typeof project.yoRcJson['@microsoft/generator-sharepoint'] !== 'undefined' &&
-      project.yoRcJson["@microsoft/generator-sharepoint"].framework === 'react';
+      project.yoRcJson["@microsoft/generator-sharepoint"].framework === 'react') ||
+      (typeof project.packageJson !== 'undefined' &&
+      typeof project.packageJson.dependencies['react'] !== 'undefined');
   }
 
   public static isKnockoutProject(project: Project): boolean {
-    return typeof project.yoRcJson !== 'undefined' &&
+    return (typeof project.yoRcJson !== 'undefined' &&
       typeof project.yoRcJson['@microsoft/generator-sharepoint'] !== 'undefined' &&
-      project.yoRcJson["@microsoft/generator-sharepoint"].framework === 'knockout';
+      project.yoRcJson["@microsoft/generator-sharepoint"].framework === 'knockout') ||
+      (typeof project.packageJson !== 'undefined' &&
+      typeof project.packageJson.dependencies['knockout'] !== 'undefined');
   }
 }
