@@ -16,6 +16,7 @@
 ### Changes
 
 - extended 'spo theme apply' with support for applying standard themes [#920](https://github.com/pnp/office365-cli/issues/920)
+- improved detecting SPFx React projects solving [#968](https://github.com/pnp/office365-cli/issues/968)
 
 ## [v1.19.0](https://github.com/pnp/office365-cli/releases/tag/v1.19.0)
 
