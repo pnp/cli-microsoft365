@@ -158,7 +158,8 @@ describe(commands.O365GROUP_LIST, () => {
               "securityEnabled": false,
               "visibility": "Private"
             }
-          ]});
+          ]
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -245,7 +246,8 @@ describe(commands.O365GROUP_LIST, () => {
               "securityEnabled": false,
               "visibility": "Private"
             }
-          ]});
+          ]
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -269,6 +271,204 @@ describe(commands.O365GROUP_LIST, () => {
             "mailNickname": "team_2"
           }
         ]));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('lists Office 365 Groups without owners in the tenant', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified')&$expand=owners&$top=100`) {
+        return Promise.resolve({
+          "value": [
+            {
+              "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
+              "deletedDateTime": null,
+              "classification": null,
+              "createdDateTime": "2017-12-07T13:58:01Z",
+              "description": "Team 1",
+              "displayName": "Team 1",
+              "groupTypes": [
+                "Unified"
+              ],
+              "mail": "team_1@contoso.onmicrosoft.com",
+              "mailEnabled": true,
+              "mailNickname": "team_1",
+              "onPremisesLastSyncDateTime": null,
+              "onPremisesProvisioningErrors": [],
+              "onPremisesSecurityIdentifier": null,
+              "onPremisesSyncEnabled": null,
+              "preferredDataLocation": null,
+              "proxyAddresses": [
+                "SMTP:team_1@contoso.onmicrosoft.com"
+              ],
+              "renewedDateTime": "2017-12-07T13:58:01Z",
+              "securityEnabled": false,
+              "visibility": "Private",
+              "owners": []
+            },
+            {
+              "id": "0157132c-bf82-48ff-99e4-b19a74950fe0",
+              "deletedDateTime": null,
+              "classification": null,
+              "createdDateTime": "2017-12-17T13:30:42Z",
+              "description": "Team 2",
+              "displayName": "Team 2",
+              "groupTypes": [
+                "Unified"
+              ],
+              "mail": "team_2@contoso.onmicrosoft.com",
+              "mailEnabled": true,
+              "mailNickname": "team_2",
+              "onPremisesLastSyncDateTime": null,
+              "onPremisesProvisioningErrors": [],
+              "onPremisesSecurityIdentifier": null,
+              "onPremisesSyncEnabled": null,
+              "preferredDataLocation": null,
+              "proxyAddresses": [
+                "SMTP:team_2@contoso.onmicrosoft.com"
+              ],
+              "renewedDateTime": "2017-12-17T13:30:42Z",
+              "securityEnabled": false,
+              "visibility": "Private",
+              "owners": [{
+                "@odata.type": "#microsoft.graph.user",
+                "id": "7343a4e9-159e-4736-a39d-f4ee2b2e1ff3",
+                "displayName": "Joseph Velliah"
+              },
+              {
+                "@odata.type": "#microsoft.graph.user",
+                "id": "7343a4e9-159e-4736-a39d-f4ee2b2e1ff4",
+                "displayName": "Bose Velliah"
+              }]
+            }
+          ]
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.service = new Service();
+    auth.service.connected = true;
+    auth.service.resource = 'https://graph.microsoft.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { orphaned: true } }, () => {
+      try {
+        assert([
+          {
+            "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
+            "displayName": "Team 1",
+            "mailNickname": "team_1"
+          },
+          {
+            "id": "0157132c-bf82-48ff-99e4-b19a74950fe0",
+            "displayName": "Team 2",
+            "mailNickname": "team_2"
+          }
+        ]);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('lists Office 365 Groups without owners in the tenant (debug)', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified')&$expand=owners&$top=100`) {
+        return Promise.resolve({
+          "value": [
+            {
+              "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
+              "deletedDateTime": null,
+              "classification": null,
+              "createdDateTime": "2017-12-07T13:58:01Z",
+              "description": "Team 1",
+              "displayName": "Team 1",
+              "groupTypes": [
+                "Unified"
+              ],
+              "mail": "team_1@contoso.onmicrosoft.com",
+              "mailEnabled": true,
+              "mailNickname": "team_1",
+              "onPremisesLastSyncDateTime": null,
+              "onPremisesProvisioningErrors": [],
+              "onPremisesSecurityIdentifier": null,
+              "onPremisesSyncEnabled": null,
+              "preferredDataLocation": null,
+              "proxyAddresses": [
+                "SMTP:team_1@contoso.onmicrosoft.com"
+              ],
+              "renewedDateTime": "2017-12-07T13:58:01Z",
+              "securityEnabled": false,
+              "visibility": "Private",
+              "owners": []
+            },
+            {
+              "id": "0157132c-bf82-48ff-99e4-b19a74950fe0",
+              "deletedDateTime": null,
+              "classification": null,
+              "createdDateTime": "2017-12-17T13:30:42Z",
+              "description": "Team 2",
+              "displayName": "Team 2",
+              "groupTypes": [
+                "Unified"
+              ],
+              "mail": "team_2@contoso.onmicrosoft.com",
+              "mailEnabled": true,
+              "mailNickname": "team_2",
+              "onPremisesLastSyncDateTime": null,
+              "onPremisesProvisioningErrors": [],
+              "onPremisesSecurityIdentifier": null,
+              "onPremisesSyncEnabled": null,
+              "preferredDataLocation": null,
+              "proxyAddresses": [
+                "SMTP:team_2@contoso.onmicrosoft.com"
+              ],
+              "renewedDateTime": "2017-12-17T13:30:42Z",
+              "securityEnabled": false,
+              "visibility": "Private",
+              "owners": [{
+                "@odata.type": "#microsoft.graph.user",
+                "id": "7343a4e9-159e-4736-a39d-f4ee2b2e1ff3",
+                "displayName": "Joseph Velliah"
+              },
+              {
+                "@odata.type": "#microsoft.graph.user",
+                "id": "7343a4e9-159e-4736-a39d-f4ee2b2e1ff4",
+                "displayName": "Bose Velliah"
+              }]
+            }
+          ]
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.service = new Service();
+    auth.service.connected = true;
+    auth.service.resource = 'https://graph.microsoft.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: true, orphaned: true } }, () => {
+      try {
+        assert([
+          {
+            "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
+            "displayName": "Team 1",
+            "mailNickname": "team_1"
+          },
+          {
+            "id": "0157132c-bf82-48ff-99e4-b19a74950fe0",
+            "displayName": "Team 2",
+            "mailNickname": "team_2"
+          }
+        ]);
         done();
       }
       catch (e) {
@@ -332,7 +532,8 @@ describe(commands.O365GROUP_LIST, () => {
               "securityEnabled": false,
               "visibility": "Private"
             }
-          ]});
+          ]
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -419,7 +620,8 @@ describe(commands.O365GROUP_LIST, () => {
               "securityEnabled": false,
               "visibility": "Private"
             }
-          ]});
+          ]
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -506,7 +708,8 @@ describe(commands.O365GROUP_LIST, () => {
               "securityEnabled": false,
               "visibility": "Private"
             }
-          ]});
+          ]
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -593,7 +796,8 @@ describe(commands.O365GROUP_LIST, () => {
               "securityEnabled": false,
               "visibility": "Private"
             }
-          ]});
+          ]
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -680,7 +884,8 @@ describe(commands.O365GROUP_LIST, () => {
               "securityEnabled": false,
               "visibility": "Private"
             }
-          ]});
+          ]
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -767,7 +972,8 @@ describe(commands.O365GROUP_LIST, () => {
               "securityEnabled": false,
               "visibility": "Private"
             }
-          ]});
+          ]
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -854,7 +1060,8 @@ describe(commands.O365GROUP_LIST, () => {
               "securityEnabled": false,
               "visibility": "Private"
             }
-          ]});
+          ]
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -941,7 +1148,8 @@ describe(commands.O365GROUP_LIST, () => {
               "securityEnabled": false,
               "visibility": "Private"
             }
-          ]});
+          ]
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -1028,7 +1236,8 @@ describe(commands.O365GROUP_LIST, () => {
               "securityEnabled": false,
               "visibility": "Private"
             }
-          ]});
+          ]
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -1117,7 +1326,8 @@ describe(commands.O365GROUP_LIST, () => {
               "securityEnabled": false,
               "visibility": "Private"
             }
-          ]});
+          ]
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -1206,7 +1416,8 @@ describe(commands.O365GROUP_LIST, () => {
               "securityEnabled": false,
               "visibility": "Private"
             }
-          ]});
+          ]
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -1272,7 +1483,7 @@ describe(commands.O365GROUP_LIST, () => {
             },
             {
               "id": "0157132c-bf82-48ff-99e4-b19a74950fe0",
-              "deletedDateTime": "2018-03-06T01:42:50Z",  
+              "deletedDateTime": "2018-03-06T01:42:50Z",
               "classification": null,
               "createdDateTime": "2017-12-17T13:30:42Z",
               "description": "Deleted Team 2",
@@ -1295,7 +1506,8 @@ describe(commands.O365GROUP_LIST, () => {
               "securityEnabled": false,
               "visibility": "Private"
             }
-          ]});
+          ]
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -1384,7 +1596,8 @@ describe(commands.O365GROUP_LIST, () => {
               "securityEnabled": false,
               "visibility": "Private"
             }
-          ]});
+          ]
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -1473,7 +1686,8 @@ describe(commands.O365GROUP_LIST, () => {
               "securityEnabled": false,
               "visibility": "Private"
             }
-          ]});
+          ]
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -1562,7 +1776,8 @@ describe(commands.O365GROUP_LIST, () => {
               "securityEnabled": false,
               "visibility": "Private"
             }
-          ]});
+          ]
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -1598,7 +1813,8 @@ describe(commands.O365GROUP_LIST, () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified') and startswith(MailNickname,'team''s%20%23')&$top=100`) {
         return Promise.resolve({
-          "value": []});
+          "value": []
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -1675,7 +1891,8 @@ describe(commands.O365GROUP_LIST, () => {
               "securityEnabled": false,
               "visibility": "Private"
             }
-          ]});
+          ]
+        });
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified')&$top=100&$skiptoken=X%2744537074090001000000000000000014000000C233BFA08475B84E8BF8C40335F8944D01000000000000000000000000000017312E322E3834302E3131333535362E312E342E32333331020000000000017D06501DC4C194438D57CFE494F81C1E%27`) {
@@ -1731,7 +1948,8 @@ describe(commands.O365GROUP_LIST, () => {
               "securityEnabled": false,
               "visibility": "Private"
             }
-          ]});
+          ]
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -1829,7 +2047,8 @@ describe(commands.O365GROUP_LIST, () => {
               "securityEnabled": false,
               "visibility": "Private"
             }
-          ]});
+          ]
+        });
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified')&$top=100&$skiptoken=X%2744537074090001000000000000000014000000C233BFA08475B84E8BF8C40335F8944D01000000000000000000000000000017312E322E3834302E3131333535362E312E342E32333331020000000000017D06501DC4C194438D57CFE494F81C1E%27`) {
@@ -1909,7 +2128,8 @@ describe(commands.O365GROUP_LIST, () => {
               "securityEnabled": false,
               "visibility": "Private"
             }
-          ]});
+          ]
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -2036,7 +2256,8 @@ describe(commands.O365GROUP_LIST, () => {
               "securityEnabled": false,
               "visibility": "Private"
             }
-          ]});
+          ]
+        });
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/010d2f0a-0c17-4ec8-b694-e85bbe607013/drive?$select=webUrl`) {
@@ -2137,7 +2358,8 @@ describe(commands.O365GROUP_LIST, () => {
               "securityEnabled": false,
               "visibility": "Private"
             }
-          ]});
+          ]
+        });
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/010d2f0a-0c17-4ec8-b694-e85bbe607013/drive?$select=webUrl`) {
@@ -2238,7 +2460,8 @@ describe(commands.O365GROUP_LIST, () => {
               "securityEnabled": false,
               "visibility": "Private"
             }
-          ]});
+          ]
+        });
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/010d2f0a-0c17-4ec8-b694-e85bbe607013/drive?$select=webUrl`) {
@@ -2339,7 +2562,8 @@ describe(commands.O365GROUP_LIST, () => {
               "securityEnabled": false,
               "visibility": "Private"
             }
-          ]});
+          ]
+        });
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/010d2f0a-0c17-4ec8-b694-e85bbe607013/drive?$select=webUrl`) {
@@ -2396,8 +2620,13 @@ describe(commands.O365GROUP_LIST, () => {
     assert.equal(actual, true);
   });
 
+  it('passes validation if only orphaned option set', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { orphaned: true } });
+    assert.equal(actual, true);
+  });
+
   it('passes validation if no options set', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { } });
+    const actual = (command.validate() as CommandValidate)({ options: {} });
     assert.equal(actual, true);
   });
 

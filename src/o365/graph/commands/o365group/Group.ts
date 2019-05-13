@@ -13,6 +13,7 @@ export interface Group {
   onPremisesProvisioningErrors: string[];
   onPremisesSecurityIdentifier?: string;
   onPremisesSyncEnabled?: boolean;
+  owners: any;
   preferredDataLocation?: string;
   proxyAddresses: string[];
   renewedDateTime: string;

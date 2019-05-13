@@ -17,6 +17,7 @@ Option|Description
 `-m, --mailNickname [displayName]`|Retrieve only groups with mailNickname starting with the specified value
 `--includeSiteUrl`|Set to retrieve the site URL for each group
 `--deleted`|Set to only retrieve deleted groups
+`--orphaned`|Set to only retrieve groups without owners
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
@@ -31,6 +32,8 @@ To list available Office 365 Groups, you have to first log in to the Microsoft G
 Using the `--includeSiteUrl` option, you can retrieve the URL of the site associated with the particular Office 365 Group. If you however retrieve too many groups and will try to get their site URLs, you will most likely get an error as the command will get throttled, issuing too many requests, too frequently. If you get an error, consider narrowing down the result set using the `--displayName` and `--mailNickname` filters.
 
 Retrieving the URL of the site associated with the particular Office 365 Group is not possible when retrieving deleted groups.
+
+Using the `--orphaned` option, you can retrieve Office 365 Groups without owners.
 
 ## Examples
 
@@ -69,4 +72,10 @@ the URL of the corresponding SharePoint site
 
 ```sh
 graph o365group list --displayName Project --includeSiteUrl
+```
+
+List Office 365 Groups without owners
+
+```sh
+graph o365group list --orphaned
 ```
