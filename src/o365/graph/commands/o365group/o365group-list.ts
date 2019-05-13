@@ -20,6 +20,7 @@ interface Options extends GlobalOptions {
   mailNickname?: string;
   includeSiteUrl: boolean;
   deleted?: boolean;
+  orphan: boolean;
 }
 
 class GraphO365GroupListCommand extends GraphItemsListCommand<Group> {
@@ -37,6 +38,7 @@ class GraphO365GroupListCommand extends GraphItemsListCommand<Group> {
     telemetryProps.mailNickname = typeof args.options.mailNickname !== 'undefined';
     telemetryProps.includeSiteUrl = args.options.includeSiteUrl;
     telemetryProps.deleted = args.options.deleted;
+    telemetryProps.orphan = args.options.orphan;
     return telemetryProps;
   }
 
@@ -44,8 +46,10 @@ class GraphO365GroupListCommand extends GraphItemsListCommand<Group> {
     const groupFilter: string = `?$filter=groupTypes/any(c:c+eq+'Unified')`;
     const displayNameFilter: string = args.options.displayName ? ` and startswith(DisplayName,'${encodeURIComponent(args.options.displayName).replace(/'/g, `''`)}')` : '';
     const mailNicknameFilter: string = args.options.mailNickname ? ` and startswith(MailNickname,'${encodeURIComponent(args.options.mailNickname).replace(/'/g, `''`)}')` : '';
+    const expandOwners: string = args.options.orphan ? '&$expand=owners' : '';
     const topCount: string = '&$top=100';
-    let endpoint: string = `${auth.service.resource}/v1.0/groups${groupFilter}${displayNameFilter}${mailNicknameFilter}${topCount}`;
+
+    let endpoint: string = `${auth.service.resource}/v1.0/groups${groupFilter}${displayNameFilter}${mailNicknameFilter}${expandOwners}${topCount}`;
 
     if (args.options.deleted) {
       endpoint = `${auth.service.resource}/v1.0/directory/deletedItems/Microsoft.Graph.Group${groupFilter}${displayNameFilter}${mailNicknameFilter}${topCount}`;
@@ -54,6 +58,17 @@ class GraphO365GroupListCommand extends GraphItemsListCommand<Group> {
     this
       .getAllItems(endpoint, cmd, true)
       .then((): Promise<any> => {
+
+        if(args.options.orphan)
+        {
+          this.items.forEach( (group, index) => {
+            if(group.owners.length > 0) 
+            {
+              this.items.splice(index,1);
+            }
+          });
+        }
+
         if (args.options.includeSiteUrl) {
           return Promise.all(this.items.map(g => this.getGroupSiteUrl(g.id, cmd)));
         }
@@ -150,6 +165,10 @@ class GraphO365GroupListCommand extends GraphItemsListCommand<Group> {
       {
         option: '--deleted',
         description: 'Set to only retrieve deleted groups'
+      },
+      {
+        option: '--orphan',
+        description: 'Set to only retrieve groups without owners'
       }
     ];
 
@@ -190,6 +209,8 @@ class GraphO365GroupListCommand extends GraphItemsListCommand<Group> {
     Retrieving the URL of the site associated with the particular
     Office 365 Group is not possible when retrieving deleted groups.
 
+    Using the ${chalk.blue('--orphan')} option, you can retrieve Office 365 Groups without owners.
+
   Examples:
   
     List all Office 365 Groups in the tenant
@@ -210,6 +231,9 @@ class GraphO365GroupListCommand extends GraphItemsListCommand<Group> {
     List Office 365 Groups with display name starting with ${chalk.grey(`Project`)} including
     the URL of the corresponding SharePoint site
       ${chalk.grey(config.delimiter)} ${this.name} --displayName Project --includeSiteUrl
+
+    List Office 365 Groups without owners in the tenant
+      ${chalk.grey(config.delimiter)} ${this.name} --orphan
 `);
   }
 }

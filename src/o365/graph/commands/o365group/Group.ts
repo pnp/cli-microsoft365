@@ -19,4 +19,5 @@ export interface Group {
   securityEnabled: boolean;
   siteUrl?: string;
   visibility: string;
+  owners: any;
 }
