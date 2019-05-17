@@ -17,8 +17,8 @@ Option|Description
 `--displayName [displayName]`|Set the display name for the Microsoft Teams team
 `--description [description]`|Set the description for the Microsoft Teams team
 `--mailNickName [mailNickName]`|Set the mail alias for the Microsoft Teams team
-`--classification [classification]`|Set the classification for the Microsoft Teams team with valid values HBI, MBI, LBI, GDPR
-`--visibility [visibility]`|Set the visibility of the Microsoft Teams team with valid values Private,Public
+`--classification [classification]`|Set the classification for the Microsoft Teams team 
+`--visibility [visibility]`|Set the visibility of the Microsoft Teams team with valid values Private, Public
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
@@ -35,10 +35,10 @@ To update the settings of the specified Microsoft Teams team, you have to first 
 
 ## Examples
 
-Set Microsoft Teams team visibility as private
+Set Microsoft Teams team visibility as Private
 
 ```sh
-graph teams set --teamId '00000000-0000-0000-0000-000000000000' --visibility private
+graph teams set --teamId '00000000-0000-0000-0000-000000000000' --visibility Private
 ```
 
 Set Microsoft Teams team clasiification as MBI

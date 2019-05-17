@@ -116,11 +116,11 @@ class GraphTeamsSetCommand extends GraphCommand {
       },
       {
         option: '--classification [classification]',
-        description: 'The classification for the Microsoft Teams team with valid values HBI, MBI, LBI, GDPR'
+        description: 'The classification for the Microsoft Teams team'
       },
       {
         option: '--visibility [visibility]',
-        description: 'Specifies the visibility of the Microsoft Teams team with valid values Private,Public'
+        description: 'Specifies the visibility of the Microsoft Teams team with valid values Private, Public'
       }
     ];
 
@@ -133,9 +133,13 @@ class GraphTeamsSetCommand extends GraphCommand {
       if (!args.options.teamId) {
         return 'Required parameter teamId missing';
       }
-
       if (!Utils.isValidGuid(args.options.teamId)) {
         return `${args.options.teamId} is not a valid GUID`;
+      }
+      if (args.options.visibility) {
+        if (args.options.visibility.toLowerCase() !== 'private' && args.options.visibility.toLowerCase() !== 'public') {
+          return `${args.options.visibility} is not a valid visibility type. Allowed values are Private|Public`;
+        }
       }
       return true;
     };
@@ -159,8 +163,8 @@ class GraphTeamsSetCommand extends GraphCommand {
 
   Examples:
   
-    Set Microsoft Teams team visibility as private
-      ${chalk.grey(config.delimiter)} ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --visibility private
+    Set Microsoft Teams team visibility as Private
+      ${chalk.grey(config.delimiter)} ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --visibility Private
 
     Set Microsoft Teams team clasiification as MBI
       ${chalk.grey(config.delimiter)} ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --classification MBI

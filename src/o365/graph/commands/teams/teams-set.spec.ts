@@ -285,11 +285,11 @@ describe(commands.TEAMS_SET, () => {
     assert.equal(actual, true);
   });
 
-  it('fails validation if classifcation is not a valid classification HBI, MBI, LBI, GDPR', () => {
+  it('fails validation if visibility is not a valid visibility Private|Public', () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee',
-        classification: 'MBA'
+        visibility: 'hidden'
       }
     });
     assert.notEqual(actual, false);
