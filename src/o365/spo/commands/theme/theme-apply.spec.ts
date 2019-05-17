@@ -8,6 +8,7 @@ import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 
+
 describe(commands.THEME_APPLY, () => {
   let vorpal: Vorpal;
   let log: string[];
@@ -136,7 +137,8 @@ describe(commands.THEME_APPLY, () => {
       options: {
         debug: false,
         name: 'Contoso',
-        webUrl: 'https://contoso.sharepoint.com/sites/project-x'
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        sharePointTheme: false
       }
     }, () => {
 
@@ -161,6 +163,638 @@ describe(commands.THEME_APPLY, () => {
         ]);
       }
     });
+  });
+
+  it('applies SharePoint theme (Blue) when correct parameters are passed', (done) => {
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve({ FormDigestValue: 'abc' });
+        }
+      }
+
+      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers['X-RequestDigest'] &&
+          opts.headers['X-RequestDigest'] === 'abc') {
+          return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "3d92299e-e019-4000-c866-de7d45aa9628" }, 12, true]));
+        }
+      }
+
+      if (opts.url.indexOf('/common/oauth2/token') > -1) {
+        return Promise.resolve('abc');
+      }
+
+      if (opts.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0) {
+          return Promise.resolve(JSON.stringify({
+            "@odata.context": "https://contoso.sharepoint.com/sites/project-x/_api/$metadata#Edm.String",
+            "value": "/sites/project-x/_catalogs/theme/Themed/6735E8EF"
+          }));
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    cmdInstance.action({
+      options: {
+        debug: false,
+        name: "Blue",
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        sharePointTheme: true
+      }
+    }, () => {
+      let setRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.body) {
+          setRequestIssued = true;
+        }
+      });
+      try {
+        assert(setRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore([
+          request.post
+        ]);
+      }
+    });
+
+
+  });
+
+  it('applies SharePoint theme (Orange) when correct parameters are passed', (done) => {
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve({ FormDigestValue: 'abc' });
+        }
+      }
+
+      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers['X-RequestDigest'] &&
+          opts.headers['X-RequestDigest'] === 'abc') {
+          return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "3d92299e-e019-4000-c866-de7d45aa9628" }, 12, true]));
+        }
+      }
+
+      if (opts.url.indexOf('/common/oauth2/token') > -1) {
+        return Promise.resolve('abc');
+      }
+
+      if (opts.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0) {
+          return Promise.resolve(JSON.stringify({
+            "@odata.context": "https://contoso.sharepoint.com/sites/project-x/_api/$metadata#Edm.String",
+            "value": "/sites/project-x/_catalogs/theme/Themed/6735E8EF"
+          }));
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    cmdInstance.action({
+      options: {
+        debug: false,
+        name: "Orange",
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        sharePointTheme: true
+      }
+    }, () => {
+      let setRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.body) {
+          setRequestIssued = true;
+        }
+      });
+      try {
+        assert(setRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore([
+          request.post
+        ]);
+      }
+    });
+
+
+  });
+
+  it('applies SharePoint theme (Red) when correct parameters are passed', (done) => {
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve({ FormDigestValue: 'abc' });
+        }
+      }
+
+      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers['X-RequestDigest'] &&
+          opts.headers['X-RequestDigest'] === 'abc') {
+          return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "3d92299e-e019-4000-c866-de7d45aa9628" }, 12, true]));
+        }
+      }
+
+      if (opts.url.indexOf('/common/oauth2/token') > -1) {
+        return Promise.resolve('abc');
+      }
+
+      if (opts.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0) {
+          return Promise.resolve(JSON.stringify({
+            "@odata.context": "https://contoso.sharepoint.com/sites/project-x/_api/$metadata#Edm.String",
+            "value": "/sites/project-x/_catalogs/theme/Themed/6735E8EF"
+          }));
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    cmdInstance.action({
+      options: {
+        debug: false,
+        name: "Red",
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        sharePointTheme: true
+      }
+    }, () => {
+      let setRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.body) {
+          setRequestIssued = true;
+        }
+      });
+      try {
+        assert(setRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore([
+          request.post
+        ]);
+      }
+    });
+
+
+  });
+
+  it('applies SharePoint theme (Purple) when correct parameters are passed', (done) => {
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve({ FormDigestValue: 'abc' });
+        }
+      }
+
+      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers['X-RequestDigest'] &&
+          opts.headers['X-RequestDigest'] === 'abc') {
+          return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "3d92299e-e019-4000-c866-de7d45aa9628" }, 12, true]));
+        }
+      }
+
+      if (opts.url.indexOf('/common/oauth2/token') > -1) {
+        return Promise.resolve('abc');
+      }
+
+      if (opts.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0) {
+          return Promise.resolve(JSON.stringify({
+            "@odata.context": "https://contoso.sharepoint.com/sites/project-x/_api/$metadata#Edm.String",
+            "value": "/sites/project-x/_catalogs/theme/Themed/6735E8EF"
+          }));
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    cmdInstance.action({
+      options: {
+        debug: false,
+        name: "Purple",
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        sharePointTheme: true
+      }
+    }, () => {
+      let setRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.body) {
+          setRequestIssued = true;
+        }
+      });
+      try {
+        assert(setRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore([
+          request.post
+        ]);
+      }
+    });
+
+
+  });
+
+  it('applies SharePoint theme (Green) when correct parameters are passed', (done) => {
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve({ FormDigestValue: 'abc' });
+        }
+      }
+
+      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers['X-RequestDigest'] &&
+          opts.headers['X-RequestDigest'] === 'abc') {
+          return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "3d92299e-e019-4000-c866-de7d45aa9628" }, 12, true]));
+        }
+      }
+
+      if (opts.url.indexOf('/common/oauth2/token') > -1) {
+        return Promise.resolve('abc');
+      }
+
+      if (opts.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0) {
+          return Promise.resolve(JSON.stringify({
+            "@odata.context": "https://contoso.sharepoint.com/sites/project-x/_api/$metadata#Edm.String",
+            "value": "/sites/project-x/_catalogs/theme/Themed/6735E8EF"
+          }));
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    cmdInstance.action({
+      options: {
+        debug: false,
+        name: "Green",
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        sharePointTheme: true
+      }
+    }, () => {
+      let setRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.body) {
+          setRequestIssued = true;
+        }
+      });
+      try {
+        assert(setRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore([
+          request.post
+        ]);
+      }
+    });
+
+
+  });
+
+  it('applies SharePoint theme (Gray) when correct parameters are passed', (done) => {
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve({ FormDigestValue: 'abc' });
+        }
+      }
+
+      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers['X-RequestDigest'] &&
+          opts.headers['X-RequestDigest'] === 'abc') {
+          return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "3d92299e-e019-4000-c866-de7d45aa9628" }, 12, true]));
+        }
+      }
+
+      if (opts.url.indexOf('/common/oauth2/token') > -1) {
+        return Promise.resolve('abc');
+      }
+
+      if (opts.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0) {
+          return Promise.resolve(JSON.stringify({
+            "@odata.context": "https://contoso.sharepoint.com/sites/project-x/_api/$metadata#Edm.String",
+            "value": "/sites/project-x/_catalogs/theme/Themed/6735E8EF"
+          }));
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    cmdInstance.action({
+      options: {
+        debug: false,
+        name: "Gray",
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        sharePointTheme: true
+      }
+    }, () => {
+      let setRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.body) {
+          setRequestIssued = true;
+        }
+      });
+      try {
+        assert(setRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore([
+          request.post
+        ]);
+      }
+    });
+
+
+  });
+
+  it('applies SharePoint theme (Dark Yellow) when correct parameters are passed', (done) => {
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve({ FormDigestValue: 'abc' });
+        }
+      }
+
+      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers['X-RequestDigest'] &&
+          opts.headers['X-RequestDigest'] === 'abc') {
+          return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "3d92299e-e019-4000-c866-de7d45aa9628" }, 12, true]));
+        }
+      }
+
+      if (opts.url.indexOf('/common/oauth2/token') > -1) {
+        return Promise.resolve('abc');
+      }
+
+      if (opts.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0) {
+          return Promise.resolve(JSON.stringify({
+            "@odata.context": "https://contoso.sharepoint.com/sites/project-x/_api/$metadata#Edm.String",
+            "value": "/sites/project-x/_catalogs/theme/Themed/6735E8EF"
+          }));
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    cmdInstance.action({
+      options: {
+        debug: false,
+        name: "Dark Yellow",
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        sharePointTheme: true
+      }
+    }, () => {
+      let setRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.body) {
+          setRequestIssued = true;
+        }
+      });
+      try {
+        assert(setRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore([
+          request.post
+        ]);
+      }
+    });
+
+
+  });
+
+  it('applies SharePoint theme (Dark Blue) when correct parameters are passed', (done) => {
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve({ FormDigestValue: 'abc' });
+        }
+      }
+
+      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers['X-RequestDigest'] &&
+          opts.headers['X-RequestDigest'] === 'abc') {
+          return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "3d92299e-e019-4000-c866-de7d45aa9628" }, 12, true]));
+        }
+      }
+
+      if (opts.url.indexOf('/common/oauth2/token') > -1) {
+        return Promise.resolve('abc');
+      }
+
+      if (opts.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0) {
+          return Promise.resolve(JSON.stringify({
+            "@odata.context": "https://contoso.sharepoint.com/sites/project-x/_api/$metadata#Edm.String",
+            "value": "/sites/project-x/_catalogs/theme/Themed/6735E8EF"
+          }));
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    cmdInstance.action({
+      options: {
+        debug: false,
+        name: "Dark Blue",
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        sharePointTheme: true
+      }
+    }, () => {
+      let setRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.body) {
+          setRequestIssued = true;
+        }
+      });
+      try {
+        assert(setRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore([
+          request.post
+        ]);
+      }
+    });
+
+
   });
 
   it('applies theme when correct parameters are passed (debug)', (done) => {
@@ -196,7 +830,8 @@ describe(commands.THEME_APPLY, () => {
       options: {
         debug: true,
         name: 'Contoso',
-        webUrl: 'https://contoso.sharepoint.com/sites/project-x'
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        sharePointTheme: false
       }
     }, () => {
 
@@ -207,6 +842,146 @@ describe(commands.THEME_APPLY, () => {
           r.headers.authorization &&
           r.headers.authorization.indexOf('Bearer ') === 0 &&
           r.headers['X-RequestDigest'] &&
+          r.body) {
+          correctRequestIssued = true;
+        }
+      });
+      try {
+        assert(correctRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore([
+          request.post
+        ]);
+      }
+    });
+  });
+
+
+  it('handles error command error correctly', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve({ FormDigestValue: 'abc' });
+        }
+      }
+
+      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers['X-RequestDigest'] &&
+          opts.headers['X-RequestDigest'] === 'abc') {
+          return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": "{ErrorMessage:error occured}", "TraceCorrelationId": "3d92299e-e019-4000-c866-de7d45aa9628" }, 12, false]));
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    cmdInstance.action({
+      options: {
+        debug: true,
+        name: 'Contoso',
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        sharePointTheme: false
+      }
+    }, () => {
+
+      let correctRequestIssued = false;
+
+      requests.forEach(r => {
+        if (r.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
+          r.headers['X-RequestDigest'] &&
+          r.body) {
+          correctRequestIssued = true;
+        }
+      });
+      try {
+        assert(correctRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore([
+          request.post
+        ]);
+      }
+    });
+  });
+
+  it('handles error command error correctly', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve({ FormDigestValue: 'abc' });
+        }
+      }
+
+      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          opts.headers['X-RequestDigest'] &&
+          opts.headers['X-RequestDigest'] === 'abc') {
+          return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": "{ErrorMessage:error occured}", "TraceCorrelationId": "3d92299e-e019-4000-c866-de7d45aa9628" }, 12, false]));
+        }
+      }
+
+      if (opts.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1) {
+        if (opts.headers.authorization &&
+          opts.headers.authorization.indexOf('Bearer ') === 0) {
+          return Promise.resolve(JSON.stringify({
+            "error": {
+              "code": "-2147024891, System.UnauthorizedAccessException",
+              "message": "Access denied. You do not have permission to perform this action or access this resource."
+            }
+          }));
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    cmdInstance.action({
+      options: {
+        debug: true,
+        name: 'Some color',
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        sharePointTheme: true
+      }
+    }, () => {
+
+      let correctRequestIssued = false;
+
+      requests.forEach(r => {
+        if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
+          r.headers.authorization &&
+          r.headers.authorization.indexOf('Bearer ') === 0 &&
           r.body) {
           correctRequestIssued = true;
         }
@@ -259,7 +1034,8 @@ describe(commands.THEME_APPLY, () => {
       options: {
         debug: true,
         name: 'Contoso',
-        webUrl: 'https://contoso.sharepoint.com/sites/project-x'
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        sharePointTheme: false
       }
     }, () => {
 
@@ -314,7 +1090,8 @@ describe(commands.THEME_APPLY, () => {
       options: {
         debug: true,
         name: 'Contoso',
-        webUrl: 'https://contoso.sharepoint.com/sites/project-x'
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        sharePointTheme: false
       }
     }, () => {
 
@@ -387,5 +1164,10 @@ describe(commands.THEME_APPLY, () => {
   it('passes validation when webUrl is passed', () => {
     const actual = (command.validate() as CommandValidate)({ options: { name: 'Contoso-Blue', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert(actual);
+  });
+
+  it('fails validation if name is not a valid SharePoint theme name', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { name: 'invalid', webUrl: 'https://contoso.sharepoint.com/sites/project-x', sharePointTheme: true } });
+    assert.notEqual(actual, true);
   });
 });

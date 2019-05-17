@@ -390,7 +390,7 @@ Register-PnPHubSite|SharePointPnPPowerShellOnline|[spo hubsite register](../cmd/
 Remove-PnPApp|SharePointPnPPowerShellOnline|[spo app remove](../cmd/spo/app/app-remove.md)
 Remove-PnPClientSideComponent|SharePointPnPPowerShellOnline|
 Remove-PnPClientSidePage|SharePointPnPPowerShellOnline|[spo page remove](../cmd/spo/page/page-remove.md)
-Remove-PnPContentType|SharePointPnPPowerShellOnline|
+Remove-PnPContentType|SharePointPnPPowerShellOnline|[spo contenttype remove](../cmd/spo/contenttype/contenttype-remove.md)
 Remove-PnPContentTypeFromDocumentSet|SharePointPnPPowerShellOnline|
 Remove-PnPContentTypeFromList|SharePointPnPPowerShellOnline|[spo list contenttype remove](../cmd/spo/list/list-contenttype-remove.md)
 Remove-PnPCustomAction|SharePointPnPPowerShellOnline|[spo customaction remove](../cmd/spo/customaction/customaction-remove.md)
@@ -621,7 +621,7 @@ Get-TeamGuestSettings|MicrosoftTeams|[graph teams guestsettings list](../cmd/gra
 Get-TeamHelp|MicrosoftTeams|
 Get-TeamMemberSettings|MicrosoftTeams|[graph teams membersettings list](../cmd/graph/teams/teams-membersettings-list.md)
 Get-TeamMessagingSettings|MicrosoftTeams|[graph teams messagingsettings list](../cmd/graph/teams/teams-messagingsettings-list.md)
-Get-TeamUser|MicrosoftTeams|[graph teams user list](../cmd/graph/teams/teams-user-list.md)
+Get-TeamUser|MicrosoftTeams|[graph teams user list](../cmd/graph/o365group/o365group-user-list.md)
 New-Team|MicrosoftTeams|[graph teams add](../cmd/graph/teams/teams-add.md)
 New-TeamChannel|MicrosoftTeams|[graph teams channel add](../cmd/graph/teams/teams-channel-add.md)
 Remove-Team|MicrosoftTeams|[graph teams remove](../cmd/graph/teams/teams-remove.md)
