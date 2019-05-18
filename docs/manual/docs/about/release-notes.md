@@ -1,5 +1,13 @@
 # Release notes
 
+## [v1.21.0](https://github.com/pnp/office365-cli/releases/tag/v1.21.0)
+
+### New commands
+
+**Microsoft Graph:**
+
+- [graph teams set](../cmd/graph/teams/teams-set.md) - updates settings of a Microsoft Teams team [#815](https://github.com/pnp/office365-cli/issues/815)
+
 ## [v1.20.0](https://github.com/pnp/office365-cli/releases/tag/v1.20.0)
 
 ### New commands
