@@ -122,6 +122,7 @@ nav:
         - navigation node remove: 'cmd/spo/navigation/navigation-node-remove.md'
       - orgnewssite:
         - orgnewssite list: 'cmd/spo/orgnewssite/orgnewssite-list.md'
+        - orgnewssite remove: 'cmd/spo/orgnewssite/orgnewssite-remove.md'
         - orgnewssite set: 'cmd/spo/orgnewssite/orgnewssite-set.md'
       - page:
         - page add: 'cmd/spo/page/page-add.md'
