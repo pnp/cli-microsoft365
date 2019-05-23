@@ -250,6 +250,7 @@ nav:
         - o365group user add: 'cmd/graph/o365group/o365group-user-add.md'
         - o365group user list: 'cmd/graph/o365group/o365group-user-list.md'
         - o365group user remove: 'cmd/graph/o365group/o365group-user-remove.md'
+        - o365group user set: 'cmd/graph/o365group/o365group-user-set.md'
       - schemaextension:
         - schemaextension add: 'cmd/graph/schemaextension/schemaextension-add.md'
       - siteclassification:
@@ -261,7 +262,7 @@ nav:
         - teams add: 'cmd/graph/teams/teams-add.md'
         - teams archive: 'cmd/graph/teams/teams-archive.md'
         - teams list: 'cmd/graph/teams/teams-list.md'
-        - teams unarchive: 'cmd/graph/teams/teams-unarchive.md' 
+        - teams unarchive: 'cmd/graph/teams/teams-unarchive.md'
         - teams app install: 'cmd/graph/teams/teams-app-install.md'
         - teams app list: 'cmd/graph/teams/teams-app-list.md'
         - teams app publish: 'cmd/graph/teams/teams-app-publish.md'
@@ -289,7 +290,7 @@ nav:
         - teams user add: 'cmd/graph/o365group/o365group-user-add.md'
         - teams user list: 'cmd/graph/o365group/o365group-user-list.md'
         - teams user remove: 'cmd/graph/o365group/o365group-user-remove.md'
-        - teams user set: 'cmd/graph/teams/teams-user-set.md'
+        - teams user set: 'cmd/graph/o365group/o365group-user-set.md'
       - user:
         - user get: 'cmd/graph/user/user-get.md'
         - user list: 'cmd/graph/user/user-list.md'

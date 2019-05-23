@@ -7,7 +7,7 @@ import {
 } from '../../../../Command';
 import { GraphItemsListCommand } from '../GraphItemsListCommand';
 import Utils from '../../../../Utils';
-import { GroupUser } from '../o365group/GroupUser';
+import { GroupUser } from './GroupUser';
 import request from '../../../../request';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -18,30 +18,39 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   role: string;
-  teamId: string;
+  teamId?: string;
+  groupId?: string;
   userName: string;
 }
 
-class GraphTeamsUserSetCommand extends GraphItemsListCommand<GroupUser> {
+class GraphO365GroupUserSetCommand extends GraphItemsListCommand<GroupUser> {
   public get name(): string {
-    return `${commands.TEAMS_USER_SET}`;
+    return `${commands.O365GROUP_USER_SET}`;
   }
 
   public get description(): string {
-    return 'Updates role of the specified user in the given Microsoft Teams team';
+    return 'Updates role of the specified user in the specified Office 365 Group or Microsoft Teams team';
+  }
+
+  public alias(): string[] | undefined {
+    return [commands.TEAMS_USER_SET];
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.teamId = typeof args.options.teamId !== 'undefined';
+    telemetryProps.groupId = typeof args.options.groupId !== 'undefined';
     telemetryProps.role = args.options.role;
     return telemetryProps;
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+    const groupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string
+
     this
-      .getOwners(cmd, args.options.teamId)
+      .getOwners(cmd, groupId)
       .then((): Promise<void> => {
-        return this.getMembersAndGuests(cmd, args.options.teamId);
+        return this.getMembersAndGuests(cmd, groupId);
       })
       .then((): Promise<void> | void => {
         // Filter out duplicate added values for owners (as they are returned as members as well)
@@ -52,20 +61,24 @@ class GraphTeamsUserSetCommand extends GraphItemsListCommand<GroupUser> {
         );
 
         if (this.debug) {
-          cmd.log('Team owners and members:')
+          cmd.log((typeof args.options.groupId !== 'undefined') ? 'Group owners and members:' : 'Team owners and members:');
           cmd.log(this.items);
           cmd.log('');
         }
 
         if (this.items.filter(i => i.userPrincipalName.toLocaleLowerCase() === args.options.userName.toLocaleLowerCase()).length <= 0) {
-          throw new Error("The specified user does not belong to the given Microsoft Teams team. Please use the 'graph teams user add' command to add new users.");
+          const userNotInGroup = (typeof args.options.groupId !== 'undefined') ?
+            'The specified user does not belong to the given Office 365 Group. Please use the \'o365group user add\' command to add new users.' :
+            'The specified user does not belong to the given Microsoft Teams team. Please use the \'graph teams user add\' command to add new users.';
+
+          throw new Error(userNotInGroup);
         }
 
         if (args.options.role === "Owner") {
           const foundMember: GroupUser | undefined = this.items.find(e => e.userPrincipalName.toLocaleLowerCase() === args.options.userName.toLocaleLowerCase() && e.userType === 'Member');
 
           if (foundMember !== undefined) {
-            const endpoint: string = `${auth.service.resource}/v1.0/groups/${args.options.teamId}/owners/$ref`;
+            const endpoint: string = `${auth.service.resource}/v1.0/groups/${groupId}/owners/$ref`;
 
             const requestOptions: any = {
               url: endpoint,
@@ -80,14 +93,18 @@ class GraphTeamsUserSetCommand extends GraphItemsListCommand<GroupUser> {
             return request.post(requestOptions);
           }
           else {
-            throw new Error("The specified user is already an owner in the specified team, and thus cannot be promoted.");
+            const userAlreadyOwner = (typeof args.options.groupId !== 'undefined') ?
+              'The specified user is already an owner in the specified Office 365 group, and thus cannot be promoted.' :
+              'The specified user is already an owner in the specified Microsoft Teams team, and thus cannot be promoted.';
+
+            throw new Error(userAlreadyOwner);
           }
         }
         else {
           const foundOwner: GroupUser | undefined = this.items.find(e => e.userPrincipalName.toLocaleLowerCase() === args.options.userName.toLocaleLowerCase() && e.userType === 'Owner');
 
           if (foundOwner !== undefined) {
-            const endpoint: string = `${auth.service.resource}/v1.0/groups/${args.options.teamId}/owners/${foundOwner.id}/$ref`;
+            const endpoint: string = `${auth.service.resource}/v1.0/groups/${groupId}/owners/${foundOwner.id}/$ref`;
 
             const requestOptions: any = {
               url: endpoint,
@@ -100,7 +117,11 @@ class GraphTeamsUserSetCommand extends GraphItemsListCommand<GroupUser> {
             return request.delete(requestOptions);
           }
           else {
-            throw new Error("The specified user is already a member in the specified team, and thus cannot be demoted.");
+            const userAlreadyMember = (typeof args.options.groupId !== 'undefined') ?
+              'The specified user is already a member in the specified Office 365 group, and thus cannot be demoted.' :
+              'The specified user is already a member in the specified Microsoft Teams team, and thus cannot be demoted.';
+
+            throw new Error(userAlreadyMember);
           }
         }
       })
@@ -113,28 +134,32 @@ class GraphTeamsUserSetCommand extends GraphItemsListCommand<GroupUser> {
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
 
-  private getOwners(cmd: CommandInstance, teamId: string): Promise<void> {
-    const endpoint: string = `${auth.service.resource}/v1.0/groups/${teamId}/owners?$select=id,displayName,userPrincipalName,userType`;
+  private getOwners(cmd: CommandInstance, groupId: string): Promise<void> {
+    const endpoint: string = `${auth.service.resource}/v1.0/groups/${groupId}/owners?$select=id,displayName,userPrincipalName,userType`;
 
     return this.getAllItems(endpoint, cmd, true).then((): void => {
       // Currently there is a bug in the Microsoft Graph that returns Owners as
-      // userType 'member'. We therefore update all returned user as owner  
+      // userType 'member'. We therefore update all returned user as owner
       for (var i in this.items) {
         this.items[i].userType = 'Owner';
       }
     });
   }
 
-  private getMembersAndGuests(cmd: CommandInstance, teamId: string): Promise<void> {
-    const endpoint: string = `${auth.service.resource}/v1.0/groups/${teamId}/members?$select=id,displayName,userPrincipalName,userType`;
+  private getMembersAndGuests(cmd: CommandInstance, groupId: string): Promise<void> {
+    const endpoint: string = `${auth.service.resource}/v1.0/groups/${groupId}/members?$select=id,displayName,userPrincipalName,userType`;
     return this.getAllItems(endpoint, cmd, false);
   }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --teamId <teamId>',
-        description: 'The ID of the team for which to change the user\'s role'
+        option: "-i, --groupId [groupId]",
+        description: "The ID of the Office 365 group for which to update user"
+      },
+      {
+        option: "--teamId [teamId]",
+        description: "The ID of the Microsoft Teams team for which to update user"
       },
       {
         option: '-n, --userName <userName>',
@@ -142,7 +167,7 @@ class GraphTeamsUserSetCommand extends GraphItemsListCommand<GroupUser> {
       },
       {
         option: '-r, --role <role>',
-        description: 'Role to set for the given user in the specified team. Allowed values: Owner|Member',
+        description: 'Role to set for the given user in the specified Office 365 Group or Microsoft Teams team. Allowed values: Owner|Member',
         autocomplete: ['Owner', 'Member']
       }
     ];
@@ -153,12 +178,20 @@ class GraphTeamsUserSetCommand extends GraphItemsListCommand<GroupUser> {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.teamId) {
-        return 'Required parameter teamId missing';
+      if (!args.options.groupId && !args.options.teamId) {
+        return 'Please provide one of the following parameters: groupId or teamId';
       }
 
-      if (!Utils.isValidGuid(args.options.teamId as string)) {
+      if (args.options.groupId && args.options.teamId) {
+        return 'You cannot provide both a groupId and teamId parameter, please provide only one';
+      }
+
+      if (args.options.teamId && !Utils.isValidGuid(args.options.teamId as string)) {
         return `${args.options.teamId} is not a valid GUID`;
+      }
+
+      if (args.options.groupId && !Utils.isValidGuid(args.options.groupId as string)) {
+        return `${args.options.groupId} is not a valid GUID`;
       }
 
       if (!args.options.userName) {
@@ -183,26 +216,31 @@ class GraphTeamsUserSetCommand extends GraphItemsListCommand<GroupUser> {
     log(
       `  ${chalk.yellow('Important:')} before using this command, log in to the Microsoft Graph
     using the ${chalk.blue(commands.LOGIN)} command.
-        
+
   Remarks:
 
-    To update role of the given user in the specified Microsoft Teams team,
+    To update the role of the given user in the specified Office 365 Group or Microsoft Teams team,
     you have to first log in to the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
     eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
 
     The command will return an error if the user already has the specified role
-    in the given Microsoft Teams team.
+    in the given Office 365 Group or Microsoft Teams team.
 
   Examples:
 
-    Promote the specified user to owner of the given Microsoft Teams team
-      ${chalk.grey(config.delimiter)} ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner
+    Promote the specified user to owner of the given Office 365 Group
+      ${chalk.grey(config.delimiter)} ${this.name} --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner
 
-    Demote the specified user from owner to member in the given Microsoft Teams
-    team
-      ${chalk.grey(config.delimiter)} ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Member
-`);
+    Demote the specified user from owner to member in the given Office 365 Group
+      ${chalk.grey(config.delimiter)} ${this.name} --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Member
+
+    Promote the specified user to owner of the given Microsoft Teams team
+      ${chalk.grey(config.delimiter)} ${commands.TEAMS_USER_SET} --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner
+
+    Demote the specified user from owner to member in the given Microsoft Teams team
+      ${chalk.grey(config.delimiter)} ${commands.TEAMS_USER_SET} --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Member
+      `);
   }
 }
 
-module.exports = new GraphTeamsUserSetCommand();
+module.exports = new GraphO365GroupUserSetCommand();

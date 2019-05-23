@@ -3,13 +3,13 @@ import Command, { CommandOption, CommandError, CommandValidate } from '../../../
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../GraphAuth';
-const command: Command = require('./teams-user-set');
+const command: Command = require('./o365group-user-set');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import { Service } from '../../../../Auth';
 
-describe(commands.TEAMS_USER_SET, () => {
+describe(commands.O365GROUP_USER_SET, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
@@ -55,12 +55,23 @@ describe(commands.TEAMS_USER_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.TEAMS_USER_SET), true);
+    assert.equal(command.name.startsWith(commands.O365GROUP_USER_SET), true);
   });
 
   it('has a description', () => {
     assert.notEqual(command.description, null);
   });
+
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notEqual(typeof alias, 'undefined');
+  });
+
+  it('defines correct alias', () => {
+    const alias = command.alias();
+    assert.equal((alias && alias.indexOf(commands.TEAMS_USER_SET) > -1), true);
+  });
+
 
   it('calls telemetry', (done) => {
     cmdInstance.action = command.action();
@@ -79,7 +90,7 @@ describe(commands.TEAMS_USER_SET, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, () => {
       try {
-        assert.equal(telemetry.name, commands.TEAMS_USER_SET);
+        assert.equal(telemetry.name, commands.O365GROUP_USER_SET);
         done();
       }
       catch (e) {
@@ -88,17 +99,27 @@ describe(commands.TEAMS_USER_SET, () => {
     });
   });
 
-  it('fails validation if the teamId is not a valid guid.', (done) => {
+  it('fails validation if the groupId is not a valid guid.', (done) => {
     const actual = (command.validate() as CommandValidate)({
       options: {
-        teamId: '61703ac8a-c49b-4fd4-8223-28f0ac3a6402'
+        groupId: 'not-c49b-4fd4-8223-28f0ac3a6402'
       }
     });
     assert.notEqual(actual, true);
     done();
   });
 
-  it('fails validation if the teamId is not provided.', (done) => {
+  it('fails validation if the teamId is not a valid guid.', (done) => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        teamId: 'not-c49b-4fd4-8223-28f0ac3a6402'
+      }
+    });
+    assert.notEqual(actual, true);
+    done();
+  });
+
+  it('fails validation if the groupId is not provided.', (done) => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         role: 'Member'
@@ -108,10 +129,21 @@ describe(commands.TEAMS_USER_SET, () => {
     done();
   });
 
+  it('fails validation when both groupId and teamId are specified', (done) => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+      }
+    });
+    assert.notEqual(actual, true);
+    done();
+  });
+
   it('fails validation when no user is specified', (done) => {
     const actual = (command.validate() as CommandValidate)({
       options: {
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+        groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         role: 'Member'
       }
     });
@@ -122,7 +154,7 @@ describe(commands.TEAMS_USER_SET, () => {
   it('fails validation when invalid role is specified', (done) => {
     const actual = (command.validate() as CommandValidate)({
       options: {
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+        groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         userName: 'anne.matthews@contoso.onmicrosoft.com',
         role: 'Invalid',
       }
@@ -134,7 +166,7 @@ describe(commands.TEAMS_USER_SET, () => {
   it('fails validation when no role is specified', (done) => {
     const actual = (command.validate() as CommandValidate)({
       options: {
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+        groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         userName: 'anne.matthews@contoso.onmicrosoft.com'
       }
     });
@@ -145,7 +177,7 @@ describe(commands.TEAMS_USER_SET, () => {
   it('passes validation when valid teamId, userName and role specified', (done) => {
     const actual = (command.validate() as CommandValidate)({
       options: {
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+        groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         userName: 'anne.matthews@contoso.onmicrosoft.com',
         role: 'Member'
       }
@@ -154,7 +186,39 @@ describe(commands.TEAMS_USER_SET, () => {
     done();
   });
 
-  it('shows error when the specified user is not present in specified team', (done) => {
+  it('shows error when the specified user is not present in specified O365 Group', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners?$select=id,displayName,userPrincipalName,userType`) {
+        return Promise.resolve({
+          "value": [{ "id": "00000000-0000-0000-0000-000000000000", "displayName": "Anne Matthews", "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com", "userType": "Member" }]
+        });
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/members?$select=id,displayName,userPrincipalName,userType`) {
+        return Promise.resolve({
+          "value": [{ "id": "00000000-0000-0000-0000-000000000001", "displayName": "Karl Matteson", "userPrincipalName": "karl.matteson@contoso.onmicrosoft.com", "userType": "Member" }]
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.service = new Service();
+    auth.service.connected = true;
+    auth.service.resource = 'https://graph.microsoft.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: 'notpresent.karl.matteson@contoso.onmicrosoft.com', role: 'Member' } }, (err?: any) => {
+
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("The specified user does not belong to the given Office 365 Group. Please use the 'o365group user add' command to add new users.")));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('shows error when the specified user is not present in specified Microsoft Teams team', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners?$select=id,displayName,userPrincipalName,userType`) {
         return Promise.resolve({
@@ -186,7 +250,39 @@ describe(commands.TEAMS_USER_SET, () => {
     });
   });
 
-  it('shows error when the specified user is already a member in specified team', (done) => {
+  it('shows error when the specified user is already a member in specified O365 Group', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners?$select=id,displayName,userPrincipalName,userType`) {
+        return Promise.resolve({
+          "value": [{ "id": "00000000-0000-0000-0000-000000000000", "displayName": "Anne Matthews", "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com", "userType": "Member" }]
+        });
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/members?$select=id,displayName,userPrincipalName,userType`) {
+        return Promise.resolve({
+          "value": [{ "id": "00000000-0000-0000-0000-000000000001", "displayName": "Karl Matteson", "userPrincipalName": "karl.matteson@contoso.onmicrosoft.com", "userType": "Member" }]
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.service = new Service();
+    auth.service.connected = true;
+    auth.service.resource = 'https://graph.microsoft.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: 'karl.matteson@contoso.onmicrosoft.com', role: 'Member' } }, (err?: any) => {
+
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('The specified user is already a member in the specified Office 365 group, and thus cannot be demoted.')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('shows error when the specified user is already a member in specified Microsoft Teams team', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners?$select=id,displayName,userPrincipalName,userType`) {
         return Promise.resolve({
@@ -209,7 +305,7 @@ describe(commands.TEAMS_USER_SET, () => {
     cmdInstance.action({ options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", userName: 'karl.matteson@contoso.onmicrosoft.com', role: 'Member' } }, (err?: any) => {
 
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('The specified user is already a member in the specified team, and thus cannot be demoted.')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('The specified user is already a member in the specified Microsoft Teams team, and thus cannot be demoted.')));
         done();
       }
       catch (e) {
@@ -218,7 +314,39 @@ describe(commands.TEAMS_USER_SET, () => {
     });
   });
 
-  it('shows error when the specified user is already a owner in specified team', (done) => {
+  it('shows error when the specified user is already a owner in specified Office 365 Group', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners?$select=id,displayName,userPrincipalName,userType`) {
+        return Promise.resolve({
+          "value": [{ "id": "00000000-0000-0000-0000-000000000000", "displayName": "Anne Matthews", "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com", "userType": "Member" }]
+        });
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/members?$select=id,displayName,userPrincipalName,userType`) {
+        return Promise.resolve({
+          "value": [{ "id": "00000000-0000-0000-0000-000000000001", "displayName": "Karl Matteson", "userPrincipalName": "karl.matteson@contoso.onmicrosoft.com", "userType": "Member" }]
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.service = new Service();
+    auth.service.connected = true;
+    auth.service.resource = 'https://graph.microsoft.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: 'anne.matthews@contoso.onmicrosoft.com', role: 'Owner' } }, (err?: any) => {
+
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('The specified user is already an owner in the specified Office 365 group, and thus cannot be promoted.')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('shows error when the specified user is already a owner in specified Microsoft Teams team', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners?$select=id,displayName,userPrincipalName,userType`) {
         return Promise.resolve({
@@ -241,7 +369,7 @@ describe(commands.TEAMS_USER_SET, () => {
     cmdInstance.action({ options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", userName: 'anne.matthews@contoso.onmicrosoft.com', role: 'Owner' } }, (err?: any) => {
 
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('The specified user is already an owner in the specified team, and thus cannot be promoted.')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('The specified user is already an owner in the specified Microsoft Teams team, and thus cannot be promoted.')));
         done();
       }
       catch (e) {
@@ -250,7 +378,7 @@ describe(commands.TEAMS_USER_SET, () => {
     });
   });
 
-  it('correctly promotes specified member to owner in specified team', (done) => {
+  it('correctly promotes specified member to owner in specified Office 365 Group', (done) => {
     let promoteMemberIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -279,7 +407,7 @@ describe(commands.TEAMS_USER_SET, () => {
     auth.service.connected = true;
     auth.service.resource = 'https://graph.microsoft.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", userName: 'karl.matteson@contoso.onmicrosoft.com', role: 'Owner' } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: 'karl.matteson@contoso.onmicrosoft.com', role: 'Owner' } }, (err?: any) => {
 
       try {
         assert(promoteMemberIssued);
@@ -291,7 +419,49 @@ describe(commands.TEAMS_USER_SET, () => {
     });
   });
 
-  it('correctly promotes specified member to owner in specified team (debug)', (done) => {
+  it('correctly promotes specified member to owner in specified Office 365 Group (debug)', (done) => {
+    let promoteMemberIssued = false;
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners?$select=id,displayName,userPrincipalName,userType`) {
+        return Promise.resolve({
+          "value": [{ "id": "00000000-0000-0000-0000-000000000000", "displayName": "Anne Matthews", "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com", "userType": "Member" }]
+        });
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/members?$select=id,displayName,userPrincipalName,userType`) {
+        return Promise.resolve({
+          "value": [{ "id": "00000000-0000-0000-0000-000000000001", "displayName": "Karl Matteson", "userPrincipalName": "karl.matteson@contoso.onmicrosoft.com", "userType": "Member" }]
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners/$ref` &&
+        JSON.stringify(opts.body) === `{"@odata.id":"https://graph.microsoft.com/v1.0/directoryObjects/00000000-0000-0000-0000-000000000001"}`) {
+        promoteMemberIssued = true;
+      }
+    });
+
+    auth.service = new Service();
+    auth.service.connected = true;
+    auth.service.resource = 'https://graph.microsoft.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000", userName: 'karl.matteson@contoso.onmicrosoft.com', role: 'Owner' } }, (err?: any) => {
+
+      try {
+        assert(promoteMemberIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+
+  it('correctly promotes specified member to owner in specified Microsoft Teams team (debug)', (done) => {
     let promoteMemberIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -332,7 +502,8 @@ describe(commands.TEAMS_USER_SET, () => {
     });
   });
 
-  it('correctly demote specified owner to member in specified team', (done) => {
+
+  it('correctly demote specified owner to member in specified Office 365 Group', (done) => {
     let demoteOwnerIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -360,7 +531,7 @@ describe(commands.TEAMS_USER_SET, () => {
     auth.service.connected = true;
     auth.service.resource = 'https://graph.microsoft.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", userName: 'anne.matthews@contoso.onmicrosoft.com', role: 'Member' } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: 'anne.matthews@contoso.onmicrosoft.com', role: 'Member' } }, (err?: any) => {
 
       try {
         assert(demoteOwnerIssued);
@@ -372,7 +543,7 @@ describe(commands.TEAMS_USER_SET, () => {
     });
   });
 
-  it('correctly demote specified owner to member in specified team (debug)', (done) => {
+  it('correctly demote specified owner to member in specified Office 365 Group (debug)', (done) => {
     let demoteOwnerIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -400,7 +571,7 @@ describe(commands.TEAMS_USER_SET, () => {
     auth.service.connected = true;
     auth.service.resource = 'https://graph.microsoft.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000", userName: 'anne.matthews@contoso.onmicrosoft.com', role: 'Member' } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000", userName: 'anne.matthews@contoso.onmicrosoft.com', role: 'Member' } }, (err?: any) => {
 
       try {
         assert(demoteOwnerIssued);
@@ -411,10 +582,6 @@ describe(commands.TEAMS_USER_SET, () => {
       }
     });
   });
-  // Succesfully sets Owner when user is Member 
-  // Succesfully sets Member when user is Owner 
-  // throws error when team not found ?
-  // everything with debug :) 
 
   it('aborts when not logged in to Microsoft Graph', (done) => {
     auth.service = new Service();
@@ -451,7 +618,7 @@ describe(commands.TEAMS_USER_SET, () => {
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
     cmd.help({}, () => { });
-    assert(find.calledWith(commands.TEAMS_USER_SET));
+    assert(find.calledWith(commands.O365GROUP_USER_SET));
   });
 
   it('has help with examples', () => {
