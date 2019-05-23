@@ -22,6 +22,7 @@ export default {
   O365GROUP_USER_ADD: `${prefix} o365group user add`,
   O365GROUP_USER_LIST: `${prefix} o365group user list`,
   O365GROUP_USER_REMOVE: `${prefix} o365group user remove`,
+  O365GROUP_USER_SET: `${prefix} o365group user set`,
   SCHEMAEXTENSION_ADD: `${prefix} schemaextension add`,
   SITECLASSIFICATION_DISABLE: `${prefix} siteclassification disable`,
   SITECLASSIFICATION_ENABLE: `${prefix} siteclassification enable`,

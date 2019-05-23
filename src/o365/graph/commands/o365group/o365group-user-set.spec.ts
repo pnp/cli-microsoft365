@@ -3,13 +3,13 @@ import Command, { CommandOption, CommandError, CommandValidate } from '../../../
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../GraphAuth';
-const command: Command = require('./teams-user-set');
+const command: Command = require('./o365group-user-set');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import { Service } from '../../../../Auth';
 
-describe(commands.TEAMS_USER_SET, () => {
+describe(commands.O365GROUP_USER_SET, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
