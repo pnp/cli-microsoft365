@@ -99,6 +99,7 @@ export default {
   NAVIGATION_NODE_ADD: `${prefix} navigation node add`,
   NAVIGATION_NODE_LIST: `${prefix} navigation node list`,
   NAVIGATION_NODE_REMOVE: `${prefix} navigation node remove`,
+  ORGNEWSSITE_LIST:  `${prefix} orgnewssite list`,
   PAGE_ADD: `${prefix} page add`,
   PAGE_GET: `${prefix} page get`,
   PAGE_LIST: `${prefix} page list`,
