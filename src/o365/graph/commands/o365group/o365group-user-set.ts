@@ -78,7 +78,7 @@ class GraphO365GroupUserSetCommand extends GraphItemsListCommand<GroupUser> {
           const foundMember: GroupUser | undefined = this.items.find(e => e.userPrincipalName.toLocaleLowerCase() === args.options.userName.toLocaleLowerCase() && e.userType === 'Member');
 
           if (foundMember !== undefined) {
-            const endpoint: string = `${auth.service.resource}/v1.0/groups/${args.options.teamId}/owners/$ref`;
+            const endpoint: string = `${auth.service.resource}/v1.0/groups/${groupId}/owners/$ref`;
 
             const requestOptions: any = {
               url: endpoint,
@@ -104,7 +104,7 @@ class GraphO365GroupUserSetCommand extends GraphItemsListCommand<GroupUser> {
           const foundOwner: GroupUser | undefined = this.items.find(e => e.userPrincipalName.toLocaleLowerCase() === args.options.userName.toLocaleLowerCase() && e.userType === 'Owner');
 
           if (foundOwner !== undefined) {
-            const endpoint: string = `${auth.service.resource}/v1.0/groups/${args.options.teamId}/owners/${foundOwner.id}/$ref`;
+            const endpoint: string = `${auth.service.resource}/v1.0/groups/${groupId}/owners/${foundOwner.id}/$ref`;
 
             const requestOptions: any = {
               url: endpoint,
@@ -118,8 +118,8 @@ class GraphO365GroupUserSetCommand extends GraphItemsListCommand<GroupUser> {
           }
           else {
             const userAlreadyMember = (typeof args.options.groupId !== 'undefined') ?
-              'The specified user is already an member in the specified Office 365 group, and thus cannot be demoted.' :
-              'The specified user is already an member in the specified Microsoft Teams team, and thus cannot be demoted.';
+              'The specified user is already a member in the specified Office 365 group, and thus cannot be demoted.' :
+              'The specified user is already a member in the specified Microsoft Teams team, and thus cannot be demoted.';
 
             throw new Error(userAlreadyMember);
           }
@@ -219,22 +219,27 @@ class GraphO365GroupUserSetCommand extends GraphItemsListCommand<GroupUser> {
         
   Remarks:
 
-    To update role of the given user in the specified Microsoft Teams team,
+    To update the role of the given user in the specified Office 365 Group or Microsoft Teams team,
     you have to first log in to the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
     eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
 
     The command will return an error if the user already has the specified role
-    in the given Microsoft Teams team.
+    in the given Office 365 Group or Microsoft Teams team.
 
   Examples:
 
-    Promote the specified user to owner of the given Microsoft Teams team
-      ${chalk.grey(config.delimiter)} ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner
+    Promote the specified user to owner of the given Office 365 Group
+      ${chalk.grey(config.delimiter)} ${this.name} --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner
 
-    Demote the specified user from owner to member in the given Microsoft Teams
-    team
-      ${chalk.grey(config.delimiter)} ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Member
-`);
+    Demote the specified user from owner to member in the given Office 365 Group
+      ${chalk.grey(config.delimiter)} ${this.name} --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Member
+
+    Promote the specified user to owner of the given Microsoft Teams team
+      ${chalk.grey(config.delimiter)} ${commands.TEAMS_USER_SET} --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner
+
+    Demote the specified user from owner to member in the given Microsoft Teams team
+      ${chalk.grey(config.delimiter)} ${commands.TEAMS_USER_SET} --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Member
+      `);
   }
 }
 
