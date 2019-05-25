@@ -4,6 +4,12 @@
 
 ### New commands
 
+**SharePoint Online:**
+
+- [spo orgnewssite list](../cmd/spo/orgnewssite/orgnewssite-list.md) - lists all organizational news sites [#975](https://github.com/pnp/office365-cli/issues/975)
+- [spo orgnewssite remove](../cmd/spo/orgnewssite/orgnewssite-remove.md) - removes a site from the list of organizational news sites [#976](https://github.com/pnp/office365-cli/issues/976)
+- [spo orgnewssite set](../cmd/spo/orgnewssite/orgnewssite-set.md) - marks site as an organizational news site [#974](https://github.com/pnp/office365-cli/issues/974)
+
 **Microsoft Graph:**
 
 - [graph teams set](../cmd/graph/teams/teams-set.md) - updates settings of a Microsoft Teams team [#815](https://github.com/pnp/office365-cli/issues/815)
