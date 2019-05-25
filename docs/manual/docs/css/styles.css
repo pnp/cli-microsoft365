@@ -30,3 +30,9 @@
     width: 150px;
   }
 }
+
+@media screen and (min-width: 964px) {
+  .md-typeset__scrollwrap {
+    overflow: visible;
+  }
+}
