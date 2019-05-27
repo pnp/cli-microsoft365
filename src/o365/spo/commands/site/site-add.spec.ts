@@ -384,6 +384,87 @@ describe(commands.SITE_ADD, () => {
     });
   });
 
+  it('creates modern team site with the specified owner', (done) => {
+    const expected = JSON.stringify({ results: ['admin@contoso.com'] });
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
+        actual = JSON.stringify(opts.body.optionalParams.Owners);
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, type: 'TeamSite', owners: 'admin@contoso.com' } }, () => {
+      try {
+        assert.strictEqual(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('creates modern team site with the specified owners', (done) => {
+    const expected = JSON.stringify({ results: ['admin@contoso.com', 'steve@contoso.com'] });
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
+        actual = JSON.stringify(opts.body.optionalParams.Owners);
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, type: 'TeamSite', owners: 'admin@contoso.com,steve@contoso.com' } }, () => {
+      try {
+        assert.strictEqual(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('creates modern team site with the specified owners trimming surrounding spaces', (done) => {
+    const expected = JSON.stringify({ results: ['admin@contoso.com', 'steve@contoso.com'] });
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
+        actual = JSON.stringify(opts.body.optionalParams.Owners);
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, type: 'TeamSite', owners: 'admin@contoso.com, steve@contoso.com' } }, () => {
+      try {
+        assert.strictEqual(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('correctly handles error when modern team site with the specified alias already exists', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
@@ -1049,6 +1130,42 @@ describe(commands.SITE_ADD, () => {
     assert.equal(actual, true);
   });
 
+  it('passes validation when single owner is specified for a TeamSite', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        type: 'TeamSite',
+        title: 'Team 1',
+        alias: 'team1',
+        owners: 'admin@contoso.com'
+      }
+    });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation when multiple owners are specified for a TeamSite', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        type: 'TeamSite',
+        title: 'Team 1',
+        alias: 'team1',
+        owners: 'admin@contoso.com,steve@contoso.com'
+      }
+    });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation when multiple owners with a space in between are specified for a TeamSite', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        type: 'TeamSite',
+        title: 'Team 1',
+        alias: 'team1',
+        owners: 'admin@contoso.com, steve@contoso.com'
+      }
+    });
+    assert.equal(actual, true);
+  });
+
   it('passes validation when the CommunicationSite type option specified', () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
@@ -1117,6 +1234,18 @@ describe(commands.SITE_ADD, () => {
         type: 'CommunicationSite',
         title: 'Marketing',
         url: 'foo'
+      }
+    });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation when the type is CommunicationSite and owners option is specified', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        type: 'CommunicationSite',
+        title: 'Marketing',
+        url: 'https://contoso.sharepoint.com/sites/marketing',
+        owners: 'admin@contoso.com'
       }
     });
     assert.notEqual(actual, true);

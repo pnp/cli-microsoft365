@@ -25,6 +25,7 @@ Option|Description
 `--allowFileSharingForGuestUsers`|(deprecated. Use `shareByEmailEnabled` instead) Determines whether it's allowed to share file with guests (applies only to communication sites)
 `--siteDesign [siteDesign]`|Type of communication site to create. Allowed values `Topic|Showcase|Blank`, default `Topic`. When creating a communication site, specify either `siteDesign` or `siteDesignId` (applies only to communication sites)
 `--siteDesignId [siteDesignId]`|Id of the custom site design to use to create the site. When creating a communication site, specify either `siteDesign` or `siteDesignId` (applies only to communication sites)
+`--owners [owners]`|Comma-separated list of users to set as site owners (applies only to team sites)
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
@@ -60,6 +61,12 @@ Create modern team site using the Dutch language
 
 ```sh
 spo site add --alias team1 --title Team 1 --lcid 1043
+```
+
+Create modern team site with the specified users as owners
+
+```sh
+spo site add --alias team1 --title Team 1 --owners 'steve@contoso.com, bob@contoso.com'
 ```
 
 Create communication site using the Topic design
