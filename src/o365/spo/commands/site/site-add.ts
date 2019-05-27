@@ -27,6 +27,7 @@ interface Options extends GlobalOptions {
   lcid?: number;
   url?: string;
   allowFileSharingForGuestUsers?: boolean;
+  owners?: string;
   shareByEmailEnabled?: boolean;
   siteDesign?: string;
   siteDesignId?: string;
@@ -61,6 +62,7 @@ class SpoSiteAddCommand extends SpoCommand {
     telemetryProps.classification = (!(!args.options.classification)).toString();
     telemetryProps.isPublic = args.options.isPublic || false;
     telemetryProps.lcid = args.options.lcid;
+    telemetryProps.owners = typeof args.options.owners !== 'undefined';
 
     if (!isTeamSite) {
       telemetryProps.allowFileSharingForGuestUsers = args.options.allowFileSharingForGuestUsers || false;
@@ -116,6 +118,12 @@ class SpoSiteAddCommand extends SpoCommand {
 
           if (args.options.lcid) {
             requestOptions.body.optionalParams.CreationOptions.results.push(`SPSiteLanguage:${args.options.lcid}`);
+          }
+
+          if (args.options.owners) {
+            requestOptions.body.optionalParams.Owners = {
+              results: args.options.owners.split(',').map(o => o.trim())
+            };
           }
         }
         else {
@@ -244,6 +252,10 @@ class SpoSiteAddCommand extends SpoCommand {
       {
         option: '--siteDesignId [siteDesignId]',
         description: 'Id of the custom site design to use to create the site. Specify either siteDesign or siteDesignId (applies only to communication sites)'
+      },
+      {
+        option: '--owners [owners]',
+        description: 'Comma-separated list of users to set as site owners (applies only to team sites)'
       }
     ];
 
@@ -301,6 +313,10 @@ class SpoSiteAddCommand extends SpoCommand {
         if (args.options.siteDesign && args.options.siteDesignId) {
           return 'Specify siteDesign or siteDesignId but not both';
         }
+
+        if (args.options.owners) {
+          return `You can only specify owners when creating Team Sites`;
+        }
       }
 
       if (args.options.lcid) {
@@ -342,6 +358,9 @@ class SpoSiteAddCommand extends SpoCommand {
 
     Create modern team site using the Dutch language
       ${chalk.grey(config.delimiter)} ${commands.SITE_ADD} --alias team1 --title Team 1 --lcid 1043
+
+    Create modern team site with the specified users as owners
+      ${chalk.grey(config.delimiter)} ${commands.SITE_ADD} --alias team1 --title Team 1 --owners 'steve@contoso.com, bob@contoso.com'
 
     Create communication site using the Topic design
       ${chalk.grey(config.delimiter)} ${commands.SITE_ADD} --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing
