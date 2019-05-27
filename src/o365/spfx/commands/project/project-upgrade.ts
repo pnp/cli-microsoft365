@@ -145,6 +145,21 @@ class SpfxProjectUpgradeCommand extends Command {
       return i === firstFindingPos;
     });
 
+    // remove superseded findings
+    findings
+      // get findings that supersede other findings
+      .filter(f => f.supersedes.length > 0)
+      .forEach(f => {
+        f.supersedes.forEach(s => {
+          // find the superseded finding
+          const i: number = findings.findIndex(f1 => f1.id === s);
+          if (i > -1) {
+            // ...and remove it from findings
+            findings.splice(i, 1);
+          }
+        });
+      });
+
     // flatten
     const findingsToReport: FindingToReport[] = ([] as FindingToReport[]).concat.apply([], findings.map(f => {
       return f.occurrences.map(o => {

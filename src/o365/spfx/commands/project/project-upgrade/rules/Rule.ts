@@ -11,6 +11,10 @@ export abstract class Rule {
   abstract get file(): string;
   abstract visit(project: Project, notifications: Finding[]): void;
 
+  get supersedes(): string[] {
+    return [];
+  }
+
   protected addFinding(findings: Finding[]): void {
     this.addFindingWithOccurrences([{
       file: this.file,
@@ -19,14 +23,7 @@ export abstract class Rule {
   }
 
   protected addFindingWithOccurrences(occurrences: Occurrence[], findings: Finding[]): void {
-    findings.push({
-      description: this.description,
-      id: this.id,
-      title: this.title,
-      occurrences: occurrences,
-      resolutionType: this.resolutionType,
-      severity: this.severity
-    });
+    this.addFindingWithCustomInfo(this.title, this.description, occurrences, findings);
   }
 
   protected addFindingWithCustomInfo(title: string, description: string, occurrences: Occurrence[], findings: Finding[]): void {
@@ -36,7 +33,8 @@ export abstract class Rule {
       description: description,
       occurrences: occurrences,
       resolutionType: this.resolutionType,
-      severity: this.severity
+      severity: this.severity,
+      supersedes: this.supersedes
     });
   }
 }
