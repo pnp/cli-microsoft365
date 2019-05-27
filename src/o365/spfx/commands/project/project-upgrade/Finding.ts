@@ -6,5 +6,6 @@ export interface Finding {
   occurrences: Occurrence[];
   resolutionType: string;
   severity: string;
+  supersedes: string[];
   title: string;
 }
