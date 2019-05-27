@@ -7,6 +7,8 @@ import {
 } from '../../../../Command';
 import { GraphItemsListCommand } from '../GraphItemsListCommand';
 
+import request from '../../../../request';
+
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
 const maxDays = 30;
@@ -23,6 +25,8 @@ interface Options extends GlobalOptions {
 }
 
 class GraphReportsTeamsDeviceUsageUserDetailCommand extends GraphItemsListCommand<any> {
+  
+
   public get name(): string {
     return `${commands.REPORTS_TEAMS_DEVICE_USAGE_USER_DETAIL}`;
   }
@@ -40,7 +44,7 @@ class GraphReportsTeamsDeviceUsageUserDetailCommand extends GraphItemsListComman
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const periodParameter: string = args.options.period ? `getTeamsDeviceUsageUserDetail(period='${encodeURIComponent(args.options.period)}')` : '';
-    const dateParameter: string = args.options.date ? `getTeamsDeviceUsageUserDetail(date='${encodeURIComponent(args.options.date)}')` : '';
+    const dateParameter: string = args.options.date ? `getTeamsDeviceUsageUserDetail(date=${encodeURIComponent(args.options.date)})` : '';
 
     let endpoint: string = '';
 
@@ -52,8 +56,37 @@ class GraphReportsTeamsDeviceUsageUserDetailCommand extends GraphItemsListComman
       endpoint = `${auth.service.resource}/v1.0/reports/${dateParameter}`;
     }
 
-    console.log(endpoint);
+    this.getUsageData(endpoint, cmd)
+      .then((res): void => {
+        cmd.log(res);
+        if (this.verbose) {
+          cmd.log(vorpal.chalk.green('DONE'));
+        }
+        cb();
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
 
+  }
+
+  protected getUsageData(url: string, cmd: CommandInstance): Promise<void> {
+    return new Promise<void>((resolve: (data: any) => void, reject: (error: any) => void): void => {
+      auth
+        .ensureAccessToken(auth.service.resource, cmd, this.debug)
+        .then((): Promise<any> => {
+          const requestOptions: any = {
+            url: url,
+            headers: {
+              authorization: `Bearer ${auth.service.accessToken}`
+            }
+          };
+
+          return request.get(requestOptions);
+        })
+        .then((res: any): void => {
+          resolve(res);
+        }, (err: any): void => {
+          reject(err);
+        });
+    });
   }
 
   public options(): CommandOption[] {
