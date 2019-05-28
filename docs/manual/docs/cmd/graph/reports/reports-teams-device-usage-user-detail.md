@@ -15,7 +15,6 @@ Option|Description
 `--help`|output usage information
 `-p, --period [period]`|Specify the length of time over which the report is aggregated. The supported values are `D7|D30|D90|D180`.
 `-d, --date [date]`|Specify the date for which you would like to view the users who performed any activity. The supported date format is `YYYY-MM-DD`.
-`-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
@@ -33,6 +32,9 @@ Reports.Read.All permission is required to call this API.
 Gets detail about Microsoft Teams device usage by user for the length of time over which the report is aggregated
 
 ```sh
+graph reports teamsdeviceusageuserdetail --period 'D7'
+```
+```sh
 graph reports teamsdeviceusageuserdetail --period D7
 ```
 
@@ -40,4 +42,7 @@ Gets detail about Microsoft Teams device usage by user for date for which you wo
 
 ```sh
 graph reports teamsdeviceusageuserdetail --date 2019-05-01
+```
+```sh
+graph reports teamsdeviceusageuserdetail --date '2019-05-01'
 ```
