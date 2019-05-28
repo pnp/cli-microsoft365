@@ -37,7 +37,7 @@ export class FN017001_MISC_npm_dedupe extends Rule {
   }
 
   visit(project: Project, findings: Finding[]): void {
-    const npmFinding: Finding | undefined = findings.find(f => typeof f.occurrences.find(o => o.resolution.indexOf('npm i ') === 0 || o.resolution.indexOf('npm un ') === 0) !== 'undefined');
+    const npmFinding: Finding | undefined = findings.find(f => typeof f.occurrences.find(o => o.resolution.indexOf('install') === 0 || o.resolution.indexOf('uninstall') === 0) !== 'undefined');
     if (npmFinding) {
       this.addFinding(findings);
     }

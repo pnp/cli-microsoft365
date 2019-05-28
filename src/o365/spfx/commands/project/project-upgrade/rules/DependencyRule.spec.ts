@@ -177,6 +177,6 @@ describe('DependencyRule', () => {
 
   it('returns uninstall resolution for uninstall a dev dependency', () => {
     const rule: DependencyRule = new DevDepRule2();
-    assert.equal(rule.resolution, 'npm un test-package -D');
+    assert.equal(rule.resolution, 'uninstallDev test-package');
   });
 });
