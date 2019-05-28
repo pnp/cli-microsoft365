@@ -14,6 +14,7 @@ Option|Description
 ------|-----------
 `--help`|output usage information
 `-v, --toVersion [toVersion]`|The version of SharePoint Framework to which upgrade the project
+`--packageManager [packageManager]`|The package manager you use. Supported managers `npm|pnpm|yarn`. Default `npm`
 `-o, --output [output]`|Output type. `json|text|md`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
@@ -41,6 +42,12 @@ Get instructions to Upgrade the current SharePoint Framework project to SharePoi
 
 ```sh
 spfx project upgrade --toVersion 1.5.0
+```
+
+Get instructions to upgrade the current SharePoint Framework project to the latest SharePoint Framework version supported by the Office 365 CLI using pnpm
+
+```sh
+spfx project upgrade --packageManager pnpm
 ```
 
 Get instructions to upgrade the current SharePoint Framework project to the latest SharePoint Framework version supported by the Office 365 CLI

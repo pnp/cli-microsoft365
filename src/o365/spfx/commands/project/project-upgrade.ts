@@ -1,7 +1,7 @@
 import config from '../../../../config';
 import commands from '../../commands';
 import Command, {
-  CommandOption, CommandError
+  CommandOption, CommandError, CommandValidate
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import * as path from 'path';
@@ -21,12 +21,14 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
+  packageManager?: string;
   toVersion?: string;
 }
 
 class SpfxProjectUpgradeCommand extends Command {
   private projectVersion: string | undefined;
   private toVersion: string = '';
+  private packageManager: string = 'npm';
   private projectRootPath: string | null = null;
   private allFindings: Finding[] = [];
   private supportedVersions: string[] = [
@@ -52,6 +54,26 @@ class SpfxProjectUpgradeCommand extends Command {
     '1.8.1',
     '1.8.2'
   ];
+  private static packageCommands = {
+    npm: {
+      install: 'npm i -SE',
+      installDev: 'npm i -DE',
+      uninstall: 'npm un -S',
+      uninstallDev: 'npm un -D'
+    },
+    pnpm: {
+      install: 'pnpm i -E',
+      installDev: 'pnpm i -DE',
+      uninstall: 'pnpm un',
+      uninstallDev: 'pnpm un'
+    },
+    yarn: {
+      install: 'yarn add -E',
+      installDev: 'yarn add -DE',
+      uninstall: 'yarn remove',
+      uninstallDev: 'yarn remove'
+    }
+  }
 
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
   public static ERROR_UNSUPPORTED_TO_VERSION: number = 2;
@@ -71,6 +93,7 @@ class SpfxProjectUpgradeCommand extends Command {
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.toVersion = args.options.toVersion || this.supportedVersions[this.supportedVersions.length - 1];
+    telemetryProps.packageManager = args.options.packageManager || 'npm';
     return telemetryProps;
   }
 
@@ -82,6 +105,7 @@ class SpfxProjectUpgradeCommand extends Command {
     }
 
     this.toVersion = args.options.toVersion ? args.options.toVersion : this.supportedVersions[this.supportedVersions.length - 1];
+    this.packageManager = args.options.packageManager || 'npm';
 
     if (this.supportedVersions.indexOf(this.toVersion) < 0) {
       cb(new CommandError(`Office 365 CLI doesn't support upgrading SharePoint Framework projects to version ${this.toVersion}. Supported versions are ${this.supportedVersions.join(', ')}`, SpfxProjectUpgradeCommand.ERROR_UNSUPPORTED_TO_VERSION));
@@ -136,8 +160,10 @@ class SpfxProjectUpgradeCommand extends Command {
         return;
       }
     });
-    const npmDedupeRule: Rule = new FN017001_MISC_npm_dedupe();
-    npmDedupeRule.visit(project, this.allFindings);
+    if (this.packageManager === 'npm') {
+      const npmDedupeRule: Rule = new FN017001_MISC_npm_dedupe();
+      npmDedupeRule.visit(project, this.allFindings);
+    }
 
     // dedupe
     const findings: Finding[] = this.allFindings.filter((f: Finding, i: number, allFindings: Finding[]) => {
@@ -175,6 +201,28 @@ class SpfxProjectUpgradeCommand extends Command {
         };
       });
     }));
+
+    // replace package operation tokens with command for the specific package manager
+    findingsToReport.forEach(f => {
+      // matches must be in this particular order to avoid false matches, eg.
+      // uninstallDev contains install
+      if (f.resolution.startsWith('uninstallDev')) {
+        f.resolution = f.resolution.replace('uninstallDev', this.getPackageManagerCommand('uninstallDev'));
+        return;
+      }
+      if (f.resolution.startsWith('installDev')) {
+        f.resolution = f.resolution.replace('installDev', this.getPackageManagerCommand('installDev'));
+        return;
+      }
+      if (f.resolution.startsWith('uninstall')) {
+        f.resolution = f.resolution.replace('uninstall', this.getPackageManagerCommand('uninstall'));
+        return;
+      }
+      if (f.resolution.startsWith('install')) {
+        f.resolution = f.resolution.replace('install', this.getPackageManagerCommand('install'));
+        return;
+      }
+    });
 
     switch (args.options.output) {
       case 'json':
@@ -348,7 +396,13 @@ class SpfxProjectUpgradeCommand extends Command {
     const s: string[] = [
       'Execute in command line', EOL,
       '-----------------------', EOL,
-      (reportData.mainNpmCommands.concat(reportData.commandsToExecute.filter((command) => command.indexOf('npm i') === -1 && command.indexOf('npm un') === -1))).join(EOL), EOL,
+      (reportData.packageManagerCommands
+        .concat(reportData.commandsToExecute
+          .filter((command) =>
+            command.indexOf(this.getPackageManagerCommand('install')) === -1 &&
+            command.indexOf(this.getPackageManagerCommand('installDev')) === -1 &&
+            command.indexOf(this.getPackageManagerCommand('uninstall')) === -1 &&
+            command.indexOf(this.getPackageManagerCommand('uninstallDev')) === -1))).join(EOL), EOL,
       EOL,
       Object.keys(reportData.modificationPerFile).map(file => {
         return [
@@ -417,7 +471,13 @@ ${f.resolution}
       '### Execute script', EOL,
       EOL,
       '```sh', EOL,
-      (reportData.mainNpmCommands.concat(reportData.commandsToExecute.filter((command) => command.indexOf('npm i') === -1 && command.indexOf('npm un') === -1))).join(EOL), EOL,
+      (reportData.packageManagerCommands
+        .concat(reportData.commandsToExecute
+          .filter((command) =>
+            command.indexOf(this.getPackageManagerCommand('install')) === -1 &&
+            command.indexOf(this.getPackageManagerCommand('installDev')) === -1 &&
+            command.indexOf(this.getPackageManagerCommand('uninstall')) === -1 &&
+            command.indexOf(this.getPackageManagerCommand('uninstallDev')) === -1))).join(EOL), EOL,
       '```', EOL,
       EOL,
       '### Modify files', EOL,
@@ -446,9 +506,9 @@ ${f.resolution}
 
     findings.forEach(f => {
       if (f.resolutionType === 'cmd') {
-        if (f.resolution.indexOf('npm i') !== -1 ||
-          f.resolution.indexOf('npm un') !== -1) {
-          this.mapNpmCommand(f.resolution, packagesDevExact,
+        if (f.resolution.indexOf('npm') > -1 ||
+          f.resolution.indexOf('yarn') > -1) {
+          this.mapPackageManagerCommand(f.resolution, packagesDevExact,
             packagesDepExact, packagesDepUn, packagesDevUn);
         }
         else {
@@ -470,67 +530,63 @@ ${f.resolution}
       }
     });
 
-    const mainNpmCommands: string[] = this.reduceNpmCommand(
+    const packageManagerCommands: string[] = this.reducePackageManagerCommand(
       packagesDepExact, packagesDevExact, packagesDepUn, packagesDevUn);
 
     return {
       commandsToExecute: commandsToExecute,
-      mainNpmCommands: mainNpmCommands,
+      packageManagerCommands: packageManagerCommands,
       modificationPerFile: modificationPerFile,
       modificationTypePerFile: modificationTypePerFile
     }
   }
 
-  private mapNpmCommand(command: string, packagesDevExact: string[],
+  private mapPackageManagerCommand(command: string, packagesDevExact: string[],
     packagesDepExact: string[], packagesDepUn: string[], packagesDevUn: string[]): void {
-    const npmReduceRegex: RegExp = /npm\s+(i|un)\s+([\w\d\@\/\.-]+)\s+(-DE|-SE|-S|-D)?/gm;
-    const npmReduceMatch: RegExpExecArray | null = npmReduceRegex.exec(command);
-    const packageNameGroupId: number = 2;
-    const installCommandGroupId: number = 1;
-    const dependencyCategoryGroupId: number = 3;
-    if (!npmReduceMatch) {
+    // matches must be in this particular order to avoid false matches, eg.
+    // uninstallDev contains install
+    if (command.startsWith(`${this.getPackageManagerCommand('uninstallDev')} `)) {
+      packagesDevUn.push(command.replace(this.getPackageManagerCommand('uninstallDev'), '').trim());
       return;
     }
-
-    if (npmReduceMatch[installCommandGroupId] === 'i') {
-      if (npmReduceMatch[dependencyCategoryGroupId] === '-SE') {
-        packagesDepExact.push(npmReduceMatch[packageNameGroupId]);
-      }
-      else if (npmReduceMatch[dependencyCategoryGroupId] === '-DE') {
-        packagesDevExact.push(npmReduceMatch[packageNameGroupId]);
-      }
+    if (command.startsWith(`${this.getPackageManagerCommand('installDev')} `)) {
+      packagesDevExact.push(command.replace(this.getPackageManagerCommand('installDev'), '').trim());
+      return;
     }
-    else {
-      if (npmReduceMatch[dependencyCategoryGroupId] === '-S') {
-        packagesDepUn.push(npmReduceMatch[packageNameGroupId]);
-      }
-      else if (npmReduceMatch[dependencyCategoryGroupId] === '-D') {
-        packagesDevUn.push(npmReduceMatch[packageNameGroupId]);
-      }
+    if (command.startsWith(`${this.getPackageManagerCommand('uninstall')} `)) {
+      packagesDepUn.push(command.replace(this.getPackageManagerCommand('uninstall'), '').trim());
+      return;
+    }
+    if (command.startsWith(`${this.getPackageManagerCommand('install')} `)) {
+      packagesDepExact.push(command.replace(this.getPackageManagerCommand('install'), '').trim());
     }
   }
 
-  private reduceNpmCommand(packagesDepExact: string[], packagesDevExact: string[],
+  private reducePackageManagerCommand(packagesDepExact: string[], packagesDevExact: string[],
     packagesDepUn: string[], packagesDevUn: string[]): string[] {
     const commandsToExecute: string[] = [];
 
     if (packagesDepExact.length > 0) {
-      commandsToExecute.push(`npm i ${packagesDepExact.join(' ')} -SE`);
+      commandsToExecute.push(`${this.getPackageManagerCommand('install')} ${packagesDepExact.join(' ')}`);
     }
 
     if (packagesDevExact.length > 0) {
-      commandsToExecute.push(`npm i ${packagesDevExact.join(' ')} -DE`);
+      commandsToExecute.push(`${this.getPackageManagerCommand('installDev')} ${packagesDevExact.join(' ')}`);
     }
 
     if (packagesDepUn.length > 0) {
-      commandsToExecute.push(`npm un ${packagesDepUn.join(' ')} -S`);
+      commandsToExecute.push(`${this.getPackageManagerCommand('uninstall')} ${packagesDepUn.join(' ')}`);
     }
 
     if (packagesDevUn.length > 0) {
-      commandsToExecute.push(`npm un ${packagesDevUn.join(' ')} -D`);
+      commandsToExecute.push(`${this.getPackageManagerCommand('uninstallDev')} ${packagesDevUn.join(' ')}`);
     }
 
     return commandsToExecute;
+  }
+
+  private getPackageManagerCommand(command: string): string {
+    return (SpfxProjectUpgradeCommand.packageCommands as any)[this.packageManager][command];
   }
 
   private getProjectRoot(folderPath: string): string | null {
@@ -582,6 +638,11 @@ ${f.resolution}
       {
         option: '-v, --toVersion [toVersion]',
         description: 'The version of SharePoint Framework to which upgrade the project'
+      },
+      {
+        option: '--packageManager [packageManager]',
+        description: 'The package manager you use. Supported managers npm|pnpm|yarn. Default npm',
+        autocomplete: ['npm', 'pnpm', 'yarn']
       }
     ];
 
@@ -593,6 +654,18 @@ ${f.resolution}
       }
     })
     return options.concat(parentOptions);
+  }
+
+  public validate(): CommandValidate {
+    return (args: CommandArgs): boolean | string => {
+      if (args.options.packageManager) {
+        if (['npm', 'pnpm', 'yarn'].indexOf(args.options.packageManager) < 0) {
+          return `${args.options.packageManager} is not a supported package manager. Supported package managers are npm, pnpm and yarn`;
+        }
+      }
+
+      return true;
+    };
   }
 
   public commandHelp(args: any, log: (help: string) => void): void {
@@ -633,6 +706,11 @@ ${f.resolution}
     SharePoint Framework version 1.5.0 and show the summary of the findings
     in the shell
       ${chalk.grey(config.delimiter)} ${this.name} --toVersion 1.5.0
+
+    Get instructions to upgrade the current SharePoint Framework project to the
+    latest SharePoint Framework version supported by the Office 365 CLI using
+    pnpm
+      ${chalk.grey(config.delimiter)} ${this.name} --packageManager pnpm
 
     Get instructions to upgrade the current SharePoint Framework project to the
     latest SharePoint Framework version supported by the Office 365 CLI

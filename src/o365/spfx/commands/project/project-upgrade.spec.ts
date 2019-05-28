@@ -1,5 +1,5 @@
 import commands from '../../commands';
-import Command, { CommandOption, CommandError } from '../../../../Command';
+import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 const command: Command = require('./project-upgrade');
@@ -38,6 +38,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     };
     telemetry = null;
     (command as any).allFindings = [];
+    (command as any).packageManager = 'npm';
     packagesDevExact = [];
     packagesDepExact = [];
     packagesDepUn = [];
@@ -516,101 +517,195 @@ describe(commands.PROJECT_UPGRADE, () => {
     assert.equal(typeof ((project.vsCode) as VsCode).settingsJson, 'undefined');
   });
 
-  it(`doesn't return any dependencies from npm`, () => {
-    (command as any).mapNpmCommand('npm', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+  //#region npm
+  it(`doesn't return any dependencies from command npm for npm package manager`, () => {
+    (command as any).mapPackageManagerCommand('npm', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
     assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
     assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
     assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
     assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
   });
 
-  it(`returns 1 exact dependency to be installed for npm i -SE`, () => {
-    (command as any).mapNpmCommand('npm i package -SE', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+  it(`returns 1 exact dependency to be installed for npm i -SE for npm package manager`, () => {
+    (command as any).mapPackageManagerCommand('npm i -SE package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
     assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
     assert.equal(packagesDepExact.length, 1, 'Incorrect number of dev deps to install');
     assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
     assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
   });
 
-  it(`returns 1 exact dev dependency to be installed for npm i -DE`, () => {
-    (command as any).mapNpmCommand('npm i package -DE', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+  it(`returns 1 exact dev dependency to be installed for npm i -DE for npm package manager`, () => {
+    (command as any).mapPackageManagerCommand('npm i -DE package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
     assert.equal(packagesDevExact.length, 1, 'Incorrect number of deps to install');
     assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
     assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
     assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
   });
 
-  it(`doesn't return any dependencies for npm i -S`, () => {
-    (command as any).mapNpmCommand('npm i package -S', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
-    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
-    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
-    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
-    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
-  });
-
-  it(`doesn't return any dependencies for npm i -D`, () => {
-    (command as any).mapNpmCommand('npm i package -D', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
-    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
-    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
-    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
-    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
-  });
-
-  it(`doesn't return any dependencies for npm un -SE`, () => {
-    (command as any).mapNpmCommand('npm un package -SE', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
-    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
-    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
-    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
-    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
-  });
-
-  it(`doesn't return any dependencies for npm un -DE`, () => {
-    (command as any).mapNpmCommand('npm un package -DE', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
-    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
-    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
-    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
-    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
-  });
-
-  it(`returns 1 dependency to uninstall for npm un -S`, () => {
-    (command as any).mapNpmCommand('npm un package -S', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+  it(`returns 1 dependency to uninstall for npm un -S for npm package manager`, () => {
+    (command as any).mapPackageManagerCommand('npm un -S package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
     assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
     assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
     assert.equal(packagesDepUn.length, 1, 'Incorrect number of deps to uninstall');
     assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
   });
 
-  it(`returns 1 dev dependency to uninstall for npm un -D`, () => {
-    (command as any).mapNpmCommand('npm un package -D', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+  it(`returns 1 dev dependency to uninstall for npm un -D for npm package manager`, () => {
+    (command as any).mapPackageManagerCommand('npm un -D package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
     assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
     assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
     assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
     assert.equal(packagesDevUn.length, 1, 'Incorrect number of dev deps to uninstall');
   });
 
+  it(`returns command to install dependency for 1 dep for npm package manager`, () => {
+    const commands: string[] = (command as any).reducePackageManagerCommand(['package'], [], [], []);
+    assert.equal(JSON.stringify(commands), JSON.stringify(['npm i -SE package']));
+  });
+
+  it(`returns command to install dev dependency for 1 dev dep for npm package manager`, () => {
+    const commands: string[] = (command as any).reducePackageManagerCommand([], ['package'], [], []);
+    assert.equal(JSON.stringify(commands), JSON.stringify(['npm i -DE package']));
+  });
+
+  it(`returns command to uninstall dependency for 1 dep for npm package manager`, () => {
+    const commands: string[] = (command as any).reducePackageManagerCommand([], [], ['package'], []);
+    assert.equal(JSON.stringify(commands), JSON.stringify(['npm un -S package']));
+  });
+
+  it(`returns command to uninstall dev dependency for 1 dev dep for npm package manager`, () => {
+    const commands: string[] = (command as any).reducePackageManagerCommand([], [], [], ['package']);
+    assert.equal(JSON.stringify(commands), JSON.stringify(['npm un -D package']));
+  });
+  //#endregion
+
+  //#region pnpm
+  it(`doesn't return any dependencies from command pnpm for pnpm package manager`, () => {
+    (command as any).packageManager = 'pnpm';
+    (command as any).mapPackageManagerCommand('pnpm', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
+    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
+    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
+  });
+
+  it(`returns 1 exact dependency to be installed for pnpm i -E for pnpm package manager`, () => {
+    (command as any).packageManager = 'pnpm';
+    (command as any).mapPackageManagerCommand('pnpm i -E package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
+    assert.equal(packagesDepExact.length, 1, 'Incorrect number of dev deps to install');
+    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
+  });
+
+  it(`returns 1 exact dev dependency to be installed for pnpm i -DE for npm package manager`, () => {
+    (command as any).packageManager = 'pnpm';
+    (command as any).mapPackageManagerCommand('pnpm i -DE package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    assert.equal(packagesDevExact.length, 1, 'Incorrect number of deps to install');
+    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
+    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
+  });
+
+  it(`returns 1 dev dependency to uninstall for pnpm un for npm package manager`, () => {
+    (command as any).packageManager = 'pnpm';
+    (command as any).mapPackageManagerCommand('pnpm un package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
+    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
+    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.equal(packagesDevUn.length, 1, 'Incorrect number of dev deps to uninstall');
+  });
+
+  it(`returns command to install dependency for 1 dep for pnpm package manager`, () => {
+    (command as any).packageManager = 'pnpm';
+    const commands: string[] = (command as any).reducePackageManagerCommand(['package'], [], [], []);
+    assert.equal(JSON.stringify(commands), JSON.stringify(['pnpm i -E package']));
+  });
+
+  it(`returns command to install dev dependency for 1 dev dep for pnpm package manager`, () => {
+    (command as any).packageManager = 'pnpm';
+    const commands: string[] = (command as any).reducePackageManagerCommand([], ['package'], [], []);
+    assert.equal(JSON.stringify(commands), JSON.stringify(['pnpm i -DE package']));
+  });
+
+  it(`returns command to uninstall dependency for 1 dep for pnpm package manager`, () => {
+    (command as any).packageManager = 'pnpm';
+    const commands: string[] = (command as any).reducePackageManagerCommand([], [], ['package'], []);
+    assert.equal(JSON.stringify(commands), JSON.stringify(['pnpm un package']));
+  });
+
+  it(`returns command to uninstall dev dependency for 1 dev dep for npm package manager`, () => {
+    (command as any).packageManager = 'pnpm';
+    const commands: string[] = (command as any).reducePackageManagerCommand([], [], [], ['package']);
+    assert.equal(JSON.stringify(commands), JSON.stringify(['pnpm un package']));
+  });
+  //#endregion
+
+  //#region yarn
+  it(`doesn't return any dependencies from command yarn for yarn package manager`, () => {
+    (command as any).packageManager = 'yarn';
+    (command as any).mapPackageManagerCommand('yarn', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
+    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
+    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
+  });
+
+  it(`returns 1 exact dependency to be installed for yarn add -E for pnpm package manager`, () => {
+    (command as any).packageManager = 'yarn';
+    (command as any).mapPackageManagerCommand('yarn add -E package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
+    assert.equal(packagesDepExact.length, 1, 'Incorrect number of dev deps to install');
+    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
+  });
+
+  it(`returns 1 exact dev dependency to be installed for yarn add -DE for npm package manager`, () => {
+    (command as any).packageManager = 'yarn';
+    (command as any).mapPackageManagerCommand('yarn add -DE package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    assert.equal(packagesDevExact.length, 1, 'Incorrect number of deps to install');
+    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
+    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
+  });
+
+  it(`returns 1 dev dependency to uninstall for yarn un for npm package manager`, () => {
+    (command as any).packageManager = 'yarn';
+    (command as any).mapPackageManagerCommand('yarn remove package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
+    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
+    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.equal(packagesDevUn.length, 1, 'Incorrect number of dev deps to uninstall');
+  });
+
+  it(`returns command to install dependency for 1 dep for yarn package manager`, () => {
+    (command as any).packageManager = 'yarn';
+    const commands: string[] = (command as any).reducePackageManagerCommand(['package'], [], [], []);
+    assert.equal(JSON.stringify(commands), JSON.stringify(['yarn add -E package']));
+  });
+
+  it(`returns command to install dev dependency for 1 dev dep for yarn package manager`, () => {
+    (command as any).packageManager = 'yarn';
+    const commands: string[] = (command as any).reducePackageManagerCommand([], ['package'], [], []);
+    assert.equal(JSON.stringify(commands), JSON.stringify(['yarn add -DE package']));
+  });
+
+  it(`returns command to uninstall dependency for 1 dep for yarn package manager`, () => {
+    (command as any).packageManager = 'yarn';
+    const commands: string[] = (command as any).reducePackageManagerCommand([], [], ['package'], []);
+    assert.equal(JSON.stringify(commands), JSON.stringify(['yarn remove package']));
+  });
+
+  it(`returns command to uninstall dev dependency for 1 dev dep for yarn package manager`, () => {
+    (command as any).packageManager = 'yarn';
+    const commands: string[] = (command as any).reducePackageManagerCommand([], [], [], ['package']);
+    assert.equal(JSON.stringify(commands), JSON.stringify(['yarn remove package']));
+  });
+  //#endregion
+
   it(`returns no commands to run when no dependencies found`, () => {
-    const commands: string[] = (command as any).reduceNpmCommand([], [], [], []);
+    const commands: string[] = (command as any).reducePackageManagerCommand([], [], [], []);
     assert.equal(JSON.stringify(commands), JSON.stringify([]));
-  });
-
-  it(`returns command to install dependency for 1 dep`, () => {
-    const commands: string[] = (command as any).reduceNpmCommand(['package'], [], [], []);
-    assert.equal(JSON.stringify(commands), JSON.stringify(['npm i package -SE']));
-  });
-
-  it(`returns command to install dev dependency for 1 dev dep`, () => {
-    const commands: string[] = (command as any).reduceNpmCommand([], ['package'], [], []);
-    assert.equal(JSON.stringify(commands), JSON.stringify(['npm i package -DE']));
-  });
-
-  it(`returns command to uninstall dependency for 1 dep`, () => {
-    const commands: string[] = (command as any).reduceNpmCommand([], [], ['package'], []);
-    assert.equal(JSON.stringify(commands), JSON.stringify(['npm un package -S']));
-  });
-
-  it(`returns command to uninstall dev dependency for 1 dev dep`, () => {
-    const commands: string[] = (command as any).reduceNpmCommand([], [], [], ['package']);
-    assert.equal(JSON.stringify(commands), JSON.stringify(['npm un package -D']));
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.0.0 project to 1.0.1', () => {
@@ -651,7 +746,7 @@ describe(commands.PROJECT_UPGRADE, () => {
       assert.equal(findings.length, 2);
     });
   });
- 
+
   it('e2e: shows correct number of findings for upgrading react web part 1.0.1 project to 1.0.2', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-101-webpart-react'));
     cmdInstance.action = command.action();
@@ -1708,6 +1803,31 @@ describe(commands.PROJECT_UPGRADE, () => {
       }
     });
     assert(containsOption);
+  });
+
+  it('passes validation when package manager not specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { } });
+    assert.equal(actual, true);
+  });
+
+  it('fails validation when unsupported package manager specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { packageManager: 'abc' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('passes validation when npm package manager specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { packageManager: 'npm' } });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation when pnpm package manager specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { packageManager: 'pnpm' } });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation when yarn package manager specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { packageManager: 'yarn' } });
+    assert.equal(actual, true);
   });
 
   it('has help referring to the right command', () => {
