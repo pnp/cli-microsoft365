@@ -61,12 +61,16 @@ class GraphO365GroupListCommand extends GraphItemsListCommand<Group> {
 
         if(args.options.orphan)
         {
+          let orphanGroups: any[] = [];
+
           this.items.forEach( (group, index) => {
-            if(group.owners.length > 0) 
+            if(!group.owners || group.owners.length == 0) 
             {
-              this.items.splice(index,1);
+              orphanGroups.push(group);
             }
           });
+
+          this.items = orphanGroups;
         }
 
         if (args.options.includeSiteUrl) {
