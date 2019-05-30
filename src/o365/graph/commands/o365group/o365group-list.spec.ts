@@ -308,16 +308,7 @@ describe(commands.O365GROUP_LIST, () => {
               "renewedDateTime": "2017-12-07T13:58:01Z",
               "securityEnabled": false,
               "visibility": "Private",
-              "owners": [{
-                "@odata.type": "#microsoft.graph.user",
-                "id": "7343a4e9-159e-4736-a39d-f4ee2b2e1ff3",
-                "displayName": "Joseph Velliah"
-              },
-              {
-                "@odata.type": "#microsoft.graph.user",
-                "id": "7343a4e9-159e-4736-a39d-f4ee2b2e1ff4",
-                "displayName": "Bose Velliah"
-              }]
+              "owners": []
             },
             {
               "id": "0157132c-bf82-48ff-99e4-b19a74950fe0",
@@ -416,16 +407,7 @@ describe(commands.O365GROUP_LIST, () => {
               "renewedDateTime": "2017-12-07T13:58:01Z",
               "securityEnabled": false,
               "visibility": "Private",
-              "owners": [{
-                "@odata.type": "#microsoft.graph.user",
-                "id": "7343a4e9-159e-4736-a39d-f4ee2b2e1ff3",
-                "displayName": "Joseph Velliah"
-              },
-              {
-                "@odata.type": "#microsoft.graph.user",
-                "id": "7343a4e9-159e-4736-a39d-f4ee2b2e1ff4",
-                "displayName": "Bose Velliah"
-              }]
+              "owners": []
             },
             {
               "id": "0157132c-bf82-48ff-99e4-b19a74950fe0",
