@@ -13,7 +13,6 @@ describe(commands.REPORTS_TEAMS_DEVICE_USAGE_USER_DETAIL, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
   let trackEvent: any;
   let telemetry: any;
 
@@ -33,7 +32,6 @@ describe(commands.REPORTS_TEAMS_DEVICE_USAGE_USER_DETAIL, () => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
     auth.service = new Service();
     telemetry = null;
     (command as any).items = [];
