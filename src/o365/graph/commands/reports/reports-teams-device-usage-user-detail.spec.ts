@@ -13,6 +13,7 @@ describe(commands.REPORTS_TEAMS_DEVICE_USAGE_USER_DETAIL, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
+  let cmdInstanceLogSpy: sinon.SinonSpy;
   let trackEvent: any;
   let telemetry: any;
 
@@ -32,7 +33,7 @@ describe(commands.REPORTS_TEAMS_DEVICE_USAGE_USER_DETAIL, () => {
         log.push(msg);
       }
     };
-    //cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
     auth.service = new Service();
     telemetry = null;
     (command as any).items = [];
@@ -180,9 +181,7 @@ describe(commands.REPORTS_TEAMS_DEVICE_USAGE_USER_DETAIL, () => {
   it('gets details about Microsoft Teams device usage by user for the given period', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/getTeamsDeviceUsageUserDetail(period='D7')`) {
-        return Promise.resolve({
-          "value": ""
-        });
+        return Promise.resolve('Report Refresh Date,User Principal Name,Last Activity Date,Is Deleted,Deleted Date,Used Web,Used Windows Phone,Used iOS,Used Mac,Used Android Phone,Used Windows,Report Period');
       }
 
       return Promise.reject('Invalid request');
@@ -199,6 +198,38 @@ describe(commands.REPORTS_TEAMS_DEVICE_USAGE_USER_DETAIL, () => {
       }
       catch (e) {
         done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+      }
+    });
+  });
+
+  it('gets details about Microsoft Teams device usage by user for the given date', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/reports/getTeamsDeviceUsageUserDetail(date='2019-05-01')`) {
+        return Promise.resolve({
+          "value": 'Report Refresh Date,User Principal Name,Last Activity Date,Is Deleted,Deleted Date,Used Web,Used Windows Phone,Used iOS,Used Mac,Used Android Phone,Used Windows,Report Period'
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.service = new Service();
+    auth.service.connected = true;
+    auth.service.resource = 'https://graph.microsoft.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, date: '2019-05-01' } }, () => {
+      try {
+        assert(1 === 1);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
       }
     });
   });
