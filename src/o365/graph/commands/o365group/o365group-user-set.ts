@@ -139,7 +139,7 @@ class GraphO365GroupUserSetCommand extends GraphItemsListCommand<GroupUser> {
 
     return this.getAllItems(endpoint, cmd, true).then((): void => {
       // Currently there is a bug in the Microsoft Graph that returns Owners as
-      // userType 'member'. We therefore update all returned user as owner  
+      // userType 'member'. We therefore update all returned user as owner
       for (var i in this.items) {
         this.items[i].userType = 'Owner';
       }
@@ -155,11 +155,11 @@ class GraphO365GroupUserSetCommand extends GraphItemsListCommand<GroupUser> {
     const options: CommandOption[] = [
       {
         option: "-i, --groupId [groupId]",
-        description: "The ID of the Office 365 group for which to list users"
+        description: "The ID of the Office 365 group for which to update user"
       },
       {
         option: "--teamId [teamId]",
-        description: "The ID of the Microsoft Teams team for which to list users"
+        description: "The ID of the Microsoft Teams team for which to update user"
       },
       {
         option: '-n, --userName <userName>',
@@ -167,7 +167,7 @@ class GraphO365GroupUserSetCommand extends GraphItemsListCommand<GroupUser> {
       },
       {
         option: '-r, --role <role>',
-        description: 'Role to set for the given user in the specified team. Allowed values: Owner|Member',
+        description: 'Role to set for the given user in the specified Office 365 Group or Microsoft Teams team. Allowed values: Owner|Member',
         autocomplete: ['Owner', 'Member']
       }
     ];
@@ -216,7 +216,7 @@ class GraphO365GroupUserSetCommand extends GraphItemsListCommand<GroupUser> {
     log(
       `  ${chalk.yellow('Important:')} before using this command, log in to the Microsoft Graph
     using the ${chalk.blue(commands.LOGIN)} command.
-        
+
   Remarks:
 
     To update the role of the given user in the specified Office 365 Group or Microsoft Teams team,
