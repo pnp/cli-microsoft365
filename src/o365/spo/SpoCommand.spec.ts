@@ -6,6 +6,7 @@ import auth, { Site } from './SpoAuth';
 import Utils from '../../Utils';
 import { CommandError } from '../../Command';
 import { FormDigestInfo } from './spo';
+import appInsights from '../../appInsights';
 
 class MockCommand extends SpoCommand {
   public get name(): string {
@@ -28,6 +29,10 @@ describe('SpoCommand', () => {
   let cmdInstance: any;
   let log: string[];
 
+  before(() => {
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+  });
+
   beforeEach(() => {
     log = [];
     cmdInstance = {
@@ -49,7 +54,8 @@ describe('SpoCommand', () => {
     Utils.restore([
       request.post,
       auth.ensureAccessToken,
-      auth.restoreAuth
+      auth.restoreAuth,
+      appInsights.trackEvent
     ]);
   });
 

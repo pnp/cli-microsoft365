@@ -6,6 +6,7 @@ const command: Command = require('./orgnewssite-remove');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import appInsights from '../../../../appInsights';
 
 describe(commands.ORGNEWSSITE_REMOVE, () => {
   let vorpal: Vorpal;
@@ -17,6 +18,7 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
   });
 
   beforeEach(() => {
@@ -47,7 +49,8 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
     Utils.restore([
       auth.ensureAccessToken,
       auth.restoreAuth,
-      request.post
+      request.post,
+      appInsights.trackEvent
     ]);
   });
 

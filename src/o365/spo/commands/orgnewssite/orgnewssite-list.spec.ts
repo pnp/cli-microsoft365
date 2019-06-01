@@ -6,6 +6,7 @@ const command: Command = require('./orgnewssite-list');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import appInsights from '../../../../appInsights';
 
 describe(commands.ORGNEWSSITE_LIST, () => {
   let vorpal: Vorpal;
@@ -16,6 +17,7 @@ describe(commands.ORGNEWSSITE_LIST, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
   });
 
   beforeEach(() => {
@@ -41,7 +43,8 @@ describe(commands.ORGNEWSSITE_LIST, () => {
     Utils.restore([
       auth.ensureAccessToken,
       auth.restoreAuth,
-      request.post
+      request.post,
+      appInsights.trackEvent
     ]);
   });
 
