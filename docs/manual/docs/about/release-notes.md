@@ -1,5 +1,20 @@
 # Release notes
 
+## [v1.22.0](https://github.com/pnp/office365-cli/releases/tag/v1.22.0)
+
+### New commands
+
+**Microsoft Graph:**
+
+- [graph o365group user set](../cmd/graph/o365group/o365group-user-set.md) - updates role of the specified user in the specified Office 365 Group or Microsoft Teams team [#982](https://github.com/pnp/office365-cli/issues/982)
+
+### Changes
+
+- extended 'spo site add' with support for specifying owners [#823](https://github.com/pnp/office365-cli/issues/823)
+- extended 'graph o365group list' with support for orphaned groups [#959](https://github.com/pnp/office365-cli/issues/959)
+- added support for superseding SPFx project upgrade findings [#970](https://github.com/pnp/office365-cli/issues/970)
+- added support for package managers [#617](https://github.com/pnp/office365-cli/issues/617)
+
 ## [v1.21.0](https://github.com/pnp/office365-cli/releases/tag/v1.21.0)
 
 ### New commands
