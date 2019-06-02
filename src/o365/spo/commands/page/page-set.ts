@@ -50,6 +50,12 @@ class SpoPageSetCommand extends SpoCommand {
     let siteAccessToken: string = '';
     let requestDigest: string = '';
     let pageName: string = args.options.name;
+    let fileNameWithoutExtension: string = pageName.replace('.aspx', '');
+    let bannerImageUrl: string = '';
+    let canvasContent1: string = '';
+    let layoutWebpartsContent: string = '';
+    let templateListItemId: string = '';
+
     if (!pageName.endsWith('.aspx')) {
       pageName += '.aspx';
     }
@@ -103,9 +109,9 @@ class SpoPageSetCommand extends SpoCommand {
 
         return request.post(requestOptions);
       })
-      .then((): Promise<void> => {
+      .then((): Promise<{ Id: string }> => {
         if (!args.options.promoteAs) {
-          return Promise.resolve();
+          return Promise.resolve({ Id: '' });
         }
 
         const requestOptions: any = {
@@ -142,7 +148,91 @@ class SpoPageSetCommand extends SpoCommand {
               FirstPublishedDate: new Date().toISOString().replace('Z', '')
             }
             break;
+          case 'Template':
+            requestOptions.url = `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeSiteUrl}')/ListItemAllFields`;
+            requestOptions.headers = {
+              authorization: `Bearer ${siteAccessToken}`,
+              'X-RequestDigest': requestDigest,
+              'content-type': 'application/json;odata=nometadata',
+              accept: 'application/json;odata=nometadata'
+            };
+            break;
         }
+
+        return request.post(requestOptions);
+      })
+      .then((res: { Id: string }): Promise<{ Id: string, BannerImageUrl: string, CanvasContent1: string, LayoutWebpartsContent: string }> => {
+        if (args.options.promoteAs !== 'Template') {
+          return Promise.resolve({ Id: '', BannerImageUrl: '', CanvasContent1: '', LayoutWebpartsContent: '' });
+        }
+
+        const requestOptions: any = {
+          json: true,
+          url: `${args.options.webUrl}/_api/SitePages/Pages(${res.Id})/SavePageAsTemplate`,
+          headers: {
+            authorization: `Bearer ${siteAccessToken}`,
+            'X-RequestDigest': requestDigest,
+            'content-type': 'application/json;odata=nometadata',
+            'X-HTTP-Method': 'POST',
+            'IF-MATCH': '*',
+            accept: 'application/json;odata=nometadata'
+          }
+        };
+
+        return request.post(requestOptions);
+      })
+      .then((res: { Id: string, BannerImageUrl: string, CanvasContent1: string, LayoutWebpartsContent: string }): Promise<void> => {
+        if (args.options.promoteAs !== 'Template') {
+          return Promise.resolve();
+        }
+
+        bannerImageUrl = res.BannerImageUrl;
+        canvasContent1 = res.CanvasContent1;
+        layoutWebpartsContent = res.LayoutWebpartsContent;
+        templateListItemId = res.Id;
+
+        const requestOptions: any = {
+          json: true,
+          url: `${args.options.webUrl}/_api/SitePages/Pages(${templateListItemId})/SavePage`,
+          headers: {
+            authorization: `Bearer ${siteAccessToken}`,
+            'X-RequestDigest': requestDigest,
+            'X-HTTP-Method': 'MERGE',
+            'IF-MATCH': '*',
+            'content-type': 'application/json;odata=nometadata',
+            accept: 'application/json;odata=nometadata'
+          },
+          body: {
+            BannerImageUrl: bannerImageUrl,
+            CanvasContent1: canvasContent1,
+            LayoutWebpartsContent: layoutWebpartsContent
+          }
+        };
+        return request.post(requestOptions);
+      })
+      .then((): Promise<void> => {
+        if (args.options.promoteAs !== 'Template') {
+          return Promise.resolve();
+        }
+
+        const requestOptions: any = {
+          json: true,
+          url: `${args.options.webUrl}/_api/SitePages/Pages(${templateListItemId})/SavePageAsDraft`,
+          headers: {
+            authorization: `Bearer ${siteAccessToken}`,
+            'X-RequestDigest': requestDigest,
+            'X-HTTP-Method': 'MERGE',
+            'IF-MATCH': '*',
+            'content-type': 'application/json;odata=nometadata',
+            accept: 'application/json;odata=nometadata'
+          },
+          body: {
+            Title: fileNameWithoutExtension,
+            BannerImageUrl: bannerImageUrl,
+            CanvasContent1: canvasContent1,
+            LayoutWebpartsContent: layoutWebpartsContent
+          }
+        };
 
         return request.post(requestOptions);
       })
@@ -208,8 +298,8 @@ class SpoPageSetCommand extends SpoCommand {
       },
       {
         option: '-p, --promoteAs [promoteAs]',
-        description: 'Update the page purpose. Allowed values HomePage|NewsPage',
-        autocomplete: ['HomePage', 'NewsPage']
+        description: 'Update the page purpose. Allowed values HomePage|NewsPage|Template',
+        autocomplete: ['HomePage', 'NewsPage', 'Template']
       },
       {
         option: '--commentsEnabled [commentsEnabled]',
@@ -253,8 +343,9 @@ class SpoPageSetCommand extends SpoCommand {
 
       if (args.options.promoteAs &&
         args.options.promoteAs !== 'HomePage' &&
-        args.options.promoteAs !== 'NewsPage') {
-        return `${args.options.promoteAs} is not a valid option for promoteAs. Allowed values HomePage|NewsPage`;
+        args.options.promoteAs !== 'NewsPage' &&
+        args.options.promoteAs !== 'Template') {
+        return `${args.options.promoteAs} is not a valid option for promoteAs. Allowed values HomePage|NewsPage|Template`;
       }
 
       if (args.options.promoteAs === 'HomePage' && args.options.layoutType !== 'Home') {
@@ -301,6 +392,9 @@ class SpoPageSetCommand extends SpoCommand {
 
     Promote the existing article page as a news article
       ${chalk.grey(config.delimiter)} ${this.name} --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --promoteAs NewsPage
+
+    Promote the existing article page as a template
+      ${chalk.grey(config.delimiter)} ${this.name} --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --promoteAs Template
 
     Change the page's layout to Home and set it as the site's home page
       ${chalk.grey(config.delimiter)} ${this.name} --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --layoutType Home --promoteAs HomePage
