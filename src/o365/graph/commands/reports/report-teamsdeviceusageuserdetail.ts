@@ -37,39 +37,28 @@ class GraphReportTeamsDeviceUsageUserDetailCommand extends GraphItemsListCommand
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const periodParameter: string = args.options.period ? `getTeamsDeviceUsageUserDetail(period='${encodeURIComponent(args.options.period)}')` : '';
-    const dateParameter: string = args.options.date ? `getTeamsDeviceUsageUserDetail(date=${encodeURIComponent(args.options.date)})` : '';
+    auth
+      .ensureAccessToken(auth.service.resource, cmd, this.debug)
+      .then((): Promise<{}> => {
 
-    const endpoint: string = `${auth.service.resource}/v1.0/reports/${(args.options.period ? periodParameter : dateParameter )}`;
+        const periodParameter: string = args.options.period ? `getTeamsDeviceUsageUserDetail(period='${encodeURIComponent(args.options.period)}')` : '';
+        const dateParameter: string = args.options.date ? `getTeamsDeviceUsageUserDetail(date=${encodeURIComponent(args.options.date)})` : '';
+        const endpoint: string = `${auth.service.resource}/v1.0/reports/${(args.options.period ? periodParameter : dateParameter)}`;
 
-    this.getUsageData(endpoint, cmd)
-      .then((res): void => {
+        const requestOptions: any = {
+          url: endpoint,
+          headers: {
+            authorization: `Bearer ${auth.service.accessToken}`
+          }
+        };
+
+        return request.get(requestOptions);
+      })
+      .then((res: any): void => {
         cmd.log(res);
+
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
-
-  }
-
-  protected getUsageData(url: string, cmd: CommandInstance): Promise<void> {
-    return new Promise<void>((resolve: (data: any) => void, reject: (error: any) => void): void => {
-      auth
-        .ensureAccessToken(auth.service.resource, cmd, this.debug)
-        .then((): Promise<any> => {
-          const requestOptions: any = {
-            url: url,
-            headers: {
-              authorization: `Bearer ${auth.service.accessToken}`
-            }
-          };
-
-          return request.get(requestOptions);
-        })
-        .then((res: any): void => {
-          resolve(res);
-        }, (err: any): void => {
-          reject(err);
-        });
-    });
   }
 
   public options(): CommandOption[] {
@@ -102,6 +91,7 @@ class GraphReportTeamsDeviceUsageUserDetailCommand extends GraphItemsListCommand
       }
 
       if (args.options.period) {
+
         const period: string = args.options.period.toUpperCase();
         if (period !== 'D7' && period !== 'D30' && period !== 'D90' && period !== 'D180') {
           return `${period} is not a valid period type. The supported values are D7|D30|D90|D180`;
