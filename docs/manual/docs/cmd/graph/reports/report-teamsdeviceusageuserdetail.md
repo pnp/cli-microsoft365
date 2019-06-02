@@ -5,7 +5,7 @@ Gets detail about Microsoft Teams device usage by user
 ## Usage
 
 ```sh
-graph reports teamsdeviceusageuserdetail [options]
+graph report teamsdeviceusageuserdetail [options]
 ```
 
 ## Options

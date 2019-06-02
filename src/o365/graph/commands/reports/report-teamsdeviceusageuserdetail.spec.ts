@@ -101,6 +101,11 @@ describe(commands.REPORT_TEAMSDEVICEUSAGEUSERDETAIL, () => {
     });
   });
 
+  it('fails validation if both period and date options are not passed', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { } });
+    assert.notEqual(actual, true);
+  });
+
   it('fails validation if both period and date options set', () => {
     const actual = (command.validate() as CommandValidate)({ options: { period: 'D7', date: '2019-05-01' } });
     assert.notEqual(actual, true);

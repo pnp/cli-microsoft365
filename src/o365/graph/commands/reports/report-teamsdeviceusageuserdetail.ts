@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
   date?: string;
 }
 
-class GraphReportsTeamsDeviceUsageUserDetailCommand extends GraphItemsListCommand<any> {
+class GraphReportTeamsDeviceUsageUserDetailCommand extends GraphItemsListCommand<any> {
 
   public get name(): string {
     return `${commands.REPORT_TEAMSDEVICEUSAGEUSERDETAIL}`;
@@ -93,6 +93,10 @@ class GraphReportsTeamsDeviceUsageUserDetailCommand extends GraphItemsListComman
 
     return (args: CommandArgs): boolean | string => {
 
+      if (!args.options.period && !args.options.date) {
+        return 'You can\'t run this command without period or date parameter.';
+      }
+
       if (args.options.period && args.options.date) {
         return 'You can\'t use period and date parameters together.';
       }
@@ -149,4 +153,4 @@ class GraphReportsTeamsDeviceUsageUserDetailCommand extends GraphItemsListComman
   }
 }
 
-module.exports = new GraphReportsTeamsDeviceUsageUserDetailCommand();
+module.exports = new GraphReportTeamsDeviceUsageUserDetailCommand();
