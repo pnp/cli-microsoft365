@@ -49,6 +49,12 @@ Promote the existing article page as a news article
 spo page set --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --promoteAs NewsPage
 ```
 
+Promote the existing article page as a template
+
+```sh
+spo page set --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --promoteAs Template
+```
+
 Change the page's layout to Home and set it as the site's home page
 
 ```sh

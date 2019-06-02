@@ -252,6 +252,39 @@ describe(commands.PAGE_SET, () => {
     });
   });
 
+  it('promotes the page as Template', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
+        !opts.body) {
+        return Promise.resolve({ Id: '1' });
+      }
+
+      if (opts.url.indexOf(`/_api/SitePages/Pages(1)/SavePageAsTemplate`) > -1) {
+        return Promise.resolve({ Id: '2', BannerImageUrl: 'url', CanvasContent1: 'content1', LayoutWebpartsContent: 'content' });
+      }
+
+      if (opts.url.indexOf(`/_api/SitePages/Pages(2)/SavePage`) > -1) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', promoteAs: 'Template' } }, (res: { Id: string }) => {
+      try {
+        assert(cmdInstanceLogSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('updates page layout to Home and promotes it as HomePage (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
@@ -572,6 +605,11 @@ describe(commands.PAGE_SET, () => {
     assert.equal(actual, true);
   });
 
+  it('passes validation if promote type is Template', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', promoteAs: 'Template' } });
+    assert.equal(actual, true);
+  });
+
   it('fails validation if promote type is HomePage but layout type is not Home', () => {
     const actual = (command.validate() as CommandValidate)({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', promoteAs: 'HomePage', layoutType: 'Article' } });
     assert.notEqual(actual, true);
@@ -581,7 +619,7 @@ describe(commands.PAGE_SET, () => {
     const actual = (command.validate() as CommandValidate)({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', promoteAs: 'NewsPage', layoutType: 'Home' } });
     assert.notEqual(actual, true);
   });
-
+  
   it('fails validation if commentsEnabled is invalid', () => {
     const actual = (command.validate() as CommandValidate)({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', commentsEnabled: 'invalid' } });
     assert.notEqual(actual, true);
