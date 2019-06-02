@@ -3,13 +3,13 @@ import Command, { CommandOption, CommandError, CommandValidate } from '../../../
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../GraphAuth';
-const command: Command = require('./reports-teams-device-usage-user-detail');
+const command: Command = require('./report-teamsdeviceusageuserdetail');
 import * as assert from 'assert';
 import Utils from '../../../../Utils';
 import { Service } from '../../../../Auth';
 import request from '../../../../request';
 
-describe(commands.REPORTS_TEAMS_DEVICE_USAGE_USER_DETAIL, () => {
+describe(commands.REPORT_TEAMSDEVICEUSAGEUSERDETAIL, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
@@ -53,7 +53,7 @@ describe(commands.REPORTS_TEAMS_DEVICE_USAGE_USER_DETAIL, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.REPORTS_TEAMS_DEVICE_USAGE_USER_DETAIL), true);
+    assert.equal(command.name.startsWith(commands.REPORT_TEAMSDEVICEUSAGEUSERDETAIL), true);
   });
 
   it('has a description', () => {
@@ -77,7 +77,7 @@ describe(commands.REPORTS_TEAMS_DEVICE_USAGE_USER_DETAIL, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, () => {
       try {
-        assert.equal(telemetry.name, commands.REPORTS_TEAMS_DEVICE_USAGE_USER_DETAIL);
+        assert.equal(telemetry.name, commands.REPORT_TEAMSDEVICEUSAGEUSERDETAIL);
         done();
       }
       catch (e) {
@@ -163,7 +163,7 @@ describe(commands.REPORTS_TEAMS_DEVICE_USAGE_USER_DETAIL, () => {
   });
 
   it('fails validation if the date more than 30 days from now', () => {
-    const maxDays = 31;
+    const maxDays = 30;
     const maxDate: Date = new Date();
     maxDate.setDate(maxDate.getDate() - maxDays);
 
@@ -252,7 +252,7 @@ describe(commands.REPORTS_TEAMS_DEVICE_USAGE_USER_DETAIL, () => {
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
     cmd.help({}, () => { });
-    assert(find.calledWith(commands.REPORTS_TEAMS_DEVICE_USAGE_USER_DETAIL));
+    assert(find.calledWith(commands.REPORT_TEAMSDEVICEUSAGEUSERDETAIL));
   });
 
   it('has help with examples', () => {

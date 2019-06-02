@@ -10,10 +10,6 @@ import request from '../../../../request';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
-const maxDays = 28;
-const maxDate: Date = new Date();
-maxDate.setDate(maxDate.getDate() - maxDays);
-
 interface CommandArgs {
   options: Options;
 }
@@ -24,9 +20,9 @@ interface Options extends GlobalOptions {
 }
 
 class GraphReportsTeamsDeviceUsageUserDetailCommand extends GraphItemsListCommand<any> {
-  
+
   public get name(): string {
-    return `${commands.REPORTS_TEAMS_DEVICE_USAGE_USER_DETAIL}`;
+    return `${commands.REPORT_TEAMSDEVICEUSAGEUSERDETAIL}`;
   }
 
   public get description(): string {
@@ -44,7 +40,7 @@ class GraphReportsTeamsDeviceUsageUserDetailCommand extends GraphItemsListComman
     const periodParameter: string = args.options.period ? `getTeamsDeviceUsageUserDetail(period='${encodeURIComponent(args.options.period)}')` : '';
     const dateParameter: string = args.options.date ? `getTeamsDeviceUsageUserDetail(date=${encodeURIComponent(args.options.date)})` : '';
 
-    let endpoint: string = args.options.period ? `${auth.service.resource}/v1.0/reports/${periodParameter}` : `${auth.service.resource}/v1.0/reports/${dateParameter}`;
+    const endpoint: string = `${auth.service.resource}/v1.0/reports/${(args.options.period ? periodParameter : dateParameter )}`;
 
     this.getUsageData(endpoint, cmd)
       .then((res): void => {
@@ -108,6 +104,9 @@ class GraphReportsTeamsDeviceUsageUserDetailCommand extends GraphItemsListComman
         }
       }
 
+      const maxDays: number = 30;
+      const maxDate: Date = new Date();
+      maxDate.setDate(maxDate.getDate() - maxDays);
       const parsedDate = Date.parse(args.options.date as string);
 
       if (args.options.date && !(!parsedDate) !== true) {
@@ -135,17 +134,17 @@ class GraphReportsTeamsDeviceUsageUserDetailCommand extends GraphItemsListComman
     the Microsoft Graph using the ${chalk.blue(commands.LOGIN)} command,
     eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN}`)}.
     
-    Reports.Read.All permission is required to call this API.
+    As this report is only available for the past 30 days, date parameter value should be a date from that range.
 
   Examples:
 
   Gets detail about Microsoft Teams device usage by user for the length of time over which 
   the report is aggregated
-    ${chalk.grey(config.delimiter)} ${commands.REPORTS_TEAMS_DEVICE_USAGE_USER_DETAIL} --period 'D7'
+    ${chalk.grey(config.delimiter)} ${commands.REPORT_TEAMSDEVICEUSAGEUSERDETAIL} --period 'D7'
 
   Gets detail about Microsoft Teams device usage by user for date for which you would like to 
   view the users who performed any activity
-    ${chalk.grey(config.delimiter)} ${commands.REPORTS_TEAMS_DEVICE_USAGE_USER_DETAIL} --date 2019-05-01
+    ${chalk.grey(config.delimiter)} ${commands.REPORT_TEAMSDEVICEUSAGEUSERDETAIL} --date 2019-05-01
 `);
   }
 }

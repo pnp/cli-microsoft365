@@ -1,4 +1,4 @@
-# graph reports Microsoft Teams device usage by user
+# graph report teamsdeviceusageuserdetail
 
 Gets detail about Microsoft Teams device usage by user
 
@@ -25,24 +25,18 @@ Option|Description
 
 To get details about Microsoft Teams device usage by user, you have to first log in to the Microsoft Graph using the [graph login](../login.md) command, eg. `graph login`.
 
-Reports.Read.All permission is required to call this API.
+As this report is only available for the past 30 days, date parameter value should be a date from that range.
 
 ## Examples
 
-Gets detail about Microsoft Teams device usage by user for the length of time over which the report is aggregated
+Gets detail about Microsoft Teams device usage by user for the last 7 days
 
 ```sh
-graph reports teamsdeviceusageuserdetail --period 'D7'
-```
-```sh
-graph reports teamsdeviceusageuserdetail --period D7
+graph report teamsdeviceusageuserdetail --period D7
 ```
 
 Gets detail about Microsoft Teams device usage by user for date for which you would like to view the users who performed any activity
 
 ```sh
-graph reports teamsdeviceusageuserdetail --date 2019-05-01
-```
-```sh
-graph reports teamsdeviceusageuserdetail --date '2019-05-01'
+graph report teamsdeviceusageuserdetail --date 2019-05-01
 ```
