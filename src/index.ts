@@ -86,7 +86,7 @@ appInsights.trackEvent({
 
 updateNotifier({ pkg: packageJSON }).notify({ defer: false });
 
-fs.realpath(__dirname, (err: NodeJS.ErrnoException, resolvedPath: string): void => {
+fs.realpath(__dirname, (err: NodeJS.ErrnoException | null, resolvedPath: string): void => {
   if (process.argv.indexOf('--completion:clink:generate') > -1) {
     loadAllCommands(resolvedPath);
     console.log(autocomplete.getClinkCompletion(vorpal));

@@ -32,7 +32,7 @@ export abstract class SpoAppBaseCommand extends SpoCommand {
       };
 
       request
-        .get(requestOptions)
+        .get<{ CorporateCatalogUrl?: string }>(requestOptions)
         .then((res: { CorporateCatalogUrl?: string }) => {
           if (res.CorporateCatalogUrl) {
             return resolve(res.CorporateCatalogUrl);

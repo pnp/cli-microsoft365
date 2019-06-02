@@ -162,7 +162,7 @@ class SpoPageSetCommand extends SpoCommand {
         return request.post(requestOptions);
       })
       .then((res: { Id: string }): Promise<{ Id: string, BannerImageUrl: string, CanvasContent1: string, LayoutWebpartsContent: string }> => {
-        if (!(args.options.promoteAs === 'Template')) {
+        if (args.options.promoteAs !== 'Template') {
           return Promise.resolve({ Id: '', BannerImageUrl: '', CanvasContent1: '', LayoutWebpartsContent: '' });
         }
 
@@ -176,13 +176,13 @@ class SpoPageSetCommand extends SpoCommand {
             'X-HTTP-Method': 'POST',
             'IF-MATCH': '*',
             accept: 'application/json;odata=nometadata'
-          },
+          }
         };
 
         return request.post(requestOptions);
       })
       .then((res: { Id: string, BannerImageUrl: string, CanvasContent1: string, LayoutWebpartsContent: string }): Promise<void> => {
-        if (!(args.options.promoteAs === 'Template')) {
+        if (args.options.promoteAs !== 'Template') {
           return Promise.resolve();
         }
 
@@ -211,7 +211,7 @@ class SpoPageSetCommand extends SpoCommand {
         return request.post(requestOptions);
       })
       .then((): Promise<void> => {
-        if (!(args.options.promoteAs === 'Template')) {
+        if (args.options.promoteAs !== 'Template') {
           return Promise.resolve();
         }
 
@@ -392,6 +392,9 @@ class SpoPageSetCommand extends SpoCommand {
 
     Promote the existing article page as a news article
       ${chalk.grey(config.delimiter)} ${this.name} --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --promoteAs NewsPage
+
+    Promote the existing article page as a template
+      ${chalk.grey(config.delimiter)} ${this.name} --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --promoteAs Template
 
     Change the page's layout to Home and set it as the site's home page
       ${chalk.grey(config.delimiter)} ${this.name} --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --layoutType Home --promoteAs HomePage
