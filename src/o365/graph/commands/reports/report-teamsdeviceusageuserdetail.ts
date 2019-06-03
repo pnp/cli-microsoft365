@@ -5,7 +5,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandOption, CommandValidate
 } from '../../../../Command';
-import { GraphItemsListCommand } from '../GraphItemsListCommand';
+import GraphCommand from "../../GraphCommand";
 import request from '../../../../request';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
   date?: string;
 }
 
-class GraphReportTeamsDeviceUsageUserDetailCommand extends GraphItemsListCommand<any> {
+class GraphReportTeamsDeviceUsageUserDetailCommand extends GraphCommand {
 
   public get name(): string {
     return `${commands.REPORT_TEAMSDEVICEUSAGEUSERDETAIL}`;
@@ -91,9 +91,8 @@ class GraphReportTeamsDeviceUsageUserDetailCommand extends GraphItemsListCommand
       }
 
       if (args.options.period) {
-
-        const period: string = args.options.period.toUpperCase();
-        if (period !== 'D7' && period !== 'D30' && period !== 'D90' && period !== 'D180') {
+        const period: string = args.options.period;
+        if (period !== 'D7' && period !== 'D30' && period !== 'D90' && period !== 'D180' && period !== 'd7' && period !== 'd30' && period !== 'd90' && period !== 'd180') {
           return `${period} is not a valid period type. The supported values are D7|D30|D90|D180`;
         }
       }
