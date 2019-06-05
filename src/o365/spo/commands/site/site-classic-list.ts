@@ -1,7 +1,7 @@
 import config from '../../../../config';
 import commands from '../../commands';
 import request from '../../../../request';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
 import { CommandOption, CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';

@@ -5,10 +5,10 @@ import {
   CommandOption,
   CommandValidate
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
 import { CustomAction } from './customaction';
-import { BasePermissions, PermissionKind } from './../../common/base-permissions';
+import { BasePermissions, PermissionKind } from '../../base-permissions';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 

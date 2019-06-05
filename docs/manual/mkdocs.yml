@@ -10,6 +10,64 @@ nav:
     - login: 'cmd/login.md'
     - logout: 'cmd/logout.md'
     - status: 'cmd/status.md'
+    - Azure Active Directory Graph (aad):
+      - groupsetting:
+        - groupsetting add: 'cmd/aad/groupsetting/groupsetting-add.md'
+        - groupsetting get: 'cmd/aad/groupsetting/groupsetting-get.md'
+        - groupsetting list: 'cmd/aad/groupsetting/groupsetting-list.md'
+        - groupsetting remove: 'cmd/aad/groupsetting/groupsetting-remove.md'
+        - groupsetting set: 'cmd/aad/groupsetting/groupsetting-set.md'
+      - groupsettingtemplate:
+        - groupsettingtemplate get: 'cmd/aad/groupsettingtemplate/groupsettingtemplate-get.md'
+        - groupsettingtemplate list: 'cmd/aad/groupsettingtemplate/groupsettingtemplate-list.md'
+      - o365group:
+        - o365group add: 'cmd/aad/o365group/o365group-add.md'
+        - o365group get: 'cmd/aad/o365group/o365group-get.md'
+        - o365group list: 'cmd/aad/o365group/o365group-list.md'
+        - o365group remove: 'cmd/aad/o365group/o365group-remove.md'
+        - o365group renew: 'cmd/aad/o365group/o365group-renew.md'
+        - o365group restore: 'cmd/aad/o365group/o365group-restore.md'
+        - o365group set: 'cmd/aad/o365group/o365group-set.md'
+        - o365group user add: 'cmd/aad/o365group/o365group-user-add.md'
+        - o365group user list: 'cmd/aad/o365group/o365group-user-list.md'
+        - o365group user remove: 'cmd/aad/o365group/o365group-user-remove.md'
+        - o365group user set: 'cmd/aad/o365group/o365group-user-set.md'
+      - oauth2grant:
+        - oauth2grant add: 'cmd/aad/oauth2grant/oauth2grant-add.md'
+        - oauth2grant list: 'cmd/aad/oauth2grant/oauth2grant-list.md'
+        - oauth2grant remove: 'cmd/aad/oauth2grant/oauth2grant-remove.md'
+        - oauth2grant set: 'cmd/aad/oauth2grant/oauth2grant-set.md'
+      - siteclassification:
+        - siteclassification disable: 'cmd/aad/siteclassification/siteclassification-disable.md'
+        - siteclassification enable: 'cmd/aad/siteclassification/siteclassification-enable.md'
+        - siteclassification get: 'cmd/aad/siteclassification/siteclassification-get.md'
+        - siteclassification set: 'cmd/aad/siteclassification/siteclassification-set.md'
+      - service principal (sp):
+        - sp get: 'cmd/aad/sp/sp-get.md'
+      - user:
+        - user get: 'cmd/aad/user/user-get.md'
+        - user list: 'cmd/aad/user/user-list.md'
+    - Microsoft Flow (flow):
+      - export: 'cmd/flow/export.md'
+      - get: 'cmd/flow/get.md'
+      - list: 'cmd/flow/list.md'
+      - environment:
+        - environment get: 'cmd/flow/environment/environment-get.md'
+        - environment list: 'cmd/flow/environment/environment-list.md'  
+      - run:
+        - run get: 'cmd/flow/run/run-get.md'
+        - run list: 'cmd/flow/run/run-list.md'
+    - Microsoft Graph (graph):
+      - schemaextension:
+        - schemaextension add: 'cmd/graph/schemaextension/schemaextension-add.md'
+    - Outlook (outlook):
+        - outlook sendmail: 'cmd/outlook/sendmail.md'
+    - Microsoft Planner (planner):
+      - task:
+        - task list: 'cmd/planner/task/task-list.md'
+    - SharePoint Framework (spfx):
+      - project:
+        - project upgrade: 'cmd/spfx/project/project-upgrade.md'
     - SharePoint Online (spo):
       - app:
         - app add: 'cmd/spo/app/app-add.md'
@@ -171,9 +229,8 @@ nav:
         - site classic remove: 'cmd/spo/site/site-classic-remove.md'
         - site classic set: 'cmd/spo/site/site-classic-set.md'
         - site commsite enable: 'cmd/spo/site/site-commsite-enable.md'
-        - site groupify: 'cmd/spo/site/site-o365group-set.md'
+        - site groupify: 'cmd/spo/site/site-groupify.md'
         - site inplacerecordsmanagement set: 'cmd/spo/site/site-inplacerecordsmanagement-set.md'
-        - site o365group set: 'cmd/spo/site/site-o365group-set.md'
       - sitedesign:
         - sitedesign add: 'cmd/spo/sitedesign/sitedesign-add.md'
         - sitedesign apply: 'cmd/spo/sitedesign/sitedesign-apply.md'
@@ -227,100 +284,54 @@ nav:
         - web reindex: 'cmd/spo/web/web-reindex.md'
         - web remove: 'cmd/spo/web/web-remove.md'
         - web set: 'cmd/spo/web/web-set.md'
-    - Office 365 (tenant):
-      - tenant:
-        - tenant id get: 'cmd/tenant-id-get.md'
-    - SharePoint Framework (spfx):
-      - project:
-        - project upgrade: 'cmd/spfx/project/project-upgrade.md'
-    - Microsoft Graph (graph):
-      - groupsetting:
-        - groupsetting add: 'cmd/graph/groupsetting/groupsetting-add.md'
-        - groupsetting get: 'cmd/graph/groupsetting/groupsetting-get.md'
-        - groupsetting list: 'cmd/graph/groupsetting/groupsetting-list.md'
-        - groupsetting remove: 'cmd/graph/groupsetting/groupsetting-remove.md'
-        - groupsetting set: 'cmd/graph/groupsetting/groupsetting-set.md'
-      - groupsettingtemplate:
-        - groupsettingtemplate get: 'cmd/graph/groupsettingtemplate/groupsettingtemplate-get.md'
-        - groupsettingtemplate list: 'cmd/graph/groupsettingtemplate/groupsettingtemplate-list.md'
-      - o365group:
-        - o365group add: 'cmd/graph/o365group/o365group-add.md'
-        - o365group get: 'cmd/graph/o365group/o365group-get.md'
-        - o365group list: 'cmd/graph/o365group/o365group-list.md'
-        - o365group remove: 'cmd/graph/o365group/o365group-remove.md'
-        - o365group renew: 'cmd/graph/o365group/o365group-renew.md'
-        - o365group restore: 'cmd/graph/o365group/o365group-restore.md'
-        - o365group set: 'cmd/graph/o365group/o365group-set.md'
-        - o365group user add: 'cmd/graph/o365group/o365group-user-add.md'
-        - o365group user list: 'cmd/graph/o365group/o365group-user-list.md'
-        - o365group user remove: 'cmd/graph/o365group/o365group-user-remove.md'
-        - o365group user set: 'cmd/graph/o365group/o365group-user-set.md'
-      - planner:
-        - planner task list: 'cmd/graph/planner/planner-task-list.md'
+    - Microsoft Teams (teams):
+      - app:
+        - app install: 'cmd/teams/app/app-install.md'
+        - app list: 'cmd/teams/app/app-list.md'
+        - app publish: 'cmd/teams/app/app-publish.md'
+        - app remove: 'cmd/teams/app/app-remove.md'
+        - app uninstall: 'cmd/teams/app/app-uninstall.md'
+        - app update: 'cmd/teams/app/app-update.md'
+      - channel:
+        - channel add: 'cmd/teams/channel/channel-add.md'
+        - channel get: 'cmd/teams/channel/channel-get.md'
+        - channel list: 'cmd/teams/channel/channel-list.md'
+        - channel set: 'cmd/teams/channel/channel-set.md'
+      - funsettings:
+        - funsettings list: 'cmd/teams/funsettings/funsettings-list.md'
+        - funsettings set: 'cmd/teams/funsettings/funsettings-set.md'
+      - guestsettings:
+        - guestsettings list: 'cmd/teams/guestsettings/guestsettings-list.md'
+        - guestsettings set: 'cmd/teams/guestsettings/guestsettings-set.md'
+      - membersettings:  
+        - membersettings list: 'cmd/teams/membersettings/membersettings-list.md'
+        - membersettings set: 'cmd/teams/membersettings/membersettings-set.md'
+      - message:
+        - message get: 'cmd/teams/message/message-get.md'
+        - message list: 'cmd/teams/message/message-list.md'
+      - messagingsettings:  
+        - messagingsettings list: 'cmd/teams/messagingsettings/messagingsettings-list.md'
+        - messagingsettings set: 'cmd/teams/messagingsettings/messagingsettings-set.md'
       - report:
-        - report teamsdeviceusageuserdetail: 'cmd/graph/report/report-teamsdeviceusageuserdetail.md'
-      - schemaextension:
-        - schemaextension add: 'cmd/graph/schemaextension/schemaextension-add.md'
-      - siteclassification:
-        - siteclassification disable: 'cmd/graph/siteclassification/siteclassification-disable.md'
-        - siteclassification enable: 'cmd/graph/siteclassification/siteclassification-enable.md'
-        - siteclassification get: 'cmd/graph/siteclassification/siteclassification-get.md'
-        - siteclassification set: 'cmd/graph/siteclassification/siteclassification-set.md'
-      - teams:
-        - teams add: 'cmd/graph/teams/teams-add.md'
-        - teams archive: 'cmd/graph/teams/teams-archive.md'
-        - teams list: 'cmd/graph/teams/teams-list.md'
-        - teams unarchive: 'cmd/graph/teams/teams-unarchive.md'
-        - teams app install: 'cmd/graph/teams/teams-app-install.md'
-        - teams app list: 'cmd/graph/teams/teams-app-list.md'
-        - teams app publish: 'cmd/graph/teams/teams-app-publish.md'
-        - teams app remove: 'cmd/graph/teams/teams-app-remove.md'
-        - teams app uninstall: 'cmd/graph/teams/teams-app-uninstall.md'
-        - teams app update: 'cmd/graph/teams/teams-app-update.md'
-        - teams channel add: 'cmd/graph/teams/teams-channel-add.md'
-        - teams channel get: 'cmd/graph/teams/teams-channel-get.md'
-        - teams channel list: 'cmd/graph/teams/teams-channel-list.md'
-        - teams channel set: 'cmd/graph/teams/teams-channel-set.md'
-        - teams clone: 'cmd/graph/teams/teams-clone.md'
-        - teams funsettings list: 'cmd/graph/teams/teams-funsettings-list.md'
-        - teams funsettings set: 'cmd/graph/teams/teams-funsettings-set.md'
-        - teams guestsettings list: 'cmd/graph/teams/teams-guestsettings-list.md'
-        - teams guestsettings set: 'cmd/graph/teams/teams-guestsettings-set.md'
-        - teams membersettings list: 'cmd/graph/teams/teams-membersettings-list.md'
-        - teams membersettings set: 'cmd/graph/teams/teams-membersettings-set.md'
-        - teams message get: 'cmd/graph/teams/teams-message-get.md'
-        - teams message list: 'cmd/graph/teams/teams-message-list.md'
-        - teams membersettings list: 'cmd/graph/teams/teams-membersettings-list.md'
-        - teams messagingsettings list: 'cmd/graph/teams/teams-messagingsettings-list.md'
-        - teams messagingsettings set: 'cmd/graph/teams/teams-messagingsettings-set.md'
-        - teams remove: 'cmd/graph/teams/teams-remove.md'
-        - teams set: 'cmd/graph/teams/teams-set.md'
-        - teams tab list: 'cmd/graph/teams/teams-tab-list.md'
-        - teams user add: 'cmd/graph/o365group/o365group-user-add.md'
-        - teams user list: 'cmd/graph/o365group/o365group-user-list.md'
-        - teams user remove: 'cmd/graph/o365group/o365group-user-remove.md'
-        - teams user set: 'cmd/graph/o365group/o365group-user-set.md'
+        - report deviceusageuserdetail: 'cmd/teams/report/report-deviceusageuserdetail.md'
+      - tab:
+        - tab list: 'cmd/teams/tab/tab-list.md'
+      - team:
+        - team add: 'cmd/teams/team/team-add.md'
+        - team archive: 'cmd/teams/team/team-archive.md'
+        - team clone: 'cmd/teams/team/team-clone.md'
+        - team list: 'cmd/teams/team/team-list.md'
+        - team remove: 'cmd/teams/team/team-remove.md'
+        - team set: 'cmd/teams/team/team-set.md'
+        - team unarchive: 'cmd/teams/team/team-unarchive.md'
       - user:
-        - user get: 'cmd/graph/user/user-get.md'
-        - user list: 'cmd/graph/user/user-list.md'
-        - user sendmail: 'cmd/graph/user/user-sendmail.md'
-    - Azure Management Service (azmgmt):
-      - flow:
-        - flow environment get: 'cmd/azmgmt/flow/flow-environment-get.md'
-        - flow environment list: 'cmd/azmgmt/flow/flow-environment-list.md'
-        - flow export: 'cmd/azmgmt/flow/flow-export.md'
-        - flow get: 'cmd/azmgmt/flow/flow-get.md'
-        - flow list: 'cmd/azmgmt/flow/flow-list.md'
-        - flow run get: 'cmd/azmgmt/flow/flow-run-get.md'
-        - flow run list: 'cmd/azmgmt/flow/flow-run-list.md'
-    - Azure Active Directory Graph (aad):
-      - oauth2grant:
-        - oauth2grant add: 'cmd/aad/oauth2grant/oauth2grant-add.md'
-        - oauth2grant list: 'cmd/aad/oauth2grant/oauth2grant-list.md'
-        - oauth2grant remove: 'cmd/aad/oauth2grant/oauth2grant-remove.md'
-        - oauth2grant set: 'cmd/aad/oauth2grant/oauth2grant-set.md'
-      - service principal (sp):
-        - sp get: 'cmd/aad/sp/sp-get.md'
+        - user add: 'cmd/aad/o365group/o365group-user-add.md'
+        - user list: 'cmd/aad/o365group/o365group-user-list.md'
+        - user remove: 'cmd/aad/o365group/o365group-user-remove.md'
+        - user set: 'cmd/aad/o365group/o365group-user-set.md'
+    - Office 365 (tenant):
+      - id:
+        - id get: 'cmd/tenant-id-get.md'
   - Concepts:
     - 'Persisting connection': 'concepts/persisting-connection.md'
     - 'Authorization and access tokens': 'concepts/authorization-tokens.md'

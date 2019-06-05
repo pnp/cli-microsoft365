@@ -4,7 +4,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandOption
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/SpoCommand';
 import { TenantProperty } from './TenantProperty';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');

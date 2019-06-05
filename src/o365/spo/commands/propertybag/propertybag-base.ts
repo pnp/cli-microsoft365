@@ -2,9 +2,9 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 import { ClientSvcResponseContents, ClientSvcResponse } from "../../spo";
 import config from '../../../../config';
-import SpoCommand from '../../SpoCommand';
-import { IdentityResponse, ClientSvc } from '../../common/ClientSvc';
-import { BasePermissions, PermissionKind } from '../../common/base-permissions';
+import SpoCommand from '../../../base/SpoCommand';
+import { IdentityResponse, ClientSvc } from '../../ClientSvc';
+import { BasePermissions, PermissionKind } from '../../base-permissions';
 
 export interface Property {
   key: string;

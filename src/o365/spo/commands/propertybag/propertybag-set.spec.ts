@@ -8,7 +8,7 @@ import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import config from '../../../../config';
-import { IdentityResponse } from '../../common/ClientSvc';
+import { IdentityResponse } from '../../ClientSvc';
 
 describe(commands.PROPERTYBAG_SET, () => {
   let vorpal: Vorpal;

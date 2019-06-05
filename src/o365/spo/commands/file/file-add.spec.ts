@@ -8,7 +8,7 @@ import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import * as fs from 'fs';
-import { FolderExtensions } from '../folder/FolderExtensions';
+import { FolderExtensions } from '../../FolderExtensions';
 
 describe(commands.FILE_ADD, () => {
   let vorpal: Vorpal;
