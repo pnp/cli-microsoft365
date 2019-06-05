@@ -97,17 +97,8 @@ class GraphReportTeamsDeviceUsageUserDetailCommand extends GraphCommand {
         }
       }
 
-      const maxDays: number = 30;
-      const maxDate: Date = new Date();
-      maxDate.setDate(maxDate.getDate() - maxDays);
-      const parsedDate = Date.parse(args.options.date as string);
-
-      if (args.options.date && !(!parsedDate) !== true) {
-        return `Provide the date in YYYY-MM-DD format`;
-      }
-
-      if (new Date(parsedDate) <= maxDate) {
-        return `This report is only available for the past 30 days, date value should be a date from that range.`;
+      if (args.options.date && !((args.options.date as string).match(/^\d{4}-\d{2}-\d{2}$/))) {
+        return `Provide a valid date in YYYY-MM-DD format`;
       }
 
       return true;

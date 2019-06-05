@@ -167,20 +167,6 @@ describe(commands.REPORT_TEAMSDEVICEUSAGEUSERDETAIL, () => {
     assert(actual);
   });
 
-  it('fails validation if the date more than 30 days from now', () => {
-    const maxDays = 30;
-    const maxDate: Date = new Date();
-    maxDate.setDate(maxDate.getDate() - maxDays);
-
-    const actual = (command.validate() as CommandValidate)({
-      options:
-      {
-        date: maxDate
-      }
-    });
-    assert.strictEqual(actual, 'This report is only available for the past 30 days, date value should be a date from that range.');
-  });
-
   it('gets details about Microsoft Teams device usage by user for the given period', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/getTeamsDeviceUsageUserDetail(period='D7')`) {

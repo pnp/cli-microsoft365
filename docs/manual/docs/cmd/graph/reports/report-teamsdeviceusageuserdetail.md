@@ -38,5 +38,5 @@ graph report teamsdeviceusageuserdetail --period D7
 Gets detail about Microsoft Teams device usage by user for date for which you would like to view the users who performed any activity
 
 ```sh
-graph report teamsdeviceusageuserdetail --date 2019-05-01
+graph report teamsdeviceusageuserdetail --date 2019-05-28
 ```
