@@ -2,7 +2,7 @@ import request from '../../../../request';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import { CommandOption, CommandTypes, CommandValidate, CommandError } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 

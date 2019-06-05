@@ -7,7 +7,7 @@ const command: Command = require('./propertybag-list');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import { ClientSvc, IdentityResponse } from '../../common/ClientSvc';
+import { ClientSvc, IdentityResponse } from '../../ClientSvc';
 
 describe(commands.PROPERTYBAG_LIST, () => {
   let vorpal: Vorpal;

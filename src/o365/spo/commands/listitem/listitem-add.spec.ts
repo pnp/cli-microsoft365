@@ -8,7 +8,7 @@ const command: Command = require('./listitem-add');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import { FolderExtensions } from '../folder/FolderExtensions';
+import { FolderExtensions } from '../../FolderExtensions';
 
 describe(commands.LISTITEM_ADD, () => {
   let vorpal: Vorpal;

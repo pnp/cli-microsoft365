@@ -1,7 +1,7 @@
 import request from '../../../../request';
 import commands from '../../commands';
 import { CommandOption, CommandValidate } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/SpoCommand';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
   ClientSidePage,

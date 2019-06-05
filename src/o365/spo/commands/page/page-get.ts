@@ -3,7 +3,7 @@ import commands from '../../commands';
 import {
   CommandOption, CommandValidate, CommandError
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/SpoCommand';
 import GlobalOptions from '../../../../GlobalOptions';
 import { PageItem } from './PageItem';
 import { ClientSidePage } from './clientsidepages';

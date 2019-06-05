@@ -6,7 +6,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandError
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/SpoCommand';
 import { TermGroupCollection } from './TermGroupCollection';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');

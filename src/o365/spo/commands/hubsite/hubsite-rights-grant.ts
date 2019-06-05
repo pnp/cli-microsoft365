@@ -5,7 +5,7 @@ import commands from '../../commands';
 import {
   CommandOption, CommandValidate, CommandError
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
 import GlobalOptions from '../../../../GlobalOptions';
 

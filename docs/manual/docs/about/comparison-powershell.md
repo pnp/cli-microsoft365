@@ -143,7 +143,7 @@ Set-SPOOrgNewsSite|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOSite|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOSiteDesign|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign set](../cmd/spo/sitedesign/sitedesign-set.md)
 Set-SPOSiteGroup|Microsoft.Online.SharePoint.PowerShell|
-Set-SPOSiteOffice365Group|Microsoft.Online.SharePoint.PowerShell|[spo site o365group set](../cmd/spo/site/site-o365group-set.md)
+Set-SPOSiteOffice365Group|Microsoft.Online.SharePoint.PowerShell|[spo site groupify](../cmd/spo/site/site-groupify.md)
 Set-SPOSiteScript|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOStorageEntity|Microsoft.Online.SharePoint.PowerShell|[spo storageentity set](../cmd/spo/storageentity/storageentity-set.md)
 Set-SPOTenant|Microsoft.Online.SharePoint.PowerShell|[spo tenant settings set](../cmd/spo/tenant/tenant-settings-set.md)
@@ -245,7 +245,7 @@ Disable-PnPFeature|SharePointPnPPowerShellOnline|
 Disable-PnPInPlaceRecordsManagementForSite|SharePointPnPPowerShellOnline|[spo site inplacerecordsmanagement set](../cmd/spo/site/site-inplacerecordsmanagement-set.md)
 Disable-PnPPowerShellTelemetry|SharePointPnPPowerShellOnline|
 Disable-PnPResponsiveUI|SharePointPnPPowerShellOnline|
-Disable-PnPSiteClassification|SharePointPnPPowerShellOnline|[graph siteclassification disable](../cmd/graph/siteclassification/siteclassification-disable.md)
+Disable-PnPSiteClassification|SharePointPnPPowerShellOnline|[aad siteclassification disable](../cmd/aad/siteclassification/siteclassification-disable.md)
 Disable-PnPTenantServicePrincipal|SharePointPnPPowerShellOnline|[spo serviceprincipal set](../cmd/spo/serviceprincipal/serviceprincipal-set.md)
 Disconnect-PnPHubSite|SharePointPnPPowerShellOnline|[spo hubsite disconnect](../cmd/spo/hubsite/hubsite-disconnect.md)
 Disconnect-PnPOnline|SharePointPnPPowerShellOnline|[logout](../cmd/logout.md)
@@ -254,7 +254,7 @@ Enable-PnPFeature|SharePointPnPPowerShellOnline|
 Enable-PnPInPlaceRecordsManagementForSite|SharePointPnPPowerShellOnline|
 Enable-PnPPowerShellTelemetry|SharePointPnPPowerShellOnline|
 Enable-PnPResponsiveUI|SharePointPnPPowerShellOnline|
-Enable-PnPSiteClassification|SharePointPnPPowerShellOnline|[graph siteclassification enable](../cmd/graph/siteclassification/siteclassification-enable.md)
+Enable-PnPSiteClassification|SharePointPnPPowerShellOnline|[aad siteclassification enable](../cmd/aad/siteclassification/siteclassification-enable.md)
 Enable-PnPTenantServicePrincipal|SharePointPnPPowerShellOnline|[spo serviceprincipal set](../cmd/spo/serviceprincipal/serviceprincipal-set.md)
 Ensure-PnPFolder|SharePointPnPPowerShellOnline|
 Execute-PnPQuery|SharePointPnPPowerShellOnline|
@@ -320,7 +320,7 @@ Get-PnPRoleDefinition|SharePointPnPPowerShellOnline|
 Get-PnPSearchConfiguration|SharePointPnPPowerShellOnline|
 Get-PnPSearchCrawlLog|SharePointPnPPowerShellOnline|
 Get-PnPSite|SharePointPnPPowerShellOnline|[spo site get](../cmd/spo/site/site-get.md), [spo site list](../cmd/spo/site/site-list.md)
-Get-PnPSiteClassification|SharePointPnPPowerShellOnline|[graph siteclassification get](../cmd/graph/siteclassification/siteclassification-get.md)
+Get-PnPSiteClassification|SharePointPnPPowerShellOnline|[aad siteclassification get](../cmd/aad/siteclassification/siteclassification-get.md)
 Get-PnPSiteClosure|SharePointPnPPowerShellOnline|
 Get-PnPSiteCollectionAdmin|SharePointPnPPowerShellOnline|
 Get-PnPSiteCollectionTermStore|SharePointPnPPowerShellOnline|
@@ -355,7 +355,7 @@ Get-PnPTermGroup|SharePointPnPPowerShellOnline|[spo term group get](../cmd/spo/t
 Get-PnPTermSet|SharePointPnPPowerShellOnline|[spo term set get](../cmd/spo/term/term-set-get.md), [spo term set list](../cmd/spo/term/term-set-list.md)
 Get-PnPTheme|SharePointPnPPowerShellOnline|
 Get-PnPTimeZoneId|SharePointPnPPowerShellOnline|
-Get-PnPUnifiedGroup|SharePointPnPPowerShellOnline|[graph o365group get](../cmd/graph/o365group/o365group-get.md), [graph o365group list](../cmd/graph/o365group/o365group-list.md)
+Get-PnPUnifiedGroup|SharePointPnPPowerShellOnline|[aad o365group get](../cmd/aad/o365group/o365group-get.md), [aad o365group list](../cmd/aad/o365group/o365group-list.md)
 Get-PnPUnifiedGroupMembers|SharePointPnPPowerShellOnline|
 Get-PnPUnifiedGroupOwners|SharePointPnPPowerShellOnline|
 Get-PnPUPABulkImportStatus|SharePointPnPPowerShellOnline|
@@ -419,7 +419,7 @@ New-PnPTenantTemplate|SharePointPnPPowerShellOnline|
 New-PnPTerm|SharePointPnPPowerShellOnline|[spo term add](../cmd/spo/term/term-add.md)
 New-PnPTermGroup|SharePointPnPPowerShellOnline|[spo term group add](../cmd/spo/term/term-group-add.md)
 New-PnPTermSet|SharePointPnPPowerShellOnline|[spo term set add](../cmd/spo/term/term-set-add.md)
-New-PnPUnifiedGroup|SharePointPnPPowerShellOnline|[graph o365group add](../cmd/graph/o365group/o365group-add.md)
+New-PnPUnifiedGroup|SharePointPnPPowerShellOnline|[aad o365group add](../cmd/aad/o365group/o365group-add.md)
 New-PnPUPABulkImportJob|SharePointPnPPowerShellOnline|
 New-PnPUser|SharePointPnPPowerShellOnline|
 New-PnPWeb|SharePointPnPPowerShellOnline|[spo web add](../cmd/spo/web/web-add.md)
@@ -467,7 +467,7 @@ Remove-PnPTenantCdnOrigin|SharePointPnPPowerShellOnline|[spo cdn origin remove](
 Remove-PnPTenantSite|SharePointPnPPowerShellOnline|
 Remove-PnPTenantTheme|SharePointPnPPowerShellOnline|[spo theme remove](../cmd/spo/theme/theme-remove.md)
 Remove-PnPTermGroup|SharePointPnPPowerShellOnline|
-Remove-PnPUnifiedGroup|SharePointPnPPowerShellOnline|[graph o365group remove](../cmd/graph/o365group/o365group-remove.md)
+Remove-PnPUnifiedGroup|SharePointPnPPowerShellOnline|[aad o365group remove](../cmd/aad/o365group/o365group-remove.md)
 Remove-PnPUser|SharePointPnPPowerShellOnline|
 Remove-PnPUserFromGroup|SharePointPnPPowerShellOnline|
 Remove-PnPView|SharePointPnPPowerShellOnline|[spo list view remove](../cmd/spo/list/list-view-remove.md)
@@ -541,7 +541,7 @@ Set-PnPTenantCdnPolicy|SharePointPnPPowerShellOnline|[spo cdn policy set](../cmd
 Set-PnPTenantSite|SharePointPnPPowerShellOnline|[spo site classic set](../cmd/spo/site/site-classic-set.md)
 Set-PnPTheme|SharePointPnPPowerShellOnline|
 Set-PnPTraceLog|SharePointPnPPowerShellOnline|
-Set-PnPUnifiedGroup|SharePointPnPPowerShellOnline|[graph o365group set](../cmd/graph/o365group/o365group-set.md)
+Set-PnPUnifiedGroup|SharePointPnPPowerShellOnline|[aad o365group set](../cmd/aad/o365group/o365group-set.md)
 Set-PnPUserProfileProperty|SharePointPnPPowerShellOnline|
 Set-PnPView|SharePointPnPPowerShellOnline|[spo list view set](../cmd/spo/list/list-view-set.md)
 Set-PnPWeb|SharePointPnPPowerShellOnline|[spo web set](../cmd/spo/web/web-set.md)
@@ -564,17 +564,17 @@ Uninstall-PnPSolution|SharePointPnPPowerShellOnline|
 Unpublish-PnPApp|SharePointPnPPowerShellOnline|[spo app retract](../cmd/spo/app/app-retract.md)
 Unregister-PnPHubSite|SharePointPnPPowerShellOnline|[spo hubsite unregister](../cmd/spo/hubsite/hubsite-unregister.md)
 Update-PnPApp|SharePointPnPPowerShellOnline|[spo app upgrade](../cmd/spo/app/app-upgrade.md)
-Update-PnPSiteClassification|SharePointPnPPowerShellOnline|[graph siteclassification set](../cmd/graph/siteclassification/siteclassification-set.md)
+Update-PnPSiteClassification|SharePointPnPPowerShellOnline|[aad siteclassification set](../cmd/aad/siteclassification/siteclassification-set.md)
 Approve-FlowApprovalRequest|Microsoft.PowerApps.PowerShell|
 Deny-FlowApprovalRequest|Microsoft.PowerApps.PowerShell|
 Disable-Flow|Microsoft.PowerApps.PowerShell|
 Enable-Flow|Microsoft.PowerApps.PowerShell|
-Get-Flow|Microsoft.PowerApps.PowerShell|[azmgmt flow list](../cmd/azmgmt/flow/flow-list.md), [azmgmt flow get](../cmd/azmgmt/flow/flow-get.md)
+Get-Flow|Microsoft.PowerApps.PowerShell|[flow list](../cmd/flow/list.md), [flow get](../cmd/flow/get.md)
 Get-FlowApproval|Microsoft.PowerApps.PowerShell|
 Get-FlowApprovalRequest|Microsoft.PowerApps.PowerShell|
-Get-FlowEnvironment|Microsoft.PowerApps.PowerShell|[azmgmt flow environment list](../cmd/azmgmt/flow/flow-environment-list.md), [azmgmt flow environment get](../cmd/azmgmt/flow/flow-environment-get.md)
+Get-FlowEnvironment|Microsoft.PowerApps.PowerShell|[flow environment list](../cmd/flow/environment/environment-list.md), [flow environment get](../cmd/flow/environment/environment-get.md)
 Get-FlowOwnerRole|Microsoft.PowerApps.PowerShell|
-Get-FlowRun|Microsoft.PowerApps.PowerShell|[azmgmt flow run list](../cmd/azmgmt/flow/flow-run-list.md), [azmgmt flow run get](../cmd/azmgmt/flow/flow-run-get.md)
+Get-FlowRun|Microsoft.PowerApps.PowerShell|[flow run list](../cmd/flow/run/run-list.md), [flow run get](../cmd/flow/run/run-get.md)
 Get-PowerApp|Microsoft.PowerApps.PowerShell|
 Get-PowerAppConnection|Microsoft.PowerApps.PowerShell|
 Get-PowerAppConnectionRoleAssignment|Microsoft.PowerApps.PowerShell|
@@ -662,26 +662,26 @@ Set-AdminPowerAppEnvironmentRoleAssignment|Microsoft.PowerApps.Administration.Po
 Set-AdminPowerAppOwner|Microsoft.PowerApps.Administration.PowerShell|
 Set-AdminPowerAppRoleAssignment|Microsoft.PowerApps.Administration.PowerShell|
 Test-PowerAppsAccount|Microsoft.PowerApps.Administration.PowerShell|
-Add-TeamUser|MicrosoftTeams|[graph teams user add](../cmd/graph/o365group/o365group-user-add.md)
+Add-TeamUser|MicrosoftTeams|[teams user add](../cmd/aad/o365group/o365group-user-add.md)
 Connect-MicrosoftTeams|MicrosoftTeams|[login](../cmd/login.md)
 Disconnect-MicrosoftTeams|MicrosoftTeams|[logout](../cmd/logout.md)
-Get-Team|MicrosoftTeams|[graph teams list](../cmd/graph/teams/teams-list.md)
-Get-TeamChannel|MicrosoftTeams|[graph teams channel list](../cmd/graph/teams/teams-channel-list.md), [graph teams channel get](../cmd/graph/teams/teams-channel-get.md)
-Get-TeamFunSettings|MicrosoftTeams|[graph teams funsettings list](../cmd/graph/teams/teams-funsettings-list.md)
-Get-TeamGuestSettings|MicrosoftTeams|[graph teams guestsettings list](../cmd/graph/teams/teams-guestsettings-list.md)
+Get-Team|MicrosoftTeams|[teams team list](../cmd/teams/team/team-list.md)
+Get-TeamChannel|MicrosoftTeams|[teams channel list](../cmd/teams/channel/channel-list.md), [teams channel get](../cmd/teams/channel/channel-get.md)
+Get-TeamFunSettings|MicrosoftTeams|[teams funsettings list](../cmd/teams/funsettings/funsettings-list.md)
+Get-TeamGuestSettings|MicrosoftTeams|[teams guestsettings list](../cmd/teams/guestsettings/guestsettings-list.md)
 Get-TeamHelp|MicrosoftTeams|
-Get-TeamMemberSettings|MicrosoftTeams|[graph teams membersettings list](../cmd/graph/teams/teams-membersettings-list.md)
-Get-TeamMessagingSettings|MicrosoftTeams|[graph teams messagingsettings list](../cmd/graph/teams/teams-messagingsettings-list.md)
-Get-TeamUser|MicrosoftTeams|[graph teams user list](../cmd/graph/o365group/o365group-user-list.md)
-New-Team|MicrosoftTeams|[graph teams add](../cmd/graph/teams/teams-add.md)
-New-TeamChannel|MicrosoftTeams|[graph teams channel add](../cmd/graph/teams/teams-channel-add.md)
-Remove-Team|MicrosoftTeams|[graph teams remove](../cmd/graph/teams/teams-remove.md)
+Get-TeamMemberSettings|MicrosoftTeams|[teams membersettings list](../cmd/teams/membersettings/membersettings-list.md)
+Get-TeamMessagingSettings|MicrosoftTeams|[teams messagingsettings list](../cmd/teams/messagingsettings/messagingsettings-list.md)
+Get-TeamUser|MicrosoftTeams|[teams user list](../cmd/aad/o365group/o365group-user-list.md)
+New-Team|MicrosoftTeams|[teams team add](../cmd/teams/team/team-add.md)
+New-TeamChannel|MicrosoftTeams|[teams channel add](../cmd/teams/channel/channel-add.md)
+Remove-Team|MicrosoftTeams|[teams team remove](../cmd/teams/team/team-remove.md)
 Remove-TeamChannel|MicrosoftTeams|
-Remove-TeamUser|MicrosoftTeams|[graph teams user remove](../cmd/graph/o365group/o365group-user-remove.md)
-Set-Team|MicrosoftTeams|[graph teams set](../cmd/graph/teams/teams-set.md)
-Set-TeamChannel|MicrosoftTeams|[graph teams channel set](../cmd/graph/teams/teams-channel-set.md)
-Set-TeamFunSettings|MicrosoftTeams|[graph teams funsettings set](../cmd/graph/teams/teams-funsettings-set.md)
-Set-TeamGuestSettings|MicrosoftTeams|[graph teams guestsettings set](../cmd/graph/teams/teams-guestsettings-set.md)
-Set-TeamMemberSettings|MicrosoftTeams|[graph teams membersettings set](../cmd/graph/teams/teams-membersettings-set.md)
-Set-TeamMessagingSettings|MicrosoftTeams|[graph teams messagingsettings set](../cmd/graph/teams/teams-messagingsettings-set.md)
+Remove-TeamUser|MicrosoftTeams|[teams user remove](../cmd/aad/o365group/o365group-user-remove.md)
+Set-Team|MicrosoftTeams|[teams team set](../cmd/teams/team/team-set.md)
+Set-TeamChannel|MicrosoftTeams|[teams channel set](../cmd/teams/channel/channel-set.md)
+Set-TeamFunSettings|MicrosoftTeams|[teams funsettings set](../cmd/teams/funsettings/funsettings-set.md)
+Set-TeamGuestSettings|MicrosoftTeams|[teams guestsettings set](../cmd/teams/guestsettings/guestsettings-set.md)
+Set-TeamMemberSettings|MicrosoftTeams|[teams membersettings set](../cmd/teams/membersettings/membersettings-set.md)
+Set-TeamMessagingSettings|MicrosoftTeams|[teams messagingsettings set](../cmd/teams/messagingsettings/messagingsettings-set.md)
 Set-TeamPicture|MicrosoftTeams|

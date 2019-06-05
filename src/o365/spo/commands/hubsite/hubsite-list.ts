@@ -1,7 +1,7 @@
 import request from '../../../../request';
 import commands from '../../commands';
 import { CommandOption } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/SpoCommand';
 import GlobalOptions from '../../../../GlobalOptions';
 import { HubSite } from './HubSite';
 import { QueryListResult } from './QueryListResult';

@@ -8,8 +8,8 @@ import {
   CommandValidate,
   CommandError
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
-import { PermissionKind, BasePermissions } from './../../common/base-permissions';
+import SpoCommand from '../../../base/SpoCommand';
+import { PermissionKind, BasePermissions } from '../../base-permissions';
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
 interface CommandArgs {

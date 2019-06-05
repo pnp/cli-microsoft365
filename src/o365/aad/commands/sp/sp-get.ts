@@ -6,7 +6,7 @@ import {
   CommandValidate
 } from '../../../../Command';
 import Utils from '../../../../Utils';
-import AadCommand from '../../AadCommand';
+import AadCommand from '../../../base/AadCommand';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
