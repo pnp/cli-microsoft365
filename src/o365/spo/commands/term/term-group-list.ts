@@ -1,4 +1,4 @@
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
+import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../../base/spo/spo';
 import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
@@ -6,7 +6,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandError
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/spo/SpoCommand';
 import { TermGroupCollection } from './TermGroupCollection';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');

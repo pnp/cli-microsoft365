@@ -1,4 +1,4 @@
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
+import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../../base/spo/spo';
 import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
@@ -8,7 +8,7 @@ import {
   CommandValidate,
   CommandError
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/spo/SpoCommand';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 

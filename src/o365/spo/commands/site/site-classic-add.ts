@@ -1,11 +1,11 @@
 import config from '../../../../config';
 import commands from '../../commands';
 import request from '../../../../request';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/spo/SpoCommand';
 import Utils from '../../../../Utils';
 import { CommandOption, CommandValidate, CommandCancel } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo } from '../../spo';
+import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo } from '../../../base/spo/spo';
 import { SiteProperties } from './SiteProperties';
 import { DeletedSiteProperties } from './DeletedSiteProperties';
 import { SpoOperation } from './SpoOperation';

@@ -7,10 +7,10 @@ import {
   CommandValidate,
   CommandTypes
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/spo/SpoCommand';
 import Utils from '../../../../Utils';
 import { ListItemInstance } from './ListItemInstance';
-import { ContextInfo, ClientSvcResponseContents, ClientSvcResponse } from '../../spo';
+import { ContextInfo, ClientSvcResponseContents, ClientSvcResponse } from '../../../base/spo/spo';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 

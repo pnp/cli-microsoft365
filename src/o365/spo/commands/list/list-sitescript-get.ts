@@ -6,7 +6,7 @@ import {
   CommandValidate,
   CommandError
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/spo/SpoCommand';
 import Utils from '../../../../Utils';
 import { ListInstance } from './ListInstance';
 

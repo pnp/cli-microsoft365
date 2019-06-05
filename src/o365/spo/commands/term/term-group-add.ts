@@ -1,4 +1,4 @@
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
+import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../../base/spo/spo';
 import config from '../../../../config';
 import request from '../../../../request';
 const uuidv4 = require('uuid/v4');
@@ -9,7 +9,7 @@ import {
   CommandOption,
   CommandValidate
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/spo/SpoCommand';
 import Utils from '../../../../Utils';
 import { TermStore } from './TermStore';
 import { TermGroup } from './TermGroup';

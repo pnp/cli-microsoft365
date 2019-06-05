@@ -5,12 +5,12 @@ import {
   CommandOption,
   CommandValidate
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
+import SpoCommand from '../../../base/spo/SpoCommand';
+import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../../base/spo/spo';
 import { SpoPropertyBagBaseCommand } from './propertybag-base';
 import GlobalOptions from '../../../../GlobalOptions';
 import Utils from '../../../../Utils';
-import { ClientSvc, IdentityResponse } from '../../common/ClientSvc';
+import { ClientSvc, IdentityResponse } from '../../../base/spo/ClientSvc';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 

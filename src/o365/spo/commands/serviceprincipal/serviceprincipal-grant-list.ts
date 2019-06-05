@@ -4,8 +4,8 @@ import commands from '../../commands';
 import {
   CommandError
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
+import SpoCommand from '../../../base/spo/SpoCommand';
+import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../../base/spo/spo';
 import { SPOWebAppServicePrincipalPermissionGrant } from './SPOWebAppServicePrincipalPermissionGrant';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');

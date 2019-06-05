@@ -5,8 +5,8 @@ import {
   CommandOption,
   CommandValidate
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
-import { ContextInfo } from '../../spo';
+import SpoCommand from '../../../base/spo/SpoCommand';
+import { ContextInfo } from '../../../base/spo/spo';
 import * as url from 'url';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');

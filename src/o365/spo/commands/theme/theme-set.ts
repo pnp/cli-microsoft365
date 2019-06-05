@@ -6,8 +6,8 @@ import {
   CommandOption,
   CommandValidate
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
+import SpoCommand from '../../../base/spo/SpoCommand';
+import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../../base/spo/spo';
 import * as fs from 'fs';
 import * as path from 'path';
 import Utils from '../../../../Utils';

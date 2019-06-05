@@ -1,4 +1,4 @@
-import { ClientSideComponent } from "../../common/ClientSideComponent";
+import { ClientSideComponent } from "../../../base/spo/ClientSideComponent";
 
 export interface GetClientSideWebPartsRsp {
   value : ClientSideComponent[];

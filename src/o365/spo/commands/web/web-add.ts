@@ -2,14 +2,14 @@ import config from '../../../../config';
 import commands from '../../commands';
 import request from '../../../../request';
 import GlobalOptions from '../../../../GlobalOptions';
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
+import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../../base/spo/spo';
 import {
   CommandOption,
   CommandValidate,
   CommandError
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
-import { PermissionKind, BasePermissions } from './../../common/base-permissions';
+import SpoCommand from '../../../base/spo/SpoCommand';
+import { PermissionKind, BasePermissions } from '../../../base/spo/base-permissions';
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
 interface CommandArgs {

@@ -6,7 +6,7 @@ import {
   CommandValidate,
   CommandTypes
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/spo/SpoCommand';
 import Utils from '../../../../Utils';
 import { ListInstance } from "./ListInstance";
 import { ListTemplateType } from './ListTemplateType';

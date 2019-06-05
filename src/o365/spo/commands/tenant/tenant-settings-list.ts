@@ -1,11 +1,11 @@
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
+import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../../base/spo/spo';
 import request from '../../../../request';
 import config from '../../../../config';
 import commands from '../../commands';
 import {
   CommandError
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/spo/SpoCommand';
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
 class SpoTenantSettingsListCommand extends SpoCommand {

@@ -3,9 +3,9 @@ import commands from '../../commands';
 import {
   CommandOption, CommandValidate
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/spo/SpoCommand';
 import Utils from '../../../../Utils';
-import { ContextInfo } from '../../spo';
+import { ContextInfo } from '../../../base/spo/spo';
 import GlobalOptions from '../../../../GlobalOptions';
 import { SiteDesignPrincipal } from './SiteDesignPrincipal';
 

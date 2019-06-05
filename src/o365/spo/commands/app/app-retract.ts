@@ -7,7 +7,7 @@ import {
 } from '../../../../Command';
 import Utils from '../../../../Utils';
 import { SpoAppBaseCommand } from './SpoAppBaseCommand';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/spo/SpoCommand';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 

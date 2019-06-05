@@ -1,4 +1,4 @@
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
+import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../../base/spo/spo';
 import request from '../../../../request';
 import config from '../../../../config';
 import commands from '../../commands';
@@ -8,7 +8,7 @@ import {
   CommandError,
   CommandValidate
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/spo/SpoCommand';
 import GlobalOptions from '../../../../GlobalOptions';
 const vorpal: Vorpal = require('../../../../vorpal-init');
 

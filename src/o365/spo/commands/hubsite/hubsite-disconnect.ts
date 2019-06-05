@@ -1,10 +1,10 @@
-import { ContextInfo } from '../../spo';
+import { ContextInfo } from '../../../base/spo/spo';
 import request from '../../../../request';
 import commands from '../../commands';
 import {
   CommandOption, CommandValidate
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/spo/SpoCommand';
 import GlobalOptions from '../../../../GlobalOptions';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');

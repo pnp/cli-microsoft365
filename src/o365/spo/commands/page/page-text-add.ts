@@ -1,13 +1,13 @@
 import request from '../../../../request';
 import commands from '../../commands';
 import { CommandOption, CommandValidate } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/spo/SpoCommand';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
   ClientSidePage,
   ClientSideText
 } from './clientsidepages';
-import { ContextInfo } from '../../spo';
+import { ContextInfo } from '../../../base/spo/spo';
 import { isNumber } from 'util';
 import { Page } from './Page';
 

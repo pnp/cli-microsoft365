@@ -6,10 +6,10 @@ import {
   CommandOption,
   CommandValidate
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/spo/SpoCommand';
 import Utils from '../../../../Utils';
-import { ContextInfo } from '../../spo';
-import { ClientSvc, IdentityResponse } from '../../common/ClientSvc';
+import { ContextInfo } from '../../../base/spo/spo';
+import { ClientSvc, IdentityResponse } from '../../../base/spo/ClientSvc';
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
 interface CommandArgs {

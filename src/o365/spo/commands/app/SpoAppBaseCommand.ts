@@ -1,4 +1,4 @@
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/spo/SpoCommand';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 

@@ -1,11 +1,11 @@
 import config from '../../../../config';
 import commands from '../../commands';
 import request from '../../../../request';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/spo/SpoCommand';
 import Utils from '../../../../Utils';
 import { CommandOption, CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
+import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../../base/spo/spo';
 import { SPOSitePropertiesEnumerable } from './SPOSitePropertiesEnumerable';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');

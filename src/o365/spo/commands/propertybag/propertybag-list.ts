@@ -3,11 +3,11 @@ import {
   CommandOption,
   CommandValidate
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
-import { ContextInfo } from '../../spo';
+import SpoCommand from '../../../base/spo/SpoCommand';
+import { ContextInfo } from '../../../base/spo/spo';
 import { SpoPropertyBagBaseCommand, Property } from './propertybag-base';
 import GlobalOptions from '../../../../GlobalOptions';
-import { ClientSvc, IdentityResponse } from '../../common/ClientSvc';
+import { ClientSvc, IdentityResponse } from '../../../base/spo/ClientSvc';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
