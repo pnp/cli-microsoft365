@@ -1,6 +1,6 @@
 import request from '../../../../request';
 import commands from '../../commands';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/SpoCommand';
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
 class SpoTenantAppCatalogUrlGetCommand extends SpoCommand {

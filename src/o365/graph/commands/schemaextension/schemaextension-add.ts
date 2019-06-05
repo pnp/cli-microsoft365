@@ -5,7 +5,7 @@ import {
   CommandOption, CommandValidate
 } from '../../../../Command';
 import Utils from '../../../../Utils';
-import GraphCommand from '../../GraphCommand';
+import GraphCommand from '../../../base/GraphCommand';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 

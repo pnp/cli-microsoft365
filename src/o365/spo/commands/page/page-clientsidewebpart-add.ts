@@ -2,14 +2,14 @@ import request from '../../../../request';
 import commands from '../../commands';
 import { CommandOption, CommandValidate } from '../../../../Command';
 const uuidv4 = require('uuid/v4');
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
   ClientSideWebpart,
   ClientSidePageComponent
 } from './clientsidepages';
-import { StandardWebPart, StandardWebPartUtils } from '../../common/StandardWebPartTypes';
+import { StandardWebPart, StandardWebPartUtils } from '../../StandardWebPartTypes';
 import { isNumber } from 'util';
 import { Control } from './canvasContent';
 

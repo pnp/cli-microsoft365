@@ -4,7 +4,7 @@ import commands from '../../commands';
 import {
   CommandOption, CommandValidate, CommandTypes, CommandError
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import GlobalOptions from '../../../../GlobalOptions';

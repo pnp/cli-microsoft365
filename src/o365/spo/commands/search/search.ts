@@ -5,7 +5,7 @@ import {
   CommandOption,
   CommandValidate
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
 import { SearchResult } from './datatypes/SearchResult';
 import { ResultTableRow } from './datatypes/ResultTableRow';

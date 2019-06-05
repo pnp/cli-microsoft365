@@ -3,7 +3,7 @@ import commands from '../../commands';
 import {
   CommandOption, CommandValidate
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/SpoCommand';
 import { ContextInfo } from '../../spo';
 import GlobalOptions from '../../../../GlobalOptions';
 import { Auth } from '../../../../Auth';

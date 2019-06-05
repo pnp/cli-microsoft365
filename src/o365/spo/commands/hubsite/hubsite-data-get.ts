@@ -3,7 +3,7 @@ import commands from '../../commands';
 import {
   CommandOption, CommandValidate
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/SpoCommand';
 import GlobalOptions from '../../../../GlobalOptions';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');

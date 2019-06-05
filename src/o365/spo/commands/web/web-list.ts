@@ -5,7 +5,7 @@ import {
   CommandOption,
   CommandValidate
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/SpoCommand';
 import { WebPropertiesCollection } from "./WebPropertiesCollection";
 
 const vorpal: Vorpal = require('../../../../vorpal-init');

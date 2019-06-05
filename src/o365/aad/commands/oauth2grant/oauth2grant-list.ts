@@ -6,7 +6,7 @@ import {
   CommandValidate
 } from '../../../../Command';
 import Utils from '../../../../Utils';
-import AadCommand from '../../AadCommand';
+import AadCommand from '../../../base/AadCommand';
 import { OAuth2PermissionGrant } from './OAuth2PermissionGrant';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');

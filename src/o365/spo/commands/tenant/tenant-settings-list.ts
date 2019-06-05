@@ -5,7 +5,7 @@ import commands from '../../commands';
 import {
   CommandError
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/SpoCommand';
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
 class SpoTenantSettingsListCommand extends SpoCommand {

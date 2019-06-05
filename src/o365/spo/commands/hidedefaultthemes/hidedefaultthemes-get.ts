@@ -1,7 +1,7 @@
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/SpoCommand';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 

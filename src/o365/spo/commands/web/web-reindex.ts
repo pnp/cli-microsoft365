@@ -5,10 +5,10 @@ import {
   CommandOption,
   CommandValidate
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/SpoCommand';
 import { SpoPropertyBagBaseCommand } from '../propertybag/propertybag-base';
 import { ContextInfo } from '../../spo';
-import { ClientSvc, IdentityResponse } from '../../common/ClientSvc';
+import { ClientSvc, IdentityResponse } from '../../ClientSvc';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 

@@ -21,10 +21,10 @@
 
 **Microsoft Graph:**
 
-- [graph o365group user set](../cmd/graph/o365group/o365group-user-set.md) - updates role of the specified user in the specified Office 365 Group or Microsoft Teams team [#982](https://github.com/pnp/office365-cli/issues/982)
-- [graph planner task list](../cmd/graph/planner/planner-task-list.md) - lists Planner tasks for the currently logged in user [#990](https://github.com/pnp/office365-cli/issues/990)
-- [graph report teamsdeviceusageuserdetail](../cmd/graph/report/report-teamsdeviceusageuserdetail.md) - gets information about Microsoft Teams device usage by user [#960](https://github.com/pnp/office365-cli/issues/960)
-- [graph teams funsettings set](../cmd/graph/teams/teams-funsettings-set.md) - updates fun settings of a Microsoft Teams team [#817](https://github.com/pnp/office365-cli/issues/817)
+- [graph o365group user set](../cmd/aad/o365group/o365group-user-set.md) - updates role of the specified user in the specified Office 365 Group or Microsoft Teams team [#982](https://github.com/pnp/office365-cli/issues/982)
+- [graph planner task list](../cmd/planner/task/task-list.md) - lists Planner tasks for the currently logged in user [#990](https://github.com/pnp/office365-cli/issues/990)
+- [graph report teamsdeviceusageuserdetail](../cmd/teams/report/report-deviceusageuserdetail.md) - gets information about Microsoft Teams device usage by user [#960](https://github.com/pnp/office365-cli/issues/960)
+- [graph teams funsettings set](../cmd/teams/funsettings/funsettings-set.md) - updates fun settings of a Microsoft Teams team [#817](https://github.com/pnp/office365-cli/issues/817)
 
 **Office 365:**
 
@@ -51,7 +51,7 @@
 
 **Microsoft Graph:**
 
-- [graph teams set](../cmd/graph/teams/teams-set.md) - updates settings of a Microsoft Teams team [#815](https://github.com/pnp/office365-cli/issues/815)
+- [graph teams set](../cmd/teams/team/team-set.md) - updates settings of a Microsoft Teams team [#815](https://github.com/pnp/office365-cli/issues/815)
 
 ## [v1.20.0](https://github.com/pnp/office365-cli/releases/tag/v1.20.0)
 
@@ -63,8 +63,8 @@
 
 **Microsoft Graph:**
 
-- [graph o365group user list](../cmd/graph/o365group/o365group-user-list.md) - lists users for the specified Office 365 group or Microsoft Teams team [#802](https://github.com/pnp/office365-cli/issues/802)
-- [graph teams clone](../cmd/graph/teams/teams-clone.md) - creates a clone of a Microsoft Teams team [#924](https://github.com/pnp/office365-cli/issues/924)
+- [graph o365group user list](../cmd/aad/o365group/o365group-user-list.md) - lists users for the specified Office 365 group or Microsoft Teams team [#802](https://github.com/pnp/office365-cli/issues/802)
+- [graph teams clone](../cmd/teams/team/team-clone.md) - creates a clone of a Microsoft Teams team [#924](https://github.com/pnp/office365-cli/issues/924)
 
 ### Changes
 
@@ -87,8 +87,8 @@
 
 **Microsoft Graph:**
 
-- [graph o365group renew](../cmd/graph/o365group/o365group-renew.md) - renews Office 365 group's expiration [#870](https://github.com/pnp/office365-cli/issues/870)
-- [graph o365group user remove](../cmd/graph/o365group/o365group-user-remove.md) - removes the specified user from specified Office 365 Group or Microsoft Teams team [#846](https://github.com/pnp/office365-cli/issues/846)
+- [graph o365group renew](../cmd/aad/o365group/o365group-renew.md) - renews Office 365 group's expiration [#870](https://github.com/pnp/office365-cli/issues/870)
+- [graph o365group user remove](../cmd/aad/o365group/o365group-user-remove.md) - removes the specified user from specified Office 365 Group or Microsoft Teams team [#846](https://github.com/pnp/office365-cli/issues/846)
 
 ### Changes
 
@@ -108,11 +108,11 @@
 
 **Microsoft Graph:**
 
-- [graph teams archive](../cmd/graph/teams/teams-archive.md) - archives specified Microsoft Teams team [#899](https://github.com/pnp/office365-cli/issues/899)
-- [graph teams channel get](../cmd/graph/teams/teams-channel-get.md) - gets information about the specific Microsoft Teams team channel [#808](https://github.com/pnp/office365-cli/issues/808)
-- [graph teams messagingsettings set](../cmd/graph/teams/teams-messagingsettings-set.md) - updates messaging settings of a Microsoft Teams team [#820](https://github.com/pnp/office365-cli/issues/820)
-- [graph teams remove](../cmd/graph/teams/teams-remove.md) - removes the specified Microsoft Teams team [#813](https://github.com/pnp/office365-cli/issues/813)
-- [graph teams unarchive](../cmd/graph/teams/teams-unarchive.md) - restores an archived Microsoft Teams team [#900](https://github.com/pnp/office365-cli/issues/900)
+- [graph teams archive](../cmd/teams/team/team-archive.md) - archives specified Microsoft Teams team [#899](https://github.com/pnp/office365-cli/issues/899)
+- [graph teams channel get](../cmd/teams/channel/channel-get.md) - gets information about the specific Microsoft Teams team channel [#808](https://github.com/pnp/office365-cli/issues/808)
+- [graph teams messagingsettings set](../cmd/teams/messagingsettings/messagingsettings-set.md) - updates messaging settings of a Microsoft Teams team [#820](https://github.com/pnp/office365-cli/issues/820)
+- [graph teams remove](../cmd/teams/team/team-remove.md) - removes the specified Microsoft Teams team [#813](https://github.com/pnp/office365-cli/issues/813)
+- [graph teams unarchive](../cmd/teams/team/team-unarchive.md) - restores an archived Microsoft Teams team [#900](https://github.com/pnp/office365-cli/issues/900)
 
 ### Changes
 
@@ -133,13 +133,13 @@
 
 **Microsoft Graph:**
 
-- [graph o365group user add](../cmd/graph/o365group/o365group-user-add.md) - adds user to specified Office 365 Group or Microsoft Teams team [#847](https://github.com/pnp/office365-cli/issues/847)
+- [graph o365group user add](../cmd/aad/o365group/o365group-user-add.md) - adds user to specified Office 365 Group or Microsoft Teams team [#847](https://github.com/pnp/office365-cli/issues/847)
 - [graph schemaextension add](../cmd/graph/schemaextension/schemaextension-add.md) - creates a Microsoft Graph schema extension [#13](https://github.com/pnp/office365-cli/issues/13)
-- [graph teams add](../cmd/graph/teams/teams-add.md) - adds a new Microsoft Teams team [#615](https://github.com/pnp/office365-cli/issues/615)
-- [graph teams app uninstall](../cmd/graph/teams/teams-app-uninstall.md) - uninstalls an app from a Microsoft Team team [#843](https://github.com/pnp/office365-cli/issues/843)
-- [graph teams channel set](../cmd/graph/teams/teams-channel-set.md) - updates properties of the specified channel in the given Microsoft Teams team [#816](https://github.com/pnp/office365-cli/issues/816)
-- [graph teams guestsettings set](../cmd/graph/teams/teams-guestsettings-set.md) - updates guest settings of a Microsoft Teams team [#818](https://github.com/pnp/office365-cli/issues/818)
-- [graph teams tab list](../cmd/graph/teams/teams-tab-list.md) - lists tabs in the specified Microsoft Teams channel [#849](https://github.com/pnp/office365-cli/issues/849)
+- [graph teams add](../cmd/teams/team/team-add.md) - adds a new Microsoft Teams team [#615](https://github.com/pnp/office365-cli/issues/615)
+- [graph teams app uninstall](../cmd/teams/app/app-uninstall.md) - uninstalls an app from a Microsoft Team team [#843](https://github.com/pnp/office365-cli/issues/843)
+- [graph teams channel set](../cmd/teams/channel/channel-set.md) - updates properties of the specified channel in the given Microsoft Teams team [#816](https://github.com/pnp/office365-cli/issues/816)
+- [graph teams guestsettings set](../cmd/teams/guestsettings/guestsettings-set.md) - updates guest settings of a Microsoft Teams team [#818](https://github.com/pnp/office365-cli/issues/818)
+- [graph teams tab list](../cmd/teams/tab/tab-list.md) - lists tabs in the specified Microsoft Teams channel [#849](https://github.com/pnp/office365-cli/issues/849)
 
 ### Changes
 
@@ -160,12 +160,12 @@
 
 **Microsoft Graph:**
 
-- [graph teams app install](../cmd/graph/teams/teams-app-install.md) - installs an app from the catalog to a Microsoft Teams team [#842](https://github.com/pnp/office365-cli/issues/842)
-- [graph teams funsettings list](../cmd/graph/teams/teams-funsettings-list.md) - lists fun settings for the specified Microsoft Teams team [#809](https://github.com/pnp/office365-cli/issues/809)
-- [graph teams guestsettings list](../cmd/graph/teams/teams-guestsettings-list.md) - lists guests settings for a Microsoft Teams team [#810](https://github.com/pnp/office365-cli/issues/810)
-- [graph teams membersettings list](../cmd/graph/teams/teams-membersettings-list.md) - lists member settings for a Microsoft Teams team [#811](https://github.com/pnp/office365-cli/issues/811)
-- [graph teams membersettings set](../cmd/graph/teams/teams-membersettings-set.md) - updates member settings of a Microsoft Teams team [#819](https://github.com/pnp/office365-cli/issues/819)
-- [graph teams messagingsettings list](../cmd/graph/teams/teams-messagingsettings-list.md) - lists messaging settings for a Microsoft Teams team [#812](https://github.com/pnp/office365-cli/issues/812)
+- [graph teams app install](../cmd/teams/app/app-install.md) - installs an app from the catalog to a Microsoft Teams team [#842](https://github.com/pnp/office365-cli/issues/842)
+- [graph teams funsettings list](../cmd/teams/funsettings/funsettings-list.md) - lists fun settings for the specified Microsoft Teams team [#809](https://github.com/pnp/office365-cli/issues/809)
+- [graph teams guestsettings list](../cmd/teams/guestsettings/guestsettings-list.md) - lists guests settings for a Microsoft Teams team [#810](https://github.com/pnp/office365-cli/issues/810)
+- [graph teams membersettings list](../cmd/teams/membersettings/membersettings-list.md) - lists member settings for a Microsoft Teams team [#811](https://github.com/pnp/office365-cli/issues/811)
+- [graph teams membersettings set](../cmd/teams/membersettings/membersettings-set.md) - updates member settings of a Microsoft Teams team [#819](https://github.com/pnp/office365-cli/issues/819)
+- [graph teams messagingsettings list](../cmd/teams/messagingsettings/messagingsettings-list.md) - lists messaging settings for a Microsoft Teams team [#812](https://github.com/pnp/office365-cli/issues/812)
 
 ### Changes
 
@@ -191,13 +191,13 @@
 
 **Microsoft Graph:**
 
-- [graph teams app list](../cmd/graph/teams/teams-app-list.md) - lists apps from the Microsoft Teams app catalog [#826](https://github.com/pnp/office365-cli/issues/826)
-- [graph teams app publish](../cmd/graph/teams/teams-app-publish.md) - publishes Teams app to the organization's app catalog [#824](https://github.com/pnp/office365-cli/issues/824)
-- [graph teams app remove](../cmd/graph/teams/teams-app-remove.md) - removes a Teams app from the organization's app catalog [#825](https://github.com/pnp/office365-cli/issues/825)
-- [graph teams app update](../cmd/graph/teams/teams-app-update.md) - updates Teams app in the organization's app catalog [#827](https://github.com/pnp/office365-cli/issues/827)
-- [graph teams channel list](../cmd/graph/teams/teams-channel-list.md) - lists channels in the specified Microsoft Teams team [#586](https://github.com/pnp/office365-cli/issues/586)
-- [graph teams user remove](../cmd/graph/o365group/o365group-user-remove.md) - removes the specified user from the specified Microsoft Teams team [#757](https://github.com/pnp/office365-cli/issues/757)
-- [graph teams user set](../cmd/graph/o365group/o365group-user-set.md) - updates role of the specified user in the given Microsoft Teams team [#760](https://github.com/pnp/office365-cli/issues/760)
+- [graph teams app list](../cmd/teams/app/app-list.md) - lists apps from the Microsoft Teams app catalog [#826](https://github.com/pnp/office365-cli/issues/826)
+- [graph teams app publish](../cmd/teams/app/app-publish.md) - publishes Teams app to the organization's app catalog [#824](https://github.com/pnp/office365-cli/issues/824)
+- [graph teams app remove](../cmd/teams/app/app-remove.md) - removes a Teams app from the organization's app catalog [#825](https://github.com/pnp/office365-cli/issues/825)
+- [graph teams app update](../cmd/teams/app/app-update.md) - updates Teams app in the organization's app catalog [#827](https://github.com/pnp/office365-cli/issues/827)
+- [graph teams channel list](../cmd/teams/channel/channel-list.md) - lists channels in the specified Microsoft Teams team [#586](https://github.com/pnp/office365-cli/issues/586)
+- [graph teams user remove](../cmd/aad/o365group/o365group-user-remove.md) - removes the specified user from the specified Microsoft Teams team [#757](https://github.com/pnp/office365-cli/issues/757)
+- [graph teams user set](../cmd/aad/o365group/o365group-user-set.md) - updates role of the specified user in the given Microsoft Teams team [#760](https://github.com/pnp/office365-cli/issues/760)
 
 ### Changes
 
@@ -223,9 +223,9 @@
 
 **Microsoft Graph:**
 
-- [graph teams message list](../cmd/graph/teams/teams-message-list.md) - lists all messages from a channel in a Microsoft Teams team [#588](https://github.com/pnp/office365-cli/issues/588)
-- [graph teams user add](../cmd/graph/o365group/o365group-user-add.md) - adds user to the specified Microsoft Teams team [#690](https://github.com/pnp/office365-cli/issues/690)
-- [graph teams user list](../cmd/graph/o365group/o365group-user-list.md) - lists users for the specified Microsoft Teams team [#689](https://github.com/pnp/office365-cli/issues/689)
+- [graph teams message list](../cmd/teams/message/message-list.md) - lists all messages from a channel in a Microsoft Teams team [#588](https://github.com/pnp/office365-cli/issues/588)
+- [graph teams user add](../cmd/aad/o365group/o365group-user-add.md) - adds user to the specified Microsoft Teams team [#690](https://github.com/pnp/office365-cli/issues/690)
+- [graph teams user list](../cmd/aad/o365group/o365group-user-list.md) - lists users for the specified Microsoft Teams team [#689](https://github.com/pnp/office365-cli/issues/689)
 
 ### Changes
 
@@ -290,8 +290,8 @@
 
 **Microsoft Graph:**
 
-- [graph siteclassification set](../cmd/graph/siteclassification/siteclassification-set.md) - updates site classification configuration [#304](https://github.com/pnp/office365-cli/issues/304)
-- [graph teams channel message get](../cmd/graph/teams/teams-message-get.md) - retrieves a message from a channel in a Microsoft Teams team [#589](https://github.com/pnp/office365-cli/issues/589)
+- [graph siteclassification set](../cmd/aad/siteclassification/siteclassification-set.md) - updates site classification configuration [#304](https://github.com/pnp/office365-cli/issues/304)
+- [graph teams channel message get](../cmd/teams/message/message-get.md) - retrieves a message from a channel in a Microsoft Teams team [#589](https://github.com/pnp/office365-cli/issues/589)
 
 ### Changes
 
@@ -321,9 +321,9 @@
 
 **Microsoft Graph:**
 
-- [graph siteclassification disable](../cmd/graph/siteclassification/siteclassification-disable.md) - disables site classification [#302](https://github.com/pnp/office365-cli/issues/302)
-- [graph siteclassification enable](../cmd/graph/siteclassification/siteclassification-enable.md) - enables site classification [#301](https://github.com/pnp/office365-cli/issues/301)
-- [graph teams channel add](../cmd/graph/teams/teams-channel-add.md) - adds a channel to the specified Microsoft Teams team [#587](https://github.com/pnp/office365-cli/issues/587)
+- [graph siteclassification disable](../cmd/aad/siteclassification/siteclassification-disable.md) - disables site classification [#302](https://github.com/pnp/office365-cli/issues/302)
+- [graph siteclassification enable](../cmd/aad/siteclassification/siteclassification-enable.md) - enables site classification [#301](https://github.com/pnp/office365-cli/issues/301)
+- [graph teams channel add](../cmd/teams/channel/channel-add.md) - adds a channel to the specified Microsoft Teams team [#587](https://github.com/pnp/office365-cli/issues/587)
 
 ### Changes
 
@@ -352,14 +352,14 @@
 
 **Microsoft Graph:**
 
-- [graph groupsetting remove](../cmd/graph/groupsetting/groupsetting-remove.md) - removes the particular group setting [#452](https://github.com/pnp/office365-cli/pull/452)
-- [graph groupsetting set](../cmd/graph/groupsetting/groupsetting-set.md) - removes the particular group setting [#451](https://github.com/pnp/office365-cli/pull/451)
+- [graph groupsetting remove](../cmd/aad/groupsetting/groupsetting-remove.md) - removes the particular group setting [#452](https://github.com/pnp/office365-cli/pull/452)
+- [graph groupsetting set](../cmd/aad/groupsetting/groupsetting-set.md) - removes the particular group setting [#451](https://github.com/pnp/office365-cli/pull/451)
 
 **Azure Management Service:**
 
-- [azmgmt flow export](../cmd/azmgmt/flow/flow-export.md) - exports the specified Microsoft Flow as a file [#383](https://github.com/pnp/office365-cli/issues/383)
-- [azmgmt flow run get](../cmd/azmgmt/flow/flow-run-get.md) - gets information about a specific run of the specified Microsoft Flow [#400](https://github.com/pnp/office365-cli/issues/400)
-- [azmgmt flow run list](../cmd/azmgmt/flow/flow-run-list.md) - lists runs of the specified Microsoft Flow [#399](https://github.com/pnp/office365-cli/issues/399)
+- [azmgmt flow export](../cmd/flow/export.md) - exports the specified Microsoft Flow as a file [#383](https://github.com/pnp/office365-cli/issues/383)
+- [azmgmt flow run get](../cmd/flow/run/run-get.md) - gets information about a specific run of the specified Microsoft Flow [#400](https://github.com/pnp/office365-cli/issues/400)
+- [azmgmt flow run list](../cmd/flow/run/run-list.md) - lists runs of the specified Microsoft Flow [#399](https://github.com/pnp/office365-cli/issues/399)
 
 ### Changes
 
@@ -385,7 +385,7 @@
 
 **Microsoft Graph:**
 
-- [graph teams list](../cmd/graph/teams/teams-list.md) - lists Microsoft Teams in the current tenant [#558](https://github.com/pnp/office365-cli/pull/558)
+- [graph teams list](../cmd/teams/team/team-list.md) - lists Microsoft Teams in the current tenant [#558](https://github.com/pnp/office365-cli/pull/558)
 
 ### Changes
 
@@ -462,17 +462,17 @@
 - [spo folder remove](../cmd/spo/folder/folder-remove.md) - deletes the specified folder [#426](https://github.com/pnp/office365-cli/issues/426)
 - [spo hidedefaultthemes get](../cmd/spo/hidedefaultthemes/hidedefaultthemes-get.md) - gets the current value of the HideDefaultThemes setting [#341](https://github.com/pnp/office365-cli/issues/341)
 - [spo hidedefaultthemes set](../cmd/spo/hidedefaultthemes/hidedefaultthemes-set.md) - sets the value of the HideDefaultThemes setting [#342](https://github.com/pnp/office365-cli/issues/342)
-- [spo site o365group set](../cmd/spo/site/site-o365group-set.md) - connects site collection to an Office 365 Group [#431](https://github.com/pnp/office365-cli/issues/431)
+- [spo site o365group set](../cmd/spo/site/site-groupify.md) - connects site collection to an Office 365 Group [#431](https://github.com/pnp/office365-cli/issues/431)
 - [spo theme apply](../cmd/spo/theme/theme-apply.md) - applies theme to the specified site [#343](https://github.com/pnp/office365-cli/issues/343)
 
 **Microsoft Graph:**
 
-- [graph groupsetting add](../cmd/graph/groupsetting/groupsetting-add.md) - creates a group setting [#443](https://github.com/pnp/office365-cli/issues/443)
-- [graph groupsetting get](../cmd/graph/groupsetting/groupsetting-get.md) - gets information about the particular group setting [#450](https://github.com/pnp/office365-cli/issues/450)
-- [graph groupsetting list](../cmd/graph/groupsetting/groupsetting-list.md) - lists Azure AD group settings [#449](https://github.com/pnp/office365-cli/issues/449)
-- [graph groupsettingtemplate get](../cmd/graph/groupsettingtemplate/groupsettingtemplate-get.md) - gets information about the specified Azure AD group settings template [#442](https://github.com/pnp/office365-cli/issues/442)
-- [graph groupsettingtemplate list](../cmd/graph/groupsettingtemplate/groupsettingtemplate-list.md) - lists Azure AD group settings templates [#441](https://github.com/pnp/office365-cli/issues/441)
-- [graph user sendmail](../cmd/graph/user/user-sendmail.md) - sends e-mail on behalf of the current user [#328](https://github.com/pnp/office365-cli/issues/328)
+- [graph groupsetting add](../cmd/aad/groupsetting/groupsetting-add.md) - creates a group setting [#443](https://github.com/pnp/office365-cli/issues/443)
+- [graph groupsetting get](../cmd/aad/groupsetting/groupsetting-get.md) - gets information about the particular group setting [#450](https://github.com/pnp/office365-cli/issues/450)
+- [graph groupsetting list](../cmd/aad/groupsetting/groupsetting-list.md) - lists Azure AD group settings [#449](https://github.com/pnp/office365-cli/issues/449)
+- [graph groupsettingtemplate get](../cmd/aad/groupsettingtemplate/groupsettingtemplate-get.md) - gets information about the specified Azure AD group settings template [#442](https://github.com/pnp/office365-cli/issues/442)
+- [graph groupsettingtemplate list](../cmd/aad/groupsettingtemplate/groupsettingtemplate-list.md) - lists Azure AD group settings templates [#441](https://github.com/pnp/office365-cli/issues/441)
+- [graph user sendmail](../cmd/outlook/sendmail.md) - sends e-mail on behalf of the current user [#328](https://github.com/pnp/office365-cli/issues/328)
 
 ### Changes
 
@@ -500,8 +500,8 @@
 
 **Microsoft Graph:**
 
-- [graph user get](../cmd/graph/user/user-get.md) - gets information about the specified user [#326](https://github.com/pnp/office365-cli/issues/326)
-- [graph user list](../cmd/graph/user/user-list.md) - lists users matching specified criteria [#327](https://github.com/pnp/office365-cli/issues/327)
+- [graph user get](../cmd/aad/user/user-get.md) - gets information about the specified user [#326](https://github.com/pnp/office365-cli/issues/326)
+- [graph user list](../cmd/aad/user/user-list.md) - lists users matching specified criteria [#327](https://github.com/pnp/office365-cli/issues/327)
 
 ### Changes
 
@@ -527,25 +527,25 @@
 
 **Microsoft Graph:**
 
-- [graph o365group remove](../cmd/graph/o365group/o365group-remove.md) - removes an Office 365 Group [#309](https://github.com/pnp/office365-cli/issues/309)
-- [graph o365group restore](../cmd/graph/o365group/o365group-restore.md) - restores a deleted Office 365 Group [#346](https://github.com/pnp/office365-cli/issues/346)
-- [graph siteclassification get](../cmd/graph/siteclassification/siteclassification-get.md) - gets site classification configuration [#303](https://github.com/pnp/office365-cli/issues/303)
+- [graph o365group remove](../cmd/aad/o365group/o365group-remove.md) - removes an Office 365 Group [#309](https://github.com/pnp/office365-cli/issues/309)
+- [graph o365group restore](../cmd/aad/o365group/o365group-restore.md) - restores a deleted Office 365 Group [#346](https://github.com/pnp/office365-cli/issues/346)
+- [graph siteclassification get](../cmd/aad/siteclassification/siteclassification-get.md) - gets site classification configuration [#303](https://github.com/pnp/office365-cli/issues/303)
 
 **Azure Management Service:**
 
 - azmgmt login - log in to the Azure Management Service [#378](https://github.com/pnp/office365-cli/issues/378)
 - azmgmt logout - log out from the Azure Management Service [#378](https://github.com/pnp/office365-cli/issues/378)
 - azmgmt status - shows Azure Management Service login status [#378](https://github.com/pnp/office365-cli/issues/378)
-- [azmgmt flow environment get](../cmd/azmgmt/flow/flow-environment-get.md) - gets information about the specified Microsoft Flow environment [#380](https://github.com/pnp/office365-cli/issues/380)
-- [azmgmt flow environment list](../cmd/azmgmt/flow/flow-environment-list.md) - lists Microsoft Flow environments in the current tenant [#379](https://github.com/pnp/office365-cli/issues/379)
-- [azmgmt flow get](../cmd/azmgmt/flow/flow-get.md) - gets information about the specified Microsoft Flow [#382](https://github.com/pnp/office365-cli/issues/382)
-- [azmgmt flow list](../cmd/azmgmt/flow/flow-list.md) - lists Microsoft Flows in the given environment [#381](https://github.com/pnp/office365-cli/issues/381)
+- [azmgmt flow environment get](../cmd/flow/environment/environment-get.md) - gets information about the specified Microsoft Flow environment [#380](https://github.com/pnp/office365-cli/issues/380)
+- [azmgmt flow environment list](../cmd/flow/environment/environment-list.md) - lists Microsoft Flow environments in the current tenant [#379](https://github.com/pnp/office365-cli/issues/379)
+- [azmgmt flow get](../cmd/flow/get.md) - gets information about the specified Microsoft Flow [#382](https://github.com/pnp/office365-cli/issues/382)
+- [azmgmt flow list](../cmd/flow/list.md) - lists Microsoft Flows in the given environment [#381](https://github.com/pnp/office365-cli/issues/381)
 
 ### Updated commands
 
 **Microsoft Graph:**
 
-- [graph o365group list](../cmd/graph/o365group/o365group-list.md) - added support for listing deleted Office 365 Groups [#347](https://github.com/pnp/office365-cli/issues/347)
+- [graph o365group list](../cmd/aad/o365group/o365group-list.md) - added support for listing deleted Office 365 Groups [#347](https://github.com/pnp/office365-cli/issues/347)
 
 ### Changes
 
@@ -582,10 +582,10 @@
 - graph - log in to the Microsoft Graph [#10](https://github.com/pnp/office365-cli/issues/10)
 - graph - log out from the Microsoft Graph [#10](https://github.com/pnp/office365-cli/issues/10)
 - graph - shows Microsoft Graph login status [#10](https://github.com/pnp/office365-cli/issues/10)
-- [graph o365group add](../cmd/graph/o365group/o365group-add.md) - creates Office 365 Group [#308](https://github.com/pnp/office365-cli/issues/308)
-- [graph o365group get](../cmd/graph/o365group/o365group-get.md) - gets information about the specified Office 365 Group [#306](https://github.com/pnp/office365-cli/issues/306)
-- [graph o365group list](../cmd/graph/o365group/o365group-list.md) - lists Office 365 Groups in the current tenant [#305](https://github.com/pnp/office365-cli/issues/305)
-- [graph o365group set](../cmd/graph/o365group/o365group-set.md) - updates Office 365 Group properties [#307](https://github.com/pnp/office365-cli/issues/307)
+- [graph o365group add](../cmd/aad/o365group/o365group-add.md) - creates Office 365 Group [#308](https://github.com/pnp/office365-cli/issues/308)
+- [graph o365group get](../cmd/aad/o365group/o365group-get.md) - gets information about the specified Office 365 Group [#306](https://github.com/pnp/office365-cli/issues/306)
+- [graph o365group list](../cmd/aad/o365group/o365group-list.md) - lists Office 365 Groups in the current tenant [#305](https://github.com/pnp/office365-cli/issues/305)
+- [graph o365group set](../cmd/aad/o365group/o365group-set.md) - updates Office 365 Group properties [#307](https://github.com/pnp/office365-cli/issues/307)
 
 ### Changes
 

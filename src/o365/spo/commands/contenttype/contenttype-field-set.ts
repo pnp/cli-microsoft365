@@ -9,7 +9,7 @@ import {
   CommandError,
   CommandTypes
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
 import { FieldLink } from './FieldLink';
 

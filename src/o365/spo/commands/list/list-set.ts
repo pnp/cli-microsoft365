@@ -6,7 +6,7 @@ import {
   CommandValidate,
   CommandTypes
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
 import { DraftVisibilityType } from './DraftVisibilityType';
 import { ListExperience } from './ListExperience';

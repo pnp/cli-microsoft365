@@ -5,11 +5,11 @@ import {
   CommandOption,
   CommandValidate
 } from '../../../../Command';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
 import * as fs from 'fs';
 import * as path from 'path';
-import { FolderExtensions } from '../folder/FolderExtensions';
+import { FolderExtensions } from '../../FolderExtensions';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 

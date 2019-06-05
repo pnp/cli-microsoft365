@@ -1,5 +1,5 @@
 import commands from '../../commands';
-import SpoCommand from '../../SpoCommand';
+import SpoCommand from '../../../base/SpoCommand';
 import {
   CommandOption,
   CommandValidate
@@ -7,7 +7,7 @@ import {
 import { ContextInfo } from '../../spo';
 import { SpoPropertyBagBaseCommand } from './propertybag-base';
 import GlobalOptions from '../../../../GlobalOptions';
-import { ClientSvc, IdentityResponse } from '../../common/ClientSvc';
+import { ClientSvc, IdentityResponse } from '../../ClientSvc';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 

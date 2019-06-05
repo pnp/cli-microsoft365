@@ -7,14 +7,14 @@ import {
   CommandValidate,
   CommandError
 } from "../../../../Command";
-import SpoCommand from "../../SpoCommand";
+import SpoCommand from "../../../base/SpoCommand";
 import Utils from "../../../../Utils";
 import {
   ContextInfo,
   ClientSvcResponse,
   ClientSvcResponseContents,
 } from "../../spo";
-import { ClientSvc, IdentityResponse } from "../../common/ClientSvc";
+import { ClientSvc, IdentityResponse } from "../../ClientSvc";
 
 const vorpal: Vorpal = require("../../../../vorpal-init");
 
