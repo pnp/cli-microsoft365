@@ -87,31 +87,31 @@
   ],
   "dependencies": {
     "adal-node": "^0.1.28",
-    "applicationinsights": "^1.1.0",
+    "applicationinsights": "^1.4.0",
     "easy-table": "^1.1.1",
     "omelette": "^0.4.12",
     "request-promise-native": "^1.0.7",
-    "semver": "^5.6.0",
-    "strip-json-comments": "^2.0.1",
-    "typescript": "^3.3.3",
-    "update-notifier": "^2.5.0",
+    "semver": "^6.1.1",
+    "strip-json-comments": "^3.0.1",
+    "typescript": "^3.5.1",
+    "update-notifier": "^3.0.0",
     "uuid": "^3.3.2",
     "vorpal": "https://github.com/pnp/vorpal/raw/master/vorpal-1.11.4.tgz"
   },
   "devDependencies": {
     "@types/easy-table": "0.0.32",
-    "@types/mocha": "^5.2.6",
-    "@types/node": "^8.10.40",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^10.14.8",
     "@types/request": "^2.48.1",
-    "@types/request-promise-native": "^1.0.15",
-    "@types/semver": "^5.5.0",
+    "@types/request-promise-native": "^1.0.16",
+    "@types/semver": "^6.0.0",
     "@types/sinon": "^5.0.5",
     "@types/update-notifier": "^2.5.0",
-    "coveralls": "^3.0.2",
-    "mocha": "^6.0.0",
+    "coveralls": "^3.0.4",
+    "mocha": "^6.1.4",
     "nyc": "^13.3.0",
     "rimraf": "^2.6.3",
-    "sinon": "^7.2.4"
+    "sinon": "^7.3.2"
   },
   "nyc": {
     "exclude": [
