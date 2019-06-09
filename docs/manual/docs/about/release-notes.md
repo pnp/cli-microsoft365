@@ -7,6 +7,7 @@
 **Microsoft Graph:**
 
 - [graph o365group user set](../cmd/graph/o365group/o365group-user-set.md) - updates role of the specified user in the specified Office 365 Group or Microsoft Teams team [#982](https://github.com/pnp/office365-cli/issues/982)
+- [graph report teamsdeviceusageuserdetail](../cmd/graph/report/report-teamsdeviceusageuserdetail.md) - gets information about Microsoft Teams device usage by user [#960](https://github.com/pnp/office365-cli/issues/960)
 
 ### Changes
 
@@ -14,6 +15,7 @@
 - extended 'graph o365group list' with support for orphaned groups [#959](https://github.com/pnp/office365-cli/issues/959)
 - added support for superseding SPFx project upgrade findings [#970](https://github.com/pnp/office365-cli/issues/970)
 - added support for package managers [#617](https://github.com/pnp/office365-cli/issues/617)
+- extended 'spo page set' with support for promoting as template [#978](https://github.com/pnp/office365-cli/issues/978)
 
 ## [v1.21.0](https://github.com/pnp/office365-cli/releases/tag/v1.21.0)
 
