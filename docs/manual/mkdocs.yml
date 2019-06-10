@@ -256,6 +256,8 @@ nav:
         - o365group user list: 'cmd/graph/o365group/o365group-user-list.md'
         - o365group user remove: 'cmd/graph/o365group/o365group-user-remove.md'
         - o365group user set: 'cmd/graph/o365group/o365group-user-set.md'
+      - planner:
+        - planner task list: 'cmd/graph/planner/planner-task-list.md'
       - report:
         - report teamsdeviceusageuserdetail: 'cmd/graph/report/report-teamsdeviceusageuserdetail.md'
       - schemaextension:
