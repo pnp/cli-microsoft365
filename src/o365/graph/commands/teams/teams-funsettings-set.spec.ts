@@ -13,7 +13,7 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
-  //  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let cmdInstanceLogSpy: sinon.SinonSpy;
   let trackEvent: any;
   let telemetry: any;
 
@@ -33,7 +33,7 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
         log.push(msg);
       }
     };
-    //cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
     auth.service = new Service();
     telemetry = null;
     (command as any).items = [];
@@ -103,13 +103,6 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
       }
     });
   });
-
-  /*
-  'allowGiphy',
-  'allowStickersAndMemes',
-  'allowCustomMemes'
-  'giphyContentRating'
-*/
 
   it('sets allowGiphy settings to false', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
@@ -391,48 +384,38 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
     });
   });
 
-  // it('sets fun settings of a Microsoft Teams team (debug)', (done) => {
-  //   sinon.stub(request, 'patch').callsFake((opts) => {
-  //     if (opts.url === `https://graph.microsoft.com/v1.0/teams/02bd9fd6-8f93-4758-87c3-1fb73740a315?$select=funSettings`) {
-  //       return Promise.resolve({});
-  //     }
+  it('sets fun settings of a Microsoft Teams team (debug)', (done) => {
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/02bd9fd6-8f93-4758-87c3-1fb73740a315`) {
+        return Promise.resolve({});
+      }
 
-  //     return Promise.reject('Invalid request');
-  //   });
+      return Promise.reject('Invalid request');
+    });
 
-  //   auth.service = new Service();
-  //   auth.service.connected = true;
-  //   auth.service.resource = 'https://graph.microsoft.com';
-  //   cmdInstance.action = command.action();
-  //   cmdInstance.action({
-  //     options: {
-  //       debug: true,
-  //       teamId: "02bd9fd6-8f93-4758-87c3-1fb73740a315",
-  //       allowGiphy: true,
-  //       giphyContentRating: "moderate",
-  //       allowStickersAndMemes: false,
-  //       allowCustomMemes: true
-  //     }
-  //   }, () => {
-  //     try {
-  //       assert(cmdInstanceLogSpy.calledWith(
-  //         {
-  //           funSettings: {
-  //             teamId: "02bd9fd6-8f93-4758-87c3-1fb73740a315",
-  //             allowGiphy: true,
-  //             giphyContentRating: "moderate",
-  //             allowStickersAndMemes: false,
-  //             allowCustomMemes: true
-  //           }
-  //         }
-  //       ));
-  //       done();
-  //     }
-  //     catch (e) {
-  //       done(e);
-  //     }
-  //   });
-  // });
+    auth.service = new Service();
+    auth.service.connected = true;
+    auth.service.resource = 'https://graph.microsoft.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        debug: true,
+        teamId: "02bd9fd6-8f93-4758-87c3-1fb73740a315",
+        allowGiphy: true,
+        giphyContentRating: "moderate",
+        allowStickersAndMemes: false,
+        allowCustomMemes: true
+      }
+    }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
 
   it('fails validation if teamId is not specified', () => {
     const actual = (command.validate() as CommandValidate)({
