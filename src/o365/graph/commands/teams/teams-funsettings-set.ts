@@ -155,8 +155,18 @@ class GraphTeamsFunSettingsSetCommand extends GraphCommand {
 
   Examples:
 
-    Set fun settings of a Microsoft Teams team
-      ${chalk.grey(config.delimiter)} ${this.name} --teamId 83cece1e-938d-44a1-8b86-918cf6151957
+    Allow giphy usage within a given Microsoft Teams team, setting the content rating for giphy to Moderate
+      ${chalk.grey(config.delimiter)} ${this.name} --teamId 83cece1e-938d-44a1-8b86-918cf6151957 --allowGiphy true --giphyContentRating Moderate
+    
+    Disable usage of giphy within the given Microsoft Teams team
+      ${chalk.grey(config.delimiter)} ${this.name} --teamId 83cece1e-938d-44a1-8b86-918cf6151957 --allowGiphy false
+
+    Allow usage of Stickers and Memes within a given Microsoft Teams team
+      ${chalk.grey(config.delimiter)} ${this.name} --teamId 83cece1e-938d-44a1-8b86-918cf6151957 --allowStickersAndMemes true
+
+    Disable usage Custom Memes within a given Microsoft Teams team
+      ${chalk.grey(config.delimiter)} ${this.name} --teamId 83cece1e-938d-44a1-8b86-918cf6151957 --allowCustomMemes false
+
 `);
   }
 }
