@@ -1181,7 +1181,7 @@ describe(commands.PAGE_ADD, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com' } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com', name:'page.aspx' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
         done();
