@@ -14,19 +14,19 @@ Option|Description
 ------|-----------
 `--help`|output usage information
 `--userid [userid]`| Retrieves all the tasks of the user. Specify `userid` or `userName` but not both. If none of them are specified, current user tasks will be returned.
-`--userName  [userName ]`| Retrieves all the tasks of the user. Specify `userid` or `userName` but not both.If none of them are specified, current user tasks will be returned.
+`--userName  [userName ]`| Retrieves all the tasks of the user. Specify `userid` or `userName` but not both. If none of them are specified, current user tasks will be returned.
 `-o, --output [output]`|Output type. `json|text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`--verbose`|Runs command with verbose logging.
+`--debug`|Runs command with debug logging.
 
 !!! important
-    Before using this command, log in to the Microsoft Graph, using the [graph login](../login.md) command.
+    before using this command, log in to the Microsoft Graph, using the [graph login](../login.md) command.
 
 ## Remarks
 
-To get information tasks of a user, you have to first log in to the Microsoft Graph using the [graph login](../login.md) command, eg. `graph login`.
+To list planner tasks of a user, you have to first log in to the Microsoft Graph using the [graph login](../login.md) command, eg. `graph login`.
 
-Using the `--userid` option, you can retrieve all the planner tasks of the specified user, but it will result in error if you don't have access to view specific user's task.  You can retrieve information about a user's task, either by specifying that user's id or user name (`userPrincipalName`), but not both.
+Using the `--userid` and `--userName` option, you can retrieve all the planner tasks of the specified user. But it will result in error if you don't have access to view specific user's task.  You can retrieve information about a user's task, either by specifying that user's id or username (`userPrincipalName`), but not both.
 
 Both userid and username is optional, if no values are passed for those parameters it will list all the tasks of current logged in user.
 
