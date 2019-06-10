@@ -129,7 +129,6 @@ class GraphTeamsFunSettingsSetCommand extends GraphCommand {
         return `Value ${value} for option ${property} is not a valid boolean`;
       }
 
-
       if (args.options.giphyContentRating) {
         const giphyContentRating = args.options.giphyContentRating.toLowerCase();
         if (giphyContentRating !== 'strict' && giphyContentRating !== 'moderate') {
