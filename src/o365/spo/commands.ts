@@ -53,6 +53,7 @@ export default {
   FOLDER_RENAME: `${prefix} folder rename`,
   HIDEDEFAULTTHEMES_GET: `${prefix} hidedefaultthemes get`,
   HIDEDEFAULTTHEMES_SET: `${prefix} hidedefaultthemes set`,
+  HOMESITE_SET: `${prefix} homesite set`,
   HUBSITE_CONNECT: `${prefix} hubsite connect`,
   HUBSITE_DATA_GET: `${prefix} hubsite data get`,
   HUBSITE_DISCONNECT: `${prefix} hubsite disconnect`,

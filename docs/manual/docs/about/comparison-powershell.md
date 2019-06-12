@@ -133,7 +133,7 @@ Set-SPOBrowserIdleSignOut|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOBuiltDesignPackageVisibility|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOGeoStorageQuota|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOHideDefaultThemes|Microsoft.Online.SharePoint.PowerShell|[spo hidedefaultthemes set](../cmd/spo/hidedefaultthemes/hidedefaultthemes-set.md)
-Set-SPOHomeSite|Microsoft.Online.SharePoint.PowerShell|
+Set-SPOHomeSite|Microsoft.Online.SharePoint.PowerShell|[spo homesite set](../cmd/spo/homesite/homesite-set.md)
 Set-SPOHubSite|Microsoft.Online.SharePoint.PowerShell|[spo hubsite set](../cmd/spo/hubsite/hubsite-set.md)
 Set-SPOMigrationPackageAzureSource|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOMultiGeoCompanyAllowedDataLocation|Microsoft.Online.SharePoint.PowerShell|
