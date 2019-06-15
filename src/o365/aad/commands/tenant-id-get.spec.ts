@@ -95,7 +95,7 @@ describe(commands.TENANT_ID_GET, () => {
     assert.equal(actual, true);
   });
 
-  it('gets Microsoft Azure or Office 365 tenant ID', (done) => {
+  it('gets Microsoft Azure or Office 365 tenant ID with correct dommain name', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://login.windows.net/contoso.com/.well-known/openid-configuration`) {
         return Promise.resolve(
@@ -169,6 +169,41 @@ describe(commands.TENANT_ID_GET, () => {
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, domainName: 'contoso.com' } }, () => {
+      try {
+        assert(1 === 1);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+      }
+    });
+  });
+
+  it('gets Microsoft Azure or Office 365 tenant ID with wrong domain name', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://login.windows.net/xyz.com/.well-known/openid-configuration`) {
+        return Promise.resolve(
+          {
+            "error": "invalid_tenant",
+            "error_description": "AADSTS90002: Tenant 'xyz.com' not found. This may happen if there are no active subscriptions for the tenant. Check with your subscription administrator.\r\nTrace ID: 8c0e5644-738f-460f-900c-edb4c918b100\r\nCorrelation ID: 69a7237f-1f84-4b88-aae7-8f7fd46d685a\r\nTimestamp: 2019-06-15 15:41:39Z",
+            "error_codes": [
+                90002
+            ],
+            "timestamp": "2019-06-15 15:41:39Z",
+            "trace_id": "8c0e5644-738f-460f-900c-edb4c918b100",
+            "correlation_id": "69a7237f-1f84-4b88-aae7-8f7fd46d685a"
+        }
+        );
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, domainName: 'xyz.com' } }, () => {
       try {
         assert(1 === 1);
         done();
