@@ -554,7 +554,7 @@ Start-PnPWorkflowInstance|SharePointPnPPowerShellOnline|
 Stop-PnPWorkflowInstance|SharePointPnPPowerShellOnline|
 Submit-PnPSearchQuery|SharePointPnPPowerShellOnline|[spo search](../cmd/spo/search/search.md)
 Sync-PnPAppToTeams|SharePointPnPPowerShellOnline|
-Test-PnPListItemIsRecord|SharePointPnPPowerShellOnline|
+Test-PnPListItemIsRecord|SharePointPnPPowerShellOnline|[spo listitem isrecord](../cmd/spo/listitem/listitem-isrecord.md)
 Test-PnPOffice365GroupAliasIsUsed|SharePointPnPPowerShellOnline|
 Test-PnPProvisioningHierarchy|SharePointPnPPowerShellOnline|
 Test-PnPTenantTemplate|SharePointPnPPowerShellOnline|
