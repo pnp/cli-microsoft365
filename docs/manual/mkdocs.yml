@@ -225,6 +225,9 @@ nav:
         - web reindex: 'cmd/spo/web/web-reindex.md'
         - web remove: 'cmd/spo/web/web-remove.md'
         - web set: 'cmd/spo/web/web-set.md'
+    - Office 365 (tenant):
+      - tenant:
+        - tenant id get: 'cmd/tenant-id-get.md'
     - SharePoint Framework (spfx):
       - project:
         - project upgrade: 'cmd/spfx/project/project-upgrade.md'
