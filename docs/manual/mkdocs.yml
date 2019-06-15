@@ -313,6 +313,7 @@ nav:
       - login: 'cmd/aad/login.md'
       - logout: 'cmd/aad/logout.md'
       - status: 'cmd/aad/status.md'
+      - tenant id get: 'cmd/aad/tenant-id-get.md'
       - oauth2grant:
         - oauth2grant add: 'cmd/aad/oauth2grant/oauth2grant-add.md'
         - oauth2grant list: 'cmd/aad/oauth2grant/oauth2grant-list.md'
