@@ -128,15 +128,30 @@ class SpoListItemRecordIsRecordCommand extends SpoCommand {
         }
         let respJson = JSON.parse(response);
 
+        // Response should come in the form of an array, 1st part is the response details, 
+        // the second part is the id used in the static method, 
+        // and the third part should be a boolean value stating whether the document is a record
         let isRecordVal = respJson[2];
+        let respDetails = respJson[0];
         if (typeof (isRecordVal) === "undefined") {
+          if (this.verbose) {
+            cmd.log("An error occurred!")
+          }
+          if (typeof (respDetails) !== "undefined") {
+            let errorInfo = respDetails.errorInfo;
+            if (typeof (errorInfo) !== "undefined" && errorInfo.ErrorMessage.indexOf("Item does not exist.")) {
+              cmd.log(vorpal.chalk.red("Item specified does not exist."));
+            }
+
+            if (this.verbose) {
+              cmd.log(vorpal.chalk.red(respDetails));
+            }
+          }
+
           cmd.log(respJson[0]);
         }
         else {
-          const isRecord: any = {
-            isRecord: isRecordVal
-          };
-          cmd.log(isRecord);
+          cmd.log(isRecordVal);
         }
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));

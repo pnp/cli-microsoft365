@@ -55,7 +55,17 @@ describe(commands.LISTITEM_RECORD_ISRECORD, () => {
     }
 
     if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-      cmdInstance.log('Process Query Post faked!');
+      if (opts.url.indexOf('itemdoesnotexist.sharepoint.com') > -1) {
+        return Promise.resolve(JSON.stringify(
+          [
+            {
+              "ErrorInfo": { "ErrorMessage": "Item does not exist. It may have been deleted by another user.", "ErrorValue": null, "TraceCorrelationId": "fedae69e-4077-8000-f13a-d4a607aefc32", "ErrorCode": -2130575338, "ErrorTypeName": "Microsoft.SharePoint.SPException" },
+              "LibraryVersion": "16.0.9005.1214",
+              "SchemaVersion": "15.0.0.0",
+              "TraceCorrelationId": "fedae69e-4077-8000-f13a-d4a607aefc32",
+            }]));
+      }
+
       return Promise.resolve(JSON.stringify(
         [
           {
@@ -151,6 +161,38 @@ describe(commands.LISTITEM_RECORD_ISRECORD, () => {
       }
       catch (e) {
         done(e);
+      }
+    });
+  });
+
+  it('throws an error when requesting a record for an item that does not exist', (done) => {
+    sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'post').callsFake(postFakes);
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://itemdoesnotexist.sharepoint.com';
+    cmdInstance.action = command.action();
+
+    const options: any = {
+      debug: true,
+      listTitle: 'Test List',
+      id: 147,
+      webUrl: `https://itemdoesnotexist.sharepoint.com/sites/project-y/`,
+      verbose: true
+    };
+
+    cmdInstance.action({ options: options }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith("An error occurred!"));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore(request.get);
+        Utils.restore(request.post);
       }
     });
   });
@@ -254,7 +296,6 @@ describe(commands.LISTITEM_RECORD_ISRECORD, () => {
     }
 
     cmdInstance.action({ options: options }, () => {
-
       try {
         assert(cmdInstanceLogSpy.calledWith("Returns error from requestObjectIdentity"));
         done();
@@ -292,12 +333,12 @@ describe(commands.LISTITEM_RECORD_ISRECORD, () => {
   });
 
   it('fails validation if listTitle and listId option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com' } });
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '1' } });
     assert.notEqual(actual, true);
   });
 
   it('fails validation if listTitle and listId are specified together', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Test List', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } });
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '1', listTitle: 'Test List', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } });
     assert.notEqual(actual, true);
   });
 
