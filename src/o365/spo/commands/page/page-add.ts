@@ -53,6 +53,11 @@ class SpoPageAddCommand extends SpoCommand {
     let itemId: string = '';
     let pageName: string = args.options.name;
     const serverRelativeSiteUrl: string = args.options.webUrl.substr(args.options.webUrl.indexOf('/', 8));
+    const fileNameWithoutExtension: string = pageName.replace('.aspx', '');
+    let bannerImageUrl: string = '';
+    let canvasContent1: string = '';
+    let layoutWebpartsContent: string = '';
+    let templateListItemId: string = '';
 
     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
@@ -126,9 +131,9 @@ class SpoPageAddCommand extends SpoCommand {
 
         return request.post(requestOptions);
       })
-      .then((): Promise<void> => {
+      .then((): Promise<{ Id: string }> => {
         if (!args.options.promoteAs) {
-          return Promise.resolve();
+          return Promise.resolve({ Id: '' });
         }
 
         const requestOptions: any = {
@@ -165,7 +170,109 @@ class SpoPageAddCommand extends SpoCommand {
               FirstPublishedDate: new Date().toISOString().replace('Z', '')
             }
             break;
+          case 'Template':
+            requestOptions.url = `${args.options.webUrl}/_api/web/getfilebyid('${itemId}')/ListItemAllFields`;
+            requestOptions.headers = {
+              authorization: `Bearer ${siteAccessToken}`,
+              'X-RequestDigest': requestDigest,
+              'content-type': 'application/json;odata=nometadata',
+              accept: 'application/json;odata=nometadata'
+            };
+            break;
         }
+
+        return request.post(requestOptions);
+      })
+      .then((res: { Id: string }): Promise<{ Id: string, BannerImageUrl: string, CanvasContent1: string, LayoutWebpartsContent: string, UniqueId: string }> => {
+        if (args.options.promoteAs !== 'Template') {
+          return Promise.resolve({ Id: '', BannerImageUrl: '', CanvasContent1: '', LayoutWebpartsContent: '', UniqueId: '' });
+        }
+
+        const requestOptions: any = {
+          json: true,
+          url: `${args.options.webUrl}/_api/SitePages/Pages(${res.Id})/SavePageAsTemplate`,
+          headers: {
+            authorization: `Bearer ${siteAccessToken}`,
+            'X-RequestDigest': requestDigest,
+            'content-type': 'application/json;odata=nometadata',
+            'X-HTTP-Method': 'POST',
+            'IF-MATCH': '*',
+            accept: 'application/json;odata=nometadata'
+          }
+        };
+
+        return request.post(requestOptions);
+      })
+      .then((res: { Id: string, BannerImageUrl: string, CanvasContent1: string, LayoutWebpartsContent: string, UniqueId: string }): Promise<void> => {
+        if (args.options.promoteAs !== 'Template') {
+          return Promise.resolve();
+        }
+
+        bannerImageUrl = res.BannerImageUrl;
+        canvasContent1 = res.CanvasContent1;
+        layoutWebpartsContent = res.LayoutWebpartsContent;
+        templateListItemId = res.Id;
+
+        const requestOptions: any = {
+          url: `${args.options.webUrl}/_api/web/getfilebyid('${res.UniqueId}')/ListItemAllFields/SetCommentsDisabled(${!args.options.commentsEnabled})`,
+          headers: {
+            authorization: `Bearer ${siteAccessToken}`,
+            'X-RequestDigest': requestDigest,
+            'content-type': 'application/json;odata=nometadata',
+            accept: 'application/json;odata=nometadata'
+          },
+          json: true
+        };
+
+        return request.post(requestOptions);
+      })
+      .then((): Promise<void> => {
+        if (args.options.promoteAs !== 'Template') {
+          return Promise.resolve();
+        }
+
+        const requestOptions: any = {
+          json: true,
+          url: `${args.options.webUrl}/_api/SitePages/Pages(${templateListItemId})/SavePage`,
+          headers: {
+            authorization: `Bearer ${siteAccessToken}`,
+            'X-RequestDigest': requestDigest,
+            'X-HTTP-Method': 'MERGE',
+            'IF-MATCH': '*',
+            'content-type': 'application/json;odata=nometadata',
+            accept: 'application/json;odata=nometadata'
+          },
+          body: {
+            BannerImageUrl: bannerImageUrl,
+            CanvasContent1: canvasContent1,
+            LayoutWebpartsContent: layoutWebpartsContent
+          }
+        };
+        return request.post(requestOptions);
+      })
+      .then((): Promise<void> => {
+        if (args.options.promoteAs !== 'Template') {
+          return Promise.resolve();
+        }
+
+        const requestOptions: any = {
+          json: true,
+          url: `${args.options.webUrl}/_api/SitePages/Pages(${templateListItemId})/SavePageAsDraft`,
+          headers: {
+            authorization: `Bearer ${siteAccessToken}`,
+            'X-RequestDigest': requestDigest,
+            'X-HTTP-Method': 'MERGE',
+            'IF-MATCH': '*',
+            'content-type': 'application/json;odata=nometadata',
+            accept: 'application/json;odata=nometadata'
+          },
+          body: {
+            Title: fileNameWithoutExtension,
+            BannerImageUrl: bannerImageUrl,
+            CanvasContent1: canvasContent1,
+            LayoutWebpartsContent: layoutWebpartsContent
+          }
+        };
 
         return request.post(requestOptions);
       })
@@ -231,8 +338,8 @@ class SpoPageAddCommand extends SpoCommand {
       },
       {
         option: '-p, --promoteAs [promoteAs]',
-        description: 'Create the page for a specific purpose. Allowed values HomePage|NewsPage',
-        autocomplete: ['HomePage', 'NewsPage']
+        description: 'Create the page for a specific purpose. Allowed values HomePage|NewsPage|Template',
+        autocomplete: ['HomePage', 'NewsPage', 'Template']
       },
       {
         option: '--commentsEnabled',
@@ -275,8 +382,9 @@ class SpoPageAddCommand extends SpoCommand {
 
       if (args.options.promoteAs &&
         args.options.promoteAs !== 'HomePage' &&
-        args.options.promoteAs !== 'NewsPage') {
-        return `${args.options.promoteAs} is not a valid option for promoteAs. Allowed values HomePage|NewsPage`;
+        args.options.promoteAs !== 'NewsPage' &&
+        args.options.promoteAs !== 'Template') {
+        return `${args.options.promoteAs} is not a valid option for promoteAs. Allowed values HomePage|NewsPage|Template`;
       }
 
       if (args.options.promoteAs === 'HomePage' && args.options.layoutType !== 'Home') {
@@ -327,6 +435,9 @@ class SpoPageAddCommand extends SpoCommand {
 
     Create new page and set it as the site's home page
       ${chalk.grey(config.delimiter)} ${this.name} --name new-page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --layoutType Home --promoteAs HomePage
+
+    Create new article page and promote it as a template
+      ${chalk.grey(config.delimiter)} ${this.name} --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --promoteAs Template
 
     Create new article page and enable comments on the page
       ${chalk.grey(config.delimiter)} ${this.name} --name new-page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --commentsEnabled
