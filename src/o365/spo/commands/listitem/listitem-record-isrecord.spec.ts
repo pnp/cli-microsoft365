@@ -54,7 +54,9 @@ describe(commands.LISTITEM_RECORD_ISRECORD, () => {
       )
     }
 
+    // IsRecord request mocks
     if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+      // Unsuccessful response for when the item does not exist
       if (opts.url.indexOf('itemdoesnotexist.sharepoint.com') > -1) {
         return Promise.resolve(JSON.stringify(
           [
@@ -66,6 +68,7 @@ describe(commands.LISTITEM_RECORD_ISRECORD, () => {
             }]));
       }
 
+      // Successful response
       return Promise.resolve(JSON.stringify(
         [
           {
@@ -79,6 +82,7 @@ describe(commands.LISTITEM_RECORD_ISRECORD, () => {
   }
 
   let getFakes = (opts: any) => {
+    // Get list mock
     if (opts.url.indexOf('/_api/web/lists') > -1 &&
       opts.url.indexOf('$select=Id') > -1) {
       cmdInstance.log('faked!');
