@@ -88,6 +88,11 @@ class AadTenantGetIDCommand extends Command {
     log(vorpal.find(commands.TENANT_ID_GET).helpInformation());
     log(
       `
+  Remarks:
+
+    To get Microsoft Azure or Office 365 tenant ID, you don't have to log in to the 
+    Microsoft Graph.
+
   Examples:
   
   Gets Microsoft Azure or Office 365 tenant ID 

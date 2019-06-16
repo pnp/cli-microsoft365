@@ -18,6 +18,10 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
+## Remarks
+
+To get Microsoft Azure or Office 365 tenant ID, you don't have to log in to the Microsoft Graph.
+
 ## Examples
 
 Gets Microsoft Azure or Office 365 tenant ID

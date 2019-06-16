@@ -1,5 +1,5 @@
 import commands from '../commands';
-import Command, { CommandValidate } from '../../../Command';
+import Command, { CommandOption, CommandValidate } from '../../../Command';
 import * as sinon from 'sinon';
 const command: Command = require('./tenant-id-get');
 import * as assert from 'assert';
@@ -215,6 +215,17 @@ describe(commands.TENANT_ID_GET, () => {
         Utils.restore(request.get);
       }
     });
+  });
+
+  it('supports debug mode', () => {
+    const options = (command.options() as CommandOption[]);
+    let containsOption = false;
+    options.forEach(o => {
+      if (o.option === '--debug') {
+        containsOption = true;
+      }
+    });
+    assert(containsOption);
   });
 
   it('has help referring to the right command', () => {
