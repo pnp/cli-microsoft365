@@ -77,7 +77,6 @@ describe(commands.LISTITEM_RECORD_ISRECORD, () => {
         ]
       ));
     }
-
     return Promise.reject('Invalid request');
   }
 
@@ -133,7 +132,6 @@ describe(commands.LISTITEM_RECORD_ISRECORD, () => {
       auth.restoreAuth,
     ]);
   });
-
 
   it('has correct name', () => {
     assert.equal(command.name.startsWith(commands.LISTITEM_RECORD_ISRECORD), true);
@@ -283,7 +281,6 @@ describe(commands.LISTITEM_RECORD_ISRECORD, () => {
   });
 
   it('fails to get _ObjecttIdentity_ when an error is returned by the _ObjectIdentity_ CSOM request', (done) => {
-
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
