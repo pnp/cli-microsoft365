@@ -3,7 +3,7 @@ import Command, { CommandOption, CommandError, CommandValidate } from '../../../
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../GraphAuth';
-const command: Command = require('./task-list');
+const command: Command = require('./planner-task-list');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
@@ -426,7 +426,7 @@ describe(commands.PLANNER_TASK_LIST, () => {
     });
   });
 
-  it('retrieves user using userid', (done) => {
+  it('retrieves user using userId', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/68be84bf-a585-4776-80b3-30aa5207aa21/planner/tasks`) {
         return Promise.resolve({
@@ -524,7 +524,7 @@ describe(commands.PLANNER_TASK_LIST, () => {
     auth.service.connected = true;
     auth.service.resource = 'https://graph.microsoft.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, userid: '68be84bf-a585-4776-80b3-30aa5207aa21' } }, () => {
+    cmdInstance.action({ options: { debug: false, userId: '68be84bf-a585-4776-80b3-30aa5207aa21' } }, () => {
       try {
         assert(cmdInstanceLogSpy.called);
         done();
@@ -633,7 +633,7 @@ describe(commands.PLANNER_TASK_LIST, () => {
     auth.service.connected = true;
     auth.service.resource = 'https://graph.microsoft.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, userid: '68be84bf-a585-4776-80b3-30aa5207aa21' } }, () => {
+    cmdInstance.action({ options: { debug: true, userId: '68be84bf-a585-4776-80b3-30aa5207aa21' } }, () => {
       try {
         assert(cmdInstanceLogSpy.called);
         done();
@@ -879,7 +879,7 @@ describe(commands.PLANNER_TASK_LIST, () => {
     auth.service = new Service('https://graph.windows.net');
     auth.service.connected = true;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, userid: '68be84bf-a585-4776-80b3-30aa5207aa22' } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: false, userId: '68be84bf-a585-4776-80b3-30aa5207aa22' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Referenced User or Group (68be84bf-a585-4776-80b3-30aa5207aa22) is not found.`)));
         done();
@@ -907,7 +907,7 @@ describe(commands.PLANNER_TASK_LIST, () => {
     auth.service = new Service('https://graph.windows.net');
     auth.service.connected = true;
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, userid: '68be84bf-a585-4776-80b3-30aa5207aa22' } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: false, userId: '68be84bf-a585-4776-80b3-30aa5207aa22' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`You do not have the required permissions to access this item.`)));
         done();
@@ -919,17 +919,17 @@ describe(commands.PLANNER_TASK_LIST, () => {
   });
 
   it('fails validation if both the id and the userName are specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { userid: '68be84bf-a585-4776-80b3-30aa5207aa22', userName: 'AarifS@contoso.onmicrosoft.com' } });
+    const actual = (command.validate() as CommandValidate)({ options: { userId: '68be84bf-a585-4776-80b3-30aa5207aa22', userName: 'AarifS@contoso.onmicrosoft.com' } });
     assert.notEqual(actual, true);
   });
 
   it('fails validation if the id is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { userid: 'invalid' } });
+    const actual = (command.validate() as CommandValidate)({ options: { userId: 'invalid' } });
     assert.notEqual(actual, true);
   });
 
   it('passes validation if the id is a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { userid: '68be84bf-a585-4776-80b3-30aa5207aa22' } });
+    const actual = (command.validate() as CommandValidate)({ options: { userId: '68be84bf-a585-4776-80b3-30aa5207aa22' } });
     assert.equal(actual, true);
   });
 

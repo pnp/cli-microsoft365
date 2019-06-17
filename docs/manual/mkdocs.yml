@@ -251,7 +251,7 @@ nav:
         - o365group user list: 'cmd/graph/o365group/o365group-user-list.md'
         - o365group user remove: 'cmd/graph/o365group/o365group-user-remove.md'
       - planner:
-        - task list: 'cmd/graph/planner/task-list.md'
+        - planner task list: 'cmd/graph/planner/planner-task-list.md'
       - schemaextension:
         - schemaextension add: 'cmd/graph/schemaextension/schemaextension-add.md'
       - siteclassification:

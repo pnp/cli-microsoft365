@@ -13,8 +13,8 @@ graph planner task list [options]
 Option|Description
 ------|-----------
 `--help`|output usage information
-`--userid [userid]`| Retrieves all the tasks of the user. Specify `userid` or `userName` but not both. If none of them are specified, current user tasks will be returned.
-`--userName  [userName ]`| Retrieves all the tasks of the user. Specify `userid` or `userName` but not both. If none of them are specified, current user tasks will be returned.
+`--userId [userId]`| Retrieves all the tasks of the user. Specify `userId` or `userName` but not both. If none of them are specified, current user tasks will be returned.
+`--userName  [userName ]`| Retrieves all the tasks of the user. Specify `userId` or `userName` but not both. If none of them are specified, current user tasks will be returned.
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging.
 `--debug`|Runs command with debug logging.
@@ -26,9 +26,9 @@ Option|Description
 
 To list planner tasks of a user, you have to first log in to the Microsoft Graph using the [graph login](../login.md) command, eg. `graph login`.
 
-Using the `--userid` and `--userName` option, you can retrieve all the planner tasks of the specified user. But it will result in error if you don't have access to view specific user's task.  You can retrieve information about a user's task, either by specifying that user's id or username (`userPrincipalName`), but not both.
+Using the `--userId` and `--userName` option, you can retrieve all the planner tasks of the specified user. But it will result in error if you don't have access to view specific user's task.  You can retrieve information about a user's task, either by specifying that user's id or username (`userPrincipalName`), but not both.
 
-Both userid and username is optional, if no values are passed for those parameters it will list all the tasks of current logged in user.
+Both userId and userName is optional, if no values are passed for those parameters it will list all the tasks of current logged in user.
 
 ## Examples
 
@@ -41,7 +41,7 @@ graph planner task list
 List all tasks of the user with id _1caf7dcd-7e83-4c3a-94f7-932a1299c844_
 
 ```sh
-graph planner task list --userid 1caf7dcd-7e83-4c3a-94f7-932a1299c844
+graph planner task list --userId 1caf7dcd-7e83-4c3a-94f7-932a1299c844
 ```
 
 List all tasks of the user with user name _AarifS@contoso.onmicrosoft.com_
