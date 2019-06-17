@@ -41,7 +41,7 @@ Get-SPOGeoAdministrator|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOGeoMoveCrossCompatibilityStatus|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOGeoStorageQuota|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOHideDefaultThemes|Microsoft.Online.SharePoint.PowerShell|[spo hidedefaultthemes get](../cmd/spo/hidedefaultthemes/hidedefaultthemes-get.md)
-Get-SPOHomeSite|Microsoft.Online.SharePoint.PowerShell|
+Get-SPOHomeSite|Microsoft.Online.SharePoint.PowerShell|[spo homesite get](../cmd/spo/homesite/homesite-get.md)
 Get-SPOHubSite|Microsoft.Online.SharePoint.PowerShell|[spo hubsite get](../cmd/spo/hubsite/hubsite-get.md), [spo hubsite list](../cmd/spo/hubsite/hubsite-list.md)
 Get-SPOMigrationJobProgress|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOMigrationJobStatus|Microsoft.Online.SharePoint.PowerShell|
@@ -295,7 +295,7 @@ Get-PnPGroupPermissions|SharePointPnPPowerShellOnline|
 Get-PnPHealthScore|SharePointPnPPowerShellOnline|
 Get-PnPHideDefaultThemes|SharePointPnPPowerShellOnline|[spo hidedefaultthemes get](../cmd/spo/hidedefaultthemes/hidedefaultthemes-get.md)
 Get-PnPHomePage|SharePointPnPPowerShellOnline|
-Get-PnPHomeSite|SharePointPnPPowerShellOnline|
+Get-PnPHomeSite|SharePointPnPPowerShellOnline|[spo homesite get](../cmd/spo/homesite/homesite-get.md)
 Get-PnPHubSite|SharePointPnPPowerShellOnline|[spo hubsite get](../cmd/spo/hubsite/hubsite-get.md), [spo hubsite list](../cmd/spo/hubsite/hubsite-list.md)
 Get-PnPIndexedPropertyKeys|SharePointPnPPowerShellOnline|
 Get-PnPInPlaceRecordsManagement|SharePointPnPPowerShellOnline|
@@ -508,7 +508,7 @@ Set-PnPFileCheckedIn|SharePointPnPPowerShellOnline|[spo file checkin](../cmd/spo
 Set-PnPFileCheckedOut|SharePointPnPPowerShellOnline|[spo file checkout](../cmd/spo/file/file-checkout.md)
 Set-PnPGroup|SharePointPnPPowerShellOnline|
 Set-PnPGroupPermissions|SharePointPnPPowerShellOnline|
-Set-PnPHomeSite|SharePointPnPPowerShellOnline|
+Set-PnPHomeSite|SharePointPnPPowerShellOnline|[spo homesite set](../cmd/spo/homesite/homesite-set.md)
 Set-PnPHideDefaultThemes|SharePointPnPPowerShellOnline|[spo hidedefaultthemes set](../cmd/spo/hidedefaultthemes/hidedefaultthemes-set.md)
 Set-PnPHomePage|SharePointPnPPowerShellOnline|
 Set-PnPHubSite|SharePointPnPPowerShellOnline|[spo hubsite set](../cmd/spo/hubsite/hubsite-set.md)

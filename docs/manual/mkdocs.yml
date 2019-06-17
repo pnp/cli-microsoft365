@@ -72,6 +72,7 @@ nav:
         - hidedefaultthemes get: 'cmd/spo/hidedefaultthemes/hidedefaultthemes-get.md'
         - hidedefaultthemes set: 'cmd/spo/hidedefaultthemes/hidedefaultthemes-set.md'
       - homesite:
+        - homesite get: 'cmd/spo/homesite/homesite-get.md'
         - homesite set: 'cmd/spo/homesite/homesite-set.md'
       - hubsite:
         - hubsite connect: 'cmd/spo/hubsite/hubsite-connect.md'
