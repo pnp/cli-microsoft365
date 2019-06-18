@@ -25,9 +25,13 @@ interface Options extends GlobalOptions {
   title?: string;
   webUrl: string;
   footerEnabled?: string;
+  searchScope?: string;
 }
 
 class SpoWebSetCommand extends SpoCommand {
+  private static searchScopeOptions: string[] =          
+    ['DefaultScope', 'Tenant', 'Hub', 'Site'];
+
   public get name(): string {
     return commands.WEB_SET;
   }
@@ -46,6 +50,7 @@ class SpoWebSetCommand extends SpoCommand {
     telemetryProps.title = typeof args.options.title !== 'undefined';
     telemetryProps.quickLaunchEnabled = typeof args.options.quickLaunchEnabled !== 'undefined';
     telemetryProps.footerEnabled = typeof args.options.footerEnabled !== 'undefined';
+    telemetryProps.searchScope = typeof args.options.searchScope !== 'undefined';
     return telemetryProps;
   }
 
@@ -83,6 +88,9 @@ class SpoWebSetCommand extends SpoCommand {
         }
         if (typeof args.options.footerEnabled !== 'undefined') {
           payload.FooterEnabled = args.options.footerEnabled === 'true';
+        }
+        if (typeof args.options.searchScope !== 'undefined') {
+          payload.SearchScope = SpoWebSetCommand.searchScopeOptions.indexOf(args.options.searchScope);
         }
 
         const requestOptions: any = {
@@ -152,6 +160,11 @@ class SpoWebSetCommand extends SpoCommand {
         option: '--footerEnabled [footerEnabled]',
         description: 'Set to \'true\' to enable footer and to \'false\' to disable it',
         autocomplete: ['true', 'false']
+      },
+      {
+        option: '--searchScope [searchScope]',
+        description: 'Search scope to set in the site. Allowed values DefaultScope|Tenant|Hub|Site',
+        autocomplete: SpoWebSetCommand.searchScopeOptions
       }
     ];
 
@@ -204,6 +217,12 @@ class SpoWebSetCommand extends SpoCommand {
         if (args.options.footerEnabled !== 'true' &&
           args.options.footerEnabled !== 'false') {
           return `${args.options.footerEnabled} is not a valid boolean value`;
+        }
+      }
+
+      if (typeof args.options.searchScope !== 'undefined') {
+        if (SpoWebSetCommand.searchScopeOptions.indexOf(args.options.searchScope) < 0) {
+          return `${args.options.searchScope} is not a valid value for searchScope.  Allowed values are DefaultScope|Tenant|Hub|Site`;
         }
       }
 
