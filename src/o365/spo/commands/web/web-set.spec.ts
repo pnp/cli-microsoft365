@@ -540,7 +540,6 @@ describe(commands.WEB_SET, () => {
     assert(containsExamples);
   });
 
-
   it('fails validation if footerEnabled is not a valid boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: 'invalid' } });
     assert.notEqual(actual, true);
@@ -590,6 +589,146 @@ describe(commands.WEB_SET, () => {
     });
 
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: 'false' } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails validation if search scope is not valid', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'invalid' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('passes validation if search scope is set to defaultscope', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'defaultscope' } });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation if search scope is set to tenant', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'tenant' } });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation if search scope is set to hub', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'hub' } });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation if search scope is set to site', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'site' } });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation even if search scope is not all lower case', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'DefaultScope' } });
+    assert.equal(actual, true);
+  });
+
+  it('sets search scope to default scope', (done) => {
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (JSON.stringify(opts.body) === JSON.stringify({
+        SearchScope: 0
+      })) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'defaultscope' } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets search scope to tenant', (done) => {
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (JSON.stringify(opts.body) === JSON.stringify({
+        SearchScope: 1
+      })) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'tenant' } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets search scope to hub', (done) => {
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (JSON.stringify(opts.body) === JSON.stringify({
+        SearchScope: 2
+      })) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'hub' } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets search scope to site', (done) => {
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (JSON.stringify(opts.body) === JSON.stringify({
+        SearchScope: 3
+      })) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'site' } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets search scope even if parameter is not all lower case', (done) => {
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (JSON.stringify(opts.body) === JSON.stringify({
+        SearchScope: 3
+      })) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'Site' } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
         done();
