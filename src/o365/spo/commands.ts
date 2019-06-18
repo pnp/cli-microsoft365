@@ -10,6 +10,7 @@ export default {
   APP_RETRACT: `${prefix} app retract`,
   APP_UNINSTALL: `${prefix} app uninstall`,
   APP_UPGRADE: `${prefix} app upgrade`,
+  APPPAGE_ADD:`${prefix} apppage add`,
   CDN_GET: `${prefix} cdn get`,
   CDN_ORIGIN_ADD: `${prefix} cdn origin add`,
   CDN_ORIGIN_LIST: `${prefix} cdn origin list`,
