@@ -22,9 +22,13 @@ interface Options extends GlobalOptions {
   title?: string;
   webUrl: string;
   footerEnabled?: string;
+  searchScope?: string;
 }
 
 class SpoWebSetCommand extends SpoCommand {
+  private static searchScopeOptions: string[] =          
+    ['defaultscope', 'tenant', 'hub', 'site'];
+
   public get name(): string {
     return commands.WEB_SET;
   }
@@ -43,6 +47,7 @@ class SpoWebSetCommand extends SpoCommand {
     telemetryProps.title = typeof args.options.title !== 'undefined';
     telemetryProps.quickLaunchEnabled = typeof args.options.quickLaunchEnabled !== 'undefined';
     telemetryProps.footerEnabled = typeof args.options.footerEnabled !== 'undefined';
+    telemetryProps.searchScope = args.options.searchScope !== 'undefined';
     return telemetryProps;
   }
 
@@ -71,6 +76,10 @@ class SpoWebSetCommand extends SpoCommand {
     }
     if (typeof args.options.footerEnabled !== 'undefined') {
       payload.FooterEnabled = args.options.footerEnabled === 'true';
+    }
+    if (typeof args.options.searchScope !== 'undefined') {
+      const searchScope = args.options.searchScope.toLowerCase();
+      payload.SearchScope = SpoWebSetCommand.searchScopeOptions.indexOf(searchScope);
     }
 
     const requestOptions: any = {
@@ -139,6 +148,11 @@ class SpoWebSetCommand extends SpoCommand {
         option: '--footerEnabled [footerEnabled]',
         description: 'Set to \'true\' to enable footer and to \'false\' to disable it',
         autocomplete: ['true', 'false']
+      },
+      {
+        option: '--searchScope [searchScope]',
+        description: 'Search scope to set in the site. Allowed values DefaultScope|Tenant|Hub|Site',
+        autocomplete: SpoWebSetCommand.searchScopeOptions
       }
     ];
 
@@ -194,6 +208,13 @@ class SpoWebSetCommand extends SpoCommand {
         }
       }
 
+      if (typeof args.options.searchScope !== 'undefined') {
+        const searchScope = args.options.searchScope.toLowerCase();
+        if (SpoWebSetCommand.searchScopeOptions.indexOf(searchScope) < 0) {
+          return `${args.options.searchScope} is not a valid value for searchScope. Allowed values are DefaultScope|Tenant|Hub|Site`;
+        }
+      }
+
       return true;
     };
   }
@@ -220,6 +241,9 @@ class SpoWebSetCommand extends SpoCommand {
     
     Hide footer in the site
       ${commands.WEB_SET} --webUrl https://contoso.sharepoint.com/sites/team-a --footerEnabled false
+
+    Set search scope to tenant scope
+      ${commands.WEB_SET} --webUrl https://contoso.sharepoint.com/sites/team-a --searchScope tenant
   ` );
   }
 }
