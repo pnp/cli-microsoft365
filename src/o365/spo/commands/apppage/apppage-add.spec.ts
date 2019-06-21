@@ -13,11 +13,15 @@ describe(commands.APPPAGE_ADD, () => {
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-
+  let trackEvent: any;
+  let telemetry: any
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(auth, 'getAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
     sinon.stub(command as any, 'getRequestDigestForSite').callsFake(() => Promise.resolve({ FormDigestValue: 'ABC' }));
+    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
+      telemetry = t;
+    });
   });
 
   beforeEach(() => {
@@ -30,6 +34,7 @@ describe(commands.APPPAGE_ADD, () => {
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
     auth.site = new Site();
+    telemetry = null;
   });
 
   afterEach(() => {
@@ -54,6 +59,31 @@ describe(commands.APPPAGE_ADD, () => {
 
   it('has a description', () => {
     assert.notEqual(command.description, null);
+  });
+  it('calls telemetry', (done) => {
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: {} }, () => {
+      try {
+        assert(trackEvent.called);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('logs correct telemetry event', (done) => {
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: {} }, () => {
+      try {
+        assert.equal(telemetry.name, commands.APPPAGE_ADD);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 
   it('aborts when not logged in to a SharePoint site', (done) => {

@@ -26,15 +26,15 @@ class SpoAppPageAddCommand extends SpoCommand {
   public get name(): string {
     return `${commands.APPPAGE_ADD}`;
   }
-
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.addToQuickLaunch = args.options.addToQuickLaunch;
+    return telemetryProps;
+  }
   public get description(): string {
     return 'Creates a single-part app page';
   }
-  //todo:remove
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    return telemetryProps;
-  }
+
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
     let siteAccessToken: string = '';
@@ -91,7 +91,7 @@ class SpoAppPageAddCommand extends SpoCommand {
       },
       {
         option: '-t, --title <title>',
-        description: 'The title of the page to create'
+        description: 'The title of the page to be created'
       },
       {
         option: '-d, --webPartData <webPartData>',
@@ -119,11 +119,12 @@ class SpoAppPageAddCommand extends SpoCommand {
         return 'Required parameter webPartData missing';
       }
       try {
-       JSON.parse(args.options.webPartData);
+        JSON.parse(args.options.webPartData);
       }
       catch (e) {
-        return `The webPartData passed is not a valid JSON string`;
+        return `Specified webPartData is not a valid JSON string. Error: ${e}`;
       }
+
       return true;
     };
   }
@@ -136,15 +137,15 @@ class SpoAppPageAddCommand extends SpoCommand {
         
   Remarks:
 
-    To a single-part app page, you have to first log in to a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
+    To create a single-part app page, you have to first log in to a SharePoint site using the ${chalk.blue(commands.LOGIN)} command,
     eg. ${chalk.grey(`${config.delimiter} ${commands.LOGIN} https://contoso.sharepoint.com`)}.
     If you want to add the single-part app page to quicklaunch, use the ${chalk.blue('addToQuickLaunch')}
     flag.
 
   Examples:
   
-    Create a single-part app page in a web with url https://contoso.sharepoint.com, webpart data are stored in the ${chalk.grey('$webPartData')} variable
-      ${chalk.grey(config.delimiter)} ${this.name} --title "app page" --webUrl "https://contoso.sharepoint.com" --webPartData $webPartData --addToQuickLaunch 
+    Create a single-part app page in a site with url https://contoso.sharepoint.com, webpart data are stored in the ${chalk.grey('$webPartData')} variable
+      ${chalk.grey(config.delimiter)} ${this.name} --title "Contoso" --webUrl "https://contoso.sharepoint.com" --webPartData $webPartData --addToQuickLaunch 
 `);
   }
 }

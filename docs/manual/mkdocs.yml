@@ -11,6 +11,8 @@ nav:
       - login: 'cmd/spo/login.md'
       - logout: 'cmd/spo/logout.md'
       - status: 'cmd/spo/status.md'
+      - apppage:
+        - apppage add: 'cmd/spo/apppage/apppage-add.md'
       - app:
         - app add: 'cmd/spo/app/app-add.md'
         - app deploy: 'cmd/spo/app/app-deploy.md'
