@@ -1,0 +1,53 @@
+# spo contenttype remove
+
+Deletes site content type
+
+## Usage
+
+```sh
+spo contenttype remove [options]
+```
+
+## Options
+
+Option|Description
+------|-----------
+`--help`|output usage information
+`-u, --webUrl <webUrl>`|Absolute URL of the site where the content type is located
+`-i, --id [id]`|The ID of the content type to remove
+`-n, --name [name]`|The name of the content type to remove
+`--confirm`|Don't prompt for confirming removal of the content type
+`-o, --output [output]`|Output type. `json|text`. Default `text`
+`--verbose`|Runs command with verbose logging
+`--debug`|Runs command with debug logging
+
+!!! important
+    Before using this command, log in to a SharePoint Online site, using the [spo login](../login.md) command.
+
+## Remarks
+
+To remove a content type, you have to first log in to a SharePoint site using the [spo login](../login.md) command, eg. `spo login https://contoso.sharepoint.com`.
+
+If the specified content type is in use by a list and cannot be removed, you will be returned the error: _Another site or list is still using this content type._ SharePoint will not allow a content type to be removed unless any dependent objects are also emptied from the recycle bin including the second-stage recycle bin.
+
+The content type you wish to remove can be selected by the ID or Name of the content type. Either ID or Name parameter must be specified.
+
+## Examples
+
+Remove a site content type by ID
+
+```sh
+spo contenttype remove --id "0x01007926A45D687BA842B947286090B8F67D" --webUrl https://contoso.sharepoint.com
+```
+
+Remove a site content type by Name
+
+```sh
+spo contenttype remove --name "My Content Type" --webUrl https://contoso.sharepoint.com --confirm
+```
+
+Remove a site content type without prompting for confirmation
+
+```sh
+spo contenttype remove --name "My Content Type" --webUrl https://contoso.sharepoint.com --confirm
+```

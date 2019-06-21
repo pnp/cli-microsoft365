@@ -15,6 +15,7 @@ Option|Description
 `--help`|output usage information
 `-n, --name <name>`|Name of the theme to apply
 `-u, --webUrl <webUrl>`|URL of the site to which the theme should be applied
+`--sharePointTheme`|Set to specify if the supplied theme name is a standard SharePoint theme
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
@@ -26,12 +27,20 @@ Option|Description
 
 To apply theme to the specified site, you have to first log in to a tenant admin site using the [spo login](../login.md) command, eg. `spo login https://contoso-admin.sharepoint.com`.
 
+Following standard SharePoint themes are supported by the Office 365 CLI: Blue, Orange, Red, Purple, Green, Gray, Dark Yellow and Dark Blue.
+
 ## Examples
 
 Apply theme to the specified site
 
 ```sh
 spo theme apply --name Contoso-Blue --webUrl https://contoso.sharepoint.com/sites/project-x
+```
+
+Apply a standard SharePoint theme to the specified site
+
+```sh
+spo theme apply --name Blue --webUrl https://contoso.sharepoint.com/sites/project-x --sharePointTheme
 ```
 
 ## More information

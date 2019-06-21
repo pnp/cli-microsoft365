@@ -1,5 +1,37 @@
 # Release notes
 
+## [v1.21.0](https://github.com/pnp/office365-cli/releases/tag/v1.21.0)
+
+### New commands
+
+**SharePoint Online:**
+
+- [spo orgnewssite list](../cmd/spo/orgnewssite/orgnewssite-list.md) - lists all organizational news sites [#975](https://github.com/pnp/office365-cli/issues/975)
+- [spo orgnewssite remove](../cmd/spo/orgnewssite/orgnewssite-remove.md) - removes a site from the list of organizational news sites [#976](https://github.com/pnp/office365-cli/issues/976)
+- [spo orgnewssite set](../cmd/spo/orgnewssite/orgnewssite-set.md) - marks site as an organizational news site [#974](https://github.com/pnp/office365-cli/issues/974)
+
+**Microsoft Graph:**
+
+- [graph teams set](../cmd/graph/teams/teams-set.md) - updates settings of a Microsoft Teams team [#815](https://github.com/pnp/office365-cli/issues/815)
+
+## [v1.20.0](https://github.com/pnp/office365-cli/releases/tag/v1.20.0)
+
+### New commands
+
+**SharePoint Online:**
+
+- [spo contenttype remove](../cmd/spo/contenttype/contenttype-remove.md) - deletes site content type [#904](https://github.com/pnp/office365-cli/issues/904)
+
+**Microsoft Graph:**
+
+- [graph o365group user list](../cmd/graph/o365group/o365group-user-list.md) - lists users for the specified Office 365 group or Microsoft Teams team [#802](https://github.com/pnp/office365-cli/issues/802)
+- [graph teams clone](../cmd/graph/teams/teams-clone.md) - creates a clone of a Microsoft Teams team [#924](https://github.com/pnp/office365-cli/issues/924)
+
+### Changes
+
+- extended 'spo theme apply' with support for applying standard themes [#920](https://github.com/pnp/office365-cli/issues/920)
+- improved detecting SPFx React projects solving [#968](https://github.com/pnp/office365-cli/issues/968)
+
 ## [v1.19.0](https://github.com/pnp/office365-cli/releases/tag/v1.19.0)
 
 ### Changes
@@ -154,7 +186,7 @@
 
 - [graph teams message list](../cmd/graph/teams/teams-message-list.md) - lists all messages from a channel in a Microsoft Teams team [#588](https://github.com/pnp/office365-cli/issues/588)
 - [graph teams user add](../cmd/graph/o365group/o365group-user-add.md) - adds user to the specified Microsoft Teams team [#690](https://github.com/pnp/office365-cli/issues/690)
-- [graph teams user list](../cmd/graph/teams/teams-user-list.md) - lists users for the specified Microsoft Teams team [#689](https://github.com/pnp/office365-cli/issues/689)
+- [graph teams user list](../cmd/graph/o365group/o365group-user-list.md) - lists users for the specified Microsoft Teams team [#689](https://github.com/pnp/office365-cli/issues/689)
 
 ### Changes
 

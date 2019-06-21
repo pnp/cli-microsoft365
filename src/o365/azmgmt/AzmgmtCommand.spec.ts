@@ -4,6 +4,7 @@ import AzmgmtCommand from './AzmgmtCommand';
 import auth from './AzmgmtAuth';
 import Utils from '../../Utils';
 import { CommandError } from '../../Command';
+import appInsights from '../../appInsights';
 
 class MockCommand extends AzmgmtCommand {
   public get name(): string {
@@ -22,6 +23,14 @@ class MockCommand extends AzmgmtCommand {
 }
 
 describe('AzmgmtCommand', () => {
+  before(() => {
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+  });
+
+  after(() => {
+    Utils.restore(appInsights.trackEvent);
+  });
+  
   it('correctly reports an error while restoring auth info', (done) => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
     const command = new MockCommand();

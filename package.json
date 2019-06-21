@@ -1,6 +1,6 @@
 {
   "name": "@pnp/office365-cli",
-  "version": "1.19.0",
+  "version": "1.21.0",
   "description": "Manage Microsoft Office 365 and SharePoint Framework projects on any platform",
   "license": "MIT",
   "main": "./dist/index.js",
@@ -52,6 +52,7 @@
     "Biro, Peter <Peter.Biro@xs.nestle.com>",
     "Bloemsma, Arjen <a.bloemsma@gmail.com>",
     "Brouwers, Stijn <stijnbrouwers@gmail.com>",
+    "Calabro, David <davej.calabro@gmail.com>",
     "Connell, Andrew <me@andrewconnell.com>",
     "Deshpande, Vardhaman <vardhaman.rd@gmail.com>",
     "Georgiev, Velin <velin.georgiev@gmail.com>",
@@ -77,6 +78,7 @@
     "Skelly, Pete <peteskelly@gmail.com>",
     "Struyf, Elio <info@estruyf.be>",
     "Svenson, Mikael <miksvenson@gmail.com>",
+    "Tatti, Anoop <anoop@live.co.uk>",
     "van Hunen, Erwin <erwin.van.hunen@outlook.com>",
     "van Rousselt, Rick <rick.vanrousselt@outlook.com>",
     "Velliah, Joseph <joseph@sprider.org>",
