@@ -1,11 +1,11 @@
 # graph planner task list
 
-Lists Planner tasks of the user
+Lists Planner tasks of the current logged in user
 
 ## Usage
 
 ```sh
-graph planner task list [options]
+graph planner task list
 ```
 
 ## Options
@@ -13,8 +13,6 @@ graph planner task list [options]
 Option|Description
 ------|-----------
 `--help`|output usage information
-`--userId [userId]`| Retrieves all the tasks of the user. Specify `userId` or `userName` but not both. If none of them are specified, current user tasks will be returned.
-`--userName  [userName ]`| Retrieves all the tasks of the user. Specify `userId` or `userName` but not both. If none of them are specified, current user tasks will be returned.
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging.
 `--debug`|Runs command with debug logging.
@@ -24,11 +22,9 @@ Option|Description
 
 ## Remarks
 
-To list planner tasks of a user, you have to first log in to the Microsoft Graph using the [graph login](../login.md) command, eg. `graph login`.
+To list planner tasks of a current logged in user, you have to first log in to the Microsoft Graph using the [graph login](../login.md) command, eg. `graph login`.
 
-Using the `--userId` and `--userName` option, you can retrieve all the planner tasks of the specified user. But it will result in error if you don't have access to view specific user's task.  You can retrieve information about a user's task, either by specifying that user's id or username (`userPrincipalName`), but not both.
-
-Both userId and userName is optional, if no values are passed for those parameters it will list all the tasks of current logged in user.
+If you are not assigned with any task it will return empty results.
 
 ## Examples
 
@@ -36,18 +32,6 @@ List all the tasks of current logged in user
 
 ```sh
 graph planner task list
-```
-
-List all tasks of the user with id _1caf7dcd-7e83-4c3a-94f7-932a1299c844_
-
-```sh
-graph planner task list --userId 1caf7dcd-7e83-4c3a-94f7-932a1299c844
-```
-
-List all tasks of the user with user name _AarifS@contoso.onmicrosoft.com_
-
-```sh
-graph planner task list --userName AarifS@contoso.onmicrosoft.com
 ```
 
 ## More information
