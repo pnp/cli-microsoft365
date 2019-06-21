@@ -13,9 +13,7 @@ describe(commands.HOMESITE_REMOVE, () => {
   let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
-  //let cmdInstanceLogSpy: sinon.SinonSpy;
-  //let telemetry: any;
-  //let requests: any[];
+  let cmdInstanceLogSpy: sinon.SinonSpy;
   let promptOptions: any;
 
   before(() => {
@@ -41,10 +39,8 @@ describe(commands.HOMESITE_REMOVE, () => {
         cb({ continue: false });
       }
     };
-    //cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
     auth.site = new Site();
-    //telemetry = null;
-    //requests = [];
     promptOptions = undefined;
   });
 
@@ -159,7 +155,6 @@ describe(commands.HOMESITE_REMOVE, () => {
       }
 
       return Promise.reject('Invalid request');
-
     });
 
     auth.site = new Site();
@@ -175,6 +170,82 @@ describe(commands.HOMESITE_REMOVE, () => {
     cmdInstance.action({ options: {} }, () => {
       try {
         assert(homeSiteRemoveCallIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('removes the Home Site when prompt confirmed (debug)', (done) => {
+    let homeSiteRemoveCallIssued = false;
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="28" ObjectPathId="27" /><Method Name="RemoveSPHSite" Id="29" ObjectPathId="27" /></Actions><ObjectPaths><Constructor Id="27" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+
+        homeSiteRemoveCallIssued = true;
+
+        return Promise.resolve(JSON.stringify(
+          [
+            {
+              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8929.1227", "ErrorInfo": null, "TraceCorrelationId": "e4f2e59e-c0a9-0000-3dd0-1d8ef12cc742"
+            }, 57, {
+              "IsNull": false
+            }, 58, "The Home site has been removed."
+          ]
+        ));
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+
+    cmdInstance.action = command.action();
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
+    cmdInstance.action({ options: { debug: true } }, () => {
+      try {
+        assert(homeSiteRemoveCallIssued && cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly handles error when removing the Home Site (debug)', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="28" ObjectPathId="27" /><Method Name="RemoveSPHSite" Id="29" ObjectPathId="27" /></Actions><ObjectPaths><Constructor Id="27" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+        return Promise.resolve(JSON.stringify(
+          [
+            {
+              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8929.1227", "ErrorInfo": {
+                "ErrorMessage": "The requested operation is part of an experimental feature that is not supported in the current environment.", "ErrorValue": null, "TraceCorrelationId": "75b6e89e-f072-8000-892f-75866252852a", "ErrorCode": -2146232832, "ErrorTypeName": "Microsoft.SharePoint.SPExperimentalFeatureException"
+              }, "TraceCorrelationId": "f1f2e59e-3047-0000-3dd0-1f48be47bbc2"
+            }
+          ]
+        ));
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso-admin.sharepoint.com';
+    auth.site.tenantId = 'abc';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: true, confirm: true } }, (err?: any) => {
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`The requested operation is part of an experimental feature that is not supported in the current environment.`)));
         done();
       }
       catch (e) {
