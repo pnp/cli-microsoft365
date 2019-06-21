@@ -71,6 +71,8 @@ nav:
       - hidedefaultthemes:
         - hidedefaultthemes get: 'cmd/spo/hidedefaultthemes/hidedefaultthemes-get.md'
         - hidedefaultthemes set: 'cmd/spo/hidedefaultthemes/hidedefaultthemes-set.md'
+      - homesite:
+        - homesite set: 'cmd/spo/homesite/homesite-set.md'
       - hubsite:
         - hubsite connect: 'cmd/spo/hubsite/hubsite-connect.md'
         - hubsite data get: 'cmd/spo/hubsite/hubsite-data-get.md'
@@ -223,6 +225,9 @@ nav:
         - web reindex: 'cmd/spo/web/web-reindex.md'
         - web remove: 'cmd/spo/web/web-remove.md'
         - web set: 'cmd/spo/web/web-set.md'
+    - Office 365 (tenant):
+      - tenant:
+        - tenant id get: 'cmd/tenant-id-get.md'
     - SharePoint Framework (spfx):
       - project:
         - project upgrade: 'cmd/spfx/project/project-upgrade.md'
@@ -277,6 +282,7 @@ nav:
         - teams channel set: 'cmd/graph/teams/teams-channel-set.md'
         - teams clone: 'cmd/graph/teams/teams-clone.md'
         - teams funsettings list: 'cmd/graph/teams/teams-funsettings-list.md'
+        - teams funsettings set: 'cmd/graph/teams/teams-funsettings-set.md'
         - teams guestsettings list: 'cmd/graph/teams/teams-guestsettings-list.md'
         - teams guestsettings set: 'cmd/graph/teams/teams-guestsettings-set.md'
         - teams membersettings list: 'cmd/graph/teams/teams-membersettings-list.md'

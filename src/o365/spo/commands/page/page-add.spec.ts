@@ -518,6 +518,88 @@ describe(commands.PAGE_ADD, () => {
     });
   });
 
+  it('creates new modern page and promotes it as Template', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
+        JSON.stringify(opts.body) === JSON.stringify({
+          urlOfFile: '/sites/team-a/sitepages/page.aspx',
+          templateFileType: 3
+        })) {
+        return Promise.resolve({
+          "CheckInComment": "",
+          "CheckOutType": 2,
+          "ContentTag": "{64201083-46BA-4966-8BC5-B0CB31E3456C},1,0",
+          "CustomizedPageStatus": 1,
+          "ETag": "\"{64201083-46BA-4966-8BC5-B0CB31E3456C},1\"",
+          "Exists": true,
+          "IrmEnabled": false,
+          "Length": "780",
+          "Level": 2,
+          "LinkingUri": null,
+          "LinkingUrl": "",
+          "MajorVersion": 0,
+          "MinorVersion": 1,
+          "Name": "page.aspx",
+          "ServerRelativeUrl": "/sites/team-a/SitePages/page.aspx",
+          "TimeCreated": "2018-03-18T20:44:17Z",
+          "TimeLastModified": "2018-03-18T20:44:17Z",
+          "Title": null,
+          "UIVersion": 1,
+          "UIVersionLabel": "0.1",
+          "UniqueId": "64201083-46ba-4966-8bc5-b0cb31e3456c"
+        });
+      }
+
+      if (opts.url.indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
+        JSON.stringify(opts.body) === JSON.stringify({
+          ContentTypeId: '0x0101009D1CB255DA76424F860D91F20E6C4118',
+          Title: 'page',
+          ClientSideApplicationId: 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec',
+          PageLayoutType: 'Article',
+          PromotedState: 0,
+          BannerImageUrl: {
+            Description: '/_layouts/15/images/sitepagethumbnail.png',
+            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
+          }
+        })) {
+        return Promise.resolve();
+      }
+
+      if (opts.url.indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
+        !opts.body) {
+        return Promise.resolve({ Id: '1' });
+      }
+
+      if (opts.url.indexOf(`/_api/SitePages/Pages(1)/SavePageAsTemplate`) > -1) {
+        return Promise.resolve({ Id: '2', BannerImageUrl: 'url', CanvasContent1: 'content1', LayoutWebpartsContent: 'content', UniqueId: 'a4eb92e3-4eae-427f-8f6d-4e2ed907c2c4' });
+      }
+
+      if (opts.url.indexOf(`/_api/web/getfilebyid('a4eb92e3-4eae-427f-8f6d-4e2ed907c2c4')/ListItemAllFields/SetCommentsDisabled`) > -1) {
+        return Promise.resolve();
+      }
+
+      if (opts.url.indexOf(`/_api/SitePages/Pages(2)/SavePage`) > -1) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', promoteAs: 'Template' } }, (res: { Id: string }) => {
+      try {
+        assert(cmdInstanceLogSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('creates new modern page using the Home layout and promotes it as HomePage (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
@@ -1043,6 +1125,11 @@ describe(commands.PAGE_ADD, () => {
     assert.equal(actual, true);
   });
 
+  it('passes validation if promote type is Template', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', promoteAs: 'Template' } });
+    assert.equal(actual, true);
+  });
+
   it('fails validation if promote type is HomePage but layout type is not Home', () => {
     const actual = (command.validate() as CommandValidate)({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', promoteAs: 'HomePage', layoutType: 'Article' } });
     assert.notEqual(actual, true);
@@ -1094,7 +1181,7 @@ describe(commands.PAGE_ADD, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com' } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com', name:'page.aspx' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
         done();

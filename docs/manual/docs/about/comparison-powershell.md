@@ -133,7 +133,7 @@ Set-SPOBrowserIdleSignOut|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOBuiltDesignPackageVisibility|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOGeoStorageQuota|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOHideDefaultThemes|Microsoft.Online.SharePoint.PowerShell|[spo hidedefaultthemes set](../cmd/spo/hidedefaultthemes/hidedefaultthemes-set.md)
-Set-SPOHomeSite|Microsoft.Online.SharePoint.PowerShell|
+Set-SPOHomeSite|Microsoft.Online.SharePoint.PowerShell|[spo homesite set](../cmd/spo/homesite/homesite-set.md)
 Set-SPOHubSite|Microsoft.Online.SharePoint.PowerShell|[spo hubsite set](../cmd/spo/hubsite/hubsite-set.md)
 Set-SPOMigrationPackageAzureSource|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOMultiGeoCompanyAllowedDataLocation|Microsoft.Online.SharePoint.PowerShell|
@@ -680,7 +680,7 @@ Remove-TeamChannel|MicrosoftTeams|
 Remove-TeamUser|MicrosoftTeams|[graph teams user remove](../cmd/graph/o365group/o365group-user-remove.md)
 Set-Team|MicrosoftTeams|[graph teams set](../cmd/graph/teams/teams-set.md)
 Set-TeamChannel|MicrosoftTeams|[graph teams channel set](../cmd/graph/teams/teams-channel-set.md)
-Set-TeamFunSettings|MicrosoftTeams|
+Set-TeamFunSettings|MicrosoftTeams|[graph teams funsettings set](../cmd/graph/teams/teams-funsettings-set.md)
 Set-TeamGuestSettings|MicrosoftTeams|[graph teams guestsettings set](../cmd/graph/teams/teams-guestsettings-set.md)
 Set-TeamMemberSettings|MicrosoftTeams|[graph teams membersettings set](../cmd/graph/teams/teams-membersettings-set.md)
 Set-TeamMessagingSettings|MicrosoftTeams|[graph teams messagingsettings set](../cmd/graph/teams/teams-messagingsettings-set.md)

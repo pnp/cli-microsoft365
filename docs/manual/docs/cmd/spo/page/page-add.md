@@ -68,6 +68,12 @@ Create new page and set it as the site's home page
 spo page add --name new-page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --layoutType Home --promoteAs HomePage
 ```
 
+Create new article page and promote it as a template
+
+```sh
+spo page add --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --promoteAs Template
+```
+
 Create new article page and enable comments on the page
 
 ```sh
