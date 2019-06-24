@@ -30,7 +30,7 @@ interface Options extends GlobalOptions {
 
 class SpoWebSetCommand extends SpoCommand {
   private static searchScopeOptions: string[] =          
-    ['DefaultScope', 'Tenant', 'Hub', 'Site'];
+    ['defaultscope', 'tenant', 'hub', 'site'];
 
   public get name(): string {
     return commands.WEB_SET;
@@ -90,7 +90,8 @@ class SpoWebSetCommand extends SpoCommand {
           payload.FooterEnabled = args.options.footerEnabled === 'true';
         }
         if (typeof args.options.searchScope !== 'undefined') {
-          payload.SearchScope = SpoWebSetCommand.searchScopeOptions.indexOf(args.options.searchScope);
+          const searchScope = args.options.searchScope.toLowerCase();
+          payload.SearchScope = SpoWebSetCommand.searchScopeOptions.indexOf(searchScope);
         }
 
         const requestOptions: any = {
@@ -163,7 +164,7 @@ class SpoWebSetCommand extends SpoCommand {
       },
       {
         option: '--searchScope [searchScope]',
-        description: 'Search scope to set in the site. Allowed values DefaultScope|Tenant|Hub|Site',
+        description: 'Search scope to set in the site. Allowed values defaultscope|tenant|hub|site',
         autocomplete: SpoWebSetCommand.searchScopeOptions
       }
     ];
@@ -221,8 +222,9 @@ class SpoWebSetCommand extends SpoCommand {
       }
 
       if (typeof args.options.searchScope !== 'undefined') {
-        if (SpoWebSetCommand.searchScopeOptions.indexOf(args.options.searchScope) < 0) {
-          return `${args.options.searchScope} is not a valid value for searchScope.  Allowed values are DefaultScope|Tenant|Hub|Site`;
+        const searchScope = args.options.searchScope.toLowerCase();
+        if (SpoWebSetCommand.searchScopeOptions.indexOf(searchScope) < 0) {
+          return `${args.options.searchScope} is not a valid value for searchScope.  Allowed values are defaultscope|tenant|hub|site`;
         }
       }
 
@@ -262,6 +264,9 @@ class SpoWebSetCommand extends SpoCommand {
     
     Hide footer in the site
       ${chalk.grey(config.delimiter)} ${commands.WEB_SET} --webUrl https://contoso.sharepoint.com/sites/team-a --footerEnabled false
+
+    Set search scope to tenant scope
+      ${chalk.grey(config.delimiter)} ${commands.WEB_SET} --webUrl https://contoso.sharepoint.com/sites/team-a --searchScope tenant
   ` );
   }
 }

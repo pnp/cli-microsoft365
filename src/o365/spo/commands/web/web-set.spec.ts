@@ -739,22 +739,27 @@ describe(commands.WEB_SET, () => {
   });
 
   it('passes validation if search scope is set to defaultscope', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'DefaultScope' } });
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'defaultscope' } });
     assert.equal(actual, true);
   });
 
   it('passes validation if search scope is set to tenant', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'Tenant' } });
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'tenant' } });
     assert.equal(actual, true);
   });
 
   it('passes validation if search scope is set to hub', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'Hub' } });
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'hub' } });
     assert.equal(actual, true);
   });
 
   it('passes validation if search scope is set to site', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'Site' } });
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'site' } });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation even if search scope is not all lower case', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'DefaultScope' } });
     assert.equal(actual, true);
   });
 
@@ -773,7 +778,7 @@ describe(commands.WEB_SET, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'DefaultScope' } }, () => {
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'defaultscope' } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
         done();
@@ -799,7 +804,7 @@ describe(commands.WEB_SET, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'Tenant' } }, () => {
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'tenant' } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
         done();
@@ -825,7 +830,7 @@ describe(commands.WEB_SET, () => {
     auth.site.connected = true;
     auth.site.url = 'https://contoso.sharepoint.com';
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'Hub' } }, () => {
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'hub' } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
         done();
@@ -837,6 +842,32 @@ describe(commands.WEB_SET, () => {
   });
 
   it('sets search scope to site', (done) => {
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (JSON.stringify(opts.body) === JSON.stringify({
+        SearchScope: 3
+      })) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'site' } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets search scope even if parameter is not all lower case', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (JSON.stringify(opts.body) === JSON.stringify({
         SearchScope: 3
