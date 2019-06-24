@@ -23,6 +23,7 @@ export default {
   O365GROUP_USER_LIST: `${prefix} o365group user list`,
   O365GROUP_USER_REMOVE: `${prefix} o365group user remove`,
   O365GROUP_USER_SET: `${prefix} o365group user set`,
+  PLANNER_TASK_LIST: `${prefix} planner task list`,
   REPORT_TEAMSDEVICEUSAGEUSERDETAIL: `${prefix} report teamsdeviceusageuserdetail`,
   SCHEMAEXTENSION_ADD: `${prefix} schemaextension add`,
   SITECLASSIFICATION_DISABLE: `${prefix} siteclassification disable`,

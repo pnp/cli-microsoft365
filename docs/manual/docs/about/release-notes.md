@@ -6,11 +6,14 @@
 
 **SharePoint Online:**
 
+- [spo homesite get](../cmd/spo/homesite/homesite-get.md) - gets information about the Home Site [#1000](https://github.com/pnp/office365-cli/issues/1000)
 - [spo homesite set](../cmd/spo/homesite/homesite-set.md) - sets the specified site as the Home Site [#1001](https://github.com/pnp/office365-cli/issues/1001)
+- [spo listitem isrecord](../cmd/spo/listitem/listitem-isrecord.md) - checks if the specified list item is a record [#771](https://github.com/pnp/office365-cli/issues/771)
 
 **Microsoft Graph:**
 
 - [graph o365group user set](../cmd/graph/o365group/o365group-user-set.md) - updates role of the specified user in the specified Office 365 Group or Microsoft Teams team [#982](https://github.com/pnp/office365-cli/issues/982)
+- [graph planner task list](../cmd/graph/planner/planner-task-list.md) - lists Planner tasks for the currently logged in user [#990](https://github.com/pnp/office365-cli/issues/990)
 - [graph report teamsdeviceusageuserdetail](../cmd/graph/report/report-teamsdeviceusageuserdetail.md) - gets information about Microsoft Teams device usage by user [#960](https://github.com/pnp/office365-cli/issues/960)
 - [graph teams funsettings set](../cmd/graph/teams/teams-funsettings-set.md) - updates fun settings of a Microsoft Teams team [#817](https://github.com/pnp/office365-cli/issues/817)
 
