@@ -38,28 +38,18 @@ class SpoAppPageAddCommand extends SpoCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
     let siteAccessToken: string = '';
-
-    auth
+     auth
       .getAccessToken(resource, auth.service.refreshToken as string, cmd, this.debug)
       .then((accessToken: string): Promise<ContextInfo> => {
         siteAccessToken = accessToken;
-
+      
         if (this.debug) {
-          cmd.log(`Retrieved access token ${accessToken}. Retrieving request digest...`);
+          cmd.log(`Retrieved access token ${accessToken}`);
         }
-
-        if (this.verbose) {
-          cmd.log(`Retrieving request digest...`);
-        }
-
-        return this.getRequestDigestForSite(args.options.webUrl, siteAccessToken, cmd, this.debug);
-      })
-      .then((res: ContextInfo): Promise<{}> => {
         const requestOptions: any = {
-          url: `${auth.site.url}/_api/sitepages/Pages/CreateFullPageApp`,
+          url: `${args.options.webUrl}/_api/sitepages/Pages/CreateFullPageApp`,
           headers: {
-            authorization: `Bearer ${auth.service.accessToken}`,
-            'X-RequestDigest': res.FormDigestValue,
+            authorization: `Bearer ${siteAccessToken}`,
             'content-type': 'application/json;odata=nometadata',
             accept: 'application/json;odata=nometadata'
           },

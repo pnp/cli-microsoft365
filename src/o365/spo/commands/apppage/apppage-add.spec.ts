@@ -126,7 +126,7 @@ describe(commands.APPPAGE_ADD, () => {
       }
     });
   });
-  it('creates a single-part app pageshowing on quicklaunch', (done) => {
+  it('creates a single-part app page showing on quicklaunch', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf(`_api/sitepages/Pages/CreateFullPageApp`) > -1 &&
      opts.body.webPartDataAsJson ===
@@ -152,7 +152,31 @@ describe(commands.APPPAGE_ADD, () => {
     });
   });
 
-  
+  it('fails to create a single-part app page if request is rejected', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`_api/sitepages/Pages/CreateFullPageApp`) > -1 &&
+      opts.body.title ==="failme")
+      {
+        return Promise.reject('Failed to create a single-part app page');
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    auth.site = new Site();
+    auth.site.connected = true;
+    auth.site.url = 'https://contoso.sharepoint.com';
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug: false, title: 'failme', webUrl: 'https://contoso.sharepoint.com/',webPartData:JSON.stringify({})} },  (err?: any) => {
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Failed to create a single-part app page`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('supports debug mode', () => {
     const options = (command.options() as CommandOption[]);
     let containsOption = false;
