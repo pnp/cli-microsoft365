@@ -29,7 +29,6 @@ class GraphReportTeamsDeviceUsageUserCountsCommand extends GraphCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.period = typeof args.options.period !== 'undefined';
     return telemetryProps;
   }
 
@@ -74,10 +73,8 @@ class GraphReportTeamsDeviceUsageUserCountsCommand extends GraphCommand {
         return 'You can\'t run this command without period parameter.';
       }
 
-      if (args.options.period) {
-        if (['D7', 'D30', 'D90', 'D180'].indexOf(args.options.period) < 0) {
-          return `${args.options.period} is not a valid period type. The supported values are D7|D30|D90|D180`;
-        }
+      if (['D7', 'D30', 'D90', 'D180'].indexOf(args.options.period) < 0) {
+        return `${args.options.period} is not a valid period type. The supported values are D7|D30|D90|D180`;
       }
 
       return true;
