@@ -261,6 +261,7 @@ nav:
       - planner:
         - planner task list: 'cmd/graph/planner/planner-task-list.md'
       - report:
+        - report teamsdeviceusagedistributionusercounts: 'cmd/graph/report/report-teamsdeviceusagedistributionusercounts.md'
         - report teamsdeviceusageuserdetail: 'cmd/graph/report/report-teamsdeviceusageuserdetail.md'
       - schemaextension:
         - schemaextension add: 'cmd/graph/schemaextension/schemaextension-add.md'
