@@ -1,10 +1,18 @@
 # Release notes
 
-## [v2.0.0](https://github.com/pnp/office365-cli/releases/tag/v1.21.0)
+## [v2.0.0](https://github.com/pnp/office365-cli/releases/tag/v2.0.0)
+
+### New commands
+
+**SharePoint Online:**
+
+- [spo apppage add](../cmd/spo/apppage/apppage-add.md) - creates a single-part app page [#874](https://github.com/pnp/office365-cli/issues/874)
 
 ### Changes
 
-- simplified login solving [#889](https://github.com/pnp/office365-cli/issues/889)
+- simplified login [#889](https://github.com/pnp/office365-cli/issues/889)
+- API name removed from the command name [#890](https://github.com/pnp/office365-cli/issues/890)
+- extended 'spo web set' with searchScope option [#947](https://github.com/pnp/office365-cli/issues/947)
 
 ## [v1.22.0](https://github.com/pnp/office365-cli/releases/tag/v1.22.0)
 
