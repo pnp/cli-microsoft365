@@ -1,7 +1,7 @@
 import commands from '../../commands';
 import Command, { CommandError, CommandOption } from '../../../../Command';
 import * as sinon from 'sinon';
-import auth, { Site } from '../../SpoAuth';
+import auth from '../../../../Auth';
 const command: Command = require('./homesite-remove');
 import * as assert from 'assert';
 import request from '../../../../request';
@@ -18,13 +18,14 @@ describe(commands.HOMESITE_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.resolve('ABC'); });
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(command as any, 'getRequestDigest').callsFake(() => {
       return {
         FormDigestValue: 'ABC'
       };
     });
+    auth.service.connected = true;
+    auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
 
   beforeEach(() => {
@@ -40,7 +41,6 @@ describe(commands.HOMESITE_REMOVE, () => {
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    auth.site = new Site();
     promptOptions = undefined;
   });
 
@@ -54,11 +54,12 @@ describe(commands.HOMESITE_REMOVE, () => {
   after(() => {
     Utils.restore([
       appInsights.trackEvent,
-      auth.ensureAccessToken,
       auth.restoreAuth,
       request.post,
       (command as any).getRequestDigest
     ]);
+    auth.service.connected = false;
+    auth.service.spoUrl = undefined;
   });
 
   it('has correct name', () => {
@@ -69,28 +70,7 @@ describe(commands.HOMESITE_REMOVE, () => {
     assert.notEqual(command.description, null);
   });
 
-  it('aborts when not logged in to a SharePoint tenant admin site', (done) => {
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso.sharepoint.com';
-
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`https://contoso.sharepoint.com is not a tenant admin site. Log in to your tenant admin site and try again`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('prompts before removing the Home Site when confirm option is not passed', (done) => {
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
 
     cmdInstance.action({ options: { debug: true } }, (err?: any) => {
@@ -114,10 +94,6 @@ describe(commands.HOMESITE_REMOVE, () => {
   it('aborts removing Home Site when confirm option is not passed and prompt not confirmed', (done) => {
     const postSpy = sinon.spy(request, 'post');
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
 
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
@@ -155,12 +131,7 @@ describe(commands.HOMESITE_REMOVE, () => {
       }
 
       return Promise.reject('Invalid request');
-    });
-
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
+    })
     cmdInstance.action = command.action();
 
     cmdInstance.action = command.action();
@@ -200,10 +171,6 @@ describe(commands.HOMESITE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
 
     cmdInstance.action = command.action();
@@ -238,10 +205,6 @@ describe(commands.HOMESITE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    auth.site.tenantId = 'abc';
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true, confirm: true } }, (err?: any) => {
       try {
@@ -299,21 +262,4 @@ describe(commands.HOMESITE_REMOVE, () => {
     assert(containsExamples);
   });
 
-  it('correctly handles lack of valid access token', (done) => {
-    Utils.restore(auth.ensureAccessToken);
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error getting access token')); });
-    auth.site = new Site();
-    auth.site.connected = true;
-    auth.site.url = 'https://contoso-admin.sharepoint.com';
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, confirm: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error getting access token')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
 });
