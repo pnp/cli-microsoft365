@@ -20,7 +20,8 @@
     "build": "tsc -p . && node scripts/copy-files.js",
     "watch": "tsc -w -p .",
     "clean": "rimraf ./dist",
-    "test": "nyc -r=lcov -r=text mocha \"dist/**/*.spec.js\""
+    "test": "nyc -r=lcov -r=text mocha \"dist/**/*.spec.js\"",
+    "test-home": "nyc -r=lcov -r=text mocha \"dist/**/homesite*.spec.js\""
   },
   "keywords": [
     "office 365",
