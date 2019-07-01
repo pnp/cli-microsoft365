@@ -9,7 +9,6 @@ import {
   CommandError
 } from '../../../../Command';
 import SpoCommand from '../../SpoCommand';
-//import Utils from '../../../../Utils';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -27,7 +26,7 @@ class SpoHomeSiteRemoveCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Removes the the Home Site';
+    return 'Removes the current Home Site';
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -131,7 +130,7 @@ class SpoHomeSiteRemoveCommand extends SpoCommand {
 
   Examples:
 
-    Removes the current Home Site
+    Removes the current Home Site without confirmation
       ${chalk.grey(config.delimiter)} ${commands.HOMESITE_REMOVE} --confirm
 
   More information:

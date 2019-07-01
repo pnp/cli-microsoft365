@@ -1,6 +1,6 @@
 # spo homesite remove
 
-Removes the the Home Site
+Removes the current Home Site
 
 ## Usage
 
