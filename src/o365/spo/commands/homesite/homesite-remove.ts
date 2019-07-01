@@ -34,10 +34,6 @@ class SpoHomeSiteRemoveCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  protected requiresTenantAdmin(): boolean {
-    return true;
-  }
-
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
 
     const removeHomeSite: () => void = (): void => {

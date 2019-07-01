@@ -211,6 +211,24 @@ describe(commands.HOMESITE_REMOVE, () => {
     });
   });
 
+  it('correctly handles random API error', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => Promise.reject('An error has occurred'));
+
+    cmdInstance.action({
+      options: {
+        confirm: true
+      }
+    }, (err?: any) => {
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`An error has occurred`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('supports debug mode', () => {
     const options = (command.options() as CommandOption[]);
     let containsDebugOption = false;
