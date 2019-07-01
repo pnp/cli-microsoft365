@@ -53,7 +53,7 @@ nav:
       - list: 'cmd/flow/list.md'
       - environment:
         - environment get: 'cmd/flow/environment/environment-get.md'
-        - environment list: 'cmd/flow/environment/environment-list.md'  
+        - environment list: 'cmd/flow/environment/environment-list.md'
       - run:
         - run get: 'cmd/flow/run/run-get.md'
         - run list: 'cmd/flow/run/run-list.md'
@@ -133,6 +133,7 @@ nav:
         - hidedefaultthemes set: 'cmd/spo/hidedefaultthemes/hidedefaultthemes-set.md'
       - homesite:
         - homesite get: 'cmd/spo/homesite/homesite-get.md'
+        - homesite remove: 'cmd/spo/homesite/homesite-remove.md'
         - homesite set: 'cmd/spo/homesite/homesite-set.md'
       - hubsite:
         - hubsite connect: 'cmd/spo/hubsite/hubsite-connect.md'
@@ -305,13 +306,13 @@ nav:
       - guestsettings:
         - guestsettings list: 'cmd/teams/guestsettings/guestsettings-list.md'
         - guestsettings set: 'cmd/teams/guestsettings/guestsettings-set.md'
-      - membersettings:  
+      - membersettings:
         - membersettings list: 'cmd/teams/membersettings/membersettings-list.md'
         - membersettings set: 'cmd/teams/membersettings/membersettings-set.md'
       - message:
         - message get: 'cmd/teams/message/message-get.md'
         - message list: 'cmd/teams/message/message-list.md'
-      - messagingsettings:  
+      - messagingsettings:
         - messagingsettings list: 'cmd/teams/messagingsettings/messagingsettings-list.md'
         - messagingsettings set: 'cmd/teams/messagingsettings/messagingsettings-set.md'
       - report:

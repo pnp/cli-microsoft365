@@ -98,7 +98,7 @@ Register-SPOHubSite|Microsoft.Online.SharePoint.PowerShell|[spo hubsite register
 Remove-SPODeletedSite|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOExternalUser|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOGeoAdministrator|Microsoft.Online.SharePoint.PowerShell|
-Remove-SPOHomeSite|Microsoft.Online.SharePoint.PowerShell|
+Remove-SPOHomeSite|Microsoft.Online.SharePoint.PowerShell|[spo homesite remove](../cmd/spo/homesite/homesite-remove.md)
 Remove-SPOHubSiteAssociation|Microsoft.Online.SharePoint.PowerShell|[spo hubsite disconnect](../cmd/spo/hubsite/hubsite-disconnect.md)
 Remove-SPOMigrationJob|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOMultiGeoCompanyAllowedDataLocation|Microsoft.Online.SharePoint.PowerShell|
