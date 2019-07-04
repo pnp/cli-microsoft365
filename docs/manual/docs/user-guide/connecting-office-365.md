@@ -67,6 +67,23 @@ Logging in using a certificate gives the Office 365 CLI app-only access to Offic
 
 Generally, you should use the default device code flow. If you need to use a non-interactive authentication flow, to for example integrate the Office 365 CLI in your build pipeline, you can login using a certificate or user credentials.
 
+!!! attention
+    PFX files exported from a Windows key store will not work as they are protected with either a password or Active Directory account. The private key must either be exported from the protected .pfx or newly created using 3rd party tools like OpenSSL (https://www.openssl.org/).
+ 
+Create a new self signed certificate:
+
+```sh
+openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout privateKey.key -out certificate.cer
+```
+
+Extract the private key from a protected .pfx and unprotect it:
+
+```sh
+openssl pkcs12 -in protected.pfx -out privateKeyWithPassphrase.pem -nodes
+
+openssl rsa -in privateKeyWithPassphrase.pem -out privateKey.key
+```
+
 ### Check login status
 
 To see if you're logged in to Office 365 and if so, with which account, use the `status` command.
