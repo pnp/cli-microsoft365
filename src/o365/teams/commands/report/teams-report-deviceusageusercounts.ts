@@ -29,7 +29,11 @@ class TeamsReportDeviceUsageUserCountsCommand extends GraphCommand {
       const endpoint: string = `${this.resource}/v1.0/reports/getTeamsDeviceUsageUserCounts(period='${encodeURIComponent(args.options.period)}')`;
       
       const requestOptions: any = {
-        url: endpoint
+        url: endpoint,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        json: true
       };
   
       request
@@ -71,14 +75,13 @@ class TeamsReportDeviceUsageUserCountsCommand extends GraphCommand {
   public commandHelp(args: {}, log: (help: string) => void): void {
     log(vorpal.find(this.name).helpInformation());
     log(
-      `
-  Examples:
+      `  Examples: 
+
     Gets the number of Microsoft Teams daily unique users by device type for 
     last week
       ${commands.TEAMS_REPORT_DEVICEUSAGEUSERCOUNTS} --period 'D7'
 `);
   }
-
 }
 
 module.exports = new TeamsReportDeviceUsageUserCountsCommand();
