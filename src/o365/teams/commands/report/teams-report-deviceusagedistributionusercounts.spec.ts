@@ -104,7 +104,8 @@ describe(commands.TEAMS_REPORT_DEVICEUSAGEDISTRIBUTIONUSERCOUNTS, () => {
   });
 
   it('gets the number of Microsoft Teams unique users by device type for the given period', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    
+    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/getTeamsDeviceUsageDistributionUserCounts(period='D7')`) {
         return Promise.resolve('Report Refresh Date,Web,Windows Phone,Android Phone,iOS,Mac,Windows,Report Period');
       }
@@ -114,13 +115,16 @@ describe(commands.TEAMS_REPORT_DEVICEUSAGEDISTRIBUTIONUSERCOUNTS, () => {
 
     cmdInstance.action({ options: { debug: false, period: 'D7' } }, () => {
       try {
-        assert(1 === 1);
+        assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsDeviceUsageDistributionUserCounts(period='D7')");
+        assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
+        assert.equal(requestStub.lastCall.args[0].json, true);
         done();
       }
       catch (e) {
         done(e);
       }
     });
+
   });
 
   it('correctly handles random API error', (done) => {

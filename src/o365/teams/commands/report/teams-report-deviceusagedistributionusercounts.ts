@@ -27,9 +27,13 @@ class TeamsReportDeviceUsageDistributionUserCountsCommand extends GraphCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const endpoint: string = `${this.resource}/v1.0/reports/getTeamsDeviceUsageDistributionUserCounts(period='${encodeURIComponent(args.options.period)}')`;
-
+    
     const requestOptions: any = {
-      url: endpoint
+      url: endpoint,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      json: true
     };
 
     request
@@ -39,7 +43,7 @@ class TeamsReportDeviceUsageDistributionUserCountsCommand extends GraphCommand {
 
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
-  }
+}
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
