@@ -1,4 +1,4 @@
-# graph report deviceusageusercounts
+# teams report deviceusageusercounts
 
 Get the number of Microsoft Teams daily unique users by device type
 
