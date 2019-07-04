@@ -316,6 +316,7 @@ nav:
         - messagingsettings set: 'cmd/teams/messagingsettings/messagingsettings-set.md'
       - report:
         - report deviceusagedistributionusercounts: 'cmd/teams/report/report-deviceusagedistributionusercounts.md'
+        - report deviceusageusercounts: 'cmd/teams/report/report-deviceusageusercounts.md'
         - report deviceusageuserdetail: 'cmd/teams/report/report-deviceusageuserdetail.md'
       - tab:
         - tab list: 'cmd/teams/tab/tab-list.md'

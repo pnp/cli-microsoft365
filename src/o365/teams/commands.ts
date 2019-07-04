@@ -22,6 +22,7 @@ export default {
   TEAMS_MESSAGINGSETTINGS_LIST: `${prefix} messagingsettings list`,
   TEAMS_MESSAGINGSETTINGS_SET: `${prefix} messagingsettings set`,
   TEAMS_REPORT_DEVICEUSAGEDISTRIBUTIONUSERCOUNTS: `${prefix} report deviceusagedistributionusercounts`,
+  TEAMS_REPORT_DEVICEUSAGEUSERCOUNTS: `${prefix} report deviceusageusercounts`,
   TEAMS_REPORT_DEVICEUSAGEUSERDETAIL: `${prefix} report deviceusageuserdetail`,
   TEAMS_TAB_LIST: `${prefix} tab list`,
   TEAMS_TEAM_ADD: `${prefix} team add`,
