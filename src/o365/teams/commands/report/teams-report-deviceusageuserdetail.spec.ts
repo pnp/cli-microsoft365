@@ -124,7 +124,7 @@ describe(commands.TEAMS_REPORT_DEVICEUSAGEUSERDETAIL, () => {
   });
 
   it('gets details about Microsoft Teams device usage by user for the given period', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/getTeamsDeviceUsageUserDetail(period='D7')`) {
         return Promise.resolve('Report Refresh Date,User Principal Name,Last Activity Date,Is Deleted,Deleted Date,Used Web,Used Windows Phone,Used iOS,Used Mac,Used Android Phone,Used Windows,Report Period');
       }
@@ -134,7 +134,9 @@ describe(commands.TEAMS_REPORT_DEVICEUSAGEUSERDETAIL, () => {
 
     cmdInstance.action({ options: { debug: false, period: 'D7' } }, () => {
       try {
-        assert(1 === 1);
+        assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsDeviceUsageUserDetail(period='D7')");
+        assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
+        assert.equal(requestStub.lastCall.args[0].json, true);
         done();
       }
       catch (e) {
@@ -144,19 +146,19 @@ describe(commands.TEAMS_REPORT_DEVICEUSAGEUSERDETAIL, () => {
   });
 
   it('gets details about Microsoft Teams device usage by user for the given date', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/reports/getTeamsDeviceUsageUserDetail(date='2019-05-01')`) {
-        return Promise.resolve({
-          "value": 'Report Refresh Date,User Principal Name,Last Activity Date,Is Deleted,Deleted Date,Used Web,Used Windows Phone,Used iOS,Used Mac,Used Android Phone,Used Windows,Report Period'
-        });
+    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/reports/getTeamsDeviceUsageUserDetail(date=2019-07-01)`) {
+        return Promise.resolve('Report Refresh Date,User Principal Name,Last Activity Date,Is Deleted,Deleted Date,Used Web,Used Windows Phone,Used iOS,Used Mac,Used Android Phone,Used Windows,Report Period');
       }
 
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, date: '2019-05-01' } }, () => {
+    cmdInstance.action({ options: { debug: false, date: '2019-07-01' } }, () => {
       try {
-        assert(1 === 1);
+        assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsDeviceUsageUserDetail(date=2019-07-01)");
+        assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
+        assert.equal(requestStub.lastCall.args[0].json, true);
         done();
       }
       catch (e) {
