@@ -30,8 +30,8 @@ Gets information about Microsoft Teams device usage by user for the last week
 teams report deviceusageuserdetail --period D7
 ```
 
-Gets information about Microsoft Teams device usage by user for May 1, 2019
+Gets information about Microsoft Teams device usage by user for July 1, 2019
 
 ```sh
-teams report deviceusageuserdetail --date 2019-05-28
+teams report deviceusageuserdetail --date 2019-07-01
 ```
