@@ -39,7 +39,11 @@ class TeamsReportDeviceUsageUserDetailCommand extends GraphCommand {
     const endpoint: string = `${this.resource}/v1.0/reports/${(args.options.period ? periodParameter : dateParameter)}`;
 
     const requestOptions: any = {
-      url: endpoint
+      url: endpoint,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      json: true
     };
 
     request
