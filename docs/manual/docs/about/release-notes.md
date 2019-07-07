@@ -11,12 +11,20 @@
 **SharePoint Online:**
 
 - [spo apppage add](../cmd/spo/apppage/apppage-add.md) - creates a single-part app page [#874](https://github.com/pnp/office365-cli/issues/874)
+- [spo homesite remove](../cmd/spo/homesite/homesite-remove.md) - removes the current Home Site [#1002](https://github.com/pnp/office365-cli/issues/1002)
+
+**Microsoft Teams:**
+
+- [teams report deviceusagedistributionusercounts](../cmd/teams/report/report-deviceusagedistributionusercounts) - gets the number of Microsoft Teams unique users by device type  [#1012](https://github.com/pnp/office365-cli/issues/1012)
+- [teams report deviceusageusercounts](../cmd/teams/report/report-deviceusageusercounts.md) - gets the number of Microsoft Teams daily unique users by device type [#1011](https://github.com/pnp/office365-cli/issues/1011)
 
 ### Changes
 
 - simplified login [#889](https://github.com/pnp/office365-cli/issues/889)
 - API name removed from the command name [#890](https://github.com/pnp/office365-cli/issues/890)
 - extended 'spo web set' with searchScope option [#947](https://github.com/pnp/office365-cli/issues/947)
+- fixed 'Access token is empty' error for 'teams report deviceusageuserdetail' [#1025](https://github.com/pnp/office365-cli/issues/1025)
+- updated documentation on connecting the CLI when protected cert [#1023](https://github.com/pnp/office365-cli/issues/1023)
 
 ## [v1.22.0](https://github.com/pnp/office365-cli/releases/tag/v1.22.0)
 
