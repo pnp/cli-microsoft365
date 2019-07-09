@@ -100,7 +100,8 @@
     "typescript": "^3.5.1",
     "update-notifier": "^3.0.0",
     "uuid": "^3.3.2",
-    "vorpal": "https://github.com/pnp/vorpal/raw/master/vorpal-1.11.4.tgz"
+    "vorpal": "https://github.com/pnp/vorpal/raw/master/vorpal-1.11.4.tgz",
+    "node-forge": "0.8.5"
   },
   "devDependencies": {
     "@types/easy-table": "0.0.32",
@@ -115,7 +116,8 @@
     "mocha": "^6.1.4",
     "nyc": "^13.3.0",
     "rimraf": "^2.6.3",
-    "sinon": "^7.3.2"
+    "sinon": "^7.3.2",
+    "@types/node-forge": "0.8.4"
   },
   "nyc": {
     "exclude": [
