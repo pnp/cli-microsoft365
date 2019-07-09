@@ -209,7 +209,7 @@ class SpoWebSetCommand extends SpoCommand {
       }
 
       if (typeof args.options.searchScope !== 'undefined') {
-        const searchScope = args.options.searchScope.toLowerCase();
+        const searchScope = args.options.searchScope.toString().toLowerCase();
         if (SpoWebSetCommand.searchScopeOptions.indexOf(searchScope) < 0) {
           return `${args.options.searchScope} is not a valid value for searchScope. Allowed values are DefaultScope|Tenant|Hub|Site`;
         }
