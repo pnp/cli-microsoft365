@@ -6,6 +6,7 @@ import { FileTokenStorage } from './auth/FileTokenStorage';
 import { AuthenticationContext, TokenResponse, ErrorResponse, UserCodeInfo, Logging, LoggingLevel } from 'adal-node';
 import { CommandError } from './Command';
 import config from './config';
+import { asn1, pkcs12, pki } from 'node-forge';
 
 export interface Hash<TValue> {
   [key: string]: TValue;
@@ -285,10 +286,47 @@ export class Auth {
         stdout.log(`Retrieving new access token using certificate (thumbprint ${this.service.thumbprint})...`);
       }
 
+      let cert: string = '';
+
+      if (this.service.password === undefined) {
+        var buf = Buffer.from(this.service.certificate as string, 'base64');
+        cert = buf.toString('utf8');
+      } else {
+        var buf = Buffer.from(this.service.certificate as string, 'base64');
+        let p12Asn1 = asn1.fromDer(buf.toString('binary'), false); 
+
+        let p12Parsed = pkcs12.pkcs12FromAsn1(p12Asn1, false, this.service.password);
+
+        var keyBags: any = p12Parsed.getBags({ bagType: pki.oids.pkcs8ShroudedKeyBag });
+        var pkcs8ShroudedKeyBag = keyBags[pki.oids.pkcs8ShroudedKeyBag][0];
+
+        if (debug) {
+          // check if there is something in the keyBag as well as
+          // the pkcs8ShroudedKeyBag. This will give us more information
+          // whether there is a cert that can potentially store keys in the keyBag.
+          // I could not find a way to add something to the keyBag with all 
+          // my attempts, but lets keep it here for troubleshooting purposes.
+
+          stdout.log(`pkcs8ShroudedKeyBagkeyBags length is ${[pki.oids.pkcs8ShroudedKeyBag].length}`);
+
+          keyBags = p12Parsed.getBags({ bagType: pki.oids.keyBag });
+          stdout.log(`keyBag length is ${keyBags[pki.oids.keyBag].length}`);
+        }
+
+        // convert a Forge private key to an ASN.1 RSAPrivateKey
+        const rsaPrivateKey = pki.privateKeyToAsn1(pkcs8ShroudedKeyBag.key);
+
+        // wrap an RSAPrivateKey ASN.1 object in a PKCS#8 ASN.1 PrivateKeyInfo
+        const privateKeyInfo = pki.wrapRsaPrivateKey(rsaPrivateKey);
+
+        // convert a PKCS#8 ASN.1 PrivateKeyInfo to PEM
+        cert = pki.privateKeyInfoToPem(privateKeyInfo);
+      }
+
       this.authCtx.acquireTokenWithClientCertificate(
         resource,
         this.appId as string,
-        this.service.certificate as string,
+        cert as string,
         this.service.thumbprint as string,
         (error: Error, response: TokenResponse | ErrorResponse): void => {
           if (debug) {

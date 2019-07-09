@@ -62,8 +62,9 @@ class LoginCommand extends Command {
           break;
         case 'certificate':
           auth.service.authType = AuthType.Certificate;
-          auth.service.certificate = fs.readFileSync(args.options.certificateFile as string, 'utf8');
+          auth.service.certificate = fs.readFileSync(args.options.certificateFile as string, 'base64');
           auth.service.thumbprint = args.options.thumbprint;
+          auth.service.password = args.options.password;
           break;
       }
 
@@ -237,8 +238,12 @@ class LoginCommand extends Command {
     Log in to Office 365 using a user name and password
       ${commands.LOGIN} --authType password --userName user@contoso.com --password pass@word1
 
-    Log in to Office 365 using a certificate
-      ${commands.LOGIN} --authType certificate --certificateFile /Users/user/dev/localhost.pfx --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1
+    Log in to Office 365 using a PEM certificate
+      ${commands.LOGIN} --authType certificate --certificateFile /Users/user/dev/localhost.pem --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1
+
+    Log in to Office 365 using a personal information exchange (.pfx) file
+      o365 login --authType certificate --certificateFile /Users/user/dev/localhost.pfx --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1 --password 'pass@word1'
+
 `);
   }
 }

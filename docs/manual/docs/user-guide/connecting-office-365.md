@@ -47,10 +47,16 @@ Generally, you should use the default device code flow. If you need to use a non
 
 Another way to log in to Office 365 in the Office 365 CLI is by using a certificate. To use this authentication method, set the `OFFICE365CLI_AADAPPID` environment variable to the ID of the Azure AD application that you want to use to authenticate the Office 365 CLI and the `OFFICE365CLI_TENANT` environment variable to the ID of your Azure AD directory. When calling the login command, set the `authType` option to `certificate`, specify the path to the certificate private key using the `certificateFile` option and specify the certificate thumbprint using the `thumbprint` option.
 
-To log in to Office 365 using a certificate, execute:
+To log in to Office 365 using a Personal Information Exchange (.pfx) file, execute:
 
 ```sh
-login --authType certificate --certificateFile /Users/user/dev/localhost.pfx --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1
+login --authType certificate --certificateFile /Users/user/dev/localhost.pfx --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1 --password 'pass@word1'
+```
+
+To log in to Office 365 using a Privacy Enhanced Mail (PEM) certificate, execute:
+
+```sh
+login --authType certificate --certificateFile /Users/user/dev/localhost.pem --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1
 ```
 
 Logging in to Office 365 using a certificate is convenient for automation scenarios where you cannot authenticate interactively but also don't want to use credentials.
@@ -76,13 +82,21 @@ Create a new self signed certificate:
 openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout privateKey.key -out certificate.cer
 ```
 
-Extract the private key from a protected .pfx and unprotect it:
+Create a new Personal Information Exchange (.pfx) file
+
+```
+openssl pkcs12 -export -out protected.pfx -inkey privateKey.key -in certificate.cer -password pass:"pass@word1"
+```
+
+At this point the `protected.pfx` file can be used to log in the Office 365 CLI following the instructions above for logging in using a .pfx file.
+
+If login with the .pfx file does not work then extract the private key from a protected .pfx and unprotect it:
 
 ```sh
 openssl pkcs12 -in protected.pfx -out privateKeyWithPassphrase.pem -nodes
-
-openssl rsa -in privateKeyWithPassphrase.pem -out privateKey.key
 ```
+
+At this point the `privateKeyWithPassphrase.pem` file can be used to log in the Office 365 CLI following the instructions above for logging in using a PEM certificate.
 
 ### Check login status
 

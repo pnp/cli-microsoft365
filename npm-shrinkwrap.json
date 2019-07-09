@@ -265,6 +265,15 @@
       "integrity": "sha512-I4+DbJEhLEg4/vIy/2gkWDvXBOOtPKV9EnLhYjMoqxcRW+TTZtUftkHktz/a8suoD5mUL7m6ReLrkPvSsCQQmw==",
       "dev": true
     },
+    "@types/node-forge": {
+      "version": "0.8.4",
+      "resolved": "https://registry.npmjs.org/@types/node-forge/-/node-forge-0.8.4.tgz",
+      "integrity": "sha512-bueB7eD1EUkWaz7SW57QYor6nZSQtH0gJwfcp9kuXhdnypYy6Frnqa73LNXqX41E71ANffBK9EJX+aQH2/eTrQ==",
+      "dev": true,
+      "requires": {
+        "@types/node": "*"
+      }
+    },
     "@types/request": {
       "version": "2.48.1",
       "resolved": "https://registry.npmjs.org/@types/request/-/request-2.48.1.tgz",
@@ -2108,6 +2117,11 @@
           "dev": true
         }
       }
+    },
+    "node-forge": {
+      "version": "0.8.5",
+      "resolved": "https://registry.npmjs.org/node-forge/-/node-forge-0.8.5.tgz",
+      "integrity": "sha512-vFMQIWt+J/7FLNyKouZ9TazT74PRV3wgv9UT4cRjC8BffxFbKXkgIWR42URCPSnHm/QDz6BOlb2Q0U4+VQT67Q=="
     },
     "node-localstorage": {
       "version": "0.6.0",
