@@ -112,7 +112,7 @@ describe(commands.LOGIN, () => {
   it('logs in to Office 365 using certificate when authType certificate set', (done) => {
     sinon.stub(fs, 'readFileSync').callsFake(() => 'certificate');
 
-    cmdInstance.action({ options: { debug: false, authType: 'certificate', certificateFile: 'certificateFile', thumbprint: 'thumbprint' } }, () => {
+    cmdInstance.action({ options: { debug: false, authType: 'certificate', certificateFile: 'certificate', thumbprint: 'thumbprint' } }, () => {
       try {
         assert.equal(auth.service.authType, AuthType.Certificate, 'Incorrect authType set');
         assert.equal(auth.service.certificate, 'certificate', 'Incorrect certificate set');

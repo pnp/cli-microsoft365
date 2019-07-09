@@ -56,8 +56,14 @@ Log in to Office 365 using a user name and password
 login --authType password --userName user@contoso.com --password pass@word1
 ```
 
-Log in to Office 365 using a certificate
+Log in to Office 365 using a PEM certificate
 
 ```sh
-login --authType certificate --certificateFile /Users/user/dev/localhost.pfx --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1
+login --authType certificate --certificateFile /Users/user/dev/localhost.pem --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1
+```
+
+Log in to Office 365 using a personal information exchange (.pfx) file
+
+```sh
+login --authType certificate --certificateFile /Users/user/dev/localhost.pfx --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1 --password 'pass@word1'
 ```
