@@ -629,6 +629,11 @@ describe(commands.WEB_SET, () => {
     assert.equal(actual, true);
   });
 
+  it('fails validation if search scope passed is a number', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 2 } });
+    assert.notEqual(actual, true);
+  });
+
   it('sets search scope to default scope', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (JSON.stringify(opts.body) === JSON.stringify({
