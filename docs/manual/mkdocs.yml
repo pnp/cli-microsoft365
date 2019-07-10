@@ -319,6 +319,7 @@ nav:
         - report deviceusagedistributionusercounts: 'cmd/teams/report/report-deviceusagedistributionusercounts.md'
         - report deviceusageusercounts: 'cmd/teams/report/report-deviceusageusercounts.md'
         - report deviceusageuserdetail: 'cmd/teams/report/report-deviceusageuserdetail.md'
+        - report useractivityusercounts: 'cmd/teams/report/report-useractivityusercounts.md'
       - tab:
         - tab list: 'cmd/teams/tab/tab-list.md'
       - team:
