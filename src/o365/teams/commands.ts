@@ -25,6 +25,7 @@ export default {
   TEAMS_REPORT_DEVICEUSAGEUSERCOUNTS: `${prefix} report deviceusageusercounts`,
   TEAMS_REPORT_DEVICEUSAGEUSERDETAIL: `${prefix} report deviceusageuserdetail`,
   TEAMS_REPORT_USERACTIVITYUSERCOUNTS: `${prefix} report useractivityusercounts`,
+  TEAMS_REPORT_USERACTIVITYCOUNTS: `${prefix} report useractivitycounts`,
   TEAMS_TAB_LIST: `${prefix} tab list`,
   TEAMS_TEAM_ADD: `${prefix} team add`,
   TEAMS_TEAM_ARCHIVE: `${prefix} team archive`,
