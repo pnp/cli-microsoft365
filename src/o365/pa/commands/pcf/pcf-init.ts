@@ -10,8 +10,8 @@ import Command, {
   CommandError
 } from '../../../../Command';
 import Utils from '../../../../Utils';
-import TemplateInstantiator from "./pcf-init/template-instantiator";
-import { TemplateVariables } from "./pcf-init/template-variables";
+import TemplateInstantiator from "../../template-instantiator";
+import { PcfInitVariables } from "./pcf-init/pcf-init-variables";
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -61,7 +61,7 @@ class PaPcfInitCommand extends Command {
       const workingDirectory: string = process.cwd();
       const workingDirectoryName: string = path.basename(workingDirectory);
       const componentDirectory: string = path.join(workingDirectory, args.options.name);
-      const variables: TemplateVariables = {
+      const variables: PcfInitVariables = {
         "$namespaceplaceholder$": args.options.namespace,
         "$controlnameplaceholder$": args.options.name,
         "$pcfProjectName$": workingDirectoryName,
@@ -72,7 +72,7 @@ class PaPcfInitCommand extends Command {
       if (this.verbose) {
         cmd.log(`name: ${args.options.name}`);
         cmd.log(`namespace: ${args.options.namespace}`);
-        cmd.log(`template: ${args.options.name}`);
+        cmd.log(`template: ${args.options.template}`);
         cmd.log(`pcfTemplatePath: ${pcfTemplatePath}`);
         cmd.log(`pcfComponentTemplatePath: ${pcfComponentTemplatePath}`);
         cmd.log(`workingDirectory: ${workingDirectory}`);
@@ -120,15 +120,15 @@ class PaPcfInitCommand extends Command {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
+
       if (fs.readdirSync(process.cwd()).some(fn => fn.endsWith('proj'))) {
-        return 'The current directory cannot be used because it already contains a project. Please create a new directory and retry the operation.';
+        return 'PowerApps component framework project creation failed. The current directory already contains a project. Please create a new directory and retry the operation.';
       }
 
       const workingDirectoryName: string = path.basename(process.cwd());
-      if (!workingDirectoryName
-        || /^((\..*)|COM\d|CLOCK\$|LPT\d|AUX|NUL|CON|PRN|(.*[\u{d800}-\u{dfff}]+.*))$/iu.test(workingDirectoryName)
-        || /^(.*\.\..*)$/i.test(workingDirectoryName)) {
-        return `Empty or invalid project name '${workingDirectoryName}'`;
+      if (!Utils.isValidFileName(workingDirectoryName))
+      {
+          return `Empty or invalid project name '${workingDirectoryName}'`;
       }
 
       if (args.options.name) {

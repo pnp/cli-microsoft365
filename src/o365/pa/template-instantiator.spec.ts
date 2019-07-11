@@ -1,11 +1,11 @@
-import Utils from '../../../../../Utils';
+import Utils from '../../Utils';
 import * as assert from 'assert';
 import * as fs from "fs";
 import * as sinon from 'sinon';
 import * as path from 'path';
 const uuidv4 = require('uuid/v4');
 import TemplateInstantiator from './template-instantiator';
-import { TemplateVariables } from './template-variables';
+import { PcfInitVariables } from './commands/pcf/pcf-init/pcf-init-variables';
 
 describe('TemplateInstantiator', () => {
   let log: string[];
@@ -13,11 +13,11 @@ describe('TemplateInstantiator', () => {
   let fsMkdirSync: sinon.SinonStub;
   let fsCopyFileSync: sinon.SinonStub;
   let fsWriteFileSync: sinon.SinonStub;
-  const assetsRoot = path.join(__dirname, 'assets');
+  const assetsRoot = path.join(__dirname, 'commands', 'pcf', 'pcf-init', 'assets');
   const componentAssetsRoot = path.join(assetsRoot, 'control', 'field-template');
   const projectDirectory = process.cwd();
   const componentDirectory = path.join(projectDirectory, 'Example1Name');
-  const variables: TemplateVariables = {
+  const variables: PcfInitVariables = {
     "$namespaceplaceholder$": "Example1.Namespace",
     "$controlnameplaceholder$": "Example1Name",
     "$pcfProjectName$": "ExampleComponentProject",

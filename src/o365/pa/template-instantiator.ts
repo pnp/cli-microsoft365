@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
-import { TemplateVariables } from "./template-variables";
+import { PcfInitVariables } from "./commands/pcf/pcf-init/pcf-init-variables";
+import { SolutionInitVariables } from "./commands/solution/solution-init/solution-init-variables";
 
 /*
  * Logic extracted from bolt.cli.dll
@@ -8,7 +9,7 @@ import { TemplateVariables } from "./template-variables";
  * Class: bolt.cli.TemplateInstantiator
  */
 export default class TemplateInstantiator {
-  public static instantiate(cmd: CommandInstance, sourcePath: string, destinationPath: string, recursive: boolean, variables: TemplateVariables, verbose: boolean) {
+  public static instantiate(cmd: CommandInstance, sourcePath: string, destinationPath: string, recursive: boolean, variables: PcfInitVariables | SolutionInitVariables, verbose: boolean) {
     TemplateInstantiator.mkdirSyncIfNotExists(cmd, destinationPath, verbose);
 
     this.getFiles(sourcePath, recursive).forEach(file => {
@@ -30,7 +31,7 @@ export default class TemplateInstantiator {
     }
   }
 
-  private static instantiateTemplate(templatePath: string, destinationPath: string, variables: TemplateVariables) {
+  private static instantiateTemplate(templatePath: string, destinationPath: string, variables: PcfInitVariables | SolutionInitVariables) {
     let isTemplateFile: boolean = false;
     let fileName: string = path.basename(templatePath);
 

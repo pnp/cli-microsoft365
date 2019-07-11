@@ -334,7 +334,7 @@ export default class Utils {
     return `${tenantUrl}${serverRelativeUrl}`;
   }
 
-  public static isJavascriptReservedWord(input: string) {
+  public static isJavascriptReservedWord(input: string): boolean {
     const javascriptReservedWords: string[] = [
       "arguments",
       "await",
@@ -502,6 +502,10 @@ export default class Utils {
       "onmousedown",
       "onsubmit"
     ];
-    return input && !input.split('.').every(value => !~javascriptReservedWords.indexOf(value));
+    return !!input && !input.split('.').every(value => !~javascriptReservedWords.indexOf(value));
+  }
+
+  public static isValidFileName(input: string): boolean {
+    return !!input && !/^((\..*)|COM\d|CLOCK\$|LPT\d|AUX|NUL|CON|PRN|(.*[\u{d800}-\u{dfff}]+.*))$/iu.test(input) && !/^(.*\.\..*)$/i.test(input);
   }
 }
