@@ -121,7 +121,7 @@ class PaPcfInitCommand extends Command {
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
 
-      if (fs.readdirSync(process.cwd()).some(fn => fn.endsWith('proj'))) {
+      if (fs.readdirSync(process.cwd()).some(fn => path.extname(fn).toLowerCase().endsWith('proj'))) {
         return 'PowerApps component framework project creation failed. The current directory already contains a project. Please create a new directory and retry the operation.';
       }
 

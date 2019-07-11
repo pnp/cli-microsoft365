@@ -27,7 +27,7 @@ interface Options extends GlobalOptions {
 /*
  * Logic extracted from bolt.module.solution.dll
  * Version: 0.4.3
- * Class: bolt.module.solution.SolutionInitVerb
+ * Class: bolt.module.solution.verbs.SolutionInitVerb
  */
 class PaSolutionInitCommand extends Command {
   public get name(): string {
@@ -120,7 +120,7 @@ class PaSolutionInitCommand extends Command {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (fs.readdirSync(process.cwd()).some(fn => fn.endsWith('proj'))) {
+      if (fs.readdirSync(process.cwd()).some(fn => path.extname(fn).toLowerCase() === '.cdsproj')) {
         return 'CDS project creation failed. The current directory already contains a project. Please create a new directory and retry the operation.';
       }
 

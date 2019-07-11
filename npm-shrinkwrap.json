@@ -319,6 +319,12 @@
       "integrity": "sha512-YV+ZcSIiv30GhLM7WwxI+bsbcW34d3Yhl2JSFBNFL6qtfsoI9++hogxz+jTqeS86ynKcMUE0AsnLWQynfJnsfA==",
       "dev": true
     },
+    "@types/xmldom": {
+      "version": "0.1.29",
+      "resolved": "https://registry.npmjs.org/@types/xmldom/-/xmldom-0.1.29.tgz",
+      "integrity": "sha1-xEKLDKhtO4gUdXJv2UmAs4onw4E=",
+      "dev": true
+    },
     "adal-node": {
       "version": "0.1.28",
       "resolved": "https://registry.npmjs.org/adal-node/-/adal-node-0.1.28.tgz",
