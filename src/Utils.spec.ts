@@ -7,17 +7,17 @@ import { CommandError } from './Command';
 import * as os from 'os';
 
 describe('Utils', () => {
-  it('isValidISODate returns true if value is in ISO Date format with - seperator', () => {
+  it('isValidISODate returns true if value is in ISO Date format with - separator', () => {
     const result = Utils.isValidISODate("2019-03-22");
     assert.equal(result, true);
   });
 
-  it('isValidISODate returns true if value is in ISO Date format with . seperator', () => {
+  it('isValidISODate returns true if value is in ISO Date format with . separator', () => {
     const result = Utils.isValidISODate("2019.03.22");
     assert.equal(result, true);
   });
 
-  it('isValidISODate returns true if value is in ISO Date format with / seperator', () => {
+  it('isValidISODate returns true if value is in ISO Date format with / separator', () => {
     const result = Utils.isValidISODate("2019/03/22");
     assert.equal(result, true);
   });
@@ -809,5 +809,40 @@ describe('Utils', () => {
   it('returns empty user name when empty access token passed', () => {
     const actual = Utils.getUserNameFromAccessToken('');
     assert.equal(actual, '');
+  });
+
+  it('isJavascriptReservedWord returns true if value equals a JavaScript Reserved Word (eg. onload)', () => {
+    const result = Utils.isJavascriptReservedWord('onload');
+    assert.strictEqual(result, true);
+  });
+
+  it('isJavascriptReservedWord returns false if value doesn\'t equal a JavaScript Reserved Word due to case sensitivity (eg. onLoad)', () => {
+    const result = Utils.isJavascriptReservedWord('onLoad');
+    assert.strictEqual(result, false);
+  });
+
+  it('isJavascriptReservedWord returns false if value doesn\'t equal a JavaScript Reserved Word', () => {
+    const result = Utils.isJavascriptReservedWord('exampleword');
+    assert.strictEqual(result, false);
+  });
+
+  it('isJavascriptReservedWord returns false if value contains but doesn\'t equal a JavaScript Reserved Word (eg. encodeURIComponent)', () => {
+    const result = Utils.isJavascriptReservedWord('examplewordencodeURIComponent');
+    assert.strictEqual(result, false);
+  });
+
+  it('isJavascriptReservedWord returns true if any part of a value, when split on dot, equals a JavaScript Reserved Word (eg. innerHeight)', () => {
+    const result = Utils.isJavascriptReservedWord('exampleword.innerHeight.anotherpart');
+    assert.strictEqual(result, true);
+  });
+
+  it('isJavascriptReservedWord returns false if any part of a value, when split on dot, doesn\'t equal a JavaScript Reserved Word', () => {
+    const result = Utils.isJavascriptReservedWord('exampleword.secondsection.anotherpart');
+    assert.strictEqual(result, false);
+  });
+
+  it('isJavascriptReservedWord returns false if any part of a value, when split on dot, contains but doesn\'t equal a JavaScript Reserved Word (eg. layer)', () => {
+    const result = Utils.isJavascriptReservedWord('exampleword.layersecondsection.anotherpart');
+    assert.strictEqual(result, false);
   });
 });

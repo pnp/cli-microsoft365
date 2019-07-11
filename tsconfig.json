@@ -52,6 +52,7 @@
     // "emitDecoratorMetadata": true,         /* Enables experimental support for emitting type metadata for decorators. */
   },
   "exclude": [
-    "./**/test-projects"
+    "./**/test-projects",
+    "./**/pcf-init/assets"
   ]
 }

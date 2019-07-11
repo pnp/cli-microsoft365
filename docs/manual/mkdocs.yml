@@ -67,6 +67,9 @@ nav:
         - schemaextension get: 'cmd/graph/schemaextension/schemaextension-get.md'
     - Outlook (outlook):
         - outlook sendmail: 'cmd/outlook/sendmail.md'
+    - PowerApps (pa):
+      - pcf:
+        - pcf init: 'cmd/pa/pcf/pcf-init.md'
     - Microsoft Planner (planner):
       - task:
         - task list: 'cmd/planner/task/task-list.md'
