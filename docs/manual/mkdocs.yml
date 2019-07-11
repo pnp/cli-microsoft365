@@ -73,6 +73,7 @@ nav:
         - pcf init: 'cmd/pa/pcf/pcf-init.md'
       - solution:
         - solution init: 'cmd/pa/solution/solution-init.md'
+        - solution reference add: 'cmd/pa/solution/solution-reference-add.md'
     - Microsoft Planner (planner):
       - task:
         - task list: 'cmd/planner/task/task-list.md'
