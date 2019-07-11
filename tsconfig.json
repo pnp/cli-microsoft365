@@ -53,6 +53,7 @@
   },
   "exclude": [
     "./**/test-projects",
-    "./**/pcf-init/assets"
+    "./**/pcf-init/assets",
+    "./**/solution-init/assets"
   ]
 }

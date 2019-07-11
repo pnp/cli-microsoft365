@@ -1,4 +1,4 @@
-export interface TemplateVariables {
+export interface PcfInitVariables {
   [key:string]: string;
   "$namespaceplaceholder$": string;
   "$controlnameplaceholder$": string;

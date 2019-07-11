@@ -7,7 +7,7 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
 import Utils from '../../../../Utils';
-import TemplateInstantiator from './pcf-init/template-instantiator';
+import TemplateInstantiator from '../../template-instantiator';
 
 describe(commands.PCF_INIT, () => {
   let vorpal: Vorpal;
