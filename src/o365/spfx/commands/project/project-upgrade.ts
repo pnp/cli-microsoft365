@@ -20,6 +20,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
+  outputFile?: string;
   packageManager?: string;
   toVersion?: string;
 }
@@ -235,16 +236,25 @@ class SpfxProjectUpgradeCommand extends Command {
 
     switch (args.options.output) {
       case 'json':
-        cmd.log(findingsToReport);
+        this.writeReport(findingsToReport, cmd, args.options);
         break;
       case 'md':
-        cmd.log(this.getMdReport(findingsToReport));
+          this.writeReport(this.getMdReport(findingsToReport), cmd, args.options);
         break;
       default:
-        cmd.log(this.getTextReport(findingsToReport));
+          this.writeReport(this.getTextReport(findingsToReport), cmd, args.options);
     }
 
     cb();
+  }
+
+  private writeReport(findingsToReport: any, cmd: CommandInstance, options: Options): void {
+    if (options.outputFile) {
+      fs.writeFileSync(path.resolve(options.outputFile), options.output === 'json' ? JSON.stringify(findingsToReport) : findingsToReport, 'utf-8');
+    }
+    else {
+      cmd.log(findingsToReport);
+    }
   }
 
   private getProject(projectRootPath: string): Project {
@@ -656,6 +666,10 @@ ${f.resolution}
         option: '--packageManager [packageManager]',
         description: 'The package manager you use. Supported managers npm|pnpm|yarn. Default npm',
         autocomplete: ['npm', 'pnpm', 'yarn']
+      },
+      {
+        option: '-f, --outputFile [outputFile]',
+        description: 'Path to the file where the upgrade report should be stored in'
       }
     ];
 
@@ -674,6 +688,13 @@ ${f.resolution}
       if (args.options.packageManager) {
         if (['npm', 'pnpm', 'yarn'].indexOf(args.options.packageManager) < 0) {
           return `${args.options.packageManager} is not a supported package manager. Supported package managers are npm, pnpm and yarn`;
+        }
+      }
+
+      if (args.options.outputFile) {
+        const dirPath: string = path.dirname(path.resolve(args.options.outputFile));
+        if (!fs.existsSync(dirPath)) {
+          return `Directory ${dirPath} doesn't exist. Please check the path and try again.`;
         }
       }
 
@@ -713,7 +734,7 @@ ${f.resolution}
   
     Get instructions to upgrade the current SharePoint Framework project to
     SharePoint Framework version 1.5.0 and save the findings in a Markdown file
-      ${this.name} --toVersion 1.5.0 --output md > upgrade-report.md
+      ${this.name} --toVersion 1.5.0 --output md --outputFile upgrade-report.md
 
     Get instructions to Upgrade the current SharePoint Framework project to
     SharePoint Framework version 1.5.0 and show the summary of the findings

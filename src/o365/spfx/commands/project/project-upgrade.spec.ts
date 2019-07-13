@@ -55,6 +55,7 @@ describe(commands.PROJECT_UPGRADE, () => {
       (command as any).getProjectVersion,
       fs.existsSync,
       fs.readFileSync,
+      fs.writeFileSync,
       Utils1.getAllFiles
     ]);
   });
@@ -1859,6 +1860,29 @@ describe(commands.PROJECT_UPGRADE, () => {
     });
   });
 
+  it('writes upgrade report to file when outputFile specified', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-151-webpart-react-graph'));
+    const writeFileSyncSpy: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(() => {});
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { output: 'md', toVersion: '1.6.0', outputFile: '/foo/report.md' } }, (err?: any) => {
+      assert(writeFileSyncSpy.called);
+    });
+  });
+
+  it('writes JSON upgrade report to file when outputFile specified in json output mode', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-151-webpart-react-graph'));
+    let typeofReport: string = '';
+    sinon.stub(fs, 'writeFileSync').callsFake((path: string, contents: any) => {
+      typeofReport = typeof contents;
+    });
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { output: 'json', toVersion: '1.6.0', outputFile: '/foo/report.md' } }, (err?: any) => {
+      assert.equal(typeofReport, 'string');
+    });
+  });
+
   it('supports debug mode', () => {
     const options = (command.options() as CommandOption[]);
     let containsOption = false;
@@ -1892,6 +1916,18 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   it('passes validation when yarn package manager specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { packageManager: 'yarn' } });
+    assert.equal(actual, true);
+  });
+
+  it('fails validation when non-existent path specified', () => {
+    sinon.stub(fs, 'existsSync').callsFake(() => false);
+    const actual = (command.validate() as CommandValidate)({ options: { outputFile: '/foo/file.md' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('passes validation when valid file path specified', () => {
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    const actual = (command.validate() as CommandValidate)({ options: { outputFile: '/foo/file.md' } });
     assert.equal(actual, true);
   });
 
