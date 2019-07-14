@@ -15,8 +15,11 @@
 
 **Microsoft Teams:**
 
-- [teams report deviceusagedistributionusercounts](../cmd/teams/report/report-deviceusagedistributionusercounts) - gets the number of Microsoft Teams unique users by device type  [#1012](https://github.com/pnp/office365-cli/issues/1012)
+- [teams report deviceusagedistributionusercounts](../cmd/teams/report/report-deviceusagedistributionusercounts) - gets the number of Microsoft Teams unique users by device type [#1012](https://github.com/pnp/office365-cli/issues/1012)
 - [teams report deviceusageusercounts](../cmd/teams/report/report-deviceusageusercounts.md) - gets the number of Microsoft Teams daily unique users by device type [#1011](https://github.com/pnp/office365-cli/issues/1011)
+- [teams report useractivityusercounts](../cmd/teams/report/report-useractivityusercounts.md) - gets the number of Microsoft Teams users by activity type [#1027](https://github.com/pnp/office365-cli/issues/1027)
+- [teams report useractivitycounts](../cmd/teams/report/report-useractivitycounts.md) - gets the number of Microsoft Teams activities by activity type [#1028](https://github.com/pnp/office365-cli/issues/1028)
+- [teams report useractivityuserdetail](../cmd/teams/report/report-useractivityuserdetail.md) - gets details about Microsoft Teams user activity by user [#1029](https://github.com/pnp/office365-cli/issues/1029)
 
 ### Changes
 
@@ -25,6 +28,7 @@
 - extended 'spo web set' with searchScope option [#947](https://github.com/pnp/office365-cli/issues/947)
 - fixed 'Access token is empty' error for 'teams report deviceusageuserdetail' [#1025](https://github.com/pnp/office365-cli/issues/1025)
 - updated documentation on connecting the CLI when protected cert [#1023](https://github.com/pnp/office365-cli/issues/1023)
+- extended 'spfx project upgrade' with outputFile option [#984](https://github.com/pnp/office365-cli/issues/984)
 
 ## [v1.22.0](https://github.com/pnp/office365-cli/releases/tag/v1.22.0)
 
