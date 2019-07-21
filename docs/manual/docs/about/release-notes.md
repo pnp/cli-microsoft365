@@ -1,9 +1,5 @@
 # Release notes
 
-## [v1.23.0](https://github.com/pnp/office365-cli/releases/tag/v1.23.0)
-
-- added support for upgrading projects built using SharePoint Framework v1.8.2 [#1044](https://github.com/pnp/office365-cli/issues/1044)
-## [v2.0.0](https://github.com/pnp/office365-cli/releases/tag/v1.21.0)
 ## [v2.0.0](https://github.com/pnp/office365-cli/releases/tag/v2.0.0)
 
 ### New commands
@@ -29,6 +25,11 @@
 - fixed 'Access token is empty' error for 'teams report deviceusageuserdetail' [#1025](https://github.com/pnp/office365-cli/issues/1025)
 - updated documentation on connecting the CLI when protected cert [#1023](https://github.com/pnp/office365-cli/issues/1023)
 - extended 'spfx project upgrade' with outputFile option [#984](https://github.com/pnp/office365-cli/issues/984)
+- login extended with support for authentication using Personal Information Exchange (.pfx) file [#1030](https://github.com/pnp/office365-cli/issues/1030)
+
+## [v1.23.0](https://github.com/pnp/office365-cli/releases/tag/v1.23.0)
+
+- added support for upgrading projects built using SharePoint Framework v1.8.2 [#1044](https://github.com/pnp/office365-cli/issues/1044)
 
 ## [v1.22.0](https://github.com/pnp/office365-cli/releases/tag/v1.22.0)
 
