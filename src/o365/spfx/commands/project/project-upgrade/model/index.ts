@@ -16,3 +16,4 @@ export * from './VsCodeLaunchJson';
 export * from './VsCodeSettingsJson';
 export * from './WriteManifestsJson';
 export * from './YoRcJson';
+export * from './ScssFile';

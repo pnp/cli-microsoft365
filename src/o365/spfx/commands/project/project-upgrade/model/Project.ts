@@ -1,4 +1,4 @@
-import { ConfigJson, CopyAssetsJson, DeployAzureStorageJson, Manifest, PackageJson, PackageSolutionJson, ServeJson, TsConfigJson, TsLintJson, WriteManifestsJson, YoRcJson, GulpfileJs, VsCode, TsFile } from ".";
+import { ConfigJson, CopyAssetsJson, DeployAzureStorageJson, Manifest, PackageJson, PackageSolutionJson, ServeJson, TsConfigJson, TsLintJson, WriteManifestsJson, YoRcJson, GulpfileJs, VsCode, TsFile, ScssFile } from ".";
 
 export interface Project {
   path: string;
@@ -13,6 +13,7 @@ export interface Project {
   serveJson?: ServeJson;
   tsConfigJson?: TsConfigJson;
   tsFiles?: TsFile[];
+  scssFiles?: ScssFile[];
   tsLintJson?: TsLintJson;
   tsLintJsonRoot?: TsLintJson;
   vsCode?: VsCode;

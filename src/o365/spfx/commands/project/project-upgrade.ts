@@ -9,7 +9,7 @@ import * as fs from 'fs';
 import { Finding, Utils, Hash, Dictionary } from './project-upgrade/';
 import { Rule } from './project-upgrade/rules/Rule';
 import { EOL } from 'os';
-import { Project, Manifest, TsFile } from './project-upgrade/model';
+import { Project, Manifest, TsFile, ScssFile } from './project-upgrade/model';
 import { FindingToReport } from './project-upgrade/FindingToReport';
 import { FN017001_MISC_npm_dedupe } from './project-upgrade/rules/FN017001_MISC_npm_dedupe';
 import { ReportData, ReportDataModification } from './ReportData';
@@ -52,7 +52,8 @@ class SpfxProjectUpgradeCommand extends Command {
     '1.7.1',
     '1.8.0',
     '1.8.1',
-    '1.8.2'
+    '1.8.2',
+    '1.9.0'
   ];
   private static packageCommands = {
     npm: {
@@ -382,6 +383,9 @@ class SpfxProjectUpgradeCommand extends Command {
     const tsFiles: string[] = srcFiles.filter(f => f.endsWith('.ts') || f.endsWith('.tsx'));
     project.tsFiles = tsFiles.map(f => new TsFile(f));
 
+    const scssFiles: string[] = srcFiles.filter(f => f.endsWith('.scss'));
+    project.scssFiles = scssFiles.map(f => new ScssFile(f));
+
     return project;
   }
 
@@ -694,7 +698,7 @@ ${f.resolution}
     Using this command you can upgrade SharePoint Framework projects built using
     versions: 1.0.0, 1.0.1, 1.0.2, 1.1.0, 1.1.1, 1.1.3, 1.2.0, 1.3.0, 1.3.1,
     1.3.2, 1.3.4, 1.4.0, 1.4.1, 1.5.0, 1.5.1, 1.6.0, 1.7.0, 1.7.1, 1.8.0 and
-    1.8.1.
+    1.8.1, 1.8.2.
 
   Examples:
   
