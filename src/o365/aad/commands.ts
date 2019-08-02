@@ -12,6 +12,7 @@ export default {
   O365GROUP_GET: `${prefix} o365group get`,
   O365GROUP_LIST: `${prefix} o365group list`,
   O365GROUP_SET: `${prefix} o365group set`,
+  O365GROUP_TEAMIFY: `${prefix} o365group teamify`,
   O365GROUP_REMOVE: `${prefix} o365group remove`,
   O365GROUP_RENEW: `${prefix} o365group renew`,
   O365GROUP_RESTORE: `${prefix} o365group restore`,
