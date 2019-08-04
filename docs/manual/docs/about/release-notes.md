@@ -17,6 +17,10 @@
 - [teams report useractivitycounts](../cmd/teams/report/report-useractivitycounts.md) - gets the number of Microsoft Teams activities by activity type [#1028](https://github.com/pnp/office365-cli/issues/1028)
 - [teams report useractivityuserdetail](../cmd/teams/report/report-useractivityuserdetail.md) - gets details about Microsoft Teams user activity by user [#1029](https://github.com/pnp/office365-cli/issues/1029)
 
+**Office 365 groups:**
+
+- [aad o365group teamify](../cmd/aad/o365group/o365group-teamify.md) - creates a new Microsoft Teams team under existing Office 365 group [#872](https://github.com/pnp/office365-cli/issues/872)
+
 ### Changes
 
 - simplified login [#889](https://github.com/pnp/office365-cli/issues/889)
