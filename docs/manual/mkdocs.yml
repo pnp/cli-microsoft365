@@ -49,6 +49,7 @@ nav:
         - user get: 'cmd/aad/user/user-get.md'
         - user list: 'cmd/aad/user/user-list.md'
     - Microsoft Flow (flow):
+      - disable: 'cmd/flow/disable.md'
       - export: 'cmd/flow/export.md'
       - get: 'cmd/flow/get.md'
       - list: 'cmd/flow/list.md'
