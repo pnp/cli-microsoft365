@@ -137,7 +137,9 @@ class FlowExportCommand extends AzmgmtCommand {
           encoding: null, // Set encoding to null, otherwise binary data will be encoded to utf8 and binary data is corrupt 
           headers: formatArgument === 'json' ? {
             accept: 'application/json'
-          } : {},
+          } : {
+            'x-anonymous': true
+          }
         };
 
         return formatArgument === 'json' ?

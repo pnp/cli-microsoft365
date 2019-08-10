@@ -177,6 +177,22 @@ describe(commands.FLOW_EXPORT, () => {
     });
   });
 
+  it('exports flow to zip does not contain token', (done) => {
+    const getRequestsStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'post').callsFake(postFakes);
+    sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
+
+    cmdInstance.action({ options: { debug: true, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'zip' } }, () => {
+      try {
+        assert.equal(getRequestsStub.lastCall.args[0].headers['x-anonymous'], true);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('exports the specified flow with a non zip file returned by the API (debug)', (done) => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
@@ -241,6 +257,22 @@ describe(commands.FLOW_EXPORT, () => {
     });
   });
 
+  it('call is made without token when format specified as ZIP', (done) => {
+    const getRequestsStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'post').callsFake(postFakes);
+    sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
+
+    cmdInstance.action({ options: { debug: false, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'zip' } }, () => {
+      try {
+        assert.equal(getRequestsStub.lastCall.args[0].headers['x-anonymous'], true);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('nothing returned when path parameter is specified', (done) => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
@@ -249,6 +281,22 @@ describe(commands.FLOW_EXPORT, () => {
     cmdInstance.action({ options: { debug: false, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'zip', path: './output.zip' } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('call is made without token when ZIP with specified path', (done) => {
+    const getRequestsStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'post').callsFake(postFakes);
+    sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
+
+    cmdInstance.action({ options: { debug: false, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'zip', path: './output.zip' } }, () => {
+      try {
+        assert.equal(getRequestsStub.lastCall.args[0].headers['x-anonymous'], true);
         done();
       }
       catch (e) {
