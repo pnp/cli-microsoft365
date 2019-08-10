@@ -568,7 +568,7 @@ Update-PnPSiteClassification|SharePointPnPPowerShellOnline|[aad siteclassificati
 Approve-FlowApprovalRequest|Microsoft.PowerApps.PowerShell|
 Deny-FlowApprovalRequest|Microsoft.PowerApps.PowerShell|
 Disable-Flow|Microsoft.PowerApps.PowerShell|[flow disable](../cmd/flow/disable.md)
-Enable-Flow|Microsoft.PowerApps.PowerShell|
+Enable-Flow|Microsoft.PowerApps.PowerShell|[flow enable](../cmd/flow/enable.md)
 Get-Flow|Microsoft.PowerApps.PowerShell|[flow list](../cmd/flow/list.md), [flow get](../cmd/flow/get.md)
 Get-FlowApproval|Microsoft.PowerApps.PowerShell|
 Get-FlowApprovalRequest|Microsoft.PowerApps.PowerShell|
@@ -606,7 +606,7 @@ Clear-AdminPowerAppApisToBypassConsent|Microsoft.PowerApps.Administration.PowerS
 Clear-AdminPowerAppAsFeatured|Microsoft.PowerApps.Administration.PowerShell|
 Clear-AdminPowerAppAsHero|Microsoft.PowerApps.Administration.PowerShell|
 Disable-AdminFlow|Microsoft.PowerApps.Administration.PowerShell|[flow disable](../cmd/flow/disable.md)
-Enable-AdminFlow|Microsoft.PowerApps.Administration.PowerShell|
+Enable-AdminFlow|Microsoft.PowerApps.Administration.PowerShell|[flow enable](../cmd/flow/enable.md)
 Get-AdminDlpPolicy|Microsoft.PowerApps.Administration.PowerShell|
 Get-AdminFlow|Microsoft.PowerApps.Administration.PowerShell|
 Get-AdminFlowOwnerRole|Microsoft.PowerApps.Administration.PowerShell|
