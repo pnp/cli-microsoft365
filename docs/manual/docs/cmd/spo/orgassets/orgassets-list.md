@@ -1,11 +1,11 @@
-# spo orgassets list
+# spo orgassetslibrary list
 
 List all libraries that are assigned as asset library
 
 ## Usage
 
 ```sh
-spo orgassets list [options]
+spo orgassetslibrary list [options]
 ```
 
 ## Options
@@ -22,8 +22,8 @@ Option|Description
 
 ## Examples
 
-List all organizational news sites
+List all libraries that are assigned as asset library
 
 ```sh
-spo orgassets list
+spo orgassetslibrary list
 ```
