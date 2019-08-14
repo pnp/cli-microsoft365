@@ -118,8 +118,39 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
     });
   });
 
-  // handles multiple
-  // handles empty results
+  it('handles no library set correctly', (done) => {
+    const svcListRequest = sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers['X-RequestDigest']) {
+          return Promise.resolve(JSON.stringify([{
+            "SchemaVersion": "15.0.0.0",
+            "LibraryVersion": "16.0.9124.1233",
+            "ErrorInfo": null,
+            "TraceCorrelationId": "1e21fa9e-403d-9000-7c8e-7e8d8898fd57"
+          }, 6, {
+            "IsNull": false
+          }]));
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({
+      options: {
+        debug: true
+      }
+    }, (err?: any) => {
+      try {
+        assert(svcListRequest.called);
+        assert.equal(err.message, 'No libraries in Organization Assets');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
 
   it('handles error getting request', (done) => {
     const svcListRequest = sinon.stub(request, 'post').callsFake((opts) => {

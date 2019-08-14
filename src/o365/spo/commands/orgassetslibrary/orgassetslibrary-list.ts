@@ -27,7 +27,7 @@ class SpoOrgNewsSiteListCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'List all libraries that are assigned as assets library';
+    return 'List all libraries that are assigned as asset library';
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
@@ -60,26 +60,33 @@ class SpoOrgNewsSiteListCommand extends SpoCommand {
           return;
         }
         else {
-          // Todo: handle empty results, test with PowerShell
-
           const orgAssetsResponse: OrgAssetsResponse = json[json.length - 1];
-          const orgAssets: OrgAssets = {
-            Url: orgAssetsResponse.Url.DecodedUrl,
-            Libraries: orgAssetsResponse.OrgAssetsLibraries._Child_Items_.map(t => {
-              return {
-                DisplayName: t.DisplayName,
-                LibraryUrl: t.LibraryUrl.DecodedUrl,
-                ListId: t.ListId,
-                ThumbnailUrl: t.ThumbnailUrl.DecodedUrl
-              }
-            })
-          }
 
-          console.log(orgAssets);
-          cmd.log(orgAssets);
+          if (orgAssetsResponse.OrgAssetsLibraries === undefined) {
+            cb(new CommandError("No libraries in Organization Assets"));
+            return
+          } else {
+            const orgAssets: OrgAssets = {
+              Url: orgAssetsResponse.Url.DecodedUrl,
+              Libraries: orgAssetsResponse.OrgAssetsLibraries._Child_Items_.map(t => {
+                return {
+                  DisplayName: t.DisplayName,
+                  LibraryUrl: t.LibraryUrl.DecodedUrl,
+                  ListId: t.ListId,
+                  ThumbnailUrl: t.ThumbnailUrl.DecodedUrl
+                }
+              })
+            }
 
-          if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
+            if (args.options.output === 'json') {
+              cmd.log(JSON.stringify(orgAssets));
+            } else {
+              cmd.log(orgAssets);
+            }
+
+            if (this.verbose) {
+              cmd.log(vorpal.chalk.green('DONE'));
+            }
           }
           cb();
         }
@@ -100,7 +107,7 @@ class SpoOrgNewsSiteListCommand extends SpoCommand {
 
   Examples:
 
-    List all libraries that are assigned as assets library
+    List all libraries that are assigned as asset library
       ${commands.ORGASSETSLIBRARY_LIST}
   `);
 
