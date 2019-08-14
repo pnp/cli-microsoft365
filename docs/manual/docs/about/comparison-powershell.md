@@ -47,7 +47,7 @@ Get-SPOMigrationJobProgress|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOMigrationJobStatus|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOMultiGeoCompanyAllowedDataLocation|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOMultiGeoExperience|Microsoft.Online.SharePoint.PowerShell|
-Get-SPOOrgAssetsLibrary|Microsoft.Online.SharePoint.PowerShell|
+Get-SPOOrgAssetsLibrary|Microsoft.Online.SharePoint.PowerShell|[spo orgassetslibrary list](../cmd/spo/orgassetslibrary/orgassetslibrary-list.md)
 Get-SPOOrgNewsSite|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOPublicCdnOrigins|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOSite|Microsoft.Online.SharePoint.PowerShell|[spo site classic list](../cmd/spo/site/site-classic-list.md)

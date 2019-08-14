@@ -190,6 +190,8 @@ nav:
         - navigation node add: 'cmd/spo/navigation/navigation-node-add.md'
         - navigation node list: 'cmd/spo/navigation/navigation-node-list.md'
         - navigation node remove: 'cmd/spo/navigation/navigation-node-remove.md'
+      - orgassetslibrary:
+        - orgassetslibrary list: 'cmd/spo/orgassetslibrary/orgassetslibrary-list.md'
       - orgnewssite:
         - orgnewssite list: 'cmd/spo/orgnewssite/orgnewssite-list.md'
         - orgnewssite remove: 'cmd/spo/orgnewssite/orgnewssite-remove.md'
