@@ -53,7 +53,7 @@ class SpfxProjectUpgradeCommand extends Command {
     '1.8.0',
     '1.8.1',
     '1.8.2',
-    '1.9.0'
+    '1.9.1'
   ];
   private static packageCommands = {
     npm: {
@@ -439,6 +439,7 @@ ${f.resolution}
         case 'json':
         case 'js':
         case 'ts':
+        case 'scss':
           resolution = `In file [${f.file}](${f.file}) update the code as follows:
 
 \`\`\`${f.resolutionType}
