@@ -118,6 +118,60 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
     });
   });
 
+  it('returns a result as json', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        return Promise.resolve(JSON.stringify([
+          { "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "8992299e-a003-4000-7686-fda36e26a53c" }, 6, {
+            "_ObjectType_": "Microsoft.SharePoint.Administration.OrgAssets",
+            "CentralAssetRepositoryLibraries": null,
+            "OrgAssetsLibraries": {
+              "_ObjectType_": "Microsoft.SharePoint.Administration.OrgAssetsLibraryCollection",
+              "_Child_Items_": [{
+                "_ObjectType_": "Microsoft.SharePoint.Administration.OrgAssetsLibrary",
+                "DisplayName": "Site Assets",
+                "FileType": "jpg",
+                "LibraryUrl": {
+                  "_ObjectType_": "SP.ResourcePath",
+                  "DecodedUrl": "sites\u002fsitedesigns\u002fSiteAssets"
+                },
+                "ListId": "\/Guid(96c2e234-c996-4877-b3a6-8aebd8ab45b6)\/",
+                "OrgAssetType": 1,
+                "ThumbnailUrl": {
+                  "_ObjectType_": "SP.ResourcePath",
+                  "DecodedUrl": "SiteAssets\u002f__siteIcon__.jpg"
+                },
+                "UniqueId": "\/Guid(0d3c9e72-60f5-40f8-9e29-b91036f5630e)\/"
+              }]
+            },
+            "SiteId": "\/Guid(9f0e0a96-14ec-4d4f-9b04-a8698367cd36)\/",
+            "Url": {
+              "_ObjectType_": "SP.ResourcePath",
+              "DecodedUrl": "\u002fsites\u002fsitedesigns"
+            },
+            "WebId": "\/Guid(030c8d27-1bb4-4042-a252-dce8ac1e9f00)\/"
+          }
+        ]));
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({ options: { debug: true, verbose: true, output: 'json' } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(JSON.stringify({
+          Url: '/sites/sitedesigns',
+          Libraries:
+            [{ DisplayName: 'Site Assets', LibraryUrl: 'sites/sitedesigns/SiteAssets', ListId: '/Guid(96c2e234-c996-4877-b3a6-8aebd8ab45b6)/', ThumbnailUrl: 'SiteAssets/__siteIcon__.jpg' }]
+        })));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('handles no library set correctly', (done) => {
     const svcListRequest = sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
