@@ -136,12 +136,6 @@ class TeamsReportUserActivityUserDetailCommand extends GraphCommand {
         return `${args.options.date} is not a valid date. The supported date format is YYYY-MM-DD`;
       }
 
-      if (args.options.output) {
-        if (['text', 'json', 'csv'].indexOf(args.options.output) < 0) {
-          return `${args.options.output} is not a valid output type. The supported values are text,json,csv`;
-        }
-      }
-
       if (args.options.outputFile && !fs.existsSync(path.dirname(args.options.outputFile))) {
         return 'Specified outputFile path where to save the file does not exist';
       }
