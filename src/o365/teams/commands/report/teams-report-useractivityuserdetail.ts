@@ -5,6 +5,8 @@ import {
 } from '../../../../Command';
 import GraphCommand from "../../../base/GraphCommand";
 import request from '../../../../request';
+import * as path from 'path';
+import * as fs from 'fs';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -15,6 +17,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   period?: string;
   date?: string;
+  outputFile?: string;
 }
 
 class TeamsReportUserActivityUserDetailCommand extends GraphCommand {
@@ -30,6 +33,7 @@ class TeamsReportUserActivityUserDetailCommand extends GraphCommand {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.period = typeof args.options.period !== 'undefined';
     telemetryProps.date = typeof args.options.date !== 'undefined';
+    telemetryProps.outputFile = typeof args.options.outputFile !== 'undefined';
     return telemetryProps;
   }
 
@@ -49,10 +53,54 @@ class TeamsReportUserActivityUserDetailCommand extends GraphCommand {
     request
       .get(requestOptions)
       .then((res: any): void => {
-        cmd.log(res);
 
+        let content: string = '';
+
+        if(args.options.output && args.options.output.toLowerCase() === 'json')
+        {
+          let reportdata = this.getJsonReport(res);
+          content = JSON.stringify(reportdata);
+
+          if(!args.options.outputFile) {
+            cmd.log(reportdata);
+          }
+        }
+        else
+        {
+          content = res;
+          
+          if(!args.options.outputFile) {
+            cmd.log(content);
+          }
+        }
+
+        if(args.options.outputFile)
+        {
+          fs.writeFileSync(args.options.outputFile, content, 'utf8');
+          if (this.verbose) {
+            cmd.log(`File saved to path '${args.options.outputFile}'`);
+          }
+        }
+        
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+  }
+
+  private getJsonReport(res: string): any {
+    let rows = res.split('\n');
+    let jsonObj = [];
+    let headers = rows[0].split(',');
+
+    for (let i = 1; i < rows.length; i++) {
+      let data = rows[i].split(',');
+      let obj: any = {};
+      for (let j = 0; j < data.length; j++) {
+        obj[headers[j].trim()] = data[j].trim();
+      }
+      jsonObj.push(obj);
+    }
+
+    return jsonObj;
   }
 
   public options(): CommandOption[] {
@@ -65,6 +113,10 @@ class TeamsReportUserActivityUserDetailCommand extends GraphCommand {
       {
         option: '-d, --date [date]',
         description: 'The date for which you would like to view the users who performed any activity. Supported date format is YYYY-MM-DD. Specify the date or period, but not both.'
+      },
+      {
+        option: '-f, --outputFile [outputFile]',
+        description: 'Path to the file where the upgrade report should be stored in'
       }
     ];
 
@@ -92,6 +144,10 @@ class TeamsReportUserActivityUserDetailCommand extends GraphCommand {
         return `${args.options.date} is not a valid date. The supported date format is YYYY-MM-DD`;
       }
 
+      if (args.options.outputFile && !fs.existsSync(path.dirname(args.options.outputFile))) {
+        return 'Specified outputFile path where to save the file does not exist';
+      }
+
       return true;
     };
   }
@@ -103,11 +159,19 @@ class TeamsReportUserActivityUserDetailCommand extends GraphCommand {
 
       Gets details about Microsoft Teams user activity by user for 
       the last week
-      ${commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL} --period 'D7'
+        ${commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL} --period 'D7'
 
       Gets details about Microsoft Teams user activity by user 
       for July 13, 2019
-      ${commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL} --date 2019-07-13
+        ${commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL} --date 2019-07-13
+
+      Gets details about Microsoft Teams user activity by user for the last week
+      and exports the report data in the specified path in csv format
+        ${commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL} --period D7 --output csv --outputFile 'C:/report.csv'
+
+      Gets details about Microsoft Teams user activity by user for the last week
+      and exports the report data in the specified path in json format
+        ${commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL} --period D7 --output json --outputFile 'C:/report.json'
 `);
   }
 }
