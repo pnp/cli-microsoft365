@@ -62,9 +62,8 @@ class SpoOrgNewsSiteListCommand extends SpoCommand {
         else {
           const orgAssetsResponse: OrgAssetsResponse = json[json.length - 1];
 
-          if (orgAssetsResponse.OrgAssetsLibraries === undefined) {
-            cb(new CommandError("No libraries in Organization Assets"));
-            return
+          if (orgAssetsResponse === null || orgAssetsResponse.OrgAssetsLibraries === undefined) {
+            cmd.log("No libraries in Organization Assets");
           } else {
             const orgAssets: OrgAssets = {
               Url: orgAssetsResponse.Url.DecodedUrl,
