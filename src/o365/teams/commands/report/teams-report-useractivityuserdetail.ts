@@ -5,6 +5,8 @@ import {
 } from '../../../../Command';
 import GraphCommand from "../../../base/GraphCommand";
 import request from '../../../../request';
+import * as path from 'path';
+import * as fs from 'fs';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -15,6 +17,8 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   period?: string;
   date?: string;
+  outputFile?: string;
+  output?: string;
 }
 
 class TeamsReportUserActivityUserDetailCommand extends GraphCommand {
@@ -30,6 +34,8 @@ class TeamsReportUserActivityUserDetailCommand extends GraphCommand {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.period = typeof args.options.period !== 'undefined';
     telemetryProps.date = typeof args.options.date !== 'undefined';
+    telemetryProps.outputFile = typeof args.options.outputFile !== 'undefined';
+    telemetryProps.output = typeof args.options.output !== 'undefined';
     return telemetryProps;
   }
 
@@ -49,8 +55,39 @@ class TeamsReportUserActivityUserDetailCommand extends GraphCommand {
     request
       .get(requestOptions)
       .then((res: any): void => {
-        cmd.log(res);
+        if (args.options.outputFile) {
 
+          let content: string = '';
+          
+          if (args.options.outputFile.toLowerCase().endsWith('.json'))
+          {
+            let rows = res.split('\n'); 
+            let jsonObj = [];
+            let headers = rows[0].split(',');
+
+            for(let i = 1; i < rows.length; i++) {
+              let data = rows[i].split(',');
+              let obj: any = {};
+              for(let j = 0; j < data.length; j++) {
+                 obj[headers[j].trim()] = data[j].trim();
+              }
+              jsonObj.push(obj);
+            }
+
+            content = JSON.stringify(jsonObj);
+          }
+          else
+          {
+            content = res;
+          }
+          
+          fs.writeFileSync(args.options.outputFile, content, 'binary');
+          cmd.log(`File saved to path '${args.options.outputFile}'`);
+        }
+        else
+        {
+          cmd.log(res);
+        }
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
@@ -65,6 +102,15 @@ class TeamsReportUserActivityUserDetailCommand extends GraphCommand {
       {
         option: '-d, --date [date]',
         description: 'The date for which you would like to view the users who performed any activity. Supported date format is YYYY-MM-DD. Specify the date or period, but not both.'
+      },
+      {
+        option: '-f, --outputFile [outputFile]',
+        description: 'Path to the file where the upgrade report should be stored in.'
+      },
+      {
+        option: '-o, --output [output]',
+        description: 'Output type. `csv|json|text`. Default `csv`',
+        autocomplete: ['csv', 'json', 'text']
       }
     ];
 
@@ -92,6 +138,28 @@ class TeamsReportUserActivityUserDetailCommand extends GraphCommand {
         return `${args.options.date} is not a valid date. The supported date format is YYYY-MM-DD`;
       }
 
+      if (args.options.output) {
+        if (['csv', 'json', 'text'].indexOf(args.options.output) < 0) {
+          return `${args.options.output} is not a valid output type. The supported values are csv,json,text`;
+        }
+      }
+
+      if (args.options.outputFile && !fs.existsSync(path.dirname(args.options.outputFile))) {
+        return 'Specified outputFile path where to save the file does not exist';
+      }
+
+      if (args.options.outputFile && args.options.output && args.options.output.toLowerCase() === 'csv' && !args.options.outputFile.toLowerCase().endsWith('.csv')) {
+        return 'Specified outputFile path should be csv file extension';
+      }
+
+      if (args.options.outputFile && args.options.output && args.options.output.toLowerCase() === 'json' && !args.options.outputFile.toLowerCase().endsWith('.json')) {
+        return 'Specified outputFile path should be json file extension';
+      }
+
+      if (args.options.outputFile && args.options.output && args.options.output.toLowerCase() === 'text' && !args.options.outputFile.toLowerCase().endsWith('.txt')) {
+        return 'Specified outputFile path should be txt file extension';
+      }
+
       return true;
     };
   }
@@ -108,6 +176,9 @@ class TeamsReportUserActivityUserDetailCommand extends GraphCommand {
       Gets details about Microsoft Teams user activity by user 
       for July 13, 2019
       ${commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL} --date 2019-07-13
+
+      Gets details about Microsoft Teams user activity by user for the last week and exports the report data in the specified path in csv format
+      ${commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL} --period D7 --outputFile '/Users/josephvelliah/Desktop/teams-report-useractivityuserdetail.csv'
 `);
   }
 }

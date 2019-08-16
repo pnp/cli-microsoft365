@@ -7,11 +7,13 @@ const command: Command = require('./teams-report-useractivityuserdetail');
 import * as assert from 'assert';
 import Utils from '../../../../Utils';
 import request from '../../../../request';
+import * as fs from 'fs';
 
 describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
+  let cmdInstanceLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -31,6 +33,7 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
         log.push(msg);
       }
     };
+    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
     (command as any).items = [];
   });
 
@@ -123,6 +126,15 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
     assert(actual);
   });
 
+  it('fails validation if specified outputFile path doesn\'t exist', () => {
+    sinon.stub(fs, 'existsSync').callsFake(() => false);
+    const actual = (command.validate() as CommandValidate)({ options: { 
+      period: 'D7',
+      outputFile: '/path/not/found.zip' } });
+    Utils.restore(fs.existsSync);
+    assert.notEqual(actual, true);
+  });
+
   it('gets details about Microsoft Teams user activity by user for the given period', (done) => {
     const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserDetail(period='D7')`) {
@@ -137,6 +149,144 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
         assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserDetail(period='D7')");
         assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
         assert.equal(requestStub.lastCall.args[0].json, true);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('gets details about Microsoft Teams user activity by user for the given period and export report data in txt format', (done) => {
+    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserDetail(period='D7')`) {
+        return Promise.resolve('Report Refresh Date,User Principal Name,Last Activity Date,Is Deleted,Deleted Date,Assigned Products,Team Chat Message Count,Private Chat Message Count,Call Count,Meeting Count,Has Other Action,Report Period');
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({ options: { debug: false, period: 'D7', outputFile : '/Users/josephvelliah/Desktop/teams-report-useractivityuserdetail.txt' } }, () => {
+      try {
+        assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserDetail(period='D7')");
+        assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
+        assert.equal(requestStub.lastCall.args[0].json, true);
+        assert(cmdInstanceLogSpy.calledWith(`File saved to path '/Users/josephvelliah/Desktop/teams-report-useractivityuserdetail.txt'`));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('gets details about Microsoft Teams user activity by user for the given period and export report data in txt format with output', (done) => {
+    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserDetail(period='D7')`) {
+        return Promise.resolve('Report Refresh Date,User Principal Name,Last Activity Date,Is Deleted,Deleted Date,Assigned Products,Team Chat Message Count,Private Chat Message Count,Call Count,Meeting Count,Has Other Action,Report Period');
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({ options: { debug: false, period: 'D7', outputFile : '/Users/josephvelliah/Desktop/teams-report-useractivityuserdetail.txt', output : 'text' } }, () => {
+      try {
+        assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserDetail(period='D7')");
+        assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
+        assert.equal(requestStub.lastCall.args[0].json, true);
+        assert(cmdInstanceLogSpy.calledWith(`File saved to path '/Users/josephvelliah/Desktop/teams-report-useractivityuserdetail.txt'`));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('gets details about Microsoft Teams user activity by user for the given period and export report data in csv format', (done) => {
+    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserDetail(period='D7')`) {
+        return Promise.resolve('Report Refresh Date,User Principal Name,Last Activity Date,Is Deleted,Deleted Date,Assigned Products,Team Chat Message Count,Private Chat Message Count,Call Count,Meeting Count,Has Other Action,Report Period');
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({ options: { debug: false, period: 'D7', outputFile : '/Users/josephvelliah/Desktop/teams-report-useractivityuserdetail.csv' } }, () => {
+      try {
+        assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserDetail(period='D7')");
+        assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
+        assert.equal(requestStub.lastCall.args[0].json, true);
+        assert(cmdInstanceLogSpy.calledWith(`File saved to path '/Users/josephvelliah/Desktop/teams-report-useractivityuserdetail.csv'`));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('gets details about Microsoft Teams user activity by user for the given period and export report data in csv format with output', (done) => {
+    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserDetail(period='D7')`) {
+        return Promise.resolve('Report Refresh Date,User Principal Name,Last Activity Date,Is Deleted,Deleted Date,Assigned Products,Team Chat Message Count,Private Chat Message Count,Call Count,Meeting Count,Has Other Action,Report Period');
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({ options: { debug: false, period: 'D7', outputFile : '/Users/josephvelliah/Desktop/teams-report-useractivityuserdetail.csv', output: 'csv' } }, () => {
+      try {
+        assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserDetail(period='D7')");
+        assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
+        assert.equal(requestStub.lastCall.args[0].json, true);
+        assert(cmdInstanceLogSpy.calledWith(`File saved to path '/Users/josephvelliah/Desktop/teams-report-useractivityuserdetail.csv'`));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('gets details about Microsoft Teams user activity by user for the given period and export report data in json format', (done) => {
+    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserDetail(period='D7')`) {
+        return Promise.resolve('Report Refresh Date,User Principal Name,Last Activity Date,Is Deleted,Deleted Date,Assigned Products,Team Chat Message Count,Private Chat Message Count,Call Count,Meeting Count,Has Other Action,Report Period');
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({ options: { debug: false, period: 'D7', outputFile : '/Users/josephvelliah/Desktop/teams-report-useractivityuserdetail.json' } }, () => {
+      try {
+        assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserDetail(period='D7')");
+        assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
+        assert.equal(requestStub.lastCall.args[0].json, true);
+        assert(cmdInstanceLogSpy.calledWith(`File saved to path '/Users/josephvelliah/Desktop/teams-report-useractivityuserdetail.json'`));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('gets details about Microsoft Teams user activity by user for the given period and export report data in json format with output', (done) => {
+    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserDetail(period='D7')`) {
+        return Promise.resolve('Report Refresh Date,User Principal Name,Last Activity Date,Is Deleted,Deleted Date,Assigned Products,Team Chat Message Count,Private Chat Message Count,Call Count,Meeting Count,Has Other Action,Report Period');
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({ options: { debug: false, period: 'D7', outputFile : '/Users/josephvelliah/Desktop/teams-report-useractivityuserdetail.json', output : 'json' } }, () => {
+      try {
+        assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserDetail(period='D7')");
+        assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
+        assert.equal(requestStub.lastCall.args[0].json, true);
+        assert(cmdInstanceLogSpy.calledWith(`File saved to path '/Users/josephvelliah/Desktop/teams-report-useractivityuserdetail.json'`));
         done();
       }
       catch (e) {
@@ -179,6 +329,28 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
         done(e);
       }
     });
+  });
+
+  it('supports specifying outputFile', () => {
+    const options = (command.options() as CommandOption[]);
+    let containsOption = false;
+    options.forEach(o => {
+      if (o.option.indexOf('--outputFile') > -1) {
+        containsOption = true;
+      }
+    });
+    assert(containsOption);
+  });
+
+  it('supports specifying output', () => {
+    const options = (command.options() as CommandOption[]);
+    let containsOption = false;
+    options.forEach(o => {
+      if (o.option.indexOf('--output') > -1) {
+        containsOption = true;
+      }
+    });
+    assert(containsOption);
   });
 
   it('supports debug mode', () => {
