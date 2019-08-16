@@ -75,6 +75,11 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
     assert.notEqual(actual, true);
   });
 
+  it('fails validation on invalid output', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { output: 'abc' } });
+    assert.notEqual(actual, true);
+  });
+
   it('passes validation on valid \'D7\' period', () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
@@ -106,6 +111,36 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         period: 'D90'
+      }
+    });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation on valid \'text\' output', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        period: 'D7',
+        output: 'text'
+      }
+    });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation on valid \'json\' output', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        period: 'D7',
+        output: 'json'
+      }
+    });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation on valid \'csv\' output', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        period: 'D7',
+        output: 'csv'
       }
     });
     assert.equal(actual, true);
