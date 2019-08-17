@@ -63,6 +63,7 @@ nav:
     - Microsoft Graph (graph):
       - schemaextension:
         - schemaextension add: 'cmd/graph/schemaextension/schemaextension-add.md'
+        - schemaextension get: 'cmd/graph/schemaextension/schemaextension-get.md'
     - Outlook (outlook):
         - outlook sendmail: 'cmd/outlook/sendmail.md'
     - Microsoft Planner (planner):
