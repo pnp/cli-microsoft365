@@ -1,0 +1,32 @@
+# graph schemaextension get
+
+Gets the properties of the specified schema extension definition
+
+## Usage
+
+```sh
+graph schemaextension get [options]
+```
+
+## Options
+
+Option|Description
+------|-----------
+`--help`|output usage information
+`-i, --id <id>`|The unique identifier for the schema extension definition
+`-o, --output [output]`|Output type. `json|text`. Default `text`
+`--verbose`|Runs command with verbose logging
+`--debug`|Runs command with debug logging
+
+## Remarks
+
+To get properties of a schema extension definition, you have to pass the ID of the schema
+extension.
+
+## Examples
+
+Gets properties of a schema extension definition with ID domain_myExtension
+
+```sh
+graph schemaextension get --id domain_myExtension 
+```
