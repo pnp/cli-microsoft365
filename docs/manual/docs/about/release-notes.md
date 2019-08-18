@@ -26,6 +26,10 @@
 
 - [aad o365group teamify](../cmd/aad/o365group/o365group-teamify.md) - creates a new Microsoft Teams team under existing Office 365 group [#872](https://github.com/pnp/office365-cli/issues/872)
 
+**Microsoft Graph:**
+
+- [graph schemaextension get](../cmd/graph/schemaextension/schemaextension-get.md) - gets the properties of the specified schema extension definition [#14](https://github.com/pnp/office365-cli/issues/14)
+
 ### Changes
 
 - simplified login [#889](https://github.com/pnp/office365-cli/issues/889)
