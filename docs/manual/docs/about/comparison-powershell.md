@@ -676,7 +676,7 @@ Get-TeamUser|MicrosoftTeams|[teams user list](../cmd/aad/o365group/o365group-use
 New-Team|MicrosoftTeams|[teams team add](../cmd/teams/team/team-add.md)
 New-TeamChannel|MicrosoftTeams|[teams channel add](../cmd/teams/channel/channel-add.md)
 Remove-Team|MicrosoftTeams|[teams team remove](../cmd/teams/team/team-remove.md)
-Remove-TeamChannel|MicrosoftTeams|
+Remove-TeamChannel|MicrosoftTeams|[teams channel remove](../cmd/teams/channel/channel-remove.md)
 Remove-TeamUser|MicrosoftTeams|[teams user remove](../cmd/aad/o365group/o365group-user-remove.md)
 Set-Team|MicrosoftTeams|[teams team set](../cmd/teams/team/team-set.md)
 Set-TeamChannel|MicrosoftTeams|[teams channel set](../cmd/teams/channel/channel-set.md)
