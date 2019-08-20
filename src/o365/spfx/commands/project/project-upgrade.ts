@@ -23,12 +23,14 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   packageManager?: string;
   toVersion?: string;
+  shell?: string;
 }
 
 class SpfxProjectUpgradeCommand extends Command {
   private projectVersion: string | undefined;
   private toVersion: string = '';
   private packageManager: string = 'npm';
+  private shell: string = 'bash';
   private projectRootPath: string | null = null;
   private allFindings: Finding[] = [];
   private supportedVersions: string[] = [
@@ -95,6 +97,7 @@ class SpfxProjectUpgradeCommand extends Command {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.toVersion = args.options.toVersion || this.supportedVersions[this.supportedVersions.length - 1];
     telemetryProps.packageManager = args.options.packageManager || 'npm';
+    telemetryProps.shell = args.options.shell || 'bash';
     return telemetryProps;
   }
 
@@ -107,6 +110,7 @@ class SpfxProjectUpgradeCommand extends Command {
 
     this.toVersion = args.options.toVersion ? args.options.toVersion : this.supportedVersions[this.supportedVersions.length - 1];
     this.packageManager = args.options.packageManager || 'npm';
+    this.shell = args.options.shell || 'bash';
 
     if (this.supportedVersions.indexOf(this.toVersion) < 0) {
       cb(new CommandError(`Office 365 CLI doesn't support upgrading SharePoint Framework projects to version ${this.toVersion}. Supported versions are ${this.supportedVersions.join(', ')}`, SpfxProjectUpgradeCommand.ERROR_UNSUPPORTED_TO_VERSION));
@@ -235,6 +239,8 @@ class SpfxProjectUpgradeCommand extends Command {
       default:
         cmd.log(this.getTextReport(findingsToReport));
     }
+
+    cmd.log(this.shell);
 
     cb();
   }
@@ -648,6 +654,11 @@ ${f.resolution}
         option: '--packageManager [packageManager]',
         description: 'The package manager you use. Supported managers npm|pnpm|yarn. Default npm',
         autocomplete: ['npm', 'pnpm', 'yarn']
+      },
+      {
+        option: '--shell [shell]',
+        description: 'The shell you use. Supported shells bash|powershell|cmd. Default bash',
+        autocomplete: ['bash', 'powershell', 'cmd']
       }
     ];
 
@@ -666,6 +677,11 @@ ${f.resolution}
       if (args.options.packageManager) {
         if (['npm', 'pnpm', 'yarn'].indexOf(args.options.packageManager) < 0) {
           return `${args.options.packageManager} is not a supported package manager. Supported package managers are npm, pnpm and yarn`;
+        }
+      }
+      if (args.options.shell) {
+        if (['bash', 'powershell', 'cmd'].indexOf(args.options.shell) < 0) {
+          return `${args.options.shell} is not a supported shell. Supported package managers are bash, powershell and cmd`;
         }
       }
 
