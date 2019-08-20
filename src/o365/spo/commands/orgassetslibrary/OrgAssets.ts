@@ -7,7 +7,7 @@ export interface OrgAssetsLibrary{
   DisplayName: string;
   LibraryUrl: string;
   ListId: string;
-  ThumbnailUrl: string;
+  ThumbnailUrl?: string | null;
 }
 
 export interface OrgAssetsResponse {
