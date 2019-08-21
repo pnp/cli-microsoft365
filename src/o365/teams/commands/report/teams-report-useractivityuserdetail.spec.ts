@@ -14,6 +14,7 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
+  let writeFileSyncFake = () => { };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -40,7 +41,8 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
   afterEach(() => {
     Utils.restore([
       vorpal.find,
-      request.get
+      request.get,
+      fs.writeFileSync
     ]);
   });
 
@@ -199,6 +201,32 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
     });
   });
 
+  it('gets details about Microsoft Teams user activity by user for the given date', (done) => {
+    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserDetail(date=2019-07-13)`) {
+        return Promise.resolve(`
+        Report Refresh Date,User Principal Name,Last Activity Date,Is Deleted,Deleted Date,Assigned Products,Team Chat Message Count,Private Chat Message Count,Call Count,Meeting Count,Has Other Action,Report Period
+        2019-08-14,abisha@contoso.onmicrosoft.com,,False,,,0,0,0,0,No,7
+        2019-08-14,same@contoso.onmicrosoft.com,2019-05-22,False,,OFFICE 365 E3 DEVELOPER+MICROSOFT FLOW FREE,0,0,0,0,No,7
+        `);
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({ options: { debug: false, date: '2019-07-13' } }, () => {
+      try {
+        assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserDetail(date=2019-07-13)");
+        assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
+        assert.equal(requestStub.lastCall.args[0].json, true);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('gets details about Microsoft Teams user activity by user for the given period and export report data in txt format', (done) => {
     const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserDetail(period='D7')`) {
@@ -211,6 +239,8 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
 
       return Promise.reject('Invalid request');
     });
+
+    sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
     cmdInstance.action({ options: { debug: false, period: 'D7', outputFile: '/Users/josephvelliah/Desktop/teams-report-useractivityuserdetail.txt' } }, () => {
       try {
@@ -238,6 +268,7 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
 
       return Promise.reject('Invalid request');
     });
+    sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
     cmdInstance.action({ options: { debug: false, period: 'D7', outputFile: '/Users/josephvelliah/Desktop/teams-report-useractivityuserdetail.txt', output: 'text' } }, () => {
       try {
@@ -265,6 +296,7 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
 
       return Promise.reject('Invalid request');
     });
+    sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
     cmdInstance.action({ options: { debug: false, period: 'D7', outputFile: '/Users/josephvelliah/Desktop/teams-report-useractivityuserdetail.csv' } }, () => {
       try {
@@ -292,6 +324,7 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
 
       return Promise.reject('Invalid request');
     });
+    sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
     cmdInstance.action({ options: { debug: false, period: 'D7', outputFile: '/Users/josephvelliah/Desktop/teams-report-useractivityuserdetail.csv', output: 'csv' } }, () => {
       try {
@@ -319,6 +352,7 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
 
       return Promise.reject('Invalid request');
     });
+    sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
     cmdInstance.action({ options: { debug: false, period: 'D7', outputFile: '/Users/josephvelliah/Desktop/teams-report-useractivityuserdetail.json' } }, () => {
       try {
@@ -342,6 +376,7 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
 
       return Promise.reject('Invalid request');
     });
+    sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
     cmdInstance.action({ options: { debug: false, period: 'D7', outputFile: '/Users/josephvelliah/Desktop/teams-report-useractivityuserdetail.json', output: 'json' } }, () => {
       try {
@@ -349,32 +384,6 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
         assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
         assert.equal(requestStub.lastCall.args[0].json, true);
         assert(cmdInstanceLogSpy.calledWith(`File saved to path '/Users/josephvelliah/Desktop/teams-report-useractivityuserdetail.json'`));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('gets details about Microsoft Teams user activity by user for the given date', (done) => {
-    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserDetail(date=2019-07-13)`) {
-        return Promise.resolve(`
-        Report Refresh Date,User Principal Name,Last Activity Date,Is Deleted,Deleted Date,Assigned Products,Team Chat Message Count,Private Chat Message Count,Call Count,Meeting Count,Has Other Action,Report Period
-        2019-08-14,abisha@contoso.onmicrosoft.com,,False,,,0,0,0,0,No,7
-        2019-08-14,same@contoso.onmicrosoft.com,2019-05-22,False,,OFFICE 365 E3 DEVELOPER+MICROSOFT FLOW FREE,0,0,0,0,No,7
-        `);
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    cmdInstance.action({ options: { debug: false, date: '2019-07-13' } }, () => {
-      try {
-        assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserDetail(date=2019-07-13)");
-        assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
-        assert.equal(requestStub.lastCall.args[0].json, true);
         done();
       }
       catch (e) {
