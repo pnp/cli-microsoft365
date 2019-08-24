@@ -7,6 +7,7 @@ import { Finding } from "../Finding";
 export abstract class FileAddRemoveRule extends Rule {
   constructor(protected filePath: string, protected add: boolean, private contents?: string) {
     super();
+    this.filePath = path.normalize(this.filePath);
   }
 
   get title(): string {
@@ -19,12 +20,12 @@ export abstract class FileAddRemoveRule extends Rule {
 
   get resolution(): string {
     if (this.add) {
-      return `cat > ${this.filePath} << EOF
+      return `add_cmd[BEFOREPATH]${this.filePath}[AFTERPATH][BEFORECONTENT]
 ${this.contents}
-EOF`;
+[AFTERCONTENT]`;
     }
     else {
-      return `rm ${this.filePath}`;
+      return `remove_cmd ${this.filePath}`;
     }
   }
 

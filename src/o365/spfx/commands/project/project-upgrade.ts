@@ -7,7 +7,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { Finding, Utils, Hash, Dictionary } from './project-upgrade/';
 import { Rule } from './project-upgrade/rules/Rule';
-import { EOL } from 'os';
+import * as os from 'os';
 import { Project, Manifest, TsFile, ScssFile } from './project-upgrade/model';
 import { FindingToReport } from './project-upgrade/FindingToReport';
 import { FN017001_MISC_npm_dedupe } from './project-upgrade/rules/FN017001_MISC_npm_dedupe';
@@ -23,12 +23,14 @@ interface Options extends GlobalOptions {
   outputFile?: string;
   packageManager?: string;
   toVersion?: string;
+  shell?: string;
 }
 
 class SpfxProjectUpgradeCommand extends Command {
   private projectVersion: string | undefined;
   private toVersion: string = '';
   private packageManager: string = 'npm';
+  private shell: string = 'bash';
   private projectRootPath: string | null = null;
   private allFindings: Finding[] = [];
   private supportedVersions: string[] = [
@@ -76,6 +78,68 @@ class SpfxProjectUpgradeCommand extends Command {
     }
   }
 
+  private static copyCommands = {
+    bash: {
+      copyCommand: 'cp',
+      copyDestinationParam: ' '
+    },
+    powershell: {
+      copyCommand: 'Copy-Item',
+      copyDestinationParam: ' -Destination '
+    },
+    cmd: {
+      copyCommand: 'copy',
+      copyDestinationParam: ' '
+    }
+  }
+
+  private static createDirectoryCommands = {
+    bash: {
+      createDirectoryCommand: 'mkdir',
+      createDirectoryPathParam: ' ',
+      createDirectoryNameParam: '/',
+      createDirectoryItemTypeParam: '',
+    },
+    powershell: {
+      createDirectoryCommand: 'New-Item',
+      createDirectoryPathParam: ' -Path "',
+      createDirectoryNameParam: '" -Name "',
+      createDirectoryItemTypeParam: '" -ItemType "directory"',
+    },
+    cmd: {
+      createDirectoryCommand: 'mkdir',
+      createDirectoryPathParam: ' "',
+      createDirectoryNameParam: '\\',
+      createDirectoryItemTypeParam: '"',
+    }
+  }
+
+  private static addFileCommands = {
+    bash: {
+      addFileCommand: 'cat > [FILEPATH] << EOF [FILECONTENT]EOF',
+    },
+    powershell: {
+      addFileCommand: `@"[FILECONTENT]"@ | Out-File -FilePath "[FILEPATH]"
+      `,
+    },
+    cmd: {
+      addFileCommand: `echo [FILECONTENT] > "[FILEPATH]"
+      `,
+    }
+  }
+
+  private static removeFileCommands = {
+    bash: {
+      removeFileCommand: 'rm',
+    },
+    powershell: {
+      removeFileCommand: 'Remove-Item',
+    },
+    cmd: {
+      removeFileCommand: 'del',
+    }
+  }
+
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
   public static ERROR_UNSUPPORTED_TO_VERSION: number = 2;
   public static ERROR_NO_VERSION: number = 3;
@@ -95,6 +159,7 @@ class SpfxProjectUpgradeCommand extends Command {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.toVersion = args.options.toVersion || this.supportedVersions[this.supportedVersions.length - 1];
     telemetryProps.packageManager = args.options.packageManager || 'npm';
+    telemetryProps.shell = args.options.shell || 'bash';
     return telemetryProps;
   }
 
@@ -116,6 +181,7 @@ class SpfxProjectUpgradeCommand extends Command {
 
     this.toVersion = args.options.toVersion ? args.options.toVersion : this.supportedVersions[this.supportedVersions.length - 1];
     this.packageManager = args.options.packageManager || 'npm';
+    this.shell = args.options.shell || 'bash';
 
     if (this.supportedVersions.indexOf(this.toVersion) < 0) {
       cb(new CommandError(`Office 365 CLI doesn't support upgrading SharePoint Framework projects to version ${this.toVersion}. Supported versions are ${this.supportedVersions.join(', ')}`, SpfxProjectUpgradeCommand.ERROR_UNSUPPORTED_TO_VERSION));
@@ -232,6 +298,45 @@ class SpfxProjectUpgradeCommand extends Command {
         f.resolution = f.resolution.replace('install', this.getPackageManagerCommand('install'));
         return;
       }
+
+      // copy support for multiple shells
+      if (f.resolution.startsWith('copy_cmd')) {
+        f.resolution = f.resolution.replace('copy_cmd', this.getCopyCommand('copyCommand'));
+        f.resolution = f.resolution.replace('DestinationParam', this.getCopyCommand('copyDestinationParam'));
+        return;
+      }
+      // createdir support for multiple shells
+      if (f.resolution.startsWith('create_dir_cmd')) {
+        f.resolution = f.resolution.replace('create_dir_cmd', this.getDirectoryCommand('createDirectoryCommand'));
+        f.resolution = f.resolution.replace('NameParam', this.getDirectoryCommand('createDirectoryNameParam'));
+        f.resolution = f.resolution.replace('PathParam', this.getDirectoryCommand('createDirectoryPathParam'));
+        f.resolution = f.resolution.replace('ItemTypeParam', this.getDirectoryCommand('createDirectoryItemTypeParam'));
+        return;
+      }
+      // 'Add' support for multiple shells
+      if (f.resolution.startsWith('add_cmd')) {
+        const pathStart: number = f.resolution.indexOf('[BEFOREPATH]') + '[BEFOREPATH]'.length;
+        const pathEnd: number = f.resolution.indexOf('[AFTERPATH]');
+        const filePath: string = f.resolution.substring(pathStart, pathEnd);
+
+        const contentStart: number = f.resolution.indexOf('[BEFORECONTENT]') + '[BEFORECONTENT]'.length;
+        const contentEnd: number = f.resolution.indexOf('[AFTERCONTENT]');
+        const fileContent: string = f.resolution.substring(contentStart, contentEnd);
+
+        f.resolution = this.getAddCommand('addFileCommand');
+        f.resolution = f.resolution.replace('[FILECONTENT]', fileContent)
+        f.resolution = f.resolution.replace('[FILEPATH]', filePath);
+        f.resolution = f.resolution.replace('[BEFOREPATH]', ' ');
+        f.resolution = f.resolution.replace('[AFTERPATH]', ' ');
+        f.resolution = f.resolution.replace('[BEFORECONTENT]', ' ');
+        f.resolution = f.resolution.replace('[AFTERCONTENT]', ' ');
+        return;
+      }
+      // 'Remove' support for multiple shells
+      if (f.resolution.startsWith('remove_cmd')) {
+        f.resolution = f.resolution.replace('remove_cmd', this.getRemoveCommand('removeFileCommand'));
+        return;
+      }
     });
 
     switch (args.options.output) {
@@ -239,10 +344,10 @@ class SpfxProjectUpgradeCommand extends Command {
         this.writeReport(findingsToReport, cmd, args.options);
         break;
       case 'md':
-          this.writeReport(this.getMdReport(findingsToReport), cmd, args.options);
+        this.writeReport(this.getMdReport(findingsToReport), cmd, args.options);
         break;
       default:
-          this.writeReport(this.getTextReport(findingsToReport), cmd, args.options);
+        this.writeReport(this.getTextReport(findingsToReport), cmd, args.options);
     }
 
     cb();
@@ -416,24 +521,24 @@ class SpfxProjectUpgradeCommand extends Command {
   private getTextReport(findings: FindingToReport[]): string {
     const reportData: ReportData = this.getReportData(findings);
     const s: string[] = [
-      'Execute in command line', EOL,
-      '-----------------------', EOL,
+      'Execute in ' + this.shell, os.EOL,
+      '-----------------------', os.EOL,
       (reportData.packageManagerCommands
         .concat(reportData.commandsToExecute
           .filter((command) =>
             command.indexOf(this.getPackageManagerCommand('install')) === -1 &&
             command.indexOf(this.getPackageManagerCommand('installDev')) === -1 &&
             command.indexOf(this.getPackageManagerCommand('uninstall')) === -1 &&
-            command.indexOf(this.getPackageManagerCommand('uninstallDev')) === -1))).join(EOL), EOL,
-      EOL,
+            command.indexOf(this.getPackageManagerCommand('uninstallDev')) === -1))).join(os.EOL), os.EOL,
+      os.EOL,
       Object.keys(reportData.modificationPerFile).map(file => {
         return [
-          file, EOL,
-          '-'.repeat(file.length), EOL,
-          reportData.modificationPerFile[file].map((m: ReportDataModification) => `${m.description}:${EOL}${m.modification}${EOL}`).join(EOL), EOL,
+          file, os.EOL,
+          '-'.repeat(file.length), os.EOL,
+          reportData.modificationPerFile[file].map((m: ReportDataModification) => `${m.description}:${os.EOL}${m.modification}${os.EOL}`).join(os.EOL), os.EOL,
         ].join('');
-      }).join(EOL),
-      EOL,
+      }).join(os.EOL),
+      os.EOL,
     ];
 
     return s.join('').trim();
@@ -468,51 +573,51 @@ ${f.resolution}
       }
 
       findingsToReport.push(
-        `### ${f.id} ${f.title} | ${f.severity}`, EOL,
-        EOL,
-        f.description, EOL,
-        EOL,
+        `### ${f.id} ${f.title} | ${f.severity}`, os.EOL,
+        os.EOL,
+        f.description, os.EOL,
+        os.EOL,
         resolution,
-        EOL,
-        `File: [${f.file}${(f.position ? `:${f.position.line}:${f.position.character}` : '')}](${f.file})`, EOL,
-        EOL
+        os.EOL,
+        `File: [${f.file}${(f.position ? `:${f.position.line}:${f.position.character}` : '')}](${f.file})`, os.EOL,
+        os.EOL
       );
     });
 
     const s: string[] = [
-      `# Upgrade project ${path.posix.basename(this.projectRootPath as string)} to v${this.toVersion}`, EOL,
-      EOL,
-      `Date: ${(new Date().toLocaleDateString())}`, EOL,
-      EOL,
-      '## Findings', EOL,
-      EOL,
-      `Following is the list of steps required to upgrade your project to SharePoint Framework version ${this.toVersion}. [Summary](#Summary) of the modifications is included at the end of the report.`, EOL,
-      EOL,
+      `# Upgrade project ${path.posix.basename(this.projectRootPath as string)} to v${this.toVersion}`, os.EOL,
+      os.EOL,
+      `Date: ${(new Date().toLocaleDateString())}`, os.EOL,
+      os.EOL,
+      '## Findings', os.EOL,
+      os.EOL,
+      `Following is the list of steps required to upgrade your project to SharePoint Framework version ${this.toVersion}. [Summary](#Summary) of the modifications is included at the end of the report.`, os.EOL,
+      os.EOL,
       findingsToReport.join(''),
-      '## Summary', EOL,
-      EOL,
-      '### Execute script', EOL,
-      EOL,
-      '```sh', EOL,
+      '## Summary', os.EOL,
+      os.EOL,
+      '### Execute script', os.EOL,
+      os.EOL,
+      '```sh', os.EOL,
       (reportData.packageManagerCommands
         .concat(reportData.commandsToExecute
           .filter((command) =>
             command.indexOf(this.getPackageManagerCommand('install')) === -1 &&
             command.indexOf(this.getPackageManagerCommand('installDev')) === -1 &&
             command.indexOf(this.getPackageManagerCommand('uninstall')) === -1 &&
-            command.indexOf(this.getPackageManagerCommand('uninstallDev')) === -1))).join(EOL), EOL,
-      '```', EOL,
-      EOL,
-      '### Modify files', EOL,
-      EOL,
+            command.indexOf(this.getPackageManagerCommand('uninstallDev')) === -1))).join(os.EOL), os.EOL,
+      '```', os.EOL,
+      os.EOL,
+      '### Modify files', os.EOL,
+      os.EOL,
       Object.keys(reportData.modificationPerFile).map(file => {
         return [
-          `#### [${file}](${file})`, EOL,
-          EOL,
-          reportData.modificationPerFile[file].map((m: ReportDataModification) => `${m.description}:${EOL}${EOL}\`\`\`${reportData.modificationTypePerFile[file]}${EOL}${m.modification}${EOL}\`\`\``).join(EOL + EOL), EOL,
+          `#### [${file}](${file})`, os.EOL,
+          os.EOL,
+          reportData.modificationPerFile[file].map((m: ReportDataModification) => `${m.description}:${os.EOL}${os.EOL}\`\`\`${reportData.modificationTypePerFile[file]}${os.EOL}${m.modification}${os.EOL}\`\`\``).join(os.EOL + os.EOL), os.EOL,
         ].join('');
-      }).join(EOL),
-      EOL,
+      }).join(os.EOL),
+      os.EOL,
     ];
 
     return s.join('').trim();
@@ -612,6 +717,22 @@ ${f.resolution}
     return (SpfxProjectUpgradeCommand.packageCommands as any)[this.packageManager][command];
   }
 
+  private getCopyCommand(command: string): string {
+    return (SpfxProjectUpgradeCommand.copyCommands as any)[this.shell][command];
+  }
+
+  private getDirectoryCommand(command: string): string {
+    return (SpfxProjectUpgradeCommand.createDirectoryCommands as any)[this.shell][command];
+  }
+
+  private getAddCommand(command: string): string {
+    return (SpfxProjectUpgradeCommand.addFileCommands as any)[this.shell][command];
+  }
+
+  private getRemoveCommand(command: string): string {
+    return (SpfxProjectUpgradeCommand.removeFileCommands as any)[this.shell][command];
+  }
+
   private getProjectRoot(folderPath: string): string | null {
     const packageJsonPath: string = path.resolve(folderPath, 'package.json');
     if (fs.existsSync(packageJsonPath)) {
@@ -668,6 +789,11 @@ ${f.resolution}
         autocomplete: ['npm', 'pnpm', 'yarn']
       },
       {
+        option: '--shell [shell]',
+        description: 'The shell you use. Supported shells bash|powershell|cmd. Default bash',
+        autocomplete: ['bash', 'powershell', 'cmd']
+      },
+      {
         option: '-f, --outputFile [outputFile]',
         description: 'Path to the file where the upgrade report should be stored in'
       }
@@ -688,6 +814,12 @@ ${f.resolution}
       if (args.options.packageManager) {
         if (['npm', 'pnpm', 'yarn'].indexOf(args.options.packageManager) < 0) {
           return `${args.options.packageManager} is not a supported package manager. Supported package managers are npm, pnpm and yarn`;
+        }
+      }
+
+      if (args.options.shell) {
+        if (['bash', 'powershell', 'cmd'].indexOf(args.options.shell) < 0) {
+          return `${args.options.shell} is not a supported shell. Supported shells are bash, powershell and cmd`;
         }
       }
 
@@ -749,6 +881,11 @@ ${f.resolution}
     Get instructions to upgrade the current SharePoint Framework project to the
     latest SharePoint Framework version supported by the Office 365 CLI
       ${this.name}
+
+    Get instructions to upgrade the current SharePoint Framework project to the
+    latest SharePoint Framework version supported by the Office 365 CLI using
+    PowerShell
+      ${this.name} --shell powershell
 `);
   }
 }
