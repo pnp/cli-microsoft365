@@ -23,12 +23,14 @@ interface Options extends GlobalOptions {
   outputFile?: string;
   packageManager?: string;
   toVersion?: string;
+  shell?: string;
 }
 
 class SpfxProjectUpgradeCommand extends Command {
   private projectVersion: string | undefined;
   private toVersion: string = '';
   private packageManager: string = 'npm';
+  private shell: string = 'bash';
   private projectRootPath: string | null = null;
   private allFindings: Finding[] = [];
   private supportedVersions: string[] = [
@@ -76,6 +78,21 @@ class SpfxProjectUpgradeCommand extends Command {
     }
   }
 
+  private static copyCommands = {
+    bash: {
+      copyCommand: 'cp',
+      copyDestinationParam: ' '
+    },
+    powershell: {
+      copyCommand: 'Copy-Item',
+      copyDestinationParam: ' -Destination '
+    },
+    cmd: {
+      copyCommand: 'xcopy',
+      copyDestinationParam: ' '
+    }
+  }
+
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
   public static ERROR_UNSUPPORTED_TO_VERSION: number = 2;
   public static ERROR_NO_VERSION: number = 3;
@@ -95,6 +112,7 @@ class SpfxProjectUpgradeCommand extends Command {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.toVersion = args.options.toVersion || this.supportedVersions[this.supportedVersions.length - 1];
     telemetryProps.packageManager = args.options.packageManager || 'npm';
+    telemetryProps.shell = args.options.shell || 'bash';
     return telemetryProps;
   }
 
@@ -116,6 +134,7 @@ class SpfxProjectUpgradeCommand extends Command {
 
     this.toVersion = args.options.toVersion ? args.options.toVersion : this.supportedVersions[this.supportedVersions.length - 1];
     this.packageManager = args.options.packageManager || 'npm';
+    this.shell = args.options.shell || 'bash';
 
     if (this.supportedVersions.indexOf(this.toVersion) < 0) {
       cb(new CommandError(`Office 365 CLI doesn't support upgrading SharePoint Framework projects to version ${this.toVersion}. Supported versions are ${this.supportedVersions.join(', ')}`, SpfxProjectUpgradeCommand.ERROR_UNSUPPORTED_TO_VERSION));
@@ -232,6 +251,13 @@ class SpfxProjectUpgradeCommand extends Command {
         f.resolution = f.resolution.replace('install', this.getPackageManagerCommand('install'));
         return;
       }
+
+      //copy support for multiple shells
+      if (f.resolution.startsWith('copy')) {
+        f.resolution = f.resolution.replace('copy', this.getCopyCommand('copyCommand'));
+        f.resolution = f.resolution.replace('DestinationParam', this.getCopyCommand('copyDestinationParam'));
+        return;
+      }
     });
 
     switch (args.options.output) {
@@ -239,10 +265,10 @@ class SpfxProjectUpgradeCommand extends Command {
         this.writeReport(findingsToReport, cmd, args.options);
         break;
       case 'md':
-          this.writeReport(this.getMdReport(findingsToReport), cmd, args.options);
+        this.writeReport(this.getMdReport(findingsToReport), cmd, args.options);
         break;
       default:
-          this.writeReport(this.getTextReport(findingsToReport), cmd, args.options);
+        this.writeReport(this.getTextReport(findingsToReport), cmd, args.options);
     }
 
     cb();
@@ -612,6 +638,10 @@ ${f.resolution}
     return (SpfxProjectUpgradeCommand.packageCommands as any)[this.packageManager][command];
   }
 
+  private getCopyCommand(command: string): string {
+    return (SpfxProjectUpgradeCommand.copyCommands as any)[this.shell][command];
+  }
+
   private getProjectRoot(folderPath: string): string | null {
     const packageJsonPath: string = path.resolve(folderPath, 'package.json');
     if (fs.existsSync(packageJsonPath)) {
@@ -668,6 +698,11 @@ ${f.resolution}
         autocomplete: ['npm', 'pnpm', 'yarn']
       },
       {
+        option: '--shell [shell]',
+        description: 'The shell you use. Supported shells bash|powershell|cmd. Default bash',
+        autocomplete: ['bash', 'powershell', 'cmd']
+      },
+      {
         option: '-f, --outputFile [outputFile]',
         description: 'Path to the file where the upgrade report should be stored in'
       }
@@ -688,6 +723,11 @@ ${f.resolution}
       if (args.options.packageManager) {
         if (['npm', 'pnpm', 'yarn'].indexOf(args.options.packageManager) < 0) {
           return `${args.options.packageManager} is not a supported package manager. Supported package managers are npm, pnpm and yarn`;
+        }
+      }
+      if (args.options.shell) {
+        if (['bash', 'powershell', 'cmd'].indexOf(args.options.shell) < 0) {
+          return `${args.options.shell} is not a supported shell. Supported package managers are bash, powershell and cmd`;
         }
       }
 
