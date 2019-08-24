@@ -78,6 +78,21 @@ class SpfxProjectUpgradeCommand extends Command {
     }
   }
 
+  private static copyCommands = {
+    bash: {
+      copyCommand: 'cp',
+      copyDestinationParam: ' '
+    },
+    powershell: {
+      copyCommand: 'Copy-Item',
+      copyDestinationParam: ' -Destination '
+    },
+    cmd: {
+      copyCommand: 'xcopy',
+      copyDestinationParam: ' '
+    }
+  }
+
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
   public static ERROR_UNSUPPORTED_TO_VERSION: number = 2;
   public static ERROR_NO_VERSION: number = 3;
@@ -225,6 +240,12 @@ class SpfxProjectUpgradeCommand extends Command {
       }
       if (f.resolution.startsWith('install')) {
         f.resolution = f.resolution.replace('install', this.getPackageManagerCommand('install'));
+        return;
+      }
+      //copy support for multiple shells
+      if (f.resolution.startsWith('copy')) {
+        f.resolution = f.resolution.replace('copy', this.getCopyCommand('copyCommand'));
+        f.resolution = f.resolution.replace('DestinationParam', this.getCopyCommand('copyDestinationParam'));
         return;
       }
     });
@@ -600,6 +621,10 @@ ${f.resolution}
     return (SpfxProjectUpgradeCommand.packageCommands as any)[this.packageManager][command];
   }
 
+  private getCopyCommand(command: string): string {
+    return (SpfxProjectUpgradeCommand.copyCommands as any)[this.shell][command];
+  }
+
   private getProjectRoot(folderPath: string): string | null {
     const packageJsonPath: string = path.resolve(folderPath, 'package.json');
     if (fs.existsSync(packageJsonPath)) {
@@ -736,7 +761,8 @@ ${f.resolution}
     Get instructions to upgrade the current SharePoint Framework project to the
     latest SharePoint Framework version supported by the Office 365 CLI
       ${chalk.grey(config.delimiter)} ${this.name}
-`);
+    `
+    );
   }
 }
 
