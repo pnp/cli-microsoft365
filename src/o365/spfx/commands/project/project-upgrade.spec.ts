@@ -39,6 +39,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     telemetry = null;
     (command as any).allFindings = [];
     (command as any).packageManager = 'npm';
+    (command as any).shell = 'bash';
     packagesDevExact = [];
     packagesDepExact = [];
     packagesDepUn = [];
@@ -1889,6 +1890,31 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   it('passes validation when yarn package manager specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { packageManager: 'yarn' } });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation when shell not specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { } });
+    assert.equal(actual, true);
+  });
+
+  it('fails validation when unsupported shell specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { packageManager: 'abc' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('passes validation when bash shell specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { shell: 'bash' } });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation when powershell shell specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { shell: 'powershell' } });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation when cmd shell specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { shell: 'cmd' } });
     assert.equal(actual, true);
   });
 
