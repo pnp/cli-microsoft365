@@ -1,3 +1,5 @@
+Export report data of teams report useractivityuserdetail command
+
 # Release notes
 
 ## [v2.0.0](https://github.com/pnp/office365-cli/releases/tag/v2.0.0)
@@ -8,6 +10,8 @@
 
 - [spo apppage add](../cmd/spo/apppage/apppage-add.md) - creates a single-part app page [#874](https://github.com/pnp/office365-cli/issues/874)
 - [spo homesite remove](../cmd/spo/homesite/homesite-remove.md) - removes the current Home Site [#1002](https://github.com/pnp/office365-cli/issues/1002)
+- [spo orgassetslibrary list](../cmd/spo/orgassetslibrary/orgassetslibrary-list.md) - lists all libraries that are assigned as org asset library [#1041](https://github.com/pnp/office365-cli/issues/1041)
+- [spo get](../cmd/spo/get.md) - gets the context URL for the root SharePoint site collection and SharePoint tenant admin site [#1071](https://github.com/pnp/office365-cli/issues/1071)
 
 **Microsoft Teams:**
 
