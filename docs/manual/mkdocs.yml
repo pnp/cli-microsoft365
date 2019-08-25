@@ -73,6 +73,7 @@ nav:
       - project:
         - project upgrade: 'cmd/spfx/project/project-upgrade.md'
     - SharePoint Online (spo):
+      - get: 'cmd/spo/get.md'
       - app:
         - app add: 'cmd/spo/app/app-add.md'
         - app deploy: 'cmd/spo/app/app-deploy.md'
