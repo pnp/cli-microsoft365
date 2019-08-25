@@ -132,6 +132,7 @@ export default {
   SERVICEPRINCIPAL_SET: `${prefix} serviceprincipal set`,
   SEARCH: `${prefix} search`,
   GET: `${prefix} get`,
+  SET: `${prefix} set`,
   SITE_ADD: `${prefix} site add`,
   SITE_APPCATALOG_ADD: `${prefix} site appcatalog add`,
   SITE_APPCATALOG_REMOVE: `${prefix} site appcatalog remove`,
