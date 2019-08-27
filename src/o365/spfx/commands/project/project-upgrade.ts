@@ -93,6 +93,24 @@ class SpfxProjectUpgradeCommand extends Command {
     }
   }
 
+  private static createDirectoryCommands = {
+    bash: {
+      createDirectoryCommand: 'mkdir',
+      createDirectoryNameParam: ' ',
+      createDirectoryItemTypeParam: ' ',
+    },
+    powershell: {
+      createDirectoryCommand: 'New-Item',
+      createDirectoryNameParam: '-Name ',
+      createDirectoryItemTypeParam: '-ItemType "directory"',
+    },
+    cmd: {
+      createDirectoryCommand: 'mkdir',
+      createDirectoryNameParam: ' ',
+      createDirectoryItemTypeParam: ' ',
+    }
+  }
+
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
   public static ERROR_UNSUPPORTED_TO_VERSION: number = 2;
   public static ERROR_NO_VERSION: number = 3;
@@ -256,6 +274,14 @@ class SpfxProjectUpgradeCommand extends Command {
       if (f.resolution.startsWith('copy')) {
         f.resolution = f.resolution.replace('copy', this.getCopyCommand('copyCommand'));
         f.resolution = f.resolution.replace('DestinationParam', this.getCopyCommand('copyDestinationParam'));
+        return;
+      }
+      //createdir support for multiple shells
+      //trim() to remove whitespaces when trailing params (createDirectoryNameParam and createDirectoryItemTypeParam) are blank
+      if (f.resolution.startsWith('createDir')) {
+        f.resolution = f.resolution.replace('createDir', this.getDirectoryCommand('createDirectoryCommand')).trim();
+        f.resolution = f.resolution.replace('NameParam', this.getDirectoryCommand('createDirectoryNameParam')).trim();
+        f.resolution = f.resolution.replace('ItemTypeParam', this.getDirectoryCommand('createDirectoryItemTypeParam')).trim();
         return;
       }
     });
@@ -442,7 +468,7 @@ class SpfxProjectUpgradeCommand extends Command {
   private getTextReport(findings: FindingToReport[]): string {
     const reportData: ReportData = this.getReportData(findings);
     const s: string[] = [
-      'Execute in command line', EOL,
+      'Execute in ' + this.shell, EOL,
       '-----------------------', EOL,
       (reportData.packageManagerCommands
         .concat(reportData.commandsToExecute
@@ -640,6 +666,10 @@ ${f.resolution}
 
   private getCopyCommand(command: string): string {
     return (SpfxProjectUpgradeCommand.copyCommands as any)[this.shell][command];
+  }
+
+  private getDirectoryCommand(command: string): string {
+    return (SpfxProjectUpgradeCommand.createDirectoryCommands as any)[this.shell][command];
   }
 
   private getProjectRoot(folderPath: string): string | null {
