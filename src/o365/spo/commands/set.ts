@@ -34,8 +34,11 @@ class SpoSetCommand extends SpoCommand {
     }
 
     auth.service.spoUrl = args.options.url;
-    auth.storeConnectionInfo();
-    cb();
+    auth.storeConnectionInfo().then(() => {
+      cb();
+    }, err => {
+      cb(err);
+    });
   }
 
   public options(): CommandOption[] {
