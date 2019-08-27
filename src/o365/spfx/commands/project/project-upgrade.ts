@@ -109,6 +109,33 @@ class SpfxProjectUpgradeCommand extends Command {
       createDirectoryNameParam: ' ',
       createDirectoryItemTypeParam: ' ',
     }
+  }     
+
+  private static addFileCommands = {
+    bash: {
+      addFileCommand: 'cat >',
+      addFileCommandParam: ' << EOF',
+    },
+    powershell: {
+      addFileCommand: 'Get-Content -Path',
+      addFileCommandParam: '',
+    },
+    cmd: {
+      addFileCommand: 'type',
+      addFileCommandParam: '',
+    }
+  }
+
+  private static removeFileCommands = {
+    bash: {
+      removeFileCommand: 'rm',
+    },
+    powershell: {
+      removeFileCommand: 'Remove-Item',
+    },
+    cmd: {
+      removeFileCommand: 'del',
+    }
   }
 
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
@@ -277,13 +304,23 @@ class SpfxProjectUpgradeCommand extends Command {
         return;
       }
       //createdir support for multiple shells
-      //trim() to remove whitespaces when trailing params (createDirectoryNameParam and createDirectoryItemTypeParam) are blank
       if (f.resolution.startsWith('createDir')) {
-        f.resolution = f.resolution.replace('createDir', this.getDirectoryCommand('createDirectoryCommand')).trim();
-        f.resolution = f.resolution.replace('NameParam', this.getDirectoryCommand('createDirectoryNameParam')).trim();
-        f.resolution = f.resolution.replace('ItemTypeParam', this.getDirectoryCommand('createDirectoryItemTypeParam')).trim();
+        f.resolution = f.resolution.replace('createDir', this.getDirectoryCommand('createDirectoryCommand'));
+        f.resolution = f.resolution.replace('NameParam', this.getDirectoryCommand('createDirectoryNameParam'));
+        f.resolution = f.resolution.replace('ItemTypeParam', this.getDirectoryCommand('createDirectoryItemTypeParam'));
         return;
       }
+      //'Add' support for multiple shells
+      if (f.resolution.startsWith('Add')) {
+        f.resolution = f.resolution.replace('Add', this.getAddCommand('addFileCommand'));
+        f.resolution = f.resolution.replace('AddParam', this.getAddCommand('addFileCommandParam'));
+        return;
+      }
+      //'Remove' support for multiple shells
+      if (f.resolution.startsWith('Remove')) {
+        f.resolution = f.resolution.replace('Remove', this.getRemoveCommand('removeFileCommand'));
+        return;
+      }      
     });
 
     switch (args.options.output) {
@@ -670,6 +707,14 @@ ${f.resolution}
 
   private getDirectoryCommand(command: string): string {
     return (SpfxProjectUpgradeCommand.createDirectoryCommands as any)[this.shell][command];
+  }
+
+  private getAddCommand(command: string): string {
+    return (SpfxProjectUpgradeCommand.addFileCommands as any)[this.shell][command];
+  }
+
+  private getRemoveCommand(command: string): string {
+    return (SpfxProjectUpgradeCommand.removeFileCommands as any)[this.shell][command];
   }
 
   private getProjectRoot(folderPath: string): string | null {

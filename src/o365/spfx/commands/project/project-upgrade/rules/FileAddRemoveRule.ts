@@ -19,12 +19,12 @@ export abstract class FileAddRemoveRule extends Rule {
 
   get resolution(): string {
     if (this.add) {
-      return `cat > ${this.filePath} << EOF
+      return `Add ${this.filePath} AddParam
 ${this.contents}
 EOF`;
     }
     else {
-      return `rm ${this.filePath}`;
+      return `Remove ${this.filePath}`;
     }
   }
 
