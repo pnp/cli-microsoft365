@@ -7,7 +7,7 @@ import * as assert from 'assert';
 import Utils from '../../../Utils';
 import auth from '../../../Auth';
 
-describe(commands.WEB_SET, () => {
+describe(commands.SET, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
