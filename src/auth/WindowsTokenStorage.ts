@@ -97,7 +97,7 @@ export class WindowsTokenStorage implements TokenStorage {
           rawPassword = chunks.join('');
         }
 
-        resolve(new Buffer(rawPassword, 'hex').toString('utf8'));
+        resolve(Buffer.from(rawPassword, 'hex').toString('utf8'));
       });
     });
   };
@@ -131,7 +131,7 @@ export class WindowsTokenStorage implements TokenStorage {
             const args: string[] = [
               '-a',
               '-t', e.name,
-              '-p', new Buffer(e.value as string, 'utf8').toString('hex')
+              '-p', Buffer.from(e.value as string, 'utf8').toString('hex')
             ];
 
             childProcess.execFile(this.credsExePath, args, (err: Error | null, stdout: string, stderr: string): void => {
