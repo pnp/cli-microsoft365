@@ -90,8 +90,24 @@ describe(commands.SET, () => {
 
     cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("Login to Office 365 first")));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Login to Office 365 first')));
         assert.equal(auth.service.spoUrl, undefined);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('throws error when setting the password fails', (done) => {
+    auth.service.connected = true;
+    Utils.restore(auth.storeConnectionInfo);
+    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.reject('An error has occurred while setting the password'))
+
+    cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com' } }, (err?: any) => {
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred while setting the password')));
         done();
       }
       catch (e) {

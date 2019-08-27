@@ -37,7 +37,7 @@ class SpoSetCommand extends SpoCommand {
     auth.storeConnectionInfo().then(() => {
       cb();
     }, err => {
-      cb(err);
+      cb(new CommandError(err));
     });
   }
 
