@@ -1857,7 +1857,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.6.0' } }, (err?: any) => {
-      assert(log[0].indexOf('Execute in command line') > -1);
+      assert(log[0].indexOf('Execute in ') > -1);
     });
   });
 
