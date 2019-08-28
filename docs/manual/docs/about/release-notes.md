@@ -12,6 +12,7 @@ Export report data of teams report useractivityuserdetail command
 - [spo homesite remove](../cmd/spo/homesite/homesite-remove.md) - removes the current Home Site [#1002](https://github.com/pnp/office365-cli/issues/1002)
 - [spo orgassetslibrary list](../cmd/spo/orgassetslibrary/orgassetslibrary-list.md) - lists all libraries that are assigned as org asset library [#1041](https://github.com/pnp/office365-cli/issues/1041)
 - [spo get](../cmd/spo/get.md) - gets the context URL for the root SharePoint site collection and SharePoint tenant admin site [#1071](https://github.com/pnp/office365-cli/issues/1071)
+- [spo set](../cmd/spo/set.md) - sets the URL of the root SharePoint site collection for use in SPO commands [#1070](https://github.com/pnp/office365-cli/issues/1070)
 
 **Microsoft Teams:**
 
