@@ -195,6 +195,96 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
     });
   });
 
+  it('removes the specified channel when prompt confirmed (debug)', (done) => {
+    let teamsChannelDeleteCallIssued = false;
+
+    sinon.stub(request, 'delete').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/d66b8110-fcad-49e8-8159-0d488ddb7656/channels/19%3Af3dcbb1674574677abcae89cb626f1e6%40thread.skype`) {
+        teamsChannelDeleteCallIssued = true;
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
+    cmdInstance.action({
+      options: {
+        debug: true,
+        channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
+        teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+      }
+    }, () => {
+      try {
+        assert(teamsChannelDeleteCallIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('removes the specified channel without prompting when confirmed specified', (done) => {
+    sinon.stub(request, 'delete').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/d66b8110-fcad-49e8-8159-0d488ddb7656/channels/19%3Af3dcbb1674574677abcae89cb626f1e6%40thread.skype`) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({
+      options: {
+        debug: true,
+        channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
+        teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+      }
+    }, () => {
+      done();
+    }, (err: any) => done(err));
+  });
+
+  it('should handle Microsoft graph error response', (done) => {
+    sinon.stub(request, 'delete').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/d66b8110-fcad-49e8-8159-0d488ddb7656/channels/19%3Af3dcbb1674574677abcae89cb626f1e6%40thread.skype`) {
+        return Promise.reject({
+          "error": {
+            "code": "ItemNotFound",
+            "message": "Failed to execute Skype backend request GetThreadS2SRequest.",
+            "innerError": {
+              "request-id": "5a563fc6-6df2-4cd9-b0b8-9810f1110714",
+              "date": "2019-08-28T19:18:30"
+            }
+          }
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action = command.action();
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
+    cmdInstance.action({
+      options: {
+        channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
+        teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
+      }
+    }, (err?: any) => {
+      try {
+        assert.equal(err.message, "Failed to execute Skype backend request GetThreadS2SRequest.");
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('supports debug mode', () => {
     const options = (command.options() as CommandOption[]);
     let containsOption = false;

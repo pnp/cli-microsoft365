@@ -3,8 +3,9 @@ import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandOption, CommandValidate
 } from '../../../../Command';
-import GraphCommand from '../../../base/GraphCommand';
 import Utils from '../../../../Utils';
+import request from '../../../../request';
+import GraphCommand from '../../../base/GraphCommand';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -36,8 +37,29 @@ class TeamsChannelRemoveCommand extends GraphCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+
+    const removeChannel: () => void = (): void => {
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels/${encodeURIComponent(args.options.channelId)}`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        json: true
+      };
+
+      request
+        .delete(requestOptions)
+        .then((): void => {
+          if (this.verbose) {
+            cmd.log(vorpal.chalk.green('DONE'));
+          }
+
+          cb();
+        }, (err: any) => this.handleRejectedODataJsonPromise(err, cmd, cb));
+    };
+
     if (args.options.confirm) {
-      this.removeChannel();
+      removeChannel();
     }
     else {
       cmd.prompt({
@@ -46,14 +68,15 @@ class TeamsChannelRemoveCommand extends GraphCommand {
         default: false,
         message: `Are you sure you want to remove the channel ${args.options.channelId} from team ${args.options.teamId}?`,
       }, (result: { continue: boolean }): void => {
-        cb();
+        if (!result.continue) {
+          cb();
+        }
+        else {
+          removeChannel();
+        }
       });
     }
   }
-
-  private removeChannel(): void {
-
-  };
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
@@ -111,6 +134,11 @@ class TeamsChannelRemoveCommand extends GraphCommand {
 
     Removes the specified Teams channel without confirmation
       ${this.name} --channelId 19:f3dcbb1674574677abcae89cb626f1e6@thread.skype --teamId d66b8110-fcad-49e8-8159-0d488ddb7656 --confirm
+
+  More information:
+
+    directory resource type (deleted items)
+      https://docs.microsoft.com/en-us/graph/api/resources/directory?view=graph-rest-1.0
 `);
   }
 }
