@@ -23,6 +23,7 @@ export default {
   CONTENTTYPE_FIELD_REMOVE: `${prefix} contenttype field remove`,
   CONTENTTYPE_FIELD_SET: `${prefix} contenttype field set`,
   CONTENTTYPE_REMOVE: `${prefix} contenttype remove`,
+  CONTENTTYPEHUB_GET: `${prefix} contenttypehub get`,
   CUSTOMACTION_ADD: `${prefix} customaction add`,
   CUSTOMACTION_CLEAR: `${prefix} customaction clear`,
   CUSTOMACTION_GET: `${prefix} customaction get`,
