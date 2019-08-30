@@ -117,12 +117,12 @@ class SpfxProjectUpgradeCommand extends Command {
       addFileCommand2: ' << EOF',
     },
     powershell: {
-      addFileCommand1: '| Out-File -FilePath',
-      addFileCommand2: '',
+      addFileCommand1: '| Out-File -FilePath "',
+      addFileCommand2: '"',
     },
     cmd: {
-      addFileCommand1: '>',
-      addFileCommand2: '',
+      addFileCommand1: '> "',
+      addFileCommand2: '"',
     }
   }
 
