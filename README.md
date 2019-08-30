@@ -11,7 +11,7 @@
 
 Using the Office 365 CLI, you can manage your Microsoft Office 365 tenant and SharePoint Framework projects on any platform. No matter if you are on Windows, macOS or Linux, using Bash, Cmder or PowerShell, using the Office 365 CLI you can configure Office 365, manage SharePoint Framework projects and build automation scripts.
 
-[![asciicast](https://asciinema.org/a/203789.png)](https://asciinema.org/a/203789)
+[![asciicast](https://asciinema.org/a/265151.png)](https://asciinema.org/a/265151)
 
 ## Installation
 
@@ -45,13 +45,13 @@ o365$ _
 
 Running the `office365` command will start the immersive CLI with its own command prompt.
 
-Start managing the settings of your Office 365 tenant by logging in to it, using the `spo login <url>` site, for example:
+Start managing the settings of your Office 365 tenant by logging in to it, using the `login` command, for example:
 
 ```sh
-o365$ spo login https://contoso-admin.sharepoint.com
+o365$ login
 ```
 
-> Depending on which settings you want to manage you might need to log in either to your tenant admin site (URL with `-admin` in it), or to a regular SharePoint site. For more information refer to the help of the command you want to use.
+> Office 365 CLI will automatically detect the URL of your tenant based on the account that you use to sign in.
 
 To list all available commands, type in the Office 365 CLI prompt `help`:
 
