@@ -103,6 +103,27 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
     done();
   });
 
+  it('fails validation if the channelId is not valid channelId', (done) => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+        channelId: 'invalid'
+      }
+    });
+    assert.notEqual(actual, true);
+    done();
+  });
+
+  it('fails validation if the teamId is not a valid guid.', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        teamId: 'invalid',
+        channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype'
+      }
+    });
+    assert.notEqual(actual, true);
+  });
+
   it('prompts before removing the specified channel when confirm option not passed', (done) => {
     cmdInstance.action({
       options: {
@@ -227,7 +248,7 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
     });
   });
 
-  it('removes the specified channel without prompting when confirmed specified', (done) => {
+  it('removes the specified channel without prompting when confirmed specified (debug)', (done) => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/d66b8110-fcad-49e8-8159-0d488ddb7656/channels/19%3Af3dcbb1674574677abcae89cb626f1e6%40thread.skype`) {
         return Promise.resolve();
@@ -241,6 +262,7 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
         debug: true,
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+        confirm: true
       }
     }, () => {
       done();
