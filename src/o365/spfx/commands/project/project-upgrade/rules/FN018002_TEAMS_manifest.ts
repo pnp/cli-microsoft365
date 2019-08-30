@@ -23,7 +23,7 @@ export class FN018002_TEAMS_manifest extends Rule {
   }
 
   get resolution(): string {
-    return `__FilePath1POS1__ __filePath__ __FilePath1POS2__
+    return `Add __filePath__ __FilePath1POS2__
 {
   "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.2/MicrosoftTeams.schema.json",
   "manifestVersion": "1.2",

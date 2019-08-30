@@ -311,9 +311,9 @@ class SpfxProjectUpgradeCommand extends Command {
         return;
       }
       //'Add' support for multiple shells
-      if (f.resolution.startsWith('__FilePath1POS1__')) {
+      if (f.resolution.startsWith('Add')) {
 
-        const FilePath1POS1 = '__FilePath1POS1__';
+        const FilePath1POS1 = 'Add';
         const FilePath1POS2 = '__FilePath1POS2__';
         const FilePath2POS1 = '__FilePath2POS1__';
         const FilePath2POS2 = '__FilePath2POS2__';
