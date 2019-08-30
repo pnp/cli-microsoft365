@@ -103,7 +103,7 @@ class SpoContentTypeHubGetCommand extends SpoCommand {
       `  Examples:
   
     Retrieve the contenttype hub url
-      ${commands.FOLDER_RENAME}
+      ${commands.CONTENTTYPEHUB_GET}
     `);
   }
 }
