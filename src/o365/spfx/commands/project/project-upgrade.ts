@@ -315,8 +315,7 @@ class SpfxProjectUpgradeCommand extends Command {
         if (this.shell == 'bash') {
           f.resolution = f.resolution.replace('Add', this.getAddCommand('addFileCommand1'));
           f.resolution = f.resolution.replace('__FilePath1POS2__', this.getAddCommand('addFileCommand2'));
-          const x = f.resolution.indexOf('__FilePath2POS1__');
-          f.resolution = f.resolution.replace(f.resolution.substr(x, f.resolution.indexOf('__FilePath2POS2__') - x + '__FilePath2POS2__'.length), 'EOF');
+          f.resolution = f.resolution.replace(f.resolution.substr(f.resolution.indexOf('__FilePath2POS1__'), f.resolution.indexOf('__FilePath2POS2__') - f.resolution.indexOf('__FilePath2POS1__') + '__FilePath2POS2__'.length), 'EOF');
         }
         else if (this.shell == 'powershell' || this.shell == 'cmd') {
           f.resolution = f.resolution.replace(f.resolution.substr(0, f.resolution.indexOf('__FilePath1POS2__') + '__FilePath1POS2__'.length), '');
