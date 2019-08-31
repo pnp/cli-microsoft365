@@ -1,5 +1,3 @@
-Export report data of teams report useractivityuserdetail command
-
 # Release notes
 
 ## [v2.0.0](https://github.com/pnp/office365-cli/releases/tag/v2.0.0)
