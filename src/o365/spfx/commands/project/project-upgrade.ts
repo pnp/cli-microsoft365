@@ -312,42 +312,23 @@ class SpfxProjectUpgradeCommand extends Command {
       }
       //'Add' support for multiple shells
       if (f.resolution.startsWith('Add')) {
-
-        const FilePath1POS1 = 'Add';
-        const FilePath1POS2 = '__FilePath1POS2__';
-        const FilePath2POS1 = '__FilePath2POS1__';
-        const FilePath2POS2 = '__FilePath2POS2__';
-
         if (this.shell == 'bash') {
-          f.resolution = f.resolution.replace(FilePath1POS1, this.getAddCommand('addFileCommand1'));
-          f.resolution = f.resolution.replace(FilePath1POS2, this.getAddCommand('addFileCommand2'));
-
-          const x = f.resolution.indexOf(FilePath2POS1);
-          const y = f.resolution.indexOf(FilePath2POS2);
-          const a = FilePath2POS2.length;
-          const z = f.resolution.substr(x, y - x + a);
-          f.resolution = f.resolution.replace(z, 'EOF');
+          f.resolution = f.resolution.replace('Add', this.getAddCommand('addFileCommand1'));
+          f.resolution = f.resolution.replace('__FilePath1POS2__', this.getAddCommand('addFileCommand2'));
+          const x = f.resolution.indexOf('__FilePath2POS1__');
+          f.resolution = f.resolution.replace(f.resolution.substr(x, f.resolution.indexOf('__FilePath2POS2__') - x + '__FilePath2POS2__'.length), 'EOF');
         }
         else if (this.shell == 'powershell') {
-          const x = f.resolution.indexOf(FilePath1POS1);
-          const y = f.resolution.indexOf(FilePath1POS2);
-          const a = FilePath1POS2.length;
-          const z = f.resolution.substr(x, y - x + a);
-          f.resolution = f.resolution.replace(z, '');
-          
-          f.resolution = f.resolution.replace(FilePath2POS1, this.getAddCommand('addFileCommand1'));
-          f.resolution = f.resolution.replace(FilePath2POS2, this.getAddCommand('addFileCommand2'));
+          const x = f.resolution.indexOf('Add');
+          f.resolution = f.resolution.replace(f.resolution.substr(x, f.resolution.indexOf('__FilePath1POS2__') - x + '__FilePath1POS2__'.length), '');
+          f.resolution = f.resolution.replace('__FilePath2POS1__', this.getAddCommand('addFileCommand1'));
+          f.resolution = f.resolution.replace('__FilePath2POS2__', this.getAddCommand('addFileCommand2'));
         }
         else if (this.shell == 'cmd') {
-          const x = f.resolution.indexOf(FilePath1POS1);
-          const y = f.resolution.indexOf(FilePath1POS2);
-          const a = FilePath1POS2.length;
-          const z = f.resolution.substr(x, y - x + a);
-          f.resolution = f.resolution.replace(z, '');
-
-          f.resolution = f.resolution.replace(FilePath2POS1, this.getAddCommand('addFileCommand1'));
-          f.resolution = f.resolution.replace(FilePath2POS2, this.getAddCommand('addFileCommand2'));
-          
+          const x = f.resolution.indexOf('Add');
+          f.resolution = f.resolution.replace(f.resolution.substr(x, f.resolution.indexOf('__FilePath1POS2__') - x + '__FilePath1POS2__'.length), '');
+          f.resolution = f.resolution.replace('__FilePath2POS1__', this.getAddCommand('addFileCommand1'));
+          f.resolution = f.resolution.replace('__FilePath2POS2__', this.getAddCommand('addFileCommand2'));
         }
         return;
       }
