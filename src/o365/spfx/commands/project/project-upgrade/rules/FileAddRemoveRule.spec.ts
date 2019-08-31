@@ -60,7 +60,7 @@ describe('FileAddRemoveRule', () => {
 
   it('adjusts resolution when the file should be created', () => {
     rule = new FileAddRule(true);
-    assert(rule.resolution.indexOf('Add ') > -1);
+    assert(rule.resolution.indexOf('Add') > -1);
   });
 
   it('adjusts resolution when the file should be removed', () => {
