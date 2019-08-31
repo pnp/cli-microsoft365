@@ -319,14 +319,12 @@ class SpfxProjectUpgradeCommand extends Command {
           f.resolution = f.resolution.replace(f.resolution.substr(x, f.resolution.indexOf('__FilePath2POS2__') - x + '__FilePath2POS2__'.length), 'EOF');
         }
         else if (this.shell == 'powershell') {
-          const x = f.resolution.indexOf('Add');
-          f.resolution = f.resolution.replace(f.resolution.substr(x, f.resolution.indexOf('__FilePath1POS2__') - x + '__FilePath1POS2__'.length), '');
+          f.resolution = f.resolution.replace(f.resolution.substr(0, f.resolution.indexOf('__FilePath1POS2__') + '__FilePath1POS2__'.length), '');
           f.resolution = f.resolution.replace('__FilePath2POS1__', this.getAddCommand('addFileCommand1'));
           f.resolution = f.resolution.replace('__FilePath2POS2__', this.getAddCommand('addFileCommand2'));
         }
         else if (this.shell == 'cmd') {
-          const x = f.resolution.indexOf('Add');
-          f.resolution = f.resolution.replace(f.resolution.substr(x, f.resolution.indexOf('__FilePath1POS2__') - x + '__FilePath1POS2__'.length), '');
+          f.resolution = f.resolution.replace(f.resolution.substr(0, f.resolution.indexOf('__FilePath1POS2__') + '__FilePath1POS2__'.length), '');
           f.resolution = f.resolution.replace('__FilePath2POS1__', this.getAddCommand('addFileCommand1'));
           f.resolution = f.resolution.replace('__FilePath2POS2__', this.getAddCommand('addFileCommand2'));
         }
