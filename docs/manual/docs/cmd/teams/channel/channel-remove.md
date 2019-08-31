@@ -14,6 +14,7 @@ Option|Description
 ------|-----------
 `--help`|output usage information
 `-c, --channelId <channelId>`|The ID of the channel to remove
+`-n, --channelName <channelName>`|The name of the channel to remove. Specify channelId or channelName but not both
 `-i, --teamId <teamId>`|The ID of the team to which the channel to remove belongs
 `--confirm`|Don't prompt for confirmation
 `-o, --output [output]`|Output type. `json|text`. Default `text`
@@ -26,16 +27,28 @@ When deleted, Microsoft Teams channels are moved to a recycle bin and can be res
 
 ## Examples
 
-Removes the specified Teams channel
+Removes the specified Teams channel by Id
 
 ```sh
 teams channel remove --channelId 19:f3dcbb1674574677abcae89cb626f1e6@thread.skype --teamId d66b8110-fcad-49e8-8159-0d488ddb7656
 ```
 
-Removes the specified Teams channel without confirmation
+Removes the specified Teams channel by Id without confirmation
 
 ```sh
 teams channel remove --channelId 19:f3dcbb1674574677abcae89cb626f1e6@thread.skype --teamId d66b8110-fcad-49e8-8159-0d488ddb7656 --confirm
+```
+
+Removes the specified Teams channel by Name
+
+```sh
+teams channel remove --channelName 'channelName' --teamId d66b8110-fcad-49e8-8159-0d488ddb7656
+```
+
+Removes the specified Teams channel by Name without confirmation
+
+```sh
+teams channel remove --channelName 'channelName' --teamId d66b8110-fcad-49e8-8159-0d488ddb7656 --confirm 
 ```
 
 ## More information

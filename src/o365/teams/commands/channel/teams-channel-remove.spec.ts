@@ -1,5 +1,5 @@
 import commands from '../../commands';
-import Command, { CommandValidate, CommandOption } from '../../../../Command';
+import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -12,6 +12,7 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
+  let cmdInstanceLogSpy: sinon.SinonSpy;
   let promptOptions: any;
 
   before(() => {
@@ -36,6 +37,7 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
         cb({ continue: false });
       }
     };
+    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
     promptOptions = undefined;
   });
 
@@ -73,7 +75,27 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
     assert.equal(actual, true);
   });
 
+  it('passes validation when channelName & teamId is specified', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        channelName: 'Channel Name',
+        teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+      }
+    });
+    assert.equal(actual, true);
+  });
+
   it('fails validation if the teamId & channelId are not provided', (done) => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+
+      }
+    });
+    assert.notEqual(actual, true);
+    done();
+  });
+
+  it('fails validation if the teamId & channelName are not provided', (done) => {
     const actual = (command.validate() as CommandValidate)({
       options: {
 
@@ -114,7 +136,7 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
     done();
   });
 
-  it('fails validation if the teamId is not a valid guid.', () => {
+  it('fails validation if the teamId is not a valid guid', () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         teamId: 'invalid',
@@ -122,6 +144,44 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
       }
     });
     assert.notEqual(actual, true);
+  });
+
+  it('fails validation if both channelName and channelId are provided', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+        channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
+        channelName: 'channelname'
+      }
+    });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails to remove channel when channel does not exists', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf(`channels?$filter=displayName eq 'channelName'`) > -1) {
+        return Promise.resolve({ value: [] });
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        debug: true,
+        teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+        channelName: 'channelName',
+        confirm: true
+      }
+    }, (err?: any) => {
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`The specified channel does not exist in the Microsoft Teams team`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 
   it('prompts before removing the specified channel when confirm option not passed', (done) => {
@@ -216,12 +276,10 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
     });
   });
 
-  it('removes the specified channel when prompt confirmed (debug)', (done) => {
-    let teamsChannelDeleteCallIssued = false;
-
+  it('removes the specified channel by id when prompt confirmed (debug)', (done) => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/d66b8110-fcad-49e8-8159-0d488ddb7656/channels/19%3Af3dcbb1674574677abcae89cb626f1e6%40thread.skype`) {
-        teamsChannelDeleteCallIssued = true;
+
         return Promise.resolve();
       }
 
@@ -235,11 +293,57 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
       options: {
         debug: true,
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
-        teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+        teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
     }, () => {
       try {
-        assert(teamsChannelDeleteCallIssued);
+        assert(cmdInstanceLogSpy.called);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('removes the specified channel by name when prompt confirmed (debug)', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf(`channels?$filter=displayName eq 'channelName'`) > -1) {
+        return Promise.resolve({
+          value: [
+            {
+              "id": "19:f3dcbb1674574677abcae89cb626f1e6@thread.skype",
+              "displayName": "channelName",
+              "description": null,
+              "email": "",
+              "webUrl": "https://teams.microsoft.com/l/channel/19:f3dcbb1674574677abcae89cb626f1e6%40thread.skype/%F0%9F%92%A1+Ideas?groupId=d66b8110-fcad-49e8-8159-0d488ddb7656&tenantId=eff8592e-e14a-4ae8-8771-d96d5c549e1c"
+            }
+          ]
+        });
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(request, 'delete').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/d66b8110-fcad-49e8-8159-0d488ddb7656/channels/19%3Af3dcbb1674574677abcae89cb626f1e6%40thread.skype`) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
+    cmdInstance.action({
+      options: {
+        debug: true,
+        channelName: 'channelName',
+        teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
+      }
+    }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
         done();
       }
       catch (e) {

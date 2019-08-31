@@ -6,6 +6,7 @@ import {
 import Utils from '../../../../Utils';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
+import { Channel } from '../../Channel';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -14,7 +15,8 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  channelId: string;
+  channelId?: string;
+  channelName?: string;
   teamId: string;
   confirm?: boolean;
 }
@@ -39,34 +41,76 @@ class TeamsChannelRemoveCommand extends GraphCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
 
     const removeChannel: () => void = (): void => {
-      const requestOptions: any = {
-        url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels/${encodeURIComponent(args.options.channelId)}`,
-        headers: {
-          accept: 'application/json;odata.metadata=none'
-        },
-        json: true
-      };
+      if (args.options.channelName) {
+        const requestOptions: any = {
+          url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels?$filter=displayName eq '${encodeURIComponent(args.options.channelName)}'`,
+          headers: {
+            accept: 'application/json;odata.metadata=none'
+          },
+          json: true
+        }
 
-      request
-        .delete(requestOptions)
-        .then((): void => {
-          if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
-          }
+        request
+          .get<{ value: Channel[] }>(requestOptions)
+          .then((res: { value: Channel[] }): Promise<void> => {
+            const channelItem: Channel | undefined = res.value[0];
 
-          cb();
-        }, (err: any) => this.handleRejectedODataJsonPromise(err, cmd, cb));
+            if (!channelItem) {
+              return Promise.reject(`The specified channel does not exist in the Microsoft Teams team`);
+            }
+
+            const channelId: string = res.value[0].id;
+
+            const requestOptions: any = {
+              url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels/${encodeURIComponent(channelId)}`,
+              headers: {
+                accept: 'application/json;odata.metadata=none'
+              },
+              json: true
+            };
+
+            return request.delete(requestOptions);
+          })
+          .then((): void => {
+            if (this.verbose) {
+              cmd.log(vorpal.chalk.green('DONE'));
+            }
+
+            cb();
+          }, (err: any) => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }
+
+      if (args.options.channelId) {
+        const requestOptions: any = {
+          url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels/${encodeURIComponent(args.options.channelId)}`,
+          headers: {
+            accept: 'application/json;odata.metadata=none'
+          },
+          json: true
+        };
+
+        request
+          .delete(requestOptions)
+          .then((): void => {
+            if (this.verbose) {
+              cmd.log(vorpal.chalk.green('DONE'));
+            }
+
+            cb();
+          }, (err: any) => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }
     };
 
     if (args.options.confirm) {
       removeChannel();
     }
     else {
+      const channelName = args.options.channelName ? args.options.channelName : args.options.channelId;
       cmd.prompt({
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the channel ${args.options.channelId} from team ${args.options.teamId}?`,
+        message: `Are you sure you want to remove the channel ${channelName} from team ${args.options.teamId}?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();
@@ -85,6 +129,10 @@ class TeamsChannelRemoveCommand extends GraphCommand {
         description: 'The ID of the channel to remove'
       },
       {
+        option: '-n, --channelName <channelName>',
+        description: 'The name of the channel to remove. Specify channelId or channelName but not both'
+      },
+      {
         option: '-i, --teamId [teamId]',
         description: 'The ID of the team to which the channel to remove belongs'
       },
@@ -100,11 +148,15 @@ class TeamsChannelRemoveCommand extends GraphCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.channelId) {
-        return 'Required parameter channelId missing';
+      if (args.options.channelId && args.options.channelName) {
+        return 'Specify channelId or channelName but not both';
       }
 
-      if (!Utils.isValidTeamsChannelId(args.options.channelId)) {
+      if (!args.options.channelId && !args.options.channelName) {
+        return 'Specify channelId or channelName';
+      }
+
+      if (args.options.channelId && !Utils.isValidTeamsChannelId(args.options.channelId)) {
         return `${args.options.channelId} is not a valid Teams Channel Id`;
       }
 
@@ -112,7 +164,7 @@ class TeamsChannelRemoveCommand extends GraphCommand {
         return 'Required parameter teamId missing';
       }
 
-      if (!Utils.isValidGuid(args.options.teamId)) {
+      if (args.options.teamId && !Utils.isValidGuid(args.options.teamId)) {
         return `${args.options.teamId} is not a valid GUID`;
       }
 
@@ -129,11 +181,17 @@ class TeamsChannelRemoveCommand extends GraphCommand {
       
   Examples:
     
-    Removes the specified Teams channel
+    Removes the specified Teams channel by Id
       ${this.name} --channelId 19:f3dcbb1674574677abcae89cb626f1e6@thread.skype --teamId d66b8110-fcad-49e8-8159-0d488ddb7656
 
-    Removes the specified Teams channel without confirmation
+    Removes the specified Teams channel by Id without confirmation
       ${this.name} --channelId 19:f3dcbb1674574677abcae89cb626f1e6@thread.skype --teamId d66b8110-fcad-49e8-8159-0d488ddb7656 --confirm
+
+    Removes the specified Teams channel by Name
+      ${this.name} --channelName 'channelName' --teamId d66b8110-fcad-49e8-8159-0d488ddb7656
+
+    Removes the specified Teams channel by Name without confirmation
+      ${this.name} --channelName 'channelName' --teamId d66b8110-fcad-49e8-8159-0d488ddb7656 --confirm  
 
   More information:
 
