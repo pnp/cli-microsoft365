@@ -113,16 +113,19 @@ class SpfxProjectUpgradeCommand extends Command {
 
   private static addFileCommands = {
     bash: {
-      addFileCommand1: 'cat >',
+      addFileCommand1: 'cat > ',
       addFileCommand2: ' << EOF',
+      addFileCommand3: 'EOF',
     },
     powershell: {
-      addFileCommand1: '| Out-File -FilePath "',
+      addFileCommand1: '"@ | Out-File -FilePath "',
       addFileCommand2: '"',
+      addFileCommand3: '@"',
     },
     cmd: {
-      addFileCommand1: '> "',
+      addFileCommand1: ')> "',
       addFileCommand2: '"',
+      addFileCommand3: 'echo (',
     }
   }
 
@@ -315,13 +318,19 @@ class SpfxProjectUpgradeCommand extends Command {
         if (this.shell == 'bash') {
           f.resolution = f.resolution.replace('Add', this.getAddCommand('addFileCommand1'));
           f.resolution = f.resolution.replace('__FilePath1POS2__', this.getAddCommand('addFileCommand2'));
-          f.resolution = f.resolution.replace(f.resolution.substr(f.resolution.indexOf('__FilePath2POS1__'), f.resolution.indexOf('__FilePath2POS2__') - f.resolution.indexOf('__FilePath2POS1__') + '__FilePath2POS2__'.length), 'EOF');
+          f.resolution = f.resolution.replace(f.resolution.substr(f.resolution.indexOf('__FilePath2POS1__'), 
+          f.resolution.indexOf('__FilePath2POS2__') - f.resolution.indexOf('__FilePath2POS1__') + '__FilePath2POS2__'.length), this.getAddCommand('addFileCommand3'));
         }
-        else if (this.shell == 'powershell' || this.shell == 'cmd') {
-          f.resolution = f.resolution.replace(f.resolution.substr(0, f.resolution.indexOf('__FilePath1POS2__') + '__FilePath1POS2__'.length), '');
+        else if (this.shell == 'powershell') {
+          f.resolution = f.resolution.replace(f.resolution.substr(0, f.resolution.indexOf('__FilePath1POS2__') + '__FilePath1POS2__'.length), this.getAddCommand('addFileCommand3'));
           f.resolution = f.resolution.replace('__FilePath2POS1__', this.getAddCommand('addFileCommand1'));
           f.resolution = f.resolution.replace('__FilePath2POS2__', this.getAddCommand('addFileCommand2'));
         }
+        else if (this.shell == 'cmd') {
+          f.resolution = f.resolution.replace(f.resolution.substr(0, f.resolution.indexOf('__FilePath1POS2__') + '__FilePath1POS2__'.length), this.getAddCommand('addFileCommand3'));
+          f.resolution = f.resolution.replace('__FilePath2POS1__', this.getAddCommand('addFileCommand1'));
+          f.resolution = f.resolution.replace('__FilePath2POS2__', this.getAddCommand('addFileCommand2'));
+        }        
         return;
       }
       //'Remove' support for multiple shells
