@@ -23,7 +23,7 @@ export class FN018002_TEAMS_manifest extends Rule {
   }
 
   get resolution(): string {
-    return `Add__filePath____FilePath1POS2__
+    return `Add[BEFOREPATH]__filePath__[AFTERPATH][BEFORECONTENT]
 {
   "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.2/MicrosoftTeams.schema.json",
   "manifestVersion": "1.2",
@@ -71,7 +71,7 @@ export class FN018002_TEAMS_manifest extends Rule {
     "id": "00000003-0000-0ff1-ce00-000000000000"
   }
 }
-__FilePath2POS1____filePath____FilePath2POS2__`;
+[AFTERCONTENT]`;
   };
 
   get resolutionType(): string {

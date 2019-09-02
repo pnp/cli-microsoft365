@@ -19,9 +19,9 @@ export abstract class FileAddRemoveRule extends Rule {
 
   get resolution(): string {
     if (this.add) {
-      return `Add${this.filePath}__FilePath1POS2__
+      return `Add[BEFOREPATH]${this.filePath}[AFTERPATH][BEFORECONTENT]
 ${this.contents}
-__FilePath2POS1__${this.filePath}__FilePath2POS2__`;
+[AFTERCONTENT]`;
     }
     else {
       return `Remove ${this.filePath}`;
