@@ -112,7 +112,7 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
   it('passes validation on valid \'180\' period', () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
-        period: 'D90'
+        period: 'D180'
       }
     });
     assert.equal(actual, true);

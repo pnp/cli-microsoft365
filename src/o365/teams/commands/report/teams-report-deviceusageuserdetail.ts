@@ -5,6 +5,8 @@ import {
 } from '../../../../Command';
 import GraphCommand from "../../../base/GraphCommand";
 import request from '../../../../request';
+import * as path from 'path';
+import * as fs from 'fs';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -15,6 +17,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   period?: string;
   date?: string;
+  outputFile?: string;
 }
 
 class TeamsReportDeviceUsageUserDetailCommand extends GraphCommand {
@@ -30,6 +33,7 @@ class TeamsReportDeviceUsageUserDetailCommand extends GraphCommand {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.period = typeof args.options.period !== 'undefined';
     telemetryProps.date = typeof args.options.date !== 'undefined';
+    telemetryProps.outputFile = typeof args.options.outputFile !== 'undefined';
     return telemetryProps;
   }
 
@@ -49,10 +53,53 @@ class TeamsReportDeviceUsageUserDetailCommand extends GraphCommand {
     request
       .get(requestOptions)
       .then((res: any): void => {
-        cmd.log(res);
+        let content: string = '';
 
+        if(args.options.output && args.options.output.toLowerCase() === 'json')
+        {
+          let reportdata = this.getJsonReport(res);
+          content = JSON.stringify(reportdata);
+
+          if(!args.options.outputFile) {
+            cmd.log(reportdata);
+          }
+        }
+        else
+        {
+          content = res;
+          
+          if(!args.options.outputFile) {
+            cmd.log(content);
+          }
+        }
+
+        if(args.options.outputFile)
+        {
+          fs.writeFileSync(args.options.outputFile, content, 'utf8');
+          if (this.verbose) {
+            cmd.log(`File saved to path '${args.options.outputFile}'`);
+          }
+        }
+        
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+  }
+
+  private getJsonReport(res: string): any {
+    let rows = res.split('\n');
+    let jsonObj = [];
+    let headers = rows[0].split(',');
+
+    for (let i = 1; i < rows.length; i++) {
+      let data = rows[i].split(',');
+      let obj: any = {};
+      for (let j = 0; j < data.length; j++) {
+        obj[headers[j].trim()] = data[j].trim();
+      }
+      jsonObj.push(obj);
+    }
+
+    return jsonObj;
   }
 
   public options(): CommandOption[] {
@@ -65,6 +112,10 @@ class TeamsReportDeviceUsageUserDetailCommand extends GraphCommand {
       {
         option: '-d, --date [date]',
         description: 'The date for which you would like to view the users who performed any activity. Supported date format is YYYY-MM-DD'
+      },
+      {
+        option: '-f, --outputFile [outputFile]',
+        description: 'Path to the file where the report should be stored in'
       }
     ];
 
@@ -92,6 +143,10 @@ class TeamsReportDeviceUsageUserDetailCommand extends GraphCommand {
         return `Provide a valid date in YYYY-MM-DD format`;
       }
 
+      if (args.options.outputFile && !fs.existsSync(path.dirname(args.options.outputFile))) {
+        return 'Specified outputFile path where to save the file does not exist';
+      }
+
       return true;
     };
   }
@@ -106,13 +161,20 @@ class TeamsReportDeviceUsageUserDetailCommand extends GraphCommand {
 
   Examples:
 
-    Gets information about Microsoft Teams device usage by user for the last
-    week
+    Gets information about Microsoft Teams device usage by user for the last week
       ${commands.TEAMS_REPORT_DEVICEUSAGEUSERDETAIL} --period 'D7'
 
     Gets information about Microsoft Teams device usage by user for
     May 1, 2019
       ${commands.TEAMS_REPORT_DEVICEUSAGEUSERDETAIL} --date 2019-05-01
+
+      Gets information about Microsoft Teams device usage by user for the last week 
+    and exports the report data in the specified path in csv format
+      ${commands.TEAMS_REPORT_DEVICEUSAGEUSERDETAIL} --period D7 --output csv --outputFile 'C:/report.csv'
+
+    Gets information about Microsoft Teams device usage by user for the last week
+    and exports the report data in the specified path in json format
+      ${commands.TEAMS_REPORT_DEVICEUSAGEUSERDETAIL} --period D7 --output json --outputFile 'C:/report.json'
 `);
   }
 }

@@ -116,7 +116,7 @@ class TeamsReportUserActivityUserDetailCommand extends GraphCommand {
       },
       {
         option: '-f, --outputFile [outputFile]',
-        description: 'Path to the file where the upgrade report should be stored in'
+        description: 'Path to the file where the report should be stored in'
       }
     ];
 
