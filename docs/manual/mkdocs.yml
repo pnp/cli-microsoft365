@@ -55,6 +55,7 @@ nav:
       - export: 'cmd/flow/export.md'
       - get: 'cmd/flow/get.md'
       - list: 'cmd/flow/list.md'
+      - remove: 'cmd/flow/remove.md'
       - environment:
         - environment get: 'cmd/flow/environment/environment-get.md'
         - environment list: 'cmd/flow/environment/environment-list.md'
