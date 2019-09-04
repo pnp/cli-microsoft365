@@ -90,7 +90,7 @@ export class Auth {
     });
   }
 
-  public ensureAccessToken(resource: string, stdout: Logger, debug: boolean = false): Promise<string> {
+  public ensureAccessToken(resource: string, stdout: Logger, debug: boolean = false, fetchNew: boolean = false): Promise<string> {
     /* istanbul ignore next */
     Logging.setLoggingOptions({
       level: debug ? 3 : 0,
@@ -104,7 +104,7 @@ export class Auth {
       const accessToken: AccessToken | undefined = this.service.accessTokens[resource];
       const expiresOn: Date = accessToken ? new Date(accessToken.expiresOn) : new Date(0);
 
-      if (accessToken && expiresOn > now) {
+      if (!fetchNew && accessToken && expiresOn > now) {
         if (debug) {
           stdout.log(`Existing access token ${accessToken.value} still valid. Returning...`);
         }

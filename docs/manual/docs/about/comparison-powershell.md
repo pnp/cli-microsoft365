@@ -263,7 +263,7 @@ Export-PnPClientSidePageMapping|SharePointPnPPowerShellOnline|
 Export-PnPTaxonomy|SharePointPnPPowerShellOnline|
 Export-PnPTermGroupToXml|SharePointPnPPowerShellOnline|
 Find-PnPFile|SharePointPnPPowerShellOnline|
-Get-PnPAccessToken|SharePointPnPPowerShellOnline|
+Get-PnPAccessToken|SharePointPnPPowerShellOnline|[accesstoken get](../cmd/accesstoken-get.md)
 Get-PnPAlert|SharePointPnPPowerShellOnline|
 Get-PnPApp|SharePointPnPPowerShellOnline|[spo app get](../cmd/spo/app/app-get.md), [spo app list](../cmd/spo/app/app-list.md)
 Get-PnPAppAuthAccessToken|SharePointPnPPowerShellOnline|

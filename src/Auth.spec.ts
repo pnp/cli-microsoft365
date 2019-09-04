@@ -200,6 +200,30 @@ describe('Auth', () => {
     });
   });
 
+  it('retrieves new access token using existing refresh token when refresh forced', (done) => {
+    const now = new Date();
+    now.setSeconds(now.getSeconds() + 1);
+    auth.service.accessTokens[resource] = {
+      expiresOn: now.toISOString(),
+      value: 'abc'
+    }
+    auth.service.refreshToken = refreshToken;
+    sinon.stub((auth as any).authCtx, 'acquireTokenWithRefreshToken').callsArgWith(3, undefined, { accessToken: 'acc' });
+    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+
+    auth.ensureAccessToken(resource, stdout, true, true).then((accessToken) => {
+      try {
+        assert.equal(accessToken, 'acc');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    }, (err) => {
+      done(err);
+    });
+  });
+
   it('starts device code authentication flow when no refresh token available and no authType specified', (done) => {
     const acquireUserCodeStub = sinon.stub((auth as any).authCtx, 'acquireUserCode').callsArgWith(3, undefined, {});
     sinon.stub((auth as any).authCtx, 'acquireTokenWithDeviceCode').callsArgWith(3, undefined, {});

@@ -10,6 +10,7 @@ nav:
     - login: 'cmd/login.md'
     - logout: 'cmd/logout.md'
     - status: 'cmd/status.md'
+    - accesstoken get: 'cmd/accesstoken-get.md'
     - Azure Active Directory Graph (aad):
       - groupsetting:
         - groupsetting add: 'cmd/aad/groupsetting/groupsetting-add.md'
