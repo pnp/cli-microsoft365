@@ -32,7 +32,7 @@ class SpfxProjectExternalizeCommand extends Command {
   public static ERROR_NO_VERSION: number = 3;
   public static ERROR_UNSUPPORTED_VERSION: number = 2;
   public get name(): string {
-    return commands.PROJECT_UPGRADE;
+    return commands.PROJECT_EXTERNALIZE;
   }
   public get description(): string {
     return 'Exteranlizes SharePoint Framework project known dependencies';
@@ -211,7 +211,7 @@ class SpfxProjectExternalizeCommand extends Command {
 
   public commandHelp(args: any, log: (help: string) => void): void {
     const chalk = vorpal.chalk;
-    log(vorpal.find(commands.PROJECT_UPGRADE).helpInformation());
+    log(vorpal.find(commands.PROJECT_EXTERNALIZE).helpInformation());
     log(
       `   ${chalk.yellow('Important:')} Run this command in the folder where the project
     that you want to upgrade is located. This command doesn't change your
