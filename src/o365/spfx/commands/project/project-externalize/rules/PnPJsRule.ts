@@ -4,7 +4,7 @@ import { ExternalizeEntry } from "../model/ExternalizeEntry";
 
 export class PnPJsRule extends BasicDependencyRule {
   public get ModuleName () {
-    return '@pnp/pmpjs';
+    return '@pnp/pnpjs';
   }  
   public visit(project: Project, findings: ExternalizeEntry[]): void {
     if(project.packageJson) {
