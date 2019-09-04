@@ -8,11 +8,12 @@ import * as assert from 'assert';
 import request from '../../../request';
 import Utils from '../../../Utils';
 
-describe(commands.FLOW_GET, () => {
+describe(commands.FLOW_REMOVE, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
+  let promptOptions: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -30,15 +31,20 @@ describe(commands.FLOW_GET, () => {
       action: command.action(),
       log: (msg: string) => {
         log.push(msg);
+      },
+      prompt: (options: any, cb: (result: { continue: boolean }) => void) => {
+        promptOptions = options;
+        cb({ continue: false });
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    promptOptions = undefined;
   });
 
   afterEach(() => {
     Utils.restore([
       vorpal.find,
-      request.get
+      request.delete
     ]);
   });
 
@@ -59,18 +65,324 @@ describe(commands.FLOW_GET, () => {
   });
 
   it('fails validation if the name is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { environment: 'abc' } });
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'
+      }
+    });
     assert.notEqual(actual, true);
   });
 
   it('fails validation if the environment is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { name: 'abc' } });
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72'
+      }
+    });
     assert.notEqual(actual, true);
   });
 
   it('passes validation when the name and environment specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', name: 'abc' } });
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+        name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72'
+      }
+    });
     assert.equal(actual, true);
+  });
+
+  it('prompts before removing the specified Microsoft Flow when confirm option not passed', (done) => {
+    cmdInstance.action({
+      options: {
+        debug: false,
+        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+        name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72'
+      }
+    }, () => {
+      let promptIssued = false;
+
+      if (promptOptions && promptOptions.type === 'confirm') {
+        promptIssued = true;
+      }
+
+      try {
+        assert(promptIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('aborts removing the specified Microsoft Flow when confirm option not passed and prompt not confirmed', (done) => {
+    const postSpy = sinon.spy(request, 'delete');
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: false });
+    };
+    cmdInstance.action({
+      options: {
+        debug: false,
+        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+        name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72'
+      }
+    }, () => {
+      try {
+        assert(postSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('removes the specified Microsoft Flow when prompt confirmed', (done) => {
+    sinon.stub(request, 'delete').callsFake((opts) => {
+      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c/flows/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72?api-version=2016-11-01`) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
+    cmdInstance.action({
+      options: {
+        debug: true,
+        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+        name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72'
+      }
+    }, () => {
+      try {
+        assert(cmdInstanceLogSpy.called);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('removes the specified Microsoft Flow as Admin when prompt confirmed', (done) => {
+    sinon.stub(request, 'delete').callsFake((opts) => {
+      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/scopes/admin/environments/Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c/flows/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72?api-version=2016-11-01`) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
+    cmdInstance.action({
+      options: {
+        debug: true,
+        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+        name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
+        asAdmin: true
+      }
+    }, () => {
+      try {
+        assert(cmdInstanceLogSpy.called);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('removes the specified Microsoft Flow without prompting when confirm specified', (done) => {
+    sinon.stub(request, 'delete').callsFake((opts) => {
+      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c/flows/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72?api-version=2016-11-01`) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({
+      options: {
+        debug: false,
+        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+        name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
+        confirm: true
+      }
+    }, () => {
+      done();
+    }, (err: any) => done(err));
+  });
+
+  it('removes the specified Microsoft Flow without prompting when confirm specified', (done) => {
+    sinon.stub(request, 'delete').callsFake((opts) => {
+      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c/flows/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72?api-version=2016-11-01`) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({
+      options: {
+        debug: false,
+        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+        name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
+        confirm: true
+      }
+    }, () => {
+      done();
+    }, (err: any) => done(err));
+  });
+
+  it('removes the specified Microsoft Flow as Admin without prompting when confirm specified', (done) => {
+    sinon.stub(request, 'delete').callsFake((opts) => {
+      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/scopes/admin/environments/Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c/flows/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72?api-version=2016-11-01`) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({
+      options: {
+        debug: false,
+        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+        name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
+        confirm: true,
+        asAdmin: true
+      }
+    }, () => {
+      done();
+    }, (err: any) => done(err));
+  });
+
+  it('correctly handles no environment found without prompting when confirm specified', (done) => {
+    sinon.stub(request, 'delete').callsFake((opts) => {
+      return Promise.reject({
+        "error": {
+          "code": "EnvironmentAccessDenied",
+          "message": "Access to the environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c' is denied."
+        }
+      });
+    });
+
+    cmdInstance.action({
+      options:
+      {
+        debug: false,
+        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+        name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
+        confirm: true
+      }
+    }, (err?: any) => {
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Access to the environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c' is denied.`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly handles no environment found as Admin without prompting when confirm specified', (done) => {
+    sinon.stub(request, 'delete').callsFake((opts) => {
+      return Promise.reject({
+        "error": {
+          "code": "EnvironmentAccessDenied",
+          "message": "Access to the environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c' is denied."
+        }
+      });
+    });
+
+    cmdInstance.action({
+      options:
+      {
+        debug: false,
+        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+        name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
+        confirm: true,
+        asAdmin: true
+      }
+    }, (err?: any) => {
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Access to the environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c' is denied.`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly handles no environment found when prompt confirmed', (done) => {
+    sinon.stub(request, 'delete').callsFake((opts) => {
+      return Promise.reject({
+        "error": {
+          "code": "EnvironmentAccessDenied",
+          "message": "Access to the environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c' is denied."
+        }
+      });
+    });
+
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
+
+    cmdInstance.action({
+      options:
+      {
+        debug: false,
+        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+        name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72'
+      }
+    }, (err?: any) => {
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Access to the environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c' is denied.`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly handles no environment found as Admin when prompt confirmed', (done) => {
+    sinon.stub(request, 'delete').callsFake((opts) => {
+      return Promise.reject({
+        "error": {
+          "code": "EnvironmentAccessDenied",
+          "message": "Access to the environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c' is denied."
+        }
+      });
+    });
+
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
+
+    cmdInstance.action({
+      options:
+      {
+        debug: false,
+        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+        name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
+        asAdmin: true
+      }
+    }, (err?: any) => {
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Access to the environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c' is denied.`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 
   it('supports debug mode', () => {
