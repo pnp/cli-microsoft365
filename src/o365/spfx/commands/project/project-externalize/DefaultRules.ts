@@ -1,5 +1,5 @@
 import { PnPJsRule } from "./rules";
 
 module.exports = [
-  new PnPJsRule();
+  new PnPJsRule(),
 ]
