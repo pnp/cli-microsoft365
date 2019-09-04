@@ -9,6 +9,9 @@ import { Utils } from './project-upgrade/';
 import { Project } from './project-upgrade/model';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
+import rules = require('./project-externalize/DefaultRules');
+import { BasicDependencyRule } from './project-externalize/rules';
+import { ExternalizeEntry } from './project-externalize/model/ExternalizeEntry';
 
 interface CommandArgs {
   options: Options;
@@ -24,6 +27,7 @@ class SpfxProjectExternalizeCommand extends Command {
   private supportedVersions: string[] = [
     '1.9.1'
   ];
+  private allFindings: ExternalizeEntry[] = [];
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
   public static ERROR_NO_VERSION: number = 3;
   public static ERROR_UNSUPPORTED_VERSION: number = 2;
@@ -72,6 +76,27 @@ class SpfxProjectExternalizeCommand extends Command {
     if (this.debug) {
       cmd.log('Collected project');
       cmd.log(project);
+    }
+
+    try {
+      (rules as BasicDependencyRule[]).forEach(r => {
+        r.visit(project, this.allFindings);
+      });
+    }
+    catch (e) {
+      cb(new CommandError(e));
+      return;
+    }
+
+    this.writeReport(this.allFindings, cmd, args.options);
+    cb();
+  }
+  private writeReport(findingsToReport: ExternalizeEntry[], cmd: CommandInstance, options: Options): void {
+    if (options.outputFile) {
+      fs.writeFileSync(path.resolve(options.outputFile), options.output === 'json' ? JSON.stringify(findingsToReport) : findingsToReport, 'utf-8');
+    }
+    else {
+      cmd.log(findingsToReport);
     }
   }
   private getProject(projectRootPath: string): Project {
