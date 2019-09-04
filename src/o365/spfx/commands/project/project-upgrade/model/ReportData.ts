@@ -1,4 +1,5 @@
-import { Hash, Dictionary } from "./project-upgrade/";
+import { Hash } from "../Hash";
+import {Dictionary} from "../Dictionary";
 
 export interface ReportData {
   commandsToExecute: string[];

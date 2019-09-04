@@ -8,10 +8,9 @@ import * as fs from 'fs';
 import { Finding, Utils, Hash, Dictionary } from './project-upgrade/';
 import { Rule } from './project-upgrade/rules/Rule';
 import { EOL } from 'os';
-import { Project, Manifest, TsFile, ScssFile } from './project-upgrade/model';
+import { Project, Manifest, TsFile, ScssFile, ReportData, ReportDataModification } from './project-upgrade/model';
 import { FindingToReport } from './project-upgrade/FindingToReport';
 import { FN017001_MISC_npm_dedupe } from './project-upgrade/rules/FN017001_MISC_npm_dedupe';
-import { ReportData, ReportDataModification } from './ReportData';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 

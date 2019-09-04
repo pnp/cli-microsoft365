@@ -6,7 +6,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import * as path from 'path';
 import * as fs from 'fs';
 import { Utils } from './project-upgrade/';
-import { Project, Manifest, TsFile, ScssFile } from './project-upgrade/model';
+import { Project } from './project-upgrade/model';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -109,6 +109,7 @@ class SpfxProjectExternalizeCommand extends Command {
       ? Array.prototype.concat(...fs.readdirSync(dir).map(f => SpfxProjectExternalizeCommand.readdirR(path.join(dir, f))))
       : dir;
   }
+  
   private getProjectRoot(folderPath: string): string | null {
     const packageJsonPath: string = path.resolve(folderPath, 'package.json');
     if (fs.existsSync(packageJsonPath)) {
