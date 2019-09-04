@@ -84,6 +84,7 @@ nav:
     - SharePoint Framework (spfx):
       - project:
         - project upgrade: 'cmd/spfx/project/project-upgrade.md'
+        - project externalize: 'cmd/spfx/project/project-externalize.md'
     - SharePoint Online (spo):
       - get: 'cmd/spo/get.md'
       - set: 'cmd/spo/set.md'
