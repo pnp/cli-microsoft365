@@ -160,6 +160,7 @@ class SpfxProjectUpgradeCommand extends Command {
     telemetryProps.toVersion = args.options.toVersion || this.supportedVersions[this.supportedVersions.length - 1];
     telemetryProps.packageManager = args.options.packageManager || 'npm';
     telemetryProps.shell = args.options.shell || 'bash';
+    telemetryProps.outputFile = typeof args.options.outputFile !== 'undefined';
     return telemetryProps;
   }
 
