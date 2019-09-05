@@ -1,4 +1,4 @@
-import Command, { CommandAction, CommandError } from '../../Command';
+import Command from '../../Command';
 import auth, { Logger } from '../../Auth';
 import request from '../../request';
 import { SpoOperation } from '../spo/commands/site/SpoOperation';
@@ -11,21 +11,6 @@ export interface FormDigest {
 }
 
 export default abstract class SpoCommand extends Command {
-  public action(): CommandAction {
-    const cmd: SpoCommand = this;
-
-    return function (this: CommandInstance, args: any, cb: (err?: any) => void) {
-      auth
-        .restoreAuth()
-        .then((): void => {
-          cmd.initAction(args, this);
-          cmd.commandAction(this, args, cb);
-        }, (error: any): void => {
-          cb(new CommandError(error));
-        });
-    }
-  }
-
   protected getRequestDigest(siteUrl: string): Promise<FormDigestInfo> {
     const requestOptions: any = {
       url: `${siteUrl}/_api/contextinfo`,
