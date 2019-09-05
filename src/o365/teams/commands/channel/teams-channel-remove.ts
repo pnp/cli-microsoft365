@@ -32,8 +32,8 @@ class TeamsChannelRemoveCommand extends GraphCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.channelId = args.options.channelId;
-    telemetryProps.teamsId = args.options.teamId;
+    telemetryProps.channelId = typeof args.options.channelId !== 'undefined';
+    telemetryProps.channelName = typeof args.options.channelName !== 'undefined';
     telemetryProps.confirm = (!(!args.options.confirm)).toString();
     return telemetryProps;
   }
@@ -125,15 +125,15 @@ class TeamsChannelRemoveCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-c, --channelId <channelId>',
+        option: '-c, --channelId [channelId]',
         description: 'The ID of the channel to remove'
       },
       {
-        option: '-n, --channelName <channelName>',
+        option: '-n, --channelName [channelName]',
         description: 'The name of the channel to remove. Specify channelId or channelName but not both'
       },
       {
-        option: '-i, --teamId [teamId]',
+        option: '-i, --teamId <teamId>',
         description: 'The ID of the team to which the channel to remove belongs'
       },
       {

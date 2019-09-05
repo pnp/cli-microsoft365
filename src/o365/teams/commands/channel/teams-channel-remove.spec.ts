@@ -369,6 +369,7 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
         confirm: true
       }
     }, () => {
+      assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
       done();
     }, (err: any) => done(err));
   });
