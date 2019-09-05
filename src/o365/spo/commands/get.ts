@@ -2,8 +2,7 @@ import commands from '../commands';
 import GlobalOptions from '../../../GlobalOptions';
 import {
   CommandOption,
-  CommandValidate,
-  CommandError
+  CommandValidate
 } from '../../../Command';
 import SpoCommand from '../../base/SpoCommand';
 import auth from '../../../Auth';
@@ -30,11 +29,6 @@ class SpoGetCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    if (!auth.service.connected) {
-      cb(new CommandError('Login to Office 365 first'));
-      return;
-    }
-
     const spoContext: SpoContext = {
       SpoUrl: auth.service.spoUrl ? auth.service.spoUrl : ''
     };
