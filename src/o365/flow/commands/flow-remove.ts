@@ -7,6 +7,7 @@ import {
 import request from '../../../request';
 import AzmgmtCommand from '../../base/AzmgmtCommand';
 import * as os from 'os';
+import Utils from '../../../Utils';
 
 const vorpal: Vorpal = require('../../../vorpal-init');
 
@@ -32,10 +33,8 @@ class FlowRemoveCommand extends AzmgmtCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.environment = args.options.environment;
-    telemetryProps.name = args.options.name;
-    telemetryProps.asAdmin = (!(!args.options.asAdmin)).toString();
-    telemetryProps.confirm = (!(!args.options.confirm)).toString();
+    telemetryProps.asAdmin = typeof args.options.asAdmin !== 'undefined';
+    telemetryProps.confirm = typeof args.options.confirm !== 'undefined';
     return telemetryProps;
   }
 
@@ -46,6 +45,7 @@ class FlowRemoveCommand extends AzmgmtCommand {
     const removeFlow: () => void = (): void => {
       const requestOptions: any = {
         url: `${this.resource}providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`,
+        resolveWithFullResponse: true,
         headers: {
           accept: 'application/json'
         },
@@ -54,12 +54,18 @@ class FlowRemoveCommand extends AzmgmtCommand {
 
       request
         .delete(requestOptions)
-        .then((): void => {
-          if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
+        .then((rawRes: any): void => {
+          // api bug, should return 404 but instead returns 204
+          // handle 204 and throw error message to cmd
+          if (rawRes.statusCode === 204) {
+            cmd.log(vorpal.chalk.red(`Error: Resource ${args.options.name} does not exist in environment ${args.options.environment}`));
+            cb();
+          } else {
+            if (this.verbose) {
+              cmd.log(vorpal.chalk.green('DONE'));
+            }
+            cb();
           }
-
-          cb();
         }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, cmd, cb));
     };
     if (args.options.confirm) {
@@ -112,6 +118,10 @@ class FlowRemoveCommand extends AzmgmtCommand {
         return 'Required option name missing';
       }
 
+      if (!Utils.isValidGuid(args.options.name)) {
+        return `${args.options.name} is not a valid GUID`;
+      }
+
       if (!args.options.environment) {
         return 'Required option environment missing';
       }
@@ -130,16 +140,16 @@ class FlowRemoveCommand extends AzmgmtCommand {
     in preview and is subject to change once the API reached general
     availability.
   
-    By default, the command will try to remove Microsoft Flows you own.
-    If you want to remove a Flow owned by another user, use the ${chalk.blue('asAdmin')}
-    flag.
+    By default, the command will try to remove a Microsoft Flow you own.
+    If you want to remove a Microsoft Flow owned by another user, use the 
+    ${chalk.blue('asAdmin')} flag.
 
     If the environment with the name you specified doesn't exist, you will get
     the ${chalk.grey('Access to the environment \'xyz\' is denied.')} error.
 
     If the Microsoft Flow with the name you specified doesn't exist, you will
-    get the ${chalk.grey(`The caller with object id \'abc\' does not have permission${os.EOL}` +
-        '    for connection \'xyz\' under Api \'shared_logicflows\'.')} error.
+    get the ${chalk.grey(`Error: Resource \'abc\' does not exist in environment${os.EOL}` +
+        '    \'xyz\'')} error.
     If you try to retrieve a non-existing flow as admin, you will get the
     ${chalk.grey('Could not find flow \'xyz\'.')} error.
    
