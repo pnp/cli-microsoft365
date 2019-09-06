@@ -60,11 +60,11 @@ describe('FileAddRemoveRule', () => {
 
   it('adjusts resolution when the file should be created', () => {
     rule = new FileAddRule(true);
-    assert(rule.resolution.indexOf('Add') > -1);
+    assert(rule.resolution.indexOf('add_cmd') > -1);
   });
 
   it('adjusts resolution when the file should be removed', () => {
     rule = new FileAddRule(false);
-    assert(rule.resolution.indexOf('Remove') > -1);
+    assert(rule.resolution.indexOf('remove_cmd') > -1);
   });
 });

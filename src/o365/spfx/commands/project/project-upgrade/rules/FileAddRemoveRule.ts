@@ -19,12 +19,12 @@ export abstract class FileAddRemoveRule extends Rule {
 
   get resolution(): string {
     if (this.add) {
-      return `Add[BEFOREPATH]${this.filePath}[AFTERPATH][BEFORECONTENT]
+      return `add_cmd[BEFOREPATH]${this.filePath}[AFTERPATH][BEFORECONTENT]
 ${this.contents}
 [AFTERCONTENT]`;
     }
     else {
-      return `Remove ${this.filePath}`;
+      return `remove_cmd ${this.filePath}`;
     }
   }
 

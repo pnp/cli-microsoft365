@@ -297,20 +297,20 @@ class SpfxProjectUpgradeCommand extends Command {
       }
 
       //copy support for multiple shells
-      if (f.resolution.startsWith('copy')) {
-        f.resolution = f.resolution.replace('copy', this.getCopyCommand('copyCommand'));
+      if (f.resolution.startsWith('copy_cmd')) {
+        f.resolution = f.resolution.replace('copy_cmd', this.getCopyCommand('copyCommand'));
         f.resolution = f.resolution.replace('DestinationParam', this.getCopyCommand('copyDestinationParam'));
         return;
       }
       //createdir support for multiple shells
-      if (f.resolution.startsWith('createDir')) {
-        f.resolution = f.resolution.replace('createDir', this.getDirectoryCommand('createDirectoryCommand'));
+      if (f.resolution.startsWith('create_dir_cmd')) {
+        f.resolution = f.resolution.replace('create_dir_cmd', this.getDirectoryCommand('createDirectoryCommand'));
         f.resolution = f.resolution.replace('NameParam', this.getDirectoryCommand('createDirectoryNameParam'));
         f.resolution = f.resolution.replace('ItemTypeParam', this.getDirectoryCommand('createDirectoryItemTypeParam'));
         return;
       }
       //'Add' support for multiple shells
-      if (f.resolution.startsWith('Add')) {
+      if (f.resolution.startsWith('add_cmd')) {
         const pathStart = f.resolution.indexOf('[BEFOREPATH]') + '[BEFOREPATH]'.length;
         const pathEnd = f.resolution.indexOf('[AFTERPATH]');
         const filePath: string = f.resolution.substring(pathStart, pathEnd);
@@ -329,8 +329,8 @@ class SpfxProjectUpgradeCommand extends Command {
         return;
       }
       //'Remove' support for multiple shells
-      if (f.resolution.startsWith('Remove')) {
-        f.resolution = f.resolution.replace('Remove', this.getRemoveCommand('removeFileCommand'));
+      if (f.resolution.startsWith('remove_cmd')) {
+        f.resolution = f.resolution.replace('remove_cmd', this.getRemoveCommand('removeFileCommand'));
         return;
       }
     });
