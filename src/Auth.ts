@@ -241,7 +241,7 @@ export class Auth {
               }
 
               if (error) {
-                reject((response && (response as any).error_description) || error.message);
+                reject((response && (response as any).error_description) || error.message || (error as any).error_description);
                 return;
               }
 
