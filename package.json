@@ -40,8 +40,14 @@
   "author": "https://github.com/pnp/office365-cli/graphs/contributors",
   "maintainers": [
     {
-      "name": "waldekm",
-      "email": "waldek@mastykarz.nl"
+      "name": "Waldek Mastykarz",
+      "email": "waldek@mastykarz.nl",
+      "web": "https://blog.mastykarz.nl"
+    },
+    {
+      "name": "Velin Georgiev",
+      "email": "velin.georgiev@gmail.com",
+      "web": "https://blog.velingeorgiev.com"
     }
   ],
   "contributors": [
