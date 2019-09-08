@@ -32,6 +32,17 @@ export interface CommandTypes {
   boolean?: string[];
 }
 
+export interface GraphResponseError {
+  error: {
+    code: string;
+    message: string;
+    innerError: {
+      "request-id": string;
+      date: string;
+    }
+  }
+}
+
 export class CommandError {
   constructor(public message: string, public code?: number) {
   }
@@ -241,17 +252,18 @@ export default abstract class Command {
         callback(new CommandError(err['odata.error'].message.value));
       }
       catch {
-        if(res.error.error && res.error.error.message) {
-          if(res.error.error.code) {
-            callback(new CommandError(res.error.error.code+" - "+res.error.error.message));
+        try {
+          const graphResponseError:GraphResponseError = res.error;
+          if(graphResponseError.error.code) {
+            callback(new CommandError(graphResponseError.error.code+" - "+graphResponseError.error.message));
           } else {
-            callback(new CommandError(res.error.error.message));
+            callback(new CommandError(graphResponseError.error.message));
           }
         }
-        else {
+        catch {
           callback(new CommandError(res.error));
         }
-      }
+      } 
     }
     else {
       if (rawResponse instanceof Error) {

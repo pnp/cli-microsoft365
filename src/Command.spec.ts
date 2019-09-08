@@ -669,7 +669,7 @@ describe('Command', () => {
     });
   });
 
-  it('correctly handles forbidden error (code) from the promise', (done) => {
+  it('correctly handles graph response (code) from the promise', (done) => {
     const errorMessage = "forbidden-message";
     const errorCode = "Access Denied";
     const cmd = new MockCommand3();
@@ -685,7 +685,7 @@ describe('Command', () => {
     });
   });
 
-  it('correctly handles forbidden error (without code) from the promise', (done) => {
+  it('correctly handles graph response error (without code) from the promise', (done) => {
     const errorMessage = "forbidden-message";
     const cmd = new MockCommand3();
     (cmd as any).handleRejectedODataPromise({ error: { error: { message: errorMessage} }}, undefined, (msg: any): void => {
