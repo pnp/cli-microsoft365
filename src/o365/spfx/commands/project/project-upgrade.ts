@@ -96,18 +96,21 @@ class SpfxProjectUpgradeCommand extends Command {
   private static createDirectoryCommands = {
     bash: {
       createDirectoryCommand: 'mkdir',
-      createDirectoryNameParam: ' ',
-      createDirectoryItemTypeParam: ' ',
+      createDirectoryPathParam: ' ',
+      createDirectoryNameParam: '/',
+      createDirectoryItemTypeParam: '',
     },
     powershell: {
       createDirectoryCommand: 'New-Item',
-      createDirectoryNameParam: '-Name ',
-      createDirectoryItemTypeParam: '-ItemType "directory"',
+      createDirectoryPathParam: ' -Path "',      
+      createDirectoryNameParam: '" -Name "',
+      createDirectoryItemTypeParam: '" -ItemType "directory"',
     },
     cmd: {
       createDirectoryCommand: 'mkdir',
-      createDirectoryNameParam: ' ',
-      createDirectoryItemTypeParam: ' ',
+      createDirectoryPathParam: ' "',
+      createDirectoryNameParam: '\\',
+      createDirectoryItemTypeParam: '"',
     }
   }
 
@@ -121,7 +124,7 @@ class SpfxProjectUpgradeCommand extends Command {
     },
     cmd: {
       addFileCommand: `echo ([FILECONTENT]) > "[FILEPATH]"
-      `,      
+      `,
     }
   }
 
@@ -306,6 +309,7 @@ class SpfxProjectUpgradeCommand extends Command {
       if (f.resolution.startsWith('create_dir_cmd')) {
         f.resolution = f.resolution.replace('create_dir_cmd', this.getDirectoryCommand('createDirectoryCommand'));
         f.resolution = f.resolution.replace('NameParam', this.getDirectoryCommand('createDirectoryNameParam'));
+        f.resolution = f.resolution.replace('PathParam', this.getDirectoryCommand('createDirectoryPathParam'));
         f.resolution = f.resolution.replace('ItemTypeParam', this.getDirectoryCommand('createDirectoryItemTypeParam'));
         return;
       }
@@ -314,7 +318,7 @@ class SpfxProjectUpgradeCommand extends Command {
         const pathStart = f.resolution.indexOf('[BEFOREPATH]') + '[BEFOREPATH]'.length;
         const pathEnd = f.resolution.indexOf('[AFTERPATH]');
         const filePath: string = f.resolution.substring(pathStart, pathEnd);
-        
+
         const contentStart = f.resolution.indexOf('[BEFORECONTENT]') + '[BEFORECONTENT]'.length;
         const contentEnd = f.resolution.indexOf('[AFTERCONTENT]');
         const fileContent: string = f.resolution.substring(contentStart, contentEnd);

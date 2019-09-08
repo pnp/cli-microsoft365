@@ -57,7 +57,7 @@ export class FN018001_TEAMS_folder extends Rule {
       if (!fs.existsSync(teamsFolderPath)) {
         occurrences.push({
           file: path.relative(project.path, teamsFolderPath),
-          resolution: `create_dir_cmd NameParam ${teamsFolderPath} ItemTypeParam`
+          resolution: `create_dir_cmdPathParam${project.path}NameParam${teamsFolderName}ItemTypeParam`
         });
       }
     });
