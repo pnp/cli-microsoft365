@@ -229,7 +229,6 @@ describe(commands.TEAMS_REPORT_USERACTIVITYCOUNTS, () => {
         assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityCounts(period='D7')");
         assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
         assert.equal(requestStub.lastCall.args[0].json, true);
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0][0]["Report Refresh Date"], '2019-08-28');
         assert.equal(fileStub.notCalled, true);
         done();
       }

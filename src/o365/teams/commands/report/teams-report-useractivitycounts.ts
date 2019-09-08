@@ -51,32 +51,24 @@ class TeamsReportUserActivityCountsCommand extends GraphCommand {
         .then((res: any): void => {
           let content: string = '';
 
-        if(args.options.output && args.options.output.toLowerCase() === 'json')
-        {
-          let reportdata = this.getJsonReport(res);
+        if (args.options.output && args.options.output.toLowerCase() === 'json') {
+          let reportdata: any = this.getJsonReport(res);
           content = JSON.stringify(reportdata);
-
-          if(!args.options.outputFile) {
-            cmd.log(reportdata);
-          }
         }
-        else
-        {
+        else {
           content = res;
-          
-          if(!args.options.outputFile) {
-            cmd.log(content);
-          }
         }
 
-        if(args.options.outputFile)
-        {
+        if (!args.options.outputFile) {
+          cmd.log(content);
+        }
+        else {
           fs.writeFileSync(args.options.outputFile, content, 'utf8');
           if (this.verbose) {
             cmd.log(`File saved to path '${args.options.outputFile}'`);
           }
         }
-        
+
         cb();
         }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
