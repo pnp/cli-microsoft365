@@ -668,4 +668,35 @@ describe('Command', () => {
       }
     });
   });
+
+  it('correctly handles forbidden error (code) from the promise', (done) => {
+    const errorMessage = "forbidden-message";
+    const errorCode = "Access Denied";
+    const cmd = new MockCommand3();
+    (cmd as any).handleRejectedODataPromise({ error: { error: { message: errorMessage,code: errorCode} }}, undefined, (msg: any): void => {
+      try {
+        console.log(msg);
+        assert.equal(JSON.stringify(msg), JSON.stringify(new CommandError(errorCode+" - "+errorMessage)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly handles forbidden error (without code) from the promise', (done) => {
+    const errorMessage = "forbidden-message";
+    const cmd = new MockCommand3();
+    (cmd as any).handleRejectedODataPromise({ error: { error: { message: errorMessage} }}, undefined, (msg: any): void => {
+      try {
+        console.log(msg);
+        assert.equal(JSON.stringify(msg), JSON.stringify(new CommandError(errorMessage)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
 });
