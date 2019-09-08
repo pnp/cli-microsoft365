@@ -30,6 +30,7 @@ class TeamsReportDeviceUsageDistributionUserCountsCommand extends GraphCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.period = typeof args.options.period !== 'undefined';
     telemetryProps.outputFile = typeof args.options.outputFile !== 'undefined';
     return telemetryProps;
   }
@@ -78,12 +79,12 @@ class TeamsReportDeviceUsageDistributionUserCountsCommand extends GraphCommand {
   }
 
   private getJsonReport(res: string): any {
-    let rows = res.split('\n');
-    let jsonObj = [];
-    let headers = rows[0].split(',');
+    const rows = res.split('\n');
+    const jsonObj = [];
+    const headers = rows[0].split(',');
 
     for (let i = 1; i < rows.length; i++) {
-      let data = rows[i].split(',');
+      const data = rows[i].split(',');
       let obj: any = {};
       for (let j = 0; j < data.length; j++) {
         obj[headers[j].trim()] = data[j].trim();
