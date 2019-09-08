@@ -241,7 +241,16 @@ export default abstract class Command {
         callback(new CommandError(err['odata.error'].message.value));
       }
       catch {
-        callback(new CommandError(res.error));
+        if(res.error.error && res.error.error.message) {
+          if(res.error.error.code) {
+            callback(new CommandError(res.error.error.code+" - "+res.error.error.message));
+          } else {
+            callback(new CommandError(res.error.error.message));
+          }
+        }
+        else {
+          callback(new CommandError(res.error));
+        }
       }
     }
     else {
