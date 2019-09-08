@@ -668,4 +668,33 @@ describe('Command', () => {
       }
     });
   });
+
+  it('correctly handles graph response (code) from the promise', (done) => {
+    const errorMessage = "forbidden-message";
+    const errorCode = "Access Denied";
+    const cmd = new MockCommand3();
+    (cmd as any).handleRejectedODataPromise({ error: { error: { message: errorMessage, code: errorCode } } }, undefined, (msg: any): void => {
+      try {
+        assert.equal(JSON.stringify(msg), JSON.stringify(new CommandError(errorCode + " - " + errorMessage)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly handles graph response error (without code) from the promise', (done) => {
+    const errorMessage = "forbidden-message";
+    const cmd = new MockCommand3();
+    (cmd as any).handleRejectedODataPromise({ error: { error: { message: errorMessage } } }, undefined, (msg: any): void => {
+      try {
+        assert.equal(JSON.stringify(msg), JSON.stringify(new CommandError(errorMessage)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
 });
