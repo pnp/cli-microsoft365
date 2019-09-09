@@ -88,7 +88,7 @@ class SpfxProjectUpgradeCommand extends Command {
       copyDestinationParam: ' -Destination '
     },
     cmd: {
-      copyCommand: 'xcopy',
+      copyCommand: 'copy',
       copyDestinationParam: ' '
     }
   }
@@ -123,7 +123,7 @@ class SpfxProjectUpgradeCommand extends Command {
       `,
     },
     cmd: {
-      addFileCommand: `echo ([FILECONTENT]) > "[FILEPATH]"
+      addFileCommand: `echo [FILECONTENT] > "[FILEPATH]"
       `,
     }
   }
@@ -880,6 +880,11 @@ ${f.resolution}
     Get instructions to upgrade the current SharePoint Framework project to the
     latest SharePoint Framework version supported by the Office 365 CLI
       ${this.name}
+
+    Get instructions to upgrade the current SharePoint Framework project to the
+    latest SharePoint Framework version supported by the Office 365 CLI using
+    powershell as shell
+      ${this.name} --shell powershell
 `);
   }
 }
