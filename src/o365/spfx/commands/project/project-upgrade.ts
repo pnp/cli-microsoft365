@@ -7,7 +7,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { Finding, Utils, Hash, Dictionary } from './project-upgrade/';
 import { Rule } from './project-upgrade/rules/Rule';
-import { EOL } from 'os';
+import * as os from 'os';
 import { Project, Manifest, TsFile, ScssFile } from './project-upgrade/model';
 import { FindingToReport } from './project-upgrade/FindingToReport';
 import { FN017001_MISC_npm_dedupe } from './project-upgrade/rules/FN017001_MISC_npm_dedupe';
@@ -102,7 +102,7 @@ class SpfxProjectUpgradeCommand extends Command {
     },
     powershell: {
       createDirectoryCommand: 'New-Item',
-      createDirectoryPathParam: ' -Path "',      
+      createDirectoryPathParam: ' -Path "',
       createDirectoryNameParam: '" -Name "',
       createDirectoryItemTypeParam: '" -ItemType "directory"',
     },
@@ -335,6 +335,8 @@ class SpfxProjectUpgradeCommand extends Command {
       //'Remove' support for multiple shells
       if (f.resolution.startsWith('remove_cmd')) {
         f.resolution = f.resolution.replace('remove_cmd', this.getRemoveCommand('removeFileCommand'));
+        if (os.platform() === 'win32')
+          f.resolution = f.resolution.replace(/\//g, '//');
         return;
       }
     });
@@ -521,24 +523,24 @@ class SpfxProjectUpgradeCommand extends Command {
   private getTextReport(findings: FindingToReport[]): string {
     const reportData: ReportData = this.getReportData(findings);
     const s: string[] = [
-      'Execute in ' + this.shell, EOL,
-      '-----------------------', EOL,
+      'Execute in ' + this.shell, os.EOL,
+      '-----------------------', os.EOL,
       (reportData.packageManagerCommands
         .concat(reportData.commandsToExecute
           .filter((command) =>
             command.indexOf(this.getPackageManagerCommand('install')) === -1 &&
             command.indexOf(this.getPackageManagerCommand('installDev')) === -1 &&
             command.indexOf(this.getPackageManagerCommand('uninstall')) === -1 &&
-            command.indexOf(this.getPackageManagerCommand('uninstallDev')) === -1))).join(EOL), EOL,
-      EOL,
+            command.indexOf(this.getPackageManagerCommand('uninstallDev')) === -1))).join(os.EOL), os.EOL,
+      os.EOL,
       Object.keys(reportData.modificationPerFile).map(file => {
         return [
-          file, EOL,
-          '-'.repeat(file.length), EOL,
-          reportData.modificationPerFile[file].map((m: ReportDataModification) => `${m.description}:${EOL}${m.modification}${EOL}`).join(EOL), EOL,
+          file, os.EOL,
+          '-'.repeat(file.length), os.EOL,
+          reportData.modificationPerFile[file].map((m: ReportDataModification) => `${m.description}:${os.EOL}${m.modification}${os.EOL}`).join(os.EOL), os.EOL,
         ].join('');
-      }).join(EOL),
-      EOL,
+      }).join(os.EOL),
+      os.EOL,
     ];
 
     return s.join('').trim();
@@ -573,51 +575,51 @@ ${f.resolution}
       }
 
       findingsToReport.push(
-        `### ${f.id} ${f.title} | ${f.severity}`, EOL,
-        EOL,
-        f.description, EOL,
-        EOL,
+        `### ${f.id} ${f.title} | ${f.severity}`, os.EOL,
+        os.EOL,
+        f.description, os.EOL,
+        os.EOL,
         resolution,
-        EOL,
-        `File: [${f.file}${(f.position ? `:${f.position.line}:${f.position.character}` : '')}](${f.file})`, EOL,
-        EOL
+        os.EOL,
+        `File: [${f.file}${(f.position ? `:${f.position.line}:${f.position.character}` : '')}](${f.file})`, os.EOL,
+        os.EOL
       );
     });
 
     const s: string[] = [
-      `# Upgrade project ${path.posix.basename(this.projectRootPath as string)} to v${this.toVersion}`, EOL,
-      EOL,
-      `Date: ${(new Date().toLocaleDateString())}`, EOL,
-      EOL,
-      '## Findings', EOL,
-      EOL,
-      `Following is the list of steps required to upgrade your project to SharePoint Framework version ${this.toVersion}. [Summary](#Summary) of the modifications is included at the end of the report.`, EOL,
-      EOL,
+      `# Upgrade project ${path.posix.basename(this.projectRootPath as string)} to v${this.toVersion}`, os.EOL,
+      os.EOL,
+      `Date: ${(new Date().toLocaleDateString())}`, os.EOL,
+      os.EOL,
+      '## Findings', os.EOL,
+      os.EOL,
+      `Following is the list of steps required to upgrade your project to SharePoint Framework version ${this.toVersion}. [Summary](#Summary) of the modifications is included at the end of the report.`, os.EOL,
+      os.EOL,
       findingsToReport.join(''),
-      '## Summary', EOL,
-      EOL,
-      '### Execute script', EOL,
-      EOL,
-      '```sh', EOL,
+      '## Summary', os.EOL,
+      os.EOL,
+      '### Execute script', os.EOL,
+      os.EOL,
+      '```sh', os.EOL,
       (reportData.packageManagerCommands
         .concat(reportData.commandsToExecute
           .filter((command) =>
             command.indexOf(this.getPackageManagerCommand('install')) === -1 &&
             command.indexOf(this.getPackageManagerCommand('installDev')) === -1 &&
             command.indexOf(this.getPackageManagerCommand('uninstall')) === -1 &&
-            command.indexOf(this.getPackageManagerCommand('uninstallDev')) === -1))).join(EOL), EOL,
-      '```', EOL,
-      EOL,
-      '### Modify files', EOL,
-      EOL,
+            command.indexOf(this.getPackageManagerCommand('uninstallDev')) === -1))).join(os.EOL), os.EOL,
+      '```', os.EOL,
+      os.EOL,
+      '### Modify files', os.EOL,
+      os.EOL,
       Object.keys(reportData.modificationPerFile).map(file => {
         return [
-          `#### [${file}](${file})`, EOL,
-          EOL,
-          reportData.modificationPerFile[file].map((m: ReportDataModification) => `${m.description}:${EOL}${EOL}\`\`\`${reportData.modificationTypePerFile[file]}${EOL}${m.modification}${EOL}\`\`\``).join(EOL + EOL), EOL,
+          `#### [${file}](${file})`, os.EOL,
+          os.EOL,
+          reportData.modificationPerFile[file].map((m: ReportDataModification) => `${m.description}:${os.EOL}${os.EOL}\`\`\`${reportData.modificationTypePerFile[file]}${os.EOL}${m.modification}${os.EOL}\`\`\``).join(os.EOL + os.EOL), os.EOL,
         ].join('');
-      }).join(EOL),
-      EOL,
+      }).join(os.EOL),
+      os.EOL,
     ];
 
     return s.join('').trim();

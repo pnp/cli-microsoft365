@@ -114,6 +114,7 @@
     "@types/update-notifier": "^2.5.0",
     "coveralls": "^3.0.4",
     "mocha": "^6.1.4",
+    "mock-os": "0.0.1",
     "nyc": "^13.3.0",
     "rimraf": "^2.6.3",
     "sinon": "^7.3.2",
