@@ -539,7 +539,7 @@
 - [graph groupsetting list](../cmd/aad/groupsetting/groupsetting-list.md) - lists Azure AD group settings [#449](https://github.com/pnp/office365-cli/issues/449)
 - [graph groupsettingtemplate get](../cmd/aad/groupsettingtemplate/groupsettingtemplate-get.md) - gets information about the specified Azure AD group settings template [#442](https://github.com/pnp/office365-cli/issues/442)
 - [graph groupsettingtemplate list](../cmd/aad/groupsettingtemplate/groupsettingtemplate-list.md) - lists Azure AD group settings templates [#441](https://github.com/pnp/office365-cli/issues/441)
-- [graph user sendmail](../cmd/outlook/sendmail.md) - sends e-mail on behalf of the current user [#328](https://github.com/pnp/office365-cli/issues/328)
+- [graph user sendmail](../cmd/outlook/mail/mail-send.md) - sends e-mail on behalf of the current user [#328](https://github.com/pnp/office365-cli/issues/328)
 
 ### Changes
 
