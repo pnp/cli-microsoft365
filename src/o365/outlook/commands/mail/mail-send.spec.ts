@@ -1,15 +1,15 @@
-import commands from '../commands';
-import Command, { CommandOption, CommandError, CommandValidate } from '../../../Command';
+import commands from '../../commands';
+import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
 import * as sinon from 'sinon';
-import appInsights from '../../../appInsights';
-import auth from '../../../Auth';
-const command: Command = require('./outlook-sendmail');
+import appInsights from '../../../../appInsights';
+import auth from '../../../../Auth';
+const command: Command = require('./mail-send');
 import * as assert from 'assert';
-import request from '../../../request';
-import Utils from '../../../Utils';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
 import * as fs from 'fs';
 
-describe(commands.OUTLOOK_SENDMAIL, () => {
+describe(commands.OUTLOOK_MAIL_SEND, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
@@ -21,7 +21,7 @@ describe(commands.OUTLOOK_SENDMAIL, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../vorpal-init');
+    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -54,7 +54,12 @@ describe(commands.OUTLOOK_SENDMAIL, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.OUTLOOK_SENDMAIL), true);
+    assert.equal(command.name.startsWith(commands.OUTLOOK_MAIL_SEND), true);
+  });
+
+  it('defines correct alias', () => {
+    const alias = command.alias();
+    assert.equal((alias && alias.indexOf(commands.OUTLOOK_SENDMAIL) > -1), true);
   });
 
   it('has a description', () => {
@@ -400,7 +405,7 @@ describe(commands.OUTLOOK_SENDMAIL, () => {
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
     cmd.help({}, () => { });
-    assert(find.calledWith(commands.OUTLOOK_SENDMAIL));
+    assert(find.calledWith(commands.OUTLOOK_MAIL_SEND));
   });
 
   it('has help with examples', () => {

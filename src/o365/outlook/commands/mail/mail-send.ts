@@ -1,14 +1,14 @@
-import commands from '../commands';
+import commands from '../../commands';
 import * as path from 'path';
 import * as fs from 'fs';
-import request from '../../../request';
-import GlobalOptions from '../../../GlobalOptions';
+import request from '../../../../request';
+import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandOption, CommandValidate
-} from '../../../Command';
-import GraphCommand from '../../base/GraphCommand';
+} from '../../../../Command';
+import GraphCommand from '../../../base/GraphCommand';
 
-const vorpal: Vorpal = require('../../../vorpal-init');
+const vorpal: Vorpal = require('../../../../vorpal-init');
 
 interface CommandArgs {
   options: Options;
@@ -25,11 +25,15 @@ interface Options extends GlobalOptions {
 
 class OutlookSendmailCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.OUTLOOK_SENDMAIL}`;
+    return `${commands.OUTLOOK_MAIL_SEND}`;
   }
 
   public get description(): string {
     return 'Sends e-mail on behalf of the current user';
+  }
+
+  public alias(): string[] | undefined {
+    return [commands.OUTLOOK_SENDMAIL];
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
