@@ -2,6 +2,7 @@ import appInsights from './appInsights';
 import GlobalOptions from './GlobalOptions';
 import request from './request';
 import auth from './Auth';
+import { GraphResponseError } from './o365/base/GraphCommand';
 
 const vorpal: Vorpal = require('./vorpal-init');
 
@@ -30,17 +31,6 @@ export interface CommandCancel {
 export interface CommandTypes {
   string?: string[];
   boolean?: string[];
-}
-
-export interface GraphResponseError {
-  error: {
-    code: string;
-    message: string;
-    innerError: {
-      "request-id": string;
-      date: string;
-    }
-  }
 }
 
 export class CommandError {
