@@ -16,7 +16,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   period: string;
-  outputFile?: string;
+  outputFilePath?: string;
 }
 
 class TeamsReportDeviceUsageDistributionUserCountsCommand extends GraphCommand {
@@ -31,7 +31,7 @@ class TeamsReportDeviceUsageDistributionUserCountsCommand extends GraphCommand {
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.period = typeof args.options.period !== 'undefined';
-    telemetryProps.outputFile = typeof args.options.outputFile !== 'undefined';
+    telemetryProps.outputFilePath = typeof args.options.outputFilePath !== 'undefined';
     return telemetryProps;
   }
 
@@ -52,20 +52,20 @@ class TeamsReportDeviceUsageDistributionUserCountsCommand extends GraphCommand {
         let content: string = '';
 
         if (args.options.output && args.options.output.toLowerCase() === 'json') {
-          let reportdata: any = this.getJsonReport(res);
+          let reportdata: any = this.getReport(res);
           content = JSON.stringify(reportdata);
         }
         else {
           content = res;
         }
 
-        if (!args.options.outputFile) {
+        if (!args.options.outputFilePath) {
           cmd.log(content);
         }
         else {
-          fs.writeFileSync(args.options.outputFile, content, 'utf8');
+          fs.writeFileSync(args.options.outputFilePath, content, 'utf8');
           if (this.verbose) {
-            cmd.log(`File saved to path '${args.options.outputFile}'`);
+            cmd.log(`File saved to path '${args.options.outputFilePath}'`);
           }
         }
 
@@ -73,7 +73,7 @@ class TeamsReportDeviceUsageDistributionUserCountsCommand extends GraphCommand {
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
 
-  private getJsonReport(res: string): any {
+  private getReport(res: string): any {
     const rows = res.split('\n');
     const jsonObj = [];
     const headers = rows[0].split(',');
@@ -98,7 +98,7 @@ class TeamsReportDeviceUsageDistributionUserCountsCommand extends GraphCommand {
         autocomplete: ['D7', 'D30', 'D90', 'D180']
       },
       {
-        option: '-f, --outputFile [outputFile]',
+        option: '-f, --outputFilePath [outputFilePath]',
         description: 'Path to the file where the upgrade report should be stored in'
       }
     ];
@@ -117,8 +117,8 @@ class TeamsReportDeviceUsageDistributionUserCountsCommand extends GraphCommand {
         return `${args.options.period} is not a valid period type. The supported values are D7|D30|D90|D180`;
       }
 
-      if (args.options.outputFile && !fs.existsSync(path.dirname(args.options.outputFile))) {
-        return 'Specified outputFile path where to save the file does not exist';
+      if (args.options.outputFilePath && !fs.existsSync(path.dirname(args.options.outputFilePath))) {
+        return 'Specified outputFilePath where to save the file does not exist';
       }
 
       return true;
@@ -134,12 +134,12 @@ class TeamsReportDeviceUsageDistributionUserCountsCommand extends GraphCommand {
       ${commands.TEAMS_REPORT_DEVICEUSAGEDISTRIBUTIONUSERCOUNTS} --period 'D7'
 
     Gets the number of Microsoft Teams unique users by device type for the last week
-    and exports the report data in the specified path in csv format
-      ${commands.TEAMS_REPORT_DEVICEUSAGEDISTRIBUTIONUSERCOUNTS} --period D7 --output csv --outputFile 'C:/report.csv'
+    and exports the report data in the specified path in text format
+      ${commands.TEAMS_REPORT_DEVICEUSAGEDISTRIBUTIONUSERCOUNTS} --period D7 --output text --outputFilePath 'C:/report.txt'
 
     Gets the number of Microsoft Teams unique users by device type for the last week
     and exports the report data in the specified path in json format
-      ${commands.TEAMS_REPORT_DEVICEUSAGEDISTRIBUTIONUSERCOUNTS} --period D7 --output json --outputFile 'C:/report.json'
+      ${commands.TEAMS_REPORT_DEVICEUSAGEDISTRIBUTIONUSERCOUNTS} --period D7 --output json --outputFilePath 'C:/report.json'
 `);
   }
 }

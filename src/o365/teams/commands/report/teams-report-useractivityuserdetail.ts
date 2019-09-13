@@ -17,7 +17,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   period?: string;
   date?: string;
-  outputFile?: string;
+  outputFilePath?: string;
 }
 
 class TeamsReportUserActivityUserDetailCommand extends GraphCommand {
@@ -33,7 +33,7 @@ class TeamsReportUserActivityUserDetailCommand extends GraphCommand {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.period = typeof args.options.period !== 'undefined';
     telemetryProps.date = typeof args.options.date !== 'undefined';
-    telemetryProps.outputFile = typeof args.options.outputFile !== 'undefined';
+    telemetryProps.outputFilePath = typeof args.options.outputFilePath !== 'undefined';
     return telemetryProps;
   }
 
@@ -56,20 +56,20 @@ class TeamsReportUserActivityUserDetailCommand extends GraphCommand {
         let content: string = '';
 
         if (args.options.output && args.options.output.toLowerCase() === 'json') {
-          let reportdata: any = this.getJsonReport(res);
+          let reportdata: any = this.getReport(res);
           content = JSON.stringify(reportdata);
         }
         else {
           content = res;
         }
 
-        if (!args.options.outputFile) {
+        if (!args.options.outputFilePath) {
           cmd.log(content);
         }
         else {
-          fs.writeFileSync(args.options.outputFile, content, 'utf8');
+          fs.writeFileSync(args.options.outputFilePath, content, 'utf8');
           if (this.verbose) {
-            cmd.log(`File saved to path '${args.options.outputFile}'`);
+            cmd.log(`File saved to path '${args.options.outputFilePath}'`);
           }
         }
 
@@ -77,7 +77,7 @@ class TeamsReportUserActivityUserDetailCommand extends GraphCommand {
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
 
-  private getJsonReport(res: string): any {
+  private getReport(res: string): any {
     const rows = res.split('\n');
     const jsonObj = [];
     const headers = rows[0].split(',');
@@ -106,7 +106,7 @@ class TeamsReportUserActivityUserDetailCommand extends GraphCommand {
         description: 'The date for which you would like to view the users who performed any activity. Supported date format is YYYY-MM-DD. Specify the date or period, but not both.'
       },
       {
-        option: '-f, --outputFile [outputFile]',
+        option: '-f, --outputFilePath [outputFilePath]',
         description: 'Path to the file where the report should be stored in'
       }
     ];
@@ -135,8 +135,8 @@ class TeamsReportUserActivityUserDetailCommand extends GraphCommand {
         return `${args.options.date} is not a valid date. The supported date format is YYYY-MM-DD`;
       }
 
-      if (args.options.outputFile && !fs.existsSync(path.dirname(args.options.outputFile))) {
-        return 'Specified outputFile path where to save the file does not exist';
+      if (args.options.outputFilePath && !fs.existsSync(path.dirname(args.options.outputFilePath))) {
+        return 'Specified outputFilePath where to save the file does not exist';
       }
 
       return true;
@@ -157,12 +157,12 @@ class TeamsReportUserActivityUserDetailCommand extends GraphCommand {
         ${commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL} --date 2019-07-13
 
       Gets details about Microsoft Teams user activity by user for the last week
-      and exports the report data in the specified path in csv format
-        ${commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL} --period D7 --output csv --outputFile 'C:/report.csv'
+      and exports the report data in the specified path in text format
+        ${commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL} --period D7 --output text --outputFilePath 'C:/report.txt'
 
       Gets details about Microsoft Teams user activity by user for the last week
       and exports the report data in the specified path in json format
-        ${commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL} --period D7 --output json --outputFile 'C:/report.json'
+        ${commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL} --period D7 --output json --outputFilePath 'C:/report.json'
 `);
   }
 }

@@ -133,22 +133,12 @@ describe(commands.TEAMS_REPORT_DEVICEUSAGEUSERCOUNTS, () => {
     assert.equal(actual, true);
   });
 
-  it('passes validation on valid \'csv\' output', () => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        period: 'D7',
-        output: 'csv'
-      }
-    });
-    assert.equal(actual, true);
-  });
-
-  it('fails validation if specified outputFile path doesn\'t exist', () => {
+  it('fails validation if specified outputFilePath doesn\'t exist', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     const actual = (command.validate() as CommandValidate)({
       options: {
         period: 'D7',
-        outputFile: '/path/not/found.zip'
+        outputFilePath: '/path/not/found.zip'
       }
     });
     Utils.restore(fs.existsSync);
@@ -196,7 +186,7 @@ describe(commands.TEAMS_REPORT_DEVICEUSAGEUSERCOUNTS, () => {
 
     const fileStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    cmdInstance.action({ options: { debug: false, period: 'D7', outputFile: '/Users/josephvelliah/Desktop/teams-report-deviceusageusercounts.txt' } }, () => {
+    cmdInstance.action({ options: { debug: false, period: 'D7', outputFilePath: '/Users/josephvelliah/Desktop/teams-report-deviceusageusercounts.txt' } }, () => {
       try {
         assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsDeviceUsageUserCounts(period='D7')");
         assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
@@ -252,63 +242,7 @@ describe(commands.TEAMS_REPORT_DEVICEUSAGEUSERCOUNTS, () => {
     });
     const fileStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    cmdInstance.action({ options: { debug: false, period: 'D7', outputFile: '/Users/josephvelliah/Desktop/teams-report-deviceusageusercounts.txt', output: 'text' } }, () => {
-      try {
-        assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsDeviceUsageUserCounts(period='D7')");
-        assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
-        assert.equal(requestStub.lastCall.args[0].json, true);
-        assert.equal(fileStub.called, true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('gets the number of Microsoft Teams daily unique users by device type for the given period and export report data in csv format', (done) => {
-    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/reports/getTeamsDeviceUsageUserCounts(period='D7')`) {
-        return Promise.resolve(`
-        Report Refresh Date,Web,Windows Phone,Android Phone,iOS,Mac,Windows,Report Date,Report Period
-        2019-08-28,0,0,0,0,0,0,2019-08-28,7
-        2019-08-28,0,0,0,0,0,0,2019-08-27,7
-        `);
-      }
-
-      return Promise.reject('Invalid request');
-    });
-    const fileStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
-
-    cmdInstance.action({ options: { debug: false, period: 'D7', outputFile: '/Users/josephvelliah/Desktop/teams-report-deviceusageusercounts.csv' } }, () => {
-      try {
-        assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsDeviceUsageUserCounts(period='D7')");
-        assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
-        assert.equal(requestStub.lastCall.args[0].json, true);
-        assert.equal(fileStub.called, true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('gets the number of Microsoft Teams daily unique users by device type for the given period and export report data in csv format with output', (done) => {
-    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/reports/getTeamsDeviceUsageUserCounts(period='D7')`) {
-        return Promise.resolve(`
-        Report Refresh Date,Web,Windows Phone,Android Phone,iOS,Mac,Windows,Report Date,Report Period
-        2019-08-28,0,0,0,0,0,0,2019-08-28,7
-        2019-08-28,0,0,0,0,0,0,2019-08-27,7
-        `);
-      }
-
-      return Promise.reject('Invalid request');
-    });
-    const fileStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
-
-    cmdInstance.action({ options: { debug: false, period: 'D7', outputFile: '/Users/josephvelliah/Desktop/teams-report-deviceusageusercounts.csv', output: 'csv' } }, () => {
+    cmdInstance.action({ options: { debug: false, period: 'D7', outputFilePath: '/Users/josephvelliah/Desktop/teams-report-deviceusageusercounts.txt', output: 'text' } }, () => {
       try {
         assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsDeviceUsageUserCounts(period='D7')");
         assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
@@ -336,7 +270,7 @@ describe(commands.TEAMS_REPORT_DEVICEUSAGEUSERCOUNTS, () => {
     });
     const fileStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    cmdInstance.action({ options: { debug: false, period: 'D7', outputFile: '/Users/josephvelliah/Desktop/teams-report-deviceusageusercounts.json' } }, () => {
+    cmdInstance.action({ options: { debug: false, period: 'D7', outputFilePath: '/Users/josephvelliah/Desktop/teams-report-deviceusageusercounts.json' } }, () => {
       try {
         assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsDeviceUsageUserCounts(period='D7')");
         assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
@@ -360,7 +294,7 @@ describe(commands.TEAMS_REPORT_DEVICEUSAGEUSERCOUNTS, () => {
     });
     const fileStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    cmdInstance.action({ options: { debug: true, period: 'D7', outputFile: '/Users/josephvelliah/Desktop/teams-report-deviceusageusercounts.json', output: 'json' } }, () => {
+    cmdInstance.action({ options: { debug: true, period: 'D7', outputFilePath: '/Users/josephvelliah/Desktop/teams-report-deviceusageusercounts.json', output: 'json' } }, () => {
       try {
         assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsDeviceUsageUserCounts(period='D7')");
         assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
@@ -389,11 +323,11 @@ describe(commands.TEAMS_REPORT_DEVICEUSAGEUSERCOUNTS, () => {
     });
   });
 
-  it('supports specifying outputFile', () => {
+  it('supports specifying outputFilePath', () => {
     const options = (command.options() as CommandOption[]);
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--outputFile') > -1) {
+      if (o.option.indexOf('--outputFilePath') > -1) {
         containsOption = true;
       }
     });
