@@ -107,6 +107,7 @@
     "@types/easy-table": "0.0.32",
     "@types/mocha": "^5.2.7",
     "@types/node": "^10.14.8",
+    "@types/node-forge": "0.8.4",
     "@types/request": "^2.48.1",
     "@types/request-promise-native": "^1.0.16",
     "@types/semver": "^6.0.0",
@@ -114,11 +115,9 @@
     "@types/update-notifier": "^2.5.0",
     "coveralls": "^3.0.4",
     "mocha": "^6.1.4",
-    "mock-os": "0.0.1",
     "nyc": "^13.3.0",
     "rimraf": "^2.6.3",
-    "sinon": "^7.3.2",
-    "@types/node-forge": "0.8.4"
+    "sinon": "^7.3.2"
   },
   "nyc": {
     "exclude": [

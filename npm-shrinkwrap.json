@@ -2070,12 +2070,6 @@
         }
       }
     },
-    "mock-os": {
-      "version": "0.0.1",
-      "resolved": "https://registry.npmjs.org/mock-os/-/mock-os-0.0.1.tgz",
-      "integrity": "sha1-qAohRnpU/RMdIkY0ZIxNd5XuSrY=",
-      "dev": true
-    },
     "ms": {
       "version": "2.1.1",
       "resolved": "https://registry.npmjs.org/ms/-/ms-2.1.1.tgz",
