@@ -17,7 +17,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   period?: string;
   date?: string;
-  outputFilePath?: string;
+  outputFile?: string;
 }
 
 class TeamsReportDeviceUsageUserDetailCommand extends GraphCommand {
@@ -33,7 +33,7 @@ class TeamsReportDeviceUsageUserDetailCommand extends GraphCommand {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.period = typeof args.options.period !== 'undefined';
     telemetryProps.date = typeof args.options.date !== 'undefined';
-    telemetryProps.outputFilePath = typeof args.options.outputFilePath !== 'undefined';
+    telemetryProps.outputFile = typeof args.options.outputFile !== 'undefined';
     return telemetryProps;
   }
 
@@ -56,20 +56,20 @@ class TeamsReportDeviceUsageUserDetailCommand extends GraphCommand {
         let content: string = '';
 
         if (args.options.output && args.options.output.toLowerCase() === 'json') {
-          let reportdata: any = this.getReport(res);
+          const reportdata: any = this.getReport(res);
           content = JSON.stringify(reportdata);
         }
         else {
           content = res;
         }
 
-        if (!args.options.outputFilePath) {
+        if (!args.options.outputFile) {
           cmd.log(content);
         }
         else {
-          fs.writeFileSync(args.options.outputFilePath, content, 'utf8');
+          fs.writeFileSync(args.options.outputFile, content, 'utf8');
           if (this.verbose) {
-            cmd.log(`File saved to path '${args.options.outputFilePath}'`);
+            cmd.log(`File saved to path '${args.options.outputFile}'`);
           }
         }
 
@@ -78,12 +78,12 @@ class TeamsReportDeviceUsageUserDetailCommand extends GraphCommand {
   }
 
   private getReport(res: string): any {
-    const rows = res.split('\n');
-    const jsonObj = [];
-    const headers = rows[0].split(',');
+    const rows: string[] = res.split('\n');
+    const jsonObj: any = [];
+    const headers: string[] = rows[0].split(',');
 
     for (let i = 1; i < rows.length; i++) {
-      const data = rows[i].split(',');
+      const data: string[] = rows[i].split(',');
       let obj: any = {};
       for (let j = 0; j < data.length; j++) {
         obj[headers[j].trim()] = data[j].trim();
@@ -106,8 +106,8 @@ class TeamsReportDeviceUsageUserDetailCommand extends GraphCommand {
         description: 'The date for which you would like to view the users who performed any activity. Supported date format is YYYY-MM-DD'
       },
       {
-        option: '-f, --outputFilePath [outputFilePath]',
-        description: 'Path to the file where the report should be stored in'
+        option: '-f, --outputFile [outputFile]',
+        description: 'Path to the file where the Microsoft Teams device usage by user report should be stored in'
       }
     ];
 
@@ -135,8 +135,8 @@ class TeamsReportDeviceUsageUserDetailCommand extends GraphCommand {
         return `Provide a valid date in YYYY-MM-DD format`;
       }
 
-      if (args.options.outputFilePath && !fs.existsSync(path.dirname(args.options.outputFilePath))) {
-        return 'Specified outputFilePath where to save the file does not exist';
+      if (args.options.outputFile && !fs.existsSync(path.dirname(args.options.outputFile))) {
+        return `The specified path ${args.options.outputFile} doesn't exist`;
       }
 
       return true;
@@ -162,11 +162,11 @@ class TeamsReportDeviceUsageUserDetailCommand extends GraphCommand {
 
       Gets information about Microsoft Teams device usage by user for the last week 
     and exports the report data in the specified path in text format
-      ${commands.TEAMS_REPORT_DEVICEUSAGEUSERDETAIL} --period D7 --output text --outputFilePath 'C:/report.txt'
+      ${commands.TEAMS_REPORT_DEVICEUSAGEUSERDETAIL} --period D7 --output text --outputFile 'C:/report.txt'
 
     Gets information about Microsoft Teams device usage by user for the last week
     and exports the report data in the specified path in json format
-      ${commands.TEAMS_REPORT_DEVICEUSAGEUSERDETAIL} --period D7 --output json --outputFilePath 'C:/report.json'
+      ${commands.TEAMS_REPORT_DEVICEUSAGEUSERDETAIL} --period D7 --output json --outputFile 'C:/report.json'
 `);
   }
 }

@@ -16,7 +16,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   period: string;
-  outputFilePath?: string;
+  outputFile?: string;
 }
 
 class TeamsReportUserActivityCountsCommand extends GraphCommand {
@@ -31,7 +31,7 @@ class TeamsReportUserActivityCountsCommand extends GraphCommand {
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.period = typeof args.options.period !== 'undefined';
-    telemetryProps.outputFilePath = typeof args.options.outputFilePath !== 'undefined';
+    telemetryProps.outputFile = typeof args.options.outputFile !== 'undefined';
     return telemetryProps;
   }
 
@@ -52,20 +52,20 @@ class TeamsReportUserActivityCountsCommand extends GraphCommand {
           let content: string = '';
 
         if (args.options.output && args.options.output.toLowerCase() === 'json') {
-          let reportdata: any = this.getReport(res);
+          const reportdata: any = this.getReport(res);
           content = JSON.stringify(reportdata);
         }
         else {
           content = res;
         }
 
-        if (!args.options.outputFilePath) {
+        if (!args.options.outputFile) {
           cmd.log(content);
         }
         else {
-          fs.writeFileSync(args.options.outputFilePath, content, 'utf8');
+          fs.writeFileSync(args.options.outputFile, content, 'utf8');
           if (this.verbose) {
-            cmd.log(`File saved to path '${args.options.outputFilePath}'`);
+            cmd.log(`File saved to path '${args.options.outputFile}'`);
           }
         }
 
@@ -74,12 +74,12 @@ class TeamsReportUserActivityCountsCommand extends GraphCommand {
   }
 
   private getReport(res: string): any {
-    const rows = res.split('\n');
-    const jsonObj = [];
-    const headers = rows[0].split(',');
+    const rows: string[] = res.split('\n');
+    const jsonObj: any = [];
+    const headers: string[] = rows[0].split(',');
 
     for (let i = 1; i < rows.length; i++) {
-      const data = rows[i].split(',');
+      const data: string[] = rows[i].split(',');
       let obj: any = {};
       for (let j = 0; j < data.length; j++) {
         obj[headers[j].trim()] = data[j].trim();
@@ -98,8 +98,8 @@ class TeamsReportUserActivityCountsCommand extends GraphCommand {
         autocomplete: ['D7', 'D30', 'D90', 'D180']
       },
       {
-        option: '-f, --outputFilePath [outputFilePath]',
-        description: 'Path to the file where the report should be stored in'
+        option: '-f, --outputFile [outputFile]',
+        description: 'Path to the file where the Microsoft Teams activities by activity type report should be stored in'
       }
     ];
 
@@ -117,8 +117,8 @@ class TeamsReportUserActivityCountsCommand extends GraphCommand {
         return `${args.options.period} is not a valid period type. The supported values are D7,D30,D90,D180`;
       }
 
-      if (args.options.outputFilePath && !fs.existsSync(path.dirname(args.options.outputFilePath))) {
-        return 'Specified outputFilePath where to save the file does not exist';
+      if (args.options.outputFile && !fs.existsSync(path.dirname(args.options.outputFile))) {
+        return `The specified path ${args.options.outputFile} doesn't exist`;
       }
 
       return true;
@@ -135,11 +135,11 @@ class TeamsReportUserActivityCountsCommand extends GraphCommand {
 
       Gets the number of Microsoft Teams activities by activity type for last week
       and exports the report data in the specified path in text format
-        ${commands.TEAMS_REPORT_USERACTIVITYCOUNTS} --period D7 --output text --outputFilePath 'C:/report.txt'
+        ${commands.TEAMS_REPORT_USERACTIVITYCOUNTS} --period D7 --output text --outputFile 'C:/report.txt'
 
         Gets the number of Microsoft Teams activities by activity type for last week
       and exports the report data in the specified path in json format
-        ${commands.TEAMS_REPORT_USERACTIVITYCOUNTS} --period D7 --output json --outputFilePath 'C:/report.json'
+        ${commands.TEAMS_REPORT_USERACTIVITYCOUNTS} --period D7 --output json --outputFile 'C:/report.json'
 `);
   }
 }

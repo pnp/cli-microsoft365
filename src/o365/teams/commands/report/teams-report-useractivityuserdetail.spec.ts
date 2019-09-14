@@ -77,11 +77,6 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
     assert.notEqual(actual, true);
   });
 
-  it('fails validation on invalid output', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { output: 'abc' } });
-    assert.notEqual(actual, true);
-  });
-
   it('passes validation on valid \'D7\' period', () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
@@ -118,26 +113,6 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
     assert.equal(actual, true);
   });
 
-  it('passes validation on valid \'text\' output', () => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        period: 'D7',
-        output: 'text'
-      }
-    });
-    assert.equal(actual, true);
-  });
-
-  it('passes validation on valid \'json\' output', () => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        period: 'D7',
-        output: 'json'
-      }
-    });
-    assert.equal(actual, true);
-  });
-
   it('fails validation if the date option is not a valid date string', () => {
     const actual = (command.validate() as CommandValidate)({
       options:
@@ -153,12 +128,12 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
     assert(actual);
   });
 
-  it('fails validation if specified outputFilePath doesn\'t exist', () => {
+  it('fails validation if specified outputFile doesn\'t exist', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     const actual = (command.validate() as CommandValidate)({
       options: {
         period: 'D7',
-        outputFilePath: '/path/not/found.zip'
+        outputFile: '/path/not/found.zip'
       }
     });
     Utils.restore(fs.existsSync);
@@ -232,7 +207,7 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
 
     const fileStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    cmdInstance.action({ options: { debug: false, period: 'D7', outputFilePath: '/Users/josephvelliah/Desktop/teams-report-useractivityuserdetail.txt' } }, () => {
+    cmdInstance.action({ options: { debug: false, period: 'D7', outputFile: '/Users/josephvelliah/Desktop/teams-report-useractivityuserdetail.txt' } }, () => {
       try {
         assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserDetail(period='D7')");
         assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
@@ -288,7 +263,7 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
     });
     const fileStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    cmdInstance.action({ options: { debug: false, period: 'D7', outputFilePath: '/Users/josephvelliah/Desktop/teams-report-useractivityuserdetail.txt', output: 'text' } }, () => {
+    cmdInstance.action({ options: { debug: false, period: 'D7', outputFile: '/Users/josephvelliah/Desktop/teams-report-useractivityuserdetail.txt', output: 'text' } }, () => {
       try {
         assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserDetail(period='D7')");
         assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
@@ -316,7 +291,7 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
     });
     const fileStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    cmdInstance.action({ options: { debug: false, period: 'D7', outputFilePath: '/Users/josephvelliah/Desktop/teams-report-useractivityuserdetail.json' } }, () => {
+    cmdInstance.action({ options: { debug: false, period: 'D7', outputFile: '/Users/josephvelliah/Desktop/teams-report-useractivityuserdetail.json' } }, () => {
       try {
         assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserDetail(period='D7')");
         assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
@@ -340,7 +315,7 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
     });
     const fileStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    cmdInstance.action({ options: { debug: true, period: 'D7', outputFilePath: '/Users/josephvelliah/Desktop/teams-report-useractivityuserdetail.json', output: 'json' } }, () => {
+    cmdInstance.action({ options: { debug: true, period: 'D7', outputFile: '/Users/josephvelliah/Desktop/teams-report-useractivityuserdetail.json', output: 'json' } }, () => {
       try {
         assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserDetail(period='D7')");
         assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
@@ -369,22 +344,11 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
     });
   });
 
-  it('supports specifying outputFilePath', () => {
+  it('supports specifying outputFile', () => {
     const options = (command.options() as CommandOption[]);
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--outputFilePath') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying output', () => {
-    const options = (command.options() as CommandOption[]);
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--output') > -1) {
+      if (o.option.indexOf('--outputFile') > -1) {
         containsOption = true;
       }
     });
