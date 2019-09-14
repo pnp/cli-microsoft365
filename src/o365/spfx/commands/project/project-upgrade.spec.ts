@@ -1946,32 +1946,24 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('upgrade 141 to 191 with cmd shell on windows generates del command and replaces / in path', () => {
-    var mock = require('mock-os');
-    mock({
-      platform: 'win32'
-    });
+    sinon.stub(process, 'platform').value('win32');
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-141-webpart-react'));
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.9.1', shell: 'cmd' } }, (err?: any) => {
       const findings: string = log[0];
-      const delCommand: string = findings.substring(findings.indexOf('del'), findings.indexOf('// A file is required'));
-      assert.equal((delCommand.indexOf('/') === -1), (mock.platform === 'win32'));
-      mock.restore();
+      const delCommand: string = findings.substring(findings.indexOf('del '), findings.lastIndexOf('echo '));
+      assert.equal((delCommand.indexOf('/') === -1), (process.platform === 'win32'));      
     });
   });
 
   it('upgrade 141 to 191 with bash shell on mac generates rm command and leaves / in path', () => {
-    var mock = require('mock-os');
-    mock({
-      platform: 'darwin'
-    });
+    sinon.stub(process, 'platform').value('darwin');
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-141-webpart-react'));
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.9.1', shell: 'bash' } }, (err?: any) => {
       const findings: string = log[0];
-      const delCommand: string = findings.substring(findings.indexOf('rm'), findings.indexOf('// A file is required'));
-      assert.equal((delCommand.indexOf('/') === -1), (mock.platform === 'win32'));
-      mock.restore();
+      const delCommand: string = findings.substring(findings.indexOf('rm '), findings.lastIndexOf('echo '));
+      assert.equal((delCommand.indexOf('/') === -1), (process.platform === 'win32'));      
     });
   });
 

@@ -336,7 +336,7 @@ class SpfxProjectUpgradeCommand extends Command {
       if (f.resolution.startsWith('remove_cmd')) {
         f.resolution = f.resolution.replace('remove_cmd', this.getRemoveCommand('removeFileCommand'));
         if (os.platform() === 'win32')
-          f.resolution = f.resolution.replace(/\//g, '//');
+          f.resolution = f.resolution.replace(/\//g, '\\');
         return;
       }
     });
