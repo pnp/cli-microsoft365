@@ -30,7 +30,7 @@ class TeamsReportUserActivityUserCountsCommand extends GraphCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.period = typeof args.options.period !== 'undefined';
+    telemetryProps.period = args.options.period;
     telemetryProps.outputFile = typeof args.options.outputFile !== 'undefined';
     return telemetryProps;
   }

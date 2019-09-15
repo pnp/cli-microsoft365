@@ -31,8 +31,8 @@ class TeamsReportDeviceUsageUserDetailCommand extends GraphCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.period = typeof args.options.period !== 'undefined';
-    telemetryProps.date = typeof args.options.date !== 'undefined';
+    telemetryProps.period = args.options.period;
+    telemetryProps.date = args.options.date;
     telemetryProps.outputFile = typeof args.options.outputFile !== 'undefined';
     return telemetryProps;
   }
