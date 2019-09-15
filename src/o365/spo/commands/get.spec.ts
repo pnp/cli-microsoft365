@@ -106,7 +106,7 @@ describe(commands.GET, () => {
 
     cmdInstance.action({ options: { } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("Login to Office 365 first")));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("Log in to Office 365 first")));
         assert.equal(auth.service.spoUrl, undefined);
         done();
       }

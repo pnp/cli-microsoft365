@@ -28,11 +28,6 @@ class SpoSetCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    if (!auth.service.connected) {
-      cb(new CommandError('Login to Office 365 first'));
-      return;
-    }
-
     auth.service.spoUrl = args.options.url;
     auth.storeConnectionInfo().then(() => {
       cb();
