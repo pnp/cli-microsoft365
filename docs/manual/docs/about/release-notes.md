@@ -1,5 +1,34 @@
 # Release notes
 
+## [v2.1.0](https://github.com/pnp/office365-cli/releases/tag/v2.1.0)
+
+### New commands
+
+**SharePoint Online:**
+
+- [spo contenttypehub get](../cmd/spo/contenttypehub/contenttypehub-get.md) - returns the URL of the SharePoint Content Type Hub of the Tenant [#905](https://github.com/pnp/office365-cli/issues/905)
+
+**Microsoft Teams:**
+
+- [teams channel remove](../cmd/teams/channel/channel-remove.md) - removes the specified channel in the Microsoft Teams team [#814](https://github.com/pnp/office365-cli/issues/814)
+
+**PowerApps:**
+
+- [pa pcf init](../cmd/pa/pcf/pcf-init.md) - Creates new PowerApps component framework project [#952](https://github.com/pnp/office365-cli/issues/952)
+- [pa solution init](../cmd/pa/solution/solution-init.md) - initializes a directory with a new CDS solution project [#953](https://github.com/pnp/office365-cli/issues/953)
+
+**Global:**
+
+- [accesstoken get](../cmd/accesstoken-get.md) - gets access token for the specified resource [#1072](https://github.com/pnp/office365-cli/issues/1072)
+
+### Changes
+
+- updated vorpal to 1.11.6 [#1092](https://github.com/pnp/office365-cli/issues/1092)
+- removed spo-specific action implementation [#1092](https://github.com/pnp/office365-cli/issues/1092)
+- implemented passing AAD error during device code auth [#1095](https://github.com/pnp/office365-cli/issues/1095)
+- added handling forbidden errors [#1096](https://github.com/pnp/office365-cli/issues/1096)
+- fixed handling Flow nextLink [#1114](https://github.com/pnp/office365-cli/issues/1114)
+
 ## [v2.0.0](https://github.com/pnp/office365-cli/releases/tag/v2.0.0)
 
 ### New commands

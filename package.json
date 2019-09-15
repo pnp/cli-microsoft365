@@ -40,8 +40,14 @@
   "author": "https://github.com/pnp/office365-cli/graphs/contributors",
   "maintainers": [
     {
-      "name": "waldekm",
-      "email": "waldek@mastykarz.nl"
+      "name": "Waldek Mastykarz",
+      "email": "waldek@mastykarz.nl",
+      "web": "https://blog.mastykarz.nl"
+    },
+    {
+      "name": "Velin Georgiev",
+      "email": "velin.georgiev@gmail.com",
+      "web": "https://blog.velingeorgiev.com"
     }
   ],
   "contributors": [
@@ -71,6 +77,7 @@
     "Powney, Mark <powney.mark@outlook.com>",
     "Priem, Mark <mark.priem@outlook.com>",
     "Raju, Arnie <arnie.raju@thesolutioncollective.com.au>",
+    "Reekmans, Yannick <reekmans.yannick@gmail.com>",
     "Romano, Rodrigo <rodrigo@rodrigoromano.net>",
     "Schot, Albert-Jan <appie@digiwijs.nl>",
     "Schouten, Robert <robert.schouten@wortell.nl>",
@@ -83,6 +90,7 @@
     "Svenson, Mikael <miksvenson@gmail.com>",
     "Tane, Peter <peter.tane@gmail.come>",
     "Tatti, Anoop <anoop@live.co.uk>",
+    "Trinder, Garry <garry.trinder@live.com>",
     "van Hunen, Erwin <erwin.van.hunen@outlook.com>",
     "van Rousselt, Rick <rick.vanrousselt@outlook.com>",
     "Velliah, Joseph <joseph@sprider.org>",
@@ -100,7 +108,7 @@
     "typescript": "^3.5.1",
     "update-notifier": "^3.0.0",
     "uuid": "^3.3.2",
-    "vorpal": "https://github.com/pnp/vorpal/raw/master/vorpal-1.11.4.tgz",
+    "vorpal": "https://github.com/pnp/vorpal/raw/master/vorpal-1.11.6.tgz",
     "node-forge": "0.8.5"
   },
   "devDependencies": {

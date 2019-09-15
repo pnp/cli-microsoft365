@@ -850,9 +850,9 @@
       }
     },
     "core-js": {
-      "version": "2.5.7",
-      "resolved": "https://registry.npmjs.org/core-js/-/core-js-2.5.7.tgz",
-      "integrity": "sha512-RszJCAxg/PP6uzXVXL6BsxSXx/B05oJAQ2vkJRjyjrEcNVycaqOmNb5OTxZPE3xa5gwZduqza6L9JOCenh/Ecw=="
+      "version": "2.6.9",
+      "resolved": "https://registry.npmjs.org/core-js/-/core-js-2.6.9.tgz",
+      "integrity": "sha512-HOpZf6eXmnl7la+cUdMnLvUxKNqLUzJvgIziQ0DiF3JwSImNphIqdGqzj6hIKyX04MmV0poclQ7+wjWvxQyR2A=="
     },
     "core-util-is": {
       "version": "1.0.2",
@@ -3935,8 +3935,8 @@
       }
     },
     "vorpal": {
-      "version": "https://github.com/pnp/vorpal/raw/master/vorpal-1.11.4.tgz",
-      "integrity": "sha512-b13/2tzghxlZN2xXq/iIVjjKO865mZTF4EU8C8gnCPYtowtGISIRh/kALz1ckMAV0oLcozouVIH5tccqfgzHsA==",
+      "version": "https://github.com/pnp/vorpal/raw/master/vorpal-1.11.6.tgz",
+      "integrity": "sha512-f3fqtnexYkJgrgx3wfJNrHZC2nzCvsEZhZ0Zu4j0LKCYfJklpT3tgijN1diN89GeczIUMKHBV6540DKAZDxtbw==",
       "requires": {
         "babel-polyfill": "^6.3.14",
         "chalk": "^1.1.0",
