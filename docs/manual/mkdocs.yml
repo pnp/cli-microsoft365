@@ -358,11 +358,9 @@ nav:
     - Office 365 (tenant):
       - id:
         - id get: 'cmd/tenant-id-get.md'
-    - PowerApps (pa):
-      - pcf:
-        - pcf init: 'cmd/pa/pcf/pcf-init.md'
-      - solution:
-        - solution init: 'cmd/pa/solution/solution-init.md'
+    - Yammer (yammer):
+      - network:
+        - network list: 'cmd/yammer/network/network-list.md'
   - Concepts:
     - 'Persisting connection': 'concepts/persisting-connection.md'
     - 'Authorization and access tokens': 'concepts/authorization-tokens.md'
