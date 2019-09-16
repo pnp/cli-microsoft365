@@ -26,7 +26,7 @@ describe(commands.TEAMS_MESSAGE_REPLY_LIST, () => {
     cmdInstance = {
       action: command.action(),
       commandWrapper: {
-        command: commands.TEAMS_MESSAGE_REPLY_LIST
+        command: command.name
       },
       log: (msg: string) => {
         log.push(msg);
@@ -388,6 +388,167 @@ describe(commands.TEAMS_MESSAGE_REPLY_LIST, () => {
     });
   });
 
+  it('outputs all data in json output mode', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/teams/02bd9fd6-8f93-4758-87c3-1fb73740a315/channels/19:d0bba23c2fc8413991125a43a54cc30e@thread.skype/messages/1501527481624/replies`) {
+        return Promise.resolve({
+          value: [
+            {
+              "id": "1501527483334",
+              "replyToId": "1501527481624",
+              "etag": "1501527483334",
+              "messageType": "message",
+              "createdDateTime": "2017-07-31T18:58:03.334Z",
+              "lastModifiedDateTime": null,
+              "deletedDateTime": null,
+              "subject": "",
+              "summary": null,
+              "importance": "normal",
+              "locale": "en-us",
+              "webUrl": "https://teams.microsoft.com/l/message/19%3Ad0bba23c2fc8413991125a43a54cc30e%40thread.skype/1501527483334?groupId=02bd9fd6-8f93-4758-87c3-1fb73740a315&tenantId=dcd219dd-bc68-4b9b-bf0b-4a33a796be35&createdTime=1501527483334&parentMessageId=1501527481624",
+              "policyViolation": null,
+              "from": {
+                "application": null,
+                "device": null,
+                "conversation": null,
+                "user": {
+                  "id": "2ed03dfd-01d8-4005-a9ef-fa8ee546dc6c",
+                  "displayName": "Lidia Holloway",
+                  "userIdentityType": "aadUser"
+                }
+              },
+              "body": {
+                "contentType": "html",
+                "content": "<div>Hey team, I'm Lidia! I've been here about six months so far and I really like it! We've got a great team and although there's always so much to do, I enjoy how well we work together.</div>"
+              },
+              "attachments": [],
+              "mentions": [],
+              "reactions": []
+            },
+            {
+              "id": "1501527482612",
+              "replyToId": "1501527481624",
+              "etag": "1501527482612",
+              "messageType": "message",
+              "createdDateTime": "2017-07-31T18:58:02.612Z",
+              "lastModifiedDateTime": null,
+              "deletedDateTime": null,
+              "subject": "",
+              "summary": null,
+              "importance": "normal",
+              "locale": "en-us",
+              "webUrl": "https://teams.microsoft.com/l/message/19%3Ad0bba23c2fc8413991125a43a54cc30e%40thread.skype/1501527482612?groupId=02bd9fd6-8f93-4758-87c3-1fb73740a315&tenantId=dcd219dd-bc68-4b9b-bf0b-4a33a796be35&createdTime=1501527482612&parentMessageId=1501527481624",
+              "policyViolation": null,
+              "from": {
+                "application": null,
+                "device": null,
+                "conversation": null,
+                "user": {
+                  "id": "8b209ac8-08ff-4ef1-896d-3b9fde0bbf04",
+                  "displayName": "Joni Sherman",
+                  "userIdentityType": "aadUser"
+                }
+              },
+              "body": {
+                "contentType": "html",
+                "content": "<div>Hi everyone, I'm Joni and I've been with our group for about 6 years. Feel free to ping me with any questions you may have!</div>"
+              },
+              "attachments": [],
+              "mentions": [],
+              "reactions": []
+            }
+          ]
+        });
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    cmdInstance.action({
+      options: {
+        debug: false,
+        output: 'json',
+        teamId: "02bd9fd6-8f93-4758-87c3-1fb73740a315",
+        channelId: "19:d0bba23c2fc8413991125a43a54cc30e@thread.skype",
+        messageId: "1501527481624"
+      }
+    }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith([
+          {
+            "id": "1501527483334",
+            "replyToId": "1501527481624",
+            "etag": "1501527483334",
+            "messageType": "message",
+            "createdDateTime": "2017-07-31T18:58:03.334Z",
+            "lastModifiedDateTime": null,
+            "deletedDateTime": null,
+            "subject": "",
+            "summary": null,
+            "importance": "normal",
+            "locale": "en-us",
+            "webUrl": "https://teams.microsoft.com/l/message/19%3Ad0bba23c2fc8413991125a43a54cc30e%40thread.skype/1501527483334?groupId=02bd9fd6-8f93-4758-87c3-1fb73740a315&tenantId=dcd219dd-bc68-4b9b-bf0b-4a33a796be35&createdTime=1501527483334&parentMessageId=1501527481624",
+            "policyViolation": null,
+            "from": {
+              "application": null,
+              "device": null,
+              "conversation": null,
+              "user": {
+                "id": "2ed03dfd-01d8-4005-a9ef-fa8ee546dc6c",
+                "displayName": "Lidia Holloway",
+                "userIdentityType": "aadUser"
+              }
+            },
+            "body": {
+              "contentType": "html",
+              "content": "<div>Hey team, I'm Lidia! I've been here about six months so far and I really like it! We've got a great team and although there's always so much to do, I enjoy how well we work together.</div>"
+            },
+            "attachments": [],
+            "mentions": [],
+            "reactions": []
+          },
+          {
+            "id": "1501527482612",
+            "replyToId": "1501527481624",
+            "etag": "1501527482612",
+            "messageType": "message",
+            "createdDateTime": "2017-07-31T18:58:02.612Z",
+            "lastModifiedDateTime": null,
+            "deletedDateTime": null,
+            "subject": "",
+            "summary": null,
+            "importance": "normal",
+            "locale": "en-us",
+            "webUrl": "https://teams.microsoft.com/l/message/19%3Ad0bba23c2fc8413991125a43a54cc30e%40thread.skype/1501527482612?groupId=02bd9fd6-8f93-4758-87c3-1fb73740a315&tenantId=dcd219dd-bc68-4b9b-bf0b-4a33a796be35&createdTime=1501527482612&parentMessageId=1501527481624",
+            "policyViolation": null,
+            "from": {
+              "application": null,
+              "device": null,
+              "conversation": null,
+              "user": {
+                "id": "8b209ac8-08ff-4ef1-896d-3b9fde0bbf04",
+                "displayName": "Joni Sherman",
+                "userIdentityType": "aadUser"
+              }
+            },
+            "body": {
+              "contentType": "html",
+              "content": "<div>Hi everyone, I'm Joni and I've been with our group for about 6 years. Feel free to ping me with any questions you may have!</div>"
+            },
+            "attachments": [],
+            "mentions": [],
+            "reactions": []
+          }
+        ]));
+
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+  
   it('correctly handles error when retrieving replies', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       return Promise.reject('An error has occurred');
