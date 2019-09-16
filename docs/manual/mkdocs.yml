@@ -329,6 +329,7 @@ nav:
       - message:
         - message get: 'cmd/teams/message/message-get.md'
         - message list: 'cmd/teams/message/message-list.md'
+        - message reply list: 'cmd/teams/message/message-reply-list.md'
       - messagingsettings:
         - messagingsettings list: 'cmd/teams/messagingsettings/messagingsettings-list.md'
         - messagingsettings set: 'cmd/teams/messagingsettings/messagingsettings-set.md'
