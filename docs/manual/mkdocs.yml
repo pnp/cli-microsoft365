@@ -352,6 +352,9 @@ nav:
         - user list: 'cmd/aad/o365group/o365group-user-list.md'
         - user remove: 'cmd/aad/o365group/o365group-user-remove.md'
         - user set: 'cmd/aad/o365group/o365group-user-set.md'
+    - Yammer:
+      - network:
+        - network list: 'cmd/yammer/network/network-list.md'
     - Office 365 (tenant):
       - id:
         - id get: 'cmd/tenant-id-get.md'

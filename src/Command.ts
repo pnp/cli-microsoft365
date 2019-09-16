@@ -275,19 +275,25 @@ export default abstract class Command {
               callback(new CommandError(response.error.error_description));
             }
             else {
-              try {
-                const error: any = JSON.parse(response.error);
-                if (error &&
-                  error.error &&
-                  error.error.message) {
-                  callback(new CommandError(error.error.message));
+              if (response.error.base) {
+                callback(new CommandError(response.error.base));
+              } 
+              else 
+              {
+                try {
+                  const error: any = JSON.parse(response.error);
+                  if (error &&
+                    error.error &&
+                    error.error.message) {
+                    callback(new CommandError(error.error.message));
+                  }
+                  else {
+                    callback(new CommandError(response.error));
+                  }
                 }
-                else {
+                catch {
                   callback(new CommandError(response.error));
                 }
-              }
-              catch {
-                callback(new CommandError(response.error));
               }
             }
           }
