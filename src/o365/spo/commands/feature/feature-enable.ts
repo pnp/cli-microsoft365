@@ -114,8 +114,15 @@ class SpoFeatureEnableCommand extends SpoCommand {
       }
 
       if (args.options.scope) {
-        if (args.options.scope.toLowerCase() !== 'site' &&
-          args.options.scope.toLowerCase() !== 'web') {
+        if (
+            !args.options.scope.toLowerCase //This will be the case when the scope is not a string value
+            || 
+            (
+              args.options.scope.toLowerCase() !== 'site' 
+              &&
+              args.options.scope.toLowerCase() !== 'web'
+            )
+          ) {
           return `${args.options.scope} is not a valid Feature scope. Allowed values are Site|Web`;
         }
       }
