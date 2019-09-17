@@ -50,6 +50,13 @@ describe(commands.FEATURE_ENABLE, () => {
     auth.service.connected = false;
   });
 
+  let validHeaders = function(headerContainer: any) {
+    return headerContainer.headers.accept &&
+    headerContainer.headers.accept.indexOf('application/json') === 0 &&
+    headerContainer.headers['X-RequestDigest'] &&
+    headerContainer.headers['X-RequestDigest'] === "abc";
+  }
+
   it('has correct name', () => {
     assert.equal(command.name.startsWith(commands.FEATURE_ENABLE), true);
   });
@@ -110,10 +117,7 @@ describe(commands.FEATURE_ENABLE, () => {
       requests.push(opts);
 
       if (opts.url.indexOf(requestUrl) > -1) {
-        if (opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0 &&
-          opts.headers['X-RequestDigest'] &&
-          opts.headers['X-RequestDigest'] === "abc") {
+        if (validHeaders(opts)) {
           return Promise.resolve();
         }
       }
@@ -130,11 +134,7 @@ describe(commands.FEATURE_ENABLE, () => {
     cmdInstance.action({ options: { debug: true, featureId: 'b2307a39-e878-458b-bc90-03bc578531d6', url: 'https://contoso.sharepoint.com' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
-        if (r.url.indexOf(requestUrl) > -1 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0 &&
-          r.headers['X-RequestDigest'] &&
-          r.headers['X-RequestDigest'] === "abc") {
+        if (r.url.indexOf(requestUrl) > -1 && validHeaders(r)) {
           correctRequestIssued = true;
         }
       });
@@ -157,10 +157,7 @@ describe(commands.FEATURE_ENABLE, () => {
       requests.push(opts);
 
       if (opts.url.indexOf(requestUrl) > -1) {
-        if (opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0 &&
-          opts.headers['X-RequestDigest'] &&
-          opts.headers['X-RequestDigest'] === "abc") {
+        if (validHeaders(opts)) {
           return Promise.resolve();
         }
       }
@@ -177,11 +174,7 @@ describe(commands.FEATURE_ENABLE, () => {
     cmdInstance.action({ options: { debug: true, featureId: '915c240e-a6cc-49b8-8b2c-0bff8b553ed3', url: 'https://contoso.sharepoint.com', scope:'site',force:true } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
-        if (r.url.indexOf(requestUrl) > -1 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0 &&
-          r.headers['X-RequestDigest'] &&
-          r.headers['X-RequestDigest'] === "abc") {
+        if (r.url.indexOf(requestUrl) > -1 && validHeaders(r)) {
           correctRequestIssued = true;
         }
       });

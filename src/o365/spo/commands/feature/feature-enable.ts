@@ -90,7 +90,7 @@ class SpoFeatureEnableCommand extends SpoCommand {
       },
       {
         option: '-s, --scope [scope]',
-        description: 'Scope of the Features to retrieve. Allowed values Site|Web. Default Web',
+        description: 'Scope of the Feature to enable. Allowed values `Site|Web`. Default `Web`',
         autocomplete: ['Site', 'Web']
       },
       {
@@ -142,10 +142,10 @@ class SpoFeatureEnableCommand extends SpoCommand {
       
     Examples:
   
-    Enable feature on site
+    Enable site feature
       ${this.name} --url https://contoso.sharepoint.com/sites/sales --featureId 915c240e-a6cc-49b8-8b2c-0bff8b553ed3 --scope Site
 
-    Enable feature on web (with force to overwrite feature with same id)
+    Enable web feature (with force to overwrite feature with same id)
       ${this.name} --url https://contoso.sharepoint.com/sites/sales --featureId 00bfea71-5932-4f9c-ad71-1557e5751100 --scope Web --force
     `);
   }
