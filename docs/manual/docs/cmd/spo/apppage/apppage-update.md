@@ -1,0 +1,29 @@
+# spo apppage update
+
+Updates the single-part app page
+
+## Usage
+
+```sh
+spo apppage update [options]
+```
+
+## Options
+
+Option|Description
+------|-----------
+`--help`|output usage information
+`-u, --webUrl <webUrl>`|The URL of the site where the page to update is located
+`-p, --pageName <pageName>`|The name of the page to be updated, eg. page.aspx
+`-d, --webPartData <webPartData>`|JSON string of the web part to put on the page
+`-o, --output [output]`|Output type. `json|text`. Default `text`
+`--verbose`|Runs command with verbose logging
+`--debug`|Runs command with debug logging
+
+## Examples
+
+Updates the single-part app page located in a site with url https://contoso.sharepoint.com, webpart data is stored in the `$webPartData` variable
+
+```sh
+spo apppage update --pageName "Contoso.aspx" --webUrl "https://contoso.sharepoint.com" --webPartData $webPartData 
+```
