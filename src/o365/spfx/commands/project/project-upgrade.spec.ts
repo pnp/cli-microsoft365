@@ -1945,28 +1945,6 @@ describe(commands.PROJECT_UPGRADE, () => {
     assert.equal(actual, true);
   });
 
-  it('upgrade 141 to 191 with cmd shell on windows generates del command and replaces / in path', () => {
-    sinon.stub(process, 'platform').value('win32');
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-141-webpart-react'));
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { toVersion: '1.9.1', shell: 'cmd' } }, (err?: any) => {
-      const findings: string = log[0];
-      const delCommand: string = findings.substring(findings.indexOf('del '), findings.lastIndexOf('echo '));
-      assert.equal((delCommand.indexOf('/') === -1), (process.platform === 'win32'));      
-    });
-  });
-
-  it('upgrade 141 to 191 with bash shell on mac generates rm command and leaves / in path', () => {
-    sinon.stub(process, 'platform').value('darwin');
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-141-webpart-react'));
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { toVersion: '1.9.1', shell: 'bash' } }, (err?: any) => {
-      const findings: string = log[0];
-      const delCommand: string = findings.substring(findings.indexOf('rm '), findings.lastIndexOf('echo '));
-      assert.equal((delCommand.indexOf('/') === -1), (process.platform === 'win32'));      
-    });
-  });
-
   it('fails validation when non-existent path specified', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     const actual = (command.validate() as CommandValidate)({ options: { outputFile: '/foo/file.md' } });
