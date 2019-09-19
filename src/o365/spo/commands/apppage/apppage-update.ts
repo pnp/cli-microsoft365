@@ -32,7 +32,7 @@ class SpoAppPageUpdateCommand extends SpoCommand {
       url: `${args.options.webUrl}/_api/sitepages/Pages/UpdateFullPageApp`,
       headers: {
         'content-type': 'application/json;odata=nometadata',
-        accept: 'application/json;odata=nometadata'
+         accept: 'application/json;odata=nometadata'
       },
       json: true,
       body: {
