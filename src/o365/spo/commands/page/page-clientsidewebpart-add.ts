@@ -108,6 +108,22 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
 
         this.setWebPartProperties(webPart, cmd, args);
 
+        // if no section exists (canvasContent array only has 1 default object), add a default section (1 col)
+        if (canvasContent.length === 1) {
+          const defaultSection: Control = {
+            position: {
+              controlIndex:1,
+              sectionIndex: 1,
+              zoneIndex: 1,
+              sectionFactor: 12,
+              layoutIndex: 1,
+            },
+            emphasis: {},
+            displayMode: 2
+          };          
+          canvasContent.unshift(defaultSection);
+        }
+
         // get unique zoneIndex values given each section can have 1 or more
         // columns each assigned to the zoneIndex of the corresponding section
         const zoneIndices: number[] = canvasContent
