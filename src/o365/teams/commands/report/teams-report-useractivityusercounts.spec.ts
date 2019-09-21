@@ -108,7 +108,7 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERCOUNTS, () => {
     assert.equal(actual, true);
   });
 
-  it('fails validation if specified outputFile doesn\'t exist', () => {
+  it('fails validation if specified outputFile directory path doesn\'t exist', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     const actual = (command.validate() as CommandValidate)({
       options: {
