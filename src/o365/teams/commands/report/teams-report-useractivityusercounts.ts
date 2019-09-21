@@ -118,7 +118,7 @@ class TeamsReportUserActivityUserCountsCommand extends GraphCommand {
       }
 
       if (args.options.outputFile && !fs.existsSync(path.dirname(args.options.outputFile))) {
-        return `The specified path ${args.options.outputFile} doesn't exist`;
+        return `The specified path ${path.dirname(args.options.outputFile)} doesn't exist`;
       }
 
       return true;
