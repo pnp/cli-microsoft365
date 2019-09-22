@@ -28,6 +28,8 @@
 - implemented passing AAD error during device code auth [#1095](https://github.com/pnp/office365-cli/issues/1095)
 - added handling forbidden errors [#1096](https://github.com/pnp/office365-cli/issues/1096)
 - fixed handling Flow nextLink [#1114](https://github.com/pnp/office365-cli/issues/1114)
+- added support for multi-shell [#887](https://github.com/pnp/office365-cli/issues/887)
+- renamed the outlook sendmail command [#1103](https://github.com/pnp/office365-cli/issues/1103)
 
 ## [v2.0.0](https://github.com/pnp/office365-cli/releases/tag/v2.0.0)
 
