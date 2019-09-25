@@ -36,27 +36,28 @@ class TeamsReportUserActivityCountsCommand extends GraphCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-      const endpoint: string = `${this.resource}/v1.0/reports/getTeamsUserActivityCounts(period='${encodeURIComponent(args.options.period)}')`;
-      
-      const requestOptions: any = {
-        url: endpoint,
-        headers: {
-          accept: 'application/json;odata.metadata=none'
-        },
-        json: true
-      };
-  
-      request
-        .get(requestOptions)
-        .then((res: any): void => {
-          let content: string = '';
+    const endpoint: string = `${this.resource}/v1.0/reports/getTeamsUserActivityCounts(period='${encodeURIComponent(args.options.period)}')`;
+
+    const requestOptions: any = {
+      url: endpoint,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      json: true
+    };
+
+    request
+      .get(requestOptions)
+      .then((res: any): void => {
+        let content: string = '';
+        let cleanResponse = this.removeEmptyLines(res);
 
         if (args.options.output && args.options.output.toLowerCase() === 'json') {
-          const reportdata: any = this.getReport(res);
+          const reportdata: any = this.getReport(cleanResponse);
           content = JSON.stringify(reportdata);
         }
         else {
-          content = res;
+          content = cleanResponse;
         }
 
         if (!args.options.outputFile) {
@@ -70,7 +71,13 @@ class TeamsReportUserActivityCountsCommand extends GraphCommand {
         }
 
         cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+  }
+
+  private removeEmptyLines(input: string): string {
+    const rows: string[] = input.split('\n');
+    const cleanRows = rows.filter(Boolean);
+    return cleanRows.join('\n');
   }
 
   private getReport(res: string): any {
@@ -137,7 +144,7 @@ class TeamsReportUserActivityCountsCommand extends GraphCommand {
       and exports the report data in the specified path in text format
         ${commands.TEAMS_REPORT_USERACTIVITYCOUNTS} --period D7 --output text --outputFile 'C:/report.txt'
 
-        Gets the number of Microsoft Teams activities by activity type for last week
+      Gets the number of Microsoft Teams activities by activity type for last week
       and exports the report data in the specified path in json format
         ${commands.TEAMS_REPORT_USERACTIVITYCOUNTS} --period D7 --output json --outputFile 'C:/report.json'
 `);

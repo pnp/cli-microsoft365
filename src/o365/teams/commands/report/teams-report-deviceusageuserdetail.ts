@@ -54,13 +54,14 @@ class TeamsReportDeviceUsageUserDetailCommand extends GraphCommand {
       .get(requestOptions)
       .then((res: any): void => {
         let content: string = '';
+        let cleanResponse = this.removeEmptyLines(res);
 
         if (args.options.output && args.options.output.toLowerCase() === 'json') {
-          const reportdata: any = this.getReport(res);
+          const reportdata: any = this.getReport(cleanResponse);
           content = JSON.stringify(reportdata);
         }
         else {
-          content = res;
+          content = cleanResponse;
         }
 
         if (!args.options.outputFile) {
@@ -75,6 +76,12 @@ class TeamsReportDeviceUsageUserDetailCommand extends GraphCommand {
 
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+  }
+
+  private removeEmptyLines(input: string): string {
+    const rows: string[] = input.split('\n');
+    const cleanRows = rows.filter(Boolean);
+    return cleanRows.join('\n');
   }
 
   private getReport(res: string): any {
@@ -160,7 +167,7 @@ class TeamsReportDeviceUsageUserDetailCommand extends GraphCommand {
     May 1, 2019
       ${commands.TEAMS_REPORT_DEVICEUSAGEUSERDETAIL} --date 2019-05-01
 
-      Gets information about Microsoft Teams device usage by user for the last week 
+    Gets information about Microsoft Teams device usage by user for the last week 
     and exports the report data in the specified path in text format
       ${commands.TEAMS_REPORT_DEVICEUSAGEUSERDETAIL} --period D7 --output text --outputFile 'C:/report.txt'
 

@@ -50,13 +50,14 @@ class TeamsReportUserActivityUserCountsCommand extends GraphCommand {
       .get(requestOptions)
       .then((res: any): void => {
         let content: string = '';
+        let cleanResponse = this.removeEmptyLines(res);
 
         if (args.options.output && args.options.output.toLowerCase() === 'json') {
-          const reportdata: any = this.getReport(res);
+          const reportdata: any = this.getReport(cleanResponse);
           content = JSON.stringify(reportdata);
         }
         else {
-          content = res;
+          content = cleanResponse;
         }
 
         if (!args.options.outputFile) {
@@ -71,6 +72,12 @@ class TeamsReportUserActivityUserCountsCommand extends GraphCommand {
 
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+  }
+
+  private removeEmptyLines(input: string): string {
+    const rows: string[] = input.split('\n');
+    const cleanRows = rows.filter(Boolean);
+    return cleanRows.join('\n');
   }
 
   private getReport(res: string): any {
