@@ -25,7 +25,7 @@ class TeamsMessageReplyListCommand extends GraphItemsListCommand<Reply>  {
   }
 
   public get description(): string {
-    return 'Retrieves a message from a channel in a Microsoft Teams team';
+    return 'Retrieves replies to a message from a channel in a Microsoft Teams team';
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
@@ -65,7 +65,7 @@ class TeamsMessageReplyListCommand extends GraphItemsListCommand<Reply>  {
       },
       {
         option: '-m, --messageId <messageId>',
-        description: 'The ID of the message to retrieve'
+        description: 'The ID of the message to retrieve replies for'
       }
     ];
 
