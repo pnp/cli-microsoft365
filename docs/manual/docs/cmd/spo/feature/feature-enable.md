@@ -21,6 +21,11 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
+## Remarks
+
+If the specified url doesn't refer to an existing site collection,
+you will get a "404 FILE NOT FOUND" error.
+
 ## Examples
 
 Enable site feature
