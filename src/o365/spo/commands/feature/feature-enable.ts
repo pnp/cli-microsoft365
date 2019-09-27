@@ -135,10 +135,10 @@ class SpoFeatureEnableCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(commands.FEATURE_ENABLE).helpInformation());
     log(
-      `  Remarks:
+      `    Remarks:
 
-      If the specified ${chalk.grey('url')} doesn't refer to an existing site collection,
-      you will get a ${chalk.grey('404 - "404 FILE NOT FOUND"')} error.
+    If the specified ${chalk.grey('url')} doesn't refer to an existing site collection,
+    you will get a ${chalk.grey('404 - "404 FILE NOT FOUND"')} error.
       
     Examples:
   
