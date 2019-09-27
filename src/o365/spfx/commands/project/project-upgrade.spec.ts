@@ -42,6 +42,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     telemetry = null;
     (command as any).allFindings = [];
     (command as any).packageManager = 'npm';
+    (command as any).shell = 'bash';
     packagesDevExact = [];
     packagesDepExact = [];
     packagesDepUn = [];
@@ -1856,13 +1857,13 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.6.0' } }, (err?: any) => {
-      assert(log[0].indexOf('Execute in command line') > -1);
+      assert(log[0].indexOf('Execute in ') > -1);
     });
   });
 
   it('writes upgrade report to file when outputFile specified', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-151-webpart-react-graph'));
-    const writeFileSyncSpy: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(() => {});
+    const writeFileSyncSpy: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { output: 'md', toVersion: '1.6.0', outputFile: '/foo/report.md' } }, (err?: any) => {
@@ -1895,7 +1896,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('passes validation when package manager not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { } });
+    const actual = (command.validate() as CommandValidate)({ options: {} });
     assert.equal(actual, true);
   });
 
@@ -1916,6 +1917,31 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   it('passes validation when yarn package manager specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { packageManager: 'yarn' } });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation when shell not specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: {} });
+    assert.equal(actual, true);
+  });
+
+  it('fails validation when unsupported shell specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { shell: 'abc' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('passes validation when bash shell specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { shell: 'bash' } });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation when powershell shell specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { shell: 'powershell' } });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation when cmd shell specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { shell: 'cmd' } });
     assert.equal(actual, true);
   });
 
