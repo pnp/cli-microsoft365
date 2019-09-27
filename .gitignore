@@ -67,6 +67,3 @@ commands.json
 
 # VS env folder
 .vs/
-
-# VS Code env folder
-.vscode/
