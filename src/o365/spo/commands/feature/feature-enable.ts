@@ -16,9 +16,9 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   url: string;
-  featureId?: string;
+  featureId: string;
   scope?: string;
-  force?: boolean;
+  force: boolean;
 }
 
 class SpoFeatureEnableCommand extends SpoCommand {
@@ -32,7 +32,6 @@ class SpoFeatureEnableCommand extends SpoCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.featureId = (!(!args.options.featureId)).toString();
     telemetryProps.url = (!(!args.options.url)).toString();
     telemetryProps.scope = (!(!args.options.scope)).toString();
     telemetryProps.force = args.options.force || false;
@@ -72,7 +71,7 @@ class SpoFeatureEnableCommand extends SpoCommand {
         })
         .then((res: string): void => {
           if (this.verbose) {
-            cmd.log('Feature activated');
+            cmd.log(vorpal.chalk.green('DONE'));
           }
           cb();
         }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
