@@ -1,4 +1,3 @@
-import { ContextInfo } from '../../spo';
 import request from '../../../../request';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -49,27 +48,21 @@ class SpoFeatureEnableCommand extends SpoCommand {
       force = false;
     }
 
+
     if (this.verbose) {
-      cmd.log('Retrieving request digest');
+      cmd.log(`Enabling feature '${args.options.featureId}' on scope '${scope}' for url '${args.options.url}' (force='${force}')...`);
     }
-    this.getRequestDigest(args.options.url)
-        .then((contextInfo: ContextInfo):Promise<string> => {
-          if (this.verbose) {
-            cmd.log(`Enabling feature '${args.options.featureId}' on scope '${scope}' for url '${args.options.url}' (force='${force}')...`);
-          }
-  
-          let url = `${args.options.url}/_api/${scope}/features/add(featureId=guid'${args.options.featureId}',force=${force})`;
-          const requestOptions: any = {
-            url: url,
-            headers: {
-              accept: 'application/json;odata=nometadata',
-              'X-RequestDigest': contextInfo.FormDigestValue,
-            },
-          };
-  
-          return request.post(requestOptions);
-        })
-        .then((res: string): void => {
+
+    let url = `${args.options.url}/_api/${scope}/features/add(featureId=guid'${args.options.featureId}',force=${force})`;
+    const requestOptions: any = {
+      url: url,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+    };
+
+    request.post(requestOptions)
+        .then((res: any): void => {
           if (this.verbose) {
             cmd.log(vorpal.chalk.green('DONE'));
           }

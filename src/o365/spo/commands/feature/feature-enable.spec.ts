@@ -50,13 +50,6 @@ describe(commands.FEATURE_ENABLE, () => {
     auth.service.connected = false;
   });
 
-  let validHeaders = function(headerContainer: any) {
-    return headerContainer.headers.accept &&
-    headerContainer.headers.accept.indexOf('application/json') === 0 &&
-    headerContainer.headers['X-RequestDigest'] &&
-    headerContainer.headers['X-RequestDigest'] === "abc";
-  }
-
   it('has correct name', () => {
     assert.equal(command.name.startsWith(commands.FEATURE_ENABLE), true);
   });
@@ -117,15 +110,9 @@ describe(commands.FEATURE_ENABLE, () => {
       requests.push(opts);
 
       if (opts.url.indexOf(requestUrl) > -1) {
-        if (validHeaders(opts)) {
+        if (opts.headers.accept && opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve();
         }
-      }
-      if (opts.url.indexOf('contextinfo') > -1) {
-        let contextInfo = {
-          FormDigestValue: 'abc'
-        };
-        return Promise.resolve(contextInfo);
       }
 
       return Promise.reject('Invalid request');
@@ -134,7 +121,7 @@ describe(commands.FEATURE_ENABLE, () => {
     cmdInstance.action({ options: { debug: true, featureId: 'b2307a39-e878-458b-bc90-03bc578531d6', url: 'https://contoso.sharepoint.com' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
-        if (r.url.indexOf(requestUrl) > -1 && validHeaders(r)) {
+        if (r.url.indexOf(requestUrl) > -1 && r.headers.accept && r.headers.accept.indexOf('application/json') === 0) {
           correctRequestIssued = true;
         }
       });
@@ -157,15 +144,9 @@ describe(commands.FEATURE_ENABLE, () => {
       requests.push(opts);
 
       if (opts.url.indexOf(requestUrl) > -1) {
-        if (validHeaders(opts)) {
+        if (opts.headers.accept && opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve();
         }
-      }
-      if (opts.url.indexOf('contextinfo') > -1) {
-        let contextInfo = {
-          FormDigestValue: 'abc'
-        };
-        return Promise.resolve(contextInfo);
       }
 
       return Promise.reject('Invalid request');
@@ -174,7 +155,7 @@ describe(commands.FEATURE_ENABLE, () => {
     cmdInstance.action({ options: { debug: true, featureId: '915c240e-a6cc-49b8-8b2c-0bff8b553ed3', url: 'https://contoso.sharepoint.com', scope:'site',force:true } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
-        if (r.url.indexOf(requestUrl) > -1 && validHeaders(r)) {
+        if (r.url.indexOf(requestUrl) > -1 && r.headers.accept && r.headers.accept.indexOf('application/json') === 0) {
           correctRequestIssued = true;
         }
       });
@@ -198,12 +179,6 @@ describe(commands.FEATURE_ENABLE, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url.indexOf(requestUrl) > -1) {
         return Promise.reject(err);
-      }
-      if (opts.url.indexOf('contextinfo') > -1) {
-        let contextInfo = {
-          FormDigestValue: 'abc'
-        };
-        return Promise.resolve(contextInfo);
       }
 
       return Promise.reject('Invalid request');
