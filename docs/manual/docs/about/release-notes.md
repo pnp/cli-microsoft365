@@ -30,6 +30,8 @@
 - fixed handling Flow nextLink [#1114](https://github.com/pnp/office365-cli/issues/1114)
 - added support for multi-shell [#887](https://github.com/pnp/office365-cli/issues/887)
 - renamed the outlook sendmail command [#1103](https://github.com/pnp/office365-cli/issues/1103)
+- extended teams report commands with support for specifying output file [#1075](https://github.com/pnp/office365-cli/issues/1075)
+- added support for adding web parts to empty pages [#740](https://github.com/pnp/office365-cli/issues/740)
 
 ## [v2.0.0](https://github.com/pnp/office365-cli/releases/tag/v2.0.0)
 
