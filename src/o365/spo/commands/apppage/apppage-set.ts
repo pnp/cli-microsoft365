@@ -18,9 +18,9 @@ interface Options extends GlobalOptions {
   webPartData: string;
 }
 
-class SpoAppPageUpdateCommand extends SpoCommand {
+class SpoAppPageSetCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.APPPAGE_UPDATE}`;
+    return `${commands.APPPAGE_SET}`;
   }
 
   public get description(): string {
@@ -42,7 +42,6 @@ class SpoAppPageUpdateCommand extends SpoCommand {
     };
 
     request.post(requestOptions).then((res: any): void => {
-      cmd.log(res);
       if (this.verbose) {
         cmd.log(vorpal.chalk.green('DONE'));
       }
@@ -57,8 +56,8 @@ class SpoAppPageUpdateCommand extends SpoCommand {
         description: 'The URL of the site where the page to update is located'
       },
       {
-        option: '-p, --pageName <pageName>',
-        description: 'The name of the page to be updated'
+        option: '-n, --pageName <pageName>',
+        description: 'The name of the page to be updated, eg. page.aspx'
       },
       {
         option: '-d, --webPartData <webPartData>',
@@ -95,16 +94,14 @@ class SpoAppPageUpdateCommand extends SpoCommand {
   public commandHelp(args: {}, log: (help: string) => void): void {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
-
-    log(`
-    
+    log(`    
   Examples:   
      
-    Updates the single-part app page in a site with url 
+   Updates the single-part app page located in a site with url 
     https://contoso.sharepoint.com, webpart data is stored in the
     ${chalk.grey('$webPartData')} variable
       ${this.name} --pageName "Contoso.aspx" --webUrl "https://contoso.sharepoint.com" --webPartData $webPartData 
 `);
   }
 }
-module.exports = new SpoAppPageUpdateCommand();
+module.exports = new SpoAppPageSetCommand();

@@ -3,16 +3,15 @@ import Command, {CommandOption,CommandValidate,CommandError } from "../../../../
 import * as sinon from "sinon";
 import appInsights from "../../../../appInsights";
 import auth from "../../../../Auth";
-const command: Command = require("./apppage-update");
+const command: Command = require("./apppage-set");
 import * as assert from "assert";
 import request from "../../../../request";
 import Utils from "../../../../Utils";
 
-describe(commands.APPPAGE_UPDATE, () => {
+describe(commands.APPPAGE_SET, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, "restoreAuth").callsFake(() => Promise.resolve());
@@ -30,7 +29,6 @@ describe(commands.APPPAGE_UPDATE, () => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, "log");
   });
 
   afterEach(() => {
@@ -43,7 +41,7 @@ describe(commands.APPPAGE_UPDATE, () => {
   });
 
   it("has correct name", () => {
-    assert.equal(command.name.startsWith(commands.APPPAGE_UPDATE), true);
+    assert.equal(command.name.startsWith(commands.APPPAGE_SET), true);
   });
 
   it("has a description", () => {
@@ -71,7 +69,6 @@ describe(commands.APPPAGE_UPDATE, () => {
       },
       () => {
         try {
-          assert(cmdInstanceLogSpy.calledWith("Done"));
           done();
         } catch (e) {
           done(e);
@@ -220,7 +217,7 @@ describe(commands.APPPAGE_UPDATE, () => {
     const find = sinon.stub(vorpal, "find").callsFake(() => cmd);
     cmd.help = command.help();
     cmd.help({}, () => {});
-    assert(find.calledWith(commands.APPPAGE_UPDATE));
+    assert(find.calledWith(commands.APPPAGE_SET));
   });
 
   it("has help with examples", () => {
