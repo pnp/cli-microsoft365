@@ -27,7 +27,7 @@ interface Options extends GlobalOptions {
 
 /*
  * Logic extracted from bolt.module.pcf.dll
- * Version: 0.4.3
+ * Version: 1.0.6
  * Class: bolt.module.pcf.PcfInitVerb
  */
 class PaPcfInitCommand extends Command {
