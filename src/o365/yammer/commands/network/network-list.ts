@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   includeSuspended: boolean;
 }
 
-class YammerMessageAddCommand extends YammerCommand {
+class YammerNetworkListCommand extends YammerCommand {
   public get name(): string {
     return `${commands.YAMMER_NETWORK_LIST}`;
   }
@@ -61,7 +61,7 @@ class YammerMessageAddCommand extends YammerCommand {
     const options: CommandOption[] = [
         {
             option: '--includeSuspended',
-            description: 'Include networks the user is suspended in'
+            description: 'Include the networks the user is suspended.'
         }
     ];
 
@@ -78,15 +78,21 @@ class YammerMessageAddCommand extends YammerCommand {
   public commandHelp(args: {}, log: (help: string) => void): void {
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  Examples:
+      `  Remarks:
+
+      This command requires Yammer 'user_impersonation' permissions in Azure AD. 
+      
+      The operations are executed in the context of the current logged in user. Certificate-based authentication with app_only permissions is not supported yet.  
+      
+      Examples:
   
       Returns a list of networks to which the current user has access
-      ${this.name} list"
+        ${this.name} list
 
       Returns a list of networks to which the current user has access including the networks the user is suspended.
-      ${this.name} list --includeSuspended
+        ${this.name} list --includeSuspended
 `   );
   }
 }
 
-module.exports = new YammerMessageAddCommand();
+module.exports = new YammerNetworkListCommand();

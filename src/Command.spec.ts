@@ -458,25 +458,6 @@ describe('Command', () => {
     });
   });
 
-  it('displays error message coming from Yammer', () => {
-    const cmd = {
-      commandWrapper: {
-        command: 'command'
-      },
-      log: (msg?: string) => { },
-      prompt: () => { }
-    };
-    const mock = new MockCommand2();
-    mock.handlePromiseError({
-      error: {
-        base: 'abc'
-      }
-    }, cmd, (err?: any) => {
-    assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
-    });
-    
-  });
-
   it('shows deprecation warning when command executed using the deprecated name', () => {
     const cmd = {
       commandWrapper: {

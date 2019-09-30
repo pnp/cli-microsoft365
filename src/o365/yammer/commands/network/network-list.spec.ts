@@ -39,8 +39,7 @@ describe(commands.YAMMER_NETWORK_LIST, () => {
   afterEach(() => {
     Utils.restore([
       vorpal.find,
-      request.get,
-      request.post
+      request.get
     ]);
   });
 
@@ -88,7 +87,7 @@ describe(commands.YAMMER_NETWORK_LIST, () => {
       });
       cmdInstance.action({ options: { debug: true } }, (err?: any) => {
           try {
-              assert(cmdInstanceLogSpy.called);
+              assert.equal(cmdInstanceLogSpy.lastCall.args[0][0].id, '123')
               done();
           }
           catch (e) {
@@ -144,7 +143,7 @@ describe(commands.YAMMER_NETWORK_LIST, () => {
     });
     cmdInstance.action({ options: { debug: true, output: "json" } }, (err?: any) => {
         try {
-            assert(cmdInstanceLogSpy.called);
+            assert.equal(cmdInstanceLogSpy.lastCall.args[0][0].id, '123');
             done();
         }
         catch (e) {
@@ -181,7 +180,7 @@ describe(commands.YAMMER_NETWORK_LIST, () => {
     });
     cmdInstance.action({ options: { debug: true, includeSuspended: true } }, (err?: any) => {
         try {
-            assert(cmdInstanceLogSpy.called);
+            assert.equal(cmdInstanceLogSpy.lastCall.args[0][0].id, '123')
             done();
         }
         catch (e) {

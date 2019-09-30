@@ -137,4 +137,57 @@ describe('YammerCommand', () => {
     const command = new MockCommand();
     assert.equal((command as any).resource, 'https://www.yammer.com/api');
   });
+
+  it('displays error message coming from Yammer', () => {
+    const cmd = {
+      commandWrapper: {
+        command: 'command'
+      },
+      log: (msg?: string) => { },
+      prompt: () => { }
+    };
+    const mock = new MockCommand();
+    mock.handlePromiseError({
+      error: {
+        base: 'abc'
+      }
+    }, cmd, (err?: any) => {
+    assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
+    });
+    
+  });
+
+  it('displays error message not from Yammer (1)', () => {
+    const cmd = {
+      commandWrapper: {
+        command: 'command'
+      },
+      log: (msg?: string) => { },
+      prompt: () => { }
+    };
+    const mock = new MockCommand();
+    mock.handlePromiseError({
+      error: 'not from Yammer'
+    }, cmd, (err?: any) => {
+    assert.equal(JSON.stringify(err), JSON.stringify({"message":{"error":"not from Yammer"}}));
+    });
+    
+  });
+
+  it('displays error message not from Yammer (2)', () => {
+    const cmd = {
+      commandWrapper: {
+        command: 'command'
+      },
+      log: (msg?: string) => { },
+      prompt: () => { }
+    };
+    const mock = new MockCommand();
+    mock.handlePromiseError({
+      message: "test"
+    }, cmd, (err?: any) => {
+    assert.equal(JSON.stringify(err), JSON.stringify({"message":{"message":"test"}}));
+    });
+    
+  });
 });
