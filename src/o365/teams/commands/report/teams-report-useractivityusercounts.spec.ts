@@ -7,11 +7,14 @@ const command: Command = require('./teams-report-useractivityusercounts');
 import * as assert from 'assert';
 import Utils from '../../../../Utils';
 import request from '../../../../request';
+import * as fs from 'fs';
 
 describe(commands.TEAMS_REPORT_USERACTIVITYUSERCOUNTS, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
+  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let writeFileSyncFake = () => { };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -31,13 +34,15 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERCOUNTS, () => {
         log.push(msg);
       }
     };
+    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
     (command as any).items = [];
   });
 
   afterEach(() => {
     Utils.restore([
       vorpal.find,
-      request.get
+      request.get,
+      fs.writeFileSync
     ]);
   });
 
@@ -103,10 +108,26 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERCOUNTS, () => {
     assert.equal(actual, true);
   });
 
+  it('fails validation if specified outputFile directory path doesn\'t exist', () => {
+    sinon.stub(fs, 'existsSync').callsFake(() => false);
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        period: 'D7',
+        outputFile: '/path/not/found.zip'
+      }
+    });
+    Utils.restore(fs.existsSync);
+    assert.notEqual(actual, true);
+  });
+
   it('gets the number of Microsoft Teams users by activity type for the given period', (done) => {
     const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserCounts(period='D7')`) {
-        return Promise.resolve('Report Refresh Date,Report Date,Team Chat Messages,Private Chat Messages,Calls,Meetings,Other Actions,Report Period');
+        return Promise.resolve(`
+        Report Refresh Date,Report Date,Team Chat Messages,Private Chat Messages,Calls,Meetings,Other Actions,Report Period
+        2019-08-28,2019-08-28,0,0,0,0,0,7
+        2019-08-28,2019-08-27,0,0,0,0,0,7
+        `);
       }
 
       return Promise.reject('Invalid request');
@@ -117,6 +138,144 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERCOUNTS, () => {
         assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserCounts(period='D7')");
         assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
         assert.equal(requestStub.lastCall.args[0].json, true);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('gets the number of Microsoft Teams users by activity type for the given period and export report data in txt format', (done) => {
+    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserCounts(period='D7')`) {
+        return Promise.resolve(`
+        Report Refresh Date,Report Date,Team Chat Messages,Private Chat Messages,Calls,Meetings,Other Actions,Report Period
+        2019-08-28,2019-08-28,0,0,0,0,0,7
+        2019-08-28,2019-08-27,0,0,0,0,0,7
+        `);
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    const fileStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
+
+    cmdInstance.action({ options: { debug: false, period: 'D7', outputFile: '/Users/josephvelliah/Desktop/teams-report-useractivityusercounts.txt' } }, () => {
+      try {
+        assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserCounts(period='D7')");
+        assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
+        assert.equal(requestStub.lastCall.args[0].json, true);
+        assert.equal(fileStub.called, true);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('gets the number of Microsoft Teams users by activity type for the given period when output is json', (done) => {
+    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserCounts(period='D7')`) {
+        return Promise.resolve(`Report Refresh Date,Report Date,Team Chat Messages,Private Chat Messages,Calls,Meetings,Other Actions,Report Period
+        2019-08-28,2019-08-28,0,0,0,0,0,7
+        2019-08-28,2019-08-27,0,0,0,0,0,7
+        `);
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    const fileStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
+
+    cmdInstance.action({ options: { debug: false, period: 'D7', output: 'json' } }, () => {
+      try {
+        assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserCounts(period='D7')");
+        assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
+        assert.equal(requestStub.lastCall.args[0].json, true);
+        assert.equal(fileStub.notCalled, true);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('gets the number of Microsoft Teams users by activity type for the given period and export report data in txt format with output', (done) => {
+    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserCounts(period='D7')`) {
+        return Promise.resolve(`
+        Report Refresh Date,Report Date,Team Chat Messages,Private Chat Messages,Calls,Meetings,Other Actions,Report Period
+        2019-08-28,2019-08-28,0,0,0,0,0,7
+        2019-08-28,2019-08-27,0,0,0,0,0,7
+        `);
+      }
+
+      return Promise.reject('Invalid request');
+    });
+    const fileStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
+
+    cmdInstance.action({ options: { debug: false, period: 'D7', outputFile: '/Users/josephvelliah/Desktop/teams-report-useractivityusercounts.txt', output: 'text' } }, () => {
+      try {
+        assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserCounts(period='D7')");
+        assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
+        assert.equal(requestStub.lastCall.args[0].json, true);
+        assert.equal(fileStub.called, true);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('gets the number of Microsoft Teams users by activity type for the given period and export report data in json format', (done) => {
+    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserCounts(period='D7')`) {
+        return Promise.resolve(`
+        Report Refresh Date,Report Date,Team Chat Messages,Private Chat Messages,Calls,Meetings,Other Actions,Report Period
+        2019-08-28,2019-08-28,0,0,0,0,0,7
+        2019-08-28,2019-08-27,0,0,0,0,0,7
+        `);
+      }
+
+      return Promise.reject('Invalid request');
+    });
+    const fileStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
+
+    cmdInstance.action({ options: { debug: false, period: 'D7', outputFile: '/Users/josephvelliah/Desktop/teams-report-useractivityusercounts.json' } }, () => {
+      try {
+        assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserCounts(period='D7')");
+        assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
+        assert.equal(requestStub.lastCall.args[0].json, true);
+        assert.equal(fileStub.called, true);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('gets the number of Microsoft Teams users by activity type for the given period and export report data in json format with output', (done) => {
+    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserCounts(period='D7')`) {
+        return Promise.resolve(`Report Refresh Date,Report Date,Team Chat Messages,Private Chat Messages,Calls,Meetings,Other Actions,Report Period\n2019-08-28,2019-08-28,0,0,0,0,0,7`);
+      }
+
+      return Promise.reject('Invalid request');
+    });
+    const fileStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
+
+    cmdInstance.action({ options: { debug: true, period: 'D7', outputFile: '/Users/josephvelliah/Desktop/teams-report-useractivityusercounts.json', output: 'json' } }, () => {
+      try {
+        assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserCounts(period='D7')");
+        assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
+        assert.equal(requestStub.lastCall.args[0].json, true);
+        assert.equal(fileStub.called, true);
+        assert(cmdInstanceLogSpy.calledWith(`File saved to path '/Users/josephvelliah/Desktop/teams-report-useractivityusercounts.json'`));
         done();
       }
       catch (e) {
@@ -137,6 +296,17 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERCOUNTS, () => {
         done(e);
       }
     });
+  });
+
+  it('supports specifying outputFile', () => {
+    const options = (command.options() as CommandOption[]);
+    let containsOption = false;
+    options.forEach(o => {
+      if (o.option.indexOf('--outputFile') > -1) {
+        containsOption = true;
+      }
+    });
+    assert(containsOption);
   });
 
   it('supports debug mode', () => {
