@@ -15,6 +15,7 @@ export default {
   O365GROUP_TEAMIFY: `${prefix} o365group teamify`,
   O365GROUP_REMOVE: `${prefix} o365group remove`,
   O365GROUP_RENEW: `${prefix} o365group renew`,
+  O365GROUP_REPORT_ACTIVITYDETAIL: `${prefix} o365group report activitydetail`,
   O365GROUP_RESTORE: `${prefix} o365group restore`,
   O365GROUP_USER_ADD: `${prefix} o365group user add`,
   O365GROUP_USER_LIST: `${prefix} o365group user list`,

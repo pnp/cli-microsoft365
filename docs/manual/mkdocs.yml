@@ -34,6 +34,8 @@ nav:
         - o365group user list: 'cmd/aad/o365group/o365group-user-list.md'
         - o365group user remove: 'cmd/aad/o365group/o365group-user-remove.md'
         - o365group user set: 'cmd/aad/o365group/o365group-user-set.md'
+        - report:
+          - report activitydetail: 'cmd/aad/o365group/report/report-activitydetail.md'
       - oauth2grant:
         - oauth2grant add: 'cmd/aad/oauth2grant/oauth2grant-add.md'
         - oauth2grant list: 'cmd/aad/oauth2grant/oauth2grant-list.md'
