@@ -367,6 +367,10 @@ nav:
     - 'Authorization and access tokens': 'concepts/authorization-tokens.md'
     - 'Command completion': 'concepts/completion.md'
     - 'Communication with Office 365': 'concepts/communicating-o365.md'
+  - Examples:
+    - 'Introduction': 'examples/index.md'
+    - Microsoft Teams:
+      - 'Deploy Microsoft Teams app from Azure DevOps': 'examples/teams/deploy-teams-app.md'
   - About:
     - 'Why this CLI': 'about/why-cli.md'
     - 'Comparison to SharePoint and Office 365 PowerShell': 'about/comparison-powershell.md'
@@ -390,6 +394,7 @@ markdown_extensions:
       guess_lang: false
   - toc:
       permalink: true
+  - pymdownx.superfences
 extra:
   social:
     - type: 'twitter'
