@@ -135,6 +135,12 @@ workflows:
           filters:
             branches:
               only: dev
+      - deploy_docs:
+          requires:
+            - publish_next
+          filters:
+            branches:
+              only: dev
   release:
     jobs:
       - build:
