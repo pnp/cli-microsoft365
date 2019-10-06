@@ -1,5 +1,21 @@
 # Release notes
 
+## v2.2.0
+
+### New commands
+
+**SharePoint Online:**
+
+- [spo feature enable](../cmd/spo/feature/feature-enable.md) - enables feature for the specified site or web [#675](https://github.com/pnp/office365-cli/issues/675)
+
+**Microsoft Teams:**
+
+- [teams message reply list](../cmd/teams/message/message-reply-list.md) - retrieves replies to a message from a channel in a Microsoft Teams team [#1109](https://github.com/pnp/office365-cli/issues/1109)
+
+**Yammer:**
+
+- [yammer network list](../cmd/yammer/network/network-list.md) - returns a list of networks to which the current user has access [#1115](https://github.com/pnp/office365-cli/issues/1115)
+
 ## [v2.1.0](https://github.com/pnp/office365-cli/releases/tag/v2.1.0)
 
 ### New commands
