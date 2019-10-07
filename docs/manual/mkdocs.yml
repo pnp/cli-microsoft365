@@ -96,6 +96,7 @@ nav:
         - app upgrade: 'cmd/spo/app/app-upgrade.md'
       - apppage:
         - apppage add: 'cmd/spo/apppage/apppage-add.md'
+        - apppage set: 'cmd/spo/apppage/apppage-set.md'
       - cdn:
         - cdn get: 'cmd/spo/cdn/cdn-get.md'
         - cdn origin add: 'cmd/spo/cdn/cdn-origin-add.md'
