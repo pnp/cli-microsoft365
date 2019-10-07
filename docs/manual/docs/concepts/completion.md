@@ -37,6 +37,8 @@ Command completion is based on a static file. After updating the Office 365 CLI,
 
 If you're using Zsh, Bash or Fish as your shell, you can benefit of Office 365 CLI command completion as well, when typing commands directly in the shell. The completion is based on the [Omelette](https://www.npmjs.com/package/omelette) package.
 
+For Mac Terminal, you'll need to add `source /usr/local/etc/profile.d/bash_completion.sh` to `~/.bashrc`
+
 #### Enable sh completion
 
 To enable completion:

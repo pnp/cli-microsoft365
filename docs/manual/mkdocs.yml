@@ -121,6 +121,7 @@ nav:
       - externaluser:
         - externaluser list: 'cmd/spo/externaluser/externaluser-list.md'
       - feature:
+        - feature enable: 'cmd/spo/feature/feature-enable.md'
         - feature list: 'cmd/spo/feature/feature-list.md'
       - field:
         - field add: 'cmd/spo/field/field-add.md'
@@ -331,6 +332,7 @@ nav:
       - message:
         - message get: 'cmd/teams/message/message-get.md'
         - message list: 'cmd/teams/message/message-list.md'
+        - message reply list: 'cmd/teams/message/message-reply-list.md'
       - messagingsettings:
         - messagingsettings list: 'cmd/teams/messagingsettings/messagingsettings-list.md'
         - messagingsettings set: 'cmd/teams/messagingsettings/messagingsettings-set.md'
@@ -359,16 +361,18 @@ nav:
     - Office 365 (tenant):
       - id:
         - id get: 'cmd/tenant-id-get.md'
-    - PowerApps (pa):
-      - pcf:
-        - pcf init: 'cmd/pa/pcf/pcf-init.md'
-      - solution:
-        - solution init: 'cmd/pa/solution/solution-init.md'
+    - Yammer (yammer):
+      - network:
+        - network list: 'cmd/yammer/network/network-list.md'
   - Concepts:
     - 'Persisting connection': 'concepts/persisting-connection.md'
     - 'Authorization and access tokens': 'concepts/authorization-tokens.md'
     - 'Command completion': 'concepts/completion.md'
     - 'Communication with Office 365': 'concepts/communicating-o365.md'
+  - Examples:
+    - 'Introduction': 'examples/index.md'
+    - Microsoft Teams:
+      - 'Deploy Microsoft Teams app from Azure DevOps': 'examples/teams/deploy-teams-app.md'
   - About:
     - 'Why this CLI': 'about/why-cli.md'
     - 'Comparison to SharePoint and Office 365 PowerShell': 'about/comparison-powershell.md'
@@ -392,6 +396,7 @@ markdown_extensions:
       guess_lang: false
   - toc:
       permalink: true
+  - pymdownx.superfences
 extra:
   social:
     - type: 'twitter'
