@@ -51,6 +51,7 @@ class SpfxProjectExternalizeCommand extends Command {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+    cmd.log('This command is currently in beta, feedback welcome at https://github.com/pnp/office365-cli/issues');
     this.projectRootPath = this.getProjectRoot(process.cwd());
     if (this.projectRootPath === null) {
       cb(new CommandError(`Couldn't find project root folder`, SpfxProjectExternalizeCommand.ERROR_NO_PROJECT_ROOT_FOLDER));
