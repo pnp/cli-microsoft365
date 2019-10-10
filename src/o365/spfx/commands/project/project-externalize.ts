@@ -78,19 +78,19 @@ class SpfxProjectExternalizeCommand extends Command {
       cmd.log('Collected project');
       cmd.log(project);
     }
-
     try {
-      (rules as BasicDependencyRule[]).forEach(r => {
-        r.visit(project, this.allFindings);
+      const asyncRulesResults = (rules as BasicDependencyRule[]).map(r => r.visit(project, this.allFindings));
+      Promise.all(asyncRulesResults).then((rulesResults) => {
+        this.allFindings.push(...rulesResults.reduce((x, y) => [...x, ...y]));
+        this.allFindings = this.allFindings.filter((x, i) => this.allFindings.findIndex(y => y.key === x.key) === i);//removing duplicates
+        this.writeReport(this.allFindings, cmd, args.options);
+        cb();
       });
     }
     catch (e) {
       cb(new CommandError(e));
       return;
     }
-
-    this.writeReport(this.allFindings, cmd, args.options);
-    cb();
   }
   private writeReport(findingsToReport: ExternalizeEntry[], cmd: CommandInstance, options: Options): void {
     if (options.outputFile) {

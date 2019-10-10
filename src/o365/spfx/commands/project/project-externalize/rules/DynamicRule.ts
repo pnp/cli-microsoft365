@@ -2,33 +2,49 @@ import { BasicDependencyRule } from "./BasicDependencyRule";
 import { Project } from "../../project-upgrade/model";
 import { ExternalizeEntry } from "../model/ExternalizeEntry";
 import * as fs from 'fs';
+import request from '../../../../../../request';
+
 
 export class DynamicRule extends BasicDependencyRule {
   public get ModuleName () {
     return '*';
   }  
-  public visit(project: Project, findings: ExternalizeEntry[]): void {
+  public async visit(project: Project): Promise<ExternalizeEntry[]> {
     if(project.packageJson) {
-      const alreadyExternalized = findings.map(x => x.key);
       const validPackageNames = Object.getOwnPropertyNames(project.packageJson.dependencies)
                             .filter(x => x.indexOf(this.typesPrefix) === -1)
-                            .filter(x => this.restrictedModules.indexOf(x) === -1)
-                            .filter(x => alreadyExternalized.indexOf(x) === -1);
+                            .filter(x => this.restrictedModules.indexOf(x) === -1);
 
-      validPackageNames.forEach((packageName) => {
-        const version = project.packageJson && project.packageJson.dependencies[packageName];
-        const filePath = this.cleanFilePath(this.getFilePath(packageName));
-        if(version && filePath) {
-          findings.push({
-            key: packageName,
-            path: `https://unpkg.com/${packageName}@${version}/${filePath}`,
-          });
-        }
-      });
+      return (await Promise.all(validPackageNames.map((x) => this.getExternalEntryForPackage(x, project))))
+              .filter(x => x !== undefined).map(x => x as ExternalizeEntry);
+    } else {
+      return [];
     }
   }
+  private getExternalEntryForPackage = async (packageName: string, project: Project): Promise<ExternalizeEntry | undefined> => {
+    const version = project.packageJson && project.packageJson.dependencies[packageName];
+    const filePath = this.cleanFilePath(this.getFilePath(packageName));
+    if(version && filePath) {
+      const url = `https://unpkg.com/${packageName}@${version}/${filePath}`;
+      const testResult = await this.testUrl(url);
+      if(testResult) {
+        return {
+          key: packageName,
+          path: url,
+        } as ExternalizeEntry;
+      }
+    }
+    return undefined;
+  }
   //TODO try injecting min in name
-  //TODO head test on url
+  private testUrl = async (url: string): Promise<boolean> => {
+    try {
+      await request.head({url: url, headers: {'x-anonymous': 'true'}});
+      return true;
+    } catch {
+      return false;
+    }
+  }
   private getFilePath = (packageName: string): string | undefined => {
     const packageJsonFilePath = `node_modules/${packageName}/package.json`;
     const packageJson = JSON.parse(fs.readFileSync(packageJsonFilePath, 'utf8'));
