@@ -5,6 +5,7 @@ import Command, {
 import GlobalOptions from '../../../../GlobalOptions';
 import * as path from 'path';
 import * as fs from 'fs';
+import * as os from 'os';
 import { Utils } from './project-upgrade/';
 import { Project, ExternalConfiguration } from './project-upgrade/model';
 
@@ -93,7 +94,7 @@ class SpfxProjectExternalizeCommand extends Command {
     }
   }
   private writeReport(findingsToReport: ExternalizeEntry[], cmd: CommandInstance, options: Options): void {
-    const textValue = options.output === 'json' ? this.serializeJSONReport(findingsToReport) : (options.output === 'md' ? this.serializeTextReport(findingsToReport) : this.serializeTextReport(findingsToReport));
+    const textValue = options.output === 'json' ? this.serializeJSONReport(findingsToReport) : (options.output === 'md' ? this.serializeMdReport(findingsToReport) : this.serializeTextReport(findingsToReport));
     if (options.outputFile) {
       fs.writeFileSync(path.resolve(options.outputFile), textValue, 'utf-8');
     }
@@ -101,9 +102,24 @@ class SpfxProjectExternalizeCommand extends Command {
       cmd.log(options.output === undefined ? findingsToReport : textValue);
     }
   }
+  private serializeMdReport = (findingsToReport: ExternalizeEntry[]): string => {
+    const lines = [`# Externalizing project ${path.posix.basename(this.projectRootPath as string)}`, os.EOL,
+                      os.EOL,
+                      `Date: ${(new Date().toLocaleDateString())}`, os.EOL,
+                      '## Findings', os.EOL,
+                      os.EOL,
+                      '### Modify files', os.EOL,
+                      '#### [config.json](config/config.json)', os.EOL,
+                      'Replace the Externals (or add if inexisting) value by', os.EOL,
+                      '```JSON', os.EOL,
+                      this.serializeJSONReport(findingsToReport), os.EOL,
+                      '```', os.EOL
+                    ];
+    return lines.join('');
+  }
   private serializeTextReport = (findingsToReport: ExternalizeEntry[]): string => {
-    return findingsToReport.length > 0 ? 'key\tpath\tglobalName\tglobalDependencies\n' +  findingsToReport.map(x => `${x.key}\t${x.path}\t${x.globalName ? x.globalName : ''}\t${x.globalDependencies && x.globalDependencies.length > 0 ? x.globalDependencies.reduce((y, z) => `${y} ${z}`) : ''}`)
-            .reduce((x, y) => `${x}\n${y}`) : '';
+    return findingsToReport.length > 0 ? 'key\tpath\tglobalName\tglobalDependencies\n' +  findingsToReport.map(x => `${x.key}\t${x.path}\t${x.globalName ? x.globalName : ''}\t${x.globalDependencies && x.globalDependencies.length > 0 ? x.globalDependencies.join(' ') : ''}`)
+            .join(os.EOL) : '';
   }
   private serializeJSONReport = (findingsToReport: ExternalizeEntry[]): string => {
     const result: ExternalConfiguration = {};
