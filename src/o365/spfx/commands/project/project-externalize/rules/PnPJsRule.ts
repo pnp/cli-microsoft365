@@ -12,7 +12,7 @@ export class PnPJsRule extends BasicDependencyRule {
       if(version) {
         findings.push({
           key: this.ModuleName,
-          path: `https://unpkg.com/@pnp/pnpjs@${version}/dist/pnpjs.es5.umd.bundle.min.js`,
+          path: `https://unpkg.com/${this.ModuleName}@${version}/dist/pnpjs.es5.umd.bundle.min.js`,
           globalName: 'pnp'
         });
       }
