@@ -6,7 +6,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import * as path from 'path';
 import * as fs from 'fs';
 import { Utils } from './project-upgrade/';
-import { Project } from './project-upgrade/model';
+import { Project, ExternalConfiguration } from './project-upgrade/model';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 import rules = require('./project-externalize/DefaultRules');
@@ -93,12 +93,28 @@ class SpfxProjectExternalizeCommand extends Command {
     }
   }
   private writeReport(findingsToReport: ExternalizeEntry[], cmd: CommandInstance, options: Options): void {
+    const textValue = options.output === 'json' ? this.serializeJSONReport(findingsToReport) : (options.output === 'md' ? this.serializeTextReport(findingsToReport) : this.serializeTextReport(findingsToReport));
     if (options.outputFile) {
-      fs.writeFileSync(path.resolve(options.outputFile), options.output === 'json' ? JSON.stringify(findingsToReport) : findingsToReport, 'utf-8');
+      fs.writeFileSync(path.resolve(options.outputFile), textValue, 'utf-8');
     }
     else {
-      cmd.log(findingsToReport);
+      cmd.log(options.output === undefined ? findingsToReport : textValue);
     }
+  }
+  private serializeTextReport = (findingsToReport: ExternalizeEntry[]): string => {
+    return findingsToReport.length > 0 ? 'key\tpath\tglobalName\tglobalDependencies\n' +  findingsToReport.map(x => `${x.key}\t${x.path}\t${x.globalName ? x.globalName : ''}\t${x.globalDependencies && x.globalDependencies.length > 0 ? x.globalDependencies.reduce((y, z) => `${y} ${z}`) : ''}`)
+            .reduce((x, y) => `${x}\n${y}`) : '';
+  }
+  private serializeJSONReport = (findingsToReport: ExternalizeEntry[]): string => {
+    const result: ExternalConfiguration = {};
+    findingsToReport.forEach((f) => {
+      result[f.key] = {
+        path: f.path,
+        globalName: f.globalName,
+        globalDependencies: f.globalDependencies
+      };
+    });
+    return JSON.stringify(result);
   }
   private getProject(projectRootPath: string): Project {
     const project: Project = {
