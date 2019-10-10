@@ -15,6 +15,7 @@ Option|Description
 `--help`|output usage information
 `-v, --toVersion [toVersion]`|The version of SharePoint Framework to which upgrade the project
 `--packageManager [packageManager]`|The package manager you use. Supported managers `npm|pnpm|yarn`. Default `npm`
+`--shell [shell]`|The shell you use. Supported shells `bash|powershell|cmd`. Default `bash`
 `-f, --outputFile [outputFile]`|Path to the file where the upgrade report should be stored in
 `-o, --output [output]`|Output type. `json|text|md`. Default `text`
 `--verbose`|Runs command with verbose logging
@@ -55,4 +56,10 @@ Get instructions to upgrade the current SharePoint Framework project to the late
 
 ```sh
 spfx project upgrade
+```
+
+Get instructions to upgrade the current SharePoint Framework project to the latest SharePoint Framework version supported by the Office 365 CLI using PowerShell
+
+```sh
+spfx project upgrade --shell powershell
 ```

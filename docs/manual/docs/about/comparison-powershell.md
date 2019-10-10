@@ -250,7 +250,7 @@ Disable-PnPTenantServicePrincipal|SharePointPnPPowerShellOnline|[spo serviceprin
 Disconnect-PnPHubSite|SharePointPnPPowerShellOnline|[spo hubsite disconnect](../cmd/spo/hubsite/hubsite-disconnect.md)
 Disconnect-PnPOnline|SharePointPnPPowerShellOnline|[logout](../cmd/logout.md)
 Enable-PnPCommSite|SharePointPnPPowerShellOnline|[spo site commsite enable](../cmd/spo/site/site-commsite-enable.md)
-Enable-PnPFeature|SharePointPnPPowerShellOnline|
+Enable-PnPFeature|SharePointPnPPowerShellOnline|[spo feature enable](../cmd/spo/feature/feature-enable.md)
 Enable-PnPInPlaceRecordsManagementForSite|SharePointPnPPowerShellOnline|
 Enable-PnPPowerShellTelemetry|SharePointPnPPowerShellOnline|
 Enable-PnPResponsiveUI|SharePointPnPPowerShellOnline|
@@ -263,7 +263,7 @@ Export-PnPClientSidePageMapping|SharePointPnPPowerShellOnline|
 Export-PnPTaxonomy|SharePointPnPPowerShellOnline|
 Export-PnPTermGroupToXml|SharePointPnPPowerShellOnline|
 Find-PnPFile|SharePointPnPPowerShellOnline|
-Get-PnPAccessToken|SharePointPnPPowerShellOnline|
+Get-PnPAccessToken|SharePointPnPPowerShellOnline|[accesstoken get](../cmd/accesstoken-get.md)
 Get-PnPAlert|SharePointPnPPowerShellOnline|
 Get-PnPApp|SharePointPnPPowerShellOnline|[spo app get](../cmd/spo/app/app-get.md), [spo app list](../cmd/spo/app/app-list.md)
 Get-PnPAppAuthAccessToken|SharePointPnPPowerShellOnline|
@@ -277,7 +277,7 @@ Get-PnPClientSideComponent|SharePointPnPPowerShellOnline|
 Get-PnPClientSidePage|SharePointPnPPowerShellOnline|[spo page get](../cmd/spo/page/page-get.md), [spo page control list](../cmd/spo/page/page-control-list.md), [spo page control get](../cmd/spo/page/page-control-get.md), [spo page section get](../cmd/spo/page/page-section-get.md), [spo page section list](../cmd/spo/page/page-section-list.md), [spo page column get](../cmd/spo/page/page-column-get.md), [spo page column list](../cmd/spo/page/page-column-list.md), [spo page text add](../cmd/spo/page/page-text-add.md)
 Get-PnPConnection|SharePointPnPPowerShellOnline|
 Get-PnPContentType|SharePointPnPPowerShellOnline|[spo contenttype get](../cmd/spo/contenttype/contenttype-get.md), [spo list contenttype list](../cmd/spo/list/list-contenttype-list.md)
-Get-PnPContentTypePublishingHubUrl|SharePointPnPPowerShellOnline|
+Get-PnPContentTypePublishingHubUrl|SharePointPnPPowerShellOnline|[spo contenttypehub get](../cmd/spo/contenttypehub/contenttypehub-get.md)
 Get-PnPContext|SharePointPnPPowerShellOnline|
 Get-PnPCustomAction|SharePointPnPPowerShellOnline|[spo customaction get](../cmd/spo/customaction/customaction-get.md), [spo customaction list](../cmd/spo/customaction/customaction-list.md)
 Get-PnPDefaultColumnValues|SharePointPnPPowerShellOnline|
@@ -676,7 +676,7 @@ Get-TeamUser|MicrosoftTeams|[teams user list](../cmd/aad/o365group/o365group-use
 New-Team|MicrosoftTeams|[teams team add](../cmd/teams/team/team-add.md)
 New-TeamChannel|MicrosoftTeams|[teams channel add](../cmd/teams/channel/channel-add.md)
 Remove-Team|MicrosoftTeams|[teams team remove](../cmd/teams/team/team-remove.md)
-Remove-TeamChannel|MicrosoftTeams|
+Remove-TeamChannel|MicrosoftTeams|[teams channel remove](../cmd/teams/channel/channel-remove.md)
 Remove-TeamUser|MicrosoftTeams|[teams user remove](../cmd/aad/o365group/o365group-user-remove.md)
 Set-Team|MicrosoftTeams|[teams team set](../cmd/teams/team/team-set.md)
 Set-TeamChannel|MicrosoftTeams|[teams channel set](../cmd/teams/channel/channel-set.md)

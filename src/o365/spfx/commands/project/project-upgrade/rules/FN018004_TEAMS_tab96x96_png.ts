@@ -58,7 +58,7 @@ export class FN018004_TEAMS_tab96x96_png extends Rule {
       if (!fs.existsSync(iconPath)) {
         occurrences.push({
           file: path.relative(project.path, iconPath),
-          resolution: `cp ${path.join(__dirname, '..', 'assets', 'tab96x96.png')} ${iconPath}`
+          resolution: `copy_cmd ${path.join(__dirname, '..', 'assets', 'tab96x96.png')}DestinationParam${iconPath}`
         });
       }
     });

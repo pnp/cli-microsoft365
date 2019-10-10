@@ -1,5 +1,54 @@
 # Release notes
 
+## v2.2.0
+
+### New commands
+
+**SharePoint Online:**
+
+- [spo feature enable](../cmd/spo/feature/feature-enable.md) - enables feature for the specified site or web [#675](https://github.com/pnp/office365-cli/issues/675)
+
+**Microsoft Teams:**
+
+- [teams message reply list](../cmd/teams/message/message-reply-list.md) - retrieves replies to a message from a channel in a Microsoft Teams team [#1109](https://github.com/pnp/office365-cli/issues/1109)
+
+**Yammer:**
+
+- [yammer network list](../cmd/yammer/network/network-list.md) - returns a list of networks to which the current user has access [#1115](https://github.com/pnp/office365-cli/issues/1115)
+
+## [v2.1.0](https://github.com/pnp/office365-cli/releases/tag/v2.1.0)
+
+### New commands
+
+**SharePoint Online:**
+
+- [spo contenttypehub get](../cmd/spo/contenttypehub/contenttypehub-get.md) - returns the URL of the SharePoint Content Type Hub of the Tenant [#905](https://github.com/pnp/office365-cli/issues/905)
+
+**Microsoft Teams:**
+
+- [teams channel remove](../cmd/teams/channel/channel-remove.md) - removes the specified channel in the Microsoft Teams team [#814](https://github.com/pnp/office365-cli/issues/814)
+
+**PowerApps:**
+
+- [pa pcf init](../cmd/pa/pcf/pcf-init.md) - Creates new PowerApps component framework project [#952](https://github.com/pnp/office365-cli/issues/952)
+- [pa solution init](../cmd/pa/solution/solution-init.md) - initializes a directory with a new CDS solution project [#953](https://github.com/pnp/office365-cli/issues/953)
+
+**Global:**
+
+- [accesstoken get](../cmd/accesstoken-get.md) - gets access token for the specified resource [#1072](https://github.com/pnp/office365-cli/issues/1072)
+
+### Changes
+
+- updated vorpal to 1.11.6 [#1092](https://github.com/pnp/office365-cli/issues/1092)
+- removed spo-specific action implementation [#1092](https://github.com/pnp/office365-cli/issues/1092)
+- implemented passing AAD error during device code auth [#1095](https://github.com/pnp/office365-cli/issues/1095)
+- added handling forbidden errors [#1096](https://github.com/pnp/office365-cli/issues/1096)
+- fixed handling Flow nextLink [#1114](https://github.com/pnp/office365-cli/issues/1114)
+- added support for multi-shell [#887](https://github.com/pnp/office365-cli/issues/887)
+- renamed the outlook sendmail command [#1103](https://github.com/pnp/office365-cli/issues/1103)
+- extended teams report commands with support for specifying output file [#1075](https://github.com/pnp/office365-cli/issues/1075)
+- added support for adding web parts to empty pages [#740](https://github.com/pnp/office365-cli/issues/740)
+
 ## [v2.0.0](https://github.com/pnp/office365-cli/releases/tag/v2.0.0)
 
 ### New commands
@@ -510,7 +559,7 @@
 - [graph groupsetting list](../cmd/aad/groupsetting/groupsetting-list.md) - lists Azure AD group settings [#449](https://github.com/pnp/office365-cli/issues/449)
 - [graph groupsettingtemplate get](../cmd/aad/groupsettingtemplate/groupsettingtemplate-get.md) - gets information about the specified Azure AD group settings template [#442](https://github.com/pnp/office365-cli/issues/442)
 - [graph groupsettingtemplate list](../cmd/aad/groupsettingtemplate/groupsettingtemplate-list.md) - lists Azure AD group settings templates [#441](https://github.com/pnp/office365-cli/issues/441)
-- [graph user sendmail](../cmd/outlook/sendmail.md) - sends e-mail on behalf of the current user [#328](https://github.com/pnp/office365-cli/issues/328)
+- [graph user sendmail](../cmd/outlook/mail/mail-send.md) - sends e-mail on behalf of the current user [#328](https://github.com/pnp/office365-cli/issues/328)
 
 ### Changes
 

@@ -180,7 +180,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     });
   });
 
-  it('doesn\'t check out page if not checked out by the current user', (done) => {
+  it('doesn\'t check out page if checked out by the current user', (done) => {
     let checkingOut = false;
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url.indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`) > -1) {
@@ -1738,6 +1738,90 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
                   "layoutIndex": 1
                 },
                 "emphasis": {}
+              },
+              {
+                "controlType": 0,
+                "pageSettingsSlice": {
+                  "isDefaultDescription": true,
+                  "isDefaultThumbnail": true
+                }
+              }
+            ])
+          }));
+          done();
+        } catch (e) {
+          done(e);
+        }
+      }
+    );
+  });
+
+  it('adds a standard web part in a default section when no section exists on page', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`) > -1) {
+        return Promise.resolve({
+          "IsPageCheckedOutToCurrentUser": true,
+          "CanvasContent1": "[{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
+        });
+      }
+
+      if (opts.url.indexOf(`/_api/web/getclientsidewebparts()`) > -1) {
+        return Promise.resolve(clientSideWebParts);
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    let body: string = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/savepage`) > -1) {
+        body = opts.body;
+        return Promise.resolve({});
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action(
+      {
+        options: {
+          debug: false,
+          pageName: 'page.aspx',
+          webUrl: 'https://contoso.sharepoint.com/sites/team-a',
+          standardWebPart: 'BingMap'
+        }
+      },
+      (err?: any) => {
+        try {
+          assert.equal(replaceId(JSON.stringify(body)), JSON.stringify({
+            CanvasContent1: JSON.stringify([
+              {
+                "controlType": 3,
+                "displayMode": 2,
+                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+                "position": {
+                  "controlIndex": 1,
+                  "sectionIndex": 1,
+                  "zoneIndex": 1,
+                  "sectionFactor": 12,
+                  "layoutIndex": 1
+                },
+                "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+                "emphasis": {},
+                "webPartData": {
+                  "dataVersion": "1.0",
+                  "description": "Display a key location on a map",
+                  "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+                  "properties": {
+                    "pushPins": [],
+                    "maxNumberOfPushPins": 1,
+                    "shouldShowPushPinTitle": true,
+                    "zoomLevel": 12,
+                    "mapType": "road"
+                  },
+                  "title": "Bing maps"
+                }
               },
               {
                 "controlType": 0,

@@ -2,6 +2,7 @@ import appInsights from './appInsights';
 import GlobalOptions from './GlobalOptions';
 import request from './request';
 import auth from './Auth';
+import { GraphResponseError } from './o365/base/GraphResponseError';
 
 const vorpal: Vorpal = require('./vorpal-init');
 
@@ -84,7 +85,7 @@ export default abstract class Command {
     if (!this.alias()) {
       return '';
     }
-    
+
     // since the command was called by something else than its name
     // it must have aliases
     const aliases: string[] = this.alias() as string[];
@@ -241,7 +242,17 @@ export default abstract class Command {
         callback(new CommandError(err['odata.error'].message.value));
       }
       catch {
-        callback(new CommandError(res.error));
+        try {
+          const graphResponseError: GraphResponseError = res.error;
+          if (graphResponseError.error.code) {
+            callback(new CommandError(graphResponseError.error.code + " - " + graphResponseError.error.message));
+          } else {
+            callback(new CommandError(graphResponseError.error.message));
+          }
+        }
+        catch {
+          callback(new CommandError(res.error));
+        }
       }
     }
     else {
