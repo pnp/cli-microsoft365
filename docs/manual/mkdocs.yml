@@ -374,6 +374,7 @@ nav:
     - 'Introduction': 'examples/index.md'
     - Microsoft Teams:
       - 'Deploy Microsoft Teams app from Azure DevOps': 'examples/teams/deploy-teams-app.md'
+      - 'Govern orphaned Microsoft Teams': 'examples/teams/govern-orphan-teams.md'
   - About:
     - 'Why this CLI': 'about/why-cli.md'
     - 'Comparison to SharePoint and Office 365 PowerShell': 'about/comparison-powershell.md'
