@@ -25,8 +25,16 @@ export class DynamicRule extends BasicDependencyRule {
     const version = project.packageJson && project.packageJson.dependencies[packageName];
     const filePath = this.cleanFilePath(this.getFilePath(packageName));
     if(version && filePath) {
-      const url = `https://unpkg.com/${packageName}@${version}/${filePath}`;
-      const testResult = await this.testUrl(url);
+      let url = this.getFileUrl(packageName, version, filePath);
+      let testResult = await this.testUrl(url);
+      if (!url.endsWith('.min.js')) {
+        const minUrl = url.replace('.js', '.min.js');
+        const minResult = await this.testUrl(minUrl);
+        if(minResult) {
+          url = minUrl;
+          testResult = true;
+        }
+      }
       if(testResult) {
         return {
           key: packageName,
@@ -36,7 +44,7 @@ export class DynamicRule extends BasicDependencyRule {
     }
     return undefined;
   }
-  //TODO try injecting min in name
+  private getFileUrl = (packageName: string, version: string, filePath: string) => `https://unpkg.com/${packageName}@${version}/${filePath}`;
   private testUrl = async (url: string): Promise<boolean> => {
     try {
       await request.head({url: url, headers: {'x-anonymous': 'true'}});

@@ -79,7 +79,7 @@ class SpfxProjectExternalizeCommand extends Command {
       cmd.log(project);
     }
     try {
-      const asyncRulesResults = (rules as BasicDependencyRule[]).map(r => r.visit(project, this.allFindings));
+      const asyncRulesResults = (rules as BasicDependencyRule[]).map(r => r.visit(project));
       Promise.all(asyncRulesResults).then((rulesResults) => {
         this.allFindings.push(...rulesResults.reduce((x, y) => [...x, ...y]));
         this.allFindings = this.allFindings.filter((x, i) => this.allFindings.findIndex(y => y.key === x.key) === i);//removing duplicates
