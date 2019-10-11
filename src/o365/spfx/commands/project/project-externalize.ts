@@ -163,11 +163,6 @@ class SpfxProjectExternalizeCommand extends Command {
     }
     return project;
   }
-  private static readdirR(dir: string): string | string[] {
-    return fs.statSync(dir).isDirectory()
-      ? Array.prototype.concat(...fs.readdirSync(dir).map(f => SpfxProjectExternalizeCommand.readdirR(path.join(dir, f))))
-      : dir;
-  }
   
   private getProjectRoot(folderPath: string): string | null {
     const packageJsonPath: string = path.resolve(folderPath, 'package.json');
