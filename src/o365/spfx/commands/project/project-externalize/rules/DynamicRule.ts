@@ -6,9 +6,6 @@ import request from '../../../../../../request';
 
 
 export class DynamicRule extends BasicDependencyRule {
-  public get ModuleName () {
-    return '*';
-  }  
   public async visit(project: Project): Promise<ExternalizeEntry[]> {
     if(project.packageJson) {
       const validPackageNames = Object.getOwnPropertyNames(project.packageJson.dependencies)
