@@ -48,6 +48,55 @@ describe('DynamicRule', () => {
     assert.equal(findings.length, 1);
   });
 
+  it('returns from main if module is missing', async () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      packageJson: {
+        dependencies: {
+          '@pnp/pnpjs': '1.3.5'
+        }
+      }
+    };
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+      if (path.endsWith('@pnp/pnpjs/package.json')) {
+        return JSON.stringify({
+          main: "./dist/pnpjs.es5.umd.bundle.js",
+        });
+      }
+      else {
+        return originalReadFileSync(path);
+      }
+    });
+    sinon.stub(request, 'head').callsFake(() => Promise.resolve());
+    const findings = await rule.visit(project);
+    assert.equal(findings.length, 1);
+  });
+
+  it('doesnt return anything if both module and main are missing', async () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      packageJson: {
+        dependencies: {
+          '@pnp/pnpjs': '1.3.5'
+        }
+      }
+    };
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+      if (path.endsWith('@pnp/pnpjs/package.json')) {
+        return JSON.stringify({
+        });
+      }
+      else {
+        return originalReadFileSync(path);
+      }
+    });
+    sinon.stub(request, 'head').callsFake(() => Promise.resolve());
+    const findings = await rule.visit(project);
+    assert.equal(findings.length, 0);
+  });
+
   it('doesnt return anything if file is not present on CDN', async () => {
     const project: Project = {
       path: '/usr/tmp',
