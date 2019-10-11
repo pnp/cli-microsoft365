@@ -55,12 +55,16 @@ export class DynamicRule extends BasicDependencyRule {
   }
   private getFilePath = (packageName: string): string | undefined => {
     const packageJsonFilePath = `node_modules/${packageName}/package.json`;
-    const packageJson = JSON.parse(fs.readFileSync(packageJsonFilePath, 'utf8'));
-    if(packageJson.module) {
-      return packageJson.module;
-    } else if (packageJson.main) {
-      return packageJson.main;
-    } else {
+    try {
+      const packageJson = JSON.parse(fs.readFileSync(packageJsonFilePath, 'utf8'));
+      if(packageJson.module) {
+        return packageJson.module;
+      } else if (packageJson.main) {
+        return packageJson.main;
+      } else {
+        return undefined;
+      }
+    } catch { // file doesn't exist, giving up
       return undefined;
     }
   }

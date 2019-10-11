@@ -16,6 +16,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
   let cmdInstance: any;
   let trackEvent: any;
   let telemetry: any;
+  const logEntryToCheck = 1; //necessary as long as we display the beta message
 
   before(() => {
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
@@ -297,8 +298,8 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { output: 'json' } }, (err?: any) => {
-      const findings: ExternalizeEntry[] = log[0];
-      assert.equal(findings.length, 21);
+      const findings: ExternalizeEntry[] = log[logEntryToCheck];
+      assert.equal(findings.length, 2);
     });
   });
   //#endregion
@@ -308,7 +309,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { output: 'json' } }, (err?: any) => {
-      assert(JSON.stringify(log[0]).indexOf('"resolution":') > -1);
+      assert(log[logEntryToCheck].startsWith('{'));
     });
   });
 
@@ -317,7 +318,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { output: 'md', } }, (err?: any) => {
-      assert(log[0].indexOf('## Findings') > -1);
+      assert(log[logEntryToCheck].indexOf('## Findings') > -1);
     });
   });
 
@@ -326,7 +327,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { } }, (err?: any) => {
-      assert(log[0].indexOf('Execute in ') > -1);
+      assert(JSON.stringify(log[logEntryToCheck]).startsWith('['));
     });
   });
 
