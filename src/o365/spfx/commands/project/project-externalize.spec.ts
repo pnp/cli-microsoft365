@@ -1,3 +1,4 @@
+import request from '../../../../request';
 import commands from '../../commands';
 import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
 import * as sinon from 'sinon';
@@ -7,8 +8,7 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
 import Utils from '../../../../Utils';
-import { Project } from './project-upgrade/model';
-import { ExternalizeEntry } from './project-externalize/model';
+import { Project, ExternalConfiguration } from './project-upgrade/model';
 
 describe(commands.PROJECT_EXTERNALIZE, () => {
   let vorpal: Vorpal;
@@ -46,7 +46,8 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       (command as any).getProjectVersion,
       fs.existsSync,
       fs.readFileSync,
-      fs.writeFileSync
+      fs.writeFileSync,
+      request.head
     ]);
   });
 
@@ -295,11 +296,29 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
 
   it('e2e: shows correct number of findings for externalizing react web part 1.8.2 project', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-182-webpart-react'));
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+      if (path.endsWith('package.json') && path.indexOf('pnpjs') > -1) {
+        return JSON.stringify({
+          main: "./dist/pnpjs.es5.umd.bundle.js",
+          module: "./dist/pnpjs.es5.umd.bundle.min.js"
+        });
+      } else if (path.endsWith('package.json') && path.indexOf('spfx-182-webpart-react') > -1) { //adding library on the fly so we get at least one result
+        const pConfig = JSON.parse(originalReadFileSync(path, 'utf8'));
+        pConfig.dependencies['@pnp/pnpjs'] = '1.3.5';
+        return JSON.stringify(pConfig);
+      }
+      else {
+        return originalReadFileSync(path);
+      }
+    });
+    sinon.stub(request, 'head').callsFake(() => Promise.resolve());
 
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { output: 'json' } }, (err?: any) => {
-      const findings: ExternalizeEntry[] = log[logEntryToCheck];
-      assert.equal(findings.length, 2);
+    cmdInstance.action({ options: { output: 'json', debug: true } }, (err?: any) => {
+      console.log(JSON.stringify(log));
+      const findings: ExternalConfiguration = JSON.parse(log[logEntryToCheck + 3]); //because debug is enabled
+      assert.equal(findings['@pnp/pnpjs'].path, 'https://unpkg.com/@pnp/pnpjs@1.3.5/dist/pnpjs.es5.umd.bundle.min.js');
     });
   });
   //#endregion
