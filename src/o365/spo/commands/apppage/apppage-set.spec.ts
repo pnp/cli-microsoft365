@@ -12,7 +12,7 @@ describe(commands.APPPAGE_SET, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
-
+  let cmdInstanceLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, "restoreAuth").callsFake(() => Promise.resolve());
@@ -30,7 +30,7 @@ describe(commands.APPPAGE_SET, () => {
         log.push(msg);
       }
     };
- 
+    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
   });
 
   afterEach(() => {
@@ -69,16 +69,20 @@ describe(commands.APPPAGE_SET, () => {
           webPartData: JSON.stringify({})
         }
       },
-      () => {
+      (err?: any) => {
+        if (err) {
+          done(err);
+          return;
+        }
         try {
-         
+          assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
-      }
-    );
-  });
+      });
+    });
 
   it("fails to update the single-part app page if request is rejected", done => {
     sinon.stub(request, "post").callsFake(opts => {

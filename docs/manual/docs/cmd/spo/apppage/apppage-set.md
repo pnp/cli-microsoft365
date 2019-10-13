@@ -25,5 +25,5 @@ Option|Description
 Updates the single-part app page located in a site with url https://contoso.sharepoint.com, webpart data is stored in the `$webPartData` variable
 
 ```sh
-spo apppage set --pageName "Contoso.aspx" --webUrl "https://contoso.sharepoint.com" --webPartData $webPartData 
+spo apppage set --webUrl "https://contoso.sharepoint.com" --pageName "Contoso.aspx" --webPartData $webPartData 
 ```

@@ -100,7 +100,7 @@ class SpoAppPageSetCommand extends SpoCommand {
     Updates the single-part app page located in a site with url 
     https://contoso.sharepoint.com, webpart data is stored in the
     ${chalk.grey('$webPartData')} variable
-      ${this.name} --pageName "Contoso.aspx" --webUrl "https://contoso.sharepoint.com" --webPartData $webPartData 
+      ${this.name} --webUrl "https://contoso.sharepoint.com" --pageName "Contoso.aspx" --webPartData $webPartData 
 `);
   }
 }
