@@ -112,7 +112,7 @@
     "typescript": "^3.5.1",
     "update-notifier": "^3.0.0",
     "uuid": "^3.3.2",
-    "vorpal": "https://github.com/pnp/vorpal/raw/master/vorpal-1.11.6.tgz",
+    "vorpal": "https://github.com/pnp/vorpal/raw/master/vorpal-1.11.7.tgz",
     "xmldom": "^0.1.27"
   },
   "devDependencies": {

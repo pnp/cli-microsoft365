@@ -688,7 +688,7 @@
     },
     "chalk": {
       "version": "1.1.3",
-      "resolved": "http://registry.npmjs.org/chalk/-/chalk-1.1.3.tgz",
+      "resolved": "https://registry.npmjs.org/chalk/-/chalk-1.1.3.tgz",
       "integrity": "sha1-qBFcVeSnAv5NFQq9OHKCKn4J/Jg=",
       "requires": {
         "ansi-styles": "^2.2.1",
@@ -856,9 +856,9 @@
       }
     },
     "core-js": {
-      "version": "2.6.9",
-      "resolved": "https://registry.npmjs.org/core-js/-/core-js-2.6.9.tgz",
-      "integrity": "sha512-HOpZf6eXmnl7la+cUdMnLvUxKNqLUzJvgIziQ0DiF3JwSImNphIqdGqzj6hIKyX04MmV0poclQ7+wjWvxQyR2A=="
+      "version": "2.6.10",
+      "resolved": "https://registry.npmjs.org/core-js/-/core-js-2.6.10.tgz",
+      "integrity": "sha512-I39t74+4t+zau64EN1fE5v2W31Adtc/REhzWN+gWRRXg6WH5qAsZm62DHpQ1+Yhe4047T55jvzz7MUqF/dBBlA=="
     },
     "core-util-is": {
       "version": "1.0.2",
@@ -1557,7 +1557,7 @@
     },
     "inquirer": {
       "version": "0.11.4",
-      "resolved": "http://registry.npmjs.org/inquirer/-/inquirer-0.11.4.tgz",
+      "resolved": "https://registry.npmjs.org/inquirer/-/inquirer-0.11.4.tgz",
       "integrity": "sha1-geM3ToNhvq/y2XAWIG01nQsy+k0=",
       "requires": {
         "ansi-escapes": "^1.1.0",
@@ -1577,7 +1577,7 @@
       "dependencies": {
         "lodash": {
           "version": "3.10.1",
-          "resolved": "http://registry.npmjs.org/lodash/-/lodash-3.10.1.tgz",
+          "resolved": "https://registry.npmjs.org/lodash/-/lodash-3.10.1.tgz",
           "integrity": "sha1-W/Rejkm6QYnhfUgnid/RW9FAt7Y="
         }
       }
@@ -2131,7 +2131,7 @@
     },
     "node-localstorage": {
       "version": "0.6.0",
-      "resolved": "http://registry.npmjs.org/node-localstorage/-/node-localstorage-0.6.0.tgz",
+      "resolved": "https://registry.npmjs.org/node-localstorage/-/node-localstorage-0.6.0.tgz",
       "integrity": "sha1-RaBgHGky395mRKIzYfG+Fzx1068="
     },
     "normalize-url": {
@@ -3239,7 +3239,7 @@
     },
     "onetime": {
       "version": "1.1.0",
-      "resolved": "http://registry.npmjs.org/onetime/-/onetime-1.1.0.tgz",
+      "resolved": "https://registry.npmjs.org/onetime/-/onetime-1.1.0.tgz",
       "integrity": "sha1-ofeDj4MUxRbwXs78vEzP4EtO14k="
     },
     "os-locale": {
@@ -3782,7 +3782,7 @@
     },
     "through": {
       "version": "2.3.8",
-      "resolved": "http://registry.npmjs.org/through/-/through-2.3.8.tgz",
+      "resolved": "https://registry.npmjs.org/through/-/through-2.3.8.tgz",
       "integrity": "sha1-DdTJ/6q8NXlgsbckEV1+Doai4fU="
     },
     "to-fast-properties": {
@@ -3941,8 +3941,8 @@
       }
     },
     "vorpal": {
-      "version": "https://github.com/pnp/vorpal/raw/master/vorpal-1.11.6.tgz",
-      "integrity": "sha512-f3fqtnexYkJgrgx3wfJNrHZC2nzCvsEZhZ0Zu4j0LKCYfJklpT3tgijN1diN89GeczIUMKHBV6540DKAZDxtbw==",
+      "version": "https://github.com/pnp/vorpal/raw/master/vorpal-1.11.7.tgz",
+      "integrity": "sha512-Dq4roQGpY2+94+w7ggg3/tdycCjHXbE7cXcNsM/8fQGncs+tYeO/G4mepHt8PNJFCiaa0ISnPrtZPY19nBPH4A==",
       "requires": {
         "babel-polyfill": "^6.3.14",
         "chalk": "^1.1.0",
