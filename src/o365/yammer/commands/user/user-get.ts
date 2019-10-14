@@ -34,7 +34,7 @@ class YammerUserGetCommand extends YammerCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    var endPoint = `${this.resource}/v1/users/current.json`
+    let endPoint = `${this.resource}/v1/users/current.json`
     
     if (args.options.userId !== undefined || args.options.email !== undefined) {
       if (args.options.userId !== undefined)
@@ -111,16 +111,16 @@ class YammerUserGetCommand extends YammerCommand {
       ` Examples:
   
     Returns the current user
-      ${this.name} user get
+      ${this.name}
 
     Returns the user with the ID 1496550697
-      ${this.name} user get --userId 1496550697
+      ${this.name} --userId 1496550697
 
     Returns an array of users matching the e-mail john.smith@contoso.com
-      ${this.name} user get --email john.smith@contoso.com
+      ${this.name} --email john.smith@contoso.com
 
     Returns an array of users matching the e-mail john.smith@contoso.com in JSON. The JSON output returns a full user object.
-      ${this.name} user get --email john.smith@contoso.com --output json
+      ${this.name} --email john.smith@contoso.com --output json
     `);
   }
 }
