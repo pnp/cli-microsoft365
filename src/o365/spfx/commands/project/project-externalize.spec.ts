@@ -316,9 +316,42 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { output: 'json', debug: true } }, (err?: any) => {
-      console.log(JSON.stringify(log));
       const findings: ExternalConfiguration = JSON.parse(log[logEntryToCheck + 3]); //because debug is enabled
       assert.equal(findings['@pnp/pnpjs'].path, 'https://unpkg.com/@pnp/pnpjs@1.3.5/dist/pnpjs.es5.umd.bundle.min.js');
+    });
+  });
+
+  it('handles failures properly', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-182-webpart-react'));
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+      if (path.endsWith('package.json') && path.indexOf('pnpjs') > -1) {
+        return JSON.stringify({
+          main: "./dist/pnpjs.es5.umd.bundle.js",
+          module: "./dist/pnpjs.es5.umd.bundle.min.js"
+        });
+      } else if (path.endsWith('package.json') && path.indexOf('spfx-182-webpart-react') > -1) { //adding library on the fly so we get at least one result
+        const pConfig = JSON.parse(originalReadFileSync(path, 'utf8'));
+        pConfig.dependencies['@pnp/pnpjs'] = '1.3.5';
+        return JSON.stringify(pConfig);
+      }
+      else {
+        return originalReadFileSync(path);
+      }
+    });
+    sinon.stub(request, 'head').callsFake(() => Promise.resolve());
+    const originalWriteFileSync = fs.writeFileSync;
+    sinon.stub(fs, 'writeFileSync').callsFake((path: string, value: string, encoding: string) => {
+      if(path.endsWith('report.json')) {
+        throw new Error('file is locked');
+      } else {
+        return originalWriteFileSync(path, value, encoding);
+      }
+    });
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { output: 'json', debug: true, outputFile: 'report.json' } }, (err?: any) => {
+      assert.equal(!err, false);
     });
   });
   //#endregion
