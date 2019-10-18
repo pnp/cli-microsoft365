@@ -11,6 +11,7 @@ export default {
   APP_UNINSTALL: `${prefix} app uninstall`,
   APP_UPGRADE: `${prefix} app upgrade`,
   APPPAGE_ADD:`${prefix} apppage add`,
+  APPPAGE_SET:`${prefix} apppage set`,
   CDN_GET: `${prefix} cdn get`,
   CDN_ORIGIN_ADD: `${prefix} cdn origin add`,
   CDN_ORIGIN_LIST: `${prefix} cdn origin list`,

@@ -217,16 +217,16 @@ describe(commands.SOLUTION_INIT, () => {
 
   it('TemplateInstantiator.instantiate is called exactly twice when the CDS Assets Directory \'Other\' already exists in the current directory, but doesn\'t contain a Solution.xml file', () => {
     const originalExistsSync = fs.existsSync;
-    sinon.stub(fs, 'existsSync').callsFake((path: string) => {
-      if (path.endsWith('Other')) {
+    sinon.stub(fs, 'existsSync').callsFake((pathToCheck: string) => {
+      if(path.basename(pathToCheck).toLowerCase() === 'other') {
         return true;
       }
-      else if (path.endsWith('Solution.xml')) {
+      else if (path.basename(pathToCheck).toLowerCase() === 'solution.xml') {
         return false;
       }
       else {
-        return originalExistsSync(path);
-      }
+        return originalExistsSync(pathToCheck);
+      }    
     });
     const templateInstantiate = sinon.stub(TemplateInstantiator, 'instantiate').callsFake(() => { });
 
@@ -238,15 +238,15 @@ describe(commands.SOLUTION_INIT, () => {
 
   it('TemplateInstantiator.instantiate is called exactly once when the CDS Assets Directory \'Other\' already exists in the current directory and contains a Solution.xml file', () => {
     const originalExistsSync = fs.existsSync;
-    sinon.stub(fs, 'existsSync').callsFake((path: string) => {
-      if (path.endsWith('Other')) {
+    sinon.stub(fs, 'existsSync').callsFake((pathToCheck: string) => {
+      if(path.basename(pathToCheck).toLowerCase() === 'other') {
         return true;
       }
-      else if (path.endsWith('Solution.xml')) {
+      else if (path.basename(pathToCheck).toLowerCase() === 'solution.xml') {
         return true;
       }
       else {
-        return originalExistsSync(path);
+        return originalExistsSync(pathToCheck);
       }
     });
     const templateInstantiate = sinon.stub(TemplateInstantiator, 'instantiate').callsFake(() => { });

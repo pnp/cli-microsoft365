@@ -585,7 +585,7 @@ Get-PowerAppRoleAssignment|Microsoft.PowerApps.PowerShell|
 Get-PowerAppsNotification|Microsoft.PowerApps.PowerShell|
 Get-PowerAppVersion|Microsoft.PowerApps.PowerShell|
 Publish-PowerApp|Microsoft.PowerApps.PowerShell|
-Remove-Flow|Microsoft.PowerApps.PowerShell|
+Remove-Flow|Microsoft.PowerApps.PowerShell|[flow remove](../cmd/flow/remove.md)
 Remove-FlowOwnerRole|Microsoft.PowerApps.PowerShell|
 Remove-PowerApp|Microsoft.PowerApps.PowerShell|
 Remove-PowerAppConnection|Microsoft.PowerApps.PowerShell|

@@ -11,7 +11,7 @@ aad o365group user list [options]
 ## Alias
 
 ```sh
-aad team user list
+teams user list
 ```
 
 ## Options
@@ -49,11 +49,11 @@ aad o365group user list --groupId '00000000-0000-0000-0000-000000000000' --role 
 List all users and their role in the specified Microsoft teams team
 
 ```sh
-aad teams user list --teamId '00000000-0000-0000-0000-000000000000'
+teams user list --teamId '00000000-0000-0000-0000-000000000000'
 ```
 
 List all owners and their role in the specified Microsoft teams team
 
 ```sh
-aad teams user list --teamId '00000000-0000-0000-0000-000000000000' --role Owner
+teams user list --teamId '00000000-0000-0000-0000-000000000000' --role Owner
 ```
