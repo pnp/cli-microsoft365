@@ -138,8 +138,12 @@ class SpoStorageEntitySetCommand extends SpoCommand {
 
     Tenant properties are stored in the app catalog site associated with that
     tenant. To set a property, you have to specify the absolute URL of the app
-    catalog site. If you specify the URL of a site different than the app
-    catalog, you will get an access denied error.
+    catalog site without a trailing slash. If you specify the URL with trailing
+    slash you get the error ${chalk.grey('The managed path sites/apps is not a managed path')}
+    ${chalk.grey('in this tenant.')}
+
+    If you specify the URL of a site different than the app catalog, you will
+    get an access denied error.
 
   Examples:
   

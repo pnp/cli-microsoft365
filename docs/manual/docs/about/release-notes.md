@@ -4,8 +4,21 @@
 
 ### New commands
 
+**Azure Active Directory:**
+
+- [aad o365group report activitydetail](../cmd/aad/o365group/o365group-report-activitydetail.md) - get details about Office 365 Groups activity by group [#1130](https://github.com/pnp/office365-cli/issues/1130)
+
+**Flow:**
+
+- [flow remove](../cmd/flow/remove.md) - removes the specified Microsoft Flow [#1063](https://github.com/pnp/office365-cli/issues/1063)
+
+**PowerApps:**
+
+- [pa solution reference add](../cmd/pa/solution/solution-reference-add.md) - adds a project reference to the solution in the current directory [#954](https://github.com/pnp/office365-cli/issues/954)
+
 **SharePoint Online:**
 
+- [spo apppage set](../cmd/spo/apppage/apppage-set.md) - updates the single-part app page [#875](https://github.com/pnp/office365-cli/issues/875)
 - [spo feature enable](../cmd/spo/feature/feature-enable.md) - enables feature for the specified site or web [#675](https://github.com/pnp/office365-cli/issues/675)
 
 **Microsoft Teams:**
@@ -15,6 +28,14 @@
 **Yammer:**
 
 - [yammer network list](../cmd/yammer/network/network-list.md) - returns a list of networks to which the current user has access [#1115](https://github.com/pnp/office365-cli/issues/1115)
+
+### Changes
+
+- updated pa commands to reflect official pac cli v1.0.6 [#1129](https://github.com/pnp/office365-cli/pull/1129)
+- added the 'Govern orphaned Microsoft Teams' example [#1147](https://github.com/pnp/office365-cli/issues/1147)
+- added the 'remove custom themes' example [#1137](https://github.com/pnp/office365-cli/issues/1137)
+- corrected 'aad o365group user list' alias [#1149](https://github.com/pnp/office365-cli/issues/1149)
+- updated 'spo storageentity set' docs about handling trailing slash [#1153](https://github.com/pnp/office365-cli/issues/1153)
 
 ## [v2.1.0](https://github.com/pnp/office365-cli/releases/tag/v2.1.0)
 
