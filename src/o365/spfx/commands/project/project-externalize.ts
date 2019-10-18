@@ -114,7 +114,7 @@ class SpfxProjectExternalizeCommand extends Command {
                     ];
     return lines.join('');
   }
-  private serializeTextReport = (findingsToReport: ExternalizeEntry[]): string => {
+  public serializeTextReport = (findingsToReport: ExternalizeEntry[]): string => {
     return findingsToReport.length > 0 ? 'key\tpath\tglobalName\tglobalDependencies\n' +  findingsToReport.map(x => `${x.key}\t${x.path}\t${x.globalName ? x.globalName : ''}\t${x.globalDependencies && x.globalDependencies.length > 0 ? x.globalDependencies.join(' ') : ''}`)
             .join(os.EOL) : '';
   }

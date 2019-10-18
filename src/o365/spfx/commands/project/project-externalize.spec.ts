@@ -9,6 +9,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import Utils from '../../../../Utils';
 import { Project, ExternalConfiguration } from './project-upgrade/model';
+import { ExternalizeEntry } from './project-externalize/model';
 
 describe(commands.PROJECT_EXTERNALIZE, () => {
   let vorpal: Vorpal;
@@ -393,11 +394,29 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
-
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { } }, (err?: any) => {
       assert(JSON.stringify(log[logEntryToCheck]).startsWith('['));
     });
+  });
+
+  it('covers all text report branches', () => {
+    const report = (command as any).serializeTextReport([
+      {
+        key: 'fake',
+        path: 'https://fake.com/module.js',
+        globalName: 'fakename',
+        globalDependencies:['fakeparent']
+      } as ExternalizeEntry,
+      {
+        key: 'fakenoglobal',
+        path: 'https://fake.com/module.js',
+        globalDependencies:['fakeparentnoglobal']
+      } as ExternalizeEntry
+    ]) as string;
+    const emptyReport = (command as any).serializeTextReport([]) as string;
+    assert.equal(report.length > 0, true);
+    assert.equal(emptyReport.length, 0);
   });
 
   it('writes upgrade report to file when outputFile specified', () => {
