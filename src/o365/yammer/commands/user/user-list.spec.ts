@@ -122,6 +122,67 @@ describe(commands.YAMMER_USER_LIST, () => {
     });
   });
 
+  it('fakes the return of more results', (done) => {
+    let i: number = 0;
+    
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (i++ === 0) {
+        return Promise.resolve({
+          users: [{"type":"user","id":1496550647,"network_id":801445,"state":"active","full_name":"Sergio Cappelletti"},
+          {"type":"user","id":1496550646,"network_id":801445,"state":"active","full_name":"Patrick Lamber"}],
+          more_available: true
+        });
+      }
+      else {
+        return Promise.resolve({
+          users: [{"type":"user","id":14965556,"network_id":801445,"state":"active","full_name":"Daniela Kiener"},
+          {"type":"user","id":12310090123,"network_id":801445,"state":"active","full_name":"Carlo Lamber"}],
+          more_available: false
+        });
+      }
+    });
+    cmdInstance.action({ options: { output: 'json' } }, (err?: any) => {
+      try {
+        assert.equal(cmdInstanceLogSpy.lastCall.args[0][0].id, 14965556);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fakes the return of more results with exception', (done) => {
+    let i: number = 0;
+    
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (i++ === 0) {
+        return Promise.resolve({
+          users: [{"type":"user","id":1496550647,"network_id":801445,"state":"active","full_name":"Sergio Cappelletti"},
+          {"type":"user","id":1496550646,"network_id":801445,"state":"active","full_name":"Patrick Lamber"}],
+          more_available: true
+        });
+      }
+      else {
+        return Promise.reject({
+          "error": {
+            "base": "An error has occurred."
+          }
+        });
+      }
+    });
+
+    cmdInstance.action({ options: { debug: false } }, (err?: any) => {
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('sorts network users by messages', function (done) {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users.json?page=1&sort_by=messages') {

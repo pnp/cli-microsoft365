@@ -52,7 +52,7 @@ class YammerUserListCommand extends YammerCommand {
       if (page === 1) 
         this.items = [];
 
-      var endPoint = `${this.resource}/v1/users.json`
+      let endPoint = `${this.resource}/v1/users.json`
     
       if (args.options.groupId !== undefined)
           endPoint = `${this.resource}/v1/users/in_group/${args.options.groupId}.json`
@@ -79,8 +79,8 @@ class YammerUserListCommand extends YammerCommand {
       request
       .get(requestOptions)
       .then((res: any): void => {
-        var userOutput = res;
-        // groups user retrieval has a users array in the output
+        let userOutput = res;
+        // groups user retrieval returns a user array containing the user objects
         if (res.users)
           userOutput = res.users;
         
@@ -103,22 +103,24 @@ class YammerUserListCommand extends YammerCommand {
 
         // this is executed once at the end if the limit operation has been executed
         // we need to return the array of the desired size. The API does not provide such a feature
-        if (args.options.limit !== undefined && this.items.length > args.options.limit) 
+        if (args.options.limit !== undefined && this.items.length > args.options.limit) {
           this.items = this.items.slice(0,args.options.limit);
-
-        // if the groups endpoint is used, the more_available will tell if a new retrieval is required
-        // if the user endpoint is used, we need to page by 50 items (hardcoded)
-        // our limit operation allows to return only the desired records, therefore, call the next page only if the limit has not been reached
-        if ((res.more_available || this.items.length % 50 === 0) && (args.options.limit !== undefined && this.items.length < args.options.limit)) {
-          this.getAllItems(cmd, args, page++)
-              .then((): void => {
-                resolve();
-              }, (err: any): void => {
-                reject(err);
-              });
+          resolve();
         }
         else {
-          resolve();
+          // if the groups endpoint is used, the more_available will tell if a new retrieval is required
+          // if the user endpoint is used, we need to page by 50 items (hardcoded)
+          if (res.more_available === true || this.items.length % 50 === 0) {
+            this.getAllItems(cmd, args, page++)
+                .then((): void => {
+                  resolve();
+                }, (err: any): void => {
+                  reject(err);
+                });
+          }
+          else {
+            resolve();
+          }
         }
       }, (err: any): void => {
         reject(err);
@@ -138,11 +140,11 @@ class YammerUserListCommand extends YammerCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--g, --groupId [number]',
+        option: '--g, --groupId [groupId]',
         description: 'Returns users within a given group'
       },
       {
-        option: '--l, --letter [string]',
+        option: '--l, --letter [letter]',
         description: 'Returns users with usernames beginning with the given character'
       },
       {
@@ -150,7 +152,7 @@ class YammerUserListCommand extends YammerCommand {
         description: 'Returns users in reverse sorting order'
       },
       {
-        option: '--limit [number]',
+        option: '--limit [limit]',
         description: 'Limits the users returned'
       },
       {
@@ -176,16 +178,16 @@ class YammerUserListCommand extends YammerCommand {
       ` Examples:
   
     Returns all Yammer network users
-      ${this.name} user list
+      ${this.name}
 
     Returns all Yammer network users with usernames beginning with "a"
-      ${this.name} user list --letter a
+      ${this.name} --letter a
 
     Returns all Yammer network users sorted alphabetically in descending order
-      ${this.name} user list --reverse
+      ${this.name} --reverse
 
     Returns the first 10 Yammer network users within the group 5785177.
-      ${this.name} user list --groupId 5785177 --limit 10
+      ${this.name} --groupId 5785177 --limit 10
     `);
   }
 }
