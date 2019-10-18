@@ -363,9 +363,11 @@ nav:
     - Office 365 (tenant):
       - id:
         - id get: 'cmd/tenant-id-get.md'
-    - Yammer (yammer):
+    - yammer (yammer):
       - network:
         - network list: 'cmd/yammer/network/network-list.md'
+      - user:
+        - user list: 'cmd/yammer/user/user-list.md'
   - Concepts:
     - 'Persisting connection': 'concepts/persisting-connection.md'
     - 'Authorization and access tokens': 'concepts/authorization-tokens.md'
