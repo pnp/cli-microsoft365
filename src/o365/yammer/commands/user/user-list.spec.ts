@@ -143,7 +143,7 @@ describe(commands.YAMMER_USER_LIST, () => {
     });
     cmdInstance.action({ options: { output: 'json' } }, (err?: any) => {
       try {
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0][0].id, 14965556);
+        assert.equal(cmdInstanceLogSpy.lastCall.args[0].length, 4);
         done();
       }
       catch (e) {
