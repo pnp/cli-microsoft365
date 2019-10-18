@@ -83,7 +83,7 @@ class YammerUserListCommand extends YammerCommand {
         // groups user retrieval returns a user array containing the user objects
         if (res.users)
           userOutput = res.users;
-        
+     
         if (args.options.output === 'json') {
           this.items = this.items.concat(userOutput);
         }
@@ -111,7 +111,7 @@ class YammerUserListCommand extends YammerCommand {
           // if the groups endpoint is used, the more_available will tell if a new retrieval is required
           // if the user endpoint is used, we need to page by 50 items (hardcoded)
           if (res.more_available === true || this.items.length % 50 === 0) {
-            this.getAllItems(cmd, args, page++)
+            this.getAllItems(cmd, args, ++page)
                 .then((): void => {
                   resolve();
                 }, (err: any): void => {
