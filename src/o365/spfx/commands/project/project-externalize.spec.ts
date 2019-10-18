@@ -376,6 +376,23 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
 
   it('returns text report with output format default', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-182-webpart-react'));
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+      if (path.endsWith('package.json') && path.indexOf('pnpjs') > -1) {
+        return JSON.stringify({
+          main: "./dist/pnpjs.es5.umd.bundle.js",
+          module: "./dist/pnpjs.es5.umd.bundle.min.js"
+        });
+      } else if (path.endsWith('package.json') && path.indexOf('spfx-182-webpart-react') > -1) { //adding library on the fly so we get at least one result
+        const pConfig = JSON.parse(originalReadFileSync(path, 'utf8'));
+        pConfig.dependencies['@pnp/pnpjs'] = '1.3.5';
+        return JSON.stringify(pConfig);
+      }
+      else {
+        return originalReadFileSync(path);
+      }
+    });
+    sinon.stub(request, 'head').callsFake(() => Promise.resolve());
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { } }, (err?: any) => {
