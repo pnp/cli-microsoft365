@@ -76,16 +76,23 @@ class YammerNetworkListCommand extends YammerCommand {
   }
 
   public commandHelp(args: {}, log: (help: string) => void): void {
+    const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  Examples:
+      `  Remarks:
+
+    ${chalk.yellow('Attention:')} In order to use this command, you need to grant the Azure AD
+    application used by the Office 365 CLI the permission to the Yammer API.
+    To do this, execute the ${chalk.blue('consent --service yammer')} command.
+    
+  Examples:
   
     Returns the current user's networks
-      ${this.name} list
+      ${this.name}
 
     Returns the current user's networks including the networks in which the user
     is suspended
-      ${this.name} list --includeSuspended
+      ${this.name} --includeSuspended
     `);
   }
 }
