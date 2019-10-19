@@ -7,6 +7,7 @@ nav:
     - 'Logging in to Office 365': 'user-guide/connecting-office-365.md'
     - 'CLI output mode': 'user-guide/cli-output-mode.md'
   - Commands:
+    - consent: 'cmd/consent.md'
     - login: 'cmd/login.md'
     - logout: 'cmd/logout.md'
     - status: 'cmd/status.md'
