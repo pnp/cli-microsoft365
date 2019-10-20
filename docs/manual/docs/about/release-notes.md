@@ -7,6 +7,8 @@
 **Azure Active Directory:**
 
 - [aad o365group report activitydetail](../cmd/aad/o365group/o365group-report-activitydetail.md) - get details about Office 365 Groups activity by group [#1130](https://github.com/pnp/office365-cli/issues/1130)
+- [aad o365group report activitycounts](../cmd/aad/o365group/o365group-report-activitycounts.md) - get the number of group activities across group workloads [#1159](https://github.com/pnp/office365-cli/issues/1159)
+- [aad o365group report activitygroupcounts](../cmd/aad/o365group/o365group-report-activitygroupcounts.md) - get the daily total number of groups and how many of them were active based on email conversations, Yammer posts, and SharePoint file activities [#1160](https://github.com/pnp/office365-cli/issues/1160)
 
 **Flow:**
 
@@ -36,6 +38,10 @@
 - added the 'remove custom themes' example [#1137](https://github.com/pnp/office365-cli/issues/1137)
 - corrected 'aad o365group user list' alias [#1149](https://github.com/pnp/office365-cli/issues/1149)
 - updated 'spo storageentity set' docs about handling trailing slash [#1153](https://github.com/pnp/office365-cli/issues/1153)
+- updated vorpal to 1.11.7 [#1150](https://github.com/pnp/office365-cli/issues/1150)
+- added versions to deps for building docs in CI [#1157](https://github.com/pnp/office365-cli/issues/1157)
+- added the 'consent' command [#1162](https://github.com/pnp/office365-cli/issues/1162)
+- added the 'Delete custom SharePoint site designs' example [#1138](https://github.com/pnp/office365-cli/issues/1138)
 
 ## [v2.1.0](https://github.com/pnp/office365-cli/releases/tag/v2.1.0)
 
