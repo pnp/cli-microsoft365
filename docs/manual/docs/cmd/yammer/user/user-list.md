@@ -13,8 +13,8 @@ yammer user list [options]
 Option|Description
 ------|-----------
 `--help`|output usage information
-`--g, --groupId [groupId]`|Returns users within a given group
-`--l, --letter [letter]`|Returns users with usernames beginning with the given character
+`-g, --groupId [groupId]`|Returns users within a given group
+`-l, --letter [letter]`|Returns users with usernames beginning with the given character
 `--reverse`|Returns users in reverse sorting order
 `--limit [limit]`|Limits the users returned
 `--sortBy [sortBy]`|'Output type. `messages|followers`. Returns users sorted by number of messages or followers, instead of the default behavior of sorting alphabetically'
