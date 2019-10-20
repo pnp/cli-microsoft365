@@ -140,11 +140,11 @@ class YammerUserListCommand extends YammerCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--g, --groupId [groupId]',
+        option: '-g, --groupId [groupId]',
         description: 'Returns users within a given group'
       },
       {
-        option: '--l, --letter [letter]',
+        option: '-l, --letter [letter]',
         description: 'Returns users with usernames beginning with the given character'
       },
       {
