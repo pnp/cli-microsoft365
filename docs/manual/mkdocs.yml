@@ -366,6 +366,8 @@ nav:
     - Yammer (yammer):
       - network:
         - network list: 'cmd/yammer/network/network-list.md'
+      - message:
+        - message list: 'cmd/yammer/message/message-list.md'
   - Concepts:
     - 'Persisting connection': 'concepts/persisting-connection.md'
     - 'Authorization and access tokens': 'concepts/authorization-tokens.md'
