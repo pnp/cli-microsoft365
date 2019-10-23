@@ -6,7 +6,9 @@ export default abstract class YammerCommand extends Command {
   }
 
   protected handleRejectedODataJsonPromise(response: any, cmd: CommandInstance, callback: (err?: any) => void): void {
-    if (response.error && response.error.base) {
+    if (response.statusCode == 404) {
+      callback(new CommandError("Not found", response.statusCode));
+    } else if (response.error && response.error.base) {
       callback(new CommandError(response.error.base));
     }
     else {
