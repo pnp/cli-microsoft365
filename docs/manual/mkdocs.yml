@@ -369,6 +369,7 @@ nav:
         - id get: 'cmd/tenant-id-get.md'
     - Yammer (yammer):
       - message:
+        - message get: 'cmd/yammer/message/message-get.md'
         - message list: 'cmd/yammer/message/message-list.md'
       - network:
         - network list: 'cmd/yammer/network/network-list.md'
