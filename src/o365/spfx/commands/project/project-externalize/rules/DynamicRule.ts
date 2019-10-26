@@ -9,7 +9,7 @@ export class DynamicRule extends BasicDependencyRule {
   public async visit(project: Project): Promise<ExternalizeEntry[]> {
     if(project.packageJson) {
       const validPackageNames = Object.getOwnPropertyNames(project.packageJson.dependencies)
-                            .filter(x => x.indexOf(this.typesPrefix) === -1)
+                            .filter(x => !this.restrictedNamespaces.map(y => x.indexOf(y) === -1).reduce((y, z) => y || z))
                             .filter(x => this.restrictedModules.indexOf(x) === -1);
 
       return (await Promise.all(validPackageNames.map((x) => this.getExternalEntryForPackage(x, project))))
@@ -72,6 +72,6 @@ export class DynamicRule extends BasicDependencyRule {
       return undefined;
     }
   }
-  private restrictedModules = ['react', 'react-dom', '@microsoft/decorators', '@microsoft/sp-application-base', '@microsoft/sp-core-library', '@microsoft/sp-lodash-subset', '@microsoft/sp-office-ui-fabric-core', '@microsoft/sp-page-context', '@microsoft/sp-webpart-base'];
-  private typesPrefix = '@types/';
+  private restrictedModules = ['react', 'react-dom'];
+  private restrictedNamespaces = ['@types/', '@microsoft/'];
 }
