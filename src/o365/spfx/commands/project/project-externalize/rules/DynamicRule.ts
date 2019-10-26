@@ -9,7 +9,7 @@ export class DynamicRule extends BasicDependencyRule {
   public async visit(project: Project): Promise<ExternalizeEntry[]> {
     if(project.packageJson) {
       const validPackageNames = Object.getOwnPropertyNames(project.packageJson.dependencies)
-                            .filter(x => !this.restrictedNamespaces.map(y => x.indexOf(y) === -1).reduce((y, z) => y || z))
+                            .filter(x => this.restrictedNamespaces.map(y => x.indexOf(y) === -1).reduce((y, z) => y && z))
                             .filter(x => this.restrictedModules.indexOf(x) === -1);
 
       return (await Promise.all(validPackageNames.map((x) => this.getExternalEntryForPackage(x, project))))
