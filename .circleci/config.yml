@@ -71,7 +71,7 @@ jobs:
   deploy_docs:
     working_directory: ~/office365-cli/docs/manual
     docker:
-      - image: circleci/python:2.7-jessie-node
+      - image: circleci/python:3.6.6-jessie-node
     steps:
       - attach_workspace:
           at: ~/office365-cli
@@ -83,10 +83,10 @@ jobs:
           command: sudo pip install mkdocs
       - run:
           name: Install MkDocs theme
-          command: sudo pip install mkdocs-material
+          command: sudo pip install mkdocs-material==3.1.0
       - run:
           name: Install PyMdown Extensions
-          command: sudo pip install pymdown-extensions
+          command: sudo pip install pymdown-extensions==6.0
       - run:
           name: Avoid hosts unknown for github
           command: echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
