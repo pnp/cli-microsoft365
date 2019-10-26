@@ -45,21 +45,24 @@ class YammerMessageListCommand extends YammerCommand {
 
   private getAllItems(cmd: CommandInstance, args: CommandArgs, firstRun: boolean, messageId: number): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      if (firstRun) 
+      if (firstRun) {
         this.items = [];
-      let endPoint = `${this.resource}/v1/messages.json`
+      }
+      let endPoint = `${this.resource}/v1/messages.json`;
       
-      if (messageId !== -1) 
-        endPoint += `?older_than=${messageId}`
-      else if (args.options.olderThanId) 
-        endPoint += `?older_than=${args.options.olderThanId}`
+      if (messageId !== -1) {
+        endPoint += `?older_than=${messageId}`;
+      }
+      else if (args.options.olderThanId) {
+        endPoint += `?older_than=${args.options.olderThanId}`;
+      }
       
       if (args.options.threaded) {
         if (endPoint.indexOf("?") > -1) 
           endPoint += "&";
         else 
-          endPoint += "?"
-        endPoint += `threaded=${args.options.threaded}`
+          endPoint += "?";
+        endPoint += `threaded=${args.options.threaded}`;
       }
 
       const requestOptions: any = {
@@ -68,9 +71,7 @@ class YammerMessageListCommand extends YammerCommand {
           accept: 'application/json;odata.metadata=none',
           'content-type': 'application/json;odata=nometadata'
         },
-        json: true,
-        body: {
-        }
+        json: true
       };
 
       request
@@ -153,6 +154,24 @@ class YammerMessageListCommand extends YammerCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
+      if (args.options.olderThanId) {
+        const olderThanId: number = parseInt(args.options.olderThanId.toString());
+        if (isNaN(olderThanId)) {
+          return `${args.options.olderThanId} is not a number`;
+        }
+      }
+
+      if (args.options.limit) {
+        const limit: number = parseInt(args.options.limit.toString());
+        if (isNaN(limit)) {
+          return `${args.options.limit} is not a number`;
+        }
+      }
+
+      if (args.options.threaded && args.options.threaded !== 'true'  && args.options.threaded !== 'extended') {
+        return `threaded accepts only the values "true" or "extended"`;
+      }
+
       return true;
     };
   }
@@ -160,8 +179,12 @@ class YammerMessageListCommand extends YammerCommand {
   public commandHelp(args: {}, log: (help: string) => void): void {
     log(vorpal.find(this.name).helpInformation());
     log(
-      ` Examples:
+      `  Remarks:
   
+      In order to use this command, you need to grant the Azure AD application used by the Office 365 CLI the permission to the Yammer API. To do this, execute the "consent --service yammer" command.
+    
+  Examples:
+    
     Returns all Yammer network messages
       ${this.name}
     

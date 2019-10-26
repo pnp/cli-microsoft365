@@ -107,6 +107,21 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
     assert.equal(actual, true);
   });
 
+  it('threaded must be a correct value', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { threaded: 10 } });
+    assert.notEqual(actual, true);
+  });
+
+  it('limit must be a number', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { limit: 'abc' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('olderThanId must be a number', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { olderThanId: 'abc' } });
+    assert.notEqual(actual, true);
+  });
+
   it('supports debug mode', () => {
     const options = (command.options() as CommandOption[]);
     let containsOption = false;
