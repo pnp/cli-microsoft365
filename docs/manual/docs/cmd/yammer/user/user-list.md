@@ -47,7 +47,7 @@ Returns all Yammer network users sorted alphabetically in descending order
 yammer user list --reverse
 ```
 
-Returns the first 10 Yammer network users within the group 1496550697.
+Returns the first 10 Yammer network users within the group 5785177..
 ```sh
-user list --groupId 1496550697 --limit 10
+user list --groupId 5785177 --limit 10
 ```

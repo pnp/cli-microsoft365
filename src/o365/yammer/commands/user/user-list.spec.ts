@@ -396,6 +396,26 @@ describe(commands.YAMMER_USER_LIST, () => {
     assert.equal(actual, true);
   });
 
+  it('letter does not allow numbers', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { letter: "1" } });
+    assert.notEqual(actual, true);
+  });
+
+  it('groupId must be a number', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { groupId: "aasdf" } });
+    assert.notEqual(actual, true);
+  });
+
+  it('limit must be a number', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { limit: "aasdf" } });
+    assert.notEqual(actual, true);
+  });
+
+  it('sortBy validation check', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { sortBy: "aasdf" } });
+    assert.notEqual(actual, true);
+  });
+
   it('supports debug mode', () => {
     const options = (command.options() as CommandOption[]);
     let containsOption = false;

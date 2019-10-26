@@ -49,21 +49,26 @@ class YammerUserListCommand extends YammerCommand {
 
   private getAllItems(cmd: CommandInstance, args: CommandArgs, page: number): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      if (page === 1) 
+      if (page === 1)  {
         this.items = [];
+      }
 
-      let endPoint = `${this.resource}/v1/users.json`
+      let endPoint = `${this.resource}/v1/users.json`;
     
-      if (args.options.groupId !== undefined)
-          endPoint = `${this.resource}/v1/users/in_group/${args.options.groupId}.json`
+      if (args.options.groupId !== undefined) {
+          endPoint = `${this.resource}/v1/users/in_group/${args.options.groupId}.json`;
+      }
       
-      endPoint += `?page=${page}`
-      if (args.options.reverse !== undefined)
-        endPoint += `&reverse=true`
-      if (args.options.sortBy !== undefined)
-        endPoint += `&sort_by=${args.options.sortBy}`
-      if (args.options.letter !== undefined)
-        endPoint += `&letter=${args.options.letter}`
+      endPoint += `?page=${page}`;
+      if (args.options.reverse !== undefined) {
+        endPoint += `&reverse=true`;
+      }
+      if (args.options.sortBy !== undefined) {
+        endPoint += `&sort_by=${args.options.sortBy}`;
+      }
+      if (args.options.letter !== undefined) {
+        endPoint += `&letter=${args.options.letter}`;
+      }
 
       const requestOptions: any = {
         url: endPoint,
@@ -71,9 +76,7 @@ class YammerUserListCommand extends YammerCommand {
           accept: 'application/json;odata.metadata=none',
           'content-type': 'application/json;odata=nometadata'
         },
-        json: true,
-        body: {
-        }
+        json: true
       };
 
       request
@@ -168,6 +171,29 @@ class YammerUserListCommand extends YammerCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
+
+      if (args.options.groupId) {
+        const groupId: number = parseInt(args.options.groupId.toString());
+        if (isNaN(groupId)) {
+          return `${args.options.groupId} is not a number`;
+        }
+      }
+
+      if (args.options.limit) {
+        const limit: number = parseInt(args.options.limit.toString());
+        if (isNaN(limit)) {
+          return `${args.options.limit} is not a number`;
+        }
+      }
+
+      if (args.options.sortBy && args.options.sortBy !== 'messages'  && args.options.sortBy !== 'followers') {
+        return `sortBy accepts only the values "messages" or "followers"`;
+      }
+
+      if (args.options.letter && !/^(?!\d)[a-zA-Z]+$/i.test(args.options.letter)) {
+        return `Value of 'letter' is invalid. Only characters within the ranges [A - Z], [a - z] are allowed.`;
+      }
+
       return true;
     };
   }
@@ -175,8 +201,12 @@ class YammerUserListCommand extends YammerCommand {
   public commandHelp(args: {}, log: (help: string) => void): void {
     log(vorpal.find(this.name).helpInformation());
     log(
-      ` Examples:
+      `  Remarks:
   
+      In order to use this command, you need to grant the Azure AD application used by the Office 365 CLI the permission to the Yammer API. To do this, execute the "consent --service yammer" command.
+    
+  Examples:
+    
     Returns all Yammer network users
       ${this.name}
 
