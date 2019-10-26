@@ -8,7 +8,7 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
 import Utils from '../../../../Utils';
-import { Project, ExternalConfiguration } from './project-upgrade/model';
+import { Project, ExternalConfiguration, External } from './project-upgrade/model';
 import { ExternalizeEntry } from './project-externalize/model';
 
 describe(commands.PROJECT_EXTERNALIZE, () => {
@@ -318,7 +318,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { output: 'json', debug: true } }, (err?: any) => {
       const findings: ExternalConfiguration = JSON.parse(log[logEntryToCheck + 3]); //because debug is enabled
-      assert.equal(findings['@pnp/pnpjs'].path, 'https://unpkg.com/@pnp/pnpjs@1.3.5/dist/pnpjs.es5.umd.bundle.min.js');
+      assert.equal((findings['@pnp/pnpjs'] as unknown as External).path, 'https://unpkg.com/@pnp/pnpjs@1.3.5/dist/pnpjs.es5.umd.bundle.min.js');
     });
   });
 

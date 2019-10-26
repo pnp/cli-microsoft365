@@ -7,7 +7,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
 import { Utils } from './project-upgrade/';
-import { Project, ExternalConfiguration } from './project-upgrade/model';
+import { Project, ExternalConfiguration, External } from './project-upgrade/model';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 import rules = require('./project-externalize/DefaultRules');
@@ -125,7 +125,7 @@ class SpfxProjectExternalizeCommand extends Command {
         path: f.path,
         globalName: f.globalName,
         globalDependencies: f.globalDependencies
-      };
+      } as External;
     });
     return JSON.stringify(result);
   }

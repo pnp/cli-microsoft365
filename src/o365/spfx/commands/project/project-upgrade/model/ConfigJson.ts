@@ -15,10 +15,10 @@ export interface Entry {
   outputPath: string;
 }
 export interface ExternalConfiguration {
-  [key: string]: External;
+  [key: string]: External | string;
 }
 export interface External {
   path: string;
-  globalName?: string;
+  globalName: string;
   globalDependencies?: string[];
 }
