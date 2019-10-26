@@ -37,7 +37,7 @@ class SpfxProjectExternalizeCommand extends Command {
     return commands.PROJECT_EXTERNALIZE;
   }
   public get description(): string {
-    return 'Exteranlizes SharePoint Framework project known dependencies';
+    return 'Externalizes SharePoint Framework project known dependencies';
   }
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
