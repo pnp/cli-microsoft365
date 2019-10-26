@@ -363,7 +363,7 @@ nav:
     - Office 365 (tenant):
       - id:
         - id get: 'cmd/tenant-id-get.md'
-    - Yammer (Yammer):
+    - Yammer (yammer):
       - network:
         - network list: 'cmd/yammer/network/network-list.md'
       - user:
