@@ -22,7 +22,7 @@ class YammerMessageGetCommand extends YammerCommand {
   }
 
   public get description(): string {
-    return 'Returns a yammer message';
+    return 'Returns a Yammer message';
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -38,9 +38,7 @@ class YammerMessageGetCommand extends YammerCommand {
         accept: 'application/json;odata.metadata=none',
         'content-type': 'application/json;odata=nometadata'
       },
-      json: true,
-      body: {
-      }
+      json: true
     };
 
     request
@@ -71,8 +69,8 @@ class YammerMessageGetCommand extends YammerCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--id <id>',
-        description: 'The id of the yammer message'
+        option: '--id',
+        description: 'The id of the Yammer message'
       }
     ];
 
@@ -83,7 +81,13 @@ class YammerMessageGetCommand extends YammerCommand {
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
       if (!args.options.id) {
-        return 'Required option id missing';
+        return 'Required id value is missing';
+      }
+      else {
+        const id: number = parseInt(args.options.id.toString());
+        if (isNaN(id)) {
+          return `${args.options.id} is not a number`;
+        }
       }
 
       return true;
@@ -93,12 +97,16 @@ class YammerMessageGetCommand extends YammerCommand {
   public commandHelp(args: {}, log: (help: string) => void): void {
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  Examples:
+      `  Remarks:
   
-    Returns the yammer message with the id 1239871123
+      In order to use this command, you need to grant the Azure AD application used by the Office 365 CLI the permission to the Yammer API. To do this, execute the "consent --service yammer" command.
+    
+  Examples:
+  
+    Returns the Yammer message with the id 1239871123
       ${this.name} --id 1239871123
 
-    Returns the yammer message with the id 1239871123 in JSON format
+    Returns the Yammer message with the id 1239871123 in JSON format
       ${this.name} --id 1239871123 --output json
     `);
   }

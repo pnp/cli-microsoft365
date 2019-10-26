@@ -8,11 +8,13 @@ import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 
-describe(commands.YAMMER_NETWORK_LIST, () => {
+describe(commands.YAMMER_MESSAGE_GET, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
+  let firstMessage: any = {"sender_id":1496550646, "replied_to_id":1496550647,"id":10123190123123,"thread_id": "", group_id: 11231123123, created_at: "2019/09/09 07:53:18 +0000", "content_excerpt": "message1"};
+  let secondMessage: any = {"sender_id":1496550640, "replied_to_id":"","id":10123190123124,"thread_id": "", group_id: "", created_at: "2019/09/08 07:53:18 +0000", "content_excerpt": "message2"};
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -52,42 +54,33 @@ describe(commands.YAMMER_NETWORK_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.YAMMER_NETWORK_LIST), true);
+    assert.equal(command.name.startsWith(commands.YAMMER_MESSAGE_GET), true);
   });
 
   it('has a description', () => {
     assert.notEqual(command.description, null);
   });
 
-  it('calls the networking endpoint without parameter', function (done) {
+  it('id must be a number', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { id: 'nonumber' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('id is required', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { } });
+    assert.notEqual(actual, true);
+  });
+
+  it('calls the messaging endpoint with the right parameters', function (done) {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === 'https://www.yammer.com/api/v1/networks/current.json') {
-        return Promise.resolve(
-          [
-            {
-              "id": 123,
-              "name": "Network1",
-              "email": "email@mail.com",
-              "community": true,
-              "permalink": "network1-link",
-              "web_url": "https://www.yammer.com/network1-link"
-            },
-            {
-              "id": 456,
-              "name": "Network2",
-              "email": "email2@mail.com",
-              "community": false,
-              "permalink": "network2-link",
-              "web_url": "https://www.yammer.com/network2-link"
-            }
-          ]
-        );
+      if (opts.url === 'https://www.yammer.com/api/v1/messages/10123190123123.json') {
+        return Promise.resolve(firstMessage);
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
+    cmdInstance.action({ options: { id:10123190123123, debug: true } }, (err?: any) => {
       try {
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0][0].id, '123')
+        assert.equal(cmdInstanceLogSpy.lastCall.args[0].id, 10123190123123)
         done();
       }
       catch (e) {
@@ -116,87 +109,26 @@ describe(commands.YAMMER_NETWORK_LIST, () => {
     });
   });
 
-  it('calls the networking endpoint without parameter and json', function (done) {
+  it('calls the messaging endpoint with id and json and json', function (done) {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === 'https://www.yammer.com/api/v1/networks/current.json') {
-        return Promise.resolve(
-          [
-            {
-              "id": 123,
-              "name": "Network1",
-              "email": "email@mail.com",
-              "community": true,
-              "permalink": "network1-link",
-              "web_url": "https://www.yammer.com/network1-link"
-            },
-            {
-              "id": 456,
-              "name": "Network2",
-              "email": "email2@mail.com",
-              "community": false,
-              "permalink": "network2-link",
-              "web_url": "https://www.yammer.com/network2-link"
-            }
-          ]
-        );
+      if (opts.url === 'https://www.yammer.com/api/v1/messages/10123190123124.json') {
+        return Promise.resolve(secondMessage);
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: true, output: "json" } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: true, id:10123190123124, output: "json" } }, (err?: any) => {
       try {
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0][0].id, '123');
+        assert.equal(cmdInstanceLogSpy.lastCall.args[0].id, 10123190123124);
         done();
       }
       catch (e) {
         done(e);
       }
     });
-  });
-
-  it('calls the networking endpoint with parameter', function (done) {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === 'https://www.yammer.com/api/v1/networks/current.json') {
-        return Promise.resolve(
-          [
-            {
-              "id": 123,
-              "name": "Network1",
-              "email": "email@mail.com",
-              "community": true,
-              "permalink": "network1-link",
-              "web_url": "https://www.yammer.com/network1-link"
-            },
-            {
-              "id": 456,
-              "name": "Network2",
-              "email": "email2@mail.com",
-              "community": false,
-              "permalink": "network2-link",
-              "web_url": "https://www.yammer.com/network2-link"
-            }
-          ]
-        );
-      }
-      return Promise.reject('Invalid request');
-    });
-    cmdInstance.action({ options: { debug: true, includeSuspended: true } }, (err?: any) => {
-      try {
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0][0].id, '123')
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('passes validation without parameters', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.equal(actual, true);
   });
 
   it('passes validation with parameters', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { includeSuspended: true } });
+    const actual = (command.validate() as CommandValidate)({ options: { id: 10123123 }});
     assert.equal(actual, true);
   });
 
@@ -220,7 +152,7 @@ describe(commands.YAMMER_NETWORK_LIST, () => {
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
     cmd.help({}, () => { });
-    assert(find.calledWith(commands.YAMMER_NETWORK_LIST));
+    assert(find.calledWith(commands.YAMMER_MESSAGE_GET));
   });
 
   it('has help with examples', () => {
