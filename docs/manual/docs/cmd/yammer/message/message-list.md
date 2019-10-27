@@ -14,7 +14,7 @@ Option|Description
 ------|-----------
 `--help`|output usage information
 `--olderThanId [olderThanId]`|Returns messages older than the message ID specified as a numeric string
-`--threaded [threaded]`|Threaded type. `true|extended`. Threaded=true will only return the thread starter (first message) for each thread. This parameter is intended for apps which need to display message threads collapsed. threaded=extended will return the thread starter messages and the two most recent messages all ordered by activity, as they are viewed in the default view on the Yammer web interface.
+`--threaded`|Will only return the thread starter (first message) for each thread. This parameter is intended for apps which need to display message threads collapsed.
 `--limit [limit]`|Limits the messages returned
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging

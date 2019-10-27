@@ -15,18 +15,18 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
   let cmdInstanceLogSpy: sinon.SinonSpy;
 
   let firstMessageBatch: any = {
-    messages: [{"sender_id":1496550646, "replied_to_id":1496550647,"id":10123190123123,"thread_id": "", group_id: 11231123123, created_at: "2019/09/09 07:53:18 +0000", "content_excerpt": "message1"},
-               {"sender_id":1496550640, "replied_to_id":"","id":10123190123124,"thread_id": "", group_id: "", created_at: "2019/09/08 07:53:18 +0000", "content_excerpt": "message2"},
-               {"sender_id":1496550610, "replied_to_id":"","id":10123190123125,"thread_id": "", group_id: "", created_at: "2019/09/07 07:53:18 +0000", "content_excerpt": "message3"},
-               {"sender_id":1496550630, "replied_to_id":"","id":10123190123126,"thread_id": "", group_id: 1123121, created_at: "2019/09/06 07:53:18 +0000", "content_excerpt": "message4"},
-               {"sender_id":1496550646, "replied_to_id":"","id":10123190123127,"thread_id": "", group_id: 1123121, created_at: "2019/09/05 07:53:18 +0000", "content_excerpt": "message5"}],
+    messages: [{"sender_id":1496550646, "replied_to_id":1496550647,"id":10123190123123,"thread_id": "", group_id: 11231123123, created_at: "2019/09/09 07:53:18 +0000", "content_excerpt": "message1", "body": { "plain": "message1 message is longer than 25 chars. Just for testing shortening"}},
+               {"sender_id":1496550640, "replied_to_id":"","id":10123190123124,"thread_id": "", group_id: "", created_at: "2019/09/08 07:53:18 +0000", "content_excerpt": "message2", "body": { "plain": "message2"}},
+               {"sender_id":1496550610, "replied_to_id":"","id":10123190123125,"thread_id": "", group_id: "", created_at: "2019/09/07 07:53:18 +0000", "content_excerpt": "message3", "body": { "plain": "message3"}},
+               {"sender_id":1496550630, "replied_to_id":"","id":10123190123126,"thread_id": "", group_id: 1123121, created_at: "2019/09/06 07:53:18 +0000", "content_excerpt": "message4", "body": { "plain": "message4"}},
+               {"sender_id":1496550646, "replied_to_id":"","id":10123190123127,"thread_id": "", group_id: 1123121, created_at: "2019/09/05 07:53:18 +0000", "content_excerpt": "message5", "body": { "plain": "message5"}}],
     meta: {
       older_available: true
     }
   };
   let secondMessageBatch: any = {
-    messages: [{"sender_id":1496550646, "replied_to_id":1496550647,"id":10123190123130,"thread_id": "", group_id: 11231123123, created_at: "2019/09/04 07:53:18 +0000", "content_excerpt": "message6"},
-               {"sender_id":1496550640, "replied_to_id":"","id":10123190123131,"thread_id": "", group_id: "", created_at: "2019/09/03 07:53:18 +0000", "content_excerpt": "message7"}],
+    messages: [{"sender_id":1496550646, "replied_to_id":1496550647,"id":10123190123130,"thread_id": "", group_id: 11231123123, created_at: "2019/09/04 07:53:18 +0000", "content_excerpt": "message6", "body": { "plain": "message6"}},
+               {"sender_id":1496550640, "replied_to_id":"","id":10123190123131,"thread_id": "", group_id: "", created_at: "2019/09/03 07:53:18 +0000", "content_excerpt": "message7", "body": { "plain": "message7"}}],
     meta: {
       older_available: false
     }
@@ -105,11 +105,6 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
   it('passes validation with parameters', () => {
     const actual = (command.validate() as CommandValidate)({ options: { limit: 10 } });
     assert.equal(actual, true);
-  });
-
-  it('threaded must be a correct value', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { threaded: 10 } });
-    assert.notEqual(actual, true);
   });
 
   it('limit must be a number', () => {
