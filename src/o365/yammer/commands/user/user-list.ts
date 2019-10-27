@@ -61,7 +61,7 @@ class YammerUserListCommand extends YammerCommand {
       
       endPoint += `?page=${page}`;
       if (args.options.reverse !== undefined) {
-        endPoint += `&reverse=TRUE`;
+        endPoint += `&reverse=true`;
       }
       if (args.options.sortBy !== undefined) {
         endPoint += `&sort_by=${args.options.sortBy}`;
