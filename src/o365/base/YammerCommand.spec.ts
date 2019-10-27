@@ -157,6 +157,23 @@ describe('YammerCommand', () => {
 
   });
 
+  it('displays 404 message coming from Yammer', () => {
+    const cmd = {
+      commandWrapper: {
+        command: 'command'
+      },
+      log: (msg?: string) => { },
+      prompt: () => { }
+    };
+    const mock = new MockCommand();
+    mock.handlePromiseError({
+      statusCode: 404
+    }, cmd, (err?: any) => {
+      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Not found',404)));
+    });
+
+  });
+
   it('displays error message not from Yammer (1)', () => {
     const cmd = {
       commandWrapper: {
