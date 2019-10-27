@@ -30,6 +30,7 @@
 **Yammer:**
 
 - [yammer network list](../cmd/yammer/network/network-list.md) - returns a list of networks to which the current user has access [#1115](https://github.com/pnp/office365-cli/issues/1115)
+- [yammer user get](../cmd/yammer/user/user-get.md) - retrieves the current user or searches for a user by ID or e-mail [#1107](https://github.com/pnp/office365-cli/issues/1107)
 
 ### Changes
 
