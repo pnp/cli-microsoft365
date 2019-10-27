@@ -107,7 +107,7 @@ class YammerMessageListCommand extends YammerCommand {
           cmd.log(this.items);  
         }
         else {
-          cmd.log(this.items.map(n => {
+          cmd.log(this.items.map((n: any) => {
             let shortBody;
             let bodyToProcess = n.body.plain;
 
