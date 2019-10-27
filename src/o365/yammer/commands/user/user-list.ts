@@ -172,18 +172,12 @@ class YammerUserListCommand extends YammerCommand {
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
 
-      if (args.options.groupId) {
-        const groupId: number = parseInt(args.options.groupId.toString());
-        if (isNaN(groupId)) {
-          return `${args.options.groupId} is not a number`;
-        }
+      if (args.options.groupId && typeof args.options.groupId !== 'number') {
+        return `${args.options.groupId} is not a number`;
       }
 
-      if (args.options.limit) {
-        const limit: number = parseInt(args.options.limit.toString());
-        if (isNaN(limit)) {
-          return `${args.options.limit} is not a number`;
-        }
+      if (args.options.limit && typeof args.options.limit !== 'number') {
+        return `${args.options.limit} is not a number`;
       }
 
       if (args.options.sortBy && args.options.sortBy !== 'messages'  && args.options.sortBy !== 'followers') {
