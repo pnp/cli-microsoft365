@@ -224,18 +224,18 @@ class SpfxProjectUpgradeCommand extends Command {
     // reverse the list of versions to upgrade to, so that most recent findings
     // will end up on top already. Saves us reversing a larger array later
     const versionsToUpgradeTo: string[] = this.supportedVersions.slice(pos + 1, posTo + 1).reverse();
-    versionsToUpgradeTo.forEach(v => {
-      try {
+    try {
+      versionsToUpgradeTo.forEach(v => {
         const rules: Rule[] = require(`./project-upgrade/upgrade-${v}`);
         rules.forEach(r => {
           r.visit(project, this.allFindings);
         });
-      }
-      catch (e) {
-        cb(new CommandError(e));
-        return;
-      }
-    });
+      });
+    }
+    catch (e) {
+      cb(new CommandError(e.message));
+      return;
+    }
     if (this.packageManager === 'npm') {
       const npmDedupeRule: Rule = new FN017001_MISC_npm_dedupe();
       npmDedupeRule.visit(project, this.allFindings);
