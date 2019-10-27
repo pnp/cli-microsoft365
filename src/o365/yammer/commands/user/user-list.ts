@@ -128,10 +128,7 @@ class YammerUserListCommand extends YammerCommand {
           const item: any = {
             id: n.id, 
             full_name: n.full_name, 
-            email: n.email, 
-            job_title: n.job_title, 
-            state: n.state, 
-            url: n.url
+            email: n.email
           };
           return item;
         }));
