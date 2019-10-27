@@ -87,23 +87,8 @@ class YammerUserListCommand extends YammerCommand {
         if (res.users)
           userOutput = res.users;
      
-        if (args.options.output === 'json') {
-          this.items = this.items.concat(userOutput);
-        }
-        else {
-          this.items = this.items.concat((userOutput as any[]).map(n => {
-            const item: any = {
-              id: n.id, 
-              full_name: n.full_name, 
-              email: n.email, 
-              job_title: n.job_title, 
-              state: n.state, 
-              url: n.url
-            };
-            return item;
-          }));
-        }
-
+        this.items = this.items.concat(userOutput);
+        
         // this is executed once at the end if the limit operation has been executed
         // we need to return the array of the desired size. The API does not provide such a feature
         if (args.options.limit !== undefined && this.items.length > args.options.limit) {
@@ -135,7 +120,22 @@ class YammerUserListCommand extends YammerCommand {
     this
     .getAllItems(cmd, args, 1)
     .then((): void => {
+      if (args.options.output === 'json') {
         cmd.log(this.items);
+      }
+      else {
+        cmd.log(this.items.map(n => {
+          const item: any = {
+            id: n.id, 
+            full_name: n.full_name, 
+            email: n.email, 
+            job_title: n.job_title, 
+            state: n.state, 
+            url: n.url
+          };
+          return item;
+        }));
+      }
         cb();
     }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   };
