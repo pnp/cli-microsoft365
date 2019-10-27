@@ -83,11 +83,8 @@ class YammerMessageGetCommand extends YammerCommand {
       if (!args.options.id) {
         return 'Required id value is missing';
       }
-      else {
-        const id: number = parseInt(args.options.id.toString());
-        if (isNaN(id)) {
-          return `${args.options.id} is not a number`;
-        }
+      if (typeof args.options.id !== 'number') {
+        return `${args.options.id} is not a number`;
       }
 
       return true;
