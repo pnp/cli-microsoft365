@@ -364,10 +364,10 @@ nav:
       - id:
         - id get: 'cmd/tenant-id-get.md'
     - Yammer (yammer):
-      - network:
-        - network list: 'cmd/yammer/network/network-list.md'
       - message:
         - message get: 'cmd/yammer/message/message-get.md'
+      - network:
+        - network list: 'cmd/yammer/network/network-list.md'
   - Concepts:
     - 'Persisting connection': 'concepts/persisting-connection.md'
     - 'Authorization and access tokens': 'concepts/authorization-tokens.md'

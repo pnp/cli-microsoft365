@@ -1,4 +1,4 @@
-# Yammer message get
+# yammer message get
 
 Returns a Yammer message
 
@@ -13,7 +13,7 @@ yammer message get [options]
 Option|Description
 ------|-----------
 `--help`|output usage information
-`--id`|The id of the Yammer message
+`--id <id>`|The id of the Yammer message
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

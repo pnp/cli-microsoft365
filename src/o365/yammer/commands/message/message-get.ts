@@ -25,12 +25,6 @@ class YammerMessageGetCommand extends YammerCommand {
     return 'Returns a Yammer message';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.id = typeof args.options.id !== undefined;
-    return telemetryProps;
-  }
-
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const requestOptions: any = {
       url: `${this.resource}/v1/messages/${args.options.id}.json`,
