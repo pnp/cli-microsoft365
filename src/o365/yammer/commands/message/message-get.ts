@@ -69,7 +69,7 @@ class YammerMessageGetCommand extends YammerCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--id',
+        option: '--id <id>',
         description: 'The id of the Yammer message'
       }
     ];
