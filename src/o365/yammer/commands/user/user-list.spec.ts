@@ -416,6 +416,16 @@ describe(commands.YAMMER_USER_LIST, () => {
     assert.notEqual(actual, true);
   });
 
+  it('letter allows just once char', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { letter: "a" } });
+    assert.equal(actual, true);
+  });
+
+  it('letter allows just once char', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { letter: "ab" } });
+    assert.notEqual(actual, true);
+  });
+
   it('supports debug mode', () => {
     const options = (command.options() as CommandOption[]);
     let containsOption = false;

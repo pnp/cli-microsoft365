@@ -49,7 +49,7 @@ class YammerUserListCommand extends YammerCommand {
 
   private getAllItems(cmd: CommandInstance, args: CommandArgs, page: number): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      if (page === 1)  {
+      if (page === 1) {
         this.items = [];
       }
 
@@ -61,7 +61,7 @@ class YammerUserListCommand extends YammerCommand {
       
       endPoint += `?page=${page}`;
       if (args.options.reverse !== undefined) {
-        endPoint += `&reverse=true`;
+        endPoint += `&reverse=TRUE`;
       }
       if (args.options.sortBy !== undefined) {
         endPoint += `&sort_by=${args.options.sortBy}`;
@@ -84,9 +84,10 @@ class YammerUserListCommand extends YammerCommand {
       .then((res: any): void => {
         let userOutput = res;
         // groups user retrieval returns a user array containing the user objects
-        if (res.users)
+        if (res.users) {          
           userOutput = res.users;
-     
+        }
+
         this.items = this.items.concat(userOutput);
         
         // this is executed once at the end if the limit operation has been executed
@@ -124,7 +125,7 @@ class YammerUserListCommand extends YammerCommand {
         cmd.log(this.items);
       }
       else {
-        cmd.log(this.items.map(n => {
+        cmd.log(this.items.map((n: any) => {
           const item: any = {
             id: n.id, 
             full_name: n.full_name, 
@@ -133,7 +134,7 @@ class YammerUserListCommand extends YammerCommand {
           return item;
         }));
       }
-        cb();
+      cb();
     }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   };
 
@@ -183,6 +184,10 @@ class YammerUserListCommand extends YammerCommand {
 
       if (args.options.letter && !/^(?!\d)[a-zA-Z]+$/i.test(args.options.letter)) {
         return `Value of 'letter' is invalid. Only characters within the ranges [A - Z], [a - z] are allowed.`;
+      }
+
+      if (args.options.letter && args.options.letter.length != 1) {
+        return `Only one char as value of 'letter' accepted.`;
       }
 
       return true;
