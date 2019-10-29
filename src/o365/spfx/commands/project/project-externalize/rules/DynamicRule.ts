@@ -3,7 +3,6 @@ import { Project } from "../../project-upgrade/model";
 import { ExternalizeEntry } from "../model/ExternalizeEntry";
 import * as fs from 'fs';
 import request from '../../../../../../request';
-import { ModuleTestResponse } from "../model";
 
 
 export class DynamicRule extends BasicDependencyRule {
@@ -45,9 +44,16 @@ export class DynamicRule extends BasicDependencyRule {
     return undefined;
   }
   private getModuleType = async (url: string): Promise<'script' | 'module'> => {
-    const response = await request.post<ModuleTestResponse>({url: 'https://scriptcheck-weu-fn.azurewebsites.net/api/script-check', headers:{'content-type': 'application/json'},
-      body: {url: url}});
-    return response.scriptType;
+    try {
+      const response = await request.post<string>({url: 'https://scriptcheck-weu-fn.azurewebsites.net/api/script-check',
+        headers:{'content-type': 'application/json', accept: 'application/json', 'x-anonymous': 'true'},
+        body: JSON.stringify({url: url}),
+      });
+      return JSON.parse(response).scriptType;
+    } catch (error) {
+      console.warn(`error testing module type url ${url}`);
+      return 'module';
+    }
   }
   private getFileUrl = (packageName: string, version: string, filePath: string) => `https://unpkg.com/${packageName}@${version}/${filePath}`;
   private testUrl = async (url: string): Promise<boolean> => {
