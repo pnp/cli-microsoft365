@@ -44,7 +44,7 @@ describe('DynamicRule', () => {
       }
     });
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
-    sinon.stub(request, 'post').callsFake(() => Promise.resolve(JSON.stringify({scriptType: 'module'})));
+    sinon.stub(request, 'post').callsFake(() => Promise.reject());
     const findings = await rule.visit(project);
     assert.equal(findings.length, 1);
   });
@@ -70,7 +70,7 @@ describe('DynamicRule', () => {
       }
     });
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
-    sinon.stub(request, 'post').callsFake(() => Promise.resolve(JSON.stringify({scriptType: 'module'})));
+    sinon.stub(request, 'post').callsFake(() => Promise.resolve(JSON.stringify({scriptType: 'script'})));
     const findings = await rule.visit(project);
     assert.equal(findings.length, 1);
   });
