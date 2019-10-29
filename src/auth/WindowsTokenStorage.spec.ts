@@ -78,7 +78,7 @@ describe('WindowsTokenStorage', () => {
   it('returns from Windows Credential Manager credential consisting of a single chunk', (done) => {
     sinon.stub(childProcess, 'execFile').callsArgWith(2, null, [
       'Target Name: SPO',
-      'Credential: ' + new Buffer('ABC', 'utf8').toString('hex')
+      'Credential: ' + Buffer.from('ABC', 'utf8').toString('hex')
     ].join(os.EOL), null);
     windowsCredsManager
       .get()
@@ -102,10 +102,10 @@ describe('WindowsTokenStorage', () => {
   it('returns from Windows Credential Manager credential consisting of multiple chunks', (done) => {
     sinon.stub(childProcess, 'execFile').callsArgWith(2, null, [
       'Target Name: SPO--1-2',
-      'Credential: ' + new Buffer('ABC', 'utf8').toString('hex'),
+      'Credential: ' + Buffer.from('ABC', 'utf8').toString('hex'),
       '',
       'Target Name: SPO--2-2',
-      'Credential: ' + new Buffer('DEF', 'utf8').toString('hex')
+      'Credential: ' + Buffer.from('DEF', 'utf8').toString('hex')
     ].join(os.EOL), null);
     windowsCredsManager
       .get()
@@ -129,7 +129,7 @@ describe('WindowsTokenStorage', () => {
   it('correctly handles error when incorrect number password chunks retrieved from Windows Credential Manager', (done) => {
     sinon.stub(childProcess, 'execFile').callsArgWith(2, null, [
       'Target Name: SPO--1-2',
-      'Credential: ' + new Buffer('ABC', 'utf8').toString('hex')
+      'Credential: ' + Buffer.from('ABC', 'utf8').toString('hex')
     ].join(os.EOL), null);
     windowsCredsManager
       .get()
@@ -180,10 +180,10 @@ describe('WindowsTokenStorage', () => {
   it('correctly handles password chunk missing in Windows Credential Manager', (done) => {
     sinon.stub(childProcess, 'execFile').callsArgWith(2, null, [
       'Target Name: SPO--1-3',
-      'Credential: ' + new Buffer('ABC', 'utf8').toString('hex'),
+      'Credential: ' + Buffer.from('ABC', 'utf8').toString('hex'),
       '',
       'Target Name: SPO--3-3',
-      'Credential: ' + new Buffer('GHI', 'utf8').toString('hex')
+      'Credential: ' + Buffer.from('GHI', 'utf8').toString('hex')
     ].join(os.EOL), null);
     windowsCredsManager
       .get()
@@ -303,7 +303,7 @@ describe('WindowsTokenStorage', () => {
           assert.deepEqual(args, [
             '-a',
             '-t', `${prefix}${prefixShort}`,
-            '-p', new Buffer('ABC', 'utf8').toString('hex')
+            '-p', Buffer.from('ABC', 'utf8').toString('hex')
           ]);
           done();
         }
