@@ -48,7 +48,8 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       fs.existsSync,
       fs.readFileSync,
       fs.writeFileSync,
-      request.head
+      request.head,
+      request.post,
     ]);
   });
 
@@ -314,6 +315,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
+    sinon.stub(request, 'post').callsFake(() => Promise.resolve(JSON.stringify({scriptType: 'module'})));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { output: 'json', debug: true } }, (err?: any) => {
@@ -341,6 +343,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
+    sinon.stub(request, 'post').callsFake(() => Promise.resolve(JSON.stringify({scriptType: 'module'})));
     const originalWriteFileSync = fs.writeFileSync;
     sinon.stub(fs, 'writeFileSync').callsFake((path: string, value: string, encoding: string) => {
       if(path.endsWith('report.json')) {
@@ -394,6 +397,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
+    sinon.stub(request, 'post').callsFake(() => Promise.resolve(JSON.stringify({scriptType: 'module'})));
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { } }, (err?: any) => {
       assert(JSON.stringify(log[logEntryToCheck]).startsWith('['));
