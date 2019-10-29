@@ -10,6 +10,7 @@ import * as path from 'path';
 import Utils from '../../../../Utils';
 import { Project, ExternalConfiguration, External } from './project-upgrade/model';
 import { ExternalizeEntry } from './project-externalize/model';
+import * as requestNative from 'request-promise-native';
 
 describe(commands.PROJECT_EXTERNALIZE, () => {
   let vorpal: Vorpal;
@@ -338,10 +339,16 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
           main: "./dist/tntjs.es5.umd.bundle.js",
           module: "./dist/tntjs.es5.umd.bundle.min.js"
         });
-      } else if (path.endsWith('package.json') && path.indexOf('spfx-182-webpart-react') > -1) { //adding library on the fly so we get at least one result
+      } else if (path.endsWith('package.json') && path.indexOf('logging') > -1) {
+        return JSON.stringify({
+          main: "./dist/logging.es5.umd.bundle.js",
+          module: "./dist/logging.es5.umd.bundle.min.js"
+        });
+      }else if (path.endsWith('package.json') && path.indexOf('spfx-182-webpart-react') > -1) { //adding library on the fly so we get at least one result
         const pConfig = JSON.parse(originalReadFileSync(path, 'utf8'));
         pConfig.dependencies['@pnp/pnpjs'] = '1.3.5';
         pConfig.dependencies['@pnp/tntjs'] = '1.3.5';
+        pConfig.dependencies['@pnp/logging'] = '1.3.5';
         return JSON.stringify(pConfig);
       }
       else {
@@ -349,7 +356,13 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
-    sinon.stub(request, 'post').callsFake(() => Promise.resolve(JSON.stringify({scriptType: 'module'})));
+    sinon.stub(request, 'post').callsFake((options: requestNative.OptionsWithUrl) => {
+      if((options.body as string).indexOf('tnt') > -1) {
+        return Promise.resolve(JSON.stringify({scriptType: 'module'}));
+      } else {
+        return Promise.resolve(JSON.stringify({scriptType: 'script'}));
+      }
+    });
     const originalWriteFileSync = fs.writeFileSync;
     sinon.stub(fs, 'writeFileSync').callsFake((path: string, value: string, encoding: string) => {
       if(path.endsWith('report.json')) {

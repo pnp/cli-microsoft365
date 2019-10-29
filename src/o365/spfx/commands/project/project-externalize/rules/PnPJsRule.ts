@@ -3,20 +3,87 @@ import { Project } from "../../project-upgrade/model";
 import { ExternalizeEntry } from "../model/ExternalizeEntry";
 
 export class PnPJsRule extends BasicDependencyRule {
-  public get ModuleName () {
-    return '@pnp/pnpjs';
-  }  
+  private pnpModules = [
+    {
+      key: "@pnp/odata",
+      globalName: "pnp.odata",
+      globalDependencies: [
+        "@pnp/common",
+        "@pnp/logging",
+        "tslib"
+      ]
+    } as ExternalizeEntry,
+    {
+      key: "@pnp/common",
+      globalName: "pnp.common",
+    } as ExternalizeEntry,
+    {
+      key: "@pnp/logging",
+      globalName: "pnp.logging",
+      globalDependencies: [
+        "tslib"
+      ]
+    } as ExternalizeEntry,
+    {
+      key: "@pnp/sp",
+      globalName: "pnp.sp",
+      globalDependencies: [
+        "@pnp/logging",
+        "@pnp/common",
+        "@pnp/odata",
+        "tslib"
+    ]} as ExternalizeEntry,
+    {
+      key: '@pnp/pnpjs',
+      globalName: 'pnp'
+    } as ExternalizeEntry,
+    {
+      key: '@pnp/sp-taxonomy',
+      globalName: 'pnp.sp-taxonomy',
+      globalDependencies: [
+        "@pnp/sp",
+        "@pnp/common",
+        "@pnp/sp-clientsvc"
+      ]
+    } as ExternalizeEntry,
+    {
+      key: '@pnp/sp-clientsvc',
+      globalName: 'pnp.sp-clientsvc',
+      globalDependencies: [
+        "@pnp/sp",
+        "@pnp/logging",
+        "@pnp/common",
+        "@pnp/odata",
+      ]
+    } as ExternalizeEntry
+  ]
   public visit(project: Project): Promise<ExternalizeEntry[]> {
-    if(project.packageJson) {
-      const version = project.packageJson.dependencies[this.ModuleName];
+    const findings = this.pnpModules.map(x => this.getModuleAndParents(project, x.key))
+                      .reduce((x, y) => [...x, ...y]);
+    if(findings.filter(x => x.key !== '@pnp/pnpjs').length > 0) {
+      findings.push({
+        key: 'tslib',
+        globalName: 'tslib',
+        path: `https://unpkg.com/tslib@^1.10.0/tslib.js`
+      })
+    }
+    return Promise.resolve(findings);
+  }
+  private getModuleAndParents = (project: Project, moduleName: string): ExternalizeEntry[] => {
+    const result: ExternalizeEntry[] = [];
+    const moduleConfiguration = this.pnpModules.find(x =>x.key === moduleName);
+    if(project.packageJson && moduleConfiguration) {
+      const version = project.packageJson.dependencies[moduleName]
       if(version) {
-        return Promise.resolve([{
-          key: this.ModuleName,
-          path: `https://unpkg.com/${this.ModuleName}@${version}/dist/pnpjs.es5.umd.bundle.min.js`,
-          globalName: 'pnp'
-        }]);
+        result.push({
+          ...moduleConfiguration,
+          path: `https://unpkg.com/${moduleConfiguration.key}@${version}/dist/${moduleName.replace('@pnp/', '')}.es5.umd${moduleName === '@pnp/common' || moduleName === ' @pnp/pnpjs' ? '.bundle': ''}.min.js`,
+        });
+        moduleConfiguration.globalDependencies && moduleConfiguration.globalDependencies.forEach(dependency => {
+          result.push(...this.getModuleAndParents(project, `@${dependency.replace('/', '.')}`));
+        });
       }
     }
-    return Promise.resolve([]);
+    return result;
   }
 }
