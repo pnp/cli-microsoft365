@@ -141,11 +141,15 @@ class SpfxProjectExternalizeCommand extends Command {
   private serializeJSONReport = (findingsToReport: ExternalizeEntry[]): string => {
     const result: ExternalConfiguration = {};
     findingsToReport.forEach((f) => {
-      result[f.key] = {
-        path: f.path,
-        globalName: f.globalName,
-        globalDependencies: f.globalDependencies
-      } as External;
+      if(f.globalName || f.globalDependencies && f.globalDependencies.length > 0) {
+        result[f.key] = {
+          path: f.path,
+          globalName: f.globalName,
+          globalDependencies: f.globalDependencies
+        } as External;
+      } else {
+        result[f.key] = f.path;
+      }
     });
     return JSON.stringify(result);
   }
