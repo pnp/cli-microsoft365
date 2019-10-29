@@ -26,6 +26,26 @@ class SpfxProjectExternalizeCommand extends Command {
   private projectVersion: string | undefined;
   private projectRootPath: string | null = null;
   private supportedVersions: string[] = [
+    '1.0.0',
+    '1.0.1',
+    '1.0.2',
+    '1.1.0',
+    '1.1.1',
+    '1.1.3',
+    '1.2.0',
+    '1.3.0',
+    '1.3.1',
+    '1.3.2',
+    '1.3.4',
+    '1.4.0',
+    '1.4.1',
+    '1.5.0',
+    '1.5.1',
+    '1.6.0',
+    '1.7.0',
+    '1.7.1',
+    '1.8.0',
+    '1.8.1',
     '1.8.2',
     '1.9.1'
   ];
