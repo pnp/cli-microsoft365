@@ -17,4 +17,3 @@ export * from './VsCodeSettingsJson';
 export * from './WriteManifestsJson';
 export * from './YoRcJson';
 export * from './ScssFile';
-export * from './ReportData';
