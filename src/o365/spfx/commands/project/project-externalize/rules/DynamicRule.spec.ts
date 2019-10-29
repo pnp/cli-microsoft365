@@ -44,6 +44,7 @@ describe('DynamicRule', () => {
       }
     });
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
+    sinon.stub(request, 'post').callsFake(() => Promise.resolve(JSON.stringify({scriptType: 'module'})));
     const findings = await rule.visit(project);
     assert.equal(findings.length, 1);
   });
@@ -69,6 +70,7 @@ describe('DynamicRule', () => {
       }
     });
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
+    sinon.stub(request, 'post').callsFake(() => Promise.resolve(JSON.stringify({scriptType: 'module'})));
     const findings = await rule.visit(project);
     assert.equal(findings.length, 1);
   });
@@ -119,6 +121,7 @@ describe('DynamicRule', () => {
       }
     });
     sinon.stub(request, 'head').callsFake(() => Promise.reject());
+    sinon.stub(request, 'post').callsFake(() => Promise.resolve(JSON.stringify({scriptType: 'module'})));
     const findings = await rule.visit(project);
     assert.equal(findings.length, 0);
   });
@@ -127,6 +130,7 @@ describe('DynamicRule', () => {
     Utils.restore([
       fs.readFileSync,
       request.head,
+      request.post,
     ]);
   });
 });
