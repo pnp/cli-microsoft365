@@ -147,8 +147,8 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       if (path.endsWith('.yo-rc.json')) {
         return `{
           "@microsoft/generator-sharepoint": {
-            "version": "1.4.1",
-            "libraryName": "spfx-141",
+            "version": "0.4.1",
+            "libraryName": "spfx-041",
             "libraryId": "dd1a0a8d-e043-4ca0-b9a4-256e82a66177",
             "environment": "spo"
           }
@@ -179,7 +179,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
       if (path.endsWith('package.json')) {
         return `{
-          "name": "spfx-141",
+          "name": "spfx-041",
           "version": "0.0.1",
           "private": true,
           "engines": {
