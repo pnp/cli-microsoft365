@@ -333,9 +333,15 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
           main: "./dist/pnpjs.es5.umd.bundle.js",
           module: "./dist/pnpjs.es5.umd.bundle.min.js"
         });
+      } else if (path.endsWith('package.json') && path.indexOf('tntjs') > -1) {
+        return JSON.stringify({
+          main: "./dist/tntjs.es5.umd.bundle.js",
+          module: "./dist/tntjs.es5.umd.bundle.min.js"
+        });
       } else if (path.endsWith('package.json') && path.indexOf('spfx-182-webpart-react') > -1) { //adding library on the fly so we get at least one result
         const pConfig = JSON.parse(originalReadFileSync(path, 'utf8'));
         pConfig.dependencies['@pnp/pnpjs'] = '1.3.5';
+        pConfig.dependencies['@pnp/tntjs'] = '1.3.5';
         return JSON.stringify(pConfig);
       }
       else {
