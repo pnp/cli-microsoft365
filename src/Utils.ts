@@ -508,4 +508,9 @@ export default class Utils {
   public static isValidFileName(input: string): boolean {
     return !!input && !/^((\..*)|COM\d|CLOCK\$|LPT\d|AUX|NUL|CON|PRN|(.*[\u{d800}-\u{dfff}]+.*))$/iu.test(input) && !/^(.*\.\..*)$/i.test(input);
   }
+
+  public static getSafeFileName(input: string): string {
+    return input
+      .replace(/'/g, "''")
+  }
 }

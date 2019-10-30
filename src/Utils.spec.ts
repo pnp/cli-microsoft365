@@ -845,4 +845,9 @@ describe('Utils', () => {
     const result = Utils.isJavascriptReservedWord('exampleword.layersecondsection.anotherpart');
     assert.strictEqual(result, false);
   });
+
+  it('should get safe filename when file\'name.txt', () => {
+    const result = Utils.getSafeFileName('file\'name.txt');
+    assert.strictEqual(result, 'file\'\'name.txt');
+  })
 });
