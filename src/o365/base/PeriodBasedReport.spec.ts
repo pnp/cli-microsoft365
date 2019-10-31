@@ -137,14 +137,14 @@ describe('PeriodBasedReport', () => {
     assert.notEqual(actual, true);
   });
 
-  it('gets the number of Microsoft Teams unique users by device type for the given period', (done) => {
+  it('get unique device type in teams and export it in a period', (done) => {
     const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
-      /*if (opts.url === `https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')`) {*/
+      if (opts.url === `https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')`) {
         return Promise.resolve(`
         Report Refresh Date,Web,Windows Phone,Android Phone,iOS,Mac,Windows,Report Period
         2019-08-28,0,0,0,0,0,0,7
         `);
-      /*}*/
+      }
 
       return Promise.reject('Invalid request');
     });
@@ -162,7 +162,7 @@ describe('PeriodBasedReport', () => {
     });
   });
 
-  it('gets the number of Microsoft Teams unique users by device type for the given period and export report data in txt format', (done) => {
+  it('produce export using period format and Teams unique device type output in txt', (done) => {
     const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')`) {
         return Promise.resolve(`
@@ -190,7 +190,7 @@ describe('PeriodBasedReport', () => {
     });
   });
 
-  it('gets the number of Microsoft Teams unique users by device type for the given period when output is json', (done) => {
+  it('produce export using period format and Teams unique device type output in json', (done) => {
     const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')`) {
         return Promise.resolve(`Report Refresh Date,Web,Windows Phone,Android Phone,iOS,Mac,Windows,Report Period
@@ -217,7 +217,7 @@ describe('PeriodBasedReport', () => {
     });
   });
 
-  it('gets the number of Microsoft Teams unique users by device type for the given period and export report data in txt format with output', (done) => {
+  it('produce export using period format and Teams unique users output in txt', (done) => {
     const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')`) {
         return Promise.resolve(`
@@ -244,7 +244,7 @@ describe('PeriodBasedReport', () => {
     });
   });
 
-  it('gets the number of Microsoft Teams unique users by device type for the given period and export report data in json format', (done) => {
+  it('produce export using period format and Teams unique users output in json', (done) => {
     const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')`) {
         return Promise.resolve(`
@@ -271,7 +271,7 @@ describe('PeriodBasedReport', () => {
     });
   });
 
-  it('gets the number of Microsoft Teams unique users by device type for the given period and export report data in json format with output', (done) => {
+  it('produce export using period format and Teams output in json', (done) => {
     const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')`) {
         return Promise.resolve(`Report Refresh Date,Web,Windows Phone,Android Phone,iOS,Mac,Windows,Report Period\n2019-08-28,0,0,0,0,0,0,7`);
