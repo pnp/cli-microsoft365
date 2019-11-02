@@ -41,15 +41,15 @@ class SpoHubSiteListCommand extends SpoCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     let hubSites: HubSite[];
-    let spoUrl: string = '';
+    let spoAdminUrl: string = '';
 
     this
-      .getSpoUrl(cmd, this.debug)
-      .then((_spoUrl: string): Promise<{ value: HubSite[]; }> => {
-        spoUrl = _spoUrl;
+      .getSpoAdminUrl(cmd, this.debug)
+      .then((_spoAdminUrl: string): Promise<{ value: HubSite[]; }> => {
+        spoAdminUrl = _spoAdminUrl;
 
         const requestOptions: any = {
-          url: `${spoUrl}/_api/hubsites`,
+          url: `${spoAdminUrl}/_api/hubsites`,
           headers: {
             accept: 'application/json;odata=nometadata'
           },
@@ -72,7 +72,7 @@ class SpoHubSiteListCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          url: `${spoUrl}/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/RenderListDataAsStream`,
+          url: `${spoAdminUrl}/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/RenderListDataAsStream`,
           headers: {
             accept: 'application/json;odata=nometadata'
           },
