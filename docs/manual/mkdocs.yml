@@ -382,6 +382,8 @@ nav:
     - 'Communication with Office 365': 'concepts/communicating-o365.md'
   - Examples:
     - 'Introduction': 'examples/index.md'
+    - Microsoft Graph:
+      - 'Authenticate with and call the Microsoft Graph' : 'examples/graph/call-graph.md'
     - SharePoint Online:
       - 'Delete custom color themes from SharePoint': 'examples/spo/remove-custom-themes.md'
       - 'Delete custom SharePoint site designs': 'examples/spo/remove-site-designs.md'
