@@ -1,6 +1,6 @@
 # Release notes
 
-## v2.2.0
+## [v2.2.0](https://github.com/pnp/office365-cli/releases/tag/v2.2.0)
 
 ### New commands
 
