@@ -1,5 +1,24 @@
 # Release notes
 
+## v2.3.0
+
+### New commands
+
+**SharePoint Framework**
+
+- [spfx project externalize](../cmd/spfx/project/project-externalize.md) - externalizes SharePoint Framework project dependencies [#571](https://github.com/pnp/office365-cli/issues/571)
+
+**Yammer**
+
+- [yammer message list](../cmd/yammer/message/message-list.md) - returns all accessible messages from the user's Yammer network [#1104](https://github.com/pnp/office365-cli/issues/1104)
+- [yammer user list](../cmd/yammer/user/user-list.md) - returns users from the current network [#1113](https://github.com/pnp/office365-cli/issues/1113)
+
+### Changes
+
+- added the 'Authenticate with and call the Microsoft Graph' example [#1186](https://github.com/pnp/office365-cli/issues/1186)
+- fixed the 'spo hubsite list' command [#1180](https://github.com/pnp/office365-cli/issues/1180)
+- fixed the 'spo file add' command [#1179](https://github.com/pnp/office365-cli/issues/1179)
+
 ## [v2.2.0](https://github.com/pnp/office365-cli/releases/tag/v2.2.0)
 
 ### New commands
