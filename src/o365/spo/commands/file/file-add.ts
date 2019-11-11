@@ -76,7 +76,7 @@ class SpoFileAddCommand extends SpoCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const folderPath: string = Utils.getServerRelativePath(args.options.webUrl, args.options.folder);
     const fullPath: string = path.resolve(args.options.path);
-    const fileName: string = path.basename(fullPath);
+    const fileName: string = Utils.getSafeFileName(path.basename(fullPath));
     const folderExtensions: FolderExtensions = new FolderExtensions(cmd, this.debug);
 
     let isCheckedOut: boolean = false;
@@ -89,6 +89,10 @@ class SpoFileAddCommand extends SpoCommand {
     if (this.debug) {
       cmd.log('Check if the specified folder exists.')
       cmd.log('');
+    }
+    
+    if (this.debug) {
+      cmd.log(`file name: ${fileName}...`);
     }
 
     const requestOptions: any = {
