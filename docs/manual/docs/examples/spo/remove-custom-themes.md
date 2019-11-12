@@ -1,4 +1,4 @@
-# Delete all custom color themes from SharePoint
+# Delete custom color themes from SharePoint
 
 Author: [Laura Kokkarinen](https://laurakokkarinen.com/does-it-spark-joy-powershell-scripts-for-keeping-your-development-environment-tidy-and-spotless/#delete-all-custom-color-themes-from-sharepoint)
 
@@ -41,7 +41,7 @@ while read theme; do
   fi
 done < <(o365 spo theme list -o json | jq -r '.[].name')
 
-if [ ${#sparksjoy[@]} = 0 ]; then
+if [ ${#themestoremove[@]} = 0 ]; then
   exit 1
 fi
 

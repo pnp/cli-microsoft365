@@ -49,6 +49,11 @@ class Request {
     return this.execute(options);
   }
 
+  public head<TResponse>(options: request.OptionsWithUrl): Promise<TResponse> {
+    options.method = 'HEAD';
+    return this.execute(options);
+  }
+
   private execute<TResponse>(options: request.OptionsWithUrl, resolve?: (res: TResponse) => void, reject?: (error: any) => void): Promise<TResponse> {
     if (!this._cmd) {
       return Promise.reject('Command reference not set on the request object');

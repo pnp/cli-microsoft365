@@ -6,6 +6,7 @@ import * as assert from 'assert';
 import Utils from '../../Utils';
 import request from '../../request';
 import appInsights from '../../appInsights';
+import auth from '../../Auth';
 
 describe(commands.TENANT_ID_GET, () => {
   let vorpal: Vorpal;
@@ -15,6 +16,8 @@ describe(commands.TENANT_ID_GET, () => {
 
   before(() => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
+    auth.service.connected = true;
   });
 
   beforeEach(() => {
@@ -41,8 +44,10 @@ describe(commands.TENANT_ID_GET, () => {
 
   after(() => {
     Utils.restore([
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      auth.restoreAuth
     ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {

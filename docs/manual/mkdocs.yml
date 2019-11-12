@@ -7,6 +7,7 @@ nav:
     - 'Logging in to Office 365': 'user-guide/connecting-office-365.md'
     - 'CLI output mode': 'user-guide/cli-output-mode.md'
   - Commands:
+    - consent: 'cmd/consent.md'
     - login: 'cmd/login.md'
     - logout: 'cmd/logout.md'
     - status: 'cmd/status.md'
@@ -30,7 +31,9 @@ nav:
         - o365group restore: 'cmd/aad/o365group/o365group-restore.md'
         - o365group set: 'cmd/aad/o365group/o365group-set.md'
         - o365group teamify: 'cmd/aad/o365group/o365group-teamify.md'
+        - o365group report activitycounts: 'cmd/aad/o365group/o365group-report-activitycounts.md'
         - o365group report activitydetail: 'cmd/aad/o365group/o365group-report-activitydetail.md'
+        - o365group report activitygroupcounts: 'cmd/aad/o365group/o365group-report-activitygroupcounts.md'
         - o365group user add: 'cmd/aad/o365group/o365group-user-add.md'
         - o365group user list: 'cmd/aad/o365group/o365group-user-list.md'
         - o365group user remove: 'cmd/aad/o365group/o365group-user-remove.md'
@@ -80,6 +83,7 @@ nav:
         - task list: 'cmd/planner/task/task-list.md'
     - SharePoint Framework (spfx):
       - project:
+        - project externalize: 'cmd/spfx/project/project-externalize.md'
         - project upgrade: 'cmd/spfx/project/project-upgrade.md'
     - SharePoint Online (spo):
       - get: 'cmd/spo/get.md'
@@ -366,8 +370,12 @@ nav:
     - Yammer (yammer):
       - message:
         - message get: 'cmd/yammer/message/message-get.md'
+        - message list: 'cmd/yammer/message/message-list.md'
       - network:
         - network list: 'cmd/yammer/network/network-list.md'
+      - user:
+        - user get: 'cmd/yammer/user/user-get.md'
+        - user list: 'cmd/yammer/user/user-list.md'
   - Concepts:
     - 'Persisting connection': 'concepts/persisting-connection.md'
     - 'Authorization and access tokens': 'concepts/authorization-tokens.md'
@@ -375,8 +383,11 @@ nav:
     - 'Communication with Office 365': 'concepts/communicating-o365.md'
   - Examples:
     - 'Introduction': 'examples/index.md'
+    - Microsoft Graph:
+      - 'Authenticate with and call the Microsoft Graph' : 'examples/graph/call-graph.md'
     - SharePoint Online:
-      - 'Delete all custom color themes from SharePoint': 'examples/spo/remove-custom-themes.md'
+      - 'Delete custom color themes from SharePoint': 'examples/spo/remove-custom-themes.md'
+      - 'Delete custom SharePoint site designs': 'examples/spo/remove-site-designs.md'
     - Microsoft Teams:
       - 'Deploy Microsoft Teams app from Azure DevOps': 'examples/teams/deploy-teams-app.md'
       - 'Govern orphaned Microsoft Teams': 'examples/teams/govern-orphan-teams.md'

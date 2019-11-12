@@ -221,6 +221,29 @@ describe('Request', () => {
       });
   });
 
+  it('sets method to HEAD for a HEAD request', (done) => {
+    sinon.stub(_request as any, 'req').callsFake((options) => {
+      _options = options;
+      return Promise.resolve();
+    });
+
+    _request
+      .head({
+        url: 'https://contoso.sharepoint.com/'
+      })
+      .then(() => {
+        try {
+          assert.equal(_options.method, 'HEAD');
+          done();
+        }
+        catch (err) {
+          done(err);
+        }
+      }, (err) => {
+        done(err);
+      });
+  });
+
   it('sets method to POST for a POST request', (done) => {
     sinon.stub(_request as any, 'req').callsFake((options) => {
       _options = options;
