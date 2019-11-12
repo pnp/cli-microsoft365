@@ -97,7 +97,7 @@ export default abstract class PeriodBasedReport extends GraphCommand {
       },
       {
         option: '-f, --outputFile [outputFile]',
-        description: 'Path to the file where the Microsoft Teams unique users by device type report should be stored in'
+        description: 'Path to the file where the report should be stored in'
       }
     ];
 
