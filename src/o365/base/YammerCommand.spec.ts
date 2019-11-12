@@ -219,7 +219,7 @@ describe('YammerCommand', () => {
     mock.handlePromiseError({
       statusCode: 404
     }, cmd, (err?: any) => {
-      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("Not found (404)")));
+      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("Not found", 404)));
     });
   });
 });

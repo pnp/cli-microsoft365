@@ -148,7 +148,7 @@ describe(commands.YAMMER_USER_GET, () => {
 
     cmdInstance.action({ options: { debug: false } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("Not found (404)")));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("Not found", 404)));
         done();
       }
       catch (e) {
