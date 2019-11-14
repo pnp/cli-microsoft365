@@ -135,7 +135,7 @@ describe(commands.FILE_ADD, () => {
   }
 
   before(() => {
-    sinon.stub(fs, 'readFileSync').returns(new Buffer('abc'));
+    sinon.stub(fs, 'readFileSync').returns(Buffer.from('abc'));
     ensureFolderStub = sinon.stub(FolderExtensions.prototype, 'ensureFolder').resolves();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
@@ -667,6 +667,61 @@ describe(commands.FILE_ADD, () => {
       }
       catch (e) {
         done(e);
+      }
+    });
+  });
+
+  it('sets field with the same name as a command option but different casing', (done) => {
+    stubGetResponses();
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf('/_api/web/GetFolderByServerRelativeUrl(') > -1) {
+        if (opts.url.indexOf('/CheckOut') > -1) {
+            return Promise.resolve({ "odata.null": true });
+        }
+        else if (opts.url.indexOf('Add') > -1) {
+            return Promise.resolve({ "CheckInComment": "", "CheckOutType": 0, "ContentTag": "{B0BC16BB-C8D9-4A24-BC04-FB52045F8BEF},428,159", "CustomizedPageStatus": 0, "ETag": "\"{B0BC16BB-C8D9-4A24-BC04-FB52045F8BEF},428\"", "Exists": true, "IrmEnabled": false, "Length": "165114", "Level": 255, "LinkingUri": null, "LinkingUrl": "", "MajorVersion": 51, "MinorVersion": 15, "Name": "MS365.jpg", "ServerRelativeUrl": "/sites/VelinDev/Shared Documents/t1/MS365.jpg", "TimeCreated": "2018-10-21T21:46:08Z", "TimeLastModified": "2018-10-25T23:49:52Z", "Title": "title4", "UIVersion": 26127, "UIVersionLabel": "51.15", "UniqueId": "b0bc16bb-c8d9-4a24-bc04-fb52045f8bef" });
+        }
+        else if (opts.url.indexOf('ValidateUpdateListItem') > -1) {
+          if (opts.body.formValues.filter((f: any) => f.FieldName === 'Folder').length > 0) {
+            return Promise.resolve({ "value": [{ "ErrorMessage": null, "FieldName": "Title", "FieldValue": "title4", "HasException": false, "ItemId": 212 }] });
+          }
+          else {
+            return Promise.reject('Field Folder missing');
+          }
+        }
+        else if (opts.url.indexOf('approve') > -1) {
+          return Promise.resolve({ "odata.null": true });
+        }
+        else if (opts.url.indexOf('publish') > -1) {
+            return Promise.resolve({ "odata.null": true });
+        } 
+        else if (opts.url.indexOf('UndoCheckOut') > -1) {
+            return Promise.resolve({ "odata.null": true });
+        }
+        else if (opts.url.indexOf('CheckIn') > -1) {
+          return Promise.resolve({ "odata.null": true });
+        }
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({
+      options: {
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        folder: 'Shared%20Documents/t1',
+        path: 'C:\Users\Velin\Desktop\MS365.jpg',
+        contentType: 'Picture',
+        Title: 'abc',
+        Folder: 'Folder',
+        publish: true
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        done();
+      }
+      catch (e) {
+        done(new Error(err.message));
       }
     });
   });
