@@ -554,22 +554,22 @@ class SpoFileAddCommand extends SpoCommand {
   private mapUnknownOptionsAsFieldValue(options: Options): FieldValue[] {
     const result: any = [];
     const excludeOptions: string[] = [
-      'weburl',
+      'webUrl',
       'folder',
       'path',
-      'contenttype',
-      'checkout',
-      'checkincomment',
+      'contentType',
+      'checkOut',
+      'checkInComment',
       'approve',
-      'approvecomment',
+      'approveComment',
       'publish',
-      'publishcomment',
+      'publishComment',
       'debug',
       'verbose'
     ];
 
     Object.keys(options).forEach(key => {
-      if (excludeOptions.indexOf(key.toLowerCase()) === -1) {
+      if (excludeOptions.indexOf(key) === -1) {
         result.push({ FieldName: key, FieldValue: (<any>options)[key].toString() });
       }
     });
