@@ -388,6 +388,7 @@ nav:
     - SharePoint Online:
       - 'Delete custom color themes from SharePoint': 'examples/spo/remove-custom-themes.md'
       - 'Delete custom SharePoint site designs': 'examples/spo/remove-site-designs.md'
+      - 'Lists active SharePoint site collection application catalogs': 'examples/spo/list-site-app-catalogs.md'
     - Microsoft Teams:
       - 'Deploy Microsoft Teams app from Azure DevOps': 'examples/teams/deploy-teams-app.md'
       - 'Govern orphaned Microsoft Teams': 'examples/teams/govern-orphan-teams.md'
