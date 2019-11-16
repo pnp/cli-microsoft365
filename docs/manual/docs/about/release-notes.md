@@ -10,6 +10,7 @@
 
 **Yammer**
 
+- [yammer message get](../cmd/yammer/message/message-get.md) - returns a Yammer message [#1105](https://github.com/pnp/office365-cli/issues/1105)
 - [yammer message list](../cmd/yammer/message/message-list.md) - returns all accessible messages from the user's Yammer network [#1104](https://github.com/pnp/office365-cli/issues/1104)
 - [yammer user list](../cmd/yammer/user/user-list.md) - returns users from the current network [#1113](https://github.com/pnp/office365-cli/issues/1113)
 
@@ -18,6 +19,8 @@
 - added the 'Authenticate with and call the Microsoft Graph' example [#1186](https://github.com/pnp/office365-cli/issues/1186)
 - fixed the 'spo hubsite list' command [#1180](https://github.com/pnp/office365-cli/issues/1180)
 - fixed the 'spo file add' command [#1179](https://github.com/pnp/office365-cli/issues/1179)
+- added case-sensitive option parsing [#1182](https://github.com/pnp/office365-cli/issues/1182)
+- added 'Lists active SharePoint site collection application catalogs' sample [#1194](https://github.com/pnp/office365-cli/issues/1194)
 
 ## [v2.2.0](https://github.com/pnp/office365-cli/releases/tag/v2.2.0)
 
