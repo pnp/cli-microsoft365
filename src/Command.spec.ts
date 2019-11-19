@@ -82,6 +82,14 @@ class MockCommand1 extends Command {
       }
     ];
   }
+
+  public trackUnknownOptionsPublic(telemetryProps: any, options: any) {
+    return this.trackUnknownOptions(telemetryProps, options);
+  }
+
+  public addUnknownOptionsToPayloadPublic(payload: any, options: any) {
+    return this.addUnknownOptionsToPayload(payload, options);
+  }
 }
 
 class MockCommand2 extends Command {
@@ -696,5 +704,34 @@ describe('Command', () => {
         done(e);
       }
     });
+  });
+
+  it('tracks the use of unknown options in telemetry', () => {
+    const command = new MockCommand1();
+    const actual = {
+      prop1: true
+    };
+    const expected = JSON.stringify({
+      prop1: true,
+      // this is expected, because we're not tracking the actual value but rather
+      // whether the property is used or not, so the tracked value for an unknown
+      // property will be always true
+      Prop2: true
+    });
+    command.trackUnknownOptionsPublic(actual, { Prop2: false });
+    assert.equal(JSON.stringify(actual), expected);
+  });
+
+  it('adds unknown options to payload', () => {
+    const command = new MockCommand1();
+    const actual = {
+      prop1: true
+    };
+    const expected = JSON.stringify({
+      prop1: true,
+      Prop2: false
+    });
+    command.addUnknownOptionsToPayloadPublic(actual, { Prop2: false })
+    assert.equal(JSON.stringify(actual), expected);
   });
 });

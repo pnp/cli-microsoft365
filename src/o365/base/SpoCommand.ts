@@ -4,6 +4,7 @@ import request from '../../request';
 import { SpoOperation } from '../spo/commands/site/SpoOperation';
 import config from '../../config';
 import { FormDigestInfo, ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../spo/spo';
+const csomDefs = require('../../../csom.json');
 
 export interface FormDigest {
   formDigestValue: string;
@@ -232,5 +233,28 @@ export default abstract class SpoCommand extends Command {
           }
         });
     });
+  }
+
+  protected validateUnknownOptions(options: any, csomObject: string, csomPropertyType: 'get' | 'set'): string | boolean {
+    const unknownOptions: any = this.getUnknownOptions(options);
+    const optionNames: string[] = Object.getOwnPropertyNames(unknownOptions);
+    if (optionNames.length === 0) {
+      return true;
+    }
+
+    for (let i: number = 0; i < optionNames.length; i++) {
+      const optionName: string = optionNames[i];
+      const csomOptionType: string = csomDefs[csomObject][csomPropertyType][optionName];
+
+      if (!csomOptionType) {
+        return `${optionName} is not a valid ${csomObject} property`;
+      }
+
+      if (['Boolean', 'String', 'Int32'].indexOf(csomOptionType) < 0) {
+        return `Unknown properties of type ${csomOptionType} are not yet supported`;
+      }
+    }
+
+    return true;
   }
 }

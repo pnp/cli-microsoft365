@@ -375,4 +375,32 @@ export default abstract class Command {
 
     return args;
   }
+
+  protected getUnknownOptions(options: any): any {
+    const unknownOptions: any = JSON.parse(JSON.stringify(options));
+    const knownOptions: CommandOption[] = this.options();
+    const optionRegex: RegExp = /--([^\s]+)/;
+    knownOptions.forEach(o => {
+      const optionName: string = (optionRegex.exec(o.option) as RegExpExecArray)[1];
+      delete unknownOptions[optionName];
+    });
+
+    return unknownOptions;
+  }
+
+  protected trackUnknownOptions(telemetryProps: any, options: any) {
+    const unknownOptions: any = this.getUnknownOptions(options);
+    const unknownOptionsNames: string[] = Object.getOwnPropertyNames(unknownOptions);
+    unknownOptionsNames.forEach(o => {
+      telemetryProps[o] = true;
+    });
+  }
+
+  protected addUnknownOptionsToPayload(payload: any, options: any) {
+    const unknownOptions: any = this.getUnknownOptions(options);
+    const unknownOptionsNames: string[] = Object.getOwnPropertyNames(unknownOptions);
+    unknownOptionsNames.forEach(o => {
+      payload[o] = unknownOptions[o];
+    });
+  }
 }

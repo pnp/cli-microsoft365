@@ -22,6 +22,10 @@ class MockCommand extends SpoCommand {
 
   public commandHelp(args: any, log: (message: string) => void): void {
   }
+
+  public validateUnknownOptionsPublic(options: any, csomObject: string, csomPropertyType: 'get' | 'set'): string | boolean {
+    return this.validateUnknownOptions(options, csomObject, csomPropertyType);
+  }
 }
 
 describe('SpoCommand', () => {
@@ -31,7 +35,7 @@ describe('SpoCommand', () => {
 
   before(() => {
     auth.service.connected = true;
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
   })
 
   beforeEach(() => {
@@ -653,5 +657,25 @@ describe('SpoCommand', () => {
           done(e);
         }
       });
+  });
+
+  it('passes validation of unknown properties when no unknown properties are set', () => {
+    const command = new MockCommand();
+    assert.strictEqual(command.validateUnknownOptionsPublic({}, 'web', 'set'), true);
+  });
+
+  it('passes validation of unknown properties when valid unknown properties specified', () => {
+    const command = new MockCommand();
+    assert.strictEqual(command.validateUnknownOptionsPublic({ AllowAutomaticASPXPageIndexing: true }, 'web', 'set'), true);
+  });
+
+  it('fails validation of unknown properties when invalid unknown property specified', () => {
+    const command = new MockCommand();
+    assert.notStrictEqual(command.validateUnknownOptionsPublic({ AllowCreateDeclarativeWorkflow: true }, 'web', 'set'), true);
+  });
+
+  it('fails validation of unknown properties when unknown property of unsupported type specified', () => {
+    const command = new MockCommand();
+    assert.notStrictEqual(command.validateUnknownOptionsPublic({ AssociatedMemberGroup: {} }, 'web', 'set'), true);
   });
 });
