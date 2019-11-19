@@ -27,6 +27,10 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
+## Remarks
+
+Next to updating web properties corresponding to the options of this command, you can update the value of any other web property using its CSOM name, eg. `--AllowAutomaticASPXPageIndexing`. At this moment, the CLI supports properties of types `Boolean`, `String` and `Int32`.
+
 ## Examples
 
 Update subsite title
@@ -70,3 +74,7 @@ Set search scope to tenant scope
 ```sh
 spo web set --webUrl https://contoso.sharepoint.com/sites/team-a --searchScope tenant
 ```
+
+## More information
+
+- Web properties: [https://docs.microsoft.com/en-us/previous-versions/office/sharepoint-server/ee545886(v=office.15)](https://docs.microsoft.com/en-us/previous-versions/office/sharepoint-server/ee545886(v=office.15))

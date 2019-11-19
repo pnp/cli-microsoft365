@@ -26,7 +26,7 @@ interface Options extends GlobalOptions {
 }
 
 class SpoWebSetCommand extends SpoCommand {
-  private static searchScopeOptions: string[] =          
+  private static searchScopeOptions: string[] =
     ['defaultscope', 'tenant', 'hub', 'site'];
 
   public get name(): string {
@@ -48,11 +48,15 @@ class SpoWebSetCommand extends SpoCommand {
     telemetryProps.quickLaunchEnabled = typeof args.options.quickLaunchEnabled !== 'undefined';
     telemetryProps.footerEnabled = typeof args.options.footerEnabled !== 'undefined';
     telemetryProps.searchScope = args.options.searchScope !== 'undefined';
+    this.trackUnknownOptions(telemetryProps, args.options);
     return telemetryProps;
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     const payload: any = {};
+
+    this.addUnknownOptionsToPayload(payload, args.options);
+
     if (args.options.title) {
       payload.Title = args.options.title;
     }
@@ -105,6 +109,10 @@ class SpoWebSetCommand extends SpoCommand {
 
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+  }
+
+  public allowUnknownOptions(): boolean | undefined {
+    return true;
   }
 
   public options(): CommandOption[] {
@@ -215,14 +223,22 @@ class SpoWebSetCommand extends SpoCommand {
         }
       }
 
-      return true;
+      return this.validateUnknownOptions(args.options, 'web', 'set');
     };
   }
 
   public commandHelp(args: {}, log: (help: string) => void): void {
+    const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  Examples:
+      `  Remarks:
+
+    Next to updating web properties corresponding to the options of this
+    command, you can update the value of any other web property using its
+    CSOM name, eg. ${chalk.grey('--AllowAutomaticASPXPageIndexing')}. At this
+    moment, the CLI supports properties of types Boolean, String and Int32.
+      
+  Examples:
   
     Update subsite title
       ${commands.WEB_SET} --webUrl https://contoso.sharepoint.com/sites/team-a --title Team-a
@@ -244,6 +260,11 @@ class SpoWebSetCommand extends SpoCommand {
 
     Set search scope to tenant scope
       ${commands.WEB_SET} --webUrl https://contoso.sharepoint.com/sites/team-a --searchScope tenant
+  
+  More information:
+    
+    Web properties
+      https://docs.microsoft.com/en-us/previous-versions/office/sharepoint-server/ee545886(v=office.15)
   ` );
   }
 }
