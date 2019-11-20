@@ -8,10 +8,10 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 interface CommandArgs {
-  options: Options;
+  options: UsagePeriodOptions;
 }
 
-interface Options extends GlobalOptions {
+export interface UsagePeriodOptions extends GlobalOptions {
   period: string;
   outputFile?: string;
 }
@@ -21,16 +21,18 @@ export default abstract class PeriodBasedReport extends GraphCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.period = args.options.period;
     telemetryProps.outputFile = typeof args.options.outputFile !== 'undefined';
     return telemetryProps;
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const endpoint: string = `${this.resource}/v1.0/reports/${this.usageEndPoint}(period='${encodeURIComponent(args.options.period)}')`;
+    const endPoint: string = `${this.resource}/v1.0/reports/${this.usageEndPoint}(period='${encodeURIComponent(args.options.period)}')`;
+    this.executeReport(endPoint, cmd, args, cb);
+  }
 
+  protected executeReport(endPoint: string, cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const requestOptions: any = {
-      url: endpoint,
+      url: endPoint,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -114,7 +116,7 @@ export default abstract class PeriodBasedReport extends GraphCommand {
       if (['D7', 'D30', 'D90', 'D180'].indexOf(args.options.period) < 0) {
         return `${args.options.period} is not a valid period type. The supported values are D7|D30|D90|D180`;
       }
-
+      
       if (args.options.outputFile && !fs.existsSync(path.dirname(args.options.outputFile))) {
         return `The specified path ${path.dirname(args.options.outputFile)} doesn't exist`;
       }
