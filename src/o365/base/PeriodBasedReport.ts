@@ -8,29 +8,38 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 interface CommandArgs {
-  options: Options;
+  options: UsagePeriodOptions;
 }
 
-interface Options extends GlobalOptions {
+interface OutputFileCommandArgs {
+  options: OutputFileOptions;
+}
+
+interface UsagePeriodOptions extends OutputFileOptions {
   period: string;
+}
+
+export interface OutputFileOptions extends GlobalOptions {
   outputFile?: string;
 }
 
 export default abstract class PeriodBasedReport extends GraphCommand {
-  public abstract get usageEndPoint(): string;
+  public abstract get usageEndpoint(): string;
 
-  public getTelemetryProperties(args: CommandArgs): any {
+  public getTelemetryProperties(args: OutputFileCommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.period = args.options.period;
     telemetryProps.outputFile = typeof args.options.outputFile !== 'undefined';
     return telemetryProps;
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const endpoint: string = `${this.resource}/v1.0/reports/${this.usageEndPoint}(period='${encodeURIComponent(args.options.period)}')`;
+    const endpoint: string = `${this.resource}/v1.0/reports/${this.usageEndpoint}(period='${encodeURIComponent(args.options.period)}')`;
+    this.executeReport(endpoint, cmd, args.options.output, args.options.outputFile, cb);
+  }
 
+  protected executeReport(endPoint: string, cmd: CommandInstance, output: string | undefined, outputFile: string | undefined, cb: () => void): void {
     const requestOptions: any = {
-      url: endpoint,
+      url: endPoint,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -43,7 +52,7 @@ export default abstract class PeriodBasedReport extends GraphCommand {
         let content: string = '';
         let cleanResponse = this.removeEmptyLines(res);
 
-        if (args.options.output && args.options.output.toLowerCase() === 'json') {
+        if (output && output.toLowerCase() === 'json') {
           const reportData: any = this.getReport(cleanResponse);
           content = JSON.stringify(reportData);
         }
@@ -51,13 +60,13 @@ export default abstract class PeriodBasedReport extends GraphCommand {
           content = cleanResponse;
         }
 
-        if (!args.options.outputFile) {
+        if (!outputFile) {
           cmd.log(content);
         }
         else {
-          fs.writeFileSync(args.options.outputFile, content, 'utf8');
+          fs.writeFileSync(outputFile, content, 'utf8');
           if (this.verbose) {
-            cmd.log(`File saved to path '${args.options.outputFile}'`);
+            cmd.log(`File saved to path '${outputFile}'`);
           }
         }
 
@@ -111,15 +120,20 @@ export default abstract class PeriodBasedReport extends GraphCommand {
         return 'Required parameter period missing';
       }
 
-      if (['D7', 'D30', 'D90', 'D180'].indexOf(args.options.period) < 0) {
-        return `${args.options.period} is not a valid period type. The supported values are D7|D30|D90|D180`;
-      }
-
       if (args.options.outputFile && !fs.existsSync(path.dirname(args.options.outputFile))) {
         return `The specified path ${path.dirname(args.options.outputFile)} doesn't exist`;
       }
 
-      return true;
+      return this.validatePeriod(args.options.period);
     };
+  }
+
+  protected validatePeriod(period: string | undefined): boolean | string {
+    if (period &&
+      ['D7', 'D30', 'D90', 'D180'].indexOf(period) < 0) {
+      return `${period} is not a valid period type. The supported values are D7|D30|D90|D180`;
+    }
+
+    return true;
   }
 }

@@ -8,7 +8,7 @@ class TeamsReportDeviceUsageDistributionUserCountsCommand extends PeriodBasedRep
     return `${commands.TEAMS_REPORT_DEVICEUSAGEDISTRIBUTIONUSERCOUNTS}`;
   }
 
-  public get usageEndPoint(): string {
+  public get usageEndpoint(): string {
     return 'getTeamsDeviceUsageDistributionUserCounts';
   }
 
