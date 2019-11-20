@@ -20,11 +20,14 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    //mock getSpoUrl
+    sinon.stub(request, 'get').callsFake((opts) => {      
+      return Promise.resolve({ webUrl: 'https://contoso.sharepoint.com' });
+    });
     sinon.stub((command as any), 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'abc'
     }));
     auth.service.connected = true;
-    auth.service.spoUrl = 'https://contoso.sharepoint.com';
 
     stubAllPostRequests  = (
       contentTypeHubRetrievalResp: any = null
@@ -83,7 +86,6 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
       appInsights.trackEvent
     ]);
     auth.service.connected = false;
-    auth.service.spoUrl = undefined;
   });
 
   it('has correct name', () => {
