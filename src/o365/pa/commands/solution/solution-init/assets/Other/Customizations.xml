@@ -10,6 +10,7 @@
   <OrganizationSettings />
   <optionsets />
   <CustomControls />
+  <SolutionPluginAssemblies />
   <EntityDataProviders />
   <Languages>
     <Language>1033</Language>

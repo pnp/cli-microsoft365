@@ -250,7 +250,7 @@ Disable-PnPTenantServicePrincipal|SharePointPnPPowerShellOnline|[spo serviceprin
 Disconnect-PnPHubSite|SharePointPnPPowerShellOnline|[spo hubsite disconnect](../cmd/spo/hubsite/hubsite-disconnect.md)
 Disconnect-PnPOnline|SharePointPnPPowerShellOnline|[logout](../cmd/logout.md)
 Enable-PnPCommSite|SharePointPnPPowerShellOnline|[spo site commsite enable](../cmd/spo/site/site-commsite-enable.md)
-Enable-PnPFeature|SharePointPnPPowerShellOnline|
+Enable-PnPFeature|SharePointPnPPowerShellOnline|[spo feature enable](../cmd/spo/feature/feature-enable.md)
 Enable-PnPInPlaceRecordsManagementForSite|SharePointPnPPowerShellOnline|
 Enable-PnPPowerShellTelemetry|SharePointPnPPowerShellOnline|
 Enable-PnPResponsiveUI|SharePointPnPPowerShellOnline|
@@ -585,7 +585,7 @@ Get-PowerAppRoleAssignment|Microsoft.PowerApps.PowerShell|
 Get-PowerAppsNotification|Microsoft.PowerApps.PowerShell|
 Get-PowerAppVersion|Microsoft.PowerApps.PowerShell|
 Publish-PowerApp|Microsoft.PowerApps.PowerShell|
-Remove-Flow|Microsoft.PowerApps.PowerShell|
+Remove-Flow|Microsoft.PowerApps.PowerShell|[flow remove](../cmd/flow/remove.md)
 Remove-FlowOwnerRole|Microsoft.PowerApps.PowerShell|
 Remove-PowerApp|Microsoft.PowerApps.PowerShell|
 Remove-PowerAppConnection|Microsoft.PowerApps.PowerShell|

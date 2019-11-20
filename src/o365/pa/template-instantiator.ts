@@ -5,7 +5,7 @@ import { SolutionInitVariables } from "./commands/solution/solution-init/solutio
 
 /*
  * Logic extracted from bolt.cli.dll
- * Version: 0.4.3
+ * Version: 1.0.6
  * Class: bolt.cli.TemplateInstantiator
  */
 export default class TemplateInstantiator {
