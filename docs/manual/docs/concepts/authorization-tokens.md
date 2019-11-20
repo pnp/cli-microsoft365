@@ -18,22 +18,24 @@ When specifying a custom Azure AD application to be used by the Office 365 CLI, 
 
 Office 365 CLI requires the following permissions to Office 365 services:
 
-- Office 365 SharePoint Online (Microsoft.SharePoint)
-    - Have full control of all site collections
-    - Read user profiles
-    - Read and write managed metadata
+- Office 365 SharePoint Online
+  - Have full control of all site collections
+  - Read user profiles
+  - Read and write managed metadata
 - Microsoft Graph
-    - Invite guest users to the organization
-    - Read and write all groups
-    - Read and write directory data
-    - Access directory as the signed in user
-    - Read and write identity providers
-    - Send mail as a user
-    - Read and write to all app catalogs
+  - Invite guest users to the organization
+  - Read and write all groups
+  - Read and write directory data
+  - Access directory as the signed in user
+  - Read and write identity providers
+  - Send mail as a user
+  - Read and write to all app catalogs
 - Windows Azure Active Directory
-    - Access the directory as the signed-in user
+  - Access the directory as the signed-in user
 - Windows Azure Service Management API
-    - Access Azure Service Management as organization users
+  - Access Azure Service Management as organization users
+- Yammer
+  - Read and write to the Yammer platform
 
 !!! attention
     After changing the ID of the Azure AD application used by the Office 365 CLI refresh the existing connection to Office 365 using the `login` command. If you try to use the existing connection, Office 365 CLI will fail when trying to refresh the existing access token.
@@ -49,3 +51,7 @@ Each command in the Office 365 CLI belongs to a service, for example the [spo si
 ## Communicating with Office 365
 
 Before a command can log in to Office 365, it requires a valid access token. Office 365 CLI automatically obtains the access token for the particular web request without you having to worry about it.
+
+## Yammer commands are executed in the context of the current logged in user
+
+Yammer commands require the delegated 'user_impersonation' permission to be granted for the Azure AD application. Yammer commands are executed in the context of the currently logged in user. Certificate-based authentication with app_only permissions is currently not supported by Azure AD.

@@ -7,6 +7,7 @@ nav:
     - 'Logging in to Office 365': 'user-guide/connecting-office-365.md'
     - 'CLI output mode': 'user-guide/cli-output-mode.md'
   - Commands:
+    - consent: 'cmd/consent.md'
     - login: 'cmd/login.md'
     - logout: 'cmd/logout.md'
     - status: 'cmd/status.md'
@@ -30,6 +31,9 @@ nav:
         - o365group restore: 'cmd/aad/o365group/o365group-restore.md'
         - o365group set: 'cmd/aad/o365group/o365group-set.md'
         - o365group teamify: 'cmd/aad/o365group/o365group-teamify.md'
+        - o365group report activitycounts: 'cmd/aad/o365group/o365group-report-activitycounts.md'
+        - o365group report activitydetail: 'cmd/aad/o365group/o365group-report-activitydetail.md'
+        - o365group report activitygroupcounts: 'cmd/aad/o365group/o365group-report-activitygroupcounts.md'
         - o365group user add: 'cmd/aad/o365group/o365group-user-add.md'
         - o365group user list: 'cmd/aad/o365group/o365group-user-list.md'
         - o365group user remove: 'cmd/aad/o365group/o365group-user-remove.md'
@@ -55,6 +59,7 @@ nav:
       - export: 'cmd/flow/export.md'
       - get: 'cmd/flow/get.md'
       - list: 'cmd/flow/list.md'
+      - remove: 'cmd/flow/remove.md'
       - environment:
         - environment get: 'cmd/flow/environment/environment-get.md'
         - environment list: 'cmd/flow/environment/environment-list.md'
@@ -72,6 +77,7 @@ nav:
         - pcf init: 'cmd/pa/pcf/pcf-init.md'
       - solution:
         - solution init: 'cmd/pa/solution/solution-init.md'
+        - solution reference add: 'cmd/pa/solution/solution-reference-add.md'
     - Microsoft Planner (planner):
       - task:
         - task list: 'cmd/planner/task/task-list.md'
@@ -93,6 +99,7 @@ nav:
         - app upgrade: 'cmd/spo/app/app-upgrade.md'
       - apppage:
         - apppage add: 'cmd/spo/apppage/apppage-add.md'
+        - apppage set: 'cmd/spo/apppage/apppage-set.md'
       - cdn:
         - cdn get: 'cmd/spo/cdn/cdn-get.md'
         - cdn origin add: 'cmd/spo/cdn/cdn-origin-add.md'
@@ -119,6 +126,7 @@ nav:
       - externaluser:
         - externaluser list: 'cmd/spo/externaluser/externaluser-list.md'
       - feature:
+        - feature enable: 'cmd/spo/feature/feature-enable.md'
         - feature list: 'cmd/spo/feature/feature-list.md'
       - field:
         - field add: 'cmd/spo/field/field-add.md'
@@ -329,6 +337,7 @@ nav:
       - message:
         - message get: 'cmd/teams/message/message-get.md'
         - message list: 'cmd/teams/message/message-list.md'
+        - message reply list: 'cmd/teams/message/message-reply-list.md'
       - messagingsettings:
         - messagingsettings list: 'cmd/teams/messagingsettings/messagingsettings-list.md'
         - messagingsettings set: 'cmd/teams/messagingsettings/messagingsettings-set.md'
@@ -357,16 +366,24 @@ nav:
     - Office 365 (tenant):
       - id:
         - id get: 'cmd/tenant-id-get.md'
-    - PowerApps (pa):
-      - pcf:
-        - pcf init: 'cmd/pa/pcf/pcf-init.md'
-      - solution:
-        - solution init: 'cmd/pa/solution/solution-init.md'
+    - Yammer (yammer):
+      - network:
+        - network list: 'cmd/yammer/network/network-list.md'
+      - user:
+        - user get: 'cmd/yammer/user/user-get.md'
   - Concepts:
     - 'Persisting connection': 'concepts/persisting-connection.md'
     - 'Authorization and access tokens': 'concepts/authorization-tokens.md'
     - 'Command completion': 'concepts/completion.md'
     - 'Communication with Office 365': 'concepts/communicating-o365.md'
+  - Examples:
+    - 'Introduction': 'examples/index.md'
+    - SharePoint Online:
+      - 'Delete custom color themes from SharePoint': 'examples/spo/remove-custom-themes.md'
+      - 'Delete custom SharePoint site designs': 'examples/spo/remove-site-designs.md'
+    - Microsoft Teams:
+      - 'Deploy Microsoft Teams app from Azure DevOps': 'examples/teams/deploy-teams-app.md'
+      - 'Govern orphaned Microsoft Teams': 'examples/teams/govern-orphan-teams.md'
   - About:
     - 'Why this CLI': 'about/why-cli.md'
     - 'Comparison to SharePoint and Office 365 PowerShell': 'about/comparison-powershell.md'
@@ -390,6 +407,7 @@ markdown_extensions:
       guess_lang: false
   - toc:
       permalink: true
+  - pymdownx.superfences
 extra:
   social:
     - type: 'twitter'

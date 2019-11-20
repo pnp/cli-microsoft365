@@ -20,6 +20,7 @@ export default {
   TEAMS_MEMBERSETTINGS_SET: `${prefix} membersettings set`,
   TEAMS_MESSAGE_GET: `${prefix} message get`,
   TEAMS_MESSAGE_LIST: `${prefix} message list`,
+  TEAMS_MESSAGE_REPLY_LIST: `${prefix} message reply list`,
   TEAMS_MESSAGINGSETTINGS_LIST: `${prefix} messagingsettings list`,
   TEAMS_MESSAGINGSETTINGS_SET: `${prefix} messagingsettings set`,
   TEAMS_REPORT_DEVICEUSAGEDISTRIBUTIONUSERCOUNTS: `${prefix} report deviceusagedistributionusercounts`,

@@ -26,7 +26,7 @@ interface Options extends GlobalOptions {
 
 /*
  * Logic extracted from bolt.module.solution.dll
- * Version: 0.4.3
+ * Version: 1.0.6
  * Class: bolt.module.solution.SolutionInitVerb
  */
 class PaSolutionInitCommand extends Command {
@@ -55,10 +55,12 @@ class PaSolutionInitCommand extends Command {
       const workingDirectoryName: string = path.basename(workingDirectory);
       const cdsAssetsDirectory: string = path.join(workingDirectory, 'Other');
       const cdsAssetsDirectorySolutionsFile: string = path.join(workingDirectory, 'Other', 'Solution.xml');
-      const customizationOptionValuePrefix: string = this.generateOptionValuePrefixForPublisher(args.options.publisherPrefix);
+      const publisherName: string = args.options.publisherName;
+      const publisherPrefix: string = args.options.publisherPrefix.toLocaleLowerCase();
+      const customizationOptionValuePrefix: string = this.generateOptionValuePrefixForPublisher(publisherPrefix);
       const variables: SolutionInitVariables = {
-        "$publisherName$": args.options.publisherName,
-        "$customizationPrefix$": args.options.publisherPrefix,
+        "$publisherName$": publisherName,
+        "$customizationPrefix$": publisherPrefix,
         "$customizationOptionValuePrefix$": customizationOptionValuePrefix,
         "$cdsProjectGuid$": uuidv4(),
         "solutionprojecttype": workingDirectoryName,
@@ -66,8 +68,8 @@ class PaSolutionInitCommand extends Command {
       };
 
       if (this.verbose) {
-        cmd.log(`publisherName: ${args.options.publisherName}`);
-        cmd.log(`publisherPrefix: ${args.options.publisherPrefix}`);
+        cmd.log(`publisherName: ${publisherName}`);
+        cmd.log(`publisherPrefix: ${publisherPrefix}`);
         cmd.log(`customizationOptionValuePrefix: ${customizationOptionValuePrefix}`);
         cmd.log(`solutionInitTemplatePath: ${solutionInitTemplatePath}`);
         cmd.log(`cdsAssetsTemplatePath: ${cdsAssetsTemplatePath}`);
@@ -91,7 +93,7 @@ class PaSolutionInitCommand extends Command {
       }
       else {
         TemplateInstantiator.instantiate(cmd, cdsAssetsTemplatePath, cdsAssetsDirectory, false, variables, this.verbose);
-        cmd.log(vorpal.chalk.green(`CDS solution files were successfully created for this project in the sub-directory 'Other', using solution name '${workingDirectory}', publisher name '${args.options.publisherName}', and customization prefix '${args.options.publisherPrefix}'.`));
+        cmd.log(vorpal.chalk.green(`CDS solution files were successfully created for this project in the sub-directory 'Other', using solution name '${workingDirectory}', publisher name '${publisherName}', and customization prefix '${publisherPrefix}'.`));
         cmd.log(`Please verify the publisher information and solution name found in the '${vorpal.chalk.grey('Solution.xml')}' file.`);
       }
 
@@ -120,7 +122,7 @@ class PaSolutionInitCommand extends Command {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (fs.readdirSync(process.cwd()).some(fn => fn.endsWith('proj'))) {
+      if (fs.readdirSync(process.cwd()).some(fn => path.extname(fn).toLowerCase() === '.cdsproj')) {
         return 'CDS project creation failed. The current directory already contains a project. Please create a new directory and retry the operation.';
       }
 
