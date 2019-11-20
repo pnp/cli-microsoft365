@@ -157,6 +157,22 @@ describe('YammerCommand', () => {
 
   });
 
+  it('displays 404 error message from Yammer', () => {
+    const cmd = {
+      commandWrapper: {
+        command: 'command'
+      },
+      log: (msg?: string) => { },
+      prompt: () => { }
+    };
+    const mock = new MockCommand();
+    mock.handlePromiseError({
+      statusCode: 404
+    }, cmd, (err?: any) => {
+      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("Not found (404)")));
+    });
+  });
+
   it('displays error message not from Yammer (1)', () => {
     const cmd = {
       commandWrapper: {
@@ -171,7 +187,6 @@ describe('YammerCommand', () => {
     }, cmd, (err?: any) => {
       assert.equal(JSON.stringify(err), JSON.stringify({ "message": { "error": "not from Yammer" } }));
     });
-
   });
 
   it('displays error message not from Yammer (2)', () => {
@@ -187,22 +202,6 @@ describe('YammerCommand', () => {
       message: "test"
     }, cmd, (err?: any) => {
       assert.equal(JSON.stringify(err), JSON.stringify({ "message": { "message": "test" } }));
-    });
-  });
-
-  it('displays 404 error message from Yammer', () => {
-    const cmd = {
-      commandWrapper: {
-        command: 'command'
-      },
-      log: (msg?: string) => { },
-      prompt: () => { }
-    };
-    const mock = new MockCommand();
-    mock.handlePromiseError({
-      statusCode: 404
-    }, cmd, (err?: any) => {
-      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("Not found (404)")));
     });
   });
 });
