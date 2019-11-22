@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import request from '../../../../../../request';
 
 export class DynamicRule extends BasicDependencyRule {
-  private restrictedModules = ['react', 'react-dom'];
+  private restrictedModules = ['react', 'react-dom', '@pnp/sp-clientsvc', '@pnp/sp-taxonomy'];
   private restrictedNamespaces = ['@types/', '@microsoft/'];
 
   public async visit(project: Project): Promise<ExternalizeEntry[]> {

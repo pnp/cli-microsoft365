@@ -37,25 +37,6 @@ export class PnPJsRule extends BasicDependencyRule {
     {
       key: '@pnp/pnpjs',
       globalName: 'pnp'
-    },
-    {
-      key: '@pnp/sp-taxonomy',
-      globalName: 'pnp.sp-taxonomy',
-      globalDependencies: [
-        "@pnp/sp",
-        "@pnp/common",
-        "@pnp/sp-clientsvc"
-      ]
-    },
-    {
-      key: '@pnp/sp-clientsvc',
-      globalName: 'pnp.sp-clientsvc',
-      globalDependencies: [
-        "@pnp/sp",
-        "@pnp/logging",
-        "@pnp/common",
-        "@pnp/odata",
-      ]
     }
   ];
 
