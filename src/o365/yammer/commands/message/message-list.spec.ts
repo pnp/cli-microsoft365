@@ -117,6 +117,36 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
     assert.notEqual(actual, true);
   });
 
+  it('groupId must be a number', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { groupId: 'abc' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('threadId must be a number', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { threadId: 'abc' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('you are not allowed to use groupId and threadId at the same time', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { groupId: 123, threadId: 123 } });
+    assert.notEqual(actual, true);
+  });
+
+  it('you cannot specify the feedType with groupId or threadId at the same time', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { feedType: 'All', threadId: 123 } });
+    assert.notEqual(actual, true);
+  });
+
+  it('Fails in case FeedType is not correct', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { feedType: 'WrongValue' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('you are not allowed to use groupId and threadId and feedType at the same time', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { feedType: 'Private', groupId: 123, threadId: 123 } });
+    assert.notEqual(actual, true);
+  });
+
   it('supports debug mode', () => {
     const options = (command.options() as CommandOption[]);
     let containsOption = false;
@@ -170,6 +200,168 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
     cmdInstance.action({ options: {} }, (err?: any) => {
+      try {
+        assert.equal(cmdInstanceLogSpy.lastCall.args[0][0].id, 10123190123130)
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('returns messages from top feed', function (done) {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://www.yammer.com/api/v1/messages/algo.json') {
+        return Promise.resolve(secondMessageBatch);
+      }
+      return Promise.reject('Invalid request');
+    });
+    cmdInstance.action({ options: { feedType: 'Top' } }, (err?: any) => {
+      try {
+        assert.equal(cmdInstanceLogSpy.lastCall.args[0][0].id, 10123190123130)
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('returns messages from my feed', function (done) {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://www.yammer.com/api/v1/messages/my_feed.json') {
+        return Promise.resolve(secondMessageBatch);
+      }
+      return Promise.reject('Invalid request');
+    });
+    cmdInstance.action({ options: { feedType: 'My' } }, (err?: any) => {
+      try {
+        assert.equal(cmdInstanceLogSpy.lastCall.args[0][0].id, 10123190123130)
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('returns messages from following feed', function (done) {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://www.yammer.com/api/v1/messages/following.json') {
+        return Promise.resolve(secondMessageBatch);
+      }
+      return Promise.reject('Invalid request');
+    });
+    cmdInstance.action({ options: { feedType: 'Following' } }, (err?: any) => {
+      try {
+        assert.equal(cmdInstanceLogSpy.lastCall.args[0][0].id, 10123190123130)
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('returns messages from sent feed', function (done) {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://www.yammer.com/api/v1/messages/sent.json') {
+        return Promise.resolve(secondMessageBatch);
+      }
+      return Promise.reject('Invalid request');
+    });
+    cmdInstance.action({ options: { feedType: 'Sent' } }, (err?: any) => {
+      try {
+        assert.equal(cmdInstanceLogSpy.lastCall.args[0][0].id, 10123190123130)
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('returns messages from private feed', function (done) {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://www.yammer.com/api/v1/messages/private.json') {
+        return Promise.resolve(secondMessageBatch);
+      }
+      return Promise.reject('Invalid request');
+    });
+    cmdInstance.action({ options: { feedType: 'Private' } }, (err?: any) => {
+      try {
+        assert.equal(cmdInstanceLogSpy.lastCall.args[0][0].id, 10123190123130)
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('returns messages from received feed', function (done) {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://www.yammer.com/api/v1/messages/received.json') {
+        return Promise.resolve(secondMessageBatch);
+      }
+      return Promise.reject('Invalid request');
+    });
+    cmdInstance.action({ options: { feedType: 'Received' } }, (err?: any) => {
+      try {
+        assert.equal(cmdInstanceLogSpy.lastCall.args[0][0].id, 10123190123130)
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('returns messages from all feed', function (done) {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://www.yammer.com/api/v1/messages.json') {
+        return Promise.resolve(secondMessageBatch);
+      }
+      return Promise.reject('Invalid request');
+    });
+    cmdInstance.action({ options: { feedType: 'All' } }, (err?: any) => {
+      try {
+        assert.equal(cmdInstanceLogSpy.lastCall.args[0][0].id, 10123190123130)
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('returns messages from the group feed', function (done) {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://www.yammer.com/api/v1/messages/in_group/123123.json') {
+        return Promise.resolve(secondMessageBatch);
+      }
+      return Promise.reject('Invalid request');
+    });
+    cmdInstance.action({ options: { groupId: 123123 } }, (err?: any) => {
+      try {
+        assert.equal(cmdInstanceLogSpy.lastCall.args[0][0].id, 10123190123130)
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('returns messages from thread feed', function (done) {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://www.yammer.com/api/v1/messages/in_thread/123123.json') {
+        return Promise.resolve(secondMessageBatch);
+      }
+      return Promise.reject('Invalid request');
+    });
+    cmdInstance.action({ options: { threadId: 123123 } }, (err?: any) => {
       try {
         assert.equal(cmdInstanceLogSpy.lastCall.args[0][0].id, 10123190123130)
         done();

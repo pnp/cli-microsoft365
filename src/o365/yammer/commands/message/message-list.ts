@@ -16,6 +16,9 @@ interface Options extends GlobalOptions {
   olderThanId?: number;
   threaded?: boolean;
   limit?: number;
+  feedType?: string;
+  groupId?: number;
+  threadId?: number;
 }
 
 class YammerMessageListCommand extends YammerCommand {
@@ -40,12 +43,36 @@ class YammerMessageListCommand extends YammerCommand {
     telemetryProps.olderThanId = args.options.olderThanId !== undefined;
     telemetryProps.threaded = args.options.threaded;
     telemetryProps.limit = args.options.limit !== undefined;
+    telemetryProps.feedType = args.options.feedType !== undefined;
+    telemetryProps.threadId = args.options.threadId !== undefined;
+    telemetryProps.groupId = args.options.groupId !== undefined;
     return telemetryProps;
   }
 
   private getAllItems(cmd: CommandInstance, args: CommandArgs, messageId: number): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      let endPoint = `${this.resource}/v1/messages.json`;
+      let endPoint = `${this.resource}/v1`;
+      
+      if (args.options.feedType === 'Top') {
+        endPoint += `/messages/algo.json`;
+      } else if (args.options.feedType === 'My') {
+        endPoint += `/messages/my_feed.json`;
+      } else if (args.options.feedType === 'Following') {
+        endPoint += `/messages/following.json`;
+      } else if (args.options.feedType === 'Sent') {
+        endPoint += `/messages/sent.json`;
+      } else if (args.options.feedType === 'Private') {
+        endPoint += `/messages/private.json`;
+      } else if (args.options.feedType === 'Received') {
+        endPoint += `/messages/received.json`;
+      } else if (args.options.threadId) {
+        endPoint += `/messages/in_thread/${args.options.threadId}.json`
+      } else if (args.options.groupId) {
+        endPoint += `/messages/in_group/${args.options.groupId}.json`
+      } else {
+        // defaults to all messages if no other options are specified
+        endPoint += `/messages.json`;
+      }
 
       if (messageId !== -1) {
         endPoint += `?older_than=${messageId}`;
@@ -148,6 +175,19 @@ class YammerMessageListCommand extends YammerCommand {
         description: 'Returns messages older than the message ID specified as a numeric string'
       },
       {
+        option: '-f, --feedType [feedType]',
+        description: 'Returns messages from a specific feed. Available options: All|Top|My|Following|Sent|Private|Received. Default All',
+        autocomplete: ['All','Top','My','Following','Sent','Private','Received']
+      },
+      {
+        option: '--groupId [groupId]',
+        description: 'Returns the messages from a specific group'
+      },
+      {
+        option: '--threadId [groupId]',
+        description: 'Returns the messages from a specific thread'
+      },
+      {
         option: '--threaded',
         description: 'Will only return the thread starter (first message) for each thread. This parameter is intended for apps which need to display message threads collapsed'
       },
@@ -163,8 +203,40 @@ class YammerMessageListCommand extends YammerCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
+      if (args.options.groupId && args.options.threadId) {
+        return `You cannot specify groupId and threadId at the same time`;
+      }
+
+      if (args.options.feedType && (args.options.groupId || args.options.threadId)) {
+        return `You cannot specify the feedType with groupId or threadId at the same time`;
+      }
+      
+      // defaults to all feedtype if no value is specified
+      if (!args.options.feedType && !args.options.groupId && !args.options.threadId) {
+        args.options.feedType = "All";
+      }
+      
+      if (args.options.feedType &&
+          args.options.feedType !== 'All' &&
+          args.options.feedType !== 'Top' &&
+          args.options.feedType !== 'My' &&
+          args.options.feedType !== 'Following' &&
+          args.options.feedType !== 'Sent' &&
+          args.options.feedType !== 'Private' &&
+          args.options.feedType !== 'Received') {
+        return `${args.options.feedType} is not a valid value for the feedType option. Allowed values are All|Top|My|Following|Sent|Private|Received`;
+      }
+
       if (args.options.olderThanId && typeof args.options.olderThanId !== 'number') {
         return `${args.options.olderThanId} is not a number`;
+      }
+
+      if (args.options.groupId && typeof args.options.groupId !== 'number') {
+        return `${args.options.groupId} is not a number`;
+      }
+
+      if (args.options.threadId && typeof args.options.threadId !== 'number') {
+        return `${args.options.threadId} is not a number`;
       }
 
       if (args.options.limit && typeof args.options.limit !== 'number') {
@@ -198,7 +270,23 @@ class YammerMessageListCommand extends YammerCommand {
 
     Returns the first 10 Yammer network messages
       ${this.name} --limit 10
-    `);
+
+    Returns the first 10 Yammer network messages from the Yammer group 312891231
+      ${this.name} --groupId 312891231  --limit 10
+    
+    Returns the first 20 Yammer message from the sent feed of the user
+      ${this.name} --feedType Sent  --limit 20
+  
+  Feed types:
+  
+    - All: Corresponds to “All” conversations in the Yammer web interface
+    - Top: The algorithmic feed for the user that corresponds to “Top” conversations. The Top conversations feed is the feed currently shown in the Yammer mobile apps
+    - My: The user’s feed, based on the selection they have made between “Following” and “Top” conversations
+    - Following: The “Following” feed which is conversations involving people and topics that the user is following
+    - Sent: All messages sent by the user
+    - Private: Private messages received by the user
+    - Received: All messages received by the user
+      `);
   }
 }
 
