@@ -89,6 +89,11 @@ describe('PeriodBasedReport', () => {
     assert.notEqual(actual, true);
   });
 
+  it('fails validation on invalid date', () => {
+    const actual = (mockCommand.validate() as CommandValidate)({ options: { date: '10.10.2019' } });
+    assert.notEqual(actual, true);
+  });
+
   it('passes validation on valid \'D7\' period', () => {
     const actual = (mockCommand.validate() as CommandValidate)({
       options: {

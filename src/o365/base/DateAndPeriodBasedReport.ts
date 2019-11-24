@@ -2,6 +2,8 @@ import {
   CommandOption, CommandValidate
 } from '../../Command';
 import PeriodBasedReport, { OutputFileOptions } from './PeriodBasedReport';
+import * as path from 'path';
+import * as fs from 'fs';
 
 interface CommandArgs {
   options: DateAndPeriodBasedOptions;
@@ -43,6 +45,14 @@ export default abstract class DateAndPeriodBasedReport extends PeriodBasedReport
     return (args: CommandArgs): boolean | string => {
       if (!args.options.period && !args.options.date) {
         return 'Specify period or date, one is required.';
+      }
+
+      if (args.options.period && ['D7', 'D30', 'D90', 'D180'].indexOf(args.options.period) < 0) {
+        return `${args.options.period} is not a valid period type. The supported values are D7|D30|D90|D180`;
+      }
+      
+      if (args.options.outputFile && !fs.existsSync(path.dirname(args.options.outputFile))) {
+        return `The specified path ${path.dirname(args.options.outputFile)} doesn't exist`;
       }
 
       if (args.options.period && args.options.date) {
