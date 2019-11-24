@@ -57,6 +57,34 @@ describe('DynamicRule', () => {
     assert.equal(findings.length, 1);
   });
 
+  it('doesnt return anything is package is unsupported', async () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      packageJson: {
+        dependencies: {
+          '@pnp/sp-taxonomy': '1.3.5',
+          '@pnp/sp-clientsvc': '1.3.5',
+        }
+      }
+    };
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+      if (path.endsWith('@pnp/sp-taxonomy/package.json') || path.endsWith('@pnp/sp-clientsvc/package.json')) {
+        return JSON.stringify({
+          main: "./dist/pnpjs.es5.umd.bundle.js",
+          module: "./dist/pnpjs.es5.umd.bundle.min.js"
+        });
+      }
+      else {
+        return originalReadFileSync(path);
+      }
+    });
+    sinon.stub(request, 'head').callsFake(() => Promise.resolve());
+    sinon.stub(request, 'post').callsFake(() => Promise.reject());
+    const findings = await rule.visit(project);
+    assert.equal(findings.length, 0);
+  });
+
   it('returns from main if module is missing', async () => {
     const project: Project = {
       path: '/usr/tmp',
