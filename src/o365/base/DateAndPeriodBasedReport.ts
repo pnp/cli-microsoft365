@@ -1,15 +1,14 @@
 import {
   CommandOption, CommandValidate
 } from '../../Command';
-import * as path from 'path';
-import * as fs from 'fs';
-import PeriodBasedReport, { UsagePeriodOptions } from './PeriodBasedReport';
+import PeriodBasedReport, { OutputFileOptions } from './PeriodBasedReport';
 
 interface CommandArgs {
-  options: Options;
+  options: DateAndPeriodBasedOptions;
 }
 
-interface Options extends UsagePeriodOptions {
+interface DateAndPeriodBasedOptions extends OutputFileOptions {
+  period?: string;
   date?: string;
 }
 
@@ -18,7 +17,14 @@ export default abstract class DateAndPeriodBasedReport extends PeriodBasedReport
     const periodParameter: string = args.options.period ? `${this.usageEndPoint}(period='${encodeURIComponent(args.options.period)}')` : '';
     const dateParameter: string = args.options.date ? `${this.usageEndPoint}(date=${encodeURIComponent(args.options.date)})` : '';
     const endPoint: string = `${this.resource}/v1.0/reports/${(args.options.period ? periodParameter : dateParameter)}`;
-    this.executeReport(endPoint, cmd, args, cb);
+    this.executeReport(endPoint, cmd, args.options.output, args.options.outputFile, cb);
+  }
+
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.period = typeof args.options.period !== 'undefined';
+    telemetryProps.date = typeof args.options.date !== 'undefined';
+    return telemetryProps;
   }
 
   public options(): CommandOption[] {
@@ -38,20 +44,13 @@ export default abstract class DateAndPeriodBasedReport extends PeriodBasedReport
       if (!args.options.period && !args.options.date) {
         return 'Specify period or date, one is required.';
       }
+
       if (args.options.period && args.options.date) {
         return 'Specify period or date but not both.';
       }
 
       if (args.options.date && !((args.options.date as string).match(/^\d{4}-\d{2}-\d{2}$/))) {
         return `${args.options.date} is not a valid date. The supported date format is YYYY-MM-DD`;
-      }
-
-      if (args.options.outputFile && !fs.existsSync(path.dirname(args.options.outputFile))) {
-        return `The specified path ${path.dirname(args.options.outputFile)} doesn't exist`;
-      }
-
-      if (args.options.period && ['D7', 'D30', 'D90', 'D180'].indexOf(args.options.period) < 0) {
-        return `${args.options.period} is not a valid period type. The supported values are D7|D30|D90|D180`;
       }
 
       return true;

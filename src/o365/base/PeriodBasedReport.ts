@@ -11,15 +11,22 @@ interface CommandArgs {
   options: UsagePeriodOptions;
 }
 
-export interface UsagePeriodOptions extends GlobalOptions {
+interface OutputFileCommandArgs {
+  options: OutputFileOptions;
+}
+
+interface UsagePeriodOptions extends OutputFileOptions {
   period: string;
+}
+
+export interface OutputFileOptions extends GlobalOptions {
   outputFile?: string;
 }
 
 export default abstract class PeriodBasedReport extends GraphCommand {
   public abstract get usageEndPoint(): string;
 
-  public getTelemetryProperties(args: CommandArgs): any {
+  public getTelemetryProperties(args: OutputFileCommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.outputFile = typeof args.options.outputFile !== 'undefined';
     return telemetryProps;
@@ -27,10 +34,10 @@ export default abstract class PeriodBasedReport extends GraphCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const endPoint: string = `${this.resource}/v1.0/reports/${this.usageEndPoint}(period='${encodeURIComponent(args.options.period)}')`;
-    this.executeReport(endPoint, cmd, args, cb);
+    this.executeReport(endPoint, cmd, args.options.output, args.options.outputFile, cb);
   }
 
-  protected executeReport(endPoint: string, cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  protected executeReport(endPoint: string, cmd: CommandInstance, output: string|undefined, outputFile: string|undefined, cb: () => void): void {
     const requestOptions: any = {
       url: endPoint,
       headers: {
@@ -45,7 +52,7 @@ export default abstract class PeriodBasedReport extends GraphCommand {
         let content: string = '';
         let cleanResponse = this.removeEmptyLines(res);
 
-        if (args.options.output && args.options.output.toLowerCase() === 'json') {
+        if (output && output.toLowerCase() === 'json') {
           const reportData: any = this.getReport(cleanResponse);
           content = JSON.stringify(reportData);
         }
@@ -53,13 +60,13 @@ export default abstract class PeriodBasedReport extends GraphCommand {
           content = cleanResponse;
         }
 
-        if (!args.options.outputFile) {
+        if (!outputFile) {
           cmd.log(content);
         }
         else {
-          fs.writeFileSync(args.options.outputFile, content, 'utf8');
+          fs.writeFileSync(outputFile, content, 'utf8');
           if (this.verbose) {
-            cmd.log(`File saved to path '${args.options.outputFile}'`);
+            cmd.log(`File saved to path '${outputFile}'`);
           }
         }
 
