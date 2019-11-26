@@ -87,7 +87,7 @@ export class PnPJsRule extends BasicDependencyRule {
           action: "add",
           path: x,
           targetValue: 'require(\"tslib\");'
-      } as FileEditSuggestion)))
+      } as FileEditSuggestion)));
     }
     
     return Promise.resolve([findings, fileEdits]);

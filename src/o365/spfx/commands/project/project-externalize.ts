@@ -165,12 +165,27 @@ class SpfxProjectExternalizeCommand extends Command {
       '```json', os.EOL,
       JSON.stringify(this.serializeJsonReport(findingsToReport), null, 2), os.EOL,
       '```', os.EOL,
-      ...editsToReport.map(x => [`#### [${x.path}](${x.path})`, os.EOL, x.action, os.EOL, '```JavaScript', os.EOL, x.targetValue, os.EOL, '```', os.EOL])
-      .reduce((x,y) => [...x, ...y])
+      ...this.getReportForFileEdit(this.getGroupedFileEditSuggestions(editsToReport, 'add')),
+      ...this.getReportForFileEdit(this.getGroupedFileEditSuggestions(editsToReport, 'remove')),
     ];
     return lines.join('');
   }
-
+  private getReportForFileEdit(suggestions: FileEditSuggestion[][]): string[] {
+    const initialReport = suggestions.map(x => [`#### [${x[0].path}](${x[0].path})`, os.EOL, x[0].action, os.EOL, '```JavaScript', os.EOL, 
+                        ...x.map(y => [y.targetValue, os.EOL]).reduce((y, z) => [...y, ...z]),
+                      '```', os.EOL]);
+    if(initialReport.length > 0) {
+      return initialReport.reduce((x,y) => [...x, ...y]);
+    }
+    else {
+      return [];
+    }
+  }
+  private getGroupedFileEditSuggestions(editsToReport: FileEditSuggestion[], action: "add" | "remove"): FileEditSuggestion[][] {
+    const editsMatchingAction = editsToReport.filter(x => x.action === action);
+    return editsMatchingAction.filter((x, i) => editsMatchingAction.findIndex(y => y.path === x.path) === i)
+    .map(x => editsMatchingAction.filter(y => y.path === x.path));
+  }
   private serializeJsonReport(findingsToReport: ExternalizeEntry[]): { externals: ExternalConfiguration } {
     const result: ExternalConfiguration = {};
     findingsToReport.forEach((f) => {
