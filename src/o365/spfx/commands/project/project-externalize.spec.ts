@@ -9,7 +9,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import Utils from '../../../../Utils';
 import { Project, ExternalConfiguration, External } from './project-upgrade/model';
-import { ExternalizeEntry } from './project-externalize/model';
+import { ExternalizeEntry, FileEditSuggestion } from './project-externalize/model';
 import * as requestNative from 'request-promise-native';
 
 describe(commands.PROJECT_EXTERNALIZE, () => {
@@ -380,8 +380,8 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { output: 'json', debug: true } }, (err?: any) => {
       try {
-        const findings: { externals: ExternalConfiguration } = log[logEntryToCheck + 3]; //because debug is enabled
-        assert.equal((findings.externals['@pnp/pnpjs'] as unknown as External).path, 'https://unpkg.com/@pnp/pnpjs@1.3.5/dist/pnpjs.es5.umd.min.js');
+        const findings: { externalConfiguration: {externals: ExternalConfiguration }, edits: FileEditSuggestion[] } = log[logEntryToCheck + 3]; //because debug is enabled
+        assert.equal((findings.externalConfiguration.externals['@pnp/pnpjs'] as unknown as External).path, 'https://unpkg.com/@pnp/pnpjs@1.3.5/dist/pnpjs.es5.umd.min.js');
         done();
       }
       catch (ex) {
@@ -515,7 +515,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, (err?: any) => {
       try {
-        assert.equal(log[1], 'In the config/config.json file update the externals property to:\n\n{\n  \"externals\": {\n    \"@pnp/pnpjs\": {\n      \"path\": \"https://unpkg.com/@pnp/pnpjs@1.3.5/dist/pnpjs.es5.umd.min.js\",\n      \"globalName\": \"pnp\"\n    }\n  }\n}');
+        assert.notEqual(log[1].indexOf('externalConfiguration'),-1);
         done();
       }
       catch (ex) {
@@ -540,7 +540,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     ]) as string;
     const emptyReport = (command as any).serializeTextReport([]) as string;
     assert(report.length > 87);
-    assert.equal(emptyReport.length, 87);
+    assert.equal(emptyReport.length, 124);
   });
 
   it('writes upgrade report to file when outputFile specified', (done) => {
