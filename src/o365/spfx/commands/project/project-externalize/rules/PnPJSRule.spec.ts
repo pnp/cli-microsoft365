@@ -19,7 +19,7 @@ describe('PnPJsRule', () => {
       }
     };
     const findings = await rule.visit(project);
-    assert.equal(findings.length, 1);
+    assert.equal(findings[0].length, 1);
   });
 
   it('returns no notification if dependency is not here', async () => {
@@ -32,6 +32,6 @@ describe('PnPJsRule', () => {
       }
     };
     const findings = await rule.visit(project);
-    assert.equal(findings.length, 0);
+    assert.equal(findings[0].length, 0);
   });
 });

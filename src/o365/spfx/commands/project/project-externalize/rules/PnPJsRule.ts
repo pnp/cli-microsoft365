@@ -69,14 +69,14 @@ export class PnPJsRule extends BasicDependencyRule {
       .map(x => this.getModuleAndParents(project, x.key))
       .reduce((x, y) => [...x, ...y]);
     const files = this.getEntryFilesList(project);
-    const fileEdits = this.pnpModules.filter(x => findings.find(y => y.key === x.key) !== undefined)
+    const rawfileEdits = this.pnpModules.filter(x => findings.find(y => y.key === x.key) !== undefined)
         .filter(x => x.shadowRequire !== undefined)
         .map(x => files.map(y => ({
           action: "add",
           path: y,
           targetValue: x.shadowRequire
         } as FileEditSuggestion)))
-        .reduce((x, y) => [...x, ...y]);
+    const fileEdits = rawfileEdits.length > 0 ? rawfileEdits.reduce((x, y) => [...x, ...y]) : [];
     if (findings.filter(x => x.key && x.key !== '@pnp/pnpjs').length > 0) {
       findings.push({
         key: 'tslib',
