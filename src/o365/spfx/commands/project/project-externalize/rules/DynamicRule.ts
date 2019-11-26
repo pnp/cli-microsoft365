@@ -1,25 +1,25 @@
 import { BasicDependencyRule } from "./BasicDependencyRule";
 import { Project } from "../../project-upgrade/model";
-import { ExternalizeEntry } from "../model/ExternalizeEntry";
 import * as fs from 'fs';
 import request from '../../../../../../request';
+import { FileEditSuggestion, ExternalizeEntry } from "../model";
 
 export class DynamicRule extends BasicDependencyRule {
   private restrictedModules = ['react', 'react-dom'];
   private restrictedNamespaces = ['@types/', '@microsoft/'];
 
-  public async visit(project: Project): Promise<ExternalizeEntry[]> {
+  public async visit(project: Project): Promise<[ExternalizeEntry[], FileEditSuggestion[]]> {
     if (!project.packageJson) {
-      return [];
+      return [[], []];
     }
 
     const validPackageNames: string[] = Object.getOwnPropertyNames(project.packageJson.dependencies)
       .filter(x => this.restrictedNamespaces.map(y => x.indexOf(y) === -1).reduce((y, z) => y && z))
       .filter(x => this.restrictedModules.indexOf(x) === -1);
 
-    return (await Promise.all(validPackageNames.map((x) => this.getExternalEntryForPackage(x, project))))
+    return [(await Promise.all(validPackageNames.map((x) => this.getExternalEntryForPackage(x, project))))
       .filter(x => x !== undefined)
-      .map(x => x as ExternalizeEntry);
+      .map(x => x as ExternalizeEntry), []];
   }
 
   private async getExternalEntryForPackage(packageName: string, project: Project): Promise<ExternalizeEntry | undefined> {

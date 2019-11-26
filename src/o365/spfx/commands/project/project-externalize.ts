@@ -12,7 +12,7 @@ import { Project, ExternalConfiguration, External } from './project-upgrade/mode
 const vorpal: Vorpal = require('../../../../vorpal-init');
 import rules = require('./project-externalize/DefaultRules');
 import { BasicDependencyRule } from './project-externalize/rules';
-import { ExternalizeEntry } from './project-externalize/model/ExternalizeEntry';
+import { ExternalizeEntry } from './project-externalize/model';
 
 interface CommandArgs {
   options: Options;
@@ -113,7 +113,7 @@ class SpfxProjectExternalizeCommand extends Command {
     Promise
       .all(asyncRulesResults)
       .then((rulesResults) => {
-        this.allFindings.push(...rulesResults.reduce((x, y) => [...x, ...y]));
+        this.allFindings.push(...rulesResults.map(x => x[0]).reduce((x, y) => [...x, ...y]));
         //removing duplicates
         this.allFindings = this.allFindings.filter((x, i) => this.allFindings.findIndex(y => y.key === x.key) === i);
         this.writeReport(this.allFindings, cmd, args.options);

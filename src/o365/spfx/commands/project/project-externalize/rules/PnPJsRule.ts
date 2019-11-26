@@ -1,6 +1,8 @@
 import { BasicDependencyRule } from "./BasicDependencyRule";
 import { Project } from "../../project-upgrade/model";
-import { ExternalizeEntry } from "../model/ExternalizeEntry";
+import { ExternalizeEntry, FileEditSuggestion } from "../model";
+import * as path from 'path';
+import * as fs from 'fs';
 
 export class PnPJsRule extends BasicDependencyRule {
   private pnpModules = [
@@ -11,18 +13,21 @@ export class PnPJsRule extends BasicDependencyRule {
         "@pnp/common",
         "@pnp/logging",
         "tslib"
-      ]
+      ],
+      shadowRequire: "require(\"@pnp/odata\");",
     },
     {
       key: "@pnp/common",
       globalName: "pnp.common",
+      shadowRequire: "require(\"@pnp/common\");",
     },
     {
       key: "@pnp/logging",
       globalName: "pnp.logging",
       globalDependencies: [
         "tslib"
-      ]
+      ],
+      shadowRequire: "require(\"@pnp/logging\");",
     },
     {
       key: "@pnp/sp",
@@ -59,20 +64,46 @@ export class PnPJsRule extends BasicDependencyRule {
     }
   ];
 
-  public visit(project: Project): Promise<ExternalizeEntry[]> {
+  public visit(project: Project): Promise<[ExternalizeEntry[],FileEditSuggestion[]]> {
     const findings = this.pnpModules
       .map(x => this.getModuleAndParents(project, x.key))
       .reduce((x, y) => [...x, ...y]);
-
-    if (findings.filter(x => x.key !== '@pnp/pnpjs').length > 0) {
+    const files = this.getEntryFilesList(project);
+    if (findings.filter(x => x.key && x.key !== '@pnp/pnpjs').length > 0) {
       findings.push({
         key: 'tslib',
         globalName: 'tslib',
         path: `https://unpkg.com/tslib@^1.10.0/tslib.js`
       });
     }
-
-    return Promise.resolve(findings);
+    const fileEdits = this.pnpModules.filter(x => findings.find(y => y.key === x.key) !== undefined)
+        .filter(x => x.shadowRequire !== undefined)
+        .map(x => files.map(y => ({
+          action: "add",
+          path: y,
+          targetValue: x.shadowRequire
+        } as FileEditSuggestion)))
+        .reduce((x, y) => [...x, ...y]);
+    return Promise.resolve([findings, fileEdits]);
+  }
+  private getEntryFilesList(project: Project): string[] {
+    const result = [...this.getComponents(project, 'webparts', ['WebPart']), ...this.getComponents(project, 'extensions', ['ApplicationCustomizer', 'CommandSet'])];
+    return result;
+  }
+  private getComponents(project:Project, componentPathSegment: string, appendixes: string[]): string[] {
+    const src = 'src';
+    const componentsPath = path.join(project.path, src, componentPathSegment);
+    if(fs.existsSync(componentsPath)) {
+      const componentFolderNames = fs.readdirSync(componentsPath);
+      return componentFolderNames
+            .filter((x) => fs.lstatSync(path.join(componentsPath, x)).isDirectory())
+            .map((x) => {
+              const candidatePaths = appendixes.map(appendix => `${src}/${componentPathSegment}/${x}/${x[0].toLocaleUpperCase()}${x.substr(1)}${appendix}.ts`)
+              .filter((y) => fs.existsSync(path.join(project.path, y)));
+              return candidatePaths.length> 0 ? candidatePaths[0] : '';
+            });
+    }
+    return [];
   }
   private getModuleAndParents(project: Project, moduleName: string): ExternalizeEntry[] {
     const result: ExternalizeEntry[] = [];
