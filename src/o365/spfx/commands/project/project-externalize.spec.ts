@@ -540,7 +540,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     ]) as string;
     const emptyReport = (command as any).serializeTextReport([]) as string;
     assert(report.length > 87);
-    assert.equal(emptyReport.length, 124);
+    assert.equal(emptyReport.length, 122);
   });
 
   it('writes upgrade report to file when outputFile specified', (done) => {
