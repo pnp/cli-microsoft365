@@ -12,7 +12,7 @@ import { Project, ExternalConfiguration, External } from './project-upgrade/mode
 const vorpal: Vorpal = require('../../../../vorpal-init');
 import rules = require('./project-externalize/DefaultRules');
 import { BasicDependencyRule } from './project-externalize/rules';
-import { ExternalizeEntry } from './project-externalize/model';
+import { ExternalizeEntry, FileEditSuggestion } from './project-externalize/model';
 
 interface CommandArgs {
   options: Options;
@@ -50,6 +50,7 @@ class SpfxProjectExternalizeCommand extends Command {
     '1.9.1'
   ];
   private allFindings: ExternalizeEntry[] = [];
+  private allEditSuggestions: FileEditSuggestion[] = [];
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
   public static ERROR_NO_VERSION: number = 3;
   public static ERROR_UNSUPPORTED_VERSION: number = 2;
@@ -114,27 +115,28 @@ class SpfxProjectExternalizeCommand extends Command {
       .all(asyncRulesResults)
       .then((rulesResults) => {
         this.allFindings.push(...rulesResults.map(x => x[0]).reduce((x, y) => [...x, ...y]));
+        this.allEditSuggestions.push(...rulesResults.map(x => x[1]).reduce((x, y) => [...x, ...y]));
         //removing duplicates
         this.allFindings = this.allFindings.filter((x, i) => this.allFindings.findIndex(y => y.key === x.key) === i);
-        this.writeReport(this.allFindings, cmd, args.options);
+        this.writeReport(this.allFindings, this.allEditSuggestions, cmd, args.options);
         cb();
       }).catch((err) => {
         cb(new CommandError(err));
       });
   }
 
-  private writeReport(findingsToReport: ExternalizeEntry[], cmd: CommandInstance, options: Options): void {
-    let report: any = findingsToReport;
+  private writeReport(findingsToReport: ExternalizeEntry[], editsToReport: FileEditSuggestion[], cmd: CommandInstance, options: Options): void {
+    let report;
 
     switch (options.output) {
       case 'json':
-        report = this.serializeJsonReport(findingsToReport);
+        report = {externalConfiguration: this.serializeJsonReport(findingsToReport), edits: editsToReport};
         break;
       case 'md':
-        report = this.serializeMdReport(findingsToReport);
+        report = this.serializeMdReport(findingsToReport, editsToReport);
         break;
       default:
-        report = this.serializeTextReport(findingsToReport);
+        report = this.serializeTextReport(findingsToReport, editsToReport);
         break;
     }
 
@@ -146,7 +148,7 @@ class SpfxProjectExternalizeCommand extends Command {
     }
   }
 
-  private serializeMdReport(findingsToReport: ExternalizeEntry[]): string {
+  private serializeMdReport(findingsToReport: ExternalizeEntry[], editsToReport: FileEditSuggestion[]): string {
     const lines = [
       `# Externalizing dependencies of project ${path.posix.basename(this.projectRootPath as string)}`, os.EOL,
       os.EOL,
@@ -162,7 +164,9 @@ class SpfxProjectExternalizeCommand extends Command {
       os.EOL,
       '```json', os.EOL,
       JSON.stringify(this.serializeJsonReport(findingsToReport), null, 2), os.EOL,
-      '```', os.EOL
+      '```', os.EOL,
+      ...editsToReport.map(x => [`#### [${x.path}](${x.path})`, os.EOL, x.action, os.EOL, '```JavaScript', os.EOL, x.targetValue, os.EOL, '```', os.EOL])
+      .reduce((x,y) => [...x, ...y])
     ];
     return lines.join('');
   }
@@ -187,11 +191,11 @@ class SpfxProjectExternalizeCommand extends Command {
     };
   }
 
-  private serializeTextReport(findingsToReport: ExternalizeEntry[]): string {
+  private serializeTextReport(findingsToReport: ExternalizeEntry[], editsToReport: FileEditSuggestion[]): string {
     const s: string[] = [
       'In the config/config.json file update the externals property to:', os.EOL,
       os.EOL,
-      JSON.stringify(this.serializeJsonReport(findingsToReport), null, 2)
+      JSON.stringify({externalConfiguration: this.serializeJsonReport(findingsToReport), edits: editsToReport}, null, 2)
     ];
 
     return s.join('').trim();
