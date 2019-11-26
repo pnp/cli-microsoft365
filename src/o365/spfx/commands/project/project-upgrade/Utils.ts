@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { Project } from './model';
+import { Project } from '../model';
 const stripJsonComments = require('strip-json-comments');
 
 export class Utils {

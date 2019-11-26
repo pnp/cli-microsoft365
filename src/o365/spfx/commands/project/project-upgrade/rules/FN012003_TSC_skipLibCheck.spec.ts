@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import { Finding } from '../Finding';
-import { Project } from '../model';
+import { Project } from '../../model';
 import { FN012003_TSC_skipLibCheck } from './FN012003_TSC_skipLibCheck';
 
 describe('FN012003_TSC_skipLibCheck', () => {

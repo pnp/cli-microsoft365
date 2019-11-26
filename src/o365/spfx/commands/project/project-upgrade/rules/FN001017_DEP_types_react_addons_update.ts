@@ -1,5 +1,5 @@
 import { DependencyRule } from "./DependencyRule";
-import { Project } from "../model";
+import { Project } from "../../model";
 import { Utils } from "../";
 
 export class FN001017_DEP_types_react_addons_test_utils extends DependencyRule {

@@ -1,7 +1,7 @@
 import { ResolutionRule } from './ResolutionRule';
 import * as assert from 'assert';
 import { Finding } from '../Finding';
-import { Project } from '../model';
+import { Project } from '../../model';
 
 class ResRule extends ResolutionRule {
   constructor() {

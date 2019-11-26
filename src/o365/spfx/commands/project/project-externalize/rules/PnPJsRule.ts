@@ -1,6 +1,7 @@
 import { BasicDependencyRule } from "./BasicDependencyRule";
-import { Project } from "../../project-upgrade/model";
-import { ExternalizeEntry } from "../model/ExternalizeEntry";
+import { Project } from "../../model";
+import { ExternalizeEntry, FileEdit } from "../";
+import { VisitationResult } from '../VisitationResult';
 
 export class PnPJsRule extends BasicDependencyRule {
   private pnpModules = [
@@ -11,18 +12,21 @@ export class PnPJsRule extends BasicDependencyRule {
         "@pnp/common",
         "@pnp/logging",
         "tslib"
-      ]
+      ],
+      shadowRequire: "require(\"@pnp/odata\");",
     },
     {
       key: "@pnp/common",
       globalName: "pnp.common",
+      shadowRequire: "require(\"@pnp/common\");",
     },
     {
       key: "@pnp/logging",
       globalName: "pnp.logging",
       globalDependencies: [
         "tslib"
-      ]
+      ],
+      shadowRequire: "require(\"@pnp/logging\");",
     },
     {
       key: "@pnp/sp",
@@ -40,21 +44,39 @@ export class PnPJsRule extends BasicDependencyRule {
     }
   ];
 
-  public visit(project: Project): Promise<ExternalizeEntry[]> {
-    const findings = this.pnpModules
+  public visit(project: Project): Promise<VisitationResult> {
+    const findings: ExternalizeEntry[] = this.pnpModules
       .map(x => this.getModuleAndParents(project, x.key))
       .reduce((x, y) => [...x, ...y]);
-
-    if (findings.filter(x => x.key !== '@pnp/pnpjs').length > 0) {
+    const files: string[] = this.getEntryFilesList(project);
+    const rawFileEdits: FileEdit[][] = this.pnpModules.filter(x => findings.find(y => y.key === x.key) !== undefined)
+      .filter(x => x.shadowRequire !== undefined)
+      .map(x => files.map(y => ({
+        action: "add",
+        path: y,
+        targetValue: x.shadowRequire
+      } as FileEdit)))
+    const fileEdits: FileEdit[] = rawFileEdits.length > 0 ? rawFileEdits.reduce((x, y) => [...x, ...y]) : [];
+    if (findings.filter(x => x.key && x.key !== '@pnp/pnpjs').length > 0) { // we're adding tslib only if we found other packages that are not the bundle which already contains tslib
       findings.push({
         key: 'tslib',
         globalName: 'tslib',
         path: `https://unpkg.com/tslib@^1.10.0/tslib.js`
       });
+      fileEdits.push(...files.map(x => ({
+        action: "add",
+        path: x,
+        targetValue: 'require(\"tslib\");'
+      } as FileEdit)));
     }
 
-    return Promise.resolve(findings);
+    return Promise.resolve({ entries: findings, suggestions: fileEdits });
   }
+
+  private getEntryFilesList(project: Project): string[] {
+    return project && project.manifests ? project.manifests.map(x => x.path.replace('.manifest.json', '.ts')) : [];
+  }
+
   private getModuleAndParents(project: Project, moduleName: string): ExternalizeEntry[] {
     const result: ExternalizeEntry[] = [];
     const moduleConfiguration = this.pnpModules.find(x => x.key === moduleName);
@@ -72,7 +94,7 @@ export class PnPJsRule extends BasicDependencyRule {
         });
       }
     }
-    
+
     return result;
   }
 }

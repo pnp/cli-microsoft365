@@ -1,5 +1,5 @@
 import { DependencyRule } from "./DependencyRule";
-import { Project } from "../model";
+import { Project } from "../../model";
 
 export class FN001021_DEP_microsoft_sp_property_pane extends DependencyRule {
   constructor(packageVersion: string) {

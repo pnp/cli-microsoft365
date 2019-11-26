@@ -1,4 +1,4 @@
-import { Project } from "../model";
+import { Project } from "../../model";
 import { Utils } from "../";
 import { ResolutionRule } from "./ResolutionRule";
 

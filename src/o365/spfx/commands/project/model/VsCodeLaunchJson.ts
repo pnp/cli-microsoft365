@@ -1,4 +1,4 @@
-import { Hash } from "../Hash";
+import { Hash } from "../project-upgrade/";
 
 export interface VsCodeLaunchJson {
   version: string;

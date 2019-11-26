@@ -1,4 +1,4 @@
-import { External } from '../../project-upgrade/model';
+import { External } from '../model';
 
 export interface ExternalizeEntry extends External {
   key: string;

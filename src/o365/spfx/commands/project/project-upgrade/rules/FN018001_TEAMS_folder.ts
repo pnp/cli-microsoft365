@@ -1,5 +1,5 @@
 import { Finding, Occurrence } from "../";
-import { Project, Manifest } from "../model";
+import { Project, Manifest } from "../../model";
 import { Rule } from "./Rule";
 import * as path from 'path';
 import * as fs from 'fs';

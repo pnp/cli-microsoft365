@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import { Finding } from '../Finding';
-import { Project } from '../model';
+import { Project } from '../../model';
 import { FN014006_CODE_launch_sourceMapPathOverrides } from './FN014006_CODE_launch_sourceMapPathOverrides';
 import Utils from '../../../../../../Utils';
 

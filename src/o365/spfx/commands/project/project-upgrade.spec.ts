@@ -8,7 +8,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import Utils from '../../../../Utils';
 import { Utils as Utils1 } from './project-upgrade/';
-import { Project, Manifest, VsCode } from './project-upgrade/model';
+import { Project, Manifest, VsCode } from './model';
 import { Finding } from './project-upgrade/Finding';
 
 describe(commands.PROJECT_UPGRADE, () => {
@@ -136,12 +136,12 @@ describe(commands.PROJECT_UPGRADE, () => {
       }
     });
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, options) => {
       if (path.endsWith('.yo-rc.json')) {
         return `{}`;
       }
       else {
-        return originalReadFileSync(path);
+        return originalReadFileSync(path, options);
       }
     });
 
@@ -170,12 +170,12 @@ describe(commands.PROJECT_UPGRADE, () => {
         "environment": "spo"
       }
     }`;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, options) => {
       if (path.endsWith('.yo-rc.json')) {
         return yoRcJson;
       }
       else {
-        return originalReadFileSync(path);
+        return originalReadFileSync(path, options);
       }
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
@@ -197,7 +197,7 @@ describe(commands.PROJECT_UPGRADE, () => {
       }
     });
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, options) => {
       if (path.endsWith('package.json')) {
         return `{
           "name": "spfx-141",
@@ -231,7 +231,7 @@ describe(commands.PROJECT_UPGRADE, () => {
         `;
       }
       else {
-        return originalReadFileSync(path);
+        return originalReadFileSync(path, options);
       }
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
@@ -270,7 +270,7 @@ describe(commands.PROJECT_UPGRADE, () => {
       }
     });
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
       if (path.endsWith('.yo-rc.json')) {
         return '';
       }
@@ -307,7 +307,7 @@ describe(commands.PROJECT_UPGRADE, () => {
         `;
       }
       else {
-        return originalReadFileSync(path);
+        return originalReadFileSync(path, encoding);
       }
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
@@ -320,12 +320,12 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   it('determining project version doesn\'t fail if package.json is empty', () => {
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
       if (path.endsWith('package.json')) {
         return '';
       }
       else {
-        return originalReadFileSync(path);
+        return originalReadFileSync(path, encoding);
       }
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
@@ -425,12 +425,12 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   it('doesn\'t fail if config.json is empty', () => {
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
       if (path.endsWith('config.json')) {
         return '';
       }
       else {
-        return originalReadFileSync(path);
+        return originalReadFileSync(path, encoding);
       }
     });
 
@@ -441,12 +441,12 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   it('doesn\'t fail if copy-assets.json is empty', () => {
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
       if (path.endsWith('copy-assets.json')) {
         return '';
       }
       else {
-        return originalReadFileSync(path);
+        return originalReadFileSync(path, encoding);
       }
     });
 
@@ -457,12 +457,12 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   it('doesn\'t fail if deploy-azure-storage.json is empty', () => {
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
       if (path.endsWith('deploy-azure-storage.json')) {
         return '';
       }
       else {
-        return originalReadFileSync(path);
+        return originalReadFileSync(path, encoding);
       }
     });
 
@@ -473,12 +473,12 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   it('doesn\'t fail if package.json is empty', () => {
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
       if (path.endsWith('package.json')) {
         return '';
       }
       else {
-        return originalReadFileSync(path);
+        return originalReadFileSync(path, encoding);
       }
     });
 
@@ -489,12 +489,12 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   it('doesn\'t fail if package-solution.json is empty', () => {
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
       if (path.endsWith('package-solution.json')) {
         return '';
       }
       else {
-        return originalReadFileSync(path);
+        return originalReadFileSync(path, encoding);
       }
     });
 
@@ -505,12 +505,12 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   it('doesn\'t fail if serve.json is empty', () => {
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
       if (path.endsWith('serve.json')) {
         return '';
       }
       else {
-        return originalReadFileSync(path);
+        return originalReadFileSync(path, encoding);
       }
     });
 
@@ -530,12 +530,12 @@ describe(commands.PROJECT_UPGRADE, () => {
       }
     });
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
       if (path.endsWith('tslint.json')) {
         return '';
       }
       else {
-        return originalReadFileSync(path);
+        return originalReadFileSync(path, encoding);
       }
     });
 
@@ -546,12 +546,12 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   it('doesn\'t fail if write-manifests.json is empty', () => {
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
       if (path.endsWith('write-manifests.json')) {
         return '';
       }
       else {
-        return originalReadFileSync(path);
+        return originalReadFileSync(path, encoding);
       }
     });
 
@@ -562,12 +562,12 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   it('doesn\'t fail if .yo-rc.json is empty', () => {
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
       if (path.endsWith('.yo-rc.json')) {
         return '';
       }
       else {
-        return originalReadFileSync(path);
+        return originalReadFileSync(path, encoding);
       }
     });
 
@@ -578,12 +578,12 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   it('doesn\'t fail if extensions.json is empty', () => {
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
       if (path.endsWith('extensions.json')) {
         return '';
       }
       else {
-        return originalReadFileSync(path);
+        return originalReadFileSync(path, encoding);
       }
     });
 
@@ -610,6 +610,38 @@ describe(commands.PROJECT_UPGRADE, () => {
     const getProject = (command as any).getProject;
     const project: Project = getProject(projectPath);
     assert.equal(typeof ((project.vsCode) as VsCode).settingsJson, 'undefined');
+  });
+
+  it('doesn\'t fail if vscode settings are empty', () => {
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
+      if (path.endsWith('settings.json')) {
+        return '';
+      }
+      else {
+        return originalReadFileSync(path, encoding);
+      }
+    });
+
+    const getProject = (command as any).getProject;
+    const project: Project = getProject(projectPath);
+    assert.equal(typeof ((project.vsCode as any).settingsJson), 'undefined');
+  });
+
+  it('doesn\'t fail if vscode launch info is empty', () => {
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
+      if (path.endsWith('launch.json')) {
+        return '';
+      }
+      else {
+        return originalReadFileSync(path, encoding);
+      }
+    });
+
+    const getProject = (command as any).getProject;
+    const project: Project = getProject(projectPath);
+    assert.equal(typeof ((project.vsCode as any).launch), 'undefined');
   });
 
   //#region npm

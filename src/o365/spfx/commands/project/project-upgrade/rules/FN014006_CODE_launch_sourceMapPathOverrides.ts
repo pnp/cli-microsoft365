@@ -1,5 +1,5 @@
 import { Finding, Occurrence } from "../";
-import { Project } from "../model";
+import { Project } from "../../model";
 import { Rule } from "./Rule";
 import * as path from 'path';
 

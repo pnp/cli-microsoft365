@@ -1,7 +1,7 @@
 import * as path from "path";
 import * as fs from "fs";
 import { Rule } from "./Rule";
-import { Project } from "../model";
+import { Project } from "../../model";
 import { Finding } from "../Finding";
 
 export abstract class FileAddRemoveRule extends Rule {

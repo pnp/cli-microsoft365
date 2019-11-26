@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import { Finding } from '../Finding';
-import { Project } from '../model';
+import { Project } from '../../model';
 import { FN006001_CFG_PS_schema } from './FN006001_CFG_PS_schema';
 
 describe('FN006001_CFG_PS_schema', () => {

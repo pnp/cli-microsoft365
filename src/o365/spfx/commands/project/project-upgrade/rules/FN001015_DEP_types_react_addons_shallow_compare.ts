@@ -1,5 +1,5 @@
 import { DependencyRule } from "./DependencyRule";
-import { Project } from "../model";
+import { Project } from "../../model";
 import { Utils } from "../";
 
 export class FN001015_DEP_types_react_addons_shallow_compare extends DependencyRule {

@@ -1,5 +1,5 @@
 import { Finding } from "../";
-import { Project } from "../model";
+import { Project } from "../../model";
 import { Rule } from "./Rule";
 
 export class FN012009_TSC_lib_es2015_collection extends Rule {

@@ -1,4 +1,4 @@
-import { Hash } from "../";
+import { Hash } from "../project-upgrade/";
 
 export interface PackageJson {
   dependencies: Hash;

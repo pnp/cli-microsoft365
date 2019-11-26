@@ -1,5 +1,5 @@
 import { Finding } from "../Finding";
-import { Project, ScssFile } from "../model";
+import { Project, ScssFile } from "../../model";
 import { ScssRule } from "./ScssRule";
 import { Occurrence, Utils } from "../";
 

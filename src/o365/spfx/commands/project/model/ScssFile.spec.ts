@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
-import Utils from '../../../../../../Utils';
+import Utils from '../../../../../Utils';
 import { ScssFile } from './ScssFile';
 
 describe('ScssFile', () => {

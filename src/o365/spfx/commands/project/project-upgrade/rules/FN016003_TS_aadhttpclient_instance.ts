@@ -1,5 +1,5 @@
 import { Finding, Occurrence } from "../";
-import { Project } from "../model";
+import { Project } from "../../model";
 import { TsRule } from "./TsRule";
 import * as ts from 'typescript';
 
