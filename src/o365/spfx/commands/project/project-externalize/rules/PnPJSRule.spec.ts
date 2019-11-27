@@ -1,6 +1,9 @@
 import * as assert from 'assert';
 import { Project } from '../../project-upgrade/model';
 import { PnPJsRule } from './PnPJsRule';
+import Utils from '../../../../../../Utils';
+import * as fs from 'fs';
+import * as sinon from 'sinon';
 
 describe('PnPJsRule', () => {
   let rule: PnPJsRule;
@@ -33,5 +36,32 @@ describe('PnPJsRule', () => {
     };
     const findings = await rule.visit(project);
     assert.equal(findings[0].length, 0);
+  });
+
+  it('doesnt return a shadow require when the type of component is not recognized', async () => {
+    const project: Project = {
+      path: 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-182-webpart-react',
+      packageJson: {
+        dependencies: {
+          '@pnp/pnpjs': '1.3.5'
+        }
+      }
+    };
+    const originalExistSync = fs.existsSync;
+    sinon.stub(fs, 'existsSync').callsFake((path: string) => {
+      if (path.indexOf('WebPart') > -1) {
+        return false;
+      }
+      else {
+        return originalExistSync(path);
+      }
+    });
+    const findings = await rule.visit(project);
+    assert.equal(findings[1].length, 0);
+  });
+  afterEach(() => {
+    Utils.restore([
+      fs.existsSync,
+    ]);
   });
 });
