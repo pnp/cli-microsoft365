@@ -74,6 +74,7 @@ nav:
       - mail:
         - mail send: 'cmd/outlook/mail/mail-send.md'
       - report:
+        - report mailboxusagequotastatusmailboxcounts: 'cmd/outlook/report/report-mailboxusagequotastatusmailboxcounts.md'
         - report mailboxusagestorage: 'cmd/outlook/report/report-mailboxusagestorage.md'
     - PowerApps (pa):
       - pcf:
