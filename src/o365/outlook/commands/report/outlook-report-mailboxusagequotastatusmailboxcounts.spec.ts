@@ -3,12 +3,12 @@ import Command from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./outlook-report-getmailboxusagequotastatusmailboxcounts');
+const command: Command = require('./outlook-report-mailboxusagequotastatusmailboxcounts');
 import * as assert from 'assert';
 import Utils from '../../../../Utils';
 import request from '../../../../request';
 
-describe(commands.OUTLOOK_USAGE_GETMAILBOXUSAGEQUOTASTATUSMAILBOXCOUNTS, () => {
+describe(commands.OUTLOOK_REPORT_MAILBOXUSAGEQUOTASTATUSMAILBOXCOUNTS, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
@@ -50,7 +50,7 @@ describe(commands.OUTLOOK_USAGE_GETMAILBOXUSAGEQUOTASTATUSMAILBOXCOUNTS, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.OUTLOOK_USAGE_GETMAILBOXUSAGEQUOTASTATUSMAILBOXCOUNTS), true);
+    assert.equal(command.name.startsWith(commands.OUTLOOK_REPORT_MAILBOXUSAGEQUOTASTATUSMAILBOXCOUNTS), true);
   });
 
   it('has a description', () => {
@@ -90,6 +90,6 @@ describe(commands.OUTLOOK_USAGE_GETMAILBOXUSAGEQUOTASTATUSMAILBOXCOUNTS, () => {
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
     cmd.help({}, () => { });
-    assert(find.calledWith(commands.OUTLOOK_USAGE_GETMAILBOXUSAGEQUOTASTATUSMAILBOXCOUNTS));
+    assert(find.calledWith(commands.OUTLOOK_REPORT_MAILBOXUSAGEQUOTASTATUSMAILBOXCOUNTS));
   });
 });

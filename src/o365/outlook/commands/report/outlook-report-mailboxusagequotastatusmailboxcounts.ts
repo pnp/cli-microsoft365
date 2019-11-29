@@ -3,9 +3,9 @@ import PeriodBasedReport from '../../../base/PeriodBasedReport';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
-class OutlookGetMailboxUsageQuotaStatusMailboxCountsCommand extends PeriodBasedReport {
+class OutlookMailboxUsageQuotaStatusMailboxCountsCommand extends PeriodBasedReport {
   public get name(): string {
-    return `${commands.OUTLOOK_USAGE_GETMAILBOXUSAGEQUOTASTATUSMAILBOXCOUNTS}`;
+    return `${commands.OUTLOOK_REPORT_MAILBOXUSAGEQUOTASTATUSMAILBOXCOUNTS}`;
   }
 
   public get usageEndpoint(): string {
@@ -22,17 +22,17 @@ class OutlookGetMailboxUsageQuotaStatusMailboxCountsCommand extends PeriodBasedR
       `  Examples:
       
     Gets the count of user mailboxes in each quota category for the last week
-      ${commands.OUTLOOK_USAGE_GETMAILBOXUSAGEQUOTASTATUSMAILBOXCOUNTS} --period D7
+      ${commands.OUTLOOK_REPORT_MAILBOXUSAGEQUOTASTATUSMAILBOXCOUNTS} --period D7
 
     Gets the count of user mailboxes in each quota category for the last week
     and exports the report data in the specified path in text format
-      ${commands.OUTLOOK_USAGE_GETMAILBOXUSAGEQUOTASTATUSMAILBOXCOUNTS} --period D7 --output text --outputFile 'C:/report.txt'
+      ${commands.OUTLOOK_REPORT_MAILBOXUSAGEQUOTASTATUSMAILBOXCOUNTS} --period D7 --output text --outputFile 'C:/report.txt'
 
     Gets the count of user mailboxes in each quota category for the last week
     and exports the report data in the specified path in json format
-      ${commands.OUTLOOK_USAGE_GETMAILBOXUSAGEQUOTASTATUSMAILBOXCOUNTS} --period D7 --output json --outputFile 'C:/report.json'
+      ${commands.OUTLOOK_REPORT_MAILBOXUSAGEQUOTASTATUSMAILBOXCOUNTS} --period D7 --output json --outputFile 'C:/report.json'
 `);
   }
 }
 
-module.exports = new OutlookGetMailboxUsageQuotaStatusMailboxCountsCommand();
+module.exports = new OutlookMailboxUsageQuotaStatusMailboxCountsCommand();

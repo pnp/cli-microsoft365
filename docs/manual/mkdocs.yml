@@ -72,7 +72,7 @@ nav:
         - schemaextension get: 'cmd/graph/schemaextension/schemaextension-get.md'
     - Outlook (outlook):
         - outlook mail send: 'cmd/outlook/mail/mail-send.md'
-        - outlook report getmailboxusagequotastatusmailboxcounts: 'cmd/outlook/report/report-getmailboxusagequotastatusmailboxcounts.md'
+        - outlook report mailboxusagequotastatusmailboxcounts: 'cmd/outlook/report/report-mailboxusagequotastatusmailboxcounts.md'
     - PowerApps (pa):
       - pcf:
         - pcf init: 'cmd/pa/pcf/pcf-init.md'
