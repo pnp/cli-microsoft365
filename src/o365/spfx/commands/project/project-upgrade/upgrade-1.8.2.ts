@@ -38,7 +38,7 @@ module.exports = [
   new FN002003_DEVDEP_microsoft_sp_webpart_workbench('1.8.2'),
   new FN002009_DEVDEP_microsoft_sp_tslint_rules('1.8.2'),
   new FN002010_DEVDEP_microsoft_rush_stack_compiler_2_7('', false),
-  new FN002011_DEVDEP_microsoft_rush_stack_compiler_2_9('0.7.7'),
+  new FN002011_DEVDEP_microsoft_rush_stack_compiler_2_9('0.7.7', false),
   new FN010001_YORC_version('1.8.2'),
   new FN012017_TSC_extends('./node_modules/@microsoft/rush-stack-compiler-2.9/includes/tsconfig-web.json'),
   new FN020001_RES_types_react('16.7.22')
