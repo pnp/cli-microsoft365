@@ -1,0 +1,16 @@
+name: 'Office 365 CLI Deploy App'
+description: 'Deploy an app using Office 365 CLI'
+inputs:
+  APP_FILE_PATH:  
+    description: 'Location of the app to deploy'
+    required: true
+  SCOPE:
+    description: 'Scope of the app catalog'
+  SITE_COLLECTION_URL:
+    description: 'The URL of the app catalog where the solution package will be added.'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+branding:
+  icon: 'download'  
+  color: 'blue'
