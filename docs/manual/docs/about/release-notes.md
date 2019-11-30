@@ -22,6 +22,7 @@
 - added case-sensitive option parsing [#1182](https://github.com/pnp/office365-cli/issues/1182)
 - added 'Lists active SharePoint site collection application catalogs' sample [#1194](https://github.com/pnp/office365-cli/issues/1194)
 - extended the 'yammer message list' command [#1184](https://github.com/pnp/office365-cli/issues/1184)
+- excluded unsupported modules in 'spfx project externalize' [#1191](https://github.com/pnp/office365-cli/issues/1191)
 
 ## [v2.2.0](https://github.com/pnp/office365-cli/releases/tag/v2.2.0)
 
