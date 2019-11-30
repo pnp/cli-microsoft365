@@ -82,7 +82,7 @@ describe('DynamicRule', () => {
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
     sinon.stub(request, 'post').callsFake(() => Promise.reject());
     const findings = await rule.visit(project);
-    assert.equal(findings.length, 0);
+    assert.equal(findings[0].length, 0);
   });
 
   it('returns from main if module is missing', async () => {
