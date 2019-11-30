@@ -376,6 +376,11 @@ nav:
       - user:
         - user get: 'cmd/yammer/user/user-get.md'
         - user list: 'cmd/yammer/user/user-list.md'
+    - GitHub Actions:
+      - login: 'cmd/actions/login.md'
+      - runscript: 'cmd/actions/runscript.md'
+      - deploy: 'cmd/actions/deploy.md'
+      - workflow: 'cmd/actions/completeworkflow.md'
   - Concepts:
     - 'Persisting connection': 'concepts/persisting-connection.md'
     - 'Authorization and access tokens': 'concepts/authorization-tokens.md'
