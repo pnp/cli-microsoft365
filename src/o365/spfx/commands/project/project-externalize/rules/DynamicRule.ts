@@ -5,7 +5,7 @@ import request from '../../../../../../request';
 import { FileEditSuggestion, ExternalizeEntry } from "../model";
 
 export class DynamicRule extends BasicDependencyRule {
-  private restrictedModules = ['react', 'react-dom'];
+  private restrictedModules = ['react', 'react-dom', '@pnp/sp-clientsvc', '@pnp/sp-taxonomy'];
   private restrictedNamespaces = ['@types/', '@microsoft/'];
 
   public async visit(project: Project): Promise<[ExternalizeEntry[], FileEditSuggestion[]]> {
