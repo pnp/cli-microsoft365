@@ -10,7 +10,7 @@ inputs:
     description: 'The URL of the app catalog where the solution package will be added.'
 runs:
   using: 'docker'
-  image: 'DockerFile'
+  image: 'Dockerfile'
 branding:
   icon: 'download'  
   color: 'blue'
