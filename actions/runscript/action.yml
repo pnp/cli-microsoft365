@@ -7,7 +7,7 @@ inputs:
     description: 'Office 365 CLI Script'
 runs:
   using: 'docker'
-  image: 'Dockerfile'
+  image: 'DockerFile'
 branding:
   icon: 'chevron-right'  
   color: 'blue'

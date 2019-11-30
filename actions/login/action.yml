@@ -9,7 +9,7 @@ inputs:
     required: true
 runs:
   using: 'docker'
-  image: 'Dockerfile'
+  image: 'DockerFile'
 branding:
   icon: 'log-in'  
   color: 'blue'
