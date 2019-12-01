@@ -74,6 +74,7 @@ nav:
       - mail:
         - mail send: 'cmd/outlook/mail/mail-send.md'
       - report:
+        - report mailactivitycounts: 'cmd/outlook/report/report-mailactivitycounts.md'
         - report mailactivityuserdetail: 'cmd/outlook/report/report-mailactivityuserdetail.md'
         - report mailappusageappsusercounts: 'cmd/outlook/report/report-mailappusageappsusercounts.md'
         - report mailappusageuserdetail: 'cmd/outlook/report/report-mailappusageuserdetail.md'
