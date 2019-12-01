@@ -27,7 +27,7 @@ describe('DynamicRule', () => {
       packageJson: undefined
     };
     const findings = await rule.visit(project);
-    assert.equal(findings[0].length, 0);
+    assert.equal(findings.entries.length, 0);
   });
 
   it('returns something is package.json is here', async () => {
@@ -54,7 +54,7 @@ describe('DynamicRule', () => {
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
     sinon.stub(request, 'post').callsFake(() => Promise.reject());
     const findings = await rule.visit(project);
-    assert.equal(findings[0].length, 1);
+    assert.equal(findings.entries.length, 1);
   });
 
   it('doesnt return anything is package is unsupported', async () => {
@@ -82,7 +82,7 @@ describe('DynamicRule', () => {
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
     sinon.stub(request, 'post').callsFake(() => Promise.reject());
     const findings = await rule.visit(project);
-    assert.equal(findings[0].length, 0);
+    assert.equal(findings.entries.length, 0);
   });
 
   it('returns from main if module is missing', async () => {
@@ -108,7 +108,7 @@ describe('DynamicRule', () => {
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
     sinon.stub(request, 'post').callsFake(() => Promise.resolve(JSON.stringify({ scriptType: 'script' })));
     const findings = await rule.visit(project);
-    assert.equal(findings[0].length, 1);
+    assert.equal(findings.entries.length, 1);
   });
 
   it('doesn\'t return anything if both module and main are missing', async () => {
@@ -132,7 +132,7 @@ describe('DynamicRule', () => {
     });
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
     const findings = await rule.visit(project);
-    assert.equal(findings[0].length, 0);
+    assert.equal(findings.entries.length, 0);
   });
 
   it('doesn\'t return anything if file is not present on CDN', async () => {
@@ -159,6 +159,6 @@ describe('DynamicRule', () => {
     sinon.stub(request, 'head').callsFake(() => Promise.reject());
     sinon.stub(request, 'post').callsFake(() => Promise.resolve(JSON.stringify({ scriptType: 'module' })));
     const findings = await rule.visit(project);
-    assert.equal(findings[0].length, 0);
+    assert.equal(findings.entries.length, 0);
   });
 });

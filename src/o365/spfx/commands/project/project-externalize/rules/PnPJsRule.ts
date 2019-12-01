@@ -1,6 +1,6 @@
 import { BasicDependencyRule } from "./BasicDependencyRule";
 import { Project } from "../../project-upgrade/model";
-import { ExternalizeEntry, FileEditSuggestion } from "../model";
+import { ExternalizeEntry, FileEditSuggestion, IVisitationResult } from "../model";
 import * as path from 'path';
 import * as fs from 'fs';
 
@@ -45,7 +45,7 @@ export class PnPJsRule extends BasicDependencyRule {
     }
   ];
 
-  public visit(project: Project): Promise<[ExternalizeEntry[],FileEditSuggestion[]]> {
+  public visit(project: Project): Promise<IVisitationResult> {
     const findings = this.pnpModules
       .map(x => this.getModuleAndParents(project, x.key))
       .reduce((x, y) => [...x, ...y]);
@@ -71,7 +71,7 @@ export class PnPJsRule extends BasicDependencyRule {
       } as FileEditSuggestion)));
     }
     
-    return Promise.resolve([findings, fileEdits]);
+    return Promise.resolve({entries: findings, suggestions: fileEdits});
   }
   private getEntryFilesList(project: Project): string[] {
     const result = [...this.getComponents(project, 'webparts', ['WebPart']), ...this.getComponents(project, 'extensions', ['ApplicationCustomizer', 'CommandSet'])];

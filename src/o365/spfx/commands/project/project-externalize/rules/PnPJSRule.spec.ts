@@ -22,7 +22,7 @@ describe('PnPJsRule', () => {
       }
     };
     const findings = await rule.visit(project);
-    assert.equal(findings[0].length, 1);
+    assert.equal(findings.entries.length, 1);
   });
 
   it('returns no notification if dependency is not here', async () => {
@@ -35,7 +35,7 @@ describe('PnPJsRule', () => {
       }
     };
     const findings = await rule.visit(project);
-    assert.equal(findings[0].length, 0);
+    assert.equal(findings.entries.length, 0);
   });
 
   it('doesnt return a shadow require when the type of component is not recognized', async () => {
@@ -57,7 +57,7 @@ describe('PnPJsRule', () => {
       }
     });
     const findings = await rule.visit(project);
-    assert.equal(findings[1].length, 0);
+    assert.equal(findings.suggestions.length, 0);
   });
   afterEach(() => {
     Utils.restore([

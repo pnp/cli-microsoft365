@@ -114,8 +114,8 @@ class SpfxProjectExternalizeCommand extends Command {
     Promise
       .all(asyncRulesResults)
       .then((rulesResults) => {
-        this.allFindings.push(...rulesResults.map(x => x[0]).reduce((x, y) => [...x, ...y]));
-        this.allEditSuggestions.push(...rulesResults.map(x => x[1]).reduce((x, y) => [...x, ...y]));
+        this.allFindings.push(...rulesResults.map(x => x.entries).reduce((x, y) => [...x, ...y]));
+        this.allEditSuggestions.push(...rulesResults.map(x => x.suggestions).reduce((x, y) => [...x, ...y]));
         //removing duplicates
         this.allFindings = this.allFindings.filter((x, i) => this.allFindings.findIndex(y => y.key === x.key) === i);
         this.writeReport(this.allFindings, this.allEditSuggestions, cmd, args.options);
