@@ -78,6 +78,7 @@ nav:
         - report mailactivityusercounts: 'cmd/outlook/report/report-mailactivityusercounts.md'
         - report mailactivityuserdetail: 'cmd/outlook/report/report-mailactivityuserdetail.md'
         - report mailappusageappsusercounts: 'cmd/outlook/report/report-mailappusageappsusercounts.md'
+        - report mailappusageusercounts: 'cmd/outlook/report/report-mailappusageusercounts.md'
         - report mailappusageuserdetail: 'cmd/outlook/report/report-mailappusageuserdetail.md'
         - report mailappusageversionsusercounts: 'cmd/outlook/report/report-mailappusageversionsusercounts.md'
         - report mailboxusagedetail: 'cmd/outlook/report/report-mailboxusagedetail.md'
