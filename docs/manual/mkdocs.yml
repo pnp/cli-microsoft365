@@ -377,6 +377,7 @@ nav:
       - message:
         - message get: 'cmd/yammer/message/message-get.md'
         - message list: 'cmd/yammer/message/message-list.md'
+        - message remove: 'cmd/yammer/message/message-remove.md'
       - network:
         - network list: 'cmd/yammer/network/network-list.md'
       - user:
