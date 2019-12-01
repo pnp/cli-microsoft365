@@ -1,6 +1,6 @@
 {
   "name": "@pnp/office365-cli",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "lockfileVersion": 1,
   "requires": true,
   "dependencies": {
@@ -3906,7 +3906,7 @@
     },
     "wrap-ansi": {
       "version": "2.1.0",
-      "resolved": "https://registry.npmjs.org/wrap-ansi/-/wrap-ansi-2.1.0.tgz",
+      "resolved": "http://registry.npmjs.org/wrap-ansi/-/wrap-ansi-2.1.0.tgz",
       "integrity": "sha1-2Pw9KE3QV5T+hJc8rs3Rz4JP3YU=",
       "requires": {
         "string-width": "^1.0.1",
