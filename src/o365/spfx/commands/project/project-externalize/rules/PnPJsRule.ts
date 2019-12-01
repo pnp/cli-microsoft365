@@ -58,7 +58,7 @@ export class PnPJsRule extends BasicDependencyRule {
           targetValue: x.shadowRequire
         } as FileEditSuggestion)))
     const fileEdits = rawfileEdits.length > 0 ? rawfileEdits.reduce((x, y) => [...x, ...y]) : [];
-    if (findings.filter(x => x.key && x.key !== '@pnp/pnpjs').length > 0) {
+    if (findings.filter(x => x.key && x.key !== '@pnp/pnpjs').length > 0) { // we're adding tslib only if we found other packages that are not the bundle which already contains tslib
       findings.push({
         key: 'tslib',
         globalName: 'tslib',
