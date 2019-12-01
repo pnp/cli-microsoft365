@@ -21,7 +21,7 @@ class OutlookMailboxUsageMailboxCountCommand extends PeriodBasedReport {
     log(
       `  Remarks:
     
-    A mailbox is considered active if the user sent or read any email.
+      A mailbox is considered active if the user sent or read any email.
   
     Examples:
       
