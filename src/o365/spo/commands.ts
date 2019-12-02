@@ -32,6 +32,7 @@ export default {
   CUSTOMACTION_LIST: `${prefix} customaction list`,
   CUSTOMACTION_REMOVE: `${prefix} customaction remove`,
   EXTERNALUSER_LIST: `${prefix} externaluser list`,
+  FEATURE_DISABLE: `${prefix} feature disable`,
   FEATURE_ENABLE: `${prefix} feature enable`,
   FEATURE_LIST: `${prefix} feature list`,
   FIELD_ADD: `${prefix} field add`,
