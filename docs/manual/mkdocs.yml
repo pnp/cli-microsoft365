@@ -133,6 +133,7 @@ nav:
       - externaluser:
         - externaluser list: 'cmd/spo/externaluser/externaluser-list.md'
       - feature:
+        - feature disable: 'cmd/spo/feature/feature-disable.md'
         - feature enable: 'cmd/spo/feature/feature-enable.md'
         - feature list: 'cmd/spo/feature/feature-list.md'
       - field:
