@@ -1,5 +1,19 @@
 # Release notes
 
+## v2.4.0
+
+### New commands
+
+**Outlook**
+
+- [outlook report mailboxusagequotastatusmailboxcounts](../cmd/outlook/report/report-mailboxusagequotastatusmailboxcounts.md) - gets the count of user mailboxes in each quota category [#1218](https://github.com/pnp/office365-cli/issues/1218)
+- [outlook report mailboxusagestorage](../cmd/outlook/report/report-mailboxusagestorage.md) - gets the amount of mailbox storage used in your organization [#1219](https://github.com/pnp/office365-cli/issues/1219)
+
+### Changes
+
+- added support for setting CSOM properties on web [#1202](https://github.com/pnp/office365-cli/issues/1202)
+- Rush stack compiler made optional for 1.9.1 upgrade [#1222](https://github.com/pnp/office365-cli/issues/1222)
+
 ## [v2.3.0](https://github.com/pnp/office365-cli/releases/tag/v2.3.0)
 
 ### New commands
