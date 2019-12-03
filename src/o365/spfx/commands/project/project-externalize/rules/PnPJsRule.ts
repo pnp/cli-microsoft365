@@ -2,8 +2,6 @@ import { BasicDependencyRule } from "./BasicDependencyRule";
 import { Project } from "../../project-upgrade/model";
 import { ExternalizeEntry, FileEdit } from "../model";
 import { VisitationResult } from './VisitationResult';
-import * as path from 'path';
-import * as fs from 'fs';
 
 export class PnPJsRule extends BasicDependencyRule {
   private pnpModules = [
@@ -75,23 +73,7 @@ export class PnPJsRule extends BasicDependencyRule {
     return Promise.resolve({entries: findings, suggestions: fileEdits});
   }
   private getEntryFilesList(project: Project): string[] {
-    const result = [...this.getComponents(project, 'webparts', ['WebPart']), ...this.getComponents(project, 'extensions', ['ApplicationCustomizer', 'CommandSet'])];
-    return result;
-  }
-  private getComponents(project:Project, componentPathSegment: string, appendixes: string[]): string[] {
-    const src = 'src';
-    const componentsPath = path.join(project.path, src, componentPathSegment);
-    if(fs.existsSync(componentsPath)) {
-      const componentFolderNames = fs.readdirSync(componentsPath);
-      return componentFolderNames
-            .filter((x) => fs.lstatSync(path.join(componentsPath, x)).isDirectory())
-            .map((x) => {
-              const candidatePaths = appendixes.map(appendix => `${src}/${componentPathSegment}/${x}/${x[0].toLocaleUpperCase()}${x.substr(1)}${appendix}.ts`)
-              .filter((y) => fs.existsSync(path.join(project.path, y)));
-              return candidatePaths.length> 0 ? candidatePaths[0] : '';
-            });
-    }
-    return [];
+    return project && project.manifests ? project.manifests.map(x => x.path.replace('.manifest.json', '.ts')) : [];
   }
   private getModuleAndParents(project: Project, moduleName: string): ExternalizeEntry[] {
     const result: ExternalizeEntry[] = [];
