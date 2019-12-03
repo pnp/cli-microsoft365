@@ -6,13 +6,13 @@ import GlobalOptions from '../../../../GlobalOptions';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
-import { Utils } from './project-upgrade/';
 import { Project, ExternalConfiguration, External } from './project-upgrade/model';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 import rules = require('./project-externalize/DefaultRules');
 import { BasicDependencyRule } from './project-externalize/rules';
 import { ExternalizeEntry, FileEdit } from './project-externalize/model';
+import { BaseProjectCommand } from './base-project-command';
 
 interface CommandArgs {
   options: Options;
@@ -22,7 +22,7 @@ interface Options extends GlobalOptions {
   outputFile?: string;
 }
 
-class SpfxProjectExternalizeCommand extends Command {
+class SpfxProjectExternalizeCommand extends BaseProjectCommand {
   private projectVersion: string | undefined;
   private projectRootPath: string | null = null;
   private supportedVersions: string[] = [
@@ -214,37 +214,6 @@ class SpfxProjectExternalizeCommand extends Command {
     ];
 
     return s.join('').trim();
-  }
-
-  private getProject(projectRootPath: string): Project {
-    const project: Project = {
-      path: projectRootPath
-    };
-
-    const configJsonPath: string = path.join(projectRootPath, 'config/config.json');
-    if (fs.existsSync(configJsonPath)) {
-      try {
-        project.configJson = JSON.parse(Utils.removeSingleLineComments(fs.readFileSync(configJsonPath, 'utf-8')));
-      }
-      catch { }
-    }
-
-    const packageJsonPath: string = path.join(projectRootPath, 'package.json');
-    if (fs.existsSync(packageJsonPath)) {
-      try {
-        project.packageJson = JSON.parse(Utils.removeSingleLineComments(fs.readFileSync(packageJsonPath, 'utf-8')));
-      }
-      catch { }
-    }
-
-    const yoRcJsonPath: string = path.join(projectRootPath, '.yo-rc.json');
-    if (fs.existsSync(yoRcJsonPath)) {
-      try {
-        project.yoRcJson = JSON.parse(Utils.removeSingleLineComments(fs.readFileSync(yoRcJsonPath, 'utf-8')));
-      }
-      catch { }
-    }
-    return project;
   }
 
   private getProjectRoot(folderPath: string): string | null {
