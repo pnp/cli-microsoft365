@@ -1,6 +1,7 @@
 import { BasicDependencyRule } from "./BasicDependencyRule";
 import { Project } from "../../project-upgrade/model";
-import { ExternalizeEntry, FileEditSuggestion, IVisitationResult } from "../model";
+import { ExternalizeEntry, FileEdit } from "../model";
+import { VisitationResult } from './VisitationResult';
 import * as path from 'path';
 import * as fs from 'fs';
 
@@ -45,7 +46,7 @@ export class PnPJsRule extends BasicDependencyRule {
     }
   ];
 
-  public visit(project: Project): Promise<IVisitationResult> {
+  public visit(project: Project): Promise<VisitationResult> {
     const findings = this.pnpModules
       .map(x => this.getModuleAndParents(project, x.key))
       .reduce((x, y) => [...x, ...y]);
@@ -56,7 +57,7 @@ export class PnPJsRule extends BasicDependencyRule {
           action: "add",
           path: y,
           targetValue: x.shadowRequire
-        } as FileEditSuggestion)))
+        } as FileEdit)))
     const fileEdits = rawfileEdits.length > 0 ? rawfileEdits.reduce((x, y) => [...x, ...y]) : [];
     if (findings.filter(x => x.key && x.key !== '@pnp/pnpjs').length > 0) { // we're adding tslib only if we found other packages that are not the bundle which already contains tslib
       findings.push({
@@ -68,7 +69,7 @@ export class PnPJsRule extends BasicDependencyRule {
           action: "add",
           path: x,
           targetValue: 'require(\"tslib\");'
-      } as FileEditSuggestion)));
+      } as FileEdit)));
     }
     
     return Promise.resolve({entries: findings, suggestions: fileEdits});

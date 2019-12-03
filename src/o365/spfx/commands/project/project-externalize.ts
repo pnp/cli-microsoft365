@@ -12,7 +12,7 @@ import { Project, ExternalConfiguration, External } from './project-upgrade/mode
 const vorpal: Vorpal = require('../../../../vorpal-init');
 import rules = require('./project-externalize/DefaultRules');
 import { BasicDependencyRule } from './project-externalize/rules';
-import { ExternalizeEntry, FileEditSuggestion } from './project-externalize/model';
+import { ExternalizeEntry, FileEdit } from './project-externalize/model';
 
 interface CommandArgs {
   options: Options;
@@ -50,7 +50,7 @@ class SpfxProjectExternalizeCommand extends Command {
     '1.9.1'
   ];
   private allFindings: ExternalizeEntry[] = [];
-  private allEditSuggestions: FileEditSuggestion[] = [];
+  private allEditSuggestions: FileEdit[] = [];
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
   public static ERROR_NO_VERSION: number = 3;
   public static ERROR_UNSUPPORTED_VERSION: number = 2;
@@ -125,7 +125,7 @@ class SpfxProjectExternalizeCommand extends Command {
       });
   }
 
-  private writeReport(findingsToReport: ExternalizeEntry[], editsToReport: FileEditSuggestion[], cmd: CommandInstance, options: Options): void {
+  private writeReport(findingsToReport: ExternalizeEntry[], editsToReport: FileEdit[], cmd: CommandInstance, options: Options): void {
     let report;
 
     switch (options.output) {
@@ -148,7 +148,7 @@ class SpfxProjectExternalizeCommand extends Command {
     }
   }
 
-  private serializeMdReport(findingsToReport: ExternalizeEntry[], editsToReport: FileEditSuggestion[]): string {
+  private serializeMdReport(findingsToReport: ExternalizeEntry[], editsToReport: FileEdit[]): string {
     const lines = [
       `# Externalizing dependencies of project ${path.posix.basename(this.projectRootPath as string)}`, os.EOL,
       os.EOL,
@@ -165,12 +165,12 @@ class SpfxProjectExternalizeCommand extends Command {
       '```json', os.EOL,
       JSON.stringify(this.serializeJsonReport(findingsToReport), null, 2), os.EOL,
       '```', os.EOL,
-      ...this.getReportForFileEdit(this.getGroupedFileEditSuggestions(editsToReport, 'add')),
-      ...this.getReportForFileEdit(this.getGroupedFileEditSuggestions(editsToReport, 'remove')),
+      ...this.getReportForFileEdit(this.getGroupedFileEdits(editsToReport, 'add')),
+      ...this.getReportForFileEdit(this.getGroupedFileEdits(editsToReport, 'remove')),
     ];
     return lines.join('');
   }
-  private getReportForFileEdit(suggestions: FileEditSuggestion[][]): string[] {
+  private getReportForFileEdit(suggestions: FileEdit[][]): string[] {
     const initialReport = suggestions.map(x => [`#### [${x[0].path}](${x[0].path})`, os.EOL, x[0].action, os.EOL, '```JavaScript', os.EOL, 
                         ...x.map(y => [y.targetValue, os.EOL]).reduce((y, z) => [...y, ...z]),
                       '```', os.EOL]);
@@ -181,7 +181,7 @@ class SpfxProjectExternalizeCommand extends Command {
       return [];
     }
   }
-  private getGroupedFileEditSuggestions(editsToReport: FileEditSuggestion[], action: "add" | "remove"): FileEditSuggestion[][] {
+  private getGroupedFileEdits(editsToReport: FileEdit[], action: "add" | "remove"): FileEdit[][] {
     const editsMatchingAction = editsToReport.filter(x => x.action === action);
     return editsMatchingAction.filter((x, i) => editsMatchingAction.findIndex(y => y.path === x.path) === i)
     .map(x => editsMatchingAction.filter(y => y.path === x.path));
@@ -206,7 +206,7 @@ class SpfxProjectExternalizeCommand extends Command {
     };
   }
 
-  private serializeTextReport(findingsToReport: ExternalizeEntry[], editsToReport: FileEditSuggestion[]): string {
+  private serializeTextReport(findingsToReport: ExternalizeEntry[], editsToReport: FileEdit[]): string {
     const s: string[] = [
       'In the config/config.json file update the externals property to:', os.EOL,
       os.EOL,

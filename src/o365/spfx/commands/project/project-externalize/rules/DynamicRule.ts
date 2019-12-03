@@ -2,13 +2,14 @@ import { BasicDependencyRule } from "./BasicDependencyRule";
 import { Project } from "../../project-upgrade/model";
 import * as fs from 'fs';
 import request from '../../../../../../request';
-import { ExternalizeEntry, IVisitationResult } from "../model";
+import { ExternalizeEntry } from "../model";
+import { VisitationResult} from './VisitationResult';
 
 export class DynamicRule extends BasicDependencyRule {
   private restrictedModules = ['react', 'react-dom', '@pnp/sp-clientsvc', '@pnp/sp-taxonomy'];
   private restrictedNamespaces = ['@types/', '@microsoft/'];
 
-  public async visit(project: Project): Promise<IVisitationResult> {
+  public async visit(project: Project): Promise<VisitationResult> {
     if (!project.packageJson) {
       return {entries: [], suggestions: []};
     }

@@ -1,4 +1,4 @@
-export interface FileEditSuggestion {
+export interface FileEdit {
   path: string;
   targetValue: string;
   action: "add" | "remove";

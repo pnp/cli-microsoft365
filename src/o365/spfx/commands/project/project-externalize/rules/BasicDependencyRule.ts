@@ -1,6 +1,6 @@
 import { Project } from "../../project-upgrade/model";
-import { IVisitationResult } from "../model";
+import { VisitationResult } from "./VisitationResult";
 
 export abstract class BasicDependencyRule {
-  abstract visit(project: Project): Promise<IVisitationResult>;
+  abstract visit(project: Project): Promise<VisitationResult>;
 }
