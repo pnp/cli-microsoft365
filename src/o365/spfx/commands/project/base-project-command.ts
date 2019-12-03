@@ -5,7 +5,8 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 export abstract class BaseProjectCommand extends Command {
-  public getProject(projectRootPath: string): Project {
+  protected projectRootPath: string | null = null;
+  protected getProject(projectRootPath: string): Project {
     const project: Project = {
       path: projectRootPath
     };
@@ -159,4 +160,47 @@ export abstract class BaseProjectCommand extends Command {
       ? Array.prototype.concat(...fs.readdirSync(dir).map(f => BaseProjectCommand.readdirR(path.join(dir, f))))
       : dir;
   }
+  protected getProjectRoot(folderPath: string): string | null {
+    const packageJsonPath: string = path.resolve(folderPath, 'package.json');
+    if (fs.existsSync(packageJsonPath)) {
+      return folderPath;
+    }
+    else {
+      const parentPath: string = path.resolve(folderPath, `..${path.sep}`);
+      if (parentPath !== folderPath) {
+        return this.getProjectRoot(parentPath);
+      }
+      else {
+        return null;
+      }
+    }
+  }
+  protected getProjectVersion(): string | undefined {
+    const yoRcPath: string = path.resolve(this.projectRootPath as string, '.yo-rc.json');
+    if (fs.existsSync(yoRcPath)) {
+      try {
+        const yoRc: any = JSON.parse(fs.readFileSync(yoRcPath, 'utf-8'));
+        if (yoRc && yoRc['@microsoft/generator-sharepoint'] &&
+          yoRc['@microsoft/generator-sharepoint'].version) {
+          return yoRc['@microsoft/generator-sharepoint'].version;
+        }
+      }
+      catch { }
+    }
+
+    const packageJsonPath: string = path.resolve(this.projectRootPath as string, 'package.json');
+    try {
+      const packageJson: any = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+      if (packageJson &&
+        packageJson.dependencies &&
+        packageJson.dependencies['@microsoft/sp-core-library']) {
+        const coreLibVersion: string = packageJson.dependencies['@microsoft/sp-core-library'];
+        return coreLibVersion.replace(/[^0-9\.]/g, '');
+      }
+    }
+    catch { }
+
+    return undefined;
+  }
+
 }
