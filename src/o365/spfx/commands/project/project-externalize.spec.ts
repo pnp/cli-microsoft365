@@ -142,7 +142,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, options) => {
       if (path.endsWith('.yo-rc.json')) {
         return `{}`;
       }
@@ -154,7 +154,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
         });
       }
       else {
-        return originalReadFileSync(path);
+        return originalReadFileSync(path, options);
       }
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
@@ -182,7 +182,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, options) => {
       if (path.endsWith('.yo-rc.json')) {
         return `{
           "@microsoft/generator-sharepoint": {
@@ -194,7 +194,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
         }`;
       }
       else {
-        return originalReadFileSync(path);
+        return originalReadFileSync(path, options);
       }
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
@@ -222,7 +222,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, options) => {
       if (path.endsWith('package.json')) {
         return `{
           "name": "spfx-041",
@@ -256,7 +256,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
         `;
       }
       else {
-        return originalReadFileSync(path);
+        return originalReadFileSync(path, options);
       }
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
@@ -307,12 +307,12 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, options) => {
       if (path.endsWith('config.json')) {
         return '{}';
       }
       else {
-        return originalReadFileSync(path);
+        return originalReadFileSync(path, options);
       }
     });
 
@@ -358,7 +358,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
   it('e2e: shows correct number of findings for externalizing react web part 1.8.2 project', (done) => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-externalize/test-projects/spfx-182-webpart-react'));
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, options) => {
       if (path.endsWith('package.json') && path.indexOf('pnpjs') > -1) {
         return JSON.stringify({
           main: "./dist/pnpjs.es5.umd.bundle.js",
@@ -371,7 +371,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
         return JSON.stringify(pConfig);
       }
       else {
-        return originalReadFileSync(path);
+        return originalReadFileSync(path, options);
       }
     });
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
@@ -390,10 +390,54 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
   });
 
+  it('returns edit suggestions', (done) => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-externalize/test-projects/spfx-182-webpart-react'));
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, options) => {
+      if (path.endsWith('package.json') && path.indexOf('logging') > -1) {
+        return JSON.stringify({
+          main: "./dist/logging.es5.umd.bundle.js",
+          module: "./dist/logging.es5.umd.bundle.min.js"
+        });
+      }
+      else if (path.endsWith('package.json') && path.indexOf('common') > -1) {
+        return JSON.stringify({
+          main: "./dist/common.es5.umd.bundle.js",
+          module: "./dist/common.es5.umd.bundle.min.js"
+        });
+      }
+      else if (path.endsWith('package.json') && path.indexOf('spfx-182-webpart-react') > -1) { //adding library on the fly so we get at least one result
+        const pConfig = JSON.parse(originalReadFileSync(path, 'utf8'));
+        pConfig.dependencies['@pnp/logging'] = '1.3.5';
+        pConfig.dependencies['@pnp/common'] = '1.3.5';
+        return JSON.stringify(pConfig);
+      }
+      else {
+        return originalReadFileSync(path, options);
+      }
+    });
+    sinon.stub(request, 'head').callsFake(() => Promise.resolve());
+    sinon.stub(request, 'post').callsFake(() => {
+      return Promise.resolve(JSON.stringify({ scriptType: 'script' }));
+    });
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { output: 'json', debug: false } }, (err?: any) => {
+      try {
+        const findings: { externalConfiguration: {externals: ExternalConfiguration }, edits: FileEdit[] } = log[0];
+        assert.notEqual(findings.edits.length, 0);
+        done();
+      }
+      catch (ex) {
+        done(ex);
+      }
+    });
+  });
+
   it('handles failures properly', (done) => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-externalize/test-projects/spfx-182-webpart-react'));
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, options) => {
       if (path.endsWith('package.json') && path.indexOf('pnpjs') > -1) {
         return JSON.stringify({
           main: "./dist/pnpjs.es5.umd.bundle.js",
@@ -427,7 +471,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
         return JSON.stringify(pConfig);
       }
       else {
-        return originalReadFileSync(path);
+        return originalReadFileSync(path, options);
       }
     });
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
@@ -494,7 +538,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
   it('returns text report with output format default', (done) => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-externalize/test-projects/spfx-182-webpart-react'));
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, options) => {
       if (path.endsWith('package.json') && path.indexOf('pnpjs') > -1) {
         return JSON.stringify({
           main: "./dist/pnpjs.es5.umd.bundle.js",
@@ -507,7 +551,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
         return JSON.stringify(pConfig);
       }
       else {
-        return originalReadFileSync(path);
+        return originalReadFileSync(path, options);
       }
     });
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
@@ -543,7 +587,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     assert.equal(emptyReport.length, 122);
   });
 
-  it('writes upgrade report to file when outputFile specified', (done) => {
+  it('writes exteranlize report to file when outputFile specified', (done) => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-externalize/test-projects/spfx-182-webpart-react'));
     const writeFileSyncSpy: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
 
@@ -559,7 +603,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
   });
 
-  it('writes JSON upgrade report to file when outputFile specified in json output mode', (done) => {
+  it('writes JSON exteranlize report to file when outputFile specified in json output mode', (done) => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-externalize/test-projects/spfx-182-webpart-react'));
     let typeofReport: string = '';
     sinon.stub(fs, 'writeFileSync').callsFake((path: string, contents: any) => {

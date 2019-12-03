@@ -99,21 +99,6 @@ export abstract class BaseProjectCommand extends Command {
       catch { }
     }
 
-    const manifests: Manifest[] = [];
-    const files: string[] = Utils.getAllFiles(path.join(projectRootPath, 'src')) as string[];
-    files.forEach(f => {
-      if (f.endsWith('.manifest.json')) {
-        try {
-          const manifestStr = Utils.removeSingleLineComments(fs.readFileSync(f, 'utf-8'));
-          const manifest: Manifest = JSON.parse(manifestStr);
-          manifest.path = f;
-          manifests.push(manifest);
-        }
-        catch { }
-      }
-    });
-    project.manifests = manifests;
-
     const gulpfileJsPath: string = path.join(projectRootPath, 'gulpfile.js');
     if (fs.existsSync(gulpfileJsPath)) {
       project.gulpfileJs = {
@@ -146,7 +131,17 @@ export abstract class BaseProjectCommand extends Command {
       catch { }
     }
 
-    const srcFiles: string[] = BaseProjectCommand.readdirR(path.join(projectRootPath, 'src')) as string[];
+    const srcFiles: string[] = Utils.getAllFiles(path.join(projectRootPath, 'src')) as string[];
+
+    const manifestFiles = srcFiles.filter(f => f.endsWith('.manifest.json'));
+    const manifests: Manifest[] = manifestFiles.map((f) => {
+      const manifestStr = Utils.removeSingleLineComments(fs.readFileSync(f, 'utf-8'));
+      const manifest: Manifest = JSON.parse(manifestStr);
+      manifest.path = f;
+      return manifest;
+    });
+    project.manifests = manifests;
+
     const tsFiles: string[] = srcFiles.filter(f => f.endsWith('.ts') || f.endsWith('.tsx'));
     project.tsFiles = tsFiles.map(f => new TsFile(f));
 
@@ -154,11 +149,6 @@ export abstract class BaseProjectCommand extends Command {
     project.scssFiles = scssFiles.map(f => new ScssFile(f));
 
     return project;
-  }
-  private static readdirR(dir: string): string | string[] {
-    return fs.statSync(dir).isDirectory()
-      ? Array.prototype.concat(...fs.readdirSync(dir).map(f => BaseProjectCommand.readdirR(path.join(dir, f))))
-      : dir;
   }
   protected getProjectRoot(folderPath: string): string | null {
     const packageJsonPath: string = path.resolve(folderPath, 'package.json');
