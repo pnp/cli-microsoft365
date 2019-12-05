@@ -60,6 +60,8 @@ nav:
       - get: 'cmd/flow/get.md'
       - list: 'cmd/flow/list.md'
       - remove: 'cmd/flow/remove.md'
+      - connector:
+        - connector list: 'cmd/pa/connector/connector-list.md'
       - environment:
         - environment get: 'cmd/flow/environment/environment-get.md'
         - environment list: 'cmd/flow/environment/environment-list.md'
@@ -86,6 +88,8 @@ nav:
         - report mailboxusagequotastatusmailboxcounts: 'cmd/outlook/report/report-mailboxusagequotastatusmailboxcounts.md'
         - report mailboxusagestorage: 'cmd/outlook/report/report-mailboxusagestorage.md'
     - PowerApps (pa):
+      - connector:
+        - connector list: 'cmd/pa/connector/connector-list.md'
       - pcf:
         - pcf init: 'cmd/pa/pcf/pcf-init.md'
       - solution:
