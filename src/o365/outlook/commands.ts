@@ -6,6 +6,7 @@ export default {
   OUTLOOK_REPORT_MAILAPPUSAGEAPPSUSERCOUNTS: `${prefix} report mailappusageappsusercounts`,
   OUTLOOK_REPORT_MAILAPPUSAGEUSERDETAIL: `${prefix} report mailappusageuserdetail`,
   OUTLOOK_REPORT_MAILAPPUSAGEVERSIONSUSERCOUNTS: `${prefix} report mailappusageversionsusercounts`,
+  OUTLOOK_REPORT_MAILBOXUSAGEDETAIL: `${prefix} report mailboxusagedetail`,
   OUTLOOK_REPORT_MAILBOXUSAGEMAILBOXCOUNT: `${prefix} report mailboxusagemailboxcount`,
   OUTLOOK_REPORT_MAILBOXUSAGEQUOTASTATUSMAILBOXCOUNTS: `${prefix} report mailboxusagequotastatusmailboxcounts`,
   OUTLOOK_REPORT_MAILBOXUSAGESTORAGE: `${prefix} report mailboxusagestorage`,
