@@ -12,7 +12,6 @@ describe(commands.YAMMER_MESSAGE_REMOVE, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
-  let promptOptions: any;
  
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -32,11 +31,9 @@ describe(commands.YAMMER_MESSAGE_REMOVE, () => {
         log.push(msg);
       },
       prompt: (options: any, cb: (result: { continue: boolean }) => void) => {
-        promptOptions = options;
         cb({ continue: false });
       }
     };
-    promptOptions = undefined;
     (command as any).items = [];
   });
 
