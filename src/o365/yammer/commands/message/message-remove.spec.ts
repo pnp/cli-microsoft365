@@ -116,6 +116,31 @@ describe(commands.YAMMER_MESSAGE_REMOVE, () => {
     });
   });
 
+  it('calls the messaging endpoint with the right parameters without confirmation', (done) => {
+    let mockStorageRemoveStub = sinon.stub(request, 'delete').callsFake((opts) => {
+      if (opts.url === 'https://www.yammer.com/api/v1/messages/10123190123123.json') {
+        return Promise.resolve();
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({ options: { debug: true, id:10123190123123, confirm: false } }, () => {
+      let promptIssued = false;
+      if (promptOptions && promptOptions.type !== 'confirm') {
+        promptIssued = false;
+      }
+
+      try {
+        assert(!promptIssued);
+        assert(mockStorageRemoveStub.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('correctly handles error', (done) => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       return Promise.reject({
