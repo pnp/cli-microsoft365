@@ -82,13 +82,7 @@ describe(commands.YAMMER_MESSAGE_REMOVE, () => {
     });
 
     cmdInstance.action({ options: { debug: true, id:10123190123123, confirm: true } }, () => {
-      let promptIssued = false;
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
-
       try {
-        assert(promptIssued);
         assert(mockStorageRemoveStub.called);
         done();
       }
