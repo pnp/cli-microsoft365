@@ -76,6 +76,7 @@ nav:
       - report:
         - report activityfilecounts: 'cmd/onedrive/report/report-activityfilecounts.md'
         - report activityusercounts: 'cmd/onedrive/report/report-activityusercounts.md'
+        - report usagestorage: 'cmd/onedrive/report/report-usagestorage.md'
     - Outlook (outlook):
       - mail:
         - mail send: 'cmd/outlook/mail/mail-send.md'
