@@ -153,7 +153,7 @@ describe(commands.YAMMER_MESSAGE_REMOVE, () => {
       });
     });
 
-    cmdInstance.action({ options: { debug: false, id:10123190123123, confirm: false } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: false, id:10123190123123, confirm: true } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
         done();
