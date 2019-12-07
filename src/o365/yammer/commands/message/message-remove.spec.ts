@@ -73,24 +73,6 @@ describe(commands.YAMMER_MESSAGE_REMOVE, () => {
     assert.notEqual(actual, true);
   });
 
-  it('calls the messaging endpoint with the right parameters', function (done) {
-    let mockStorageRemoveStub = sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url === 'https://www.yammer.com/api/v1/messages/10123190123123.json') {
-        return Promise.resolve();
-      }
-      return Promise.reject('Invalid request');
-    });
-    cmdInstance.action({ options: { id:10123190123123, debug: true } }, (err?: any) => {
-      try {
-        assert(mockStorageRemoveStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('calls the messaging endpoint with the right parameters and confirmation', (done) => {
     let mockStorageRemoveStub = sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages/10123190123123.json') {
@@ -124,14 +106,35 @@ describe(commands.YAMMER_MESSAGE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, id:10123190123123, confirm: false } }, () => {
-      let promptIssued = false;
-      if (promptOptions && promptOptions.type !== 'confirm') {
-        promptIssued = false;
-      }
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
 
+    cmdInstance.action({ options: { debug: true, id:10123190123123, confirm: false } }, () => {
       try {
-        assert(!promptIssued);
+        assert(mockStorageRemoveStub.called);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('calls the messaging endpoint with the right parameters without confirmation (2)', (done) => {
+    let mockStorageRemoveStub = sinon.stub(request, 'delete').callsFake((opts) => {
+      if (opts.url === 'https://www.yammer.com/api/v1/messages/10123190123123.json') {
+        return Promise.resolve();
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: false });
+    };
+
+    cmdInstance.action({ options: { debug: true, id:10123190123123, confirm: false } }, () => {
+      try {
         assert(mockStorageRemoveStub.notCalled);
         done();
       }
