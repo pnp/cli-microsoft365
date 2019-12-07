@@ -14,11 +14,12 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   id: number;
+  confirm?: boolean;
 }
 
 class YammerMessageRemoveCommand extends YammerCommand {
   public get name(): string {
-    return `${commands.YAMMER_MESSAGE_REMOVE}`;
+    return commands.YAMMER_MESSAGE_REMOVE;
   }
 
   public get description(): string {
@@ -26,24 +27,45 @@ class YammerMessageRemoveCommand extends YammerCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const requestOptions: any = {
-      url: `${this.resource}/v1/messages/${args.options.id}.json`,
-      headers: {
-        accept: 'application/json;odata.metadata=none',
-        'content-type': 'application/json;odata=nometadata'
-      },
-      json: true
-    };
+    const removeApp: () => void = (): void => {
+      const requestOptions: any = {
+        url: `${this.resource}/v1/messages/${args.options.id}.json`,
+        headers: {
+          accept: 'application/json;odata.metadata=none',
+          'content-type': 'application/json;odata=nometadata'
+        },
+        json: true
+      };
 
-    request
-      .delete(requestOptions)
-      .then((res: any): void => {
-        if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+      request
+        .delete(requestOptions)
+        .then((res: any): void => {
+          if (this.verbose) {
+            cmd.log(vorpal.chalk.green('DONE'));
+          }
+          
+          cb();
+        }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }
+
+    if (args.options.confirm) {
+      removeApp();
+    }
+    else {
+      cmd.prompt({
+        type: 'confirm',
+        name: 'continue',
+        default: false,
+        message: `Are you sure you want to remove the Yammer message ${args.options.id}?`,
+      }, (result: { continue: boolean }): void => {
+        if (!result.continue) {
+          cb();
         }
-        
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+        else {
+          removeApp();
+        }
+      });
+    }
   }
 
   public options(): CommandOption[] {
@@ -51,6 +73,10 @@ class YammerMessageRemoveCommand extends YammerCommand {
       {
         option: '--id <id>',
         description: 'The id of the Yammer message'
+      },
+      {
+        option: '--confirm',
+        description: 'Don\'t prompt for confirming removing the Yammer message'
       }
     ];
 
@@ -81,12 +107,18 @@ class YammerMessageRemoveCommand extends YammerCommand {
     application used by the Office 365 CLI the permission to the Yammer API.
     To do this, execute the ${chalk.blue('consent --service yammer')} command.
 
-    To remove a message, you must either (1) have posted the message yourself (2) be an administrator of the group the message was posted to or (3) be an admin of the network the message is in.
+    To remove a message, you must either 
+      (1) have posted the message yourself 
+      (2) be an administrator of the group the message was posted to or 
+      (3) be an admin of the network the message is in.
     
   Examples:
   
     Removes the Yammer message with the id 1239871123
       ${this.name} --id 1239871123
+
+    Removes the Yammer message with the id 1239871123. Don't prompt for confirmation.
+      ${this.name} --id 1239871123 --confirm
     `);
   }
 }

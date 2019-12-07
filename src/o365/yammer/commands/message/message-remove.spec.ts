@@ -8,10 +8,11 @@ import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 
-describe(commands.YAMMER_MESSAGE_GET, () => {
+describe(commands.YAMMER_MESSAGE_REMOVE, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
+  let promptOptions: any;
  
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -29,8 +30,13 @@ describe(commands.YAMMER_MESSAGE_GET, () => {
       action: command.action(),
       log: (msg: string) => {
         log.push(msg);
+      },
+      prompt: (options: any, cb: (result: { continue: boolean }) => void) => {
+        promptOptions = options;
+        cb({ continue: false });
       }
     };
+    promptOptions = undefined;
     (command as any).items = [];
   });
 
@@ -68,7 +74,7 @@ describe(commands.YAMMER_MESSAGE_GET, () => {
   });
 
   it('calls the messaging endpoint with the right parameters', function (done) {
-    sinon.stub(request, 'delete').callsFake((opts) => {
+    let mockStorageRemoveStub = sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages/10123190123123.json') {
         return Promise.resolve();
       }
@@ -76,6 +82,32 @@ describe(commands.YAMMER_MESSAGE_GET, () => {
     });
     cmdInstance.action({ options: { id:10123190123123, debug: true } }, (err?: any) => {
       try {
+        assert(mockStorageRemoveStub.called);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('calls the messaging endpoint with the right parameters and confirmation', (done) => {
+    let mockStorageRemoveStub = sinon.stub(request, 'delete').callsFake((opts) => {
+      if (opts.url === 'https://www.yammer.com/api/v1/messages/10123190123123.json') {
+        return Promise.resolve();
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({ options: { debug: true, id:10123190123123, confirm: true } }, () => {
+      let promptIssued = false;
+      if (promptOptions && promptOptions.type === 'confirm') {
+        promptIssued = true;
+      }
+
+      try {
+        assert(promptIssued);
+        assert(mockStorageRemoveStub.called);
         done();
       }
       catch (e) {
