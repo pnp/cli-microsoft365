@@ -19,7 +19,11 @@ class SpoReportOneDriveUsageAccountCountsCommand extends PeriodBasedReport {
   public commandHelp(args: {}, log: (help: string) => void): void {
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  Examples:
+      `  Remarks:
+
+    Any site on which users viewed, modified, uploaded, downloaded, shared, or synced files is considered an active site.
+      
+         Examples:
       
     Gets the trend in the number of active OneDrive for Business sites for the last week
       ${commands.REPORT_ONEDRIVEUSAGEACCOUNTCOUNTS} --period D7
