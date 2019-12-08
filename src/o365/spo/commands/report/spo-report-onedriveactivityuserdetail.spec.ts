@@ -3,7 +3,7 @@ import Command from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./outlook-report-onedriveactivityuserdetail');
+const command: Command = require('./spo-report-onedriveactivityuserdetail');
 import * as assert from 'assert';
 import Utils from '../../../../Utils';
 import request from '../../../../request';
