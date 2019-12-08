@@ -38,6 +38,10 @@ export default abstract class DateAndPeriodBasedReport extends PeriodBasedReport
     ];
 
     const parentOptions: CommandOption[] = super.options();
+    // period is optional in this command
+    for (let index = 0; index < parentOptions.length; index++) {
+      parentOptions[index].option = parentOptions[index].option.replace("-p, --period <period>", "-p, --period [period]");
+    }
     return options.concat(parentOptions);
   }
 
