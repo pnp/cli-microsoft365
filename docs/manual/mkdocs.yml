@@ -76,6 +76,7 @@ nav:
       - report:
         - report activityfilecounts: 'cmd/onedrive/report/report-activityfilecounts.md'
         - report activityusercounts: 'cmd/onedrive/report/report-activityusercounts.md'
+        - report usageaccountcounts: 'cmd/onedrive/report/report-usageaccountcounts.md'
         - report usagefilecounts: 'cmd/onedrive/report/report-usagefilecounts.md'
         - report usagestorage: 'cmd/onedrive/report/report-usagestorage.md'
     - Outlook (outlook):
