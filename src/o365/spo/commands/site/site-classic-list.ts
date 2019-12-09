@@ -76,7 +76,7 @@ class SiteClassicListCommand extends SpoCommand {
         else {
           const sites: SPOSitePropertiesEnumerable = json[json.length - 1];
           if (args.options.output === 'json') {
-            cmd.log(sites._Child_Items_);
+            sites._Child_Items_.forEach(s => cmd.log(s));
           }
           else {
             cmd.log(sites._Child_Items_.map(s => {
