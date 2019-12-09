@@ -6,8 +6,18 @@
 
 **Outlook**
 
+- [outlook report mailappusageversionsusercounts](../cmd/outlook/report/report-mailappusageversionsusercounts.md) - gets the count of unique users by Outlook desktop version [#1215](https://github.com/pnp/office365-cli/issues/1215)
+- [outlook report mailboxusagemailboxcount](../cmd/outlook/report/report-mailboxusagemailboxcount.md) - gets the total number of user mailboxes in your organization and how many are active each day of the reporting period [#1217](https://github.com/pnp/office365-cli/issues/1217)
 - [outlook report mailboxusagequotastatusmailboxcounts](../cmd/outlook/report/report-mailboxusagequotastatusmailboxcounts.md) - gets the count of user mailboxes in each quota category [#1218](https://github.com/pnp/office365-cli/issues/1218)
 - [outlook report mailboxusagestorage](../cmd/outlook/report/report-mailboxusagestorage.md) - gets the amount of mailbox storage used in your organization [#1219](https://github.com/pnp/office365-cli/issues/1219)
+
+**SharePoint**
+
+- [spo feature disable](../cmd/spo/feature/feature-disable.md) - disables feature for the specified site or web [#676](https://github.com/pnp/office365-cli/issues/676)
+
+**Yammer**
+
+- [yammer message remove](../cmd/yammer/message/message-remove.md) - removes a Yammer message [#1106](https://github.com/pnp/office365-cli/issues/1106)
 
 ### Changes
 
