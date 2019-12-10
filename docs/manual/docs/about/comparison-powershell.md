@@ -156,7 +156,7 @@ Set-SPOUnifiedGroup|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOUser|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOWebTheme|Microsoft.Online.SharePoint.PowerShell|
 Start-SPOSiteContentMove|Microsoft.Online.SharePoint.PowerShell|
-Start-SPOSiteRename|Microsoft.Online.SharePoint.PowerShell|
+Start-SPOSiteRename|Microsoft.Online.SharePoint.PowerShell|[spo site rename](../cmd/spo/site/site-rename.md)
 Start-SPOUnifiedGroupMove|Microsoft.Online.SharePoint.PowerShell|
 Start-SPOUserAndContentMove|Microsoft.Online.SharePoint.PowerShell|
 Stop-SPOSiteContentMove|Microsoft.Online.SharePoint.PowerShell|

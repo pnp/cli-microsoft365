@@ -273,7 +273,9 @@ nav:
       - site:
         - site add: 'cmd/spo/site/site-add.md'
         - site get: 'cmd/spo/site/site-get.md'
+        - site groupify: 'cmd/spo/site/site-groupify.md'
         - site list: 'cmd/spo/site/site-list.md'
+        - site rename: 'cmd/spo/site/site-rename.md'
         - site set: 'cmd/spo/site/site-set.md'
         - site appcatalog add: 'cmd/spo/site/site-appcatalog-add.md'
         - site appcatalog remove: 'cmd/spo/site/site-appcatalog-remove.md'
@@ -282,7 +284,6 @@ nav:
         - site classic remove: 'cmd/spo/site/site-classic-remove.md'
         - site classic set: 'cmd/spo/site/site-classic-set.md'
         - site commsite enable: 'cmd/spo/site/site-commsite-enable.md'
-        - site groupify: 'cmd/spo/site/site-groupify.md'
         - site inplacerecordsmanagement set: 'cmd/spo/site/site-inplacerecordsmanagement-set.md'
       - sitedesign:
         - sitedesign add: 'cmd/spo/sitedesign/sitedesign-add.md'

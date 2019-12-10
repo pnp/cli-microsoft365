@@ -149,6 +149,7 @@ export default {
   SITE_GROUPIFY: `${prefix} site groupify`,
   SITE_LIST: `${prefix} site list`,
   SITE_INPLACERECORDSMANAGEMENT_SET: `${prefix} site inplacerecordsmanagement set`,
+  SITE_RENAME: `${prefix} site rename`,
   SITE_SET: `${prefix} site set`,
   SITEDESIGN_ADD: `${prefix} sitedesign add`,
   SITEDESIGN_APPLY: `${prefix} sitedesign apply`,
