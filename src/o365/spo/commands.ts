@@ -135,7 +135,6 @@ export default {
   SERVICEPRINCIPAL_SET: `${prefix} serviceprincipal set`,
   SEARCH: `${prefix} search`,
   GET: `${prefix} get`,
-  REPORT_ONEDRIVEACTIVITYFILECOUNTS: `${prefix} report onedriveactivityfilecounts`,
   SET: `${prefix} set`,
   SITE_ADD: `${prefix} site add`,
   SITE_APPCATALOG_ADD: `${prefix} site appcatalog add`,
