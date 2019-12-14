@@ -1,11 +1,11 @@
-# spo report onedriveusageaccountcounts
+# onedrive report usageaccountcounts
 
 Gets the trend in the number of active OneDrive for Business sites
 
 ## Usage
 
 ```sh
-spo report onedriveusageaccountcounts [options]
+onedrive report usageaccountcounts [options]
 ```
 
 ## Options
@@ -28,17 +28,17 @@ Any site on which users viewed, modified, uploaded, downloaded, shared, or synce
 Gets the trend in the number of active OneDrive for Business sites for the last week
 
 ```sh
-spo report onedriveusageaccountcounts --period D7
+onedrive report usageaccountcounts --period D7
 ```
 
 Gets the trend in the number of active OneDrive for Business sites for the last week and exports the report data in the specified path in text format
 
 ```sh
-spo report onedriveusageaccountcounts --period D7 --output text --outputFile 'C:/report.txt'
+onedrive report usageaccountcounts --period D7 --output text --outputFile 'C:/report.txt'
 ```
 
 Gets the trend in the number of active OneDrive for Business sites for the last week and exports the report data in the specified path in json format
 
 ```sh
-spo report onedriveusageaccountcounts --period D7 --output json --outputFile 'C:/report.json'
+onedrive report usageaccountcounts --period D7 --output json --outputFile 'C:/report.json'
 ```
