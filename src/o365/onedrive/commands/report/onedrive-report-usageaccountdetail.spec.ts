@@ -3,12 +3,12 @@ import Command from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./spo-report-onedriveusageaccountdetail');
+const command: Command = require('./onedrive-report-usageaccountdetail');
 import * as assert from 'assert';
 import Utils from '../../../../Utils';
 import request from '../../../../request';
 
-describe(commands.SPO_REPORT_ONEDRIVEUSAGEACCOUNTDETAIL, () => {
+describe(commands.REPORT_ONEDRIVEUSAGEACCOUNTDETAIL, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
@@ -50,7 +50,7 @@ describe(commands.SPO_REPORT_ONEDRIVEUSAGEACCOUNTDETAIL, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.SPO_REPORT_ONEDRIVEUSAGEACCOUNTDETAIL), true);
+    assert.equal(command.name.startsWith(commands.REPORT_ONEDRIVEUSAGEACCOUNTDETAIL), true);
   });
 
   it('has a description', () => {
@@ -90,6 +90,6 @@ describe(commands.SPO_REPORT_ONEDRIVEUSAGEACCOUNTDETAIL, () => {
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
     cmd.help({}, () => { });
-    assert(find.calledWith(commands.SPO_REPORT_ONEDRIVEUSAGEACCOUNTDETAIL));
+    assert(find.calledWith(commands.REPORT_ONEDRIVEUSAGEACCOUNTDETAIL));
   });
 });

@@ -1,11 +1,11 @@
-# spo report onedriveusageaccountdetail
+# onedrive report usageaccountdetail
 
 Gets details about OneDrive usage by account
 
 ## Usage
 
 ```sh
-spo report onedriveusageaccountdetail [options]
+onedrive report usageaccountdetail [options]
 ```
 
 ## Options
@@ -25,23 +25,23 @@ Option|Description
 Gets details about OneDrive usage by account for the last week
 
 ```sh
-spo report onedriveusageaccountdetail --period D7
+onedrive report usageaccountdetail --period D7
 ```
 
 Gets details about OneDrive usage by account for May 1, 2019
 
 ```sh
-spo report onedriveusageaccountdetail --date 2019-05-01
+onedrive report usageaccountdetail --date 2019-05-01
 ```
 
 Gets details about OneDrive usage by account for the last week and exports the report data in the specified path in text format
 
 ```sh
-spo report onedriveusageaccountdetail --period D7 --output text --outputFile 'C:/report.txt'
+onedrive report usageaccountdetail --period D7 --output text --outputFile 'C:/report.txt'
 ```
 
 Gets details about OneDrive usage by account for the last week and exports the report data in the specified path in json format
 
 ```sh
-spo report onedriveusageaccountdetail --period D7 --output json --outputFile 'C:/report.json'
+onedrive report usageaccountdetail --period D7 --output json --outputFile 'C:/report.json'
 ```
