@@ -70,6 +70,9 @@ nav:
       - schemaextension:
         - schemaextension add: 'cmd/graph/schemaextension/schemaextension-add.md'
         - schemaextension get: 'cmd/graph/schemaextension/schemaextension-get.md'
+    - OneDrive (onedrive):
+      - report:
+        - report onedriveactivityuserdetail: 'cmd/onedrive/report/report-onedriveactivityuserdetail.md'
     - Outlook (outlook):
       - mail:
         - mail send: 'cmd/outlook/mail/mail-send.md'
@@ -239,8 +242,6 @@ nav:
         - propertybag list: 'cmd/spo/propertybag/propertybag-list.md'
         - propertybag remove: 'cmd/spo/propertybag/propertybag-remove.md'
         - propertybag set: 'cmd/spo/propertybag/propertybag-set.md'
-      - report:
-        - report onedriveactivityuserdetail: 'cmd/spo/report/report-onedriveactivityuserdetail.md'
       - search:
         - search: 'cmd/spo/search/search.md'
       - serviceprincipal:

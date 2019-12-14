@@ -1,11 +1,11 @@
-# spo report onedriveactivityuserdetail
+# onedrive report activityuserdetail
 
 Gets details about OneDrive activity by user
 
 ## Usage
 
 ```sh
-spo report onedriveactivityuserdetail [options]
+onedrive report activityuserdetail [options]
 ```
 
 ## Options
@@ -25,23 +25,23 @@ Option|Description
 Gets details about OneDrive activity by user for the last week
 
 ```sh
-spo report onedriveactivityuserdetail --period D7
+onedrive report activityuserdetail --period D7
 ```
 
 Gets details about OneDrive activity by user for May 1, 2019
 
 ```sh
-spo report onedriveactivityuserdetail --date 2019-05-01
+onedrive report activityuserdetail --date 2019-05-01
 ```
 
 Gets details about OneDrive activity by user for the last week and exports the report data in the specified path in text format
 
 ```sh
-spo report onedriveactivityuserdetail --period D7 --output text --outputFile 'C:/report.txt'
+onedrive report activityuserdetail --period D7 --output text --outputFile 'C:/report.txt'
 ```
 
 Gets details about OneDrive activity by user for the last week and exports the report data in the specified path in json format
 
 ```sh
-spo report onedriveactivityuserdetail --period D7 --output json --outputFile 'C:/report.json'
+onedrive report activityuserdetail --period D7 --output json --outputFile 'C:/report.json'
 ```
