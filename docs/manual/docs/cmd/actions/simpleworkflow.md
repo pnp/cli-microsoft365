@@ -47,7 +47,7 @@ Now, since we created this new workflow file i.e. since we have pushed a file, t
 - The right side shows the steps in that job. We can see that there are 3 steps. `Set up job`, `Run a one-line script` and `Complete job`.
 - GitHub automatically creates the steps `Set up job` and `Complete job` for each job. 
 ![All steps](../../images/action-cli-simple-workflow-steps.png)
-- `Run a one-line script` is the one we created in our workflow. So if we expand that by clicking on it, we can see that `Hello world!` is printed.
+- `Run a one-line script` is the one we created in our workflow. So if we expand that by clicking on it, we can see that `Hello world!` is printed. 
 ![Hello world](../../images/action-cli-simple-workflow-hello-world.png)
 
 That concludes creating a simple workflow in a GitHub repo. More details on the syntax explained above can be found [here](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/workflow-syntax-for-github-actions).
