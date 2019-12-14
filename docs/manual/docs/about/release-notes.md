@@ -10,6 +10,13 @@
 - [outlook report mailboxusagemailboxcount](../cmd/outlook/report/report-mailboxusagemailboxcount.md) - gets the total number of user mailboxes in your organization and how many are active each day of the reporting period [#1217](https://github.com/pnp/office365-cli/issues/1217)
 - [outlook report mailboxusagequotastatusmailboxcounts](../cmd/outlook/report/report-mailboxusagequotastatusmailboxcounts.md) - gets the count of user mailboxes in each quota category [#1218](https://github.com/pnp/office365-cli/issues/1218)
 - [outlook report mailboxusagestorage](../cmd/outlook/report/report-mailboxusagestorage.md) - gets the amount of mailbox storage used in your organization [#1219](https://github.com/pnp/office365-cli/issues/1219)
+- [outlook report mailappusageusercounts](../cmd/outlook/report/report-mailappusageusercounts.md) - gets the count of unique users that connected to Exchange Online using any email app [#1214](https://github.com/pnp/office365-cli/issues/1214)
+- [outlook report mailactivityusercounts](../cmd/outlook/report/report-mailactivityusercounts.md) - enables you to understand trends on the number of unique users who are performing email activities like send, read, and receive [#1211](https://github.com/pnp/office365-cli/issues/1211)
+- [outlook report mailactivitycounts](../cmd/outlook/report/report-mailactivitycounts.md) - enables you to understand the trends of email activity (like how many were sent, read, and received) in your organization [#1210](https://github.com/pnp/office365-cli/issues/1210)
+- [outlook report mailboxusagedetail](../cmd/outlook/report/report-mailboxusagedetail.md) - gets details about mailbox usage [#1216](https://github.com/pnp/office365-cli/issues/1216) 
+- [outlook report mailappusageuserdetail](../cmd/outlook/report/report-mailappusageuserdetail.md) - gets details about which activities users performed on the various email apps [#1212](https://github.com/pnp/office365-cli/issues/1212)
+- [outlook report mailactivityuserdetail](../cmd/outlook/report/report-mailactivityuserdetail.md) - gets details about email activity users have performed [#1209](https://github.com/pnp/office365-cli/issues/1209)
+- [outlook report mailappusageappsusercounts](../cmd/outlook/report/report-mailappusageappsusercounts.md) - gets the count of unique users per email app [#1213](https://github.com/pnp/office365-cli/issues/1213)
 
 **SharePoint**
 
@@ -18,6 +25,10 @@
 **Yammer**
 
 - [yammer message remove](../cmd/yammer/message/message-remove.md) - removes a Yammer message [#1106](https://github.com/pnp/office365-cli/issues/1106)
+
+**Power Apps**
+
+- [pa connector list](../cmd/pa/connector/connector-list.md) - lists Power Apps and Power Automate (Flow) connectors [#1237](https://github.com/pnp/office365-cli/issues/1237)
 
 ### Changes
 
