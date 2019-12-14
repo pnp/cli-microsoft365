@@ -1,11 +1,11 @@
-# spo report onedriveusagestorage
+# onedrive report usagestorage
 
 Gets the trend on the amount of storage you are using in OneDrive for Business
 
 ## Usage
 
 ```sh
-spo report onedriveusagestorage [options]
+onedrive report usagestorage [options]
 ```
 
 ## Options
@@ -24,17 +24,17 @@ Option|Description
 Gets the trend on the amount of storage you are using in OneDrive for Business for the last week
 
 ```sh
-spo report onedriveusagestorage --period D7
+onedrive report usagestorage --period D7
 ```
 
 Gets the trend on the amount of storage you are using in OneDrive for Business for the last week and exports the report data in the specified path in text format
 
 ```sh
-spo report onedriveusagestorage --period D7 --output text --outputFile 'C:/report.txt'
+onedrive report usagestorage --period D7 --output text --outputFile 'C:/report.txt'
 ```
 
 Gets the trend on the amount of storage you are using in OneDrive for Business for the last week and exports the report data in the specified path in json format
 
 ```sh
-spo report onedriveusagestorage --period D7 --output json --outputFile 'C:/report.json'
+onedrive report usagestorage --period D7 --output json --outputFile 'C:/report.json'
 ```
