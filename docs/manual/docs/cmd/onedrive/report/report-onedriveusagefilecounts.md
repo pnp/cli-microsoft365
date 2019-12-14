@@ -1,11 +1,11 @@
-# spo report onedriveusagefilecounts
+# onedrive report usagefilecounts
 
 Gets the total number of files across all sites and how many are active files
 
 ## Usage
 
 ```sh
-spo report onedriveusagefilecounts [options]
+onedrive report usagefilecounts [options]
 ```
 
 ## Options
@@ -28,17 +28,17 @@ A file is considered active if it has been saved, synced, modified, or shared wi
 Gets the total number of files across all sites and how many are active files for the last week
 
 ```sh
-spo report onedriveusagefilecounts --period D7
+onedrive report usagefilecounts --period D7
 ```
 
 Gets the total number of files across all sites and how many are active files for the last week and exports the report data in the specified path in text format
 
 ```sh
-spo report onedriveusagefilecounts --period D7 --output text --outputFile 'C:/report.txt'
+onedrive report usagefilecounts --period D7 --output text --outputFile 'C:/report.txt'
 ```
 
 Gets the total number of files across all sites and how many are active files for the last week and exports the report data in the specified path in json format
 
 ```sh
-spo report onedriveusagefilecounts --period D7 --output json --outputFile 'C:/report.json'
+onedrive report usagefilecounts --period D7 --output json --outputFile 'C:/report.json'
 ```
