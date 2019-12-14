@@ -3,7 +3,7 @@ import PeriodBasedReport from '../../../base/PeriodBasedReport';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
-class SpoReportOneDriveActivityUserCountCommand extends PeriodBasedReport {
+class OneDriveReportActivityUserCountCommand extends PeriodBasedReport {
   public get name(): string {
     return commands.REPORT_ONEDRIVEACTIVITYUSERCOUNTS;
   }
@@ -35,4 +35,4 @@ class SpoReportOneDriveActivityUserCountCommand extends PeriodBasedReport {
   }
 }
 
-module.exports = new SpoReportOneDriveActivityUserCountCommand();
+module.exports = new OneDriveReportActivityUserCountCommand();

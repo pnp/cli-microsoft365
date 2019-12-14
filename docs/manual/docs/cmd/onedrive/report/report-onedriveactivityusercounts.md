@@ -1,11 +1,11 @@
-# spo report onedriveactivityusercounts
+# onerive report activityusercounts
 
 Gets the trend in the number of active OneDrive users
 
 ## Usage
 
 ```sh
-spo report onedriveactivityusercounts [options]
+onedrive report activityusercounts [options]
 ```
 
 ## Options
@@ -24,17 +24,17 @@ Option|Description
 Gets the trend in the number of active OneDrive users for the last week
 
 ```sh
-spo report onedriveactivityusercounts --period D7
+onedrive report activityusercounts --period D7
 ```
 
 Gets the trend in the number of active OneDrive users for the last week and exports the report data in the specified path in text format
 
 ```sh
-spo report onedriveactivityusercounts --period D7 --output text --outputFile 'C:/report.txt'
+onedrive report activityusercounts --period D7 --output text --outputFile 'C:/report.txt'
 ```
 
 Gets the trend in the number of active OneDrive users for the last week and exports the report data in the specified path in json format
 
 ```sh
-spo report onedriveactivityusercounts --period D7 --output json --outputFile 'C:/report.json'
+onedrive report activityusercounts --period D7 --output json --outputFile 'C:/report.json'
 ```
