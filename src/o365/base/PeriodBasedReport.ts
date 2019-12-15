@@ -101,7 +101,7 @@ export default abstract class PeriodBasedReport extends GraphCommand {
     const options: CommandOption[] = [
       {
         option: '-p, --period <period>',
-        description: 'The length of time over which the report is aggregated. Supported values D7|D30|D90|D180',
+        description: 'The length of time over which the report is aggregated. Supported values D7,D30,D90,D180',
         autocomplete: ['D7', 'D30', 'D90', 'D180']
       },
       {

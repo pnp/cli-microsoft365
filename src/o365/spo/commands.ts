@@ -129,6 +129,7 @@ export default {
   PROPERTYBAG_REMOVE: `${prefix} propertybag remove`,
   PROPERTYBAG_SET: `${prefix} propertybag set`,
   REPORT_SITEUSAGEPAGES: `${prefix} report siteusagepages`, 
+  REPORT_SITEUSAGESTORAGE: `${prefix} report siteusagestorage`, 
   SEARCH: `${prefix} search`,
   SERVICEPRINCIPAL_GRANT_ADD: `${prefix} serviceprincipal grant add`,
   SERVICEPRINCIPAL_GRANT_LIST: `${prefix} serviceprincipal grant list`,
