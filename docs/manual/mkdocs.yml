@@ -263,6 +263,7 @@ nav:
         - propertybag set: 'cmd/spo/propertybag/propertybag-set.md'
       - report:
         - report siteusagepages: 'cmd/spo/report/report-siteusagepages.md'
+        - report siteusagesitecounts: 'cmd/spo/report/report-siteusagesitecounts.md'
         - report siteusagestorage: 'cmd/spo/report/report-siteusagestorage.md'
       - search:
         - search: 'cmd/spo/search/search.md'
