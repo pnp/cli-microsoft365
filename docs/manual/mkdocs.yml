@@ -261,6 +261,8 @@ nav:
         - propertybag list: 'cmd/spo/propertybag/propertybag-list.md'
         - propertybag remove: 'cmd/spo/propertybag/propertybag-remove.md'
         - propertybag set: 'cmd/spo/propertybag/propertybag-set.md'
+      - report:
+        - report siteusagepages: 'cmd/spo/report/report-siteusagepages.md'
       - search:
         - search: 'cmd/spo/search/search.md'
       - serviceprincipal:
