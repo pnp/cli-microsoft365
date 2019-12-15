@@ -457,6 +457,7 @@ nav:
       - 'Delete all (non-group connected) modern SharePoint sites': 'examples/spo/delete-non-group-connected-modern-sites.md'
       - 'Delete custom color themes from SharePoint': 'examples/spo/remove-custom-themes.md'
       - 'Delete custom SharePoint site designs': 'examples/spo/remove-site-designs.md'
+      - 'Delete custom SharePoint site scripts': 'examples/spo/remove-site-scripts.md'
       - 'Lists active SharePoint site collection application catalogs': 'examples/spo/list-site-app-catalogs.md'
     - Microsoft Teams:
       - 'Deploy Microsoft Teams app from Azure DevOps': 'examples/teams/deploy-teams-app.md'
