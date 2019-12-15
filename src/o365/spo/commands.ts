@@ -128,6 +128,7 @@ export default {
   PROPERTYBAG_LIST: `${prefix} propertybag list`,
   PROPERTYBAG_REMOVE: `${prefix} propertybag remove`,
   PROPERTYBAG_SET: `${prefix} propertybag set`,
+  REPORT_SITEUSAGEFILECOUNTS: `${prefix} report siteusagefilecounts`, 
   REPORT_SITEUSAGEPAGES: `${prefix} report siteusagepages`, 
   REPORT_SITEUSAGESITECOUNTS: `${prefix} report siteusagesitecounts`,
   REPORT_SITEUSAGESTORAGE: `${prefix} report siteusagestorage`, 
