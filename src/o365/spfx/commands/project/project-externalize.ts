@@ -23,6 +23,9 @@ interface Options extends GlobalOptions {
 }
 
 class SpfxProjectExternalizeCommand extends BaseProjectCommand {
+  public constructor() {
+    super(); //https://github.com/pnp/office365-cli/pull/1206#issuecomment-561169435
+  }
   private projectVersion: string | undefined;
   private supportedVersions: string[] = [
     '1.0.0',
