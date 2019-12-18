@@ -1,6 +1,7 @@
 const prefix: string = 'flow';
 
 export default {
+  CONNECTOR_EXPORT: `${prefix} connector export`,
   CONNECTOR_LIST: `${prefix} connector list`,
   FLOW_DISABLE: `${prefix} disable`,
   FLOW_ENABLE: `${prefix} enable`,
