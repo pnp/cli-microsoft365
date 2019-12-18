@@ -61,6 +61,7 @@ nav:
       - list: 'cmd/flow/list.md'
       - remove: 'cmd/flow/remove.md'
       - connector:
+        - connector export: 'cmd/pa/connector/connector-export.md'
         - connector list: 'cmd/pa/connector/connector-list.md'
       - environment:
         - environment get: 'cmd/flow/environment/environment-get.md'
@@ -99,6 +100,7 @@ nav:
         - report mailboxusagestorage: 'cmd/outlook/report/report-mailboxusagestorage.md'
     - PowerApps (pa):
       - connector:
+        - connector export: 'cmd/pa/connector/connector-export.md'
         - connector list: 'cmd/pa/connector/connector-list.md'
       - pcf:
         - pcf init: 'cmd/pa/pcf/pcf-init.md'
