@@ -29,7 +29,7 @@ interface Options extends GlobalOptions {
 
 class SpfxProjectUpgradeCommand extends BaseProjectCommand {
   public constructor() {
-    super(); //https://github.com/pnp/office365-cli/pull/1206#issuecomment-561169435
+    super()/* istanbul ignore next */; //https://github.com/pnp/office365-cli/pull/1206#issuecomment-566704285
   }
   private projectVersion: string | undefined;
   private toVersion: string = '';
