@@ -264,6 +264,7 @@ nav:
         - propertybag remove: 'cmd/spo/propertybag/propertybag-remove.md'
         - propertybag set: 'cmd/spo/propertybag/propertybag-set.md'
       - report:
+        - report activityfilecounts: 'cmd/spo/report/report-activityfilecounts.md'
         - report siteusagefilecounts: 'cmd/spo/report/report-siteusagefilecounts.md'
         - report siteusagepages: 'cmd/spo/report/report-siteusagepages.md'
         - report siteusagesitecounts: 'cmd/spo/report/report-siteusagesitecounts.md'
