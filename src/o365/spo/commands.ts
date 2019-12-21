@@ -131,6 +131,7 @@ export default {
   REPORT_ACTIVITYFILECOUNTS: `${prefix} report activityfilecounts`,
   REPORT_ACTIVITYPAGES: `${prefix} report activitypages`,
   REPORT_ACTIVITYUSERCOUNTS: `${prefix} report activityusercounts`,
+  REPORT_ACTIVITYUSERDETAIL: `${prefix} report activityuserdetail`,
   REPORT_SITEUSAGEFILECOUNTS: `${prefix} report siteusagefilecounts`, 
   REPORT_SITEUSAGEPAGES: `${prefix} report siteusagepages`, 
   REPORT_SITEUSAGESITECOUNTS: `${prefix} report siteusagesitecounts`,
