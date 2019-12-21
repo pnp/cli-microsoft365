@@ -19,11 +19,7 @@ class SpoReportActivityFileCountsCommand extends PeriodBasedReport {
   public commandHelp(args: {}, log: (help: string) => void): void {
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  Remarks:
-
-    Any site on which users viewed, modified, uploaded, downloaded, shared, or synced files is considered an active site.
-      
-         Examples:
+      `  Examples:
       
     Gets the number of unique, licensed users who interacted with files stored on SharePoint sites for the last week
       ${commands.REPORT_ACTIVITYFILECOUNTS} --period D7
