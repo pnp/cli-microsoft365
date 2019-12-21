@@ -3,7 +3,7 @@ import Command from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./spo-report-siteusagepages');
+const command: Command = require('./report-siteusagepages');
 import * as assert from 'assert';
 import Utils from '../../../../Utils';
 import request from '../../../../request';
