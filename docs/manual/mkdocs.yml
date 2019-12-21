@@ -268,6 +268,7 @@ nav:
         - report activitypages: 'cmd/spo/report/report-activitypages.md'
         - report activityusercounts: 'cmd/spo/report/report-activityusercounts.md'
         - report activityuserdetail: 'cmd/spo/report/report-activityuserdetail.md'
+        - report siteusagedetail: 'cmd/spo/report/report-siteusagedetail.md'
         - report siteusagefilecounts: 'cmd/spo/report/report-siteusagefilecounts.md'
         - report siteusagepages: 'cmd/spo/report/report-siteusagepages.md'
         - report siteusagesitecounts: 'cmd/spo/report/report-siteusagesitecounts.md'
