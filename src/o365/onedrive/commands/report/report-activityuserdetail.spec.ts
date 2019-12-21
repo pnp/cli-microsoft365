@@ -3,7 +3,7 @@ import Command from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./onedrive-report-activityuserdetail');
+const command: Command = require('./report-activityuserdetail');
 import * as assert from 'assert';
 import Utils from '../../../../Utils';
 import request from '../../../../request';
@@ -50,7 +50,8 @@ describe(commands.REPORT_ONEDRIVEACTIVITYUSERDETAIL, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.REPORT_ONEDRIVEACTIVITYUSERDETAIL), true);
+    assert.equal(command.name.startsWith(commands.
+      ), true);
   });
 
   it('has a description', () => {

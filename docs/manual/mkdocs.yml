@@ -72,7 +72,7 @@ nav:
         - schemaextension get: 'cmd/graph/schemaextension/schemaextension-get.md'
     - OneDrive (onedrive):
       - report:
-        - report onedriveactivityuserdetail: 'cmd/onedrive/report/report-onedriveactivityuserdetail.md'
+        - report onedriveactivityuserdetail: 'cmd/onedrive/report/report-activityuserdetail.md'
     - Outlook (outlook):
       - mail:
         - mail send: 'cmd/outlook/mail/mail-send.md'
