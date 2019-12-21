@@ -8,7 +8,7 @@ import * as assert from 'assert';
 import Utils from '../../../../Utils';
 import request from '../../../../request';
 
-describe(commands.REPORT_ONEDRIVEACTIVITYUSERDETAIL, () => {
+describe(commands.REPORT_ACTIVITYUSERDETAIL, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
@@ -91,6 +91,6 @@ describe(commands.REPORT_ONEDRIVEACTIVITYUSERDETAIL, () => {
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
     cmd.help({}, () => { });
-    assert(find.calledWith(commands.REPORT_ONEDRIVEACTIVITYUSERDETAIL));
+    assert(find.calledWith(commands.REPORT_ACTIVITYUSERDETAIL));
   });
 });
