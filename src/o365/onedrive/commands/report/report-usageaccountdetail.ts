@@ -5,7 +5,7 @@ const vorpal: Vorpal = require('../../../../vorpal-init');
 
 class OneDriveReportUsageAccountDetailCommand extends DateAndPeriodBasedReport {
   public get name(): string {
-    return commands.REPORT_ONEDRIVEUSAGEACCOUNTDETAIL;
+    return commands.REPORT_USAGEACCOUNTDETAIL;
   }
 
   public get usageEndpoint(): string {
@@ -22,18 +22,18 @@ class OneDriveReportUsageAccountDetailCommand extends DateAndPeriodBasedReport {
       `  Examples:
       
     Gets details about OneDrive usage by account for the last week
-      ${commands.REPORT_ONEDRIVEUSAGEACCOUNTDETAIL} --period D7
+      ${commands.REPORT_USAGEACCOUNTDETAIL} --period D7
 
     Gets details about OneDrive usage by account for May 1, 2019
-      ${commands.REPORT_ONEDRIVEUSAGEACCOUNTDETAIL} --date 2019-05-01
+      ${commands.REPORT_USAGEACCOUNTDETAIL} --date 2019-05-01
 
     Gets details about OneDrive usage by account for the last week
     and exports the report data in the specified path in text format
-      ${commands.REPORT_ONEDRIVEUSAGEACCOUNTDETAIL} --period D7 --output text --outputFile 'C:/report.txt'
+      ${commands.REPORT_USAGEACCOUNTDETAIL} --period D7 --output text --outputFile 'C:/report.txt'
 
     Gets details about OneDrive usage by account for the last week
     and exports the report data in the specified path in json format
-      ${commands.REPORT_ONEDRIVEUSAGEACCOUNTDETAIL} --period D7 --output json --outputFile 'C:/report.json'
+      ${commands.REPORT_USAGEACCOUNTDETAIL} --period D7 --output json --outputFile 'C:/report.json'
 `);
   }
 }
