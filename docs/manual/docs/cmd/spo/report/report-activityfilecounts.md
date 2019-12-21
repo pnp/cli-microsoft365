@@ -19,10 +19,6 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
-## Remarks
-
-Any site on which users viewed, modified, uploaded, downloaded, shared, or synced files is considered an active site
-
 ## Examples
 
 Gets the number of unique, licensed users who interacted with files stored on SharePoint sites for the last week
