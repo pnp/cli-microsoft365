@@ -50,7 +50,7 @@ describe(commands.REPORT_ACTIVITYUSERDETAIL, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.REPORT_ONEDRIVEACTIVITYUSERDETAIL), true);
+    assert.equal(command.name.startsWith(commands.REPORT_ACTIVITYUSERDETAIL), true);
   });
 
   it('has a description', () => {
