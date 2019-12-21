@@ -8,7 +8,7 @@ import * as assert from 'assert';
 import Utils from '../../../../Utils';
 import request from '../../../../request';
 
-describe(commands.REPORT_ONEDRIVEUSAGEACCOUNTCOUNTS, () => {
+describe(commands.REPORT_USAGEACCOUNTCOUNTS, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
@@ -50,7 +50,7 @@ describe(commands.REPORT_ONEDRIVEUSAGEACCOUNTCOUNTS, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.REPORT_ONEDRIVEUSAGEACCOUNTCOUNTS), true);
+    assert.equal(command.name.startsWith(commands.REPORT_USAGEACCOUNTCOUNTS), true);
   });
 
   it('has a description', () => {
@@ -90,6 +90,6 @@ describe(commands.REPORT_ONEDRIVEUSAGEACCOUNTCOUNTS, () => {
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
     cmd.help({}, () => { });
-    assert(find.calledWith(commands.REPORT_ONEDRIVEUSAGEACCOUNTCOUNTS));
+    assert(find.calledWith(commands.REPORT_USAGEACCOUNTCOUNTS));
   });
 });

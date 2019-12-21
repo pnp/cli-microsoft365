@@ -5,7 +5,7 @@ const vorpal: Vorpal = require('../../../../vorpal-init');
 
 class OneDriveReportUsageAccountCountsCommand extends PeriodBasedReport {
   public get name(): string {
-    return commands.REPORT_ONEDRIVEUSAGEACCOUNTCOUNTS;
+    return commands.REPORT_USAGEACCOUNTCOUNTS;
   }
 
   public get usageEndpoint(): string {
@@ -26,15 +26,15 @@ class OneDriveReportUsageAccountCountsCommand extends PeriodBasedReport {
          Examples:
       
     Gets the trend in the number of active OneDrive for Business sites for the last week
-      ${commands.REPORT_ONEDRIVEUSAGEACCOUNTCOUNTS} --period D7
+      ${commands.REPORT_USAGEACCOUNTCOUNTS} --period D7
 
     Gets the trend in the number of active OneDrive for Business sites for the last week
     and exports the report data in the specified path in text format
-      ${commands.REPORT_ONEDRIVEUSAGEACCOUNTCOUNTS} --period D7 --output text --outputFile 'C:/report.txt'
+      ${commands.REPORT_USAGEACCOUNTCOUNTS} --period D7 --output text --outputFile 'C:/report.txt'
 
     Gets the trend in the number of active OneDrive for Business sites for the last week
     and exports the report data in the specified path in json format
-      ${commands.REPORT_ONEDRIVEUSAGEACCOUNTCOUNTS} --period D7 --output json --outputFile 'C:/report.json'
+      ${commands.REPORT_USAGEACCOUNTCOUNTS} --period D7 --output json --outputFile 'C:/report.json'
 `);
   }
 }

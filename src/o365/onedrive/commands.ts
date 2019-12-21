@@ -1,5 +1,5 @@
 const prefix: string = 'onedrive';
 
 export default {
-  REPORT_ONEDRIVEUSAGEACCOUNTCOUNTS: `${prefix} report usageaccountcounts`
+  REPORT_USAGEACCOUNTCOUNTS: `${prefix} report usageaccountcounts`
 };
