@@ -4,6 +4,13 @@
 
 ### New commands
 
+**OneDrive**
+
+- [onedrive report activityfilecounts](../cmd/onedrive/report/report-activityfilecounts.md) - gets the number of unique, licensed users that performed file interactions against any OneDrive account [#1257](https://github.com/pnp/office365-cli/issues/1257)
+- [onedrive report activityusercounts](../cmd/onedrive/report/report-activityusercounts.md) - gets the trend in the number of active OneDrive users [#1256](https://github.com/pnp/office365-cli/issues/1256)
+- [onedrive report usagefilecounts](../cmd/onedrive/report/report-usagefilecounts.md) - gets the total number of files across all sites and how many are active files [#1253](https://github.com/pnp/office365-cli/issues/1253)
+- [onedrive report usagestorage](../cmd/onedrive/report/report-usagestorage.md) - gets the trend on the amount of storage you are using in OneDrive for Business [#1254](https://github.com/pnp/office365-cli/issues/1254)
+
 **Outlook**
 
 - [outlook report mailappusageversionsusercounts](../cmd/outlook/report/report-mailappusageversionsusercounts.md) - gets the count of unique users by Outlook desktop version [#1215](https://github.com/pnp/office365-cli/issues/1215)
