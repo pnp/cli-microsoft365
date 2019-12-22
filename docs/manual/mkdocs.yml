@@ -413,6 +413,7 @@ nav:
       - group:
         - group list: 'cmd/yammer/group/group-list.md'
       - message:
+        - message add: 'cmd/yammer/message/message-add.md'
         - message get: 'cmd/yammer/message/message-get.md'
         - message list: 'cmd/yammer/message/message-list.md'
         - message remove: 'cmd/yammer/message/message-remove.md'
