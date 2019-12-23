@@ -241,7 +241,7 @@ ConvertTo-PnPClientSidePage|SharePointPnPPowerShellOnline|
 Copy-PnPFile|SharePointPnPPowerShellOnline|[spo file copy](../cmd/spo/file/file-copy.md), [spo folder copy](../cmd/spo/folder/folder-copy.md)
 Copy-PnPItemProxy|SharePointPnPPowerShellOnline|
 Deny-PnPTenantServicePrincipalPermissionRequest|SharePointPnPPowerShellOnline|[spo serviceprincipal permissionrequest deny](../cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-deny.md)
-Disable-PnPFeature|SharePointPnPPowerShellOnline|
+Disable-PnPFeature|SharePointPnPPowerShellOnline|[spo feature disable](../cmd/spo/feature/feature-disable.md)
 Disable-PnPInPlaceRecordsManagementForSite|SharePointPnPPowerShellOnline|[spo site inplacerecordsmanagement set](../cmd/spo/site/site-inplacerecordsmanagement-set.md)
 Disable-PnPPowerShellTelemetry|SharePointPnPPowerShellOnline|
 Disable-PnPResponsiveUI|SharePointPnPPowerShellOnline|

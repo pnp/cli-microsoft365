@@ -60,6 +60,8 @@ nav:
       - get: 'cmd/flow/get.md'
       - list: 'cmd/flow/list.md'
       - remove: 'cmd/flow/remove.md'
+      - connector:
+        - connector list: 'cmd/pa/connector/connector-list.md'
       - environment:
         - environment get: 'cmd/flow/environment/environment-get.md'
         - environment list: 'cmd/flow/environment/environment-list.md'
@@ -72,14 +74,29 @@ nav:
         - schemaextension get: 'cmd/graph/schemaextension/schemaextension-get.md'
     - OneDrive (onedrive):
       - report:
-        - report onedriveactivityuserdetail: 'cmd/onedrive/report/report-activityuserdetail.md'
+        - report activityfilecounts: 'cmd/onedrive/report/report-activityfilecounts.md'
+        - report activityusercounts: 'cmd/onedrive/report/report-activityusercounts.md'
+        - report activityuserdetail: 'cmd/onedrive/report/report-activityuserdetail.md'
+        - report usagefilecounts: 'cmd/onedrive/report/report-usagefilecounts.md'
+        - report usagestorage: 'cmd/onedrive/report/report-usagestorage.md'
     - Outlook (outlook):
       - mail:
         - mail send: 'cmd/outlook/mail/mail-send.md'
       - report:
+        - report mailactivitycounts: 'cmd/outlook/report/report-mailactivitycounts.md'
+        - report mailactivityusercounts: 'cmd/outlook/report/report-mailactivityusercounts.md'
+        - report mailactivityuserdetail: 'cmd/outlook/report/report-mailactivityuserdetail.md'
+        - report mailappusageappsusercounts: 'cmd/outlook/report/report-mailappusageappsusercounts.md'
+        - report mailappusageusercounts: 'cmd/outlook/report/report-mailappusageusercounts.md'
+        - report mailappusageuserdetail: 'cmd/outlook/report/report-mailappusageuserdetail.md'
+        - report mailappusageversionsusercounts: 'cmd/outlook/report/report-mailappusageversionsusercounts.md'
+        - report mailboxusagedetail: 'cmd/outlook/report/report-mailboxusagedetail.md'
+        - report mailboxusagemailboxcount: 'cmd/outlook/report/report-mailboxusagemailboxcount.md'
         - report mailboxusagequotastatusmailboxcounts: 'cmd/outlook/report/report-mailboxusagequotastatusmailboxcounts.md'
         - report mailboxusagestorage: 'cmd/outlook/report/report-mailboxusagestorage.md'
     - PowerApps (pa):
+      - connector:
+        - connector list: 'cmd/pa/connector/connector-list.md'
       - pcf:
         - pcf init: 'cmd/pa/pcf/pcf-init.md'
       - solution:
@@ -134,6 +151,7 @@ nav:
       - externaluser:
         - externaluser list: 'cmd/spo/externaluser/externaluser-list.md'
       - feature:
+        - feature disable: 'cmd/spo/feature/feature-disable.md'
         - feature enable: 'cmd/spo/feature/feature-enable.md'
         - feature list: 'cmd/spo/feature/feature-list.md'
       - field:
@@ -378,6 +396,7 @@ nav:
       - message:
         - message get: 'cmd/yammer/message/message-get.md'
         - message list: 'cmd/yammer/message/message-list.md'
+        - message remove: 'cmd/yammer/message/message-remove.md'
       - network:
         - network list: 'cmd/yammer/network/network-list.md'
       - user:
