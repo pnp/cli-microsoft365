@@ -1,12 +1,8 @@
 # Release notes
 
-## v2.4.0
+## [v2.4.0](https://github.com/pnp/office365-cli/releases/tag/v2.4.0)
 
 ### New commands
-
-**SharePoint**
-
-- [spo site rename](../cmd/spo/site/site-rename.md) - renames the URL and title of a site collection [#1197](https://github.com/pnp/office365-cli/issues/1197)
 
 **OneDrive**
 
@@ -33,6 +29,7 @@
 **SharePoint**
 
 - [spo feature disable](../cmd/spo/feature/feature-disable.md) - disables feature for the specified site or web [#676](https://github.com/pnp/office365-cli/issues/676)
+- [spo site rename](../cmd/spo/site/site-rename.md) - renames the URL and title of a site collection [#1197](https://github.com/pnp/office365-cli/issues/1197)
 
 **Yammer**
 
