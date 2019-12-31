@@ -4,7 +4,7 @@ import { ManifestRule } from "./ManifestRule";
 
 export class FN011004_MAN_fieldCustomizer_schema extends ManifestRule {
   constructor(private schema: string) {
-    super()/* istanbul ignore next */;
+    super();
   }
 
   get id(): string {

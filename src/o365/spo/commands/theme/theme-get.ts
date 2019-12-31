@@ -63,7 +63,8 @@ class SpoThemeGetCommand extends SpoCommand {
         return Promise.resolve(json);
       })
       .then((json: any): void => {
-        const { _ObjectType_, ...theme } = json[6];
+        const theme = json[6];
+        delete theme._ObjectType_;
         cmd.log(theme);
 
         if (this.verbose) {

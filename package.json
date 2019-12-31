@@ -20,7 +20,7 @@
     "build": "tsc -p . && node scripts/copy-files.js",
     "watch": "tsc -w -p .",
     "clean": "rimraf ./dist",
-    "test": "nyc -r=lcov -r=text mocha \"dist/**/*.spec.js\""
+    "test": "c8 mocha \"dist/**/*.spec.js\""
   },
   "keywords": [
     "office 365",
@@ -108,6 +108,7 @@
   "dependencies": {
     "adal-node": "^0.2.1",
     "applicationinsights": "^1.5.0",
+    "c8": "^7.0.0",
     "easy-table": "^1.1.1",
     "node-forge": "^0.9.1",
     "omelette": "^0.4.12",
@@ -133,14 +134,7 @@
     "@types/xmldom": "^0.1.29",
     "coveralls": "^3.0.7",
     "mocha": "^6.2.1",
-    "nyc": "^13.3.0",
     "rimraf": "^3.0.0",
     "sinon": "^7.5.0"
-  },
-  "nyc": {
-    "exclude": [
-      "**/*.spec.js",
-      "**/clientsidepages.js"
-    ]
   }
 }

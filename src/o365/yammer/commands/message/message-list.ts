@@ -25,7 +25,6 @@ class YammerMessageListCommand extends YammerCommand {
   private items: any[];
   private static readonly feedTypes: string[] = ['All', 'Top', 'My', 'Following', 'Sent', 'Private', 'Received'];
 
-  /* istanbul ignore next */
   constructor() {
     super();
     this.items = [];

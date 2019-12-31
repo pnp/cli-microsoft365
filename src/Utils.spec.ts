@@ -292,37 +292,37 @@ describe('Utils', () => {
   });
 
   it('should get server relative path when https://contoso.sharepoint.com/sites/team1', () => {
-    const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com/sites/team1');
+    const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com/sites/team1', '');
     assert.equal(actual, '/sites/team1');
   });
 
   it('should get server relative path when https://contoso.sharepoint.com/sites/team1/', () => {
-    const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com/sites/team1/');
+    const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com/sites/team1/', '');
     assert.equal(actual, '/sites/team1');
   });
 
   it('should get server relative path when https://contoso.sharepoint.com/', () => {
-    const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com/');
+    const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com/', '');
     assert.equal(actual, '/');
   });
 
   it('should get server relative path when domain only', () => {
-    const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com');
+    const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com', '');
     assert.equal(actual, '/');
   });
 
   it('should get server relative path when /sites/team1 relative path passed as param', () => {
-    const actual = Utils.getServerRelativePath('/sites/team1');
+    const actual = Utils.getServerRelativePath('/sites/team1', '');
     assert.equal(actual, '/sites/team1');
   });
 
   it('should get server relative path when /sites/team1/ relative path passed as param', () => {
-    const actual = Utils.getServerRelativePath('/sites/team1/');
+    const actual = Utils.getServerRelativePath('/sites/team1/', '');
     assert.equal(actual, '/sites/team1');
   });
 
   it('should get server relative path when / relative path passed as param', () => {
-    const actual = Utils.getServerRelativePath('/');
+    const actual = Utils.getServerRelativePath('/', '');
     assert.equal(actual, '/');
   });
 
@@ -801,13 +801,18 @@ describe('Utils', () => {
     assert.equal(actual, 'Office 365 CLI Contoso');
   });
 
-  it('returns empty user name when access token is undefined available', () => {
+  it('returns empty user name when access token is undefined', () => {
     const actual = Utils.getUserNameFromAccessToken(undefined as any);
     assert.equal(actual, '');
   });
 
   it('returns empty user name when empty access token passed', () => {
     const actual = Utils.getUserNameFromAccessToken('');
+    assert.equal(actual, '');
+  });
+
+  it('returns empty user name when invalid access token passed', () => {
+    const actual = Utils.getUserNameFromAccessToken('abc.def.ghi');
     assert.equal(actual, '');
   });
 

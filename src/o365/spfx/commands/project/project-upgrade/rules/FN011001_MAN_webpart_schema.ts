@@ -4,7 +4,7 @@ import { ManifestRule } from "./ManifestRule";
 
 export class FN011001_MAN_webpart_schema extends ManifestRule {
   constructor(private schema: string) {
-    super()/* istanbul ignore next */;
+    super();
   }
 
   get id(): string {

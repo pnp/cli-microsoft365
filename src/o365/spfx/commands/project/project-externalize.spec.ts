@@ -19,6 +19,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
   let trackEvent: any;
   let telemetry: any;
   const logEntryToCheck = 1; //necessary as long as we display the beta message
+  const projectPath: string = './src/o365/spfx/commands/project/project-externalize/test-projects/spfx-182-webpart-react';
 
   before(() => {
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
@@ -296,6 +297,83 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
   });
 
+  it('determining project version doesn\'t fail if .yo-rc.json is empty', () => {
+    const originalExistsSync = fs.existsSync;
+    sinon.stub(fs, 'existsSync').callsFake((path: string) => {
+      if (path.endsWith('.yo-rc.json')) {
+        return true;
+      }
+      else {
+        return originalExistsSync(path);
+      }
+    });
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+      if (path.endsWith('.yo-rc.json')) {
+        return '';
+      }
+      else if (path.endsWith('package.json')) {
+        return `{
+          "name": "spfx-141",
+          "version": "0.0.1",
+          "private": true,
+          "engines": {
+            "node": ">=0.10.0"
+          },
+          "scripts": {
+            "build": "gulp bundle",
+            "clean": "gulp clean",
+            "test": "gulp test"
+          },
+          "dependencies": {
+            "@microsoft/sp-core-library": "~1.4.1",
+            "@microsoft/sp-webpart-base": "~1.4.1",
+            "@microsoft/sp-lodash-subset": "~1.4.1",
+            "@microsoft/sp-office-ui-fabric-core": "~1.4.1",
+            "@types/webpack-env": ">=1.12.1 <1.14.0"
+          },
+          "devDependencies": {
+            "@microsoft/sp-build-web": "~1.4.1",
+            "@microsoft/sp-module-interfaces": "~1.4.1",
+            "@microsoft/sp-webpart-workbench": "~1.4.1",
+            "gulp": "~3.9.1",
+            "@types/chai": ">=3.4.34 <3.6.0",
+            "@types/mocha": ">=2.2.33 <2.6.0",
+            "ajv": "~5.2.2"
+          }
+        }
+        `;
+      }
+      else {
+        return originalReadFileSync(path);
+      }
+    });
+    const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.4.1' } }, (err?: any) => {
+      assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '1.4.1');
+    });
+  });
+
+  it('determining project version doesn\'t fail if package.json is empty', () => {
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+      if (path.endsWith('package.json')) {
+        return '';
+      }
+      else {
+        return originalReadFileSync(path);
+      }
+    });
+    const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.4.1' } }, (err?: any) => {
+      assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, undefined);
+    });
+  });
+
   it('loads config.json when available', () => {
     const originalExistsSync = fs.existsSync;
     sinon.stub(fs, 'existsSync').callsFake((path: string) => {
@@ -317,7 +395,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
 
     const getProject = (command as any).getProject;
-    const project: Project = getProject('./');
+    const project: Project = getProject(projectPath);
     assert.notEqual(typeof (project.configJson), 'undefined');
   });
 
@@ -333,7 +411,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
 
     const getProject = (command as any).getProject;
-    const project: Project = getProject('./');
+    const project: Project = getProject(projectPath);
     assert.equal(typeof (project.packageJson), 'undefined');
   });
 
@@ -349,8 +427,56 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
 
     const getProject = (command as any).getProject;
-    const project: Project = getProject('./');
+    const project: Project = getProject(projectPath);
     assert.equal(typeof (project.tsConfigJson), 'undefined');
+  });
+
+  it('doesn\'t fail if config.json is empty', () => {
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+      if (path.endsWith('config.json')) {
+        return '';
+      }
+      else {
+        return originalReadFileSync(path);
+      }
+    });
+
+    const getProject = (command as any).getProject;
+    const project: Project = getProject(projectPath);
+    assert.equal(typeof (project.configJson), 'undefined');
+  });
+
+  it('doesn\'t fail if package.json is empty', () => {
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+      if (path.endsWith('package.json')) {
+        return '';
+      }
+      else {
+        return originalReadFileSync(path);
+      }
+    });
+
+    const getProject = (command as any).getProject;
+    const project: Project = getProject(projectPath);
+    assert.equal(typeof (project.packageJson), 'undefined');
+  });
+
+  it('doesn\'t fail if .yo-rc.json is empty', () => {
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+      if (path.endsWith('.yo-rc.json')) {
+        return '';
+      }
+      else {
+        return originalReadFileSync(path);
+      }
+    });
+
+    const getProject = (command as any).getProject;
+    const project: Project = getProject(projectPath);
+    assert.equal(typeof (project.yoRcJson), 'undefined');
   });
 
   //#region findings

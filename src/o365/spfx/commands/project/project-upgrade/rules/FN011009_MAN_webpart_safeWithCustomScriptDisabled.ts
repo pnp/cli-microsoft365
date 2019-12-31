@@ -4,7 +4,7 @@ import { ManifestRule } from "./ManifestRule";
 
 export class FN011009_MAN_webpart_safeWithCustomScriptDisabled extends ManifestRule {
   constructor(private add: boolean) {
-    super()/* istanbul ignore next */;
+    super();
   }
 
   get id(): string {

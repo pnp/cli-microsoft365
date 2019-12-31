@@ -2,7 +2,6 @@ import { DependencyRule } from "./DependencyRule";
 
 export class FN001018_DEP_microsoft_sp_client_base extends DependencyRule {
   constructor(packageVersion: string, add: boolean) {
-    /* istanbul ignore next */
     super('@microsoft/sp-client-base', packageVersion, false, true, add);
   }
 

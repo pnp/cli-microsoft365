@@ -5,7 +5,6 @@ import * as ts from 'typescript';
 
 export class FN016004_TS_property_pane_property_import extends TsRule {
   constructor() {
-    /* istanbul ignore next */
     super();
   }
 

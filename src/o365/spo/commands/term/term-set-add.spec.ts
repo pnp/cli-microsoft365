@@ -993,6 +993,11 @@ describe(commands.TERM_SET_ADD, () => {
     assert.equal(actual, true);
   });
 
+  it('passes validation when custom properties is a valid JSON string', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { name: 'PnP-Organizations', termGroupName: 'PnPTermSets', customProperties: '{}' } });
+    assert.equal(actual, true);
+  });
+
   it('supports debug mode', () => {
     const options = (command.options() as CommandOption[]);
     let containsOption = false;

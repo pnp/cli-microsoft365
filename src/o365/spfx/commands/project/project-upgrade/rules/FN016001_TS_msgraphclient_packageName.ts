@@ -5,7 +5,7 @@ import * as ts from 'typescript';
 
 export class FN016001_TS_msgraphclient_packageName extends TsRule {
   constructor(private packageName: string) {
-    super()/* istanbul ignore next */;
+    super();
   }
 
   get id(): string {

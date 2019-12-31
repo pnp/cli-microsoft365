@@ -57,7 +57,34 @@ describe('DynamicRule', () => {
     assert.equal(findings.length, 1);
   });
 
-  it('doesnt return anything is package is unsupported', async () => {
+  it('returns globalName if module type is script', async () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      packageJson: {
+        dependencies: {
+          '@pnp/pnpjs': '1.3.5'
+        }
+      }
+    };
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+      if (path.endsWith('@pnp/pnpjs/package.json')) {
+        return JSON.stringify({
+          main: "./dist/pnpjs.es5.umd.bundle.js",
+          module: "./dist/pnpjs.es5.umd.bundle.min.js"
+        });
+      }
+      else {
+        return originalReadFileSync(path);
+      }
+    });
+    sinon.stub(request, 'head').callsFake(() => Promise.resolve());
+    sinon.stub(request, 'post').callsFake(() => Promise.resolve({ scriptType: 'script' }));
+    const findings = await rule.visit(project);
+    assert.equal(findings.length, 1);
+  });
+
+  it('doesn\'t return anything is package is unsupported', async () => {
     const project: Project = {
       path: '/usr/tmp',
       packageJson: {
@@ -158,6 +185,29 @@ describe('DynamicRule', () => {
     });
     sinon.stub(request, 'head').callsFake(() => Promise.reject());
     sinon.stub(request, 'post').callsFake(() => Promise.resolve(JSON.stringify({ scriptType: 'module' })));
+    const findings = await rule.visit(project);
+    assert.equal(findings.length, 0);
+  });
+
+  it('doesn\'t return anything if package.json is empty', async () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      packageJson: {
+        dependencies: {
+          '@pnp/pnpjs': '1.3.5'
+        }
+      }
+    };
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+      if (path.endsWith('@pnp/pnpjs/package.json')) {
+        return '';
+      }
+      else {
+        return originalReadFileSync(path);
+      }
+    });
+    sinon.stub(request, 'head').callsFake(() => Promise.resolve());
     const findings = await rule.visit(project);
     assert.equal(findings.length, 0);
   });
