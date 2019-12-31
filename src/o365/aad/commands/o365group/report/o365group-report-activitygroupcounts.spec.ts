@@ -20,7 +20,7 @@ describe(commands.O365GROUP_REPORT_ACTIVITYGROUPCOUNTS, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
+    vorpal = require('../../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
