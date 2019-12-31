@@ -1,7 +1,7 @@
-import commands from '../../commands';
-import PeriodBasedReport from '../../../base/PeriodBasedReport';
+import commands from '../../../commands';
+import PeriodBasedReport from '../../../../base/PeriodBasedReport';
 
-const vorpal: Vorpal = require('../../../../vorpal-init');
+const vorpal: Vorpal = require('../../../../../vorpal-init');
 
 class O365GroupReportActivityGroupCountsCommand extends PeriodBasedReport {
   public get name(): string {
@@ -28,12 +28,12 @@ class O365GroupReportActivityGroupCountsCommand extends PeriodBasedReport {
     Get the daily total number of groups and how many of them were active based
     on activities for the last week and exports the report data in the specified
     path in text format
-      ${commands.O365GROUP_REPORT_ACTIVITYGROUPCOUNTS} --period D7 --output text --outputFile './o365groupactivitygroupcounts.txt'
+      ${commands.O365GROUP_REPORT_ACTIVITYGROUPCOUNTS} --period D7 --output text --outputFile o365groupactivitygroupcounts.txt
 
     Get the daily total number of groups and how many of them were active based
     on activities for the last week and exports the report data in the specified
     path in json format
-      ${commands.O365GROUP_REPORT_ACTIVITYGROUPCOUNTS} --period D7 --output json --outputFile './o365groupactivitygroupcounts.json'
+      ${commands.O365GROUP_REPORT_ACTIVITYGROUPCOUNTS} --period D7 --output json --outputFile o365groupactivitygroupcounts.json
 `);
   }
 }
