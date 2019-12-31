@@ -29,7 +29,7 @@ class SpoHubSiteListCommand extends SpoCommand {
   }
 
   constructor() {
-    super()/* istanbul ignore next */;
+    super();
     this.batchSize = 30;
   }
 
@@ -85,37 +85,11 @@ class SpoHubSiteListCommand extends SpoCommand {
           }
         };
 
-        if (this.debug || this.verbose) {
+        if (this.debug) {
           cmd.log(`Will retrieve associated sites (including the hub sites) in batches of ${this.batchSize}`);
         }
-        const getSites = async (reqOptions: any, nonPagedUrl: string, sites: AssociatedSite[] = [], batchNumber: number = 0): Promise<AssociatedSite[]> => {
-          const res: QueryListResult = await request.post(requestOptions);
-          batchNumber++;
-          const retrievedSites: AssociatedSite[] = res.Row.length > 0 ? sites.concat(res.Row) : sites;
 
-          if (this.debug || this.verbose) {
-            cmd.log(res);
-            cmd.log(`Retrieved ${res.Row.length} sites in batch ${batchNumber}`);
-          }
-
-          if (!!res.NextHref) {
-            reqOptions.url = nonPagedUrl + res.NextHref;
-            if (this.debug) {
-              cmd.log(`Url for next batch of sites: ${reqOptions.url}`);
-            }
-
-            return getSites(reqOptions, nonPagedUrl, retrievedSites, batchNumber);
-          }
-          else {
-            if (this.debug || this.verbose) {
-              cmd.log(`Retrieved ${retrievedSites.length} sites in total`);
-            }
-
-            return retrievedSites;
-          }
-        }
-
-        return getSites(requestOptions, requestOptions.url);
+        return this.getSites(requestOptions, requestOptions.url, cmd);
       })
       .then((res: AssociatedSite[] | void): void => {
         if (res) {
@@ -155,6 +129,46 @@ class SpoHubSiteListCommand extends SpoCommand {
 
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+  }
+
+  private getSites(reqOptions: any, nonPagedUrl: string, cmd: CommandInstance, sites: AssociatedSite[] = [], batchNumber: number = 0): Promise<AssociatedSite[]> {
+    return new Promise<AssociatedSite[]>((resolve: (associatedSites: AssociatedSite[]) => void, reject: (error: any) => void): void => {
+      request
+        .post<QueryListResult>(reqOptions)
+        .then((res: QueryListResult): void => {
+          batchNumber++;
+          const retrievedSites: AssociatedSite[] = res.Row.length > 0 ? sites.concat(res.Row) : sites;
+
+          if (this.debug) {
+            cmd.log(res);
+            cmd.log(`Retrieved ${res.Row.length} sites in batch ${batchNumber}`);
+          }
+
+          if (!!res.NextHref) {
+            reqOptions.url = nonPagedUrl + res.NextHref;
+            if (this.debug) {
+              cmd.log(`Url for next batch of sites: ${reqOptions.url}`);
+            }
+
+            this
+              .getSites(reqOptions, nonPagedUrl, cmd, retrievedSites, batchNumber)
+              .then((associatedSites: AssociatedSite[]): void => {
+                resolve(associatedSites);
+              }, (err: any): void => {
+                reject(err);
+              });
+          }
+          else {
+            if (this.debug) {
+              cmd.log(`Retrieved ${retrievedSites.length} sites in total`);
+            }
+
+            resolve(retrievedSites);
+          }
+        }, (err: any): void => {
+          reject(err);
+        });
+    });
   }
 
   public options(): CommandOption[] {

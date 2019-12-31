@@ -34,7 +34,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
   private fieldLink: FieldLink | null;
 
   constructor() {
-    super()/* istanbul ignore next */;
+    super();
     this.requestDigest = '';
     this.siteId = '';
     this.webId = '';

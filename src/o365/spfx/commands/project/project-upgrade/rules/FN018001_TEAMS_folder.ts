@@ -6,7 +6,6 @@ import * as fs from 'fs';
 
 export class FN018001_TEAMS_folder extends Rule {
   constructor() {
-    /* istanbul ignore next */
     super();
   }
 

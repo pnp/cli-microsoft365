@@ -126,7 +126,7 @@ class SpoListItemAddCommand extends SpoCommand {
           return request
             .get<any>(requestOptions)
             .then(rootFolderResponse => {
-              targetFolderServerRelativeUrl = Utils.getServerRelativePath(rootFolderResponse["ServerRelativeUrl"], args.options.folder);
+              targetFolderServerRelativeUrl = Utils.getServerRelativePath(rootFolderResponse["ServerRelativeUrl"], args.options.folder as string);
 
               return folderExtensions.ensureFolder(args.options.webUrl, targetFolderServerRelativeUrl);
             });

@@ -2,7 +2,6 @@ import { FileAddRemoveRule } from "./FileAddRemoveRule";
 
 export class FN015005_FILE_src_index_ts extends FileAddRemoveRule {
   constructor(add: boolean, contents: string) {
-    /* istanbul ignore next */
     super('./src/index.ts', add, contents);
   }
 

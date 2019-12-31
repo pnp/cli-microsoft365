@@ -4,7 +4,7 @@ import { ManifestRule } from "./ManifestRule";
 
 export class FN011005_MAN_webpart_defaultGroup extends ManifestRule {
   constructor(private oldDefaultGroup: string, private newDefaultGroup: string) {
-    super()/* istanbul ignore next */;
+    super();
   }
 
   get id(): string {

@@ -197,7 +197,7 @@ export default class Utils {
    * // returns "/sites/team1/Shared Documents"
    * Utils.getServerRelativePath("/sites/team1/", "/Shared Documents");
    */
-  public static getServerRelativePath(webUrl: string, folderRelativePath: string = ""): string {
+  public static getServerRelativePath(webUrl: string, folderRelativePath: string): string {
     const tenantUrl: string = `${url.parse(webUrl).protocol}//${url.parse(webUrl).hostname}`;
     let webRelativePath: string = webUrl.replace(tenantUrl, '');
 

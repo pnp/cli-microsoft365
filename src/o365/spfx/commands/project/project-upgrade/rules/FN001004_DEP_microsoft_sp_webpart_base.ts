@@ -2,7 +2,6 @@ import { DependencyRule } from "./DependencyRule";
 
 export class FN001004_DEP_microsoft_sp_webpart_base extends DependencyRule {
   constructor(packageVersion: string) {
-    /* istanbul ignore next */
     super('@microsoft/sp-webpart-base', packageVersion, false, true);
   }
 

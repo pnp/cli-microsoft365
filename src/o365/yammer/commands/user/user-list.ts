@@ -23,7 +23,6 @@ interface Options extends GlobalOptions {
 class YammerUserListCommand extends YammerCommand {
   protected items: any[];
 
-  /* istanbul ignore next */
   constructor() {
     super();
     this.items = [];

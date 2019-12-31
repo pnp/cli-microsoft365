@@ -1,7 +1,7 @@
 defaults: &defaults
   working_directory: ~/office365-cli
   docker:
-    - image: circleci/node:10.15.3
+    - image: circleci/node:12.14.0
 
 version: 2
 jobs:
@@ -36,7 +36,7 @@ jobs:
           command: npm test
       - run:
           name: Run coveralls
-          command: './node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls'
+          command: './node_modules/.bin/c8 report --reporter=text-lcov | ./node_modules/.bin/coveralls'
           environment:
             - COVERALLS_REPO_TOKEN: "VsEM7x54Sb8kg1sjzpA6aafoyvlcTtM30"
             - COVERALLS_SERVICE_NAME: "circle-ci"

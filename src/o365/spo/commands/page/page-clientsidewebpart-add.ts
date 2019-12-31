@@ -112,7 +112,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
         if (canvasContent.length === 1) {
           const defaultSection: Control = {
             position: {
-              controlIndex:1,
+              controlIndex: 1,
               sectionIndex: 1,
               zoneIndex: 1,
               sectionFactor: 12,
@@ -120,7 +120,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
             },
             emphasis: {},
             displayMode: 2
-          };          
+          };
           canvasContent.unshift(defaultSection);
         }
 
@@ -331,12 +331,9 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
         cmd.log('');
       }
 
-      try {
-        const webPartData = JSON.parse(args.options.webPartData);
-        (webPart as any).webPartData = this.extend((webPart as any).webPartData, webPartData);
-        webPart.id = (webPart as any).webPartData.instanceId;
-      }
-      catch { }
+      const webPartData = JSON.parse(args.options.webPartData);
+      (webPart as any).webPartData = this.extend((webPart as any).webPartData, webPartData);
+      webPart.id = (webPart as any).webPartData.instanceId;
     }
   }
 

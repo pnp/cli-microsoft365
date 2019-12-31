@@ -350,7 +350,6 @@ export default abstract class Command {
     const cmd = commandData.match;
     // required for tests not to fail.
     // Can't happen on runtime because we are already inside a command
-    /* istanbul ignore next */
     if (!cmd) {
       return args;
     }

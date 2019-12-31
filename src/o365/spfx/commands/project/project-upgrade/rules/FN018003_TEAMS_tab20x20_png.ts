@@ -6,7 +6,6 @@ import * as fs from 'fs';
 
 export class FN018003_TEAMS_tab20x20_png extends Rule {
   constructor() {
-    /* istanbul ignore next */
     super();
   }
 
