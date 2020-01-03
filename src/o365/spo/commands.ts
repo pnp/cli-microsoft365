@@ -106,6 +106,7 @@ export default {
   NAVIGATION_NODE_LIST: `${prefix} navigation node list`,
   NAVIGATION_NODE_REMOVE: `${prefix} navigation node remove`,
   ORGASSETSLIBRARY_LIST: `${prefix} orgassetslibrary list`,
+  ORGASSETSLIBRARY_REMOVE: `${prefix} orgassetslibrary remove`,
   ORGNEWSSITE_LIST: `${prefix} orgnewssite list`,
   ORGNEWSSITE_REMOVE: `${prefix} orgnewssite remove`,
   ORGNEWSSITE_SET: `${prefix} orgnewssite set`,
