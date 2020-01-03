@@ -326,10 +326,9 @@ class SpoListItemAddCommand extends SpoCommand {
 
     Object.keys(options).forEach(key => {
       if (excludeOptions.indexOf(key) === -1) {
-        requestBody.push({ FieldName: key, FieldValue: (<any>options)[key] });
+        requestBody.push({ FieldName: key, FieldValue: `${(<any>options)[key]}` });
       }
     });
-
     return requestBody;
   }
 }
