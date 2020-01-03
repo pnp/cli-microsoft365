@@ -392,7 +392,9 @@ nav:
         - user set: 'cmd/aad/o365group/o365group-user-set.md'
     - Office 365 (tenant):
       - id:
-        - id get: 'cmd/tenant-id-get.md'
+        - id get: 'cmd/tenant/general/id-get.md'
+      - report:
+        - report activeusercounts: 'cmd/tenant/report/report-activeusercounts.md'
     - Yammer (yammer):
       - message:
         - message get: 'cmd/yammer/message/message-get.md'
