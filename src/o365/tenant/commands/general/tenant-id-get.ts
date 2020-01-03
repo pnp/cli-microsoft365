@@ -1,13 +1,13 @@
-import commands from './commands';
-import GlobalOptions from '../../GlobalOptions';
-import request from '../../request';
+import commands from '../../commands';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import Command, {
   CommandOption,
   CommandValidate,
   CommandError
-} from '../../Command';
+} from '../../../../Command';
 
-const vorpal: Vorpal = require('../../vorpal-init');
+const vorpal: Vorpal = require('../../../../vorpal-init');
 
 interface CommandArgs {
   options: Options;
