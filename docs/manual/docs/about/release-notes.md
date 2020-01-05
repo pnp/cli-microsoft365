@@ -1,5 +1,25 @@
 # Release notes
 
+## v2.5.0
+
+### New commands
+
+**OneDrive**
+
+- [onedrive report activityuserdetail](../cmd/onedrive/report/report-activityuserdetail.md) - gets details about OneDrive activity by user [#1255](https://github.com/pnp/office365-cli/issues/1255)
+- [onedrive report usageaccountdetail](../cmd/onedrive/report/report-usageaccountdetail.md) - gets details about OneDrive usage by account [#1251](https://github.com/pnp/office365-cli/issues/1251)
+
+**SharePoint**
+
+- [spo report siteusagefilecounts](../cmd/spo/report/report-siteusagefilecounts.md) - get the total number of files across all sites and the number of active files [#1247](https://github.com/pnp/office365-cli/issues/1247)
+- [spo report siteusagepages](../cmd/spo/report/report-siteusagepages.md) - gets the number of pages viewed across all sites [#1250](https://github.com/pnp/office365-cli/issues/1250)
+- [spo report siteusagesitecounts](../cmd/spo/report/report-siteusagesitecounts.md) - gets the total number of files across all sites and the number of active files [#1248](https://github.com/pnp/office365-cli/issues/1248)
+- [spo report siteusagestorage](../cmd/spo/report/report-siteusagestorage.md) - gets the trend of storage allocated and consumed during the reporting period [#1249](https://github.com/pnp/office365-cli/issues/1249)
+
+### Changes
+
+- fixed error using command spo listitem add when text field value only contains numbers [#1297](https://github.com/pnp/office365-cli/issues/1297)
+
 ## [v2.4.0](https://github.com/pnp/office365-cli/releases/tag/v2.4.0)
 
 ### New commands
