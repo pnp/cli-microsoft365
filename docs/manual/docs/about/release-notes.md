@@ -1,6 +1,6 @@
 # Release notes
 
-## v2.5.0
+## [v2.5.0](https://github.com/pnp/office365-cli/releases/tag/v2.5.0)
 
 ### New commands
 
@@ -19,6 +19,7 @@
 ### Changes
 
 - fixed error using command spo listitem add when text field value only contains numbers [#1297](https://github.com/pnp/office365-cli/issues/1297)
+- added support for upgrading projects built using SharePoint Framework v1.9.1 [#1310](https://github.com/pnp/office365-cli/pull/1310)
 
 ## [v2.4.0](https://github.com/pnp/office365-cli/releases/tag/v2.4.0)
 
