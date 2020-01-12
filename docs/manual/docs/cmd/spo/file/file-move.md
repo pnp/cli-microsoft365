@@ -18,6 +18,7 @@ Option|Description
 `-t, --targetUrl <targetUrl>`|Server-relative URL where to move the file
 `--deleteIfAlreadyExists`|If a file already exists at the targetUrl, it will be moved to the recycle bin. If omitted, the move operation will be canceled if the file already exists at the targetUrl location
 `--allowSchemaMismatch`|Ignores any missing fields in the target document library and moves the file anyway
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

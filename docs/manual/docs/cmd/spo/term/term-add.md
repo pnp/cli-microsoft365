@@ -23,6 +23,7 @@ Option|Description
 `--parentTermId [parentTermId]`|ID of the term below which the term should be added
 `--customProperties [customProperties]`|JSON string with key-value pairs representing custom properties to set on the term
 `--localCustomProperties [localCustomProperties]`|JSON string with key-value pairs representing local custom properties to set on the term
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

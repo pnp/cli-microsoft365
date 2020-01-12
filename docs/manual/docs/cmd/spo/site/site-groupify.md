@@ -29,6 +29,7 @@ Option|Description
 `-c, --classification [classification]`|The classification value, if classifications are set for the organization. If no value is provided, the default classification will be set, if one is configured
 `--isPublic`|Determines the Office 365 Group’s privacy setting. If set, the group will be public, otherwise it will be private
 `--keepOldHomepage`|For sites that already have a modern page set as homepage, set this option, to keep it as the homepage
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

@@ -16,6 +16,7 @@ Option|Description
 `-t, --type [type]`|Type of CDN to manage. `Public|Private`. Default `Public`
 `-p, --policy <policy>`|CDN policy to configure. `IncludeFileExtensions|ExcludeRestrictedSiteClassifications`
 `-v, --value <value>`|Value for the policy to configure
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

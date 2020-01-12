@@ -109,6 +109,7 @@
     "adal-node": "^0.2.1",
     "applicationinsights": "^1.5.0",
     "easy-table": "^1.1.1",
+    "jmespath": "^0.15.0",
     "node-forge": "^0.9.1",
     "omelette": "^0.4.12",
     "request-promise-native": "^1.0.7",
@@ -122,6 +123,7 @@
   },
   "devDependencies": {
     "@types/easy-table": "0.0.32",
+    "@types/jmespath": "^0.15.0",
     "@types/mocha": "^5.2.7",
     "@types/node": "^10.14.22",
     "@types/node-forge": "^0.8.6",

@@ -23,6 +23,8 @@ Option|Description
 `--teamId [teamId]`|The ID of the Microsoft Teams team from which to remove the user
 `-n, --userName <userName>`|User's UPN (user principal name), eg. `johndoe@example.com`
 `--confirm`|Don't prompt for confirming removing the user from the specified Office 365 Group or Microsoft Teams team
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+`-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 

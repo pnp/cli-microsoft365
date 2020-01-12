@@ -18,6 +18,7 @@ Option|Description
 `-t, --listTitle [listTitle]`|Title of the list to retrieve all webhooks for. Specify either `listId` or `listTitle` but not both
 `--id [id]`|(deprecated. Use `listId` instead) ID of the list to retrieve all webhooks for. Specify either `id` or `title` but not both
 `--title [title]`|(deprecated. Use `listTitle` instead) Title of the list to retrieve all webhooks for. Specify either `id` or `title` but not both
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

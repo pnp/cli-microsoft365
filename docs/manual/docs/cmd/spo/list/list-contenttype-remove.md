@@ -18,6 +18,7 @@ Option|Description
 `-t, --listTitle [listTitle]`|Title of the list from which to remove the content type, specify `listId` or `listTitle` but not both
 `-c, --contentTypeId <contentTypeId>`|ID of the content type to remove from the list
 `--confirm`|Don't prompt for confirming removing the content type from the list
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

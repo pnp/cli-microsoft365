@@ -26,6 +26,7 @@ Option|Description
 `--showPublishDate`|Set, to show the publishing date
 `--kicker [kicker]`|Text to show in the kicker, when showKicker is set
 `--authors [authors]`|Comma-separated list of page authors to show in the header
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

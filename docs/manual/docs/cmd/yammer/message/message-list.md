@@ -19,6 +19,7 @@ Option|Description
 `--groupId [groupId]`|Returns the messages from a specific group
 `--threadId [threadId]`|Returns the messages from a specific thread
 `--limit [limit]`|Limits the messages returned
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

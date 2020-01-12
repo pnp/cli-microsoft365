@@ -15,6 +15,7 @@ Option|Description
 `--help`| output usage information
 `-i, --teamId <teamId>`|The ID of the Microsoft Teams team where the channel is located
 `-c, --channelId <channelId>`|The ID of the channel for which to list tabs
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

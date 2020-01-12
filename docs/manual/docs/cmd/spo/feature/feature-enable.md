@@ -17,6 +17,7 @@ Option|Description
 `-f, --featureId <id>`|The ID of the feature to enable
 `-s, --scope [scope]`|Scope of the Feature to enable. Allowed values `Site|Web`. Default `Web`
 `--force`|Specifies whether to overwrite an existing feature with the same feature identifier. This parameter is ignored if there are no errors.
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

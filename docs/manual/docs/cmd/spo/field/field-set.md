@@ -19,6 +19,7 @@ Option|Description
 `-i|--id [id]`|ID of the field to update. Specify `name` or `id` but not both
 `-n|--name [name]`|Title or internal name of the field to update. Specify `name` or `id` but not both
 `--updateExistingLists`|Set, to push the update to existing lists. Otherwise, the changes will apply to new lists only
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

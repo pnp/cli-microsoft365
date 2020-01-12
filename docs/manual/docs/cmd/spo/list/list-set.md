@@ -76,6 +76,7 @@ Option|Description
 `--validationFormula [validationFormula]`|Gets or sets a formula that is evaluated each time that a list item is added or updated.
 `--validationMessage [validationMessage]`|Gets or sets the message that is displayed when validation fails for a list item.
 `--writeSecurity [writeSecurity]`|Gets or sets the Write security setting for the list. Valid values are 1 (All users can modify all items)|2 (Users can modify only items that they create)|4 (Users cannot modify any list item)
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

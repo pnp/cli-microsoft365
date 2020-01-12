@@ -18,6 +18,7 @@ Option|Description
 `-v, --value <value>`|Value to set for the property
 `-d, --description [description]`|Description to set for the property (optional)
 `-c, --comment [comment]`|Comment to set for the property (optional)
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

@@ -16,6 +16,7 @@ Option|Description
 `-i, --teamId <teamId>`|The ID of the team to add the channel to
 `-n, --name <name>`|The name of the channel to add
 `-d, --description [description]`|The description of the channel to add
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
