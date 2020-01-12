@@ -1,5 +1,21 @@
 # Release notes
 
+## v2.6.0
+
+### New commands
+
+**Microsoft Graph:**
+
+- [graph schemaextension remove](../cmd/graph/schemaextension/schemaextension-remove.md) - removes specified Microsoft Graph schema extension [#16](https://github.com/pnp/office365-cli/issues/16)
+
+**SharePoint**
+
+- [spo report activityfilecounts](../cmd/spo/report/report-activityfilecounts.md) - gets the number of unique, licensed users who interacted with files stored on SharePoint sites [#1243](https://github.com/pnp/office365-cli/issues/1243)
+
+### Changes
+
+- added support for file edit suggestions [#1190](https://github.com/pnp/office365-cli/issues/1190)
+
 ## [v2.5.0](https://github.com/pnp/office365-cli/releases/tag/v2.5.0)
 
 ### New commands
