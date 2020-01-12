@@ -18,6 +18,7 @@ Option|Description
 `-t, --listTitle [listTitle]`|Title of the list where the item should be added. Specify `listId` or `listTitle` but not both
 `-c, --contentType [contentType]`|The name or the ID of the content type to associate with the new item
 `-f, --folder [folder]`|The list-relative URL of the folder where the item should be created
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

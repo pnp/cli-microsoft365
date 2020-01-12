@@ -20,6 +20,7 @@ Option|Description
 `-m, --previewImageUrl [previewImageUrl]`|The URL of a preview image. If none is specified SharePoint will use a generic image
 `-a, --previewImageAltText [previewImageAltText]`|The alt text description of the image for accessibility
 `--isDefault`|Set if the site design is applied as the default site design
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

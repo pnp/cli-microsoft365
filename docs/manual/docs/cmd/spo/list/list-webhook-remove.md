@@ -18,6 +18,7 @@ Option|Description
 `-t, --listTitle [listTitle]`|Title of the list from which the webhook should be removed. Specify either `listId` or `listTitle` but not both
 `-i, --id <id>`|ID of the webhook to remove
 `--confirm`|Don't prompt for confirming removing the webhook
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

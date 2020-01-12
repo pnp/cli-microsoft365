@@ -291,6 +291,107 @@ describe('Utils', () => {
     }
   });
 
+  it('applies JMESPath query to a single object', (done) => {
+    const sandbox = sinon.createSandbox();
+    if (!vorpal._command) {
+      (vorpal as any)._command = undefined;
+    }
+    sandbox.stub(vorpal, '_command').value({
+      args: {
+        options: {
+          query: 'first',
+          output: 'json'
+        }
+      }
+    });
+    const o = {
+      "first": "Joe",
+      "last": "Doe"
+    };
+    const actual = Utils.logOutput([o]);
+    try {
+      assert.equal(actual, JSON.stringify("Joe"));
+      done();
+    }
+    catch (e) {
+      done(e);
+    }
+    finally {
+      sandbox.restore();
+    }
+  });
+
+  it('applies JMESPath query to an array', (done) => {
+    const sandbox = sinon.createSandbox();
+    if (!vorpal._command) {
+      (vorpal as any)._command = undefined;
+    }
+    sandbox.stub(vorpal, '_command').value({
+      args: {
+        options: {
+          query: `locations[?state == 'WA'].name | sort(@) | {WashingtonCities: join(', ', @)}`,
+          output: 'json'
+        }
+      }
+    });
+    const o = {
+      "locations": [
+        {"name": "Seattle", "state": "WA"},
+        {"name": "New York", "state": "NY"},
+        {"name": "Bellevue", "state": "WA"},
+        {"name": "Olympia", "state": "WA"}
+      ]
+    };
+    const actual = Utils.logOutput([o]);
+    try {
+      assert.equal(actual, JSON.stringify({
+        "WashingtonCities": "Bellevue, Olympia, Seattle"
+      }));
+      done();
+    }
+    catch (e) {
+      done(e);
+    }
+    finally {
+      sandbox.restore();
+    }
+  });
+
+  it('doesn\'t apply JMESPath query when command help requested', (done) => {
+    const sandbox = sinon.createSandbox();
+    if (!vorpal._command) {
+      (vorpal as any)._command = undefined;
+    }
+    sandbox.stub(vorpal, '_command').value({
+      args: {
+        options: {
+          query: `locations[?state == 'WA'].name | sort(@) | {WashingtonCities: join(', ', @)}`,
+          output: 'json',
+          help: true
+        }
+      }
+    });
+    const o = {
+      "locations": [
+        {"name": "Seattle", "state": "WA"},
+        {"name": "New York", "state": "NY"},
+        {"name": "Bellevue", "state": "WA"},
+        {"name": "Olympia", "state": "WA"}
+      ]
+    };
+    const actual = Utils.logOutput([o]);
+    try {
+      assert.equal(actual, JSON.stringify(o));
+      done();
+    }
+    catch (e) {
+      done(e);
+    }
+    finally {
+      sandbox.restore();
+    }
+  });
+
   it('should get server relative path when https://contoso.sharepoint.com/sites/team1', () => {
     const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com/sites/team1', '');
     assert.equal(actual, '/sites/team1');

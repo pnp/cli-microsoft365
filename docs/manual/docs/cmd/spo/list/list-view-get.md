@@ -19,6 +19,7 @@ Option|Description
 `--listUrl [listUrl]`|Server- or web-relative URL of the list where the view is located. Specify only one of `listTitle`, `listId` or `listUrl`
 `--viewId [viewId]`|ID of the view to get. Specify `viewTitle` or `viewId` but not both
 `--viewTitle [viewTitle]`|Title of the view to get. Specify `viewTitle` or `viewId` but not both
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

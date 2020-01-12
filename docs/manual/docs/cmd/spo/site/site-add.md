@@ -26,6 +26,7 @@ Option|Description
 `--siteDesign [siteDesign]`|Type of communication site to create. Allowed values `Topic|Showcase|Blank`, default `Topic`. When creating a communication site, specify either `siteDesign` or `siteDesignId` (applies only to communication sites)
 `--siteDesignId [siteDesignId]`|Id of the custom site design to use to create the site. When creating a communication site, specify either `siteDesign` or `siteDesignId` (applies only to communication sites)
 `--owners [owners]`|Comma-separated list of users to set as site owners (applies only to team sites)
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

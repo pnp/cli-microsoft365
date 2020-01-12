@@ -4,6 +4,7 @@ export enum Output {
 }
 
 export default interface GlobalOptions {
+  query?: string;
   output?: string;
   debug?: boolean;
   verbose?: boolean;

@@ -16,6 +16,7 @@ Option|Description
 `-i, --id [id]`|The ID of the user to retrieve information for. Specify `id` or `userName` but not both
 `-n, --userName [userName]`|The name of the user to retrieve information for. Specify `id` or `userName` but not both
 `-p, --properties [properties]`|Comma-separated list of properties to retrieve
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

@@ -25,6 +25,7 @@ Option|Description
 `--bodyContentsFilePath [bodyContentsFilePath]`|Relative or absolute path to the file with e-mail body contents
 `--bodyContentType [bodyContentType]`|Type of the body content. Available options: `Text|HTML`. Default `Text`
 `--saveToSentItems [saveToSentItems]`|Save e-mail in the sent items folder. Default `true`
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

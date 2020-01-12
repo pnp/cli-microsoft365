@@ -18,6 +18,8 @@ Option|Description
 `-t, --listTitle [listTitle]`|The title of the list where the item is located. Specify `listId` or `listTitle` but not both
 `-i, --id <id>`|The ID of the list item to declare as record
 `-d, --date [date]`|Record declaration date in ISO format. eg. 2019-12-31
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+`-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`| Runs command with debug logging
 

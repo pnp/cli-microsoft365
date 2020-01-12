@@ -3,6 +3,7 @@ import * as os from 'os';
 const vorpal: Vorpal = require('./vorpal-init');
 import { CommandError } from './Command';
 import * as url from 'url';
+import * as jmespath from 'jmespath';
 
 export default class Utils {
   public static escapeXml(s: any | undefined) {
@@ -88,6 +89,14 @@ export default class Utils {
 
     if (logStatementType === 'undefined') {
       return logStatement;
+    }
+
+    if (vorpal._command &&
+      vorpal._command.args &&
+      vorpal._command.args.options &&
+      vorpal._command.args.options.query &&
+      !vorpal._command.args.options.help) {
+      logStatement = jmespath.search(logStatement, vorpal._command.args.options.query);
     }
 
     if (vorpal._command &&

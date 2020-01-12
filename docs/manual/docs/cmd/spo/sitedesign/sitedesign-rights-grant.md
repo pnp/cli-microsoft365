@@ -16,6 +16,7 @@ Option|Description
 `-i, --id <id>`|The ID of the site design to grant rights on
 `-p, --principals <principals>`|Comma-separated list of principals to grant view rights. Principals can be users or mail-enabled security groups in the form of `alias` or `alias@<domain name>.com`
 `-r, --rights <rights>`|Rights to grant to principals. Available values `View`
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

@@ -15,6 +15,7 @@ Option|Description
 `--help`|output usage information
 `-f, --flow <flow>`|The name of the Microsoft Flow to retrieve the runs for
 `-e, --environment <environment>`|The name of the environment to which the flow belongs
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

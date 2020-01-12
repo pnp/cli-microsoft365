@@ -16,6 +16,7 @@ Option|Description
 `-t, --title <title>`|Site script title
 `-c, --content <content>`|JSON string containing the site script
 `-d, --description [description]`|Site script description
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

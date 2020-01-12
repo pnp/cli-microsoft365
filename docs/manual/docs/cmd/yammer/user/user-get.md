@@ -15,6 +15,7 @@ Option|Description
 `--help`|output usage information
 `-i, --userId [userId]`|Retrieve a user by ID
 `--email [email]`|Retrieve a user by e-mail
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

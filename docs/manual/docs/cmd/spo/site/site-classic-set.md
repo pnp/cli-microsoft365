@@ -25,6 +25,7 @@ Option|Description
 `--lockState [lockState]`|Sets site's lock state. Allowed values `Unlock|NoAdditions|ReadOnly|NoAccess`
 `--noScriptSite [noScriptSite]`|Specifies if the site allows custom script or not
 `--wait`|Wait for the settings to be applied before completing the command
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
