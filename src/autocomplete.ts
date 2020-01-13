@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const omelette: (template: string) => Omelette = require('omelette');
 import * as os from 'os';
 import * as fs from 'fs';
@@ -21,7 +23,7 @@ class Autocomplete {
       catch { }
     }
 
-    this.omelette = omelette('o365|office365');
+    this.omelette = omelette('o365_comp|o365|office365');
     this.omelette.on('complete', this.handleAutocomplete.bind(this));
     this.omelette.init();
   }
