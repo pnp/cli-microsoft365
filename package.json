@@ -6,7 +6,8 @@
   "main": "./dist/index.js",
   "bin": {
     "office365": "./dist/index.js",
-    "o365": "./dist/index.js"
+    "o365": "./dist/index.js",
+    "o365_comp": "./dist/autocomplete.js"
   },
   "repository": {
     "type": "git",
