@@ -47,7 +47,7 @@ jobs:
     # Office 365 cli login action
     - name: Login to tenant
       uses: pnp/action-cli-login@v1
-      env:
+      with:
         ADMIN_USERNAME:  ${{ secrets.adminUsername }}
         ADMIN_PASSWORD:  ${{ secrets.adminPassword }}
     

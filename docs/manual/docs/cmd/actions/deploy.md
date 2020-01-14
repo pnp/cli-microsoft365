@@ -20,6 +20,8 @@ These secrets are encrypted and can only be used by GitHub actions.
 - `APP_FILE_PATH` : **Required** Relative path of the app in your repo.
 - `SCOPE` : Scope of the app catalog: `tenant|sitecollection`. Default `tenant`.
 - `SITE_COLLECTION_URL` : The URL of the site collection where the solution package will be added and installed. It must be specified when the scope is `sitecollection`.
+- `SKIP_FEATURE_DEPLOYMENT` : `true|false` If the app supports tenant-wide deployment, deploy it to the whole tenant.
+- `OVERWRITE` : `true|false` Set to overwrite the existing package file.
 
 ### Example workflow - Office 365 CLI Deploy
 On every `push` build the code, then login to Office 365 and then start deploying.
@@ -51,7 +53,7 @@ jobs:
     # Office 365 cli login action
     - name: Login to tenant
       uses: pnp/action-cli-login@v1
-      env:
+      with:
         ADMIN_USERNAME:  ${{ secrets.adminUsername }}
         ADMIN_PASSWORD:  ${{ secrets.adminPassword }}
     
@@ -61,14 +63,16 @@ jobs:
     # Option 1 - Deploy app at tenant level
     - name: Option 1 - Deploy app to tenant
         uses: pnp/action-cli-deploy@v1
-        env:
+        with:
           APP_FILE_PATH: sharepoint/solution/spfx-o365-cli-action.sppkg
+          SKIP_FEATURE_DEPLOYMENT: true
+          OVERWRITE: true
     # Option 1 - ends
      
     # Option 2 - Deploy app to a site collection
     - name: Option 2 - Deploy app to a site collection
         uses: pnp/action-cli-deploy@v1
-        env:
+        with:
           APP_FILE_PATH: sharepoint/solution/spfx-o365-cli-action.sppkg
           SCOPE: sitecollection
           SITE_COLLECTION_URL: https://contoso.sharepoint.com/sites/teamsite

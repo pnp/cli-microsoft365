@@ -34,7 +34,7 @@ on: push
 # Variables that are available for all the jobs in the workflow
 env:
   SPPKG_FILE_NAME: ${{ 'package-name.sppkg' }}
-  SEND_MAIL: false
+  SEND_MAIL: 'true'
 
 jobs:
   build-and-deploy:
@@ -67,22 +67,22 @@ jobs:
     # Login to tenant using action-cli-login
     - name: Office 365 CLI Login
       uses: pnp/action-cli-login@v1
-      env:
+      with:
         ADMIN_USERNAME:  ${{ secrets.adminUsername }}
         ADMIN_PASSWORD:  ${{ secrets.adminPassword }}
     
     # Deploy package to tenant using action-cli-deploy
     - name: Office 365 CLI Deploy
       uses: pnp/action-cli-deploy@v1
-      env:
+      with:
         APP_FILE_PATH: sharepoint/solution/${{ env.SPPKG_FILE_NAME }}
     
     # Send an email using action-cli-runscript
     - name: Office 365 CLI Send email
       uses: pnp/action-cli-runscript@v1
-      env:
+      with:
          O365_CLI_SCRIPT: o365 spo mail send --webUrl https://contoso.sharepoint.com/sites/teamsite --to 'user@contoso.onmicrosoft.com' --subject 'Deployment done' --body '<h2>Office 365 CLI</h2> <p>The deployment is complete.</p> <br/> Email sent via Office 365 CLI GitHub Action.'
-      if: env.SEND_MAIL == true
+      if: env.SEND_MAIL == 'true'
 
 ```
 
