@@ -191,6 +191,7 @@ export default {
   STORAGEENTITY_SET: `${prefix} storageentity set`,
   STORAGEENTITY_REMOVE: `${prefix} storageentity remove`,
   TENANT_APPCATALOGURL_GET: `${prefix} tenant appcatalogurl get`,
+  TENANT_RECYCLEBINITEM_LIST:  `${prefix} tenant recyclebinitem list`,
   TENANT_SETTINGS_LIST: `${prefix} tenant settings list`,
   TENANT_SETTINGS_SET: `${prefix} tenant settings set`,
   TERM_ADD: `${prefix} term add`,

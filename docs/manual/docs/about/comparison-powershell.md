@@ -342,7 +342,7 @@ Get-PnPTenantAppCatalogUrl|SharePointPnPPowerShellOnline|[spo tenant appcatalogu
 Get-PnPTenantCdnEnabled|SharePointPnPPowerShellOnline|[spo cdn get](../cmd/spo/cdn/cdn-get.md)
 Get-PnPTenantCdnOrigin|SharePointPnPPowerShellOnline|[spo cdn origin list](../cmd/spo/cdn/cdn-origin-list.md)
 Get-PnPTenantCdnPolicies|SharePointPnPPowerShellOnline|[spo cdn policy list](../cmd/spo/cdn/cdn-policy-list.md)
-Get-PnPTenantRecycleBinItem|SharePointPnPPowerShellOnline|
+Get-PnPTenantRecycleBinItem|SharePointPnPPowerShellOnline|[spo tenant recyclebinitem list](../cmd/spo/tenant/tenant-recyclebinitem-list.md)
 Get-PnPTenantSequence|SharePointPnPPowerShellOnline|
 Get-PnPTenantSequenceSite|SharePointPnPPowerShellOnline|
 Get-PnPTenantServicePrincipalPermissionGrants|SharePointPnPPowerShellOnline|[spo serviceprincipal grant list](../cmd/spo/serviceprincipal/serviceprincipal-grant-list.md)
