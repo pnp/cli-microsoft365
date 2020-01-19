@@ -55,6 +55,10 @@ nav:
       - user:
         - user get: 'cmd/aad/user/user-get.md'
         - user list: 'cmd/aad/user/user-list.md'
+    - CLI (cli):
+      - completion:
+        - completion pwsh setup: 'cmd/cli/completion/completion-pwsh-setup.md'
+        - completion pwsh update: 'cmd/cli/completion/completion-pwsh-update.md'
     - Microsoft Flow (flow):
       - disable: 'cmd/flow/disable.md'
       - enable: 'cmd/flow/enable.md'

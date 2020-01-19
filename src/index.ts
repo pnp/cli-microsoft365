@@ -46,6 +46,12 @@ const loadCommandFromArgs = (args: string[], rootFolder: string): void => {
     return;
   }
 
+  const isCompletionCommand: boolean = args.indexOf('completion') > -1;
+  if (isCompletionCommand) {
+    loadAllCommands(rootFolder);
+    return;
+  }
+
   // get the name of the command to be executed from args
   // first two arguments are node and the name of the script
   let cliArgs: string[] = args.slice(2);
