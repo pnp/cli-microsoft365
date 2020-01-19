@@ -8,13 +8,27 @@
 
 - [graph schemaextension remove](../cmd/graph/schemaextension/schemaextension-remove.md) - removes specified Microsoft Graph schema extension [#16](https://github.com/pnp/office365-cli/issues/16)
 
+**Power Apps**
+
+- [pa connector export](../cmd/pa/connector/connector-export.md) - exports the specified power automate or power apps custom connector [#1084](https://github.com/pnp/office365-cli/issues/1084)
+
 **SharePoint**
 
 - [spo report activityfilecounts](../cmd/spo/report/report-activityfilecounts.md) - gets the number of unique, licensed users who interacted with files stored on SharePoint sites [#1243](https://github.com/pnp/office365-cli/issues/1243)
+- [spo report activitypages](../cmd/spo/report/report-activitypages.md) - gets the number of unique pages visited by users [#1245](https://github.com/pnp/office365-cli/issues/1245)
+- [spo report activityuserdetail](../cmd/spo/report/report-activityuserdetail.md) - gets details about SharePoint activity by user [#1242](https://github.com/pnp/office365-cli/issues/1242)
+- [spo report activityusercounts](../cmd/spo/report/report-activityusercounts.md) - gets the trend in the number of active users [#1244](https://github.com/pnp/office365-cli/issues/1244)
+- [spo report siteusagedetail](../cmd/spo/report/report-siteusagedetail.md) - gets details about SharePoint site usage [#1246](https://github.com/pnp/office365-cli/issues/1246)
+
+**Yammer**
+
+- [yammer group list](../cmd/yammer/group/group-list.md) - returns the list of groups in a Yammer network or the groups for a specific user [#1185](https://github.com/pnp/office365-cli/issues/1185)
 
 ### Changes
 
 - added support for file edit suggestions [#1190](https://github.com/pnp/office365-cli/issues/1190)
+- added support for JMESPath [#1315](https://github.com/pnp/office365-cli/issues/1315)
+- made non-immersive mode completion standalone [#1316](https://github.com/pnp/office365-cli/issues/1316)
 
 ## [v2.5.0](https://github.com/pnp/office365-cli/releases/tag/v2.5.0)
 
