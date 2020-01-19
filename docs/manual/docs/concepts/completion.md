@@ -25,13 +25,13 @@ To enable completion:
 
 You should now be able to complete your input, eg. typing `o365 s<tab>` will complete it to `o365 spo` and typing `o365 spo <tab><tab>` will list all SharePoint Online commands available in Office 365 CLI. To see the options available for the current command, type `-<tab><tab>`, for example `o365 spo app list -<tab><tab>` will list all options available for the `o365 spo app list` command.
 
-#### Disable Clink completion
-
-To disable completion, delete the `o365.lua` file you generated previously and restart your shell.
-
 #### Update Clink completion
 
 Command completion is based on a static file. After updating the Office 365 CLI, you should update the completion file as described in the [Enable completion](#enable-clink-completion) section so that the completion file reflects the latest commands in the Office 365 CLI.
+
+#### Disable Clink completion
+
+To disable completion, delete the `o365.lua` file you generated previously and restart your shell.
 
 ### Zsh, Bash and Fish
 
@@ -49,6 +49,10 @@ To enable completion:
 
 You should now be able to complete your input, eg. typing `o365 s<tab>` will complete it to `o365 spo` and typing `o365 spo <tab><tab>` will list all SharePoint Online commands available in Office 365 CLI. To see the options available for the command, type `-<tab><tab>`, for example `o365 spo app list -<tab><tab>` will list all options available for the `o365 spo app list` command. If the command is completed, the completion will automatically start suggestions with a `-` indicating that you have matched a command and can now specify its options. Command options you've already used are removed from the suggestions list, but the completion doesn't take into account short and long variant of the same option. If you specified the `--output` option in your command, `--option` will not be displayed in the list of suggestions, but `-o` will.
 
+#### Update sh completion
+
+Command completion is based on the static `commands.json` file located in the folder where the Office 365 CLI is installed. After updating the Office 365 CLI, you should update the completion file by executing `o365 --completion:sh:generate` in the command line. After running this command, it's not necessary to restart the shell to see the latest changes.
+
 #### Disable sh completion
 
 To disable completion, edit your shell's profile file (for Zsh `~/.zshrc`) and remove the following lines:
@@ -61,6 +65,24 @@ To disable completion, edit your shell's profile file (for Zsh `~/.zshrc`) and r
 
 Save the profile file and restart the shell for the changes to take effect.
 
-#### Update sh completion
+### PowerShell
 
-Command completion is based on the static `commands.json` file located in the folder where the Office 365 CLI is installed. After updating the Office 365 CLI, you should update the completion file by executing `o365 --completion:sh:generate` in the command line. After running this command, it's not necessary to restart the shell to see the latest changes.
+If you use Office 365 CLI in PowerShell you can use the custom argument completer provided with the Office 365 CLI to get command completion when typing commands directly in the shell.
+
+#### Enable PowerShell completion
+
+To enable completion in your current PowerShell profile:
+
+1. Start PowerShell
+1. Execute `o365 cli completion pwsh setup --profile $profile`. This will generate the `commands.json` file in the same folder where the Office 365 CLI is installed, listing all available commands and their options. Additionally, it will register completion in your PowerShell profile
+1. Restart PowerShell
+
+You should now be able to complete your input, eg. typing `o365 s<tab>` will complete it to `o365 spo` and typing `o365 spo <tab><tab>` will list all SharePoint Online commands available in Office 365 CLI. To see the options available for the command, type `-<tab><tab>`, for example `o365 spo app list -<tab><tab>` will list all options available for the `o365 spo app list` command. If the command is completed, the completion will automatically start suggestions with a `-` indicating that you have matched a command and can now specify its options. Command options you've already used are removed from the suggestions list, but the completion doesn't take into account short and long variant of the same option. If you specified the `--output` option in your command, `--option` will not be displayed in the list of suggestions, but `-o` will.
+
+#### Update PowerShell completion
+
+Command completion is based on the static `commands.json` file located in the folder where the Office 365 CLI is installed. After updating the Office 365 CLI, you should update the completion file by executing `o365 cli completion pwsh update` in the command line. After running this command, it's not necessary to restart PowerShell to see the latest changes.
+
+#### Disable PowerShell completion
+
+To disable Office 365 CLI command completion in your PowerShell profile, open the profile file in a code editor, and remove the reference to the `Register-O365CLICompletion.ps1` script. Restart PowerShell for the changes to take effect.
