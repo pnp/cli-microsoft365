@@ -74,6 +74,7 @@ nav:
         - schemaextension add: 'cmd/graph/schemaextension/schemaextension-add.md'
         - schemaextension get: 'cmd/graph/schemaextension/schemaextension-get.md'
         - schemaextension remove: 'cmd/graph/schemaextension/schemaextension-remove.md'
+        - schemaextension set: 'cmd/graph/schemaextension/schemaextension-set.md'
     - OneDrive (onedrive):
       - report:
         - report activityfilecounts: 'cmd/onedrive/report/report-activityfilecounts.md'
