@@ -425,6 +425,7 @@ nav:
     - 'Authorization and access tokens': 'concepts/authorization-tokens.md'
     - 'Command completion': 'concepts/completion.md'
     - 'Communication with Office 365': 'concepts/communicating-o365.md'
+    - 'GitHub Actions': 'concepts/github-actions.md'
   - Examples:
     - 'Introduction': 'examples/index.md'
     - Microsoft Graph:
