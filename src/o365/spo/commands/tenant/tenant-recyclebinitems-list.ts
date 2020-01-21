@@ -55,7 +55,7 @@ class SpoTenantSettingsListCommand extends SpoCommand {
             DaysRemaining: Number(r.DaysRemaining),
             DeletionTime: this.dateParser(r.DeletionTime as string),
             Url: r.Url
-          }
+          };
         }).sort((a, b) => {
           const urlA = a.Url.toUpperCase();
           const urlB = b.Url.toUpperCase();
