@@ -25,6 +25,8 @@ foreach ($site in $sites)
 
 ```
 
+Note - There is a known issue running this script using PowerShell Core on Mac OS, see issue [#1266](https://github.com/pnp/office365-cli/issues/1266) for further detail
+
 ```bash tab="Bash"
 #!/bin/bash
 
