@@ -731,7 +731,7 @@
     },
     "chalk": {
       "version": "1.1.3",
-      "resolved": "https://registry.npmjs.org/chalk/-/chalk-1.1.3.tgz",
+      "resolved": "http://registry.npmjs.org/chalk/-/chalk-1.1.3.tgz",
       "integrity": "sha1-qBFcVeSnAv5NFQq9OHKCKn4J/Jg=",
       "requires": {
         "ansi-styles": "^2.2.1",
@@ -1651,7 +1651,7 @@
     },
     "inquirer": {
       "version": "0.11.4",
-      "resolved": "https://registry.npmjs.org/inquirer/-/inquirer-0.11.4.tgz",
+      "resolved": "http://registry.npmjs.org/inquirer/-/inquirer-0.11.4.tgz",
       "integrity": "sha1-geM3ToNhvq/y2XAWIG01nQsy+k0=",
       "requires": {
         "ansi-escapes": "^1.1.0",
@@ -1671,7 +1671,7 @@
       "dependencies": {
         "lodash": {
           "version": "3.10.1",
-          "resolved": "https://registry.npmjs.org/lodash/-/lodash-3.10.1.tgz",
+          "resolved": "http://registry.npmjs.org/lodash/-/lodash-3.10.1.tgz",
           "integrity": "sha1-W/Rejkm6QYnhfUgnid/RW9FAt7Y="
         }
       }
@@ -2197,7 +2197,7 @@
     },
     "node-localstorage": {
       "version": "0.6.0",
-      "resolved": "https://registry.npmjs.org/node-localstorage/-/node-localstorage-0.6.0.tgz",
+      "resolved": "http://registry.npmjs.org/node-localstorage/-/node-localstorage-0.6.0.tgz",
       "integrity": "sha1-RaBgHGky395mRKIzYfG+Fzx1068="
     },
     "normalize-url": {
@@ -2277,7 +2277,7 @@
     },
     "onetime": {
       "version": "1.1.0",
-      "resolved": "https://registry.npmjs.org/onetime/-/onetime-1.1.0.tgz",
+      "resolved": "http://registry.npmjs.org/onetime/-/onetime-1.1.0.tgz",
       "integrity": "sha1-ofeDj4MUxRbwXs78vEzP4EtO14k="
     },
     "p-cancelable": {
@@ -2789,7 +2789,7 @@
     },
     "through": {
       "version": "2.3.8",
-      "resolved": "https://registry.npmjs.org/through/-/through-2.3.8.tgz",
+      "resolved": "http://registry.npmjs.org/through/-/through-2.3.8.tgz",
       "integrity": "sha1-DdTJ/6q8NXlgsbckEV1+Doai4fU="
     },
     "to-readable-stream": {
@@ -3031,7 +3031,7 @@
     },
     "wrap-ansi": {
       "version": "2.1.0",
-      "resolved": "https://registry.npmjs.org/wrap-ansi/-/wrap-ansi-2.1.0.tgz",
+      "resolved": "http://registry.npmjs.org/wrap-ansi/-/wrap-ansi-2.1.0.tgz",
       "integrity": "sha1-2Pw9KE3QV5T+hJc8rs3Rz4JP3YU=",
       "requires": {
         "string-width": "^1.0.1",

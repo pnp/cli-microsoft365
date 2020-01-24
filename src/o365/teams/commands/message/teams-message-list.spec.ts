@@ -121,7 +121,7 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
     assert.notEqual(actual, true);
   });
 
-  it('fails validates for a incorrect channelId missing leading 19:.', (done) => {
+  it('fails validatation for a incorrect channelId missing leading 19:.', (done) => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
@@ -132,7 +132,7 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
     done();
   });
 
-  it('fails validates for a incorrect channelId missing trailing @thread.skpye.', (done) => {
+  it('fails validation for a incorrect channelId missing trailing @thread.skpye.', (done) => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
@@ -141,6 +141,19 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
     });
     assert.notEqual(actual, true);
     done();
+  });
+
+  it('fails validation for since date too far in the past (> 8 months)', () => {
+    let d: Date = new Date()
+    d.setMonth(d.getMonth() - 9);
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
+        channelId: "19:eb30973b42a847a2a1df92d91e37c76a@thread.skype",
+        since: d.toISOString()
+      }
+    });
+    assert.notEqual(actual, true);
   });
 
   it('supports debug mode', () => {
@@ -159,6 +172,19 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
       options: {
         teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
         channelId: "19:eb30973b42a847a2a1df92d91e37c76a@thread.skype"
+      }
+    });
+    assert.equal(actual, true);
+  });
+
+  it('validates for a correct input (with optional --since param)', () => {
+    let d: Date = new Date()
+    d.setMonth(d.getMonth() - 7);
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
+        channelId: "19:eb30973b42a847a2a1df92d91e37c76a@thread.skype",
+        since: d.toISOString()
       }
     });
     assert.equal(actual, true);

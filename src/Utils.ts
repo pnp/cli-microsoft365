@@ -61,11 +61,28 @@ export default class Utils {
     return guidRegEx.test(guid);
   }
 
+  public static isDateInRange(date: string, monthOffset: number): boolean {
+    const d: Date = new Date(date);
+    let cutoffDate: Date = new Date();
+    cutoffDate.setMonth(cutoffDate.getMonth() - monthOffset);
+    return d > cutoffDate;
+  }
+
   public static isValidISODate(date: string): boolean {
     const dateRegEx: RegExp = new RegExp(
       /^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/i
     );
     return dateRegEx.test(date);
+  }
+
+  public static isValidISODateDashOnly(date: string): boolean {
+    const dateTimeRegEx: RegExp = new RegExp(
+      /^(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))$/i
+    );
+    const dateOnlyRegEx: RegExp = new RegExp(
+      /^(19|20)\d\d[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])$/i
+    );
+    return dateTimeRegEx.test(date) ? true : dateOnlyRegEx.test(date);
   }
 
   public static isValidBoolean(value: string): boolean {

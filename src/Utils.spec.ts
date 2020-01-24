@@ -37,6 +37,55 @@ describe('Utils', () => {
     assert.equal(result, false);
   });
 
+  it('isValidISODateDashOnly returns true if value is in ISO Date format with - separator', () => {
+    const result = Utils.isValidISODateDashOnly("2019-03-22");
+    assert.equal(result, true);
+  });
+
+  it('isValidISODateDashOnly returns false if value is in ISO Date format with . separator', () => {
+    const result = Utils.isValidISODateDashOnly("2019.03.22");
+    assert.equal(result, false);
+  });
+
+  it('isValidISODateDashOnly returns false if value is in ISO Date format with / separator', () => {
+    const result = Utils.isValidISODateDashOnly("2019/03/22");
+    assert.equal(result, false);
+  });
+
+  it('isValidISODateDashOnly returns false if value is blank', () => {
+    const result = Utils.isValidISODateDashOnly("");
+    assert.equal(result, false);
+  });
+
+  it('isValidISODate returns false if value is not in ISO Date format', () => {
+    const result = Utils.isValidISODate("22-03-2019");
+    assert.equal(result, false);
+  });
+
+  it('isValidISODateDashOnly returns false if alpha characters are passed', () => {
+    const result = Utils.isValidISODateDashOnly("sharing is caring");
+    assert.equal(result, false);
+  });
+
+  it('isDateInRange returns true if date within monthOffset is passed', () => {
+    let d: Date = new Date()
+    d.setMonth(d.getMonth() - 1);
+    const result = Utils.isDateInRange(d.toISOString(), 2);
+    assert.equal(result, true);
+  });
+
+  it('isDateInRange returns false if date prior to monthOffset is passed', () => {
+    let d: Date = new Date()
+    d.setMonth(d.getMonth() - 2);
+    const result = Utils.isDateInRange(d.toISOString(), 1);
+    assert.equal(result, false);
+  });
+
+  it('isDateInRange returns false if alpha characters are passed', () => {
+    const result = Utils.isDateInRange("sharing is caring", 1);
+    assert.equal(result, false);
+  });
+
   it('isValidGuid returns true if valid guid', () => {
     const result = Utils.isValidGuid('b2307a39-e878-458b-bc90-03bc578531d6');
     assert.equal(result, true);
