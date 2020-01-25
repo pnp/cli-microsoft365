@@ -143,6 +143,17 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
     done();
   });
 
+  it('fails validation for since date wrong format', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
+        channelId: "19:eb30973b42a847a2a1df92d91e37c76a@thread.skype",
+        since: "2019.12.31"
+      }
+    });
+    assert.notEqual(actual, true);
+  });
+
   it('fails validation for since date too far in the past (> 8 months)', () => {
     let d: Date = new Date()
     d.setMonth(d.getMonth() - 9);
