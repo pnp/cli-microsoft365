@@ -29,7 +29,7 @@ class TeamsMessageListCommand extends GraphItemsListCommand<Message> {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const deltaExtension: string = !!args.options.since ? `/delta?$filter=lastModifiedDateTime gt ${args.options.since}` : '';
+    const deltaExtension: string = args.options.since !== undefined ? `/delta?$filter=lastModifiedDateTime gt ${args.options.since}` : '';
     const endpoint: string = `${this.resource}/beta/teams/${args.options.teamId}/channels/${args.options.channelId}/messages${deltaExtension}`;
 
     this
@@ -66,7 +66,7 @@ class TeamsMessageListCommand extends GraphItemsListCommand<Message> {
         description: 'The ID of the channel for which to list messages'
       },
       {
-        option: '-s, --since <since>',
+        option: '-s, --since [since]',
         description: 'Date (ISO standard, dash separator) to get delta of messages from (in last 8 months)'
       }
     ];
@@ -93,13 +93,12 @@ class TeamsMessageListCommand extends GraphItemsListCommand<Message> {
         return `${args.options.channelId} is not a valid Teams ChannelId`;
       }
 
-      if (!!args.options.since) {
-        if (!Utils.isValidISODateDashOnly(args.options.since as string)) {
-          return `${args.options.since} is not a valid ISO Date (with dash separator)`;
-        }
-        if (!Utils.isDateInRange(args.options.since as string, 8)) {
-          return `${args.options.since} is not in the last 8 months (for delta messages)`;
-        }
+      if (args.options.since && !Utils.isValidISODateDashOnly(args.options.since as string)) {
+        return `${args.options.since} is not a valid ISO Date (with dash separator)`;
+      }
+      
+      if (args.options.since && !Utils.isDateInRange(args.options.since as string, 8)) {
+        return `${args.options.since} is not in the last 8 months (for delta messages)`;
       }
 
       return true;
