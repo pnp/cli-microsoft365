@@ -449,6 +449,111 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
     });
   });
 
+  it('lists messages since date specified', (done) => {
+    const dt: string = new Date().toISOString()
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/teams/fce9e580-8bba-4638-ab5c-ab40016651e3/channels/19:eb30973b42a847a2a1df92d91e37c76a@thread.skype/messages/delta?$filter=lastModifiedDateTime gt ${dt}`) {
+        return Promise.resolve({
+          value: [
+            {
+              "attachments": [],
+              "body": {
+                "content": "<p>Welcome!</p>",
+                "contentType": "html"
+              },
+              "createdDateTime": "2018-11-15T13:56:40.091Z",
+              "deleted": false,
+              "etag": "1542290200091",
+              "from": {
+                "application": {
+                  "applicationIdentityType": "bot",
+                  "displayName": "POITBot",
+                  "id": "d22ece15-e04f-453a-adbd-d1514d2f1abe"
+                },
+                "conversation": null,
+                "device": null,
+                "user": null
+              },
+              "id": "1542290200091",
+              "importance": "normal",
+              "lastModifiedDateTime": null,
+              "locale": "en-us",
+              "mentions": [],
+              "messageType": "message",
+              "policyViolation": null,
+              "reactions": [],
+              "replyToId": null,
+              "subject": null,
+              "summary": null
+            },
+            {
+              "attachments": [],
+              "body": {
+                "content": "hello",
+                "contentType": "text"
+              },
+              "createdDateTime": "2018-11-15T13:20:43.581Z",
+              "deleted": false,
+              "etag": "1542288043581",
+              "from": {
+                "application": null,
+                "conversation": null,
+                "device": null,
+                "user": {
+                  "displayName": "Balamurugan Kailasam",
+                  "id": "065868eb-f08f-4a82-9786-690bc5c38fce",
+                  "userIdentityType": "aadUser"
+                }
+              },
+              "id": "1542288043581",
+              "importance": "normal",
+              "lastModifiedDateTime": null,
+              "locale": "en-us",
+              "mentions": [],
+              "messageType": "message",
+              "policyViolation": null,
+              "reactions": [],
+              "replyToId": null,
+              "subject": "",
+              "summary": null
+            }
+          ]
+        });
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    cmdInstance.action({
+      options: {
+        debug: false,
+        teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
+        channelId: "19:eb30973b42a847a2a1df92d91e37c76a@thread.skype",
+        since: dt 
+      }
+    }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith([
+          {
+            "id": "1542290200091",
+            "summary": null,
+            "body": "<p>Welcome!</p>"
+          },
+          {
+            "id": "1542288043581",
+            "summary": null,
+            "body": "hello"
+          }
+        ]));
+
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('outputs all data in json output mode', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/teams/fce9e580-8bba-4638-ab5c-ab40016651e3/channels/19:eb30973b42a847a2a1df92d91e37c76a@thread.skype/messages`) {
