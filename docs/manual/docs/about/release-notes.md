@@ -29,6 +29,8 @@
 - added support for file edit suggestions [#1190](https://github.com/pnp/office365-cli/issues/1190)
 - added support for JMESPath [#1315](https://github.com/pnp/office365-cli/issues/1315)
 - made non-immersive mode completion standalone [#1316](https://github.com/pnp/office365-cli/issues/1316)
+- added GitHub Actions documentation [#1094](https://github.com/pnp/office365-cli/issues/1094)
+- added the 'Delete all non group connected SharePoint sites' example [#1141](https://github.com/pnp/office365-cli/issues/1141)
 
 ## [v2.5.0](https://github.com/pnp/office365-cli/releases/tag/v2.5.0)
 
