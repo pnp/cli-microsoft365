@@ -23,7 +23,7 @@ interface Options extends GlobalOptions {
   libraryUrl: string;
 }
 
-class SpoOrgNewsSiteListCommand extends SpoCommand {
+class SpoOrgAssetLibRemoveCommand extends SpoCommand {
   public get name(): string {
     return `${commands.ORGASSETSLIBRARY_REMOVE}`;
   }
@@ -134,4 +134,4 @@ class SpoOrgNewsSiteListCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoOrgNewsSiteListCommand();
+module.exports = new SpoOrgAssetLibRemoveCommand();
