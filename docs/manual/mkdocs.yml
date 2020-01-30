@@ -259,6 +259,7 @@ nav:
         - navigation node list: 'cmd/spo/navigation/navigation-node-list.md'
         - navigation node remove: 'cmd/spo/navigation/navigation-node-remove.md'
       - orgassetslibrary:
+        - orgassetslibrary add: 'cmd/spo/orgassetslibrary/orgassetslibrary-add.md'
         - orgassetslibrary list: 'cmd/spo/orgassetslibrary/orgassetslibrary-list.md'
         - orgassetslibrary remove: 'cmd/spo/orgassetslibrary/orgassetslibrary-remove.md'
       - orgnewssite:
