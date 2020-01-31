@@ -223,6 +223,26 @@ describe(commands.FILE_CHECKOUT, () => {
     });
   });
 
+  it('should call the correct API url when tenant root URL option is passed', (done) => {
+    const postStub: sinon.SinonStub = stubPostResponses();
+
+    cmdInstance.action({
+      options: {
+        debug: false,
+        fileUrl: '/Documents/Test1.docx',
+        webUrl: 'https://contoso.sharepoint.com',
+      }
+    }, () => {
+      try {
+        assert.equal(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/_api/web/GetFileByServerRelativeUrl('%2FDocuments%2FTest1.docx')/checkout");
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('supports debug mode', () => {
     const options = (command.options() as CommandOption[]);
     let containsDebugOption = false;

@@ -224,6 +224,26 @@ describe(commands.FILE_CHECKIN, () => {
     });
   });
 
+  it('should call the correct API url when tenant root URL option is passed', (done) => {
+    const postStub: sinon.SinonStub = stubPostResponses();
+
+    cmdInstance.action({
+      options: {
+        debug: false,
+        fileUrl: '/Documents/Test1.docx',
+        webUrl: 'https://contoso.sharepoint.com',
+      }
+    }, () => {
+      try {
+        assert.equal(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/_api/web/GetFileByServerRelativeUrl('%2FDocuments%2FTest1.docx')/checkin(comment='',checkintype=1)");
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('should call correctly the API when type is minor', (done) => {
     const postStub: sinon.SinonStub = stubPostResponses();
 
