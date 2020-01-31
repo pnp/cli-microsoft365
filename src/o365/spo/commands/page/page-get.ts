@@ -7,6 +7,8 @@ import SpoCommand from '../../../base/SpoCommand';
 import GlobalOptions from '../../../../GlobalOptions';
 import { PageItem } from './PageItem';
 import { ClientSidePage } from './clientsidepages';
+import Utils from '../../../../Utils';
+//import { relative } from 'path';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -39,7 +41,7 @@ class SpoPageGetCommand extends SpoCommand {
     }
 
     const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${args.options.webUrl.substr(args.options.webUrl.indexOf('/', 8))}/SitePages/${encodeURIComponent(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId,ListItemAllFields/PageLayoutType,ListItemAllFields/CommentsDisabled`,
+      url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${Utils.getServerRelativeSiteUrl(args.options.webUrl)}/SitePages/${encodeURIComponent(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId,ListItemAllFields/PageLayoutType,ListItemAllFields/CommentsDisabled`,
       headers: {
         'content-type': 'application/json;charset=utf-8',
         accept: 'application/json;odata=nometadata'
@@ -124,7 +126,7 @@ class SpoPageGetCommand extends SpoCommand {
     a ${chalk.grey('File doesn\'t exists')} error.
 
   Examples:
-  
+
     Get information about the modern page with name ${chalk.grey('home.aspx')}
       ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx
 `);

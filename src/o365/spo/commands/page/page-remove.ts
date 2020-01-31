@@ -4,6 +4,7 @@ import { CommandOption, CommandValidate } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
 import { ContextInfo } from '../../spo';
 import GlobalOptions from '../../../../GlobalOptions';
+import Utils from '../../../../Utils';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -29,7 +30,6 @@ class SpoPageRemoveCommand extends SpoCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     let requestDigest: string = '';
     let pageName: string = args.options.name;
-    const serverRelativeSiteUrl: string = args.options.webUrl.substr(args.options.webUrl.indexOf('/', 8));
 
     const removePage = () => {
       this
@@ -47,7 +47,7 @@ class SpoPageRemoveCommand extends SpoCommand {
 
           const requestOptions: any = {
             url: `${args.options
-              .webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeSiteUrl}/sitepages/${pageName}')`,
+              .webUrl}/_api/web/getfilebyserverrelativeurl('${Utils.getServerRelativeSiteUrl(args.options.webUrl)}/sitepages/${pageName}')`,
             headers: {
               'X-RequestDigest': requestDigest,
               'X-HTTP-Method': 'DELETE',

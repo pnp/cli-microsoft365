@@ -280,6 +280,32 @@ describe(commands.FILE_GET, () => {
     });
   });
 
+  it('uses correct API url when tenant root URL option is passed', (done) => {
+    const getStub: any = sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('/_api/web/GetFileByServerRelativeUrl(') > -1) {
+        return Promise.resolve('Correct Url')
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({
+      options: {
+        debug: false,
+        url: '/Documents/Test1.docx',
+        webUrl: 'https://contoso.sharepoint.com',
+      }
+    }, () => {
+      try {
+        assert.equal(getStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/_api/web/GetFileByServerRelativeUrl(\'%2FDocuments%2FTest1.docx\')');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('should handle promise rejection', (done) => {
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: File Not Found." } } });
     sinon.stub(request, 'get').callsFake((opts) => {

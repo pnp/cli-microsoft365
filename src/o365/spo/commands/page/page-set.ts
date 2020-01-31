@@ -7,6 +7,7 @@ import SpoCommand from '../../../base/SpoCommand';
 import { ContextInfo } from '../../spo';
 import GlobalOptions from '../../../../GlobalOptions';
 import { Auth } from '../../../../Auth';
+import Utils from '../../../../Utils';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -56,7 +57,7 @@ class SpoPageSetCommand extends SpoCommand {
     if (!pageName.endsWith('.aspx')) {
       pageName += '.aspx';
     }
-    const serverRelativeSiteUrl: string = `${args.options.webUrl.substr(args.options.webUrl.indexOf('/', 8))}/sitepages/${pageName}`;
+    const serverRelativeFileUrl: string = `${Utils.getServerRelativeSiteUrl(args.options.webUrl)}/sitepages/${pageName}`;
 
     this
       .getRequestDigest(args.options.webUrl)
@@ -68,7 +69,7 @@ class SpoPageSetCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeSiteUrl}')/ListItemAllFields`,
+          url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeFileUrl}')/ListItemAllFields`,
           headers: {
             'X-RequestDigest': requestDigest,
             'content-type': 'application/json;odata=nometadata',
@@ -116,7 +117,7 @@ class SpoPageSetCommand extends SpoCommand {
             };
             break;
           case 'NewsPage':
-            requestOptions.url = `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeSiteUrl}')/ListItemAllFields`;
+            requestOptions.url = `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeFileUrl}')/ListItemAllFields`;
             requestOptions.headers = {
               'X-RequestDigest': requestDigest,
               'X-HTTP-Method': 'MERGE',
@@ -130,7 +131,7 @@ class SpoPageSetCommand extends SpoCommand {
             }
             break;
           case 'Template':
-            requestOptions.url = `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeSiteUrl}')/ListItemAllFields`;
+            requestOptions.url = `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeFileUrl}')/ListItemAllFields`;
             requestOptions.headers = {
               'X-RequestDigest': requestDigest,
               'content-type': 'application/json;odata=nometadata',
@@ -219,7 +220,7 @@ class SpoPageSetCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeSiteUrl}')/ListItemAllFields/SetCommentsDisabled(${args.options.commentsEnabled === 'false'})`,
+          url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeFileUrl}')/ListItemAllFields/SetCommentsDisabled(${args.options.commentsEnabled === 'false'})`,
           headers: {
             'X-RequestDigest': requestDigest,
             'content-type': 'application/json;odata=nometadata',
@@ -236,7 +237,7 @@ class SpoPageSetCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeSiteUrl}')/Publish('${encodeURIComponent(args.options.publishMessage || '').replace(/'/g, '%39')}')`,
+          url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeFileUrl}')/Publish('${encodeURIComponent(args.options.publishMessage || '').replace(/'/g, '%39')}')`,
           headers: {
             'X-RequestDigest': requestDigest,
             'content-type': 'application/json;odata=nometadata',
