@@ -1,6 +1,7 @@
 import request from '../../../../request';
 import { PageItem } from './PageItem';
 import { ClientSidePage, CanvasSection, CanvasColumn, ClientSidePart } from './clientsidepages';
+import Utils from '../../../../Utils';
 
 export class Page {
   public static getPage(name: string, webUrl: string, cmd: CommandInstance, debug: boolean, verbose: boolean): Promise<ClientSidePage> {
@@ -15,7 +16,7 @@ export class Page {
       }
 
       const requestOptions: any = {
-        url: `${webUrl}/_api/web/getfilebyserverrelativeurl('${webUrl.substr(webUrl.indexOf('/', 8))}/SitePages/${encodeURIComponent(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId`,
+        url: `${webUrl}/_api/web/getfilebyserverrelativeurl('${Utils.getServerRelativeSiteUrl(webUrl)}/SitePages/${encodeURIComponent(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId`,
         headers: {
           'content-type': 'application/json;charset=utf-8',
           accept: 'application/json;odata=nometadata'

@@ -198,7 +198,7 @@ export default class Utils {
    * @param folderRelativePath folder relative path e.g. /Shared Documents
    * @example
    * // returns "/sites/team1"
-   * Utils.getServerRelativePath("https://contoso.sharepoint.com/sites/team1");
+   * Utils.getServerRelativePath("https://contoso.sharepoint.com/sites/team1", "");
    * @example
    * // returns "/sites/team1/Shared Documents"
    * Utils.getServerRelativePath("https://contoso.sharepoint.com/sites/team1", "/Shared Documents");
@@ -239,7 +239,7 @@ export default class Utils {
     }
 
     if (folderRelativePath !== '') {
-      // add '/' at 0 for siteRelativePath 
+      // add '/' at 0 for siteRelativePath
       if (folderRelativePath[0] !== '/') {
         folderRelativePath = `/${folderRelativePath}`;
       }
@@ -260,6 +260,26 @@ export default class Utils {
     }
 
     return webRelativePath.replace('//', '/');
+  }
+
+    /**
+   * Returns server relative site url.
+   * @param webUrl web full or web relative url e.g. https://contoso.sharepoint.com/sites/team1
+   * @example
+   * // returns "/sites/team1"
+   * Utils.getServerRelativeSiteUrl("https://contoso.sharepoint.com/sites/team1";
+   * @example
+   * // returns ""
+   * Utils.getServerRelativeSiteUrl("https://contoso.sharepoint.com");
+   * @example
+   * // returns "/sites/team1/Shared Documents"
+   * Utils.getServerRelativePath("/sites/team1/", "/Shared Documents");
+   */
+  public static getServerRelativeSiteUrl(webUrl: string): string {
+    let serverRelativeSiteUrl = Utils.getServerRelativePath(webUrl, '');
+
+    // return an empty string instead of / to prevent //
+    return serverRelativeSiteUrl.length == 1 ? "" : serverRelativeSiteUrl;
   }
 
   /**
@@ -311,7 +331,7 @@ export default class Utils {
       folderWebRelativePath = folderUrl;
     }
 
-    // add '/' at 0 for folderWebRelativePath 
+    // add '/' at 0 for folderWebRelativePath
     if (folderWebRelativePath[0] !== '/') {
       folderWebRelativePath = `/${folderWebRelativePath}`;
     }

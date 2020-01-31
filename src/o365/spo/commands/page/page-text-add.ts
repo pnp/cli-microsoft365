@@ -10,6 +10,7 @@ import {
 import { ContextInfo } from '../../spo';
 import { isNumber } from 'util';
 import { Page } from './Page';
+import Utils from '../../../../Utils';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -109,10 +110,6 @@ class SpoPageTextAddCommand extends SpoCommand {
     pageName: string,
     requestDigest: string
   ): Promise<void> {
-    const serverRelativeSiteUrl: string = `${args.options.webUrl.substr(
-      args.options.webUrl.indexOf('/', 8)
-    )}/SitePages/${pageName}`;
-
     const updatedContent: string = clientSidePage.toHtml();
 
     if (this.debug) {
@@ -123,7 +120,7 @@ class SpoPageTextAddCommand extends SpoCommand {
 
     const requestOptions: any = {
       url: `${args.options
-        .webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeSiteUrl}')/ListItemAllFields`,
+        .webUrl}/_api/web/getfilebyserverrelativeurl('${Utils.getServerRelativeSiteUrl(args.options.webUrl)}/sitepages/${pageName}')/ListItemAllFields`,
       headers: {
         'X-RequestDigest': requestDigest,
         'content-type': 'application/json;odata=nometadata',

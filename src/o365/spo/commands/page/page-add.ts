@@ -7,6 +7,7 @@ import SpoCommand from '../../../base/SpoCommand';
 import { ContextInfo } from '../../spo';
 import GlobalOptions from '../../../../GlobalOptions';
 import { Auth } from '../../../../Auth';
+import Utils from '../../../../Utils';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -49,7 +50,7 @@ class SpoPageAddCommand extends SpoCommand {
     let requestDigest: string = '';
     let itemId: string = '';
     let pageName: string = args.options.name;
-    const serverRelativeSiteUrl: string = args.options.webUrl.substr(args.options.webUrl.indexOf('/', 8));
+    const serverRelativeSiteUrl: string = Utils.getServerRelativeSiteUrl(args.options.webUrl);
     const fileNameWithoutExtension: string = pageName.replace('.aspx', '');
     let bannerImageUrl: string = '';
     let canvasContent1: string = '';
@@ -394,7 +395,7 @@ class SpoPageAddCommand extends SpoCommand {
       ${this.name} --name new-page.aspx --title 'My page' --webUrl https://contoso.sharepoint.com/sites/a-team
 
     Create new modern page. Use the Home page layout and include the default set
-    of web parts 
+    of web parts
       ${this.name} --name new-page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --layoutType Home
 
     Create new article page and promote it as a news article

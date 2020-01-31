@@ -98,12 +98,41 @@ describe(commands.PAGE_REMOVE, () => {
 
 	it('removes a modern page (debug) without confirm prompt', (done) => {
     fakeRestCalls();
-		cmdInstance.action(
+    cmdInstance.action(
 			{
 				options: {
 					debug: true,
 					name: 'page.aspx',
 					webUrl: 'https://contoso.sharepoint.com/sites/team-a',
+					confirm: true
+				}
+			},
+			() => {
+				try {
+					assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+					done();
+				} catch (e) {
+					done(e);
+				}
+			}
+		);
+  });
+
+  it('removes a modern page (debug) without confirm prompt on root of tenant', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+			if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sitepages/page.aspx')`) > -1) {
+				return Promise.resolve();
+			}
+
+			return Promise.reject('Invalid request');
+    });
+
+		cmdInstance.action(
+			{
+				options: {
+					debug: true,
+					name: 'page.aspx',
+					webUrl: 'https://contoso.sharepoint.com',
 					confirm: true
 				}
 			},
