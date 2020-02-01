@@ -1,7 +1,7 @@
 ---
 name: New command
 about: Suggest a new command to be included in this project
-title: 'New command: <short decription>'
+title: 'New command: <short description>'
 labels: ''
 assignees: ''
 
@@ -35,7 +35,7 @@ assignees: ''
 > Option | Description  
 > -- | --
 > `-i, --teamId <teamId>` | The Id of the Microsoft Team
-> `-r, --role [role]` | Filter the results to only  users with the given role: Owner or Member.
+> `-r, --role [role]` | Filter the results to only users with the given role: Owner or Member.
 >
 > _(DELETE THIS PARAGRAPH AFTER READING)_
 
