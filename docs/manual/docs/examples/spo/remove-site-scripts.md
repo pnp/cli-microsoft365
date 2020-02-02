@@ -34,7 +34,6 @@ while read script; do
   exists=true
   for keep in "${sparksjoy[@]}"; do
     if [ "$keep" == "$scriptTitle" ] ; then
-      echo matched;
       exists=false
       break
     fi
@@ -49,10 +48,14 @@ printf '%s\n' "${sitesscriptstoremove[@]}"
 echo "Press Enter to start deleting (CTRL + C to exit)"
 read foo
 
+if [ ${#sitesscriptstoremove[@]} = 0 ]; then
+  exit 1
+fi
+
 for script in "${sitesscriptstoremove[@]}"; do
     scriptTitle=$(echo ${script} | jq -r '.Title')
     scriptId=$(echo ${script} | jq -r '.Id')
-    echo "Deleting Site design..."  $scriptTitle $scriptId
+    echo "Deleting Site script..."  $scriptTitle $scriptTitle
     o365 spo sitescript remove --id $scriptId --confirm
 done
 
