@@ -44,13 +44,14 @@ while read script; do
 
 done < <(o365 spo sitescript list -o json | jq -c '.[]')
 
+if [ ${#sitesscriptstoremove[@]} = 0 ]; then
+  exit 1
+fi
+
 printf '%s\n' "${sitesscriptstoremove[@]}"
 echo "Press Enter to start deleting (CTRL + C to exit)"
 read foo
 
-if [ ${#sitesscriptstoremove[@]} = 0 ]; then
-  exit 1
-fi
 
 for script in "${sitesscriptstoremove[@]}"; do
     scriptTitle=$(echo ${script} | jq -r '.Title')
