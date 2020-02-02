@@ -47,6 +47,12 @@ Sends a private conversation to the user with the ID 1231231231
 yammer message add --body "Hello everyone!" --directToUserIds 1231231231
 ```
 
+Sends a private conversation to multiple users by ID
+
+```sh
+yammer message add --body "Hello everyone!" --directToUserIds 1231231231,1121312
+```
+
 Sends a private conversation to the user with the e-mail pl@nubo.eu and sc@nubo.eu 
 
 ```sh

@@ -146,6 +146,9 @@ class YammerMessageAddCommand extends YammerCommand {
     Sends a private conversation to the user with the ID 1231231231 
       ${this.name} --body "Hello everyone!" --directToUserIds 1231231231
 
+    Sends a private conversation to multiple users by ID
+      ${this.name} --body "Hello everyone!" --directToUserIds 1231231231,1121312
+
     Sends a private conversation to the user with the e-mail pl@nubo.eu and sc@nubo.eu 
       ${this.name} --body "Hello everyone!" --directToUserIds pl@nubo.eu,sc@nubo.eu
      
