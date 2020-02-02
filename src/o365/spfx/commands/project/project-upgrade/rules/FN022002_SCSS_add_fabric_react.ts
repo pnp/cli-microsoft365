@@ -1,10 +1,9 @@
 import { Finding } from "../Finding";
-import { Project, ScssFile } from "../model";
+import { Project, ScssFile } from "../../model";
 import { ScssRule } from "./ScssRule";
 import { Occurrence, Utils } from "../";
 
 export class FN022002_SCSS_add_fabric_react extends ScssRule {
-  /* istanbul ignore next */
   constructor(private importValue: string) {
     super();
   }

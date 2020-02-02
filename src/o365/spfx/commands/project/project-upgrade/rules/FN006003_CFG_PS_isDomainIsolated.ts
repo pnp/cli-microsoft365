@@ -1,5 +1,5 @@
 import { Finding } from "../";
-import { Project } from "../model";
+import { Project } from "../../model";
 import { Rule } from "./Rule";
 
 export class FN006003_CFG_PS_isDomainIsolated extends Rule {

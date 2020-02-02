@@ -18,7 +18,6 @@ export abstract class SpoPropertyBagBaseCommand extends SpoCommand {
    */
   protected formDigestValue: string;
 
-  /* istanbul ignore next */
   constructor() {
     super();
     this.formDigestValue = '';

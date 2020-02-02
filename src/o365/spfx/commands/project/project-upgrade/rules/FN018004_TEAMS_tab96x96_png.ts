@@ -1,12 +1,11 @@
 import { Finding, Occurrence } from "../";
-import { Project, Manifest } from "../model";
+import { Project, Manifest } from "../../model";
 import { Rule } from "./Rule";
 import * as path from 'path';
 import * as fs from 'fs';
 
 export class FN018004_TEAMS_tab96x96_png extends Rule {
   constructor() {
-    /* istanbul ignore next */
     super();
   }
 

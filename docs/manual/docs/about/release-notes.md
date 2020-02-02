@@ -1,8 +1,69 @@
 # Release notes
 
-## v2.4.0
+## [v2.6.0](https://github.com/pnp/office365-cli/releases/tag/v2.6.0)
 
 ### New commands
+
+**Microsoft Graph:**
+
+- [graph schemaextension remove](../cmd/graph/schemaextension/schemaextension-remove.md) - removes specified Microsoft Graph schema extension [#16](https://github.com/pnp/office365-cli/issues/16)
+
+**Power Apps**
+
+- [pa connector export](../cmd/pa/connector/connector-export.md) - exports the specified power automate or power apps custom connector [#1084](https://github.com/pnp/office365-cli/issues/1084)
+
+**SharePoint**
+
+- [spo report activityfilecounts](../cmd/spo/report/report-activityfilecounts.md) - gets the number of unique, licensed users who interacted with files stored on SharePoint sites [#1243](https://github.com/pnp/office365-cli/issues/1243)
+- [spo report activitypages](../cmd/spo/report/report-activitypages.md) - gets the number of unique pages visited by users [#1245](https://github.com/pnp/office365-cli/issues/1245)
+- [spo report activityuserdetail](../cmd/spo/report/report-activityuserdetail.md) - gets details about SharePoint activity by user [#1242](https://github.com/pnp/office365-cli/issues/1242)
+- [spo report activityusercounts](../cmd/spo/report/report-activityusercounts.md) - gets the trend in the number of active users [#1244](https://github.com/pnp/office365-cli/issues/1244)
+- [spo report siteusagedetail](../cmd/spo/report/report-siteusagedetail.md) - gets details about SharePoint site usage [#1246](https://github.com/pnp/office365-cli/issues/1246)
+
+**Yammer**
+
+- [yammer group list](../cmd/yammer/group/group-list.md) - returns the list of groups in a Yammer network or the groups for a specific user [#1185](https://github.com/pnp/office365-cli/issues/1185)
+
+### Changes
+
+- added support for file edit suggestions [#1190](https://github.com/pnp/office365-cli/issues/1190)
+- added support for JMESPath [#1315](https://github.com/pnp/office365-cli/issues/1315)
+- made non-immersive mode completion standalone [#1316](https://github.com/pnp/office365-cli/issues/1316)
+- added GitHub Actions documentation [#1094](https://github.com/pnp/office365-cli/issues/1094)
+- added the 'Delete all non group connected SharePoint sites' example [#1141](https://github.com/pnp/office365-cli/issues/1141)
+
+## [v2.5.0](https://github.com/pnp/office365-cli/releases/tag/v2.5.0)
+
+### New commands
+
+**OneDrive**
+
+- [onedrive report activityuserdetail](../cmd/onedrive/report/report-activityuserdetail.md) - gets details about OneDrive activity by user [#1255](https://github.com/pnp/office365-cli/issues/1255)
+- [onedrive report usageaccountdetail](../cmd/onedrive/report/report-usageaccountdetail.md) - gets details about OneDrive usage by account [#1251](https://github.com/pnp/office365-cli/issues/1251)
+
+**SharePoint**
+
+- [spo report siteusagefilecounts](../cmd/spo/report/report-siteusagefilecounts.md) - get the total number of files across all sites and the number of active files [#1247](https://github.com/pnp/office365-cli/issues/1247)
+- [spo report siteusagepages](../cmd/spo/report/report-siteusagepages.md) - gets the number of pages viewed across all sites [#1250](https://github.com/pnp/office365-cli/issues/1250)
+- [spo report siteusagesitecounts](../cmd/spo/report/report-siteusagesitecounts.md) - gets the total number of files across all sites and the number of active files [#1248](https://github.com/pnp/office365-cli/issues/1248)
+- [spo report siteusagestorage](../cmd/spo/report/report-siteusagestorage.md) - gets the trend of storage allocated and consumed during the reporting period [#1249](https://github.com/pnp/office365-cli/issues/1249)
+
+### Changes
+
+- fixed error using command spo listitem add when text field value only contains numbers [#1297](https://github.com/pnp/office365-cli/issues/1297)
+- added support for upgrading projects built using SharePoint Framework v1.9.1 [#1310](https://github.com/pnp/office365-cli/pull/1310)
+
+## [v2.4.0](https://github.com/pnp/office365-cli/releases/tag/v2.4.0)
+
+### New commands
+
+**OneDrive**
+
+- [onedrive report activityfilecounts](../cmd/onedrive/report/report-activityfilecounts.md) - gets the number of unique, licensed users that performed file interactions against any OneDrive account [#1257](https://github.com/pnp/office365-cli/issues/1257)
+- [onedrive report activityusercounts](../cmd/onedrive/report/report-activityusercounts.md) - gets the trend in the number of active OneDrive users [#1256](https://github.com/pnp/office365-cli/issues/1256)
+- [onedrive report usageaccountcounts](../cmd/onedrive/report/report-usageaccountcounts.md) - gets the trend in the number of active OneDrive for Business sites [#1252](https://github.com/pnp/office365-cli/issues/1252)
+- [onedrive report usagefilecounts](../cmd/onedrive/report/report-usagefilecounts.md) - gets the total number of files across all sites and how many are active files [#1253](https://github.com/pnp/office365-cli/issues/1253)
+- [onedrive report usagestorage](../cmd/onedrive/report/report-usagestorage.md) - gets the trend on the amount of storage you are using in OneDrive for Business [#1254](https://github.com/pnp/office365-cli/issues/1254)
 
 **Outlook**
 
@@ -21,6 +82,7 @@
 **SharePoint**
 
 - [spo feature disable](../cmd/spo/feature/feature-disable.md) - disables feature for the specified site or web [#676](https://github.com/pnp/office365-cli/issues/676)
+- [spo site rename](../cmd/spo/site/site-rename.md) - renames the URL and title of a site collection [#1197](https://github.com/pnp/office365-cli/issues/1197)
 
 **Yammer**
 

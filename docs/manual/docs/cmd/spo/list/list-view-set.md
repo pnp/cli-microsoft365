@@ -18,6 +18,7 @@ Option|Description
 `--listTitle [listTitle]`|Title of the list where the view is located. Specify `listTitle` or `listId` but not both
 `--viewId [viewId]`|ID of the view to update. Specify `viewTitle` or `viewId` but not both
 `--viewTitle [viewTitle]`|Title of the view to update. Specify `viewTitle` or `viewId` but not both
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

@@ -143,6 +143,10 @@ export default abstract class Command {
   public options(): CommandOption[] {
     return [
       {
+        option: '--query [query]',
+        description: 'JMESPath query string. See http://jmespath.org/ for more information and examples'
+      },
+      {
         option: '-o, --output [output]',
         description: 'Output type. json|text. Default text',
         autocomplete: ['json', 'text']
@@ -350,7 +354,6 @@ export default abstract class Command {
     const cmd = commandData.match;
     // required for tests not to fail.
     // Can't happen on runtime because we are already inside a command
-    /* istanbul ignore next */
     if (!cmd) {
       return args;
     }

@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import { Finding } from '../Finding';
-import { Project } from '../model';
+import { Project } from '../../model';
 import { FN008003_CFG_TSL_preferConst } from './FN008003_CFG_TSL_preferConst';
 
 describe('FN010201_CFG_TSL_preferConst', () => {

@@ -8,7 +8,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import Utils from '../../../../Utils';
 import { Utils as Utils1 } from './project-upgrade/';
-import { Project, Manifest, VsCode } from './project-upgrade/model';
+import { Project, Manifest, VsCode } from './model';
 import { Finding } from './project-upgrade/Finding';
 
 describe(commands.PROJECT_UPGRADE, () => {
@@ -136,12 +136,12 @@ describe(commands.PROJECT_UPGRADE, () => {
       }
     });
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, options) => {
       if (path.endsWith('.yo-rc.json')) {
         return `{}`;
       }
       else {
-        return originalReadFileSync(path);
+        return originalReadFileSync(path, options);
       }
     });
 
@@ -170,12 +170,12 @@ describe(commands.PROJECT_UPGRADE, () => {
         "environment": "spo"
       }
     }`;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, options) => {
       if (path.endsWith('.yo-rc.json')) {
         return yoRcJson;
       }
       else {
-        return originalReadFileSync(path);
+        return originalReadFileSync(path, options);
       }
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
@@ -197,7 +197,7 @@ describe(commands.PROJECT_UPGRADE, () => {
       }
     });
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, options) => {
       if (path.endsWith('package.json')) {
         return `{
           "name": "spfx-141",
@@ -231,7 +231,7 @@ describe(commands.PROJECT_UPGRADE, () => {
         `;
       }
       else {
-        return originalReadFileSync(path);
+        return originalReadFileSync(path, options);
       }
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
@@ -256,6 +256,83 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, (err?: any) => {
       assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Unable to determine the version of the current SharePoint Framework project`, 3)));
+    });
+  });
+
+  it('determining project version doesn\'t fail if .yo-rc.json is empty', () => {
+    const originalExistsSync = fs.existsSync;
+    sinon.stub(fs, 'existsSync').callsFake((path: string) => {
+      if (path.endsWith('.yo-rc.json')) {
+        return true;
+      }
+      else {
+        return originalExistsSync(path);
+      }
+    });
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
+      if (path.endsWith('.yo-rc.json')) {
+        return '';
+      }
+      else if (path.endsWith('package.json')) {
+        return `{
+          "name": "spfx-141",
+          "version": "0.0.1",
+          "private": true,
+          "engines": {
+            "node": ">=0.10.0"
+          },
+          "scripts": {
+            "build": "gulp bundle",
+            "clean": "gulp clean",
+            "test": "gulp test"
+          },
+          "dependencies": {
+            "@microsoft/sp-core-library": "~1.4.1",
+            "@microsoft/sp-webpart-base": "~1.4.1",
+            "@microsoft/sp-lodash-subset": "~1.4.1",
+            "@microsoft/sp-office-ui-fabric-core": "~1.4.1",
+            "@types/webpack-env": ">=1.12.1 <1.14.0"
+          },
+          "devDependencies": {
+            "@microsoft/sp-build-web": "~1.4.1",
+            "@microsoft/sp-module-interfaces": "~1.4.1",
+            "@microsoft/sp-webpart-workbench": "~1.4.1",
+            "gulp": "~3.9.1",
+            "@types/chai": ">=3.4.34 <3.6.0",
+            "@types/mocha": ">=2.2.33 <2.6.0",
+            "ajv": "~5.2.2"
+          }
+        }
+        `;
+      }
+      else {
+        return originalReadFileSync(path, encoding);
+      }
+    });
+    const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.4.1' } }, (err?: any) => {
+      assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '1.4.1');
+    });
+  });
+
+  it('determining project version doesn\'t fail if package.json is empty', () => {
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
+      if (path.endsWith('package.json')) {
+        return '';
+      }
+      else {
+        return originalReadFileSync(path, encoding);
+      }
+    });
+    const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.4.1' } }, (err?: any) => {
+      assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, undefined);
     });
   });
 
@@ -346,6 +423,175 @@ describe(commands.PROJECT_UPGRADE, () => {
     assert.equal(typeof (project.tsConfigJson), 'undefined');
   });
 
+  it('doesn\'t fail if config.json is empty', () => {
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
+      if (path.endsWith('config.json')) {
+        return '';
+      }
+      else {
+        return originalReadFileSync(path, encoding);
+      }
+    });
+
+    const getProject = (command as any).getProject;
+    const project: Project = getProject(projectPath);
+    assert.equal(typeof (project.configJson), 'undefined');
+  });
+
+  it('doesn\'t fail if copy-assets.json is empty', () => {
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
+      if (path.endsWith('copy-assets.json')) {
+        return '';
+      }
+      else {
+        return originalReadFileSync(path, encoding);
+      }
+    });
+
+    const getProject = (command as any).getProject;
+    const project: Project = getProject(projectPath);
+    assert.equal(typeof (project.copyAssetsJson), 'undefined');
+  });
+
+  it('doesn\'t fail if deploy-azure-storage.json is empty', () => {
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
+      if (path.endsWith('deploy-azure-storage.json')) {
+        return '';
+      }
+      else {
+        return originalReadFileSync(path, encoding);
+      }
+    });
+
+    const getProject = (command as any).getProject;
+    const project: Project = getProject(projectPath);
+    assert.equal(typeof (project.deployAzureStorageJson), 'undefined');
+  });
+
+  it('doesn\'t fail if package.json is empty', () => {
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
+      if (path.endsWith('package.json')) {
+        return '';
+      }
+      else {
+        return originalReadFileSync(path, encoding);
+      }
+    });
+
+    const getProject = (command as any).getProject;
+    const project: Project = getProject(projectPath);
+    assert.equal(typeof (project.packageJson), 'undefined');
+  });
+
+  it('doesn\'t fail if package-solution.json is empty', () => {
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
+      if (path.endsWith('package-solution.json')) {
+        return '';
+      }
+      else {
+        return originalReadFileSync(path, encoding);
+      }
+    });
+
+    const getProject = (command as any).getProject;
+    const project: Project = getProject(projectPath);
+    assert.equal(typeof (project.packageSolutionJson), 'undefined');
+  });
+
+  it('doesn\'t fail if serve.json is empty', () => {
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
+      if (path.endsWith('serve.json')) {
+        return '';
+      }
+      else {
+        return originalReadFileSync(path, encoding);
+      }
+    });
+
+    const getProject = (command as any).getProject;
+    const project: Project = getProject(projectPath);
+    assert.equal(typeof (project.serveJson), 'undefined');
+  });
+
+  it('doesn\'t fail if tslint.json is empty', () => {
+    const originalExistsSync = fs.existsSync;
+    sinon.stub(fs, 'existsSync').callsFake((path: string) => {
+      if (path.endsWith('tslint.json')) {
+        return true;
+      }
+      else {
+        return originalExistsSync(path);
+      }
+    });
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
+      if (path.endsWith('tslint.json')) {
+        return '';
+      }
+      else {
+        return originalReadFileSync(path, encoding);
+      }
+    });
+
+    const getProject = (command as any).getProject;
+    const project: Project = getProject(projectPath);
+    assert.equal(typeof (project.tsLintJson), 'undefined');
+  });
+
+  it('doesn\'t fail if write-manifests.json is empty', () => {
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
+      if (path.endsWith('write-manifests.json')) {
+        return '';
+      }
+      else {
+        return originalReadFileSync(path, encoding);
+      }
+    });
+
+    const getProject = (command as any).getProject;
+    const project: Project = getProject(projectPath);
+    assert.equal(typeof (project.writeManifestsJson), 'undefined');
+  });
+
+  it('doesn\'t fail if .yo-rc.json is empty', () => {
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
+      if (path.endsWith('.yo-rc.json')) {
+        return '';
+      }
+      else {
+        return originalReadFileSync(path, encoding);
+      }
+    });
+
+    const getProject = (command as any).getProject;
+    const project: Project = getProject(projectPath);
+    assert.equal(typeof (project.yoRcJson), 'undefined');
+  });
+
+  it('doesn\'t fail if extensions.json is empty', () => {
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
+      if (path.endsWith('extensions.json')) {
+        return '';
+      }
+      else {
+        return originalReadFileSync(path, encoding);
+      }
+    });
+
+    const getProject = (command as any).getProject;
+    const project: Project = getProject(projectPath);
+    assert.equal(typeof ((project.vsCode as VsCode).extensionsJson), 'undefined');
+  });
+
   it('loads manifests when available', () => {
     assert.equal((project141webPartNoLib.manifests as Manifest[]).length, 1);
   });
@@ -364,6 +610,38 @@ describe(commands.PROJECT_UPGRADE, () => {
     const getProject = (command as any).getProject;
     const project: Project = getProject(projectPath);
     assert.equal(typeof ((project.vsCode) as VsCode).settingsJson, 'undefined');
+  });
+
+  it('doesn\'t fail if vscode settings are empty', () => {
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
+      if (path.endsWith('settings.json')) {
+        return '';
+      }
+      else {
+        return originalReadFileSync(path, encoding);
+      }
+    });
+
+    const getProject = (command as any).getProject;
+    const project: Project = getProject(projectPath);
+    assert.equal(typeof ((project.vsCode as any).settingsJson), 'undefined');
+  });
+
+  it('doesn\'t fail if vscode launch info is empty', () => {
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
+      if (path.endsWith('launch.json')) {
+        return '';
+      }
+      else {
+        return originalReadFileSync(path, encoding);
+      }
+    });
+
+    const getProject = (command as any).getProject;
+    const project: Project = getProject(projectPath);
+    assert.equal(typeof ((project.vsCode as any).launch), 'undefined');
   });
 
   //#region npm
@@ -564,7 +842,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.0.1', output: 'json' } }, (err?: any) => {
       (command as any).supportedVersions.splice(1, 1);
-      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("Cannot find module './project-upgrade/upgrade-0'")));
+      assert(JSON.stringify(err).indexOf("Cannot find module './project-upgrade/upgrade-0'") > -1);
     });
   });
 
@@ -1456,7 +1734,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.0', output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[0];
-      assert.equal(findings.length, 17);
+      assert.equal(findings.length, 18);
     });
   });
 
@@ -1466,7 +1744,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.0', output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[0];
-      assert.equal(findings.length, 17);
+      assert.equal(findings.length, 18);
     });
   });
 
@@ -1476,7 +1754,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.0', output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[0];
-      assert.equal(findings.length, 19);
+      assert.equal(findings.length, 20);
     });
   });
   //#endregion
@@ -1667,6 +1945,68 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
   //#endregion
 
+  //#region 1.9.1
+  it('e2e: shows correct number of findings for upgrading application customizer 1.9.1 project to 1.10.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-191-applicationcustomizer'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.10.0', output: 'json' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 12);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading field customizer react 1.9.1 project to 1.10.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-191-fieldcustomizer-react'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.10.0', output: 'json' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 11);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading list view command set 1.9.1 project to 1.10.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-191-listviewcommandset'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.10.0', output: 'json' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 12);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading ko web part 1.9.1 project to 1.10.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-191-webpart-ko'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.10.0', output: 'json' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 14);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading no framework web part 1.9.1 project to 1.10.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-191-webpart-nolib'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.10.0', output: 'json' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 14);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading react web part 1.9.1 project to 1.10.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-191-webpart-react'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.10.0', output: 'json' } }, (err?: any) => {
+      const findings: Finding[] = log[0];
+      assert.equal(findings.length, 14);
+    });
+  });
+  //#endregion
+
   //#region superseded rules
   it('ignores superseded findings (1.7.1 > 1.8.2)', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-171-webpart-react'));
@@ -1674,7 +2014,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.2', output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[0];
-      assert.equal(findings.length, 23);
+      assert.equal(findings.length, 24);
     });
   });
 

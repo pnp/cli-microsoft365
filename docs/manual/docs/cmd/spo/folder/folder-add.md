@@ -16,6 +16,7 @@ Option|Description
 `-u, --webUrl <webUrl>`|The URL of the site where the folder will be created
 `-p, --parentFolderUrl <parentFolderUrl>`|Site-relative URL of the parent folder
 `-n, --name <name>`|Name of the new folder to be created
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

@@ -16,6 +16,7 @@ Option|Description
 `-u, --webUrl <webUrl>`|URL of the site where the list to extract the site script from is located
 `-l, --listId [listId]`|ID of the list to extract the site script from. Specify either `listId` or `listTitle` but not both
 `-t, --listTitle [listTitle]`|Title of the list to extract the site script from. Specify either `listId` or `listTitle` but not both
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

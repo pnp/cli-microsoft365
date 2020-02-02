@@ -23,6 +23,7 @@ Option|Description
 `--teamId [teamId]`|The ID of the Teams team to which to add the user
 `-n, --userName <userName>`|User's UPN (user principal name, eg. johndoe@example.com)
 `-r, --role [role]`|The role to be assigned to the new user: `Owner|Member`. Default `Member`
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

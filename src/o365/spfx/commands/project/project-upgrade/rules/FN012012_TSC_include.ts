@@ -1,5 +1,5 @@
 import { Finding } from "../";
-import { Project, TsConfigJson } from "../model";
+import { Project, TsConfigJson } from "../../model";
 import { Rule } from "./Rule";
 
 export class FN012012_TSC_include extends Rule {

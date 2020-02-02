@@ -126,7 +126,7 @@ class SpoListItemAddCommand extends SpoCommand {
           return request
             .get<any>(requestOptions)
             .then(rootFolderResponse => {
-              targetFolderServerRelativeUrl = Utils.getServerRelativePath(rootFolderResponse["ServerRelativeUrl"], args.options.folder);
+              targetFolderServerRelativeUrl = Utils.getServerRelativePath(rootFolderResponse["ServerRelativeUrl"], args.options.folder as string);
 
               return folderExtensions.ensureFolder(args.options.webUrl, targetFolderServerRelativeUrl);
             });
@@ -326,10 +326,9 @@ class SpoListItemAddCommand extends SpoCommand {
 
     Object.keys(options).forEach(key => {
       if (excludeOptions.indexOf(key) === -1) {
-        requestBody.push({ FieldName: key, FieldValue: (<any>options)[key] });
+        requestBody.push({ FieldName: key, FieldValue: `${(<any>options)[key]}` });
       }
     });
-
     return requestBody;
   }
 }

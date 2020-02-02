@@ -36,7 +36,7 @@ class SpoAppPageSetCommand extends SpoCommand {
       },
       json: true,
       body: {
-        serverRelativeUrl: `${Utils.getServerRelativePath(args.options.webUrl)}/SitePages/${args.options.pageName}`,
+        serverRelativeUrl: `${Utils.getServerRelativePath(args.options.webUrl, '')}/SitePages/${args.options.pageName}`,
         webPartDataAsJson: args.options.webPartData
       }
     };

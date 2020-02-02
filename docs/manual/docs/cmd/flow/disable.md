@@ -16,6 +16,7 @@ Option|Description
 `-n, --name <name>`|The name of the Microsoft Flow to disable
 `-e, --environment <environment>`|The name of the environment for which to disable Flow
 `--asAdmin`|Set, to disable the Flow as admin
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

@@ -21,6 +21,7 @@ Option|Description
 `-l, --locale [locale]`|Subsite locale LCID, eg. `1033` for en-US. Default `1033`
 `--breakInheritance`|Set to not inherit permissions from the parent site
 `--inheritNavigation`|Set to inherit the navigation from the parent site
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

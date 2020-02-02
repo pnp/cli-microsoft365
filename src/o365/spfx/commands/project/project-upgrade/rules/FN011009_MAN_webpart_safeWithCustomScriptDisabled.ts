@@ -1,10 +1,10 @@
 import { Finding, Occurrence } from "../";
-import { Project } from "../model";
+import { Project } from "../../model";
 import { ManifestRule } from "./ManifestRule";
 
 export class FN011009_MAN_webpart_safeWithCustomScriptDisabled extends ManifestRule {
   constructor(private add: boolean) {
-    super()/* istanbul ignore next */;
+    super();
   }
 
   get id(): string {

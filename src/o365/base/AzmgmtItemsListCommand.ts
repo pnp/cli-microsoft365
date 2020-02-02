@@ -6,7 +6,6 @@ import * as url from 'url';
 export abstract class AzmgmtItemsListCommand<T> extends AzmgmtCommand {
   protected items: T[];
 
-  /* istanbul ignore next */
   constructor() {
     super();
     this.items = [];

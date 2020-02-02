@@ -15,6 +15,7 @@ Option|Description
 `--help`|output usage information
 `-i, --id <id>`|The ID of the Office 365 Group to retrieve information for
 `--includeSiteUrl`|Set to retrieve the site URL for the group
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

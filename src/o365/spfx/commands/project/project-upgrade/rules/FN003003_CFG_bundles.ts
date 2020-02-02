@@ -1,5 +1,5 @@
 import { Finding } from "../";
-import { Project, Entry } from "../model";
+import { Project, Entry } from "../../model";
 import { Rule } from "./Rule";
 
 export class FN003003_CFG_bundles extends Rule {
@@ -64,14 +64,10 @@ export class FN003003_CFG_bundles extends Rule {
    */
   private tryGetBundleName(entry: string, index: number): string {
     let name: string = index.toString();
-    try {
-      name = entry.substring(entry.lastIndexOf('/') + 1, entry.length);
-      name = name.replace('.js', '');
-      name = name.replace(/([a-z](?=[A-Z]))/g, '$1-');
-      name = name.toLowerCase();
-    }
-    catch {
-    }
+    name = entry.substring(entry.lastIndexOf('/') + 1, entry.length);
+    name = name.replace('.js', '');
+    name = name.replace(/([a-z](?=[A-Z]))/g, '$1-');
+    name = name.toLowerCase();
 
     return name;
   }

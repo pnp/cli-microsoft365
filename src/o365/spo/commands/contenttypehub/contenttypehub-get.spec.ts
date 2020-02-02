@@ -169,6 +169,7 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
     let containsOutputOption = false;
     let containsVerboseOption = false;
     let containsDebugOption = false;
+    let containsQueryOption = false;
 
     options.forEach(o => {
       if (o.option.indexOf('--output') > -1) {
@@ -177,13 +178,16 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
         containsVerboseOption = true;
       } else if (o.option.indexOf('--debug') > -1) {
         containsDebugOption = true;
+      } else if (o.option.indexOf('--query') > -1) {
+        containsQueryOption = true;
       }
     });
     
-    assert(options.length === 3,"Wrong amount of options returned");
-    assert(containsOutputOption,"Output option not available");
-    assert(containsVerboseOption,"Verbose option not available");
-    assert(containsDebugOption,"Debug option not available");
+    assert(options.length === 4, "Wrong amount of options returned");
+    assert(containsOutputOption, "Output option not available");
+    assert(containsVerboseOption, "Verbose option not available");
+    assert(containsDebugOption, "Debug option not available");
+    assert(containsQueryOption, "Query option not available");
   });
 
   it('has help referring to the right command', () => {

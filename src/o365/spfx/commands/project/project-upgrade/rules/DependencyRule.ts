@@ -1,5 +1,5 @@
 import { Finding, Hash } from "../";
-import { Project } from "../model";
+import { Project } from "../../model";
 import { Rule } from "./Rule";
 import { lt, valid, validRange } from "semver";
 

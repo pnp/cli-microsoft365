@@ -61,6 +61,7 @@ nav:
       - list: 'cmd/flow/list.md'
       - remove: 'cmd/flow/remove.md'
       - connector:
+        - connector export: 'cmd/pa/connector/connector-export.md'
         - connector list: 'cmd/pa/connector/connector-list.md'
       - environment:
         - environment get: 'cmd/flow/environment/environment-get.md'
@@ -72,6 +73,16 @@ nav:
       - schemaextension:
         - schemaextension add: 'cmd/graph/schemaextension/schemaextension-add.md'
         - schemaextension get: 'cmd/graph/schemaextension/schemaextension-get.md'
+        - schemaextension remove: 'cmd/graph/schemaextension/schemaextension-remove.md'
+    - OneDrive (onedrive):
+      - report:
+        - report activityfilecounts: 'cmd/onedrive/report/report-activityfilecounts.md'
+        - report activityusercounts: 'cmd/onedrive/report/report-activityusercounts.md'
+        - report activityuserdetail: 'cmd/onedrive/report/report-activityuserdetail.md'
+        - report usageaccountcounts: 'cmd/onedrive/report/report-usageaccountcounts.md'
+        - report usageaccountdetail: 'cmd/onedrive/report/report-usageaccountdetail.md'
+        - report usagefilecounts: 'cmd/onedrive/report/report-usagefilecounts.md'
+        - report usagestorage: 'cmd/onedrive/report/report-usagestorage.md'
     - Outlook (outlook):
       - mail:
         - mail send: 'cmd/outlook/mail/mail-send.md'
@@ -89,6 +100,7 @@ nav:
         - report mailboxusagestorage: 'cmd/outlook/report/report-mailboxusagestorage.md'
     - PowerApps (pa):
       - connector:
+        - connector export: 'cmd/pa/connector/connector-export.md'
         - connector list: 'cmd/pa/connector/connector-list.md'
       - pcf:
         - pcf init: 'cmd/pa/pcf/pcf-init.md'
@@ -253,6 +265,16 @@ nav:
         - propertybag list: 'cmd/spo/propertybag/propertybag-list.md'
         - propertybag remove: 'cmd/spo/propertybag/propertybag-remove.md'
         - propertybag set: 'cmd/spo/propertybag/propertybag-set.md'
+      - report:
+        - report activityfilecounts: 'cmd/spo/report/report-activityfilecounts.md'
+        - report activitypages: 'cmd/spo/report/report-activitypages.md'
+        - report activityusercounts: 'cmd/spo/report/report-activityusercounts.md'
+        - report activityuserdetail: 'cmd/spo/report/report-activityuserdetail.md'
+        - report siteusagedetail: 'cmd/spo/report/report-siteusagedetail.md'
+        - report siteusagefilecounts: 'cmd/spo/report/report-siteusagefilecounts.md'
+        - report siteusagepages: 'cmd/spo/report/report-siteusagepages.md'
+        - report siteusagesitecounts: 'cmd/spo/report/report-siteusagesitecounts.md'
+        - report siteusagestorage: 'cmd/spo/report/report-siteusagestorage.md'
       - search:
         - search: 'cmd/spo/search/search.md'
       - serviceprincipal:
@@ -266,7 +288,9 @@ nav:
       - site:
         - site add: 'cmd/spo/site/site-add.md'
         - site get: 'cmd/spo/site/site-get.md'
+        - site groupify: 'cmd/spo/site/site-groupify.md'
         - site list: 'cmd/spo/site/site-list.md'
+        - site rename: 'cmd/spo/site/site-rename.md'
         - site set: 'cmd/spo/site/site-set.md'
         - site appcatalog add: 'cmd/spo/site/site-appcatalog-add.md'
         - site appcatalog remove: 'cmd/spo/site/site-appcatalog-remove.md'
@@ -275,7 +299,6 @@ nav:
         - site classic remove: 'cmd/spo/site/site-classic-remove.md'
         - site classic set: 'cmd/spo/site/site-classic-set.md'
         - site commsite enable: 'cmd/spo/site/site-commsite-enable.md'
-        - site groupify: 'cmd/spo/site/site-groupify.md'
         - site inplacerecordsmanagement set: 'cmd/spo/site/site-inplacerecordsmanagement-set.md'
       - sitedesign:
         - sitedesign add: 'cmd/spo/sitedesign/sitedesign-add.md'
@@ -386,6 +409,8 @@ nav:
       - id:
         - id get: 'cmd/tenant-id-get.md'
     - Yammer (yammer):
+      - group:
+        - group list: 'cmd/yammer/group/group-list.md'
       - message:
         - message get: 'cmd/yammer/message/message-get.md'
         - message list: 'cmd/yammer/message/message-list.md'
@@ -400,11 +425,13 @@ nav:
     - 'Authorization and access tokens': 'concepts/authorization-tokens.md'
     - 'Command completion': 'concepts/completion.md'
     - 'Communication with Office 365': 'concepts/communicating-o365.md'
+    - 'GitHub Actions': 'concepts/github-actions.md'
   - Examples:
     - 'Introduction': 'examples/index.md'
     - Microsoft Graph:
       - 'Authenticate with and call the Microsoft Graph' : 'examples/graph/call-graph.md'
     - SharePoint Online:
+      - 'Delete all (non-group connected) modern SharePoint sites': 'examples/spo/delete-non-group-connected-modern-sites.md'
       - 'Delete custom color themes from SharePoint': 'examples/spo/remove-custom-themes.md'
       - 'Delete custom SharePoint site designs': 'examples/spo/remove-site-designs.md'
       - 'Lists active SharePoint site collection application catalogs': 'examples/spo/list-site-app-catalogs.md'

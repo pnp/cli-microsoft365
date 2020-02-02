@@ -16,6 +16,8 @@ Option|Description
 `-n, --name <name>`|Name of the page to remove
 `-u, --webUrl <webUrl>`|URL of the site from which the page should be removed
 `--confirm`|Do not prompt for confirmation before removing the page
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+`-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 

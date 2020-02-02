@@ -1,10 +1,10 @@
 import { Finding, Occurrence } from "../";
-import { Project } from "../model";
+import { Project } from "../../model";
 import { ManifestRule } from "./ManifestRule";
 
 export class FN011003_MAN_listViewCommandSet_schema extends ManifestRule {
   constructor(private schema: string) {
-    super()/* istanbul ignore next */;
+    super();
   }
 
   get id(): string {

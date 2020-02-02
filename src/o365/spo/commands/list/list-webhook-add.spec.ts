@@ -16,7 +16,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -444,7 +444,8 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
 
   it('fails validation if the expirationDateTime is in the past', () => {
     const currentDate: Date = new Date();
-    const dateString: string = (currentDate.getFullYear() - 1) + "-" + currentDate.getMonth() + "-01";
+    const currentMonth: number = currentDate.getMonth() + 1;
+    const dateString: string = `${(currentDate.getFullYear() - 1)}-${currentMonth < 10 ? '0' : ''}${currentMonth}-01`;
 
     const actual = (command.validate() as CommandValidate)({
       options:
@@ -460,7 +461,8 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
 
   it('fails validation if the expirationDateTime more than six months from now', () => {
     const currentDate: Date = new Date();
-    const dateString: string = (currentDate.getFullYear() + 1) + "-" + currentDate.getMonth() + "-01";
+    const currentMonth: number = currentDate.getMonth() + 1;
+    const dateString: string = `${(currentDate.getFullYear() + 1)}-${currentMonth < 10 ? '0' : ''}${currentMonth}-01`;
 
     const actual = (command.validate() as CommandValidate)({
       options:

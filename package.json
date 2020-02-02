@@ -1,12 +1,13 @@
 {
   "name": "@pnp/office365-cli",
-  "version": "2.4.0",
+  "version": "2.7.0",
   "description": "Manage Microsoft Office 365 and SharePoint Framework projects on any platform",
   "license": "MIT",
   "main": "./dist/index.js",
   "bin": {
     "office365": "./dist/index.js",
-    "o365": "./dist/index.js"
+    "o365": "./dist/index.js",
+    "o365_comp": "./dist/autocomplete.js"
   },
   "repository": {
     "type": "git",
@@ -20,7 +21,7 @@
     "build": "tsc -p . && node scripts/copy-files.js",
     "watch": "tsc -w -p .",
     "clean": "rimraf ./dist",
-    "test": "nyc -r=lcov -r=text mocha \"dist/**/*.spec.js\""
+    "test": "c8 mocha \"dist/**/*.spec.js\""
   },
   "keywords": [
     "office 365",
@@ -99,6 +100,7 @@
     "Tane, Peter <peter.tane@gmail.come>",
     "Tatti, Anoop <anoop@live.co.uk>",
     "Trinder, Garry <garry.trinder@live.com>",
+    "Vaghasia, Siddharth <siddh.vaghasia@gmail.com>",
     "van Hunen, Erwin <erwin.van.hunen@outlook.com>",
     "van Rousselt, Rick <rick.vanrousselt@outlook.com>",
     "Velliah, Joseph <joseph@sprider.org>",
@@ -109,6 +111,7 @@
     "adal-node": "^0.2.1",
     "applicationinsights": "^1.5.0",
     "easy-table": "^1.1.1",
+    "jmespath": "^0.15.0",
     "node-forge": "^0.9.1",
     "omelette": "^0.4.12",
     "request-promise-native": "^1.0.7",
@@ -122,6 +125,7 @@
   },
   "devDependencies": {
     "@types/easy-table": "0.0.32",
+    "@types/jmespath": "^0.15.0",
     "@types/mocha": "^5.2.7",
     "@types/node": "^10.14.22",
     "@types/node-forge": "^0.8.6",
@@ -131,16 +135,10 @@
     "@types/sinon": "^5.0.5",
     "@types/update-notifier": "^2.5.0",
     "@types/xmldom": "^0.1.29",
+    "c8": "^7.0.0",
     "coveralls": "^3.0.7",
     "mocha": "^6.2.1",
-    "nyc": "^13.3.0",
     "rimraf": "^3.0.0",
     "sinon": "^7.5.0"
-  },
-  "nyc": {
-    "exclude": [
-      "**/*.spec.js",
-      "**/clientsidepages.js"
-    ]
   }
 }

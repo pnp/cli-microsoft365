@@ -3088,6 +3088,18 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     assert.notEqual(actual, true);
   });
 
+  it('passes validation when webPartProperties value is valid JSON', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        pageName: 'page.aspx',
+        webUrl: 'https://contoso.sharepoint.com',
+        webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
+        webPartProperties: '{}'
+      }
+    });
+    assert.equal(actual, true);
+  });
+
   it('fails validation if webPartData value is not valid JSON', () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
@@ -3098,6 +3110,18 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       }
     });
     assert.notEqual(actual, true);
+  });
+
+  it('passes validation when webPartData value is valid JSON', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        pageName: 'page.aspx',
+        webUrl: 'https://contoso.sharepoint.com',
+        webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
+        webPartData: '{}'
+      }
+    });
+    assert.equal(actual, true);
   });
 
   it('fails validation if standardWebPart is not valid', () => {

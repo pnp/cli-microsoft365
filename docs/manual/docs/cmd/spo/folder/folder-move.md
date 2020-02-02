@@ -17,6 +17,7 @@ Option|Description
 `-s, --sourceUrl <sourceUrl>`|Site-relative URL of the folder to move
 `-t, --targetUrl <targetUrl>`|Server-relative URL where to move the folder
 `--allowSchemaMismatch`|Ignores any missing fields in the target destination and moves the folder anyway
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

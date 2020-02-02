@@ -1,6 +1,6 @@
-import { Project } from "../../project-upgrade/model";
-import { ExternalizeEntry } from "../model/ExternalizeEntry";
+import { Project } from "../../model";
+import { VisitationResult } from "../";
 
 export abstract class BasicDependencyRule {
-  abstract visit(project: Project): Promise<ExternalizeEntry[]>;
+  abstract visit(project: Project): Promise<VisitationResult>;
 }

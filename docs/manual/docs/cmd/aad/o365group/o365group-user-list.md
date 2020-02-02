@@ -22,6 +22,7 @@ Option|Description
 `-i, --groupId [groupId]`|The ID of the Office 365 group for which to list users
 `--teamId [teamId]`|The ID of the Microsoft Teams team for which to list users
 `-r, --role [role]`|Filter the results to only users with the given role: `Owner|Member|Guest`
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

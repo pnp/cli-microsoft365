@@ -291,38 +291,139 @@ describe('Utils', () => {
     }
   });
 
+  it('applies JMESPath query to a single object', (done) => {
+    const sandbox = sinon.createSandbox();
+    if (!vorpal._command) {
+      (vorpal as any)._command = undefined;
+    }
+    sandbox.stub(vorpal, '_command').value({
+      args: {
+        options: {
+          query: 'first',
+          output: 'json'
+        }
+      }
+    });
+    const o = {
+      "first": "Joe",
+      "last": "Doe"
+    };
+    const actual = Utils.logOutput([o]);
+    try {
+      assert.equal(actual, JSON.stringify("Joe"));
+      done();
+    }
+    catch (e) {
+      done(e);
+    }
+    finally {
+      sandbox.restore();
+    }
+  });
+
+  it('applies JMESPath query to an array', (done) => {
+    const sandbox = sinon.createSandbox();
+    if (!vorpal._command) {
+      (vorpal as any)._command = undefined;
+    }
+    sandbox.stub(vorpal, '_command').value({
+      args: {
+        options: {
+          query: `locations[?state == 'WA'].name | sort(@) | {WashingtonCities: join(', ', @)}`,
+          output: 'json'
+        }
+      }
+    });
+    const o = {
+      "locations": [
+        {"name": "Seattle", "state": "WA"},
+        {"name": "New York", "state": "NY"},
+        {"name": "Bellevue", "state": "WA"},
+        {"name": "Olympia", "state": "WA"}
+      ]
+    };
+    const actual = Utils.logOutput([o]);
+    try {
+      assert.equal(actual, JSON.stringify({
+        "WashingtonCities": "Bellevue, Olympia, Seattle"
+      }));
+      done();
+    }
+    catch (e) {
+      done(e);
+    }
+    finally {
+      sandbox.restore();
+    }
+  });
+
+  it('doesn\'t apply JMESPath query when command help requested', (done) => {
+    const sandbox = sinon.createSandbox();
+    if (!vorpal._command) {
+      (vorpal as any)._command = undefined;
+    }
+    sandbox.stub(vorpal, '_command').value({
+      args: {
+        options: {
+          query: `locations[?state == 'WA'].name | sort(@) | {WashingtonCities: join(', ', @)}`,
+          output: 'json',
+          help: true
+        }
+      }
+    });
+    const o = {
+      "locations": [
+        {"name": "Seattle", "state": "WA"},
+        {"name": "New York", "state": "NY"},
+        {"name": "Bellevue", "state": "WA"},
+        {"name": "Olympia", "state": "WA"}
+      ]
+    };
+    const actual = Utils.logOutput([o]);
+    try {
+      assert.equal(actual, JSON.stringify(o));
+      done();
+    }
+    catch (e) {
+      done(e);
+    }
+    finally {
+      sandbox.restore();
+    }
+  });
+
   it('should get server relative path when https://contoso.sharepoint.com/sites/team1', () => {
-    const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com/sites/team1');
+    const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com/sites/team1', '');
     assert.equal(actual, '/sites/team1');
   });
 
   it('should get server relative path when https://contoso.sharepoint.com/sites/team1/', () => {
-    const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com/sites/team1/');
+    const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com/sites/team1/', '');
     assert.equal(actual, '/sites/team1');
   });
 
   it('should get server relative path when https://contoso.sharepoint.com/', () => {
-    const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com/');
+    const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com/', '');
     assert.equal(actual, '/');
   });
 
   it('should get server relative path when domain only', () => {
-    const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com');
+    const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com', '');
     assert.equal(actual, '/');
   });
 
   it('should get server relative path when /sites/team1 relative path passed as param', () => {
-    const actual = Utils.getServerRelativePath('/sites/team1');
+    const actual = Utils.getServerRelativePath('/sites/team1', '');
     assert.equal(actual, '/sites/team1');
   });
 
   it('should get server relative path when /sites/team1/ relative path passed as param', () => {
-    const actual = Utils.getServerRelativePath('/sites/team1/');
+    const actual = Utils.getServerRelativePath('/sites/team1/', '');
     assert.equal(actual, '/sites/team1');
   });
 
   it('should get server relative path when / relative path passed as param', () => {
-    const actual = Utils.getServerRelativePath('/');
+    const actual = Utils.getServerRelativePath('/', '');
     assert.equal(actual, '/');
   });
 
@@ -801,13 +902,18 @@ describe('Utils', () => {
     assert.equal(actual, 'Office 365 CLI Contoso');
   });
 
-  it('returns empty user name when access token is undefined available', () => {
+  it('returns empty user name when access token is undefined', () => {
     const actual = Utils.getUserNameFromAccessToken(undefined as any);
     assert.equal(actual, '');
   });
 
   it('returns empty user name when empty access token passed', () => {
     const actual = Utils.getUserNameFromAccessToken('');
+    assert.equal(actual, '');
+  });
+
+  it('returns empty user name when invalid access token passed', () => {
+    const actual = Utils.getUserNameFromAccessToken('abc.def.ghi');
     assert.equal(actual, '');
   });
 

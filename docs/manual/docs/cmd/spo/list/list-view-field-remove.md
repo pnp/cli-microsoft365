@@ -20,6 +20,7 @@ Option|Description
 `--viewTitle [viewTitle]`|Title of the view to update. Specify `viewTitle` or `viewId` but not both
 `--fieldId [fieldId]`|ID of the field to remove. Specify fieldId or fieldTitle but not both
 `--fieldTitle [fieldTitle]`|The **case-sensitive** internal name or display name of the field to remove. Specify `fieldId` or `fieldTitle` but not both
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

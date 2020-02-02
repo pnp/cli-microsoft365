@@ -18,6 +18,7 @@ Option|Description
 `--giphyContentRating [giphyContentRating]`|Settings to set content rating for giphy. Allowed values `Strict|Moderate`
 `--allowStickersAndMemes [allowStickersAndMemes]`|Set to `true` to allow stickers and memes and to `false` to disable them
 `--allowCustomMemes [allowCustomMemes]`|Set to `true` to allow custom memes and to `false` to disable them
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

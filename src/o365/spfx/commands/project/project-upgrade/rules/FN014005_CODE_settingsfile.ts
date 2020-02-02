@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import { Finding } from "../";
-import { Project } from "../model";
+import { Project } from "../../model";
 import * as path from "path";
 import { Rule } from "./Rule";
 

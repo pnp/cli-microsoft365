@@ -91,7 +91,6 @@ export class Auth {
   }
 
   public ensureAccessToken(resource: string, stdout: Logger, debug: boolean = false, fetchNew: boolean = false): Promise<string> {
-    /* istanbul ignore next */
     Logging.setLoggingOptions({
       level: debug ? 3 : 0,
       log: (level: LoggingLevel, message: string, error?: Error): void => {
@@ -347,7 +346,7 @@ export class Auth {
 
   public cancel(): void {
     if (this.userCodeInfo) {
-      this.authCtx.cancelRequestToGetTokenWithDeviceCode(this.userCodeInfo as UserCodeInfo, /* istanbul ignore next */(error: Error, response: TokenResponse | ErrorResponse): void => { });
+      this.authCtx.cancelRequestToGetTokenWithDeviceCode(this.userCodeInfo as UserCodeInfo, (error: Error, response: TokenResponse | ErrorResponse): void => { });
     }
   }
 

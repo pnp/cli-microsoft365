@@ -1,5 +1,5 @@
 import { Finding } from "../";
-import { Project, Entry } from "../model";
+import { Project, Entry } from "../../model";
 import { Rule } from "./Rule";
 
 export class FN003004_CFG_entries extends Rule {

@@ -16,6 +16,7 @@ Option|Description
 `-u, --webUrl <webUrl>`|URL of the site where the list to retrieve is located
 `-i, --id [id]`|ID of the list to retrieve information for. Specify either `id` or `title` but not both
 `-t, --title [title]`|Title of the list to retrieve information for. Specify either `id` or `title` but not both
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

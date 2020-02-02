@@ -21,6 +21,7 @@ Option|Description
 `-l, --filter [odataFilter]`|OData filter to use to query the list of items with. Specify `query` or `filter` but not both
 `-p, --pageSize [pageSize]`|Number of list items to return. Specify `query` or `pageSize` but not both
 `-n, --pageNumber [pageNumber]`|Page number to return if `pageSize` is specified (first page is indexed as value of 0)
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

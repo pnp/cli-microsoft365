@@ -24,7 +24,7 @@ class SpoWebReindexCommand extends SpoCommand {
   private reindexedLists: boolean;
 
   constructor() {
-    super()/* istanbul ignore next */;
+    super();
     this.reindexedLists = false;
   }
 

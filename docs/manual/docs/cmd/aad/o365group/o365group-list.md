@@ -18,6 +18,7 @@ Option|Description
 `--includeSiteUrl`|Set to retrieve the site URL for each group
 `--deleted`|Set to only retrieve deleted groups
 `--orphaned`|Set to only retrieve groups without owners
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

@@ -316,6 +316,26 @@ describe('autocomplete', () => {
     }
   });
 
+  it('doesnt fail when the commands file is empty', () => {
+    Utils.restore(fs.existsSync);
+    sinon.stub(fs, 'existsSync').callsFake((path) => true);
+    const readFileSyncStub = sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => '');
+    (autocomplete as any).init();
+    try {
+      assert.equal(JSON.stringify((autocomplete as any).commands), JSON.stringify({}));
+    }
+    catch (e) {
+      fail(e);
+    }
+    finally {
+      Utils.restore([
+        fs.existsSync,
+        fs.readFileSync,
+        readFileSyncStub
+      ]);
+    }
+  });
+
   it('correctly lists available services when completing first fragment and it\'s empty', () => {
     const evtData = {
       before: "o365",

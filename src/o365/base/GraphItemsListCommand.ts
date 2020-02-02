@@ -5,7 +5,6 @@ import { GraphResponse } from './GraphResponse';
 export abstract class GraphItemsListCommand<T> extends GraphCommand {
   protected items: T[];
 
-  /* istanbul ignore next */
   constructor() {
     super();
     this.items = [];

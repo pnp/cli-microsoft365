@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
 import { Finding } from '../Finding';
-import { Project } from '../model';
+import { Project } from '../../model';
 import { FN018004_TEAMS_tab96x96_png } from './FN018004_TEAMS_tab96x96_png';
 import Utils from '../../../../../../Utils';
 

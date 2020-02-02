@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
 import { Finding } from '../Finding';
-import { Project, TsFile } from '../model';
+import { Project, TsFile } from '../../model';
 import { FN016004_TS_property_pane_property_import } from './FN016004_TS_property_pane_property_import';
 import Utils from '../../../../../../Utils';
 import { TsRule } from './TsRule';

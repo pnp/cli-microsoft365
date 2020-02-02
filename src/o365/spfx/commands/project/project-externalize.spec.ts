@@ -8,8 +8,8 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
 import Utils from '../../../../Utils';
-import { Project, ExternalConfiguration, External } from './project-upgrade/model';
-import { ExternalizeEntry } from './project-externalize/model';
+import { Project, ExternalConfiguration, External } from './model';
+import { ExternalizeEntry, FileEdit } from './project-externalize/';
 import * as requestNative from 'request-promise-native';
 
 describe(commands.PROJECT_EXTERNALIZE, () => {
@@ -19,6 +19,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
   let trackEvent: any;
   let telemetry: any;
   const logEntryToCheck = 1; //necessary as long as we display the beta message
+  const projectPath: string = './src/o365/spfx/commands/project/project-externalize/test-projects/spfx-182-webpart-react';
 
   before(() => {
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
@@ -142,7 +143,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, options) => {
       if (path.endsWith('.yo-rc.json')) {
         return `{}`;
       }
@@ -154,7 +155,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
         });
       }
       else {
-        return originalReadFileSync(path);
+        return originalReadFileSync(path, options);
       }
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
@@ -182,7 +183,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, options) => {
       if (path.endsWith('.yo-rc.json')) {
         return `{
           "@microsoft/generator-sharepoint": {
@@ -194,7 +195,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
         }`;
       }
       else {
-        return originalReadFileSync(path);
+        return originalReadFileSync(path, options);
       }
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
@@ -222,7 +223,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, options) => {
       if (path.endsWith('package.json')) {
         return `{
           "name": "spfx-041",
@@ -256,7 +257,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
         `;
       }
       else {
-        return originalReadFileSync(path);
+        return originalReadFileSync(path, options);
       }
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
@@ -296,6 +297,83 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
   });
 
+  it('determining project version doesn\'t fail if .yo-rc.json is empty', () => {
+    const originalExistsSync = fs.existsSync;
+    sinon.stub(fs, 'existsSync').callsFake((path: string) => {
+      if (path.endsWith('.yo-rc.json')) {
+        return true;
+      }
+      else {
+        return originalExistsSync(path);
+      }
+    });
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
+      if (path.endsWith('.yo-rc.json')) {
+        return '';
+      }
+      else if (path.endsWith('package.json')) {
+        return `{
+          "name": "spfx-141",
+          "version": "0.0.1",
+          "private": true,
+          "engines": {
+            "node": ">=0.10.0"
+          },
+          "scripts": {
+            "build": "gulp bundle",
+            "clean": "gulp clean",
+            "test": "gulp test"
+          },
+          "dependencies": {
+            "@microsoft/sp-core-library": "~1.4.1",
+            "@microsoft/sp-webpart-base": "~1.4.1",
+            "@microsoft/sp-lodash-subset": "~1.4.1",
+            "@microsoft/sp-office-ui-fabric-core": "~1.4.1",
+            "@types/webpack-env": ">=1.12.1 <1.14.0"
+          },
+          "devDependencies": {
+            "@microsoft/sp-build-web": "~1.4.1",
+            "@microsoft/sp-module-interfaces": "~1.4.1",
+            "@microsoft/sp-webpart-workbench": "~1.4.1",
+            "gulp": "~3.9.1",
+            "@types/chai": ">=3.4.34 <3.6.0",
+            "@types/mocha": ">=2.2.33 <2.6.0",
+            "ajv": "~5.2.2"
+          }
+        }
+        `;
+      }
+      else {
+        return originalReadFileSync(path, encoding);
+      }
+    });
+    const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.4.1' } }, (err?: any) => {
+      assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '1.4.1');
+    });
+  });
+
+  it('determining project version doesn\'t fail if package.json is empty', () => {
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
+      if (path.endsWith('package.json')) {
+        return '';
+      }
+      else {
+        return originalReadFileSync(path, encoding);
+      }
+    });
+    const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.4.1' } }, (err?: any) => {
+      assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, undefined);
+    });
+  });
+
   it('loads config.json when available', () => {
     const originalExistsSync = fs.existsSync;
     sinon.stub(fs, 'existsSync').callsFake((path: string) => {
@@ -307,17 +385,17 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, options) => {
       if (path.endsWith('config.json')) {
         return '{}';
       }
       else {
-        return originalReadFileSync(path);
+        return originalReadFileSync(path, options);
       }
     });
 
     const getProject = (command as any).getProject;
-    const project: Project = getProject('./');
+    const project: Project = getProject(projectPath);
     assert.notEqual(typeof (project.configJson), 'undefined');
   });
 
@@ -333,7 +411,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
 
     const getProject = (command as any).getProject;
-    const project: Project = getProject('./');
+    const project: Project = getProject(projectPath);
     assert.equal(typeof (project.packageJson), 'undefined');
   });
 
@@ -349,8 +427,56 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
 
     const getProject = (command as any).getProject;
-    const project: Project = getProject('./');
+    const project: Project = getProject(projectPath);
     assert.equal(typeof (project.tsConfigJson), 'undefined');
+  });
+
+  it('doesn\'t fail if config.json is empty', () => {
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
+      if (path.endsWith('config.json')) {
+        return '';
+      }
+      else {
+        return originalReadFileSync(path, encoding);
+      }
+    });
+
+    const getProject = (command as any).getProject;
+    const project: Project = getProject(projectPath);
+    assert.equal(typeof (project.configJson), 'undefined');
+  });
+
+  it('doesn\'t fail if package.json is empty', () => {
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
+      if (path.endsWith('package.json')) {
+        return '';
+      }
+      else {
+        return originalReadFileSync(path, encoding);
+      }
+    });
+
+    const getProject = (command as any).getProject;
+    const project: Project = getProject(projectPath);
+    assert.equal(typeof (project.packageJson), 'undefined');
+  });
+
+  it('doesn\'t fail if .yo-rc.json is empty', () => {
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
+      if (path.endsWith('.yo-rc.json')) {
+        return '';
+      }
+      else {
+        return originalReadFileSync(path, encoding);
+      }
+    });
+
+    const getProject = (command as any).getProject;
+    const project: Project = getProject(projectPath);
+    assert.equal(typeof (project.yoRcJson), 'undefined');
   });
 
   //#region findings
@@ -358,7 +484,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
   it('e2e: shows correct number of findings for externalizing react web part 1.8.2 project', (done) => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-externalize/test-projects/spfx-182-webpart-react'));
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, options) => {
       if (path.endsWith('package.json') && path.indexOf('pnpjs') > -1) {
         return JSON.stringify({
           main: "./dist/pnpjs.es5.umd.bundle.js",
@@ -371,7 +497,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
         return JSON.stringify(pConfig);
       }
       else {
-        return originalReadFileSync(path);
+        return originalReadFileSync(path, options);
       }
     });
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
@@ -380,8 +506,52 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { output: 'json', debug: true } }, (err?: any) => {
       try {
-        const findings: { externals: ExternalConfiguration } = log[logEntryToCheck + 3]; //because debug is enabled
-        assert.equal((findings.externals['@pnp/pnpjs'] as unknown as External).path, 'https://unpkg.com/@pnp/pnpjs@1.3.5/dist/pnpjs.es5.umd.min.js');
+        const findings: { externalConfiguration: { externals: ExternalConfiguration }, edits: FileEdit[] } = log[logEntryToCheck + 3]; //because debug is enabled
+        assert.equal((findings.externalConfiguration.externals['@pnp/pnpjs'] as unknown as External).path, 'https://unpkg.com/@pnp/pnpjs@1.3.5/dist/pnpjs.es5.umd.min.js');
+        done();
+      }
+      catch (ex) {
+        done(ex);
+      }
+    });
+  });
+
+  it('returns edit suggestions', (done) => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-externalize/test-projects/spfx-182-webpart-react'));
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, options) => {
+      if (path.endsWith('package.json') && path.indexOf('logging') > -1) {
+        return JSON.stringify({
+          main: "./dist/logging.es5.umd.bundle.js",
+          module: "./dist/logging.es5.umd.bundle.min.js"
+        });
+      }
+      else if (path.endsWith('package.json') && path.indexOf('common') > -1) {
+        return JSON.stringify({
+          main: "./dist/common.es5.umd.bundle.js",
+          module: "./dist/common.es5.umd.bundle.min.js"
+        });
+      }
+      else if (path.endsWith('package.json') && path.indexOf('spfx-182-webpart-react') > -1) { //adding library on the fly so we get at least one result
+        const pConfig = JSON.parse(originalReadFileSync(path, 'utf8'));
+        pConfig.dependencies['@pnp/logging'] = '1.3.5';
+        pConfig.dependencies['@pnp/common'] = '1.3.5';
+        return JSON.stringify(pConfig);
+      }
+      else {
+        return originalReadFileSync(path, options);
+      }
+    });
+    sinon.stub(request, 'head').callsFake(() => Promise.resolve());
+    sinon.stub(request, 'post').callsFake(() => {
+      return Promise.resolve(JSON.stringify({ scriptType: 'script' }));
+    });
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { output: 'json', debug: false } }, (err?: any) => {
+      try {
+        const findings: { externalConfiguration: { externals: ExternalConfiguration }, edits: FileEdit[] } = log[0];
+        assert.notEqual(findings.edits.length, 0);
         done();
       }
       catch (ex) {
@@ -393,7 +563,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
   it('handles failures properly', (done) => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-externalize/test-projects/spfx-182-webpart-react'));
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, options) => {
       if (path.endsWith('package.json') && path.indexOf('pnpjs') > -1) {
         return JSON.stringify({
           main: "./dist/pnpjs.es5.umd.bundle.js",
@@ -427,7 +597,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
         return JSON.stringify(pConfig);
       }
       else {
-        return originalReadFileSync(path);
+        return originalReadFileSync(path, options);
       }
     });
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
@@ -494,7 +664,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
   it('returns text report with output format default', (done) => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-externalize/test-projects/spfx-182-webpart-react'));
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
+    sinon.stub(fs, 'readFileSync').callsFake((path: string, options) => {
       if (path.endsWith('package.json') && path.indexOf('pnpjs') > -1) {
         return JSON.stringify({
           main: "./dist/pnpjs.es5.umd.bundle.js",
@@ -507,7 +677,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
         return JSON.stringify(pConfig);
       }
       else {
-        return originalReadFileSync(path);
+        return originalReadFileSync(path, options);
       }
     });
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
@@ -515,7 +685,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, (err?: any) => {
       try {
-        assert.equal(log[1], 'In the config/config.json file update the externals property to:\n\n{\n  \"externals\": {\n    \"@pnp/pnpjs\": {\n      \"path\": \"https://unpkg.com/@pnp/pnpjs@1.3.5/dist/pnpjs.es5.umd.min.js\",\n      \"globalName\": \"pnp\"\n    }\n  }\n}');
+        assert.notEqual(log[1].indexOf('externalConfiguration'), -1);
         done();
       }
       catch (ex) {
@@ -540,10 +710,10 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     ]) as string;
     const emptyReport = (command as any).serializeTextReport([]) as string;
     assert(report.length > 87);
-    assert.equal(emptyReport.length, 87);
+    assert.equal(emptyReport.length, 122);
   });
 
-  it('writes upgrade report to file when outputFile specified', (done) => {
+  it('writes externalize report to file when outputFile specified', (done) => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-externalize/test-projects/spfx-182-webpart-react'));
     const writeFileSyncSpy: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
 
@@ -559,7 +729,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
   });
 
-  it('writes JSON upgrade report to file when outputFile specified in json output mode', (done) => {
+  it('writes JSON externalize report to file when outputFile specified in json output mode', (done) => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-externalize/test-projects/spfx-182-webpart-react'));
     let typeofReport: string = '';
     sinon.stub(fs, 'writeFileSync').callsFake((path: string, contents: any) => {

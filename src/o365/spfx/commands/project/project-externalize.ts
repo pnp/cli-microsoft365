@@ -6,13 +6,13 @@ import GlobalOptions from '../../../../GlobalOptions';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
-import { Utils } from './project-upgrade/';
-import { Project, ExternalConfiguration, External } from './project-upgrade/model';
+import { Project, ExternalConfiguration, External } from './model';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 import rules = require('./project-externalize/DefaultRules');
 import { BasicDependencyRule } from './project-externalize/rules';
-import { ExternalizeEntry } from './project-externalize/model/ExternalizeEntry';
+import { ExternalizeEntry, FileEdit } from './project-externalize/';
+import { BaseProjectCommand } from './base-project-command';
 
 interface CommandArgs {
   options: Options;
@@ -22,9 +22,12 @@ interface Options extends GlobalOptions {
   outputFile?: string;
 }
 
-class SpfxProjectExternalizeCommand extends Command {
+class SpfxProjectExternalizeCommand extends BaseProjectCommand {
+  public constructor() {
+    super();
+  }
+
   private projectVersion: string | undefined;
-  private projectRootPath: string | null = null;
   private supportedVersions: string[] = [
     '1.0.0',
     '1.0.1',
@@ -50,6 +53,7 @@ class SpfxProjectExternalizeCommand extends Command {
     '1.9.1'
   ];
   private allFindings: ExternalizeEntry[] = [];
+  private allEditSuggestions: FileEdit[] = [];
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
   public static ERROR_NO_VERSION: number = 3;
   public static ERROR_UNSUPPORTED_VERSION: number = 2;
@@ -113,28 +117,29 @@ class SpfxProjectExternalizeCommand extends Command {
     Promise
       .all(asyncRulesResults)
       .then((rulesResults) => {
-        this.allFindings.push(...rulesResults.reduce((x, y) => [...x, ...y]));
+        this.allFindings.push(...rulesResults.map(x => x.entries).reduce((x, y) => [...x, ...y]));
+        this.allEditSuggestions.push(...rulesResults.map(x => x.suggestions).reduce((x, y) => [...x, ...y]));
         //removing duplicates
         this.allFindings = this.allFindings.filter((x, i) => this.allFindings.findIndex(y => y.key === x.key) === i);
-        this.writeReport(this.allFindings, cmd, args.options);
+        this.writeReport(this.allFindings, this.allEditSuggestions, cmd, args.options);
         cb();
       }).catch((err) => {
         cb(new CommandError(err));
       });
   }
 
-  private writeReport(findingsToReport: ExternalizeEntry[], cmd: CommandInstance, options: Options): void {
-    let report: any = findingsToReport;
+  private writeReport(findingsToReport: ExternalizeEntry[], editsToReport: FileEdit[], cmd: CommandInstance, options: Options): void {
+    let report;
 
     switch (options.output) {
       case 'json':
-        report = this.serializeJsonReport(findingsToReport);
+        report = { externalConfiguration: this.serializeJsonReport(findingsToReport), edits: editsToReport };
         break;
       case 'md':
-        report = this.serializeMdReport(findingsToReport);
+        report = this.serializeMdReport(findingsToReport, editsToReport);
         break;
       default:
-        report = this.serializeTextReport(findingsToReport);
+        report = this.serializeTextReport(findingsToReport, editsToReport);
         break;
     }
 
@@ -146,7 +151,7 @@ class SpfxProjectExternalizeCommand extends Command {
     }
   }
 
-  private serializeMdReport(findingsToReport: ExternalizeEntry[]): string {
+  private serializeMdReport(findingsToReport: ExternalizeEntry[], editsToReport: FileEdit[]): string {
     const lines = [
       `# Externalizing dependencies of project ${path.posix.basename(this.projectRootPath as string)}`, os.EOL,
       os.EOL,
@@ -162,11 +167,35 @@ class SpfxProjectExternalizeCommand extends Command {
       os.EOL,
       '```json', os.EOL,
       JSON.stringify(this.serializeJsonReport(findingsToReport), null, 2), os.EOL,
-      '```', os.EOL
+      '```', os.EOL,
+      ...this.getReportForFileEdit(this.getGroupedFileEdits(editsToReport, 'add')),
+      ...this.getReportForFileEdit(this.getGroupedFileEdits(editsToReport, 'remove')),
     ];
     return lines.join('');
   }
 
+  private getReportForFileEdit(suggestions: FileEdit[][]): string[] {
+    const initialReport = suggestions
+      .map(x => [
+        `#### [${x[0].path}](${x[0].path})`, os.EOL,
+        x[0].action, os.EOL,
+        '```JavaScript', os.EOL,
+        ...x.map(y => [y.targetValue, os.EOL]).reduce((y, z) => [...y, ...z]), '```', os.EOL]);
+      
+    if (initialReport.length > 0) {
+      return initialReport.reduce((x, y) => [...x, ...y]);
+    }
+    else {
+      return [];
+    }
+  }
+
+  private getGroupedFileEdits(editsToReport: FileEdit[], action: "add" | "remove"): FileEdit[][] {
+    const editsMatchingAction = editsToReport.filter(x => x.action === action);
+    return editsMatchingAction
+      .filter((x, i) => editsMatchingAction.findIndex(y => y.path === x.path) === i)
+      .map(x => editsMatchingAction.filter(y => y.path === x.path));
+  }
   private serializeJsonReport(findingsToReport: ExternalizeEntry[]): { externals: ExternalConfiguration } {
     const result: ExternalConfiguration = {};
     findingsToReport.forEach((f) => {
@@ -187,89 +216,14 @@ class SpfxProjectExternalizeCommand extends Command {
     };
   }
 
-  private serializeTextReport(findingsToReport: ExternalizeEntry[]): string {
+  private serializeTextReport(findingsToReport: ExternalizeEntry[], editsToReport: FileEdit[]): string {
     const s: string[] = [
       'In the config/config.json file update the externals property to:', os.EOL,
       os.EOL,
-      JSON.stringify(this.serializeJsonReport(findingsToReport), null, 2)
+      JSON.stringify({ externalConfiguration: this.serializeJsonReport(findingsToReport), edits: editsToReport }, null, 2)
     ];
 
     return s.join('').trim();
-  }
-
-  private getProject(projectRootPath: string): Project {
-    const project: Project = {
-      path: projectRootPath
-    };
-
-    const configJsonPath: string = path.join(projectRootPath, 'config/config.json');
-    if (fs.existsSync(configJsonPath)) {
-      try {
-        project.configJson = JSON.parse(Utils.removeSingleLineComments(fs.readFileSync(configJsonPath, 'utf-8')));
-      }
-      catch { }
-    }
-
-    const packageJsonPath: string = path.join(projectRootPath, 'package.json');
-    if (fs.existsSync(packageJsonPath)) {
-      try {
-        project.packageJson = JSON.parse(Utils.removeSingleLineComments(fs.readFileSync(packageJsonPath, 'utf-8')));
-      }
-      catch { }
-    }
-
-    const yoRcJsonPath: string = path.join(projectRootPath, '.yo-rc.json');
-    if (fs.existsSync(yoRcJsonPath)) {
-      try {
-        project.yoRcJson = JSON.parse(Utils.removeSingleLineComments(fs.readFileSync(yoRcJsonPath, 'utf-8')));
-      }
-      catch { }
-    }
-    return project;
-  }
-
-  private getProjectRoot(folderPath: string): string | null {
-    const packageJsonPath: string = path.resolve(folderPath, 'package.json');
-    if (fs.existsSync(packageJsonPath)) {
-      return folderPath;
-    }
-    else {
-      const parentPath: string = path.resolve(folderPath, `..${path.sep}`);
-      if (parentPath !== folderPath) {
-        return this.getProjectRoot(parentPath);
-      }
-      else {
-        return null;
-      }
-    }
-  }
-
-  private getProjectVersion(): string | undefined {
-    const yoRcPath: string = path.resolve(this.projectRootPath as string, '.yo-rc.json');
-    if (fs.existsSync(yoRcPath)) {
-      try {
-        const yoRc: any = JSON.parse(fs.readFileSync(yoRcPath, 'utf-8'));
-        if (yoRc && yoRc['@microsoft/generator-sharepoint'] &&
-          yoRc['@microsoft/generator-sharepoint'].version) {
-          return yoRc['@microsoft/generator-sharepoint'].version;
-        }
-      }
-      catch { }
-    }
-
-    const packageJsonPath: string = path.resolve(this.projectRootPath as string, 'package.json');
-    try {
-      const packageJson: any = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
-      if (packageJson &&
-        packageJson.dependencies &&
-        packageJson.dependencies['@microsoft/sp-core-library']) {
-        const coreLibVersion: string = packageJson.dependencies['@microsoft/sp-core-library'];
-        return coreLibVersion.replace(/[^0-9\.]/g, '');
-      }
-    }
-    catch { }
-
-    return undefined;
   }
 
   public options(): CommandOption[] {

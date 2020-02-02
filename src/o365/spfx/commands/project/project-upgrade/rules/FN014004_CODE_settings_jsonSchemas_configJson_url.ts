@@ -1,5 +1,5 @@
 import { Finding } from "../";
-import { Project, VsCodeSettingsJsonJsonSchema } from "../model";
+import { Project, VsCodeSettingsJsonJsonSchema } from "../../model";
 import { Rule } from "./Rule";
 
 export class FN014004_CODE_settings_jsonSchemas_configJson_url extends Rule {

@@ -122,29 +122,42 @@ class GraphSchemaExtensionAdd extends GraphCommand {
   }
 
   private validateProperties(propertiesString: string): boolean | string {
+    let result: boolean | string = false;
+
     try {
       const properties: any = JSON.parse(propertiesString);
 
       // If the properties object is not an array
       if (properties.length === undefined) {
-        return 'The specified JSON string is not an array';
-      }
+        
+        result = 'The specified JSON string is not an array';
 
-      for (let i: number = 0; i < properties.length; i++) {
-        const property: any = properties[i];
-        if (!property.name) {
-          return `Property ${JSON.stringify(property)} misses name`;
-        }
-        if (!this.isValidPropertyType(property.type)) {
-          return `${property.type} is not a valid property type. Valid types are: Binary, Boolean, DateTime, Integer and String`;
-        }
-      }
+      } else {
 
-      return true;
+        for (let i: number = 0; i < properties.length; i++) {
+          const property: any = properties[i];
+          if (!property.name) {
+            
+            result = `Property ${JSON.stringify(property)} misses name`;
+
+          }
+          if (!this.isValidPropertyType(property.type)) {
+            
+            result = `${property.type} is not a valid property type. Valid types are: Binary, Boolean, DateTime, Integer and String`;
+
+          }
+        }
+
+        if(typeof result !== "string") {
+          result = true;
+        };
+      }
     }
     catch (e) {
-      return e;
+      result = e;
     }
+
+    return result;
   }
 
   private isValidPropertyType(propertyType: string): boolean {
