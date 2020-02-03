@@ -152,6 +152,10 @@ export default abstract class Command {
         autocomplete: ['json', 'text']
       },
       {
+        option: '--pretty',
+        description: 'Prettifies json output'
+      },
+      {
         option: '--verbose',
         description: 'Runs command with verbose logging'
       },

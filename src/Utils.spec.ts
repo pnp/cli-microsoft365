@@ -180,7 +180,8 @@ describe('Utils', () => {
     sandbox.stub(vorpal, '_command').value({
       args: {
         options: {
-          output: 'json'
+          output: 'json',
+          pretty: false
         }
       }
     });
@@ -188,6 +189,33 @@ describe('Utils', () => {
     const actual = Utils.logOutput([o]);
     try {
       assert.equal(actual, JSON.stringify(o));
+      done();
+    }
+    catch (e) {
+      done(e);
+    }
+    finally {
+      sandbox.restore();
+    }
+  });
+
+  it('formats output as pretty JSON when JSON output and pretty requested', (done) => {
+    const sandbox = sinon.createSandbox();
+    if (!vorpal._command) {
+      (vorpal as any)._command = undefined;
+    }
+    sandbox.stub(vorpal, '_command').value({
+      args: {
+        options: {
+          output: 'json',
+          pretty: true
+        }
+      }
+    });
+    const o = { lorem: 'ipsum', dolor: 'sit' };
+    const actual = Utils.logOutput([o]);
+    try {
+      assert.equal(actual, JSON.stringify(o, null, 2));
       done();
     }
     catch (e) {
@@ -385,10 +413,10 @@ describe('Utils', () => {
     });
     const o = {
       "locations": [
-        {"name": "Seattle", "state": "WA"},
-        {"name": "New York", "state": "NY"},
-        {"name": "Bellevue", "state": "WA"},
-        {"name": "Olympia", "state": "WA"}
+        { "name": "Seattle", "state": "WA" },
+        { "name": "New York", "state": "NY" },
+        { "name": "Bellevue", "state": "WA" },
+        { "name": "Olympia", "state": "WA" }
       ]
     };
     const actual = Utils.logOutput([o]);
@@ -422,10 +450,10 @@ describe('Utils', () => {
     });
     const o = {
       "locations": [
-        {"name": "Seattle", "state": "WA"},
-        {"name": "New York", "state": "NY"},
-        {"name": "Bellevue", "state": "WA"},
-        {"name": "Olympia", "state": "WA"}
+        { "name": "Seattle", "state": "WA" },
+        { "name": "New York", "state": "NY" },
+        { "name": "Bellevue", "state": "WA" },
+        { "name": "Olympia", "state": "WA" }
       ]
     };
     const actual = Utils.logOutput([o]);

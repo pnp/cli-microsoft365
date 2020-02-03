@@ -22,7 +22,8 @@ Option|Description
 `-e, --environment <environment>`|The name of the environment where the custom connector to export is located
 `-c, --connector <connector>`|The name of the custom connector to export
 `--outputFolder [outputFolder]`|Path where the folder with connector's files should be saved. If not specified, will create the connector's folder in the current folder.
-`-o, --output [output]`|Output type. `json,text`. Default `text`
+`-o, --output [output]`|Output type. `json|text`. Default `text`
+`--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 

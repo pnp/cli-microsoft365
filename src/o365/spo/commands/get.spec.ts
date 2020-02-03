@@ -16,7 +16,7 @@ describe(commands.GET, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -62,7 +62,7 @@ describe(commands.GET, () => {
   it('gets SPO URL when no URL was get previously', (done) => {
     auth.service.spoUrl = undefined;
 
-    cmdInstance.action({ 
+    cmdInstance.action({
       options: {
         output: 'json',
         debug: true
@@ -70,7 +70,7 @@ describe(commands.GET, () => {
     }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({
-            SpoUrl:''
+          SpoUrl: ''
         }));
         done();
       }
@@ -83,7 +83,7 @@ describe(commands.GET, () => {
   it('gets SPO URL when other URL was get previously', (done) => {
     auth.service.spoUrl = 'https://northwind.sharepoint.com';
 
-    cmdInstance.action({ 
+    cmdInstance.action({
       options: {
         output: 'json',
         debug: true
@@ -91,7 +91,7 @@ describe(commands.GET, () => {
     }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({
-          SpoUrl:'https://northwind.sharepoint.com'
+          SpoUrl: 'https://northwind.sharepoint.com'
         }));
         done();
       }
@@ -104,7 +104,7 @@ describe(commands.GET, () => {
   it('throws error when trying to get SPO URL when not logged in to O365', (done) => {
     auth.service.connected = false;
 
-    cmdInstance.action({ options: { } }, (err?: any) => {
+    cmdInstance.action({ options: {} }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("Log in to Office 365 first")));
         assert.equal(auth.service.spoUrl, undefined);
@@ -122,6 +122,7 @@ describe(commands.GET, () => {
     let containsVerboseOption = false;
     let containsDebugOption = false;
     let containsQueryOption = false;
+    let containsprettyOption = false;
 
     options.forEach(o => {
       if (o.option.indexOf('--output') > -1) {
@@ -132,18 +133,21 @@ describe(commands.GET, () => {
         containsDebugOption = true;
       } else if (o.option.indexOf('--query') > -1) {
         containsQueryOption = true;
+      } else if (o.option.indexOf('--pretty') > -1) {
+        containsprettyOption = true;
       }
     });
-    
-    assert(options.length === 4,"Wrong number of options returned");
+
+    assert(options.length === 5, "Wrong amount of options returned");
     assert(containsOutputOption, "Output option not available");
     assert(containsVerboseOption, "Verbose option not available");
     assert(containsDebugOption, "Debug option not available");
     assert(containsQueryOption, "Query option not available");
+    assert(containsprettyOption, "pretty option not available");
   });
 
   it('passes validation without any extra options', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { } });
+    const actual = (command.validate() as CommandValidate)({ options: {} });
     assert.equal(actual, true);
   });
 
