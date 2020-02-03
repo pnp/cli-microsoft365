@@ -98,6 +98,26 @@ $ o365 spo app list -o json
 !!! tip
     Some `list` commands return different output in text and JSON mode. For readability, in the text mode they only include a few properties, so that the output can be formatted as a table and will fit on the screen. In JSON mode however, they will include all available properties so that it's possible to process the full set of information about the particular object. For more details, refer to the help of the particular command.
 
+### Pretty JSON output
+
+The default format returns JSON on a single line, however if you prefer this to be multi line and indented to improve readbility in you shell, you can use the `--pretty` flag to change the output format.
+
+```sh
+$ o365 spo app list -o json --pretty
+[
+  {
+    "AppCatalogVersion": "1.0.0.0",
+    "CanUpgrade": false,
+    "CurrentVersionDeployed": false,
+    "Deployed": false,
+    "ID": "e6362993-d4fd-4c5a-8254-fd095a7291ad",
+    "InstalledVersion": "",
+    "IsClientSideSolution": true,
+    "Title": "spfx-140-online-client-side-solution"
+  }
+]
+```
+
 ### Verbose and debug output in JSON mode
 
 When executing commands in JSON output mode with the `--verbose` or `--debug` flag, the verbose and debug logging statements will be also formatted as JSON and will be added to the output. When processing the command output, you would have to determine yourself which of the returned JSON objects represents the actual command result and which are additional verbose and debug logging statements.

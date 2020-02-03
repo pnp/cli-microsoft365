@@ -19,14 +19,14 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub((command as any), 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'abc'
     }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
 
-    stubAllPostRequests  = (
+    stubAllPostRequests = (
       contentTypeHubRetrievalResp: any = null
     ): sinon.SinonStub => {
       return sinon.stub(request, 'post').callsFake((opts) => {
@@ -47,7 +47,7 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
             }]));
           }
         }
-  
+
         return Promise.reject('Invalid request');
       });
     }
@@ -97,7 +97,7 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
   it('should send correct request body', (done) => {
     const requestStub: sinon.SinonStub = stubAllPostRequests();
     const options: Object = {
-      verbose:true
+      verbose: true
     }
 
     cmdInstance.action({ options: options }, () => {
@@ -122,7 +122,7 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
   </ObjectPaths>
 </Request>`;
         assert.equal(requestStub.lastCall.args[0].body, bodyPayload);
-        assert(cmdInstanceLogSpy.calledWith({"ContentTypePublishingHub":"https:\\u002f\\u002fcontoso.sharepoint.com\\u002fsites\\u002fcontentTypeHub"}));
+        assert(cmdInstanceLogSpy.calledWith({ "ContentTypePublishingHub": "https:\\u002f\\u002fcontoso.sharepoint.com\\u002fsites\\u002fcontentTypeHub" }));
         done();
       }
       catch (e) {
@@ -170,6 +170,7 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
     let containsVerboseOption = false;
     let containsDebugOption = false;
     let containsQueryOption = false;
+    let containsprettyOption = false;
 
     options.forEach(o => {
       if (o.option.indexOf('--output') > -1) {
@@ -180,14 +181,17 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
         containsDebugOption = true;
       } else if (o.option.indexOf('--query') > -1) {
         containsQueryOption = true;
+      } else if (o.option.indexOf('--pretty') > -1) {
+        containsprettyOption = true;
       }
     });
-    
-    assert(options.length === 4, "Wrong amount of options returned");
+
+    assert(options.length === 5, "Wrong amount of options returned");
     assert(containsOutputOption, "Output option not available");
     assert(containsVerboseOption, "Verbose option not available");
     assert(containsDebugOption, "Debug option not available");
     assert(containsQueryOption, "Query option not available");
+    assert(containsprettyOption, "pretty option not available");
   });
 
   it('has help referring to the right command', () => {
