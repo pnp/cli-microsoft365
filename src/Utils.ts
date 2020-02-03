@@ -103,7 +103,9 @@ export default class Utils {
       vorpal._command.args &&
       vorpal._command.args.options &&
       vorpal._command.args.options.output === 'json') {
-      return JSON.stringify(logStatement);
+      return vorpal._command.args.options.pretty
+        ? JSON.stringify(logStatement, null, 2)
+        : JSON.stringify(logStatement);
     }
 
     if (logStatement instanceof CommandError) {
