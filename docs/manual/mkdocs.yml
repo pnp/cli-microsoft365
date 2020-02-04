@@ -31,9 +31,10 @@ nav:
         - o365group restore: 'cmd/aad/o365group/o365group-restore.md'
         - o365group set: 'cmd/aad/o365group/o365group-set.md'
         - o365group teamify: 'cmd/aad/o365group/o365group-teamify.md'
-        - o365group report activitycounts: 'cmd/aad/o365group/o365group-report-activitycounts.md'
-        - o365group report activitydetail: 'cmd/aad/o365group/o365group-report-activitydetail.md'
-        - o365group report activitygroupcounts: 'cmd/aad/o365group/o365group-report-activitygroupcounts.md'
+        - report:
+          - report activitycounts: 'cmd/aad/o365group/report/report-activitycounts.md'
+          - report activitydetail: 'cmd/aad/o365group/report/report-activitydetail.md'
+          - report activitygroupcounts: 'cmd/aad/o365group/report/report-activitygroupcounts.md'
         - o365group user add: 'cmd/aad/o365group/o365group-user-add.md'
         - o365group user list: 'cmd/aad/o365group/o365group-user-list.md'
         - o365group user remove: 'cmd/aad/o365group/o365group-user-remove.md'

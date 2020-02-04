@@ -127,9 +127,9 @@
 
 **Azure Active Directory:**
 
-- [aad o365group report activitydetail](../cmd/aad/o365group/o365group-report-activitydetail.md) - get details about Office 365 Groups activity by group [#1130](https://github.com/pnp/office365-cli/issues/1130)
-- [aad o365group report activitycounts](../cmd/aad/o365group/o365group-report-activitycounts.md) - get the number of group activities across group workloads [#1159](https://github.com/pnp/office365-cli/issues/1159)
-- [aad o365group report activitygroupcounts](../cmd/aad/o365group/o365group-report-activitygroupcounts.md) - get the daily total number of groups and how many of them were active based on email conversations, Yammer posts, and SharePoint file activities [#1160](https://github.com/pnp/office365-cli/issues/1160)
+- [aad o365group report activitydetail](../cmd/aad/o365group/report/report-activitydetail.md) - get details about Office 365 Groups activity by group [#1130](https://github.com/pnp/office365-cli/issues/1130)
+- [aad o365group report activitycounts](../cmd/aad/o365group/report/report-activitycounts.md) - get the number of group activities across group workloads [#1159](https://github.com/pnp/office365-cli/issues/1159)
+- [aad o365group report activitygroupcounts](../cmd/aad/o365group/report/report-activitygroupcounts.md) - get the daily total number of groups and how many of them were active based on email conversations, Yammer posts, and SharePoint file activities [#1160](https://github.com/pnp/office365-cli/issues/1160)
 
 **Flow:**
 

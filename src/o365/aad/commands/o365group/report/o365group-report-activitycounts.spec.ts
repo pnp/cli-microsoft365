@@ -1,12 +1,12 @@
-import commands from '../../commands';
+import commands from '../../../commands';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
-import auth from '../../../../Auth';
+import appInsights from '../../../../../appInsights';
+import auth from '../../../../../Auth';
 const command: Command = require('./o365group-report-activitycounts');
 import * as assert from 'assert';
-import Utils from '../../../../Utils';
-import request from '../../../../request';
-import Command from '../../../../Command';
+import Utils from '../../../../../Utils';
+import request from '../../../../../request';
+import Command from '../../../../../Command';
 
 describe(commands.O365GROUP_REPORT_ACTIVITYCOUNTS, () => {
   let vorpal: Vorpal;
@@ -20,7 +20,7 @@ describe(commands.O365GROUP_REPORT_ACTIVITYCOUNTS, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
+    vorpal = require('../../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {

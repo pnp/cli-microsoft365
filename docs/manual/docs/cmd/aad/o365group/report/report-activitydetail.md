@@ -38,11 +38,11 @@ aad o365group report activitydetail --date 2019-09-28
 Get details about Office 365 Groups activity by group for the last week and exports the report data in the specified path in text format
 
 ```sh
-aad o365group report activitydetail --period D7 --output text --outputFile './o365groupactivitydetail.txt'
+aad o365group report activitydetail --period D7 --output text --outputFile o365groupactivitydetail.txt
 ```
 
 Get details about Office 365 Groups activity by group for the last week and exports the report data in the specified path in json format
 
 ```sh
-aad o365group report activitydetail --period D7 --output json --outputFile './o365groupactivitydetail.json'
+aad o365group report activitydetail --period D7 --output json --outputFile o365groupactivitydetail.json
 ```

@@ -31,11 +31,11 @@ aad o365group report activitycounts --period D7
 Get the number of group activities across group workloads for the last week and exports the report data in the specified path in text format
 
 ```sh
-aad o365group report activitycounts --period D7 --output text --outputFile './o365groupactivitycounts.txt'
+aad o365group report activitycounts --period D7 --output text --outputFile o365groupactivitycounts.txt
 ```
 
 Get the number of group activities across group workloads for the last week and exports the report data in the specified path in json format
 
 ```sh
-aad o365group report activitycounts --period D7 --output json --outputFile './o365groupactivitycounts.json'
+aad o365group report activitycounts --period D7 --output json --outputFile o365groupactivitycounts.json
 ```
