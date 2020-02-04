@@ -34,6 +34,7 @@ nav:
         - report:
           - report activitycounts: 'cmd/aad/o365group/report/report-activitycounts.md'
           - report activitydetail: 'cmd/aad/o365group/report/report-activitydetail.md'
+          - report activityfilecounts: 'cmd/aad/o365group/report/report-activityfilecounts.md'
           - report activitygroupcounts: 'cmd/aad/o365group/report/report-activitygroupcounts.md'
         - o365group user add: 'cmd/aad/o365group/o365group-user-add.md'
         - o365group user list: 'cmd/aad/o365group/o365group-user-list.md'
