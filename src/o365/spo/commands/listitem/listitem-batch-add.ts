@@ -61,7 +61,7 @@ class SpoListItemAddCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
 
     const fullPath: string = path.resolve(args.options.path);
     const fileName: string = Utils.getSafeFileName(path.basename(fullPath));
@@ -149,11 +149,18 @@ class SpoListItemAddCommand extends SpoCommand {
         if (this.verbose) {
           cmd.log(`Creating items in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
         }
+        let promises: Array<Promise<any>> = [];
+        let errors: Array<any> = [];
+        let lineNumber: number = 0;
         // get the file
-        fs.createReadStream(fileName)
-          .pipe(csv({ columns: true }))
+        let stream = fs.createReadStream(fileName);
+        stream.on('error', function(){ 
+          cb(`error accessing file ${fileName}`);
+         });
+        stream.pipe(csv({ columns: true }))
           .on('data', async (row: any) => {
-           const requestBody: any = {
+            const ln = lineNumber++;
+            const requestBody: any = {
               formValues: this.mapRequestBody(row)
             };
             if (args.options.folder) {
@@ -183,11 +190,9 @@ class SpoListItemAddCommand extends SpoCommand {
               body: requestBody,
               json: true
             };
-            await request.post(requestOptions)
+            promises.push(request.post(requestOptions)
               .then(async (response: any): Promise<any> => {
                 // Response is from /AddValidateUpdateItemUsingPath POST call, perform get on added item to get all field values
-             
-
                 const fieldValues: FieldValue[] = response.value;
                 const idField = fieldValues.filter((thisField, index, values) => {
                   return (thisField.FieldName == "Id");
@@ -202,7 +207,6 @@ class SpoListItemAddCommand extends SpoCommand {
                 if (idField.length === 0) {
                   return Promise.reject(`Item didn't add successfully`)
                 }
-
                 const requestOptions: any = {
                   url: `${listRestUrl}/items(${idField[0].FieldValue})`,
                   headers: {
@@ -210,26 +214,35 @@ class SpoListItemAddCommand extends SpoCommand {
                   },
                   json: true
                 };
-               
+
                 await request.get(requestOptions)
                   .then((response: any): Promise<any> => {
-                  
+
                     cmd.log(<ListItemInstance>response);
                     return Promise.resolve();
-                  }).catch((err)=> {
-                    cmd.log(`error on get`)
-                    this.handleRejectedODataJsonPromise(err, cmd, cb);
+                  }).catch((err) => {
+                    cmd.log(`error on line ${ln} ${err}`)
+                    errors.push(err);
                   })
                 return Promise.resolve();
-              }).catch((e) => {
-                cmd.log(e);
-              });
+              }).catch((err) => {
+                cmd.log(`error on line ${ln} ${err}`)
+                errors.push(err);
+              }));
           })
           .on('end', () => {
-            cmd.log('CSV file successfully processed');
+            Promise.all(promises).then((values) => {
+              if (errors.length == 0) {
+                cmd.log('CSV file successfully processed');
+                cb()
+              } else {
+                cb(`CSV file processed with ${errors.length} errors`);
+              }
+
+
+            })
 
           });
-
 
       })
 
