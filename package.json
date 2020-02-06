@@ -110,6 +110,7 @@
   "dependencies": {
     "adal-node": "^0.2.1",
     "applicationinsights": "^1.5.0",
+    "csv-parser": "2.3.2",
     "easy-table": "^1.1.1",
     "jmespath": "^0.15.0",
     "node-forge": "^0.9.1",
