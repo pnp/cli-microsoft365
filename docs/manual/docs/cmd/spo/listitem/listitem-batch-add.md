@@ -1,4 +1,4 @@
-# spo listitem add
+# spo listitem batch add
 
 Creates a list item in the specified list
 
