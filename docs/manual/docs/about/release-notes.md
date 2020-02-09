@@ -1,5 +1,29 @@
 # Release notes
 
+## v2.7.0
+
+### New commands
+
+**Azure Active Directory:**
+
+- [aad o365group report activityfilecounts](../cmd/aad/o365group/report/report-activityfilecounts.md) - get the total number of files and how many of them were active across all group sites associated with an Office 365 Group [#1285](https://github.com/pnp/office365-cli/issues/1285)
+
+**Microsoft Graph:**
+
+- [graph schemaextension set](../cmd/graph/schemaextension/schemaextension-set.md) - updates a Microsoft Graph schema extension [#15](https://github.com/pnp/office365-cli/issues/15)
+
+**SharePoint**
+
+- [spo orgassetslibrary remove](../cmd/spo/orgassetslibrary/orgassetslibrary-remove.md) - removes a library that was designated as a central location for organization assets across the tenant [#1042](https://github.com/pnp/office365-cli/issues/1042)
+
+**Yammer:**
+
+- [yammer message add](../cmd/yammer/message/message-add.md) - posts a Yammer network message on behalf of the current user [#1101](https://github.com/pnp/office365-cli/issues/1101)
+
+### Changes
+
+- added PowerShell command completion [#261](https://github.com/pnp/office365-cli/issues/261)
+
 ## [v2.6.0](https://github.com/pnp/office365-cli/releases/tag/v2.6.0)
 
 ### New commands
