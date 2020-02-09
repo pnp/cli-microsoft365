@@ -1,11 +1,11 @@
-# cli completion pwsh update
+# cli completion sh update
 
-Updates command completion for PowerShell
+Updates command completion for Zsh, Bash and Fish
 
 ## Usage
 
 ```sh
-cli completion pwsh update [options]
+cli completion sh update [options]
 ```
 
 ## Options
@@ -21,14 +21,14 @@ Option|Description
 
 ## Remarks
 
-This commands updates the list of commands and their options used by command completion in PowerShell. You should run this command each time after upgrading the Office 365 CLI.
+This commands updates the list of commands and their options used by command completion in Zsh, Bash and Fish. You should run this command each time after upgrading the Office 365 CLI.
 
 ## Examples
 
-Update list of commands for PowerShell command completion
+Update list of commands for Zsh, Bash and Fish command completion
 
-```powershell
-cli completion pwsh update
+```sh
+cli completion sh update
 ```
 
 ## More information

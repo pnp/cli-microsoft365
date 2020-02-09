@@ -16,6 +16,7 @@ Option|Description
 `-p, --profile <profile>`|Path to the PowerShell profile file
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
+`--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
@@ -27,8 +28,7 @@ If the specified profile path doesn't exist, the CLI will try to create it.
 
 ## Examples
 
-Set up command completion for PowerShell using the profile from the profile
-variable
+Set up command completion for PowerShell using the profile from the profile variable
 
 ```powershell
 cli completion pwsh setup --profile $profile
