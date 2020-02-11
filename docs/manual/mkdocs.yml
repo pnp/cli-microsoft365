@@ -13,6 +13,8 @@ nav:
     - status: 'cmd/status.md'
     - accesstoken get: 'cmd/accesstoken-get.md'
     - Azure Active Directory Graph (aad):
+      - approleassignment:
+        - approleassignment list: 'cmd/aad/approleassignment/approleassignment-list.md'
       - groupsetting:
         - groupsetting add: 'cmd/aad/groupsetting/groupsetting-add.md'
         - groupsetting get: 'cmd/aad/groupsetting/groupsetting-get.md'

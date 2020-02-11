@@ -1,6 +1,7 @@
 const prefix: string = 'aad';
 
 export default {
+  APPROLEASSIGNMENT_LIST: `${prefix} approleassignment list`,
   GROUPSETTING_ADD: `${prefix} groupsetting add`,
   GROUPSETTING_GET: `${prefix} groupsetting get`,
   GROUPSETTING_LIST: `${prefix} groupsetting list`,
