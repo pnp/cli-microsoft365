@@ -31,12 +31,7 @@ class AadAppRoleAssignmentListCommand extends AadCommand {
   }
 
   public async commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): Promise<void> {
-    if (this.verbose) {
-      cmd.log(`Retrieving list of AppRole assignments for the service principal...`);
-    }
-
     try {
-
       // get the service principal associated with the appId
       const spMatchQuery: string = args.options.appId ?
         `appId eq '${encodeURIComponent(args.options.appId)}'` :
@@ -50,12 +45,9 @@ class AadAppRoleAssignmentListCommand extends AadCommand {
         return;
       }
 
-      // get the role assigments for that service principal
-      let aras: AppRoleAssignment[] = await this.GetAppRoleAssignments(sp.objectId);
-
       // The role assignment has an appRoleId but no name. To get the name, we need to get all the roles from the resource.
       // The resource is a service principal. Multiple roles may have same resource id.
-      let resourceIds = Array.from(new Set(aras.map((item: AppRoleAssignment) => item.resourceId)));
+      let resourceIds = Array.from(new Set(sp.appRoleAssignments.map((item: AppRoleAssignment) => item.resourceId)));
 
       let resources: ServicePrincipal[] = [];
 
@@ -71,7 +63,7 @@ class AadAppRoleAssignmentListCommand extends AadCommand {
 
       // loop thru all appRoleAssignments for the servicePrincipal and lookup the appRole.Id in the resources[resourceId].appRoles array...
       let results: any[] = [];
-      aras.map((appRoleAssignment: AppRoleAssignment) => {
+      sp.appRoleAssignments.map((appRoleAssignment: AppRoleAssignment) => {
         let resource = resources.find(r => r.objectId === appRoleAssignment.resourceId);
         if (resource) {
           let appRole = resource.appRoles.find(r => r.id === appRoleAssignment.id)
@@ -95,7 +87,7 @@ class AadAppRoleAssignmentListCommand extends AadCommand {
       else {
         cmd.log(results.map(r => {
           return {
-            resourceName: r.resourceDisplayName,
+            resourceDisplayName: r.resourceDisplayName,
             roleName: r.roleName
           }
         }));
@@ -109,10 +101,11 @@ class AadAppRoleAssignmentListCommand extends AadCommand {
   }
 
   private async GetServicePrincipalForApp(filterParam: string): Promise<ServicePrincipal> {
+
     const spRequestOptions: any = {
-      url: `${this.resource}/myorganization/servicePrincipals?api-version=1.6&$filter=${filterParam}`,
+      url: `${this.resource}/myorganization/servicePrincipals?api-version=1.6&$expand=appRoleAssignments&$filter=${filterParam}`,
       headers: {
-        accept: 'application/json;odata=nometadata'
+        accept: 'application/json'
       },
       json: true
     };
@@ -129,7 +122,7 @@ class AadAppRoleAssignmentListCommand extends AadCommand {
     const spRequestOptions: any = {
       url: `${this.resource}/myorganization/servicePrincipals/${spId}?api-version=1.6`,
       headers: {
-        accept: 'application/json;odata=nometadata'
+        accept: 'application/json'
       },
       json: true
     };
@@ -141,27 +134,6 @@ class AadAppRoleAssignmentListCommand extends AadCommand {
 
     return sp;
   }
-
-
-  private async GetAppRoleAssignments(servicePrincipalId: string): Promise<AppRoleAssignment[]> {
-
-    const requestOptions: any = {
-      url: `${this.resource}/myorganization/servicePrincipals/${servicePrincipalId}/appRoleAssignments?api-version=1.6`,
-      headers: {
-        accept: 'application/json;odata=nometadata'
-      },
-      json: true
-    };
-
-    let aras = await request.get<{ value: AppRoleAssignment[] }>(requestOptions)
-      .then((response: { value: AppRoleAssignment[] }): AppRoleAssignment[] => {
-        return response.value;
-      });
-
-    return aras;
-
-  }
-
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [

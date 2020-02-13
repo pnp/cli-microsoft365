@@ -1,3 +1,5 @@
+import { AppRoleAssignment } from "./AppRoleAssignment";
+
 export interface AppRole {
   allowedMemberTypes: string[];
   description: string;
@@ -26,6 +28,7 @@ export interface Oauth2Permissions {
 }
 
 export interface ServicePrincipal {
+  appRoleAssignments: AppRoleAssignment[];
   objectType: string;
   objectId: string;
   deletionTimestamp ?: any;
