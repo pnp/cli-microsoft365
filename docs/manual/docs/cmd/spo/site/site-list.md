@@ -15,6 +15,7 @@ Option|Description
 `--help`|output usage information
 `--type [type]`|type of modern sites to list. Allowed values `TeamSite|CommunicationSite`, default `TeamSite`
 `-f, --filter [filter]`|filter to apply when retrieving sites
+`--deleted`|use this switch to only return deleted sites
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--pretty`|Prettifies `json` output
@@ -54,4 +55,10 @@ List all modern team sites that contain _project_ in the URL
 
 ```sh
 spo site list --type TeamSite --filter "Url -like 'project'"
+```
+
+List all deleted sites in the tenant you're logged in to
+
+```sh
+spo site list --deleted
 ```

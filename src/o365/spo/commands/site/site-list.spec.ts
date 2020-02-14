@@ -14,10 +14,10 @@ describe(commands.SITE_LIST, () => {
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
-  
+
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(command as any, 'getRequestDigest').callsFake(() => { return { FormDigestValue: 'abc' }; });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
@@ -245,6 +245,47 @@ describe(commands.SITE_LIST, () => {
             Url: 'https://m365x324230.sharepoint.com/sites/comtest_001'
           }
         ]))
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('retrieves a list of deleted sites', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers['X-RequestDigest'] &&
+          opts.headers['X-RequestDigest'] === 'abc' &&
+          opts.deleted &&
+          opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><ObjectPath Id="6" ObjectPathId="5" /><Query Id="7" ObjectPathId="5"><Query SelectAllProperties="true"><Properties><Property Name="NextStartIndexFromSharePoint" ScalarProperty="true" /></Properties></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="5" ParentId="3" Name="GetDeletedSitePropertiesFromSharePoint"><Parameters><Parameter Type="Null" /></Parameters></Method></ObjectPaths></Request>`) {
+          return Promise.resolve(JSON.stringify([
+            {
+              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.19729.12021", "ErrorInfo": null, "TraceCorrelationId": "782a00fd-e6ac-4129-8db1-0b84402490cf"
+            }, 12, {
+              "IsNull": false
+            }, 14, {
+              "IsNull": false
+            }, 15, {
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SPODeletedSitePropertiesEnumerable", "NextStartIndex": -1, "NextStartIndexFromSharePoint": null, "_Child_Items_": [
+                {
+                  "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties", "_ObjectIdentity_": "782a00fd-e6ac-4129-8db1-0b84402490cf|908bed80-a04a-4433-b4a0-883d9847d110:6cd70031-6912-499f-877c-1df89d46200f\nDeletedSiteProperties\nhttps%3a%2f%2fm365x324230.sharepoint.com%2fsites%2fmtest_201", "DaysRemaining": 86, "DeletionTime": "\/Date(2020,1,7,13,8,26,907)\/", "SiteId": "\/Guid(7bdf0575-0de3-4d41-9608-e57d27100001)\/", "Status": "Recycled", "StorageMaximumLevel": 26214400, "Url": "https:\u002f\u002fm365x324230.sharepoint.com\u002fsites\u002fmtest_201", "UserCodeMaximumLevel": 300
+                }, {
+                  "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties", "_ObjectIdentity_": "782a00fd-e6ac-4129-8db1-0b84402490cf|908bed80-a04a-4433-b4a0-883d9847d110:6cd70031-6912-499f-877c-1df89d46200f\nDeletedSiteProperties\nhttps%3a%2f%2fm365x324230.sharepoint.com%2fsites%2fmtest_202", "DaysRemaining": 86, "DeletionTime": "\/Date(2020,1,7,12,35,9,617)\/", "SiteId": "\/Guid(87d49910-398c-48d1-80ca-b0d415293fa7)\/", "Status": "Recycled", "StorageMaximumLevel": 26214400, "Url": "https:\u002f\u002fm365x324230.sharepoint.com\u002fsites\u002fmtest_202", "UserCodeMaximumLevel": 300
+                }
+              ]
+            }
+          ]));
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({ options: { deleted: true } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.notCalled);
         done();
       }
       catch (e) {
