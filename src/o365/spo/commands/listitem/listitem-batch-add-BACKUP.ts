@@ -7,14 +7,14 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
-//import { ListItemInstance } from './ListItemInstance';
+import { ListItemInstance } from './ListItemInstance';
 import { FolderExtensions } from '../../FolderExtensions';
 
 import * as path from 'path';
 
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
-const csv = require('fast-csv');
+const csv = require('csv-parse');
 const fs = require('fs');
 
 
@@ -31,16 +31,15 @@ interface Options extends GlobalOptions {
   path: string;
 }
 
-// interface FieldValue {
-//   ErrorMessage: string;
-//   FieldName: string;
-//   FieldValue: any;
-//   HasException: boolean;
-//   ItemId: number;
-// }
+interface FieldValue {
+  ErrorMessage: string;
+  FieldName: string;
+  FieldValue: any;
+  HasException: boolean;
+  ItemId: number;
+}
 
 class SpoListItemAddCommand extends SpoCommand {
-
   public allowUnknownOptions(): boolean | undefined {
     return false;
   }
@@ -63,26 +62,16 @@ class SpoListItemAddCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    let lineNumber: number = 0;
-    let contentTypeName: string | null = null;
-    let listRestUrl: string | null = null;
-    let batchSize: number=2;
-    let UuidDenerator = this.generateUUID;
-    let recordsToAdd = new Array();
 
-
-
-
-    let targetFolderServerRelativeUrl: string = ``;
     const fullPath: string = path.resolve(args.options.path);
     const fileName: string = Utils.getSafeFileName(path.basename(fullPath));
     const listIdArgument = args.options.listId || '';
     const listTitleArgument = args.options.listTitle || '';
-    listRestUrl = (args.options.listId ?
+    const listRestUrl: string = (args.options.listId ?
       `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(listIdArgument)}')`
       : `${args.options.webUrl}/_api/web/lists/getByTitle('${encodeURIComponent(listTitleArgument)}')`);
-
-
+    let contentTypeName: string = '';
+    let targetFolderServerRelativeUrl: string = '';
 
     const folderExtensions: FolderExtensions = new FolderExtensions(cmd, this.debug);
 
@@ -160,22 +149,20 @@ class SpoListItemAddCommand extends SpoCommand {
         if (this.verbose) {
           cmd.log(`Creating items in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
         }
+        let promises: Array<Promise<any>> = [];
+        let errors: Array<any> = [];
+        let lineNumber: number = 0;
         // get the file
         let fileStream = fs.createReadStream(fileName);
-        let lmapRequestBody = this.mapRequestBody;
-        fileStream.on('error', function () {
+        fileStream.on('error', function(){ 
           cb(`error accessing file ${fileName}`);
-        });
-        let csvStream: any = fileStream.pipe(csv.parse({ headers: true }));
-        //start the batch
-        let changeSetId = this.generateUUID();
-        let endpoint = `${listRestUrl}/AddValidateUpdateItemUsingPath()`;
-        let linesInBatch = 0;
-        csvStream
-          .on("data", function (row: any) {
-            lineNumber++; linesInBatch++;
+         });
+         
+        fileStream.pipe(csv({ columns: true }))
+          .on('data', async (row: any) => {
+            const ln = lineNumber++;
             const requestBody: any = {
-              formValues: lmapRequestBody(row)
+              formValues: this.mapRequestBody(row)
             };
             if (args.options.folder) {
               requestBody.listItemCreateInfo = {
@@ -184,81 +171,80 @@ class SpoListItemAddCommand extends SpoCommand {
                 }
               };
             }
+
             if (args.options.contentType && contentTypeName !== '') {
+              if (this.debug) {
+                cmd.log(`Specifying content type name [${contentTypeName}] in request body`);
+              }
+
               requestBody.formValues.push({
                 FieldName: 'ContentType',
                 FieldValue: contentTypeName
               });
             }
-            // row is ready
-            recordsToAdd.push('--changeset_' + changeSetId);
-            recordsToAdd.push('Content-Type: application/http');
-            recordsToAdd.push('Content-Transfer-Encoding: binary');
-            recordsToAdd.push('');
-            recordsToAdd.push('POST ' + endpoint + ' HTTP/1.1');
-            recordsToAdd.push('Content-Type: application/json;odata=verbose');
-            recordsToAdd.push('');
-            recordsToAdd.push(`${JSON.stringify(requestBody)}`);
-            recordsToAdd.push('');
-            cmd.log(`line #= ${lineNumber}; lines in batch : ${linesInBatch} batchsue ${batchSize}`)
-            if (linesInBatch >= batchSize) {
-              /***
-               *  Send the batch
-               * 
-               */
-              cmd.log(`sending batch`)
-              recordsToAdd.push('--changeset_' + changeSetId + '--');
-              csvStream.pause();
-              var batchBody = recordsToAdd.join('\u000d\u000a');
-              let batchContents = new Array();
-              let batchId = UuidDenerator();
-              batchContents.push('--batch_' + batchId);
-              batchContents.push('Content-Type: multipart/mixed; boundary="changeset_' + changeSetId + '"');
-              batchContents.push('Content-Length: ' + batchBody.length);
-              batchContents.push('Content-Transfer-Encoding: binary');
-              batchContents.push('');
-              batchContents.push(batchBody);
-              batchContents.push('');
-              const updateOptions: any = {
-                url: `${args.options.webUrl}/_api/$batch`,
-                headers: {
-                  //'X-RequestDigest': formDigestValue,
-                  'Content-Type': `multipart/mixed; boundary="batch_${batchId}"`
-                },
-                body: batchContents.join('\r\n')
+
+            const requestOptions: any = {
+              url: `${listRestUrl}/AddValidateUpdateItemUsingPath()`,
+              headers: {
+                'accept': 'application/json;odata=nometadata'
+              },
+              body: requestBody,
+              json: true
+            };
+            promises.push(request.post(requestOptions)
+              .then(async (response: any): Promise<any> => {
+                // Response is from /AddValidateUpdateItemUsingPath POST call, perform get on added item to get all field values
+                const fieldValues: FieldValue[] = response.value;
+                const idField = fieldValues.filter((thisField, index, values) => {
+                  return (thisField.FieldName == "Id");
+                });
+
+                if (this.debug) {
+                  cmd.log(`field values returned:`)
+                  cmd.log(fieldValues)
+                  cmd.log(`Id returned by AddValidateUpdateItemUsingPath: ${idField}`);
+                }
+
+                if (idField.length === 0) {
+                  return Promise.reject(`Item didn't add successfully`)
+                }
+                const requestOptions: any = {
+                  url: `${listRestUrl}/items(${idField[0].FieldValue})`,
+                  headers: {
+                    'accept': 'application/json;odata=nometadata'
+                  },
+                  json: true
+                };
+
+                return request.get(requestOptions)
+                  .then((response: any): Promise<any> => {
+
+                    cmd.log(<ListItemInstance>response);
+                    return Promise.resolve();
+                  }).catch((err) => {
+                    cmd.log(`error on line ${ln} ${err}`)
+                    errors.push(err);
+                    return Promise.reject();
+                  })
+                
+              }).catch((err) => {
+                cmd.log(`error on line ${ln} ${err}`)
+                errors.push(err);
+              }));
+          })
+          .on('end', () => {
+            Promise.all(promises).then((values) => {
+              if (errors.length == 0) {
+                cmd.log('CSV file successfully processed');
+                cb()
+              } else {
+                cb(`CSV file processed with ${errors.length} errors`);
               }
-              cmd.log(updateOptions)
-              request.post(updateOptions)
-              .catch((e)=>{
-                cmd.log(`error`);
-cmd.log(e);
-              })
-              .then((results)=>{
-                cmd.log(`results`);
-cmd.log(results);
-              })
-              
-              .finally(() => {
-                cmd.log(`vatrcgh done`);
-                changeSetId = UuidDenerator();
-                csvStream.resume();
-                linesInBatch=0;
-              })
-              /***
-              *  done sending batch
-              */
-
-            }
-          })
-          .on("end", function () {
-            cmd.log(`Processed ${lineNumber} Rows!`)
-            cmd.log("We are done!")
-          })
-          .on("error", function (error: any) {
-            cmd.log(error)
+            })
           });
-
       })
+
+
   }
 
   public options(): CommandOption[] {
@@ -294,15 +280,7 @@ cmd.log(results);
   }
 
 
-  private generateUUID() {
-    var d = new Date().getTime();
-    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-      var r = (d + Math.random() * 16) % 16 | 0;
-      d = Math.floor(d / 16);
-      return (c == 'x' ? r : (r & 0x7 | 0x8)).toString(16);
-    });
-    return uuid;
-  }
+
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
       if (!args.options.webUrl) {
