@@ -146,7 +146,7 @@ class SpoSiteDesignRightsRevokeCommand extends SpoCommand {
     ${chalk.grey('The specified user or domain group was not found')} error.
 
   Examples:
-  
+
     Revoke access to the site design with ID
     ${chalk.grey('2c1ba4c4-cd9b-4417-832f-92a34bc34b2a')} from user with alias ${chalk.grey('PattiF')}.
     Will prompt for confirmation before revoking the access
@@ -155,7 +155,7 @@ class SpoSiteDesignRightsRevokeCommand extends SpoCommand {
     Revoke access to the site design with ID
     ${chalk.grey('2c1ba4c4-cd9b-4417-832f-92a34bc34b2a')} from users with aliases ${chalk.grey('PattiF')} and
     ${chalk.grey('AdeleV')} without prompting for confirmation
-      ${this.name} --id 2c1ba4c4-cd9b-4417-832f-92a34bc34b2a --principals PattiF,AdeleV --confirm
+      ${this.name} --id 2c1ba4c4-cd9b-4417-832f-92a34bc34b2a --principals "PattiF,AdeleV" --confirm
 
   More information:
 

@@ -46,6 +46,12 @@ Reset the page header to default
 spo page header set --webUrl https://contoso.sharepoint.com/sites/team-a --pageName home.aspx
 ```
 
+Reset the page header to default and set authors
+
+```sh
+spo page header set --webUrl https://contoso.sharepoint.com/sites/team-a --pageName home.aspx --authors "steve@contoso.com, bob@contoso.com"
+```
+
 Use the specified image focused on the given coordinates in the page header
 
 ```sh

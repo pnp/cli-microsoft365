@@ -447,9 +447,12 @@ class SpoPageHeaderSetCommand extends SpoCommand {
     functionality that isn't available on all tenants yet.
 
   Examples:
-  
+
     Reset the page header to default
       ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --pageName home.aspx
+
+    Reset the page header to default and set authors
+      ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --pageName home.aspx --authors "steve@contoso.com, bob@contoso.com"
 
     Use the specified image focused on the given coordinates in the page header
       ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --pageName home.aspx --type Custom --imageUrl /sites/team-a/SiteAssets/hero.jpg --altText 'Sunset over the ocean' --translateX 42.3837520042758 --translateY 56.4285714285714

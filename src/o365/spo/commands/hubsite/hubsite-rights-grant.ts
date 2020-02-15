@@ -130,7 +130,7 @@ class SpoHubSiteRightsGrantCommand extends SpoCommand {
     log(
       `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
     the tenant admin site.
-        
+
   Remarks:
 
     ${chalk.yellow('Attention:')} This command is based on a SharePoint API that is currently
@@ -138,14 +138,14 @@ class SpoHubSiteRightsGrantCommand extends SpoCommand {
     availability.
 
   Examples:
-  
+
     Grant user with alias ${chalk.grey('PattiF')} permission to join sites to the hub site with
     URL ${chalk.grey('https://contoso.sharepoint.com/sites/sales')}
       ${this.name} --url https://contoso.sharepoint.com/sites/sales --principals PattiF --rights Join
 
     Grant users with aliases ${chalk.grey('PattiF')} and ${chalk.grey('AdeleV')} permission to join sites
     to the hub site with URL ${chalk.grey('https://contoso.sharepoint.com/sites/sales')}
-      ${this.name} --url https://contoso.sharepoint.com/sites/sales --principals PattiF,AdeleV --rights Join
+      ${this.name} --url https://contoso.sharepoint.com/sites/sales --principals "PattiF,AdeleV" --rights Join
 
     Grant user with email ${chalk.grey('PattiF@contoso.com')} permission to join sites
     to the hub site with URL ${chalk.grey('https://contoso.sharepoint.com/sites/sales')}

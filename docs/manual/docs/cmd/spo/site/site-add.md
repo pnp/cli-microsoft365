@@ -61,7 +61,7 @@ spo site add --alias team1 --title Team 1 --lcid 1043
 Create modern team site with the specified users as owners
 
 ```sh
-spo site add --alias team1 --title Team 1 --owners 'steve@contoso.com, bob@contoso.com'
+spo site add --alias team1 --title Team 1 --owners "steve@contoso.com, bob@contoso.com"
 ```
 
 Create communication site using the Topic design

@@ -45,7 +45,7 @@ aad user get --userName AarifS@contoso.onmicrosoft.com
 For the user with id _1caf7dcd-7e83-4c3a-94f7-932a1299c844_ retrieve the user name, e-mail address and full name
 
 ```sh
-aad user get --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --properties userPrincipalName,mail,displayName
+aad user get --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --properties "userPrincipalName,mail,displayName"
 ```
 
 ## More information

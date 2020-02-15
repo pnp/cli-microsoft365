@@ -173,20 +173,20 @@ class SpoMailSendCommand extends SpoCommand {
     log(vorpal.find(this.name).helpInformation());
     log(
       `  Remarks:
-  
+
     All recipients (internal and external) have to have access to the target
     SharePoint site.
-        
+
   Examples:
-  
-    Send an e-mail to ${chalk.grey('user@contoso.com')} 
-      ${commands.MAIL_SEND} --webUrl https://contoso.sharepoint.com/sites/project-x --to 'user@contoso.com' --subject 'Email sent via Office 365 CLI' --body '<h1>Office 365 CLI</h1>Email sent via <b>command</b>.'
-    
+
+    Send an e-mail to ${chalk.grey('user@contoso.com')}
+      ${commands.MAIL_SEND} --webUrl https://contoso.sharepoint.com/sites/project-x --to "user@contoso.com" --subject "Email sent via Office 365 CLI" --body "<h1>Office 365 CLI</h1>Email sent via <b>command</b>."
+
     Send an e-mail to multiples addresses
-      ${commands.MAIL_SEND} --webUrl https://contoso.sharepoint.com/sites/project-x --to 'user1@contoso.com,user2@contoso.com' --subject 'Email sent via Office 365 CLI' --body '<h1>Office 365 CLI</h1>Email sent via <b>command</b>.' --cc 'user3@contoso.com' --bcc 'user4@contoso.com'
-    
+      ${commands.MAIL_SEND} --webUrl https://contoso.sharepoint.com/sites/project-x --to "user1@contoso.com,user2@contoso.com" --subject "Email sent via Office 365 CLI" --body "<h1>Office 365 CLI</h1>Email sent via <b>command</b>." --cc "user3@contoso.com" --bcc "user4@contoso.com"
+
     Send an e-mail to ${chalk.grey('user@contoso.com')} with additional headers
-      ${commands.MAIL_SEND} --webUrl https://contoso.sharepoint.com/sites/project-x --to 'user@contoso.com' --subject 'Email sent via Office 365 CLI' --body '<h1>Office 365 CLI</h1>Email sent via <b>command</b>.' --additionalHeaders "'{\"X-MC-Tags\":\"Office 365 CLI\"}'"
+      ${commands.MAIL_SEND} --webUrl https://contoso.sharepoint.com/sites/project-x --to "user@contoso.com" --subject "Email sent via Office 365 CLI" --body "<h1>Office 365 CLI</h1>Email sent via <b>command</b>." --additionalHeaders "'{\"X-MC-Tags\":\"Office 365 CLI\"}'"
       `);
   }
 }

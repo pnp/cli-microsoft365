@@ -49,13 +49,13 @@ aad o365group set --id 28beab62-7540-4db1-a23f-29a6018a3848 --isPrivate false
 Add new Office 365 Group owners
 
 ```sh
-aad o365group set --id 28beab62-7540-4db1-a23f-29a6018a3848 --owners DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com
+aad o365group set --id 28beab62-7540-4db1-a23f-29a6018a3848 --owners "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
 ```
 
 Add new Office 365 Group members
 
 ```sh
-aad o365group set --id 28beab62-7540-4db1-a23f-29a6018a3848 --members DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com
+aad o365group set --id 28beab62-7540-4db1-a23f-29a6018a3848 --members "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
 ```
 
 Update Office 365 Group logo

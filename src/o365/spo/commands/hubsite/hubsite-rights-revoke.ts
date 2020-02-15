@@ -150,7 +150,7 @@ class SpoHubSiteRightsRevokeCommand extends SpoCommand {
     log(
       `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
     the tenant admin site.
-                
+
   Remarks:
 
     ${chalk.yellow('Attention:')} This command is based on a SharePoint API that is currently
@@ -158,7 +158,7 @@ class SpoHubSiteRightsRevokeCommand extends SpoCommand {
     availability.
 
   Examples:
-  
+
     Revoke rights to join sites to the hub site with URL
     ${chalk.grey('https://contoso.sharepoint.com/sites/sales')} from user with alias ${chalk.grey('PattiF')}.
     Will prompt for confirmation before revoking the rights
@@ -167,7 +167,7 @@ class SpoHubSiteRightsRevokeCommand extends SpoCommand {
     Revoke rights to join sites to the hub site with URL
     ${chalk.grey('https://contoso.sharepoint.com/sites/sales')} from user with aliases ${chalk.grey('PattiF')}
     and ${chalk.grey('AdeleV')} without prompting for confirmation
-      ${this.name} --url https://contoso.sharepoint.com/sites/sales --principals PattiF,AdeleV --confirm
+      ${this.name} --url https://contoso.sharepoint.com/sites/sales --principals "PattiF,AdeleV" --confirm
 
   More information:
 
