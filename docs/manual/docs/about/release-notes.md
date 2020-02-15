@@ -291,7 +291,7 @@
 
 **Office 365:**
 
-- [tenant id get](../cmd/tenant-id-get.md) - gets Office 365 tenant ID for the specified domain [#998](https://github.com/pnp/office365-cli/issues/998)
+- [tenant id get](../cmd/tenant/id/id-get.md) - gets Office 365 tenant ID for the specified domain [#998](https://github.com/pnp/office365-cli/issues/998)
 
 ### Changes
 

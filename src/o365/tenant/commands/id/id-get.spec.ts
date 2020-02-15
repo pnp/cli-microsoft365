@@ -1,12 +1,12 @@
-import commands from './commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../Command';
+import commands from '../../commands';
+import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
-const command: Command = require('./tenant-id-get');
+const command: Command = require('./id-get');
 import * as assert from 'assert';
-import Utils from '../../Utils';
-import request from '../../request';
-import appInsights from '../../appInsights';
-import auth from '../../Auth';
+import Utils from '../../../../Utils';
+import request from '../../../../request';
+import appInsights from '../../../../appInsights';
+import auth from '../../../../Auth';
 
 describe(commands.TENANT_ID_GET, () => {
   let vorpal: Vorpal;
@@ -21,7 +21,7 @@ describe(commands.TENANT_ID_GET, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../vorpal-init');
+    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
