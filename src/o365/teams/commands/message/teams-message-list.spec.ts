@@ -121,7 +121,7 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
     assert.notEqual(actual, true);
   });
 
-  it('fails validates for a incorrect channelId missing leading 19:.', (done) => {
+  it('fails validatation for a incorrect channelId missing leading 19:.', (done) => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
@@ -132,7 +132,7 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
     done();
   });
 
-  it('fails validates for a incorrect channelId missing trailing @thread.skpye.', (done) => {
+  it('fails validation for a incorrect channelId missing trailing @thread.skpye.', (done) => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
@@ -141,6 +141,30 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
     });
     assert.notEqual(actual, true);
     done();
+  });
+
+  it('fails validation for since date wrong format', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
+        channelId: "19:eb30973b42a847a2a1df92d91e37c76a@thread.skype",
+        since: "2019.12.31"
+      }
+    });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation for since date too far in the past (> 8 months)', () => {
+    let d: Date = new Date()
+    d.setMonth(d.getMonth() - 9);
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
+        channelId: "19:eb30973b42a847a2a1df92d91e37c76a@thread.skype",
+        since: d.toISOString()
+      }
+    });
+    assert.notEqual(actual, true);
   });
 
   it('supports debug mode', () => {
@@ -159,6 +183,19 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
       options: {
         teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
         channelId: "19:eb30973b42a847a2a1df92d91e37c76a@thread.skype"
+      }
+    });
+    assert.equal(actual, true);
+  });
+
+  it('validates for a correct input (with optional --since param)', () => {
+    let d: Date = new Date()
+    d.setMonth(d.getMonth() - 7);
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
+        channelId: "19:eb30973b42a847a2a1df92d91e37c76a@thread.skype",
+        since: d.toISOString()
       }
     });
     assert.equal(actual, true);
@@ -388,6 +425,111 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
         debug: false,
         teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
         channelId: "19:eb30973b42a847a2a1df92d91e37c76a@thread.skype"
+      }
+    }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith([
+          {
+            "id": "1542290200091",
+            "summary": null,
+            "body": "<p>Welcome!</p>"
+          },
+          {
+            "id": "1542288043581",
+            "summary": null,
+            "body": "hello"
+          }
+        ]));
+
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('lists messages since date specified', (done) => {
+    const dt: string = new Date().toISOString()
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/teams/fce9e580-8bba-4638-ab5c-ab40016651e3/channels/19:eb30973b42a847a2a1df92d91e37c76a@thread.skype/messages/delta?$filter=lastModifiedDateTime gt ${dt}`) {
+        return Promise.resolve({
+          value: [
+            {
+              "attachments": [],
+              "body": {
+                "content": "<p>Welcome!</p>",
+                "contentType": "html"
+              },
+              "createdDateTime": "2018-11-15T13:56:40.091Z",
+              "deleted": false,
+              "etag": "1542290200091",
+              "from": {
+                "application": {
+                  "applicationIdentityType": "bot",
+                  "displayName": "POITBot",
+                  "id": "d22ece15-e04f-453a-adbd-d1514d2f1abe"
+                },
+                "conversation": null,
+                "device": null,
+                "user": null
+              },
+              "id": "1542290200091",
+              "importance": "normal",
+              "lastModifiedDateTime": null,
+              "locale": "en-us",
+              "mentions": [],
+              "messageType": "message",
+              "policyViolation": null,
+              "reactions": [],
+              "replyToId": null,
+              "subject": null,
+              "summary": null
+            },
+            {
+              "attachments": [],
+              "body": {
+                "content": "hello",
+                "contentType": "text"
+              },
+              "createdDateTime": "2018-11-15T13:20:43.581Z",
+              "deleted": false,
+              "etag": "1542288043581",
+              "from": {
+                "application": null,
+                "conversation": null,
+                "device": null,
+                "user": {
+                  "displayName": "Balamurugan Kailasam",
+                  "id": "065868eb-f08f-4a82-9786-690bc5c38fce",
+                  "userIdentityType": "aadUser"
+                }
+              },
+              "id": "1542288043581",
+              "importance": "normal",
+              "lastModifiedDateTime": null,
+              "locale": "en-us",
+              "mentions": [],
+              "messageType": "message",
+              "policyViolation": null,
+              "reactions": [],
+              "replyToId": null,
+              "subject": "",
+              "summary": null
+            }
+          ]
+        });
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    cmdInstance.action({
+      options: {
+        debug: false,
+        teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
+        channelId: "19:eb30973b42a847a2a1df92d91e37c76a@thread.skype",
+        since: dt 
       }
     }, () => {
       try {
