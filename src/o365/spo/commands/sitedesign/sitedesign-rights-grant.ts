@@ -118,12 +118,12 @@ class SpoSiteDesignRightsGrantCommand extends SpoCommand {
     log(vorpal.find(this.name).helpInformation());
     log(
       `  Examples:
-  
+
     Grant user with alias ${chalk.grey('PattiF')} view permission to the specified site design
       ${this.name} --id 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --principals PattiF --rights View
 
     Grant users with aliases ${chalk.grey('PattiF')} and ${chalk.grey('AdeleV')} view permission to the specified site design
-      ${this.name} --id 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --principals PattiF,AdeleV --rights View
+      ${this.name} --id 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --principals "PattiF,AdeleV" --rights View
 
     Grant user with email ${chalk.grey('PattiF@contoso.com')} view permission to the specified site design
       ${this.name} --id 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --principals PattiF@contoso.com --rights View

@@ -115,7 +115,7 @@ class AadUserGetCommand extends GraphCommand {
     ${chalk.grey(`objects are not present.`)} error.
 
   Examples:
-  
+
     Get information about the user with id ${chalk.grey(`1caf7dcd-7e83-4c3a-94f7-932a1299c844`)}
       ${this.name} --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844
 
@@ -124,10 +124,10 @@ class AadUserGetCommand extends GraphCommand {
 
     For the user with id ${chalk.grey(`1caf7dcd-7e83-4c3a-94f7-932a1299c844`)}
     retrieve the user name, e-mail address and full name
-      ${this.name} --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --properties userPrincipalName,mail,displayName
-  
+      ${this.name} --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --properties "userPrincipalName,mail,displayName"
+
   More information:
-    
+
     Microsoft Graph User properties
       https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/resources/user#properties
 `);

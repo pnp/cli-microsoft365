@@ -310,11 +310,11 @@ class AadO365GroupAddCommand extends GraphCommand {
     log(vorpal.find(this.name).helpInformation());
     log(
       `  Remarks:
-  
+
     When specifying the path to the logo image you can use both relative and
     absolute paths. Note, that ~ in the path, will not be resolved and will most
     likely result in an error.
-   
+
   Examples:
 
     Create a public Office 365 Group
@@ -324,10 +324,10 @@ class AadO365GroupAddCommand extends GraphCommand {
       ${this.name} --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --isPrivate true
 
     Create a public Office 365 Group and set specified users as its owners
-      ${this.name} --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --owners DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com
+      ${this.name} --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --owners "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
 
     Create a public Office 365 Group and set specified users as its members
-      ${this.name} --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --members DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com
+      ${this.name} --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --members "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
 
     Create a public Office 365 Group and set its logo
       ${this.name} --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --logoPath images/logo.png
