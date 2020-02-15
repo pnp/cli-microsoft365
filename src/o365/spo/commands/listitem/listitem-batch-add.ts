@@ -66,7 +66,7 @@ class SpoListItemAddCommand extends SpoCommand {
     let lineNumber: number = 0;
     let contentTypeName: string | null = null;
     let listRestUrl: string | null = null;
-    let batchSize: number=2;
+    let batchSize: number = 250;
     let UuidDenerator = this.generateUUID;
     let recordsToAdd = new Array();
 
@@ -229,30 +229,71 @@ class SpoListItemAddCommand extends SpoCommand {
               }
               cmd.log(updateOptions)
               request.post(updateOptions)
-              .catch((e)=>{
-                cmd.log(`error`);
-cmd.log(e);
-              })
-              .then((results)=>{
-                cmd.log(`results`);
-cmd.log(results);
-              })
-              
-              .finally(() => {
-                cmd.log(`vatrcgh done`);
-                changeSetId = UuidDenerator();
-                csvStream.resume();
-                linesInBatch=0;
-              })
-              /***
-              *  done sending batch
-              */
+                .catch((e) => {
+                  cmd.log(`error`);
+                  cb(e);
+                })
+                .then((results) => {
+                  cmd.log(`results`);
+                  cmd.log(results);
+                })
+
+                .finally(() => {
+                  cmd.log(`vatrcgh done`);
+                  recordsToAdd.splice(0,recordsToAdd.length);//clear the buffer
+                  changeSetId = UuidDenerator();
+                  csvStream.resume();
+                  linesInBatch = 0;
+                })
+             
 
             }
           })
           .on("end", function () {
-            cmd.log(`Processed ${lineNumber} Rows!`)
-            cmd.log("We are done!")
+            if (linesInBatch > 0){
+              cmd.log(`sending final batch`)
+              recordsToAdd.push('--changeset_' + changeSetId + '--');
+              var batchBody = recordsToAdd.join('\u000d\u000a');
+              let batchContents = new Array();
+              let batchId = UuidDenerator();
+              batchContents.push('--batch_' + batchId);
+              batchContents.push('Content-Type: multipart/mixed; boundary="changeset_' + changeSetId + '"');
+              batchContents.push('Content-Length: ' + batchBody.length);
+              batchContents.push('Content-Transfer-Encoding: binary');
+              batchContents.push('');
+              batchContents.push(batchBody);
+              batchContents.push('');
+              const updateOptions: any = {
+                url: `${args.options.webUrl}/_api/$batch`,
+                headers: {
+                  //'X-RequestDigest': formDigestValue,
+                  'Content-Type': `multipart/mixed; boundary="batch_${batchId}"`
+                },
+                body: batchContents.join('\r\n')
+              }
+              cmd.log(updateOptions)
+              request.post(updateOptions)
+                .catch((e) => {
+                  cmd.log(`error`);
+                  cb(e);
+                })
+                .then((results) => {
+                  cmd.log(`results`);
+                  cmd.log(results);
+                })
+
+                .finally(() => {
+                  cmd.log(`Processed ${lineNumber} Rows`)
+                  cmd.log(`vatrcgh done`);
+                  cb();
+                })
+            }else{
+              cmd.log(`Processed ${lineNumber} Rows`)
+
+              cb();
+            }
+            
+            
           })
           .on("error", function (error: any) {
             cmd.log(error)
