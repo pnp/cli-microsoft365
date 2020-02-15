@@ -121,6 +121,7 @@ nav:
       - task:
         - task list: 'cmd/planner/task/task-list.md'
     - SharePoint Framework (spfx):
+      - doctor: 'cmd/spfx/doctor.md'
       - project:
         - project externalize: 'cmd/spfx/project/project-externalize.md'
         - project upgrade: 'cmd/spfx/project/project-upgrade.md'
