@@ -47,13 +47,13 @@ aad o365group add --displayName Finance --description 'This is the Contoso Finan
 Create a public Office 365 Group and set specified users as its owners
 
 ```sh
-aad o365group add --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --owners DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com
+aad o365group add --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --owners "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
 ```
 
 Create a public Office 365 Group and set specified users as its members
 
 ```sh
-aad o365group add --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --members DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com
+aad o365group add --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --members "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
 ```
 
 Create a public Office 365 Group and set its logo

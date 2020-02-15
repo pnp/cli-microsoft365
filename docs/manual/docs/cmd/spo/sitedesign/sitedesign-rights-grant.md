@@ -33,7 +33,7 @@ spo sitedesign rights grant --id 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --principa
 Grant users with aliases _PattiF_ and _AdeleV_ view permission to the specified site design
 
 ```sh
-spo sitedesign rights grant --id 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --principals PattiF,AdeleV --rights View
+spo sitedesign rights grant --id 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --principals "PattiF,AdeleV" --rights View
 ```
 
 Grant user with email _PattiF@contoso.com_ view permission to the specified site design

@@ -37,7 +37,7 @@ aad user list
 List all users in the tenant. For each one return the display name and e-mail address
 
 ```sh
-aad user list --properties displayName,mail
+aad user list --properties "displayName,mail"
 ```
 
 Show users whose display name starts with _Patt_

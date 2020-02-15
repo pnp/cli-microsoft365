@@ -41,7 +41,7 @@ spo hubsite rights revoke --url https://contoso.sharepoint.com/sites/sales --pri
 Revoke rights to join sites to the hub site with URL _https://contoso.sharepoint.com/sites/sales_ from user with aliases _PattiF_ and _AdeleV_ without prompting for confirmation
 
 ```sh
-spo hubsite rights revoke --url https://contoso.sharepoint.com/sites/sales --principals PattiF,AdeleV --confirm
+spo hubsite rights revoke --url https://contoso.sharepoint.com/sites/sales --principals "PattiF,AdeleV" --confirm
 ```
 
 ## More information
