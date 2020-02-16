@@ -256,7 +256,7 @@ describe(commands.FILE_GET, () => {
 
   it('uses correct API url when url option is passed', (done) => {
     const getStub: any = sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/GetFileByServerRelativeUrl(') > -1) {
+      if (opts.url.indexOf('/_api/web/GetFileByServerRelativePath(') > -1) {
         return Promise.resolve('Correct Url')
       }
 
@@ -271,7 +271,34 @@ describe(commands.FILE_GET, () => {
       }
     }, () => {
       try {
-        assert.equal(getStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativeUrl(\'%2Fsites%2Fproject-x%2FDocuments%2FTest1.docx\')');
+        assert.equal(getStub.lastCall.args[0].url, `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativePath(DecodedUrl=@f)?@f='%2Fsites%2Fproject-x%2FDocuments%2FTest1.docx'`);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('uses correct API url when url option is passed to get file as list item', (done) => {
+    const getStub: any = sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url.indexOf('/_api/web/GetFileByServerRelativePath(') > -1) {
+        return Promise.resolve('Correct Url')
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({
+      options: {
+        debug: false,
+        url: '/sites/project-x/Documents/Test1.docx',
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        asListItem: true
+      }
+    }, () => {
+      try {
+        assert.equal(getStub.lastCall.args[0].url, `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativePath(DecodedUrl=@f)?$expand=ListItemAllFields&@f='%2Fsites%2Fproject-x%2FDocuments%2FTest1.docx'`);
         done();
       }
       catch (e) {
@@ -282,7 +309,7 @@ describe(commands.FILE_GET, () => {
 
   it('uses correct API url when tenant root URL option is passed', (done) => {
     const getStub: any = sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/GetFileByServerRelativeUrl(') > -1) {
+      if (opts.url.indexOf('/_api/web/GetFileByServerRelativePath(') > -1) {
         return Promise.resolve('Correct Url')
       }
 
@@ -297,7 +324,7 @@ describe(commands.FILE_GET, () => {
       }
     }, () => {
       try {
-        assert.equal(getStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/_api/web/GetFileByServerRelativeUrl(\'%2FDocuments%2FTest1.docx\')');
+        assert.equal(getStub.lastCall.args[0].url, `https://contoso.sharepoint.com/_api/web/GetFileByServerRelativePath(DecodedUrl=@f)?@f='%2FDocuments%2FTest1.docx'`);
         done();
       }
       catch (e) {

@@ -59,7 +59,7 @@ class SpoFileGetCommand extends SpoCommand {
       requestUrl = `${args.options.webUrl}/_api/web/GetFileById('${encodeURIComponent(args.options.id)}')`;
     }
     else if (args.options.url) {
-      requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${encodeURIComponent(args.options.url)}')`;
+      requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl=@f)`;
     }
 
     if (args.options.asListItem) {
@@ -67,6 +67,17 @@ class SpoFileGetCommand extends SpoCommand {
     }
     else if (args.options.asFile || args.options.asString) {
       options = '/$value';
+    }
+
+    if (args.options.url) {
+      if (options.indexOf('?') < 0) {
+        options += '?';
+      }
+      else {
+        options += '&';
+      }
+
+      options += `@f='${encodeURIComponent(args.options.url)}'`
     }
 
     const requestOptions: any = {
