@@ -30,6 +30,7 @@ export default {
   TEAMS_REPORT_USERACTIVITYUSERCOUNTS: `${prefix} report useractivityusercounts`,
   TEAMS_REPORT_USERACTIVITYUSERDETAIL: `${prefix} report useractivityuserdetail`,
   TEAMS_TAB_LIST: `${prefix} tab list`,
+  TEAMS_TAB_ADD: `${prefix} tab add`,
   TEAMS_TEAM_ADD: `${prefix} team add`,
   TEAMS_TEAM_ARCHIVE: `${prefix} team archive`,
   TEAMS_TEAM_CLONE: `${prefix} team clone`,
