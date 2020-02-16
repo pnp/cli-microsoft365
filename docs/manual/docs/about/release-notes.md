@@ -23,6 +23,9 @@
 ### Changes
 
 - added PowerShell command completion [#261](https://github.com/pnp/office365-cli/issues/261)
+- added 'since' option to 'teams message list' command [#1125](https://github.com/pnp/office365-cli/issues/1125)
+- extended 'spo file add' with chunked uploads [#1052](https://github.com/pnp/office365-cli/issues/1052)
+- added support for prettifying json output [#1324](https://github.com/pnp/office365-cli/issues/1324)
 
 ## [v2.6.0](https://github.com/pnp/office365-cli/releases/tag/v2.6.0)
 
