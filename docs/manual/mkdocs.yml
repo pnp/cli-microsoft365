@@ -405,6 +405,7 @@ nav:
         - report useractivityusercounts: 'cmd/teams/report/report-useractivityusercounts.md'
         - report useractivityuserdetail: 'cmd/teams/report/report-useractivityuserdetail.md'
       - tab:
+        - tab add: 'cmd/teams/tab/tab-add.md'
         - tab list: 'cmd/teams/tab/tab-list.md'
       - team:
         - team add: 'cmd/teams/team/team-add.md'
