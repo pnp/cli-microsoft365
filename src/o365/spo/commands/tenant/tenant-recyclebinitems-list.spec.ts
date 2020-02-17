@@ -2,7 +2,6 @@ import commands from '../../commands';
 import Command, { CommandError, CommandOption } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-//import config from '../../../../config';
 const command: Command = require('./tenant-recyclebinitems-list');
 import * as assert from 'assert';
 import request from '../../../../request';

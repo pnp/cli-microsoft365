@@ -22,7 +22,7 @@ Option|Description
 
 ## Examples
 
-List items in tenant level recycle bin
+Returns all modern and classic site collections in the tenant scoped recycle bin
 
 ```sh
 spo tenant recyclebinitems list

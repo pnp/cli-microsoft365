@@ -50,23 +50,25 @@ class SpoTenantSettingsListCommand extends SpoCommand {
         if (args.options.output === 'json') {
           cmd.log(results._Child_Items_);
         }
-        cmd.log(results._Child_Items_.map((r) => {
-          return {
-            DaysRemaining: Number(r.DaysRemaining),
-            DeletionTime: this.dateParser(r.DeletionTime as string),
-            Url: r.Url
-          };
-        }).sort((a, b) => {
-          const urlA = a.Url.toUpperCase();
-          const urlB = b.Url.toUpperCase();
-          if (urlA < urlB) {
-            return -1;
-          }
-          if (urlA > urlB) {
-            return 1;
-          }
-          return 0;
-        }));
+        else {
+          cmd.log(results._Child_Items_.map((r) => {
+            return {
+              DaysRemaining: Number(r.DaysRemaining),
+              DeletionTime: this.dateParser(r.DeletionTime as string),
+              Url: r.Url
+            };
+          }).sort((a, b) => {
+            const urlA = a.Url.toUpperCase();
+            const urlB = b.Url.toUpperCase();
+            if (urlA < urlB) {
+              return -1;
+            }
+            if (urlA > urlB) {
+              return 1;
+            }
+            return 0;
+          }));
+        }
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
   }
