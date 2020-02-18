@@ -276,10 +276,10 @@ export default class Utils {
    * Utils.getServerRelativePath("/sites/team1/", "/Shared Documents");
    */
   public static getServerRelativeSiteUrl(webUrl: string): string {
-    let serverRelativeSiteUrl = Utils.getServerRelativePath(webUrl, '');
+    const serverRelativeSiteUrl = Utils.getServerRelativePath(webUrl, '');
 
-    // return an empty string instead of / to prevent //
-    return serverRelativeSiteUrl.length == 1 ? "" : serverRelativeSiteUrl;
+    // return an empty string instead of / to prevent // replies
+    return serverRelativeSiteUrl === '/' ? "" : serverRelativeSiteUrl;
   }
 
   /**
