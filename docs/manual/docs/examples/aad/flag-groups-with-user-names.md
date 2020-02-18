@@ -1,10 +1,10 @@
-# Flag Microsoft Teams
+# Scan Office 365 Groups created with User's Givenname or Surname
 
 Author: [Joseph Velliah](https://sprider.blog/2020/02/03/governance-scan-office-365-groups-created-with-user-first-or-last-name-using-office-365-cli-commands/)
 
-We can use the group naming policy to enforce a consistent naming strategy for groups created by users in our organization. A naming policy can help us and our users identify the function of the group. We can use the policy to block specific words from being used in group names and aliases. But what if we need to find out the list of Office 365 groups created with user’s givenName or displayName as their mail?
+We can use the group naming policy to enforce a consistent naming strategy for groups created by users in our organization. A naming policy can help us and our users identify the function of the group. We can use the policy to block specific words from being used in group names and aliases. But what if we need to find out the list of Office 365 groups created with user’s givenName or surname as their mail?
 
-This sample script scans the Office 365 groups that may contain user’s givenName or displayName as the group mail.
+This sample script scans the Office 365 groups that may contain user’s givenName or surname as the group mail.
 
 Note: The filter condition can be changed as per your requirement.
 
