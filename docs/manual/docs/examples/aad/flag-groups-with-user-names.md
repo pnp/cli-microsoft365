@@ -23,7 +23,6 @@ foreach ($user in $users) {
     foreach ($group in $groupsMatch) {
         $groupObject = New-Object -TypeName PSObject
         $groupObject | Add-Member -MemberType NoteProperty -Name "groupId" -Value $group.id
-        $groupObject | Add-Member -MemberType NoteProperty -Name "groupDisplayName" -Value $group.displayName
         $groupObject | Add-Member -MemberType NoteProperty -Name "groupMail" -Value $group.mail
         $groupObject | Add-Member -MemberType NoteProperty -Name "userGivenName" -Value $userGivenName
         $groupObject | Add-Member -MemberType NoteProperty -Name "userSurname" -Value $userSurname
@@ -56,11 +55,11 @@ for user in `echo $users | jq -c '.[]'`; do
         groupId=`echo $group | jq  -r '.id'`
         groupMail=`echo $group | jq  -r '.mail'`
         groupObject=$(jq -n -c \
-                --arg id "$groupId" \
-                --arg gm "${groupMail}" \
-                --arg gn "${userGivenName}" \
-                --arg sn "${userSurname}" \
-                '{groupId: $id, groupMail: $gm, userGivenName: $gn, userSurname: $sn}')
+                --arg GroupId "$groupId" \
+                --arg GroupMail "$groupMail" \
+                --arg UserGivenName "$userGivenName" \
+                --arg UserSurname "$userSurname" \
+                '{groupId: $GroupId, groupMail: $GroupMail, userGivenName: $UserGivenName, userSurname: $UserSurname}')
 
         groupsToFlag+=($groupObject)
     done
