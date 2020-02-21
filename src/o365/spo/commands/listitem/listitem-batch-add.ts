@@ -9,13 +9,11 @@ import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
 //import { ListItemInstance } from './ListItemInstance';
 import { FolderExtensions } from '../../FolderExtensions';
-
 import * as path from 'path';
-
-
+import { Transform } from 'stream';
 const vorpal: Vorpal = require('../../../../vorpal-init');
-const csv = require('fast-csv');
-const fs = require('fs');
+const csv = require('@fast-csv/parse');
+import {createReadStream} from 'fs';
 
 
 interface CommandArgs {
@@ -30,14 +28,6 @@ interface Options extends GlobalOptions {
   folder?: string;
   path: string;
 }
-
-// interface FieldValue {
-//   ErrorMessage: string;
-//   FieldName: string;
-//   FieldValue: any;
-//   HasException: boolean;
-//   ItemId: number;
-// }
 
 class SpoListItemAddCommand extends SpoCommand {
 
@@ -66,12 +56,36 @@ class SpoListItemAddCommand extends SpoCommand {
     let lineNumber: number = 0;
     let contentTypeName: string | null = null;
     let listRestUrl: string | null = null;
-    let batchSize: number = 250;
-    let UuidDenerator = this.generateUUID;
-    let recordsToAdd = new Array();
+    let batchSize: number = 4000      ; // max is  1048576
+    let recordsToAdd = "";
+    let batchInProcess = false;
+    const  generateUUID= function() {
+      var d = new Date().getTime();
+      var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = (d + Math.random() * 16) % 16 | 0;
+        d = Math.floor(d / 16);
+        return (c == 'x' ? r : (r & 0x7 | 0x8)).toString(16);
+      });
+      return uuid;
+    }
+    const parseResults = (response: any): void => {
+      cmd.log(`in parseresults`)
+      let responseLines = response.toString().split('\n');
+      // read each line until you find JSON...
+      for (let responseLine of responseLines) {
+       try {
+          // parse the JSON response...
+          var tryParseJson = JSON.parse(responseLine);
+          for (let result of tryParseJson.d.AddValidateUpdateItemUsingPath.results){
+            if (result.HasException){
+              cmd.log(result)
+            }
+          }
+        } catch (e) {
+        }
+      }
 
-
-
+    }
 
     let targetFolderServerRelativeUrl: string = ``;
     const fullPath: string = path.resolve(args.options.path);
@@ -81,8 +95,6 @@ class SpoListItemAddCommand extends SpoCommand {
     listRestUrl = (args.options.listId ?
       `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(listIdArgument)}')`
       : `${args.options.webUrl}/_api/web/lists/getByTitle('${encodeURIComponent(listTitleArgument)}')`);
-
-
 
     const folderExtensions: FolderExtensions = new FolderExtensions(cmd, this.debug);
 
@@ -160,145 +172,141 @@ class SpoListItemAddCommand extends SpoCommand {
         if (this.verbose) {
           cmd.log(`Creating items in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
         }
-        // get the file
-        let fileStream = fs.createReadStream(fileName);
+       
         let lmapRequestBody = this.mapRequestBody;
-        fileStream.on('error', function () {
-          cb(`error accessing file ${fileName}`);
-        });
-        let csvStream: any = fileStream.pipe(csv.parse({ headers: true }));
         //start the batch
-        let changeSetId = this.generateUUID();
+        let changeSetId = generateUUID();
         let endpoint = `${listRestUrl}/AddValidateUpdateItemUsingPath()`;
-        let linesInBatch = 0;
+         // get the file
+         let fileStream = createReadStream(fileName);
+        let csvStream: any = csv.parseStream(fileStream, {headers:true  })
         csvStream
-          .on("data", function (row: any) {
-            lineNumber++; linesInBatch++;
-            const requestBody: any = {
-              formValues: lmapRequestBody(row)
-            };
-            if (args.options.folder) {
-              requestBody.listItemCreateInfo = {
-                FolderPath: {
-                  DecodedUrl: targetFolderServerRelativeUrl
-                }
+        .pipe(new Transform({
+          objectMode: true,
+          write(row: any, encoding: string, callback: (error?: (Error | null)) => void): void {
+            console.log(`Processing row ${JSON.stringify(row)}`)
+          
+              console.log(`Done processing row ${JSON.stringify(row)}`);
+              lineNumber++;
+              const requestBody: any = {
+                formValues: lmapRequestBody(row)
               };
-            }
-            if (args.options.contentType && contentTypeName !== '') {
-              requestBody.formValues.push({
-                FieldName: 'ContentType',
-                FieldValue: contentTypeName
-              });
-            }
-            // row is ready
-            recordsToAdd.push('--changeset_' + changeSetId);
-            recordsToAdd.push('Content-Type: application/http');
-            recordsToAdd.push('Content-Transfer-Encoding: binary');
-            recordsToAdd.push('');
-            recordsToAdd.push('POST ' + endpoint + ' HTTP/1.1');
-            recordsToAdd.push('Content-Type: application/json;odata=verbose');
-            recordsToAdd.push('');
-            recordsToAdd.push(`${JSON.stringify(requestBody)}`);
-            recordsToAdd.push('');
-            cmd.log(`line #= ${lineNumber}; lines in batch : ${linesInBatch} batchsue ${batchSize}`)
-            if (linesInBatch >= batchSize) {
-              /***
-               *  Send the batch
-               * 
-               */
-              cmd.log(`sending batch`)
-              recordsToAdd.push('--changeset_' + changeSetId + '--');
-              csvStream.pause();
-              var batchBody = recordsToAdd.join('\u000d\u000a');
-              let batchContents = new Array();
-              let batchId = UuidDenerator();
-              batchContents.push('--batch_' + batchId);
-              batchContents.push('Content-Type: multipart/mixed; boundary="changeset_' + changeSetId + '"');
-              batchContents.push('Content-Length: ' + batchBody.length);
-              batchContents.push('Content-Transfer-Encoding: binary');
-              batchContents.push('');
-              batchContents.push(batchBody);
-              batchContents.push('');
-              const updateOptions: any = {
-                url: `${args.options.webUrl}/_api/$batch`,
-                headers: {
-                  //'X-RequestDigest': formDigestValue,
-                  'Content-Type': `multipart/mixed; boundary="batch_${batchId}"`
-                },
-                body: batchContents.join('\r\n')
+              if (args.options.folder) {
+                requestBody.listItemCreateInfo = {
+                  FolderPath: {
+                    DecodedUrl: targetFolderServerRelativeUrl
+                  }
+                };
               }
-              cmd.log(updateOptions)
-              request.post(updateOptions)
-                .catch((e) => {
-                  cmd.log(`error`);
-                  cb(e);
-                })
-                .then((results) => {
-                  cmd.log(`results`);
-                  cmd.log(results);
-                })
-
-                .finally(() => {
-                  cmd.log(`vatrcgh done`);
-                  recordsToAdd.splice(0,recordsToAdd.length);//clear the buffer
-                  changeSetId = UuidDenerator();
-                  csvStream.resume();
-                  linesInBatch = 0;
-                })
-             
-
-            }
-          })
+              if (args.options.contentType && contentTypeName !== '') {
+                requestBody.formValues.push({
+                  FieldName: 'ContentType',
+                  FieldValue: contentTypeName
+                });
+              }
+              // row is ready
+              recordsToAdd += '--changeset_' + changeSetId + '\u000d\u000a' +
+                'Content-Type: application/http' + '\u000d\u000a' +
+                'Content-Transfer-Encoding: binary' + '\u000d\u000a' +
+                '\u000d\u000a' +
+                'POST ' + endpoint + ' HTTP/1.1' + '\u000d\u000a' +
+                'Content-Type: application/json;odata=verbose' + '\u000d\u000a' +
+                'Accept: application/json;odata=verbose' + '\u000d\u000a' +
+                '\u000d\u000a' +
+                `${JSON.stringify(requestBody)}` + '\u000d\u000a' +
+                '\u000d\u000a';
+  
+              if (recordsToAdd.length >= batchSize) {
+                /***  Send the batch   **/
+                recordsToAdd += '--changeset_' + changeSetId + '--' + '\u000d\u000a';
+                csvStream.pause();
+                batchInProcess = true;
+                let batchContents = new Array();
+                let batchId = generateUUID();
+                batchContents.push('--batch_' + batchId);
+                batchContents.push('Content-Type: multipart/mixed; boundary="changeset_' + changeSetId + '"');
+                batchContents.push('Content-Length: ' + recordsToAdd.length);
+                batchContents.push('Content-Transfer-Encoding: binary');
+                batchContents.push('');
+                batchContents.push(recordsToAdd);
+                batchContents.push('');
+                const updateOptions: any = {
+                  url: `${args.options.webUrl}/_api/$batch`,
+                  headers: {
+                    'Content-Type': `multipart/mixed; boundary="batch_${batchId}"`
+                  },
+                  body: batchContents.join('\r\n')
+                }
+                request.post(updateOptions)
+                  .catch((e) => {
+                    cb(e);
+                  })
+                  .then((response) => {
+                    parseResults(response)
+                  })
+                  .finally(() => {
+                    recordsToAdd = ``;
+                    changeSetId = generateUUID();
+                    csvStream.resume();
+                    batchInProcess = false;
+                  })
+              }
+              this.push(row);
+              callback();
+      
+          },
+        }))
+          .on("headers",function(headers:any){ // not gerring called. should validate column names up front
+             cmd.log("in headers")
+             cmd.log(headers)
+            csvStream.pause();
+            cmd.log(headers);
+            csvStream.resume();
+          }) 
           .on("end", function () {
-            if (linesInBatch > 0){
-              cmd.log(`sending final batch`)
-              recordsToAdd.push('--changeset_' + changeSetId + '--');
-              var batchBody = recordsToAdd.join('\u000d\u000a');
-              let batchContents = new Array();
-              let batchId = UuidDenerator();
-              batchContents.push('--batch_' + batchId);
-              batchContents.push('Content-Type: multipart/mixed; boundary="changeset_' + changeSetId + '"');
-              batchContents.push('Content-Length: ' + batchBody.length);
-              batchContents.push('Content-Transfer-Encoding: binary');
-              batchContents.push('');
-              batchContents.push(batchBody);
-              batchContents.push('');
-              const updateOptions: any = {
-                url: `${args.options.webUrl}/_api/$batch`,
-                headers: {
-                  //'X-RequestDigest': formDigestValue,
-                  'Content-Type': `multipart/mixed; boundary="batch_${batchId}"`
-                },
-                body: batchContents.join('\r\n')
-              }
-              cmd.log(updateOptions)
-              request.post(updateOptions)
-                .catch((e) => {
-                  cmd.log(`error`);
-                  cb(e);
-                })
-                .then((results) => {
-                  cmd.log(`results`);
-                  cmd.log(results);
-                })
-
-                .finally(() => {
+            function waitForLastBatch() { // should not need to do this. "end" should not be called while stream is paused
+              if (batchInProcess === true) {
+                setTimeout(waitForLastBatch, 5000);
+              } else {
+                if (recordsToAdd.length > 0) {
+                  let batchContents = new Array();
+                  let batchId = generateUUID();
+                  batchContents.push('--batch_' + batchId);
+                  batchContents.push('Content-Type: multipart/mixed; boundary="changeset_' + changeSetId + '"');
+                  batchContents.push('Content-Length: ' + recordsToAdd.length);
+                  batchContents.push('Content-Transfer-Encoding: binary');
+                  batchContents.push('');
+                  batchContents.push(recordsToAdd);
+                  batchContents.push('');
+                  const updateOptions: any = {
+                    url: `${args.options.webUrl}/_api/$batch`,
+                    headers: {
+                      'Content-Type': `multipart/mixed; boundary="batch_${batchId}"`
+                    },
+                    body: batchContents.join('\r\n')
+                  }
+                  request.post(updateOptions)
+                    .catch((e) => {
+                      cb(e);
+                    })
+                    .then((response) => {
+                      parseResults(response)
+                    })
+                    .finally(() => {
+                      cmd.log(`Processed ${lineNumber} Rows`)
+                      cb();
+                    })
+                } else {
                   cmd.log(`Processed ${lineNumber} Rows`)
-                  cmd.log(`vatrcgh done`);
                   cb();
-                })
-            }else{
-              cmd.log(`Processed ${lineNumber} Rows`)
-
-              cb();
+                }
+              }
             }
-            
-            
+            waitForLastBatch();
           })
           .on("error", function (error: any) {
-            cmd.log(error)
+            cb(error)
           });
-
       })
   }
 
@@ -335,15 +343,7 @@ class SpoListItemAddCommand extends SpoCommand {
   }
 
 
-  private generateUUID() {
-    var d = new Date().getTime();
-    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-      var r = (d + Math.random() * 16) % 16 | 0;
-      d = Math.floor(d / 16);
-      return (c == 'x' ? r : (r & 0x7 | 0x8)).toString(16);
-    });
-    return uuid;
-  }
+
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
       if (!args.options.webUrl) {
