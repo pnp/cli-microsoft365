@@ -188,7 +188,23 @@ Each command must by accompanied by a set of unit tests. We aim for 100% code an
 
 > To see the current code coverage, run `npm test`. Once testing completes, open the **./coverage/lcov-report/index.html** file in the web browser and browser through the different project files.
 
-See the existing test files to get a better understanding of how they are structured and how different elements such as objects or web requests are mocked.
+See the existing test files to get a better understanding of how they are structured and how different elements such as objects or web requests are mocked. The following VS Code configuration will enable debugging unit tests (change the glob in the args to match tests you want to debug):
+
+```json
+{
+  "type": "node",
+  "request": "launch",
+  "name": "Mocha",
+  "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+  "args": [
+    "--colors",
+    "${workspaceFolder}/dist/o365/aad/commands/approleassignment/**/*.spec.js",
+  ],
+  "console": "integratedTerminal",
+  "protocol": "inspector",
+  "preLaunchTask": "tsc: build - tsconfig.json",
+}
+```
 
 Once you're done with your unit tests, run `npm test` to verify that you're covering all code and branches of your command with your unit tests.
 
