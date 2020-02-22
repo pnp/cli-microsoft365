@@ -15,8 +15,6 @@ const vorpal: Vorpal = require('../../../../vorpal-init');
 const csv = require('@fast-csv/parse');
 import { createReadStream } from 'fs';
 
-
-
 interface CommandArgs {
   options: Options;
 }
@@ -57,7 +55,9 @@ class SpoListItemAddCommand extends SpoCommand {
     let lineNumber: number = 0;
     let contentTypeName: string | null = null;
     let listRestUrl: string | null = null;
-    let batchSize: number = 500; // max is  1048576
+    let batchSize: number = 1048576; // max is  1048576
+    let rowsInBatch:number=0;
+    let maxRowsInBatch:number=999;
     let recordsToAdd = "";
     let csvHeaders: Array<string>;
     const generateUUID = function () {
@@ -70,7 +70,7 @@ class SpoListItemAddCommand extends SpoCommand {
       return uuid;
     }
     const parseResults = (response: any): void => {
-        let responseLines = response.toString().split('\n');
+      let responseLines = response.toString().split('\n');
       // read each line until you find JSON...
       for (let responseLine of responseLines) {
         try {
@@ -84,7 +84,6 @@ class SpoListItemAddCommand extends SpoCommand {
         } catch (e) {
         }
       }
-
     }
 
     const mapRequestBody = (row: any, csvHeaders: Array<string>): any => {
@@ -123,14 +122,11 @@ class SpoListItemAddCommand extends SpoCommand {
         if (args.options.contentType) {
           const foundContentType = response.value.filter((ct: any) => {
             const contentTypeMatch: boolean = ct.Id.StringValue === args.options.contentType || ct.Name === args.options.contentType;
-
             if (this.debug) {
               cmd.log(`Checking content type value [${ct.Name}]: ${contentTypeMatch}`);
             }
-
             return contentTypeMatch;
           });
-
           if (this.debug) {
             cmd.log('content type filter output...');
             cmd.log(foundContentType);
@@ -179,26 +175,22 @@ class SpoListItemAddCommand extends SpoCommand {
         if (this.verbose) {
           cmd.log(`Creating items in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
         }
-
-
-        //start the batch
+        //start the batch -- each batch will get assigned its own id
         let changeSetId = generateUUID();
         let endpoint = `${listRestUrl}/AddValidateUpdateItemUsingPath()`;
-        // get the file
+        // get the csv  file passed in from the cmd line
         let fileStream = createReadStream(fileName);
         let csvStream: any = csv.parseStream(fileStream, { headers: false })
         csvStream
-          .pipe(new Transform({ //https://github.com/C2FO/fast-csv/issues/328
+          .pipe(new Transform({ //https://github.com/C2FO/fast-csv/issues/328 Need to transform if  we are batching asynch
             objectMode: true,
             write(row: any, encoding: string, callback: (error?: (Error | null)) => void): void {
-              console.log(`Processing row ${JSON.stringify(row)}`)
-              
-              if (lineNumber === 0) { // process headers //headers doens not work if using transform
+              if (lineNumber === 0) {
                 /***
-                 * Process csv Headers
+                 * Process csv Headers (fast csv headers doens not work if using transform)
                  */
                 csvHeaders = row;
-            
+                // fetch the valid field names from the list. If you pass a bad field name to AddValidateUpdateItemUsingPath it returns xml not JSON
                 const fetchFieldsRequest: any = {
                   url: `${listRestUrl}/fields?$select=InternalName&$filter=ReadOnlyField eq false`,
                   headers: {
@@ -235,7 +227,8 @@ class SpoListItemAddCommand extends SpoCommand {
                 /***
                 * Process csv Data
                 */
-               lineNumber++
+                lineNumber++
+                rowsInBatch++;
                 const requestBody: any = {
                   formValues: mapRequestBody(row, csvHeaders)
                 };
@@ -264,10 +257,9 @@ class SpoListItemAddCommand extends SpoCommand {
                   `${JSON.stringify(requestBody)}` + '\u000d\u000a' +
                   '\u000d\u000a';
 
-                if (recordsToAdd.length >= batchSize) {
-                  /***  Send the batch   **/
+                /***  Send the batch if the buffer is getting full   **/
+                if (rowsInBatch > maxRowsInBatch || recordsToAdd.length >= batchSize ) {
                   recordsToAdd += '--changeset_' + changeSetId + '--' + '\u000d\u000a';
-
                   let batchContents = new Array();
                   let batchId = generateUUID();
                   batchContents.push('--batch_' + batchId);
@@ -291,13 +283,11 @@ class SpoListItemAddCommand extends SpoCommand {
                     .then((response) => {
                       parseResults(response)
                       recordsToAdd = ``;
+                      rowsInBatch=0;
                       changeSetId = generateUUID();
                       this.push(row);
                       callback();
-
                     })
-
-
                 }
                 else {
                   this.push(row);
@@ -309,7 +299,7 @@ class SpoListItemAddCommand extends SpoCommand {
           }))
           .on("data", function () { })// dont delete this ,  or on end wont fire
           .on("end", function () {
-            cmd.log(`on end`)
+            
             if (recordsToAdd.length > 0) {
               let batchContents = new Array();
               let batchId = generateUUID();
