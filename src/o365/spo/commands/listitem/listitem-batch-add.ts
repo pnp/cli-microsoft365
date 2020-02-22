@@ -59,6 +59,7 @@ class SpoListItemAddCommand extends SpoCommand {
     let listRestUrl: string | null = null;
     let batchSize: number = 500; // max is  1048576
     let recordsToAdd = "";
+    let csvHeaders: Array<string>;
     const generateUUID = function () {
       var d = new Date().getTime();
       var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -69,8 +70,7 @@ class SpoListItemAddCommand extends SpoCommand {
       return uuid;
     }
     const parseResults = (response: any): void => {
-      cmd.log(`in parseresults`)
-      let responseLines = response.toString().split('\n');
+        let responseLines = response.toString().split('\n');
       // read each line until you find JSON...
       for (let responseLine of responseLines) {
         try {
@@ -87,6 +87,13 @@ class SpoListItemAddCommand extends SpoCommand {
 
     }
 
+    const mapRequestBody = (row: any, csvHeaders: Array<string>): any => {
+      const requestBody: any = [];
+      Object.keys(row).forEach(async key => {
+        requestBody.push({ FieldName: csvHeaders[parseInt(key)], FieldValue: (<any>row)[key] });
+      });
+      return requestBody;
+    }
     let targetFolderServerRelativeUrl: string = ``;
     const fullPath: string = path.resolve(args.options.path);
     const fileName: string = Utils.getSafeFileName(path.basename(fullPath));
@@ -173,7 +180,7 @@ class SpoListItemAddCommand extends SpoCommand {
           cmd.log(`Creating items in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
         }
 
-        let lmapRequestBody = this.mapRequestBody;
+
         //start the batch
         let changeSetId = generateUUID();
         let endpoint = `${listRestUrl}/AddValidateUpdateItemUsingPath()`;
@@ -185,8 +192,13 @@ class SpoListItemAddCommand extends SpoCommand {
             objectMode: true,
             write(row: any, encoding: string, callback: (error?: (Error | null)) => void): void {
               console.log(`Processing row ${JSON.stringify(row)}`)
-              lineNumber++
-              if (lineNumber === 0) { // process headers
+              
+              if (lineNumber === 0) { // process headers //headers doens not work if using transform
+                /***
+                 * Process csv Headers
+                 */
+                csvHeaders = row;
+            
                 const fetchFieldsRequest: any = {
                   url: `${listRestUrl}/fields?$select=InternalName&$filter=ReadOnlyField eq false`,
                   headers: {
@@ -195,24 +207,22 @@ class SpoListItemAddCommand extends SpoCommand {
                 }
                 request.get(fetchFieldsRequest)
                   .then((realFields) => {
-                    const fields = JSON.parse(realFields as string).value
-                    for (let csvField of row) {
+                    const spFields = JSON.parse(realFields as string).value
+                    for (let header of csvHeaders) {
                       let fieldFound = false;
-                      cmd.log(csvField)
-                      for (let spField of fields) {
-                        cmd.log(spField)
-                        cmd.log(`${csvField}  ${spField}   ${csvField === spField}`)
-                        if (csvField === spField.InternalName) {
+                      for (let spField of spFields) {
+                        if (header === spField.InternalName) {
                           fieldFound = true;
                           break;
                         }
                       }
                       if (!fieldFound) {
-                        cmd.log(`Field ${csvField} was not found on the SharePoint list.  Valid fields follow`)
-                        cmd.log(fields)
-                        cb(`Error-- field ${csvField} was not found on the SharePoint list`)
+                        cmd.log(`Field ${header} was not found on the SharePoint list.  Valid fields follow`)
+                        cmd.log(spFields)
+                        cb(`Error-- field ${header} was not found on the SharePoint list`)
                       }
                     }
+                    lineNumber++
                     this.push(row);
                     callback();
                   })
@@ -220,10 +230,14 @@ class SpoListItemAddCommand extends SpoCommand {
                     cb(error)
                   })
 
-              } //headers doens not work if using transform
+              }
               else {
+                /***
+                * Process csv Data
+                */
+               lineNumber++
                 const requestBody: any = {
-                  formValues: lmapRequestBody(row)
+                  formValues: mapRequestBody(row, csvHeaders)
                 };
                 if (args.options.folder) {
                   requestBody.listItemCreateInfo = {
@@ -285,9 +299,9 @@ class SpoListItemAddCommand extends SpoCommand {
 
 
                 }
-                else{
-                this.push(row);
-                callback();
+                else {
+                  this.push(row);
+                  callback();
                 }
 
               }
@@ -438,13 +452,7 @@ class SpoListItemAddCommand extends SpoCommand {
    `);
   }
 
-  private mapRequestBody(row: any): any {
-    const requestBody: any = [];
-    Object.keys(row).forEach(async key => {
-      requestBody.push({ FieldName: key, FieldValue: (<any>row)[key] });
-    });
-    return requestBody;
-  }
+
 }
 
 module.exports = new SpoListItemAddCommand();

@@ -1,4 +1,4 @@
-"Title"
-"Test1"
-"Test2"
-"Test3"
+"Title","Anumber",adate,ayesno,achoice
+"Test1",1,23/02/2012,1,"Choice 1"
+"Test2",22.3,23/02/2012,1,"Choice 2"
+"Test3",3,23/02/2012,1
