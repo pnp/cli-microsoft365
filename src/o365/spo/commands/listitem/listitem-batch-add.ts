@@ -55,9 +55,10 @@ class SpoListItemAddCommand extends SpoCommand {
     let lineNumber: number = 0;
     let contentTypeName: string | null = null;
     let listRestUrl: string | null = null;
-    let batchSize: number = 1048576; // max is  1048576
+    let maxBytesInBatch: number = 1000000; // max is  1048576
     let rowsInBatch:number=0;
-    let maxRowsInBatch:number=999;
+    let batchCounter=0;
+    let batchSize:number=900;
     let recordsToAdd = "";
     let csvHeaders: Array<string>;
     const generateUUID = function () {
@@ -69,11 +70,17 @@ class SpoListItemAddCommand extends SpoCommand {
       });
       return uuid;
     }
-    const parseResults = (response: any): void => {
-      let responseLines = response.toString().split('\n');
-      // read each line until you find JSON...
+    const parseResults = (response: any,cmd:CommandInstance,cb: (err?: any) => void): void => {
+      let responseLines:Array<string> = response.toString().split('\n');
+      // read each line until you find JSON... 
       for (let responseLine of responseLines) {
         try {
+          //check for error 
+      
+          if (responseLine.startsWith("HTTP/1.1 5")){ //any 500 errors (like timeout), just stop
+            cmd.log("An error was returned from SharePoint. Please retry with a lower batchsize")
+            cb(responseLine);
+          }
           // parse the JSON response...
           var tryParseJson = JSON.parse(responseLine);
           for (let result of tryParseJson.d.AddValidateUpdateItemUsingPath.results) {
@@ -258,11 +265,13 @@ class SpoListItemAddCommand extends SpoCommand {
                   '\u000d\u000a';
 
                 /***  Send the batch if the buffer is getting full   **/
-                if (rowsInBatch > maxRowsInBatch || recordsToAdd.length >= batchSize ) {
+                if (rowsInBatch > batchSize || recordsToAdd.length >= maxBytesInBatch ) {
+                 
                   recordsToAdd += '--changeset_' + changeSetId + '--' + '\u000d\u000a';
                   let batchContents = new Array();
                   let batchId = generateUUID();
                   batchContents.push('--batch_' + batchId);
+                  cmd.log(`Sending batch #${++batchCounter} BatchID(${batchId}) ChangeSetID(${changeSetId}) with ${rowsInBatch} rows`)
                   batchContents.push('Content-Type: multipart/mixed; boundary="changeset_' + changeSetId + '"');
                   batchContents.push('Content-Length: ' + recordsToAdd.length);
                   batchContents.push('Content-Transfer-Encoding: binary');
@@ -281,7 +290,7 @@ class SpoListItemAddCommand extends SpoCommand {
                       cb(e);
                     })
                     .then((response) => {
-                      parseResults(response)
+                      parseResults(response,cmd,cb)
                       recordsToAdd = ``;
                       rowsInBatch=0;
                       changeSetId = generateUUID();
@@ -301,9 +310,13 @@ class SpoListItemAddCommand extends SpoCommand {
           .on("end", function () {
             
             if (recordsToAdd.length > 0) {
+             
+                
               let batchContents = new Array();
               let batchId = generateUUID();
               batchContents.push('--batch_' + batchId);
+              cmd.log(`Sending final batch #${++batchCounter} BatchID(${batchId}) ChangeSetID(${changeSetId}) with ${rowsInBatch} rows`)
+             
               batchContents.push('Content-Type: multipart/mixed; boundary="changeset_' + changeSetId + '"');
               batchContents.push('Content-Length: ' + recordsToAdd.length);
               batchContents.push('Content-Transfer-Encoding: binary');
@@ -322,7 +335,7 @@ class SpoListItemAddCommand extends SpoCommand {
                   cb(e);
                 })
                 .then((response) => {
-                  parseResults(response)
+                  parseResults(response,cmd,cb)
                 })
                 .finally(() => {
                   cmd.log(`Processed ${lineNumber} Rows`)
