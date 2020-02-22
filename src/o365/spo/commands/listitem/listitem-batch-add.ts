@@ -13,7 +13,8 @@ import * as path from 'path';
 import { Transform } from 'stream';
 const vorpal: Vorpal = require('../../../../vorpal-init');
 const csv = require('@fast-csv/parse');
-import {createReadStream} from 'fs';
+import { createReadStream } from 'fs';
+
 
 
 interface CommandArgs {
@@ -56,10 +57,9 @@ class SpoListItemAddCommand extends SpoCommand {
     let lineNumber: number = 0;
     let contentTypeName: string | null = null;
     let listRestUrl: string | null = null;
-    let batchSize: number = 4000      ; // max is  1048576
+    let batchSize: number = 500; // max is  1048576
     let recordsToAdd = "";
-    let batchInProcess = false;
-    const  generateUUID= function() {
+    const generateUUID = function () {
       var d = new Date().getTime();
       var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         var r = (d + Math.random() * 16) % 16 | 0;
@@ -73,11 +73,11 @@ class SpoListItemAddCommand extends SpoCommand {
       let responseLines = response.toString().split('\n');
       // read each line until you find JSON...
       for (let responseLine of responseLines) {
-       try {
+        try {
           // parse the JSON response...
           var tryParseJson = JSON.parse(responseLine);
-          for (let result of tryParseJson.d.AddValidateUpdateItemUsingPath.results){
-            if (result.HasException){
+          for (let result of tryParseJson.d.AddValidateUpdateItemUsingPath.results) {
+            if (result.HasException) {
               cmd.log(result)
             }
           }
@@ -172,103 +172,88 @@ class SpoListItemAddCommand extends SpoCommand {
         if (this.verbose) {
           cmd.log(`Creating items in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
         }
-       
+
         let lmapRequestBody = this.mapRequestBody;
         //start the batch
         let changeSetId = generateUUID();
         let endpoint = `${listRestUrl}/AddValidateUpdateItemUsingPath()`;
-         // get the file
-         let fileStream = createReadStream(fileName);
-        let csvStream: any = csv.parseStream(fileStream, {headers:true  })
+        // get the file
+        let fileStream = createReadStream(fileName);
+        let csvStream: any = csv.parseStream(fileStream, { headers: false })
         csvStream
-        .pipe(new Transform({
-          objectMode: true,
-          write(row: any, encoding: string, callback: (error?: (Error | null)) => void): void {
-            console.log(`Processing row ${JSON.stringify(row)}`)
-          
-              console.log(`Done processing row ${JSON.stringify(row)}`);
-              lineNumber++;
-              const requestBody: any = {
-                formValues: lmapRequestBody(row)
-              };
-              if (args.options.folder) {
-                requestBody.listItemCreateInfo = {
-                  FolderPath: {
-                    DecodedUrl: targetFolderServerRelativeUrl
-                  }
-                };
-              }
-              if (args.options.contentType && contentTypeName !== '') {
-                requestBody.formValues.push({
-                  FieldName: 'ContentType',
-                  FieldValue: contentTypeName
-                });
-              }
-              // row is ready
-              recordsToAdd += '--changeset_' + changeSetId + '\u000d\u000a' +
-                'Content-Type: application/http' + '\u000d\u000a' +
-                'Content-Transfer-Encoding: binary' + '\u000d\u000a' +
-                '\u000d\u000a' +
-                'POST ' + endpoint + ' HTTP/1.1' + '\u000d\u000a' +
-                'Content-Type: application/json;odata=verbose' + '\u000d\u000a' +
-                'Accept: application/json;odata=verbose' + '\u000d\u000a' +
-                '\u000d\u000a' +
-                `${JSON.stringify(requestBody)}` + '\u000d\u000a' +
-                '\u000d\u000a';
-  
-              if (recordsToAdd.length >= batchSize) {
-                /***  Send the batch   **/
-                recordsToAdd += '--changeset_' + changeSetId + '--' + '\u000d\u000a';
-                csvStream.pause();
-                batchInProcess = true;
-                let batchContents = new Array();
-                let batchId = generateUUID();
-                batchContents.push('--batch_' + batchId);
-                batchContents.push('Content-Type: multipart/mixed; boundary="changeset_' + changeSetId + '"');
-                batchContents.push('Content-Length: ' + recordsToAdd.length);
-                batchContents.push('Content-Transfer-Encoding: binary');
-                batchContents.push('');
-                batchContents.push(recordsToAdd);
-                batchContents.push('');
-                const updateOptions: any = {
-                  url: `${args.options.webUrl}/_api/$batch`,
+          .pipe(new Transform({ //https://github.com/C2FO/fast-csv/issues/328
+            objectMode: true,
+            write(row: any, encoding: string, callback: (error?: (Error | null)) => void): void {
+              console.log(`Processing row ${JSON.stringify(row)}`)
+              lineNumber++
+              if (lineNumber === 0) { // process headers
+                const fetchFieldsRequest: any = {
+                  url: `${listRestUrl}/fields?$select=InternalName&$filter=ReadOnlyField eq false`,
                   headers: {
-                    'Content-Type': `multipart/mixed; boundary="batch_${batchId}"`
+                    'Accept': `application/json;odata=nometadata`
                   },
-                  body: batchContents.join('\r\n')
                 }
-                request.post(updateOptions)
-                  .catch((e) => {
-                    cb(e);
+                request.get(fetchFieldsRequest)
+                  .then((realFields) => {
+                    const fields = JSON.parse(realFields as string).value
+                    for (let csvField of row) {
+                      let fieldFound = false;
+                      cmd.log(csvField)
+                      for (let spField of fields) {
+                        cmd.log(spField)
+                        cmd.log(`${csvField}  ${spField}   ${csvField === spField}`)
+                        if (csvField === spField.InternalName) {
+                          fieldFound = true;
+                          break;
+                        }
+                      }
+                      if (!fieldFound) {
+                        cmd.log(`Field ${csvField} was not found on the SharePoint list.  Valid fields follow`)
+                        cmd.log(fields)
+                        cb(`Error-- field ${csvField} was not found on the SharePoint list`)
+                      }
+                    }
+                    this.push(row);
+                    callback();
                   })
-                  .then((response) => {
-                    parseResults(response)
+                  .catch((error) => {
+                    cb(error)
                   })
-                  .finally(() => {
-                    recordsToAdd = ``;
-                    changeSetId = generateUUID();
-                    csvStream.resume();
-                    batchInProcess = false;
-                  })
-              }
-              this.push(row);
-              callback();
-      
-          },
-        }))
-          .on("headers",function(headers:any){ // not gerring called. should validate column names up front
-             cmd.log("in headers")
-             cmd.log(headers)
-            csvStream.pause();
-            cmd.log(headers);
-            csvStream.resume();
-          }) 
-          .on("end", function () {
-            function waitForLastBatch() { // should not need to do this. "end" should not be called while stream is paused
-              if (batchInProcess === true) {
-                setTimeout(waitForLastBatch, 5000);
-              } else {
-                if (recordsToAdd.length > 0) {
+
+              } //headers doens not work if using transform
+              else {
+                const requestBody: any = {
+                  formValues: lmapRequestBody(row)
+                };
+                if (args.options.folder) {
+                  requestBody.listItemCreateInfo = {
+                    FolderPath: {
+                      DecodedUrl: targetFolderServerRelativeUrl
+                    }
+                  };
+                }
+                if (args.options.contentType && contentTypeName !== '') {
+                  requestBody.formValues.push({
+                    FieldName: 'ContentType',
+                    FieldValue: contentTypeName
+                  });
+                }
+                // row is ready
+                recordsToAdd += '--changeset_' + changeSetId + '\u000d\u000a' +
+                  'Content-Type: application/http' + '\u000d\u000a' +
+                  'Content-Transfer-Encoding: binary' + '\u000d\u000a' +
+                  '\u000d\u000a' +
+                  'POST ' + endpoint + ' HTTP/1.1' + '\u000d\u000a' +
+                  'Content-Type: application/json;odata=verbose' + '\u000d\u000a' +
+                  'Accept: application/json;odata=verbose' + '\u000d\u000a' +
+                  '\u000d\u000a' +
+                  `${JSON.stringify(requestBody)}` + '\u000d\u000a' +
+                  '\u000d\u000a';
+
+                if (recordsToAdd.length >= batchSize) {
+                  /***  Send the batch   **/
+                  recordsToAdd += '--changeset_' + changeSetId + '--' + '\u000d\u000a';
+
                   let batchContents = new Array();
                   let batchId = generateUUID();
                   batchContents.push('--batch_' + batchId);
@@ -291,18 +276,58 @@ class SpoListItemAddCommand extends SpoCommand {
                     })
                     .then((response) => {
                       parseResults(response)
+                      recordsToAdd = ``;
+                      changeSetId = generateUUID();
+                      this.push(row);
+                      callback();
+
                     })
-                    .finally(() => {
-                      cmd.log(`Processed ${lineNumber} Rows`)
-                      cb();
-                    })
-                } else {
+
+
+                }
+                else{
+                this.push(row);
+                callback();
+                }
+
+              }
+            },
+          }))
+          .on("data", function () { })// dont delete this ,  or on end wont fire
+          .on("end", function () {
+            cmd.log(`on end`)
+            if (recordsToAdd.length > 0) {
+              let batchContents = new Array();
+              let batchId = generateUUID();
+              batchContents.push('--batch_' + batchId);
+              batchContents.push('Content-Type: multipart/mixed; boundary="changeset_' + changeSetId + '"');
+              batchContents.push('Content-Length: ' + recordsToAdd.length);
+              batchContents.push('Content-Transfer-Encoding: binary');
+              batchContents.push('');
+              batchContents.push(recordsToAdd);
+              batchContents.push('');
+              const updateOptions: any = {
+                url: `${args.options.webUrl}/_api/$batch`,
+                headers: {
+                  'Content-Type': `multipart/mixed; boundary="batch_${batchId}"`
+                },
+                body: batchContents.join('\r\n')
+              }
+              request.post(updateOptions)
+                .catch((e) => {
+                  cb(e);
+                })
+                .then((response) => {
+                  parseResults(response)
+                })
+                .finally(() => {
                   cmd.log(`Processed ${lineNumber} Rows`)
                   cb();
-                }
-              }
+                })
+            } else {
+              cmd.log(`Processed ${lineNumber} Rows`)
+              cb();
             }
-            waitForLastBatch();
           })
           .on("error", function (error: any) {
             cb(error)
