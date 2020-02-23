@@ -225,7 +225,7 @@
 
 **Global:**
 
-- [accesstoken get](../cmd/accesstoken-get.md) - gets access token for the specified resource [#1072](https://github.com/pnp/office365-cli/issues/1072)
+- [util accesstoken get](../cmd/util/accesstoken/accesstoken-get.md) - gets access token for the specified resource [#1072](https://github.com/pnp/office365-cli/issues/1072)
 
 ### Changes
 

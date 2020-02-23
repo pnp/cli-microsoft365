@@ -11,7 +11,6 @@ nav:
     - login: 'cmd/login.md'
     - logout: 'cmd/logout.md'
     - status: 'cmd/status.md'
-    - accesstoken get: 'cmd/accesstoken-get.md'
     - Azure Active Directory Graph (aad):
       - approleassignment:
         - approleassignment list: 'cmd/aad/approleassignment/approleassignment-list.md'
@@ -438,6 +437,9 @@ nav:
       - user:
         - user get: 'cmd/yammer/user/user-get.md'
         - user list: 'cmd/yammer/user/user-list.md'
+    - Utilities (util):
+      - accesstoken:
+        - accesstoken get: 'cmd/util/accesstoken/accesstoken-get.md'
   - Concepts:
     - 'Persisting connection': 'concepts/persisting-connection.md'
     - 'Authorization and access tokens': 'concepts/authorization-tokens.md'

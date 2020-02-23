@@ -1,13 +1,14 @@
-import commands from './commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../Command';
+import commands from '../../commands';
+import globalCommands from '../../../commands/commands';
+import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 const command: Command = require('./accesstoken-get');
 import * as assert from 'assert';
-import Utils from '../../Utils';
-import appInsights from '../../appInsights';
-import auth from '../../Auth';
+import Utils from '../../../../Utils';
+import appInsights from '../../../../appInsights';
+import auth from '../../../../Auth';
 
-describe(commands.ACCESSTOKEN_GET, () => {
+describe(commands.UTIL_ACCESSTOKEN_GET, () => {
   let vorpal: Vorpal;
   let log: any[];
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -20,7 +21,7 @@ describe(commands.ACCESSTOKEN_GET, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../vorpal-init');
+    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -50,11 +51,21 @@ describe(commands.ACCESSTOKEN_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.ACCESSTOKEN_GET), true);
+    assert.equal(command.name.startsWith(commands.UTIL_ACCESSTOKEN_GET), true);
   });
 
   it('has a description', () => {
     assert.notEqual(command.description, null);
+  });
+
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notEqual(typeof alias, 'undefined');
+  });
+
+  it('defines correct alias', () => {
+    const alias = command.alias();
+    assert.equal((alias && alias.indexOf(globalCommands.ACCESSTOKEN_GET) > -1), true);
   });
 
   it('retrieves access token for the specified resource', (done) => {
@@ -130,7 +141,7 @@ describe(commands.ACCESSTOKEN_GET, () => {
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
     cmd.help({}, () => { });
-    assert(find.calledWith(commands.ACCESSTOKEN_GET));
+    assert(find.calledWith(commands.UTIL_ACCESSTOKEN_GET));
   });
 
   it('has help with examples', () => {
