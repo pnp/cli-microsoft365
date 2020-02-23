@@ -6,15 +6,25 @@
 
 **Azure Active Directory:**
 
+- [aad approleassignment list](../cmd/aad/approleassignment/approleassignment-list.md) - lists app role assignments for the specified application registration [#1270](https://github.com/pnp/office365-cli/issues/1270)
 - [aad o365group report activityfilecounts](../cmd/aad/o365group/report/report-activityfilecounts.md) - get the total number of files and how many of them were active across all group sites associated with an Office 365 Group [#1285](https://github.com/pnp/office365-cli/issues/1285)
 
 **Microsoft Graph:**
 
 - [graph schemaextension set](../cmd/graph/schemaextension/schemaextension-set.md) - updates a Microsoft Graph schema extension [#15](https://github.com/pnp/office365-cli/issues/15)
 
-**SharePoint**
+**Office 365:**
+
+- [tenant report activeusercounts](../cmd/tenant/report/report-activeusercounts.md) - gets the count of daily active users in the reporting period by product [#1298](https://github.com/pnp/office365-cli/issues/1298)
+
+**SharePoint:**
 
 - [spo orgassetslibrary remove](../cmd/spo/orgassetslibrary/orgassetslibrary-remove.md) - removes a library that was designated as a central location for organization assets across the tenant [#1042](https://github.com/pnp/office365-cli/issues/1042)
+- [spo tenant recyclebinitem list](../cmd/spo/tenant/tenant-recyclebinitem-list.md) - returns all modern and classic site collections in the tenant scoped recycle bin [#1144](https://github.com/pnp/office365-cli/issues/1144)
+
+**Microsoft Teams:**
+
+- [teams tab add](../cmd/teams/tab/tab-add.md) - add a tab to the specified channel [#850](https://github.com/pnp/office365-cli/issues/850)
 
 **Yammer:**
 
@@ -26,6 +36,10 @@
 - added 'since' option to 'teams message list' command [#1125](https://github.com/pnp/office365-cli/issues/1125)
 - extended 'spo file add' with chunked uploads [#1052](https://github.com/pnp/office365-cli/issues/1052)
 - added support for prettifying json output [#1324](https://github.com/pnp/office365-cli/issues/1324)
+- fixed bug in retrieving modern pages from root site [#1328](https://github.com/pnp/office365-cli/issues/1328)
+- extended 'spo site list' command with support for returning deleted sites [#1335](https://github.com/pnp/office365-cli/issues/1335)
+- exposed completion commands as CLI commands [#1329](https://github.com/pnp/office365-cli/issues/1329)
+- fixed bug in retrieving files with special characters [#1358](https://github.com/pnp/office365-cli/issues/1358)
 
 ## [v2.6.0](https://github.com/pnp/office365-cli/releases/tag/v2.6.0)
 
@@ -35,11 +49,11 @@
 
 - [graph schemaextension remove](../cmd/graph/schemaextension/schemaextension-remove.md) - removes specified Microsoft Graph schema extension [#16](https://github.com/pnp/office365-cli/issues/16)
 
-**Power Apps**
+**Power Apps:**
 
 - [pa connector export](../cmd/pa/connector/connector-export.md) - exports the specified power automate or power apps custom connector [#1084](https://github.com/pnp/office365-cli/issues/1084)
 
-**SharePoint**
+**SharePoint:**
 
 - [spo report activityfilecounts](../cmd/spo/report/report-activityfilecounts.md) - gets the number of unique, licensed users who interacted with files stored on SharePoint sites [#1243](https://github.com/pnp/office365-cli/issues/1243)
 - [spo report activitypages](../cmd/spo/report/report-activitypages.md) - gets the number of unique pages visited by users [#1245](https://github.com/pnp/office365-cli/issues/1245)
@@ -47,7 +61,7 @@
 - [spo report activityusercounts](../cmd/spo/report/report-activityusercounts.md) - gets the trend in the number of active users [#1244](https://github.com/pnp/office365-cli/issues/1244)
 - [spo report siteusagedetail](../cmd/spo/report/report-siteusagedetail.md) - gets details about SharePoint site usage [#1246](https://github.com/pnp/office365-cli/issues/1246)
 
-**Yammer**
+**Yammer:**
 
 - [yammer group list](../cmd/yammer/group/group-list.md) - returns the list of groups in a Yammer network or the groups for a specific user [#1185](https://github.com/pnp/office365-cli/issues/1185)
 
@@ -63,12 +77,12 @@
 
 ### New commands
 
-**OneDrive**
+**OneDrive:**
 
 - [onedrive report activityuserdetail](../cmd/onedrive/report/report-activityuserdetail.md) - gets details about OneDrive activity by user [#1255](https://github.com/pnp/office365-cli/issues/1255)
 - [onedrive report usageaccountdetail](../cmd/onedrive/report/report-usageaccountdetail.md) - gets details about OneDrive usage by account [#1251](https://github.com/pnp/office365-cli/issues/1251)
 
-**SharePoint**
+**SharePoint:**
 
 - [spo report siteusagefilecounts](../cmd/spo/report/report-siteusagefilecounts.md) - get the total number of files across all sites and the number of active files [#1247](https://github.com/pnp/office365-cli/issues/1247)
 - [spo report siteusagepages](../cmd/spo/report/report-siteusagepages.md) - gets the number of pages viewed across all sites [#1250](https://github.com/pnp/office365-cli/issues/1250)
@@ -84,7 +98,7 @@
 
 ### New commands
 
-**OneDrive**
+**OneDrive:**
 
 - [onedrive report activityfilecounts](../cmd/onedrive/report/report-activityfilecounts.md) - gets the number of unique, licensed users that performed file interactions against any OneDrive account [#1257](https://github.com/pnp/office365-cli/issues/1257)
 - [onedrive report activityusercounts](../cmd/onedrive/report/report-activityusercounts.md) - gets the trend in the number of active OneDrive users [#1256](https://github.com/pnp/office365-cli/issues/1256)
@@ -92,7 +106,7 @@
 - [onedrive report usagefilecounts](../cmd/onedrive/report/report-usagefilecounts.md) - gets the total number of files across all sites and how many are active files [#1253](https://github.com/pnp/office365-cli/issues/1253)
 - [onedrive report usagestorage](../cmd/onedrive/report/report-usagestorage.md) - gets the trend on the amount of storage you are using in OneDrive for Business [#1254](https://github.com/pnp/office365-cli/issues/1254)
 
-**Outlook**
+**Outlook:**
 
 - [outlook report mailappusageversionsusercounts](../cmd/outlook/report/report-mailappusageversionsusercounts.md) - gets the count of unique users by Outlook desktop version [#1215](https://github.com/pnp/office365-cli/issues/1215)
 - [outlook report mailboxusagemailboxcount](../cmd/outlook/report/report-mailboxusagemailboxcount.md) - gets the total number of user mailboxes in your organization and how many are active each day of the reporting period [#1217](https://github.com/pnp/office365-cli/issues/1217)
@@ -106,16 +120,16 @@
 - [outlook report mailactivityuserdetail](../cmd/outlook/report/report-mailactivityuserdetail.md) - gets details about email activity users have performed [#1209](https://github.com/pnp/office365-cli/issues/1209)
 - [outlook report mailappusageappsusercounts](../cmd/outlook/report/report-mailappusageappsusercounts.md) - gets the count of unique users per email app [#1213](https://github.com/pnp/office365-cli/issues/1213)
 
-**SharePoint**
+**SharePoint:**
 
 - [spo feature disable](../cmd/spo/feature/feature-disable.md) - disables feature for the specified site or web [#676](https://github.com/pnp/office365-cli/issues/676)
 - [spo site rename](../cmd/spo/site/site-rename.md) - renames the URL and title of a site collection [#1197](https://github.com/pnp/office365-cli/issues/1197)
 
-**Yammer**
+**Yammer:**
 
 - [yammer message remove](../cmd/yammer/message/message-remove.md) - removes a Yammer message [#1106](https://github.com/pnp/office365-cli/issues/1106)
 
-**Power Apps**
+**Power Apps:**
 
 - [pa connector list](../cmd/pa/connector/connector-list.md) - lists Power Apps and Power Automate (Flow) connectors [#1237](https://github.com/pnp/office365-cli/issues/1237)
 
@@ -128,11 +142,11 @@
 
 ### New commands
 
-**SharePoint Framework**
+**SharePoint Framework:**
 
 - [spfx project externalize](../cmd/spfx/project/project-externalize.md) - externalizes SharePoint Framework project dependencies [#571](https://github.com/pnp/office365-cli/issues/571)
 
-**Yammer**
+**Yammer:**
 
 - [yammer message get](../cmd/yammer/message/message-get.md) - returns a Yammer message [#1105](https://github.com/pnp/office365-cli/issues/1105)
 - [yammer message list](../cmd/yammer/message/message-list.md) - returns all accessible messages from the user's Yammer network [#1104](https://github.com/pnp/office365-cli/issues/1104)
