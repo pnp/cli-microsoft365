@@ -26,6 +26,7 @@ interface Options extends GlobalOptions {
   contentType?: string;
   folder?: string;
   path: string;
+  batchSize:number;
 }
 
 class SpoListItemAddCommand extends SpoCommand {
@@ -56,10 +57,9 @@ class SpoListItemAddCommand extends SpoCommand {
     let contentTypeName: string | null = null;
     let listRestUrl: string | null = null;
     let maxBytesInBatch: number = 1000000; // max is  1048576
-    let rowsInBatch:number=0;
-    let batchCounter=0;
-    let batchSize:number=900;
-    let recordsToAdd = "";
+    let rowsInBatch: number = 0;
+    let batchCounter = 0;
+      let recordsToAdd = "";
     let csvHeaders: Array<string>;
     const generateUUID = function () {
       var d = new Date().getTime();
@@ -70,15 +70,15 @@ class SpoListItemAddCommand extends SpoCommand {
       });
       return uuid;
     }
-    const parseResults = (response: any,cmd:CommandInstance,cb: (err?: any) => void): void => {
-      let responseLines:Array<string> = response.toString().split('\n');
+    const parseResults = (response: any, cmd: CommandInstance, cb: (err?: any) => void): void => {
+      let responseLines: Array<string> = response.toString().split('\n');
       // read each line until you find JSON... 
       for (let responseLine of responseLines) {
         try {
           //check for error 
-      
-          if (responseLine.startsWith("HTTP/1.1 5")){ //any 500 errors (like timeout), just stop
-            cmd.log("An error was returned from SharePoint. Please retry with a lower batchsize")
+
+          if (responseLine.startsWith("HTTP/1.1 5")) { //any 500 errors (like timeout), just stop
+            cmd.log("An HTTP 5xx error was returned from SharePoint. Please retry with a lower --batchsize ")
             cb(responseLine);
           }
           // parse the JSON response...
@@ -105,6 +105,7 @@ class SpoListItemAddCommand extends SpoCommand {
     const fileName: string = Utils.getSafeFileName(path.basename(fullPath));
     const listIdArgument = args.options.listId || '';
     const listTitleArgument = args.options.listTitle || '';
+    const batchSize: number=args.options.batchSize|| 10;
     listRestUrl = (args.options.listId ?
       `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(listIdArgument)}')`
       : `${args.options.webUrl}/_api/web/lists/getByTitle('${encodeURIComponent(listTitleArgument)}')`);
@@ -265,13 +266,13 @@ class SpoListItemAddCommand extends SpoCommand {
                   '\u000d\u000a';
 
                 /***  Send the batch if the buffer is getting full   **/
-                if (rowsInBatch > batchSize || recordsToAdd.length >= maxBytesInBatch ) {
-                 
+                if (rowsInBatch >= batchSize || recordsToAdd.length >= maxBytesInBatch) {
+
                   recordsToAdd += '--changeset_' + changeSetId + '--' + '\u000d\u000a';
                   let batchContents = new Array();
                   let batchId = generateUUID();
                   batchContents.push('--batch_' + batchId);
-                  cmd.log(`Sending batch #${++batchCounter} BatchID(${batchId}) ChangeSetID(${changeSetId}) with ${rowsInBatch} rows`)
+                  cmd.log(`Sending batch #${++batchCounter} with ${rowsInBatch} items`)
                   batchContents.push('Content-Type: multipart/mixed; boundary="changeset_' + changeSetId + '"');
                   batchContents.push('Content-Length: ' + recordsToAdd.length);
                   batchContents.push('Content-Transfer-Encoding: binary');
@@ -290,9 +291,9 @@ class SpoListItemAddCommand extends SpoCommand {
                       cb(e);
                     })
                     .then((response) => {
-                      parseResults(response,cmd,cb)
+                      parseResults(response, cmd, cb)
                       recordsToAdd = ``;
-                      rowsInBatch=0;
+                      rowsInBatch = 0;
                       changeSetId = generateUUID();
                       this.push(row);
                       callback();
@@ -308,15 +309,15 @@ class SpoListItemAddCommand extends SpoCommand {
           }))
           .on("data", function () { })// dont delete this ,  or on end wont fire
           .on("end", function () {
-            
+
             if (recordsToAdd.length > 0) {
-             
-                
+
+
               let batchContents = new Array();
               let batchId = generateUUID();
               batchContents.push('--batch_' + batchId);
-              cmd.log(`Sending final batch #${++batchCounter} BatchID(${batchId}) ChangeSetID(${changeSetId}) with ${rowsInBatch} rows`)
-             
+              cmd.log(`Sending final batch #${++batchCounter} with ${rowsInBatch} items`)
+
               batchContents.push('Content-Type: multipart/mixed; boundary="changeset_' + changeSetId + '"');
               batchContents.push('Content-Length: ' + recordsToAdd.length);
               batchContents.push('Content-Transfer-Encoding: binary');
@@ -335,7 +336,7 @@ class SpoListItemAddCommand extends SpoCommand {
                   cb(e);
                 })
                 .then((response) => {
-                  parseResults(response,cmd,cb)
+                  parseResults(response, cmd, cb)
                 })
                 .finally(() => {
                   cmd.log(`Processed ${lineNumber} Rows`)
@@ -378,6 +379,10 @@ class SpoListItemAddCommand extends SpoCommand {
         option: '-f, --folder [folder]',
         description: 'The list-relative URL of the folder where the item should be created'
       },
+      {
+        option: '-b, --batchSize [batchSize]',
+        description: 'The maximum number of records to sent to SharePoint in a batch (default is 400)'
+      },
     ];
 
     const parentOptions: CommandOption[] = super.options();
@@ -412,6 +417,10 @@ class SpoListItemAddCommand extends SpoCommand {
       if (args.options.listId &&
         !Utils.isValidGuid(args.options.listId)) {
         return `${args.options.listId} in option listId is not a valid GUID`;
+      }
+      if (args.options.batchSize &&
+        args.options.batchSize > 1000){
+        return `batchsize ${args.options.batchSize} exceeds the 1000 item limit`;
       }
 
       return true;
