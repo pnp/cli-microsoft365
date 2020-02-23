@@ -552,7 +552,7 @@ Set-PnPWebTheme|SharePointPnPPowerShellOnline|
 Set-PnPWikiPageContent|SharePointPnPPowerShellOnline|
 Start-PnPWorkflowInstance|SharePointPnPPowerShellOnline|
 Stop-PnPWorkflowInstance|SharePointPnPPowerShellOnline|
-Submit-PnPSearchQuery|SharePointPnPPowerShellOnline|[spo search](../cmd/spo/search/search.md)
+Submit-PnPSearchQuery|SharePointPnPPowerShellOnline|[spo search](../cmd/spo/spo-search.md)
 Sync-PnPAppToTeams|SharePointPnPPowerShellOnline|
 Test-PnPListItemIsRecord|SharePointPnPPowerShellOnline|[spo listitem isrecord](../cmd/spo/listitem/listitem-isrecord.md)
 Test-PnPOffice365GroupAliasIsUsed|SharePointPnPPowerShellOnline|
@@ -567,9 +567,9 @@ Update-PnPApp|SharePointPnPPowerShellOnline|[spo app upgrade](../cmd/spo/app/app
 Update-PnPSiteClassification|SharePointPnPPowerShellOnline|[aad siteclassification set](../cmd/aad/siteclassification/siteclassification-set.md)
 Approve-FlowApprovalRequest|Microsoft.PowerApps.PowerShell|
 Deny-FlowApprovalRequest|Microsoft.PowerApps.PowerShell|
-Disable-Flow|Microsoft.PowerApps.PowerShell|[flow disable](../cmd/flow/disable.md)
-Enable-Flow|Microsoft.PowerApps.PowerShell|[flow enable](../cmd/flow/enable.md)
-Get-Flow|Microsoft.PowerApps.PowerShell|[flow list](../cmd/flow/list.md), [flow get](../cmd/flow/get.md)
+Disable-Flow|Microsoft.PowerApps.PowerShell|[flow disable](../cmd/flow/flow-disable.md)
+Enable-Flow|Microsoft.PowerApps.PowerShell|[flow enable](../cmd/flow/flow-enable.md)
+Get-Flow|Microsoft.PowerApps.PowerShell|[flow list](../cmd/flow/flow-list.md), [flow get](../cmd/flow/flow-get.md)
 Get-FlowApproval|Microsoft.PowerApps.PowerShell|
 Get-FlowApprovalRequest|Microsoft.PowerApps.PowerShell|
 Get-FlowEnvironment|Microsoft.PowerApps.PowerShell|[flow environment list](../cmd/flow/environment/environment-list.md), [flow environment get](../cmd/flow/environment/environment-get.md)
@@ -585,7 +585,7 @@ Get-PowerAppRoleAssignment|Microsoft.PowerApps.PowerShell|
 Get-PowerAppsNotification|Microsoft.PowerApps.PowerShell|
 Get-PowerAppVersion|Microsoft.PowerApps.PowerShell|
 Publish-PowerApp|Microsoft.PowerApps.PowerShell|
-Remove-Flow|Microsoft.PowerApps.PowerShell|[flow remove](../cmd/flow/remove.md)
+Remove-Flow|Microsoft.PowerApps.PowerShell|[flow remove](../cmd/flow/flow-remove.md)
 Remove-FlowOwnerRole|Microsoft.PowerApps.PowerShell|
 Remove-PowerApp|Microsoft.PowerApps.PowerShell|
 Remove-PowerAppConnection|Microsoft.PowerApps.PowerShell|
@@ -605,8 +605,8 @@ Add-PowerAppsAccount|Microsoft.PowerApps.Administration.PowerShell|
 Clear-AdminPowerAppApisToBypassConsent|Microsoft.PowerApps.Administration.PowerShell|
 Clear-AdminPowerAppAsFeatured|Microsoft.PowerApps.Administration.PowerShell|
 Clear-AdminPowerAppAsHero|Microsoft.PowerApps.Administration.PowerShell|
-Disable-AdminFlow|Microsoft.PowerApps.Administration.PowerShell|[flow disable](../cmd/flow/disable.md)
-Enable-AdminFlow|Microsoft.PowerApps.Administration.PowerShell|[flow enable](../cmd/flow/enable.md)
+Disable-AdminFlow|Microsoft.PowerApps.Administration.PowerShell|[flow disable](../cmd/flow/flow-disable.md)
+Enable-AdminFlow|Microsoft.PowerApps.Administration.PowerShell|[flow enable](../cmd/flow/flow-enable.md)
 Get-AdminDlpPolicy|Microsoft.PowerApps.Administration.PowerShell|
 Get-AdminFlow|Microsoft.PowerApps.Administration.PowerShell|
 Get-AdminFlowOwnerRole|Microsoft.PowerApps.Administration.PowerShell|

@@ -70,7 +70,7 @@ const loadCommandFromArgs = (args: string[], rootFolder: string): void => {
   }
   else {
     if (cliArgs.length === 2) {
-      commandFilePath = path.join(rootFolder, 'o365', cliArgs[0], 'commands', `${cliArgs[1]}.js`);
+      commandFilePath = path.join(rootFolder, 'o365', cliArgs[0], 'commands', `${cliArgs.join('-')}.js`);
     }
     else {
       commandFilePath = path.join(rootFolder, 'o365', cliArgs[0], 'commands', cliArgs[1], cliArgs.slice(1).join('-') + '.js');

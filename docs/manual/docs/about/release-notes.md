@@ -7,7 +7,7 @@
 **Azure Active Directory:**
 
 - [aad approleassignment list](../cmd/aad/approleassignment/approleassignment-list.md) - lists app role assignments for the specified application registration [#1270](https://github.com/pnp/office365-cli/issues/1270)
-- [aad o365group report activityfilecounts](../cmd/aad/o365group/report/report-activityfilecounts.md) - get the total number of files and how many of them were active across all group sites associated with an Office 365 Group [#1285](https://github.com/pnp/office365-cli/issues/1285)
+- [aad o365group report activityfilecounts](../cmd/aad/o365group/o365group-report-activityfilecounts.md) - get the total number of files and how many of them were active across all group sites associated with an Office 365 Group [#1285](https://github.com/pnp/office365-cli/issues/1285)
 
 **Microsoft Graph:**
 
@@ -169,13 +169,13 @@
 
 **Azure Active Directory:**
 
-- [aad o365group report activitydetail](../cmd/aad/o365group/report/report-activitydetail.md) - get details about Office 365 Groups activity by group [#1130](https://github.com/pnp/office365-cli/issues/1130)
-- [aad o365group report activitycounts](../cmd/aad/o365group/report/report-activitycounts.md) - get the number of group activities across group workloads [#1159](https://github.com/pnp/office365-cli/issues/1159)
-- [aad o365group report activitygroupcounts](../cmd/aad/o365group/report/report-activitygroupcounts.md) - get the daily total number of groups and how many of them were active based on email conversations, Yammer posts, and SharePoint file activities [#1160](https://github.com/pnp/office365-cli/issues/1160)
+- [aad o365group report activitydetail](../cmd/aad/o365group/o365group-report-activitydetail.md) - get details about Office 365 Groups activity by group [#1130](https://github.com/pnp/office365-cli/issues/1130)
+- [aad o365group report activitycounts](../cmd/aad/o365group/o365group-report-activitycounts.md) - get the number of group activities across group workloads [#1159](https://github.com/pnp/office365-cli/issues/1159)
+- [aad o365group report activitygroupcounts](../cmd/aad/o365group/o365group-report-activitygroupcounts.md) - get the daily total number of groups and how many of them were active based on email conversations, Yammer posts, and SharePoint file activities [#1160](https://github.com/pnp/office365-cli/issues/1160)
 
 **Flow:**
 
-- [flow remove](../cmd/flow/remove.md) - removes the specified Microsoft Flow [#1063](https://github.com/pnp/office365-cli/issues/1063)
+- [flow remove](../cmd/flow/flow-remove.md) - removes the specified Microsoft Flow [#1063](https://github.com/pnp/office365-cli/issues/1063)
 
 **PowerApps:**
 
@@ -249,8 +249,8 @@
 - [spo apppage add](../cmd/spo/apppage/apppage-add.md) - creates a single-part app page [#874](https://github.com/pnp/office365-cli/issues/874)
 - [spo homesite remove](../cmd/spo/homesite/homesite-remove.md) - removes the current Home Site [#1002](https://github.com/pnp/office365-cli/issues/1002)
 - [spo orgassetslibrary list](../cmd/spo/orgassetslibrary/orgassetslibrary-list.md) - lists all libraries that are assigned as org asset library [#1041](https://github.com/pnp/office365-cli/issues/1041)
-- [spo get](../cmd/spo/get.md) - gets the context URL for the root SharePoint site collection and SharePoint tenant admin site [#1071](https://github.com/pnp/office365-cli/issues/1071)
-- [spo set](../cmd/spo/set.md) - sets the URL of the root SharePoint site collection for use in SPO commands [#1070](https://github.com/pnp/office365-cli/issues/1070)
+- [spo get](../cmd/spo/spo-get.md) - gets the context URL for the root SharePoint site collection and SharePoint tenant admin site [#1071](https://github.com/pnp/office365-cli/issues/1071)
+- [spo set](../cmd/spo/spo-set.md) - sets the URL of the root SharePoint site collection for use in SPO commands [#1070](https://github.com/pnp/office365-cli/issues/1070)
 
 **Microsoft Teams:**
 
@@ -262,8 +262,8 @@
 
 **Microsoft Flow:**
 
-- [flow disable](../cmd/flow/disable.md) - disables Microsoft Flow [#1055](https://github.com/pnp/office365-cli/issues/1055)
-- [flow enable](../cmd/flow/enable.md) - enables Microsoft Flow [#1054](https://github.com/pnp/office365-cli/issues/1054)
+- [flow disable](../cmd/flow/flow-disable.md) - disables Microsoft Flow [#1055](https://github.com/pnp/office365-cli/issues/1055)
+- [flow enable](../cmd/flow/flow-enable.md) - enables Microsoft Flow [#1054](https://github.com/pnp/office365-cli/issues/1054)
 
 **Office 365 groups:**
 
@@ -563,7 +563,7 @@
 - [spo list view set](../cmd/spo/list/list-view-set.md) - updates existing list view [#662](https://github.com/pnp/office365-cli/issues/662)
 - [spo list webhook remove](../cmd/spo/list/list-webhook-remove.md) - removes the specified webhook from the list [#650](https://github.com/pnp/office365-cli/issues/650)
 - [spo list webhook set](../cmd/spo/list/list-webhook-set.md) - updates the specified webhook [#651](https://github.com/pnp/office365-cli/issues/651)
-- [spo search](../cmd/spo/search/search.md) - executes a search query [#316](https://github.com/pnp/office365-cli/issues/316)
+- [spo search](../cmd/spo/spo-search.md) - executes a search query [#316](https://github.com/pnp/office365-cli/issues/316)
 - [spo serviceprincipal grant add](../cmd/spo/serviceprincipal/serviceprincipal-grant-add.md) - grants the service principal permission to the specified API [#590](https://github.com/pnp/office365-cli/issues/590)
 
 **Microsoft Graph:**
@@ -635,7 +635,7 @@
 
 **Azure Management Service:**
 
-- [azmgmt flow export](../cmd/flow/export.md) - exports the specified Microsoft Flow as a file [#383](https://github.com/pnp/office365-cli/issues/383)
+- [azmgmt flow export](../cmd/flow/flow-export.md) - exports the specified Microsoft Flow as a file [#383](https://github.com/pnp/office365-cli/issues/383)
 - [azmgmt flow run get](../cmd/flow/run/run-get.md) - gets information about a specific run of the specified Microsoft Flow [#400](https://github.com/pnp/office365-cli/issues/400)
 - [azmgmt flow run list](../cmd/flow/run/run-list.md) - lists runs of the specified Microsoft Flow [#399](https://github.com/pnp/office365-cli/issues/399)
 
@@ -816,8 +816,8 @@
 - azmgmt status - shows Azure Management Service login status [#378](https://github.com/pnp/office365-cli/issues/378)
 - [azmgmt flow environment get](../cmd/flow/environment/environment-get.md) - gets information about the specified Microsoft Flow environment [#380](https://github.com/pnp/office365-cli/issues/380)
 - [azmgmt flow environment list](../cmd/flow/environment/environment-list.md) - lists Microsoft Flow environments in the current tenant [#379](https://github.com/pnp/office365-cli/issues/379)
-- [azmgmt flow get](../cmd/flow/get.md) - gets information about the specified Microsoft Flow [#382](https://github.com/pnp/office365-cli/issues/382)
-- [azmgmt flow list](../cmd/flow/list.md) - lists Microsoft Flows in the given environment [#381](https://github.com/pnp/office365-cli/issues/381)
+- [azmgmt flow get](../cmd/flow/flow-get.md) - gets information about the specified Microsoft Flow [#382](https://github.com/pnp/office365-cli/issues/382)
+- [azmgmt flow list](../cmd/flow/flow-list.md) - lists Microsoft Flows in the given environment [#381](https://github.com/pnp/office365-cli/issues/381)
 
 ### Updated commands
 

@@ -32,11 +32,10 @@ nav:
         - o365group restore: 'cmd/aad/o365group/o365group-restore.md'
         - o365group set: 'cmd/aad/o365group/o365group-set.md'
         - o365group teamify: 'cmd/aad/o365group/o365group-teamify.md'
-        - report:
-          - report activitycounts: 'cmd/aad/o365group/report/report-activitycounts.md'
-          - report activitydetail: 'cmd/aad/o365group/report/report-activitydetail.md'
-          - report activityfilecounts: 'cmd/aad/o365group/report/report-activityfilecounts.md'
-          - report activitygroupcounts: 'cmd/aad/o365group/report/report-activitygroupcounts.md'
+        - o365group report activitycounts: 'cmd/aad/o365group/o365group-report-activitycounts.md'
+        - o365group report activitydetail: 'cmd/aad/o365group/o365group-report-activitydetail.md'
+        - o365group report activityfilecounts: 'cmd/aad/o365group/o365group-report-activityfilecounts.md'
+        - o365group report activitygroupcounts: 'cmd/aad/o365group/o365group-report-activitygroupcounts.md'
         - o365group user add: 'cmd/aad/o365group/o365group-user-add.md'
         - o365group user list: 'cmd/aad/o365group/o365group-user-list.md'
         - o365group user remove: 'cmd/aad/o365group/o365group-user-remove.md'
@@ -64,12 +63,12 @@ nav:
         - completion sh setup: 'cmd/cli/completion/completion-sh-setup.md'
         - completion sh update: 'cmd/cli/completion/completion-sh-update.md'
     - Microsoft Flow (flow):
-      - disable: 'cmd/flow/disable.md'
-      - enable: 'cmd/flow/enable.md'
-      - export: 'cmd/flow/export.md'
-      - get: 'cmd/flow/get.md'
-      - list: 'cmd/flow/list.md'
-      - remove: 'cmd/flow/remove.md'
+      - disable: 'cmd/flow/flow-disable.md'
+      - enable: 'cmd/flow/flow-enable.md'
+      - export: 'cmd/flow/flow-export.md'
+      - get: 'cmd/flow/flow-get.md'
+      - list: 'cmd/flow/flow-list.md'
+      - remove: 'cmd/flow/flow-remove.md'
       - connector:
         - connector export: 'cmd/pa/connector/connector-export.md'
         - connector list: 'cmd/pa/connector/connector-list.md'
@@ -126,8 +125,9 @@ nav:
         - project externalize: 'cmd/spfx/project/project-externalize.md'
         - project upgrade: 'cmd/spfx/project/project-upgrade.md'
     - SharePoint Online (spo):
-      - get: 'cmd/spo/get.md'
-      - set: 'cmd/spo/set.md'
+      - get: 'cmd/spo/spo-get.md'
+      - search: 'cmd/spo/spo-search.md'
+      - set: 'cmd/spo/spo-set.md'
       - app:
         - app add: 'cmd/spo/app/app-add.md'
         - app deploy: 'cmd/spo/app/app-deploy.md'
@@ -287,8 +287,6 @@ nav:
         - report siteusagepages: 'cmd/spo/report/report-siteusagepages.md'
         - report siteusagesitecounts: 'cmd/spo/report/report-siteusagesitecounts.md'
         - report siteusagestorage: 'cmd/spo/report/report-siteusagestorage.md'
-      - search:
-        - search: 'cmd/spo/search/search.md'
       - serviceprincipal:
         - serviceprincipal grant add: 'cmd/spo/serviceprincipal/serviceprincipal-grant-add.md'
         - serviceprincipal grant list: 'cmd/spo/serviceprincipal/serviceprincipal-grant-list.md'
