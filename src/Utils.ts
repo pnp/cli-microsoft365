@@ -85,6 +85,39 @@ export default class Utils {
     return dateTimeRegEx.test(date) ? true : dateOnlyRegEx.test(date);
   }
 
+  public static isValidISODateTime(dateTime: string): boolean {
+    const withMilliSecsPattern: RegExp = new RegExp(
+      /^[0-9]{4}-((0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01])|(0[469]|11)-(0[1-9]|[12][0-9]|30)|(02)-(0[1-9]|[12][0-9]))T(0[0-9]|1[0-9]|2[0-3]):(0[0-9]|[1-5][0-9]):(0[0-9]|[1-5][0-9])\.[0-9]{3}Z$/);
+    if (withMilliSecsPattern.test(dateTime)) {
+      return true;
+    }
+    const withSecsPattern: RegExp = new RegExp(
+      /^[0-9]{4}-((0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01])|(0[469]|11)-(0[1-9]|[12][0-9]|30)|(02)-(0[1-9]|[12][0-9]))T(0[0-9]|1[0-9]|2[0-3]):(0[0-9]|[1-5][0-9]):(0[0-9]|[1-5][0-9])Z$/);
+    if (withSecsPattern.test(dateTime)) {
+      return true;
+    }
+
+    const withMinutesPattern: RegExp = new RegExp(
+      /^[0-9]{4}-((0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01])|(0[469]|11)-(0[1-9]|[12][0-9]|30)|(02)-(0[1-9]|[12][0-9]))T(0[0-9]|1[0-9]|2[0-3]):(0[0-9]|[1-5][0-9])Z$/);
+    if (withMinutesPattern.test(dateTime)) {
+      return true;
+    }
+
+    const withHoursPattern: RegExp = new RegExp(
+      /^[0-9]{4}-((0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01])|(0[469]|11)-(0[1-9]|[12][0-9]|30)|(02)-(0[1-9]|[12][0-9]))T(0[0-9]|1[0-9]|2[0-3])Z$/);
+    if (withHoursPattern.test(dateTime)) {
+      return true;
+    }
+
+    const withoutTimePattern: RegExp = new RegExp(
+      /^[0-9]{4}-((0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01])|(0[469]|11)-(0[1-9]|[12][0-9]|30)|(02)-(0[1-9]|[12][0-9]))$/);
+    if (withoutTimePattern.test(dateTime)) {
+      return true;
+    }
+
+    return false;
+  }
+
   public static isValidBoolean(value: string): boolean {
     return value.toLowerCase() === 'true' || value.toLowerCase() === 'false'
   }
