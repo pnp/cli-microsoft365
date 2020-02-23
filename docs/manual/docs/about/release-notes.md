@@ -40,6 +40,7 @@
 - extended 'spo site list' command with support for returning deleted sites [#1335](https://github.com/pnp/office365-cli/issues/1335)
 - exposed completion commands as CLI commands [#1329](https://github.com/pnp/office365-cli/issues/1329)
 - fixed bug in retrieving files with special characters [#1358](https://github.com/pnp/office365-cli/issues/1358)
+- added alias to 'accesstoken get' [#1369](https://github.com/pnp/office365-cli/issues/1369)
 
 ## [v2.6.0](https://github.com/pnp/office365-cli/releases/tag/v2.6.0)
 
