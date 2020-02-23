@@ -225,6 +225,7 @@ nav:
         - list webhook set: 'cmd/spo/list/list-webhook-set.md'
       - listitem:
         - listitem add: 'cmd/spo/listitem/listitem-add.md'
+        - listitem batch add: 'cmd/spo/listitem/listitem-batch-add.md'
         - listitem get: 'cmd/spo/listitem/listitem-get.md'
         - listitem isrecord: 'cmd/spo/listitem/listitem-isrecord.md'
         - listitem list: 'cmd/spo/listitem/listitem-list.md'

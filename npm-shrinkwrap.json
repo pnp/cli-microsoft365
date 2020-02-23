@@ -10,6 +10,19 @@
       "integrity": "sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==",
       "dev": true
     },
+    "@fast-csv/parse": {
+      "version": "4.1.1",
+      "resolved": "https://registry.npmjs.org/@fast-csv/parse/-/parse-4.1.1.tgz",
+      "integrity": "sha512-ayyg/O1IlOWn0d0vcVmOz1DHnD5vutHbDdovKS2qX2PcT09TkZe0Xx/2Wh2CSynzM+2ynj/05fxYKFDpiorpzQ==",
+      "requires": {
+        "lodash.escaperegexp": "^4.1.2",
+        "lodash.groupby": "^4.6.0",
+        "lodash.isfunction": "^3.0.9",
+        "lodash.isnil": "^4.0.0",
+        "lodash.isundefined": "^3.0.1",
+        "lodash.uniq": "^4.5.0"
+      }
+    },
     "@istanbuljs/schema": {
       "version": "0.1.2",
       "resolved": "https://registry.npmjs.org/@istanbuljs/schema/-/schema-0.1.2.tgz",
@@ -1101,6 +1114,11 @@
       "resolved": "https://registry.npmjs.org/crypto-random-string/-/crypto-random-string-1.0.0.tgz",
       "integrity": "sha1-ojD2T1aDEOFJgAmUB5DsmVRbyn4="
     },
+    "csv-parse": {
+      "version": "4.8.5",
+      "resolved": "https://registry.npmjs.org/csv-parse/-/csv-parse-4.8.5.tgz",
+      "integrity": "sha512-rpsLmlLWJZifmLzZEVGbZ9phWnJyi+cCbCGYr4vX2NaHFtgbmQPFk+WmMkmMkQXgsIUn6CgnK9cTuUAfFjoXbA=="
+    },
     "dashdash": {
       "version": "1.14.1",
       "resolved": "https://registry.npmjs.org/dashdash/-/dashdash-1.14.1.tgz",
@@ -1958,6 +1976,36 @@
       "version": "4.17.15",
       "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.17.15.tgz",
       "integrity": "sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A=="
+    },
+    "lodash.escaperegexp": {
+      "version": "4.1.2",
+      "resolved": "https://registry.npmjs.org/lodash.escaperegexp/-/lodash.escaperegexp-4.1.2.tgz",
+      "integrity": "sha1-ZHYsSGGAglGKw99Mz11YhtriA0c="
+    },
+    "lodash.groupby": {
+      "version": "4.6.0",
+      "resolved": "https://registry.npmjs.org/lodash.groupby/-/lodash.groupby-4.6.0.tgz",
+      "integrity": "sha1-Cwih3PaDl8OXhVwyOXg4Mt90A9E="
+    },
+    "lodash.isfunction": {
+      "version": "3.0.9",
+      "resolved": "https://registry.npmjs.org/lodash.isfunction/-/lodash.isfunction-3.0.9.tgz",
+      "integrity": "sha512-AirXNj15uRIMMPihnkInB4i3NHeb4iBtNg9WRWuK2o31S+ePwwNmDPaTL3o7dTJ+VXNZim7rFs4rxN4YU1oUJw=="
+    },
+    "lodash.isnil": {
+      "version": "4.0.0",
+      "resolved": "https://registry.npmjs.org/lodash.isnil/-/lodash.isnil-4.0.0.tgz",
+      "integrity": "sha1-SeKM1VkBNFjIFMVHnTxmOiG/qmw="
+    },
+    "lodash.isundefined": {
+      "version": "3.0.1",
+      "resolved": "https://registry.npmjs.org/lodash.isundefined/-/lodash.isundefined-3.0.1.tgz",
+      "integrity": "sha1-I+89lTVWUgOmbO/VuDD4SJEa+0g="
+    },
+    "lodash.uniq": {
+      "version": "4.5.0",
+      "resolved": "https://registry.npmjs.org/lodash.uniq/-/lodash.uniq-4.5.0.tgz",
+      "integrity": "sha1-0CJTc662Uq3BvILklFM5qEJ1R3M="
     },
     "log-driver": {
       "version": "1.2.7",

@@ -108,8 +108,10 @@
     "Williams, Rabia <rabiawilliams@gmail.com>"
   ],
   "dependencies": {
+    "@fast-csv/parse": "4.1.1",
     "adal-node": "^0.2.1",
     "applicationinsights": "^1.5.0",
+    "csv-parse": "^4.8.5",
     "easy-table": "^1.1.1",
     "jmespath": "^0.15.0",
     "node-forge": "^0.9.1",
