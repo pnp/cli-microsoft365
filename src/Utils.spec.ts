@@ -85,6 +85,31 @@ describe('Utils', () => {
     const result = Utils.isDateInRange("sharing is caring", 1);
     assert.equal(result, false);
   });
+  
+  it('should validate a valid date without time is passed', () => {
+    const result = Utils.isValidISODateTime("2019-01-01");
+    assert.equal(result, true);
+  });
+
+  it('should validate a valid date with only hours-precision time is passed', () => {
+    const result = Utils.isValidISODateTime("2019-01-01T01Z");
+    assert.equal(result, true);
+  });
+
+  it('should validate a valid date with only minutes-precision time is passed', () => {
+    const result = Utils.isValidISODateTime("2019-01-01T01:01Z");
+    assert.equal(result, true);
+  });
+
+  it('should validate a valid date with only seconds-precision time is passed', () => {
+    const result = Utils.isValidISODateTime("2019-01-01T01:01:01Z");
+    assert.equal(result, true);
+  });
+
+  it('should validate a valid date with milliseconds-precision time is passed', () => {
+    const result = Utils.isValidISODateTime("2019-01-01T01:01:01.123Z");
+    assert.equal(result, true);
+  });
 
   it('isValidGuid returns true if valid guid', () => {
     const result = Utils.isValidGuid('b2307a39-e878-458b-bc90-03bc578531d6');
