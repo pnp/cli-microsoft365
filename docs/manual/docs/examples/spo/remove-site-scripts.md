@@ -48,7 +48,6 @@ if [ ${#sitesscriptstoremove[@]} = 0 ]; then
   exit 1
 fi
 
-printf '%s\n' "${sitesscriptstoremove[@]}"
 echo "Press Enter to start deleting (CTRL + C to exit)"
 read foo
 
