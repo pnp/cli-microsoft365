@@ -381,7 +381,7 @@ class SpoListItemAddCommand extends SpoCommand {
       },
       {
         option: '-b, --batchSize [batchSize]',
-        description: 'The maximum number of records to sent to SharePoint in a batch (default is 400)'
+        description: 'The maximum number of records to sent to SharePoint in a batch (default is 10)'
       },
     ];
 
