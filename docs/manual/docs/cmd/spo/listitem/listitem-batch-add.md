@@ -19,6 +19,7 @@ Option|Description
 `-p, --path [path]`|  The path of the csv file with records to be added to the SharePoint list 
 `-c, --contentType [contentType]`|The name or the ID of the content type to associate with the new item
 `-f, --folder [folder]`|The list-relative URL of the folder where the item should be created
+`-b, --batchSize [batchSize]`|The maximum number of records to sent to SharePoint in a batch (default is 10)
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
