@@ -180,12 +180,12 @@ class SpoSiteDesignAddCommand extends SpoCommand {
     the design will lead to unexpected results.
 
   Examples:
-  
+
     Create new site design for provisioning modern team sites
       ${this.name} --title "Contoso team site" --webTemplate TeamSite --siteScripts "19b0e1b2-e3d1-473f-9394-f08c198ef43e,b2307a39-e878-458b-bc90-03bc578531d6"
 
     Create new default site design for provisioning modern communication sites
-      ${this.name} --title "Contoso communication site" --webTemplate CommunicationSite --siteScripts 19b0e1b2-e3d1-473f-9394-f08c198ef43e --isDefault
+      ${this.name} --title "Contoso communication site" --webTemplate CommunicationSite --siteScripts "19b0e1b2-e3d1-473f-9394-f08c198ef43e" --isDefault
 
   More information:
 

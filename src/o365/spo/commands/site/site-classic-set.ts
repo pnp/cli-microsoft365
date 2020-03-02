@@ -76,7 +76,7 @@ class SpoSiteClassicSetCommand extends SpoCommand {
         return this.ensureFormDigest(this.spoAdminUrl, cmd, this.context, this.debug);
       })
       .then((res: FormDigestInfo): Promise<string> => {
-        this.context = res; 
+        this.context = res;
         if (this.verbose) {
           cmd.log(`Setting basic properties ${args.options.url}...`);
         }
@@ -176,7 +176,7 @@ class SpoSiteClassicSetCommand extends SpoCommand {
         return this.ensureFormDigest(this.spoAdminUrl as string, cmd, this.context, this.debug);
       })
       .then((res: FormDigestInfo): Promise<void> => {
-        this.context = res; 
+        this.context = res;
         return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
           if (!args.options.owners) {
             resolve();
@@ -256,7 +256,7 @@ class SpoSiteClassicSetCommand extends SpoCommand {
       this
         .ensureFormDigest(this.spoAdminUrl as string, cmd, this.context, this.debug)
         .then((res: FormDigestInfo): Promise<string> => {
-          this.context = res; 
+          this.context = res;
           const requestOptions: any = {
             url: `${this.spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
             headers: {
@@ -415,7 +415,7 @@ class SpoSiteClassicSetCommand extends SpoCommand {
     log(
       `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
     the tenant admin site.
-   
+
   Remarks:
 
     The value of the ${chalk.blue('--resourceQuota')} option must not exceed
@@ -452,7 +452,7 @@ class SpoSiteClassicSetCommand extends SpoCommand {
     the ${chalk.blue(this.getCommandName())} command will keep running until
     it received confirmation from Office 365 that the site has been fully
     configured.
-  
+
   Examples:
 
     Change the title of the site collection. Don't wait for the configuration
@@ -460,7 +460,7 @@ class SpoSiteClassicSetCommand extends SpoCommand {
       ${this.getCommandName()} --url https://contoso.sharepoint.com/sites/team --title Team
 
     Add the specified user accounts as site collection administrators
-      ${this.getCommandName()} --url https://contoso.sharepoint.com/sites/team --owners joe@contoso.com,steve@contoso.com
+      ${this.getCommandName()} --url https://contoso.sharepoint.com/sites/team --owners "joe@contoso.com,steve@contoso.com"
 
     Lock the site preventing users from accessing it. Wait for the configuration
     to complete

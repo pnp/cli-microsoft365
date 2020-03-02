@@ -409,21 +409,21 @@ class SpoSearchCommand extends SpoCommand {
     log(vorpal.find(this.name).helpInformation());
     log(
       `  Examples:
-  
+
     Execute search query to retrieve all Document Sets
     (ContentTypeId = '${chalk.grey('0x0120D520')}') for the English locale
-      ${commands.SEARCH} --query 'ContentTypeId:0x0120D520' --culture 1033
+      ${commands.SEARCH} --query "ContentTypeId:0x0120D520" --culture 1033
 
     Retrieve all documents. For each document, retrieve the Path, Author
     and FileType.
-      ${commands.SEARCH} --query 'IsDocument:1' --selectProperties 'Path,Author,FileType' --allResults
-    
+      ${commands.SEARCH} --query "IsDocument:1" --selectProperties "Path,Author,FileType" --allResults
+
     Return the top 50 items of which the title starts with 'Marketing' while
     trimming duplicates.
-      ${commands.SEARCH} --query 'Title:Marketing*' --rowLimit=50 --trimDuplicates
+      ${commands.SEARCH} --query "Title:Marketing*" --rowLimit=50 --trimDuplicates
 
     Return only items from a specific result source (using the source id).
-      ${commands.SEARCH} --query '*' --sourceId 6e71030e-5e16-4406-9bff-9c1829843083
+      ${commands.SEARCH} --query "*" --sourceId "6e71030e-5e16-4406-9bff-9c1829843083"
       `);
   }
 }
