@@ -328,7 +328,7 @@ class SpoSiteAddCommand extends SpoCommand {
     log(vorpal.find(this.name).helpInformation());
     log(
       `  Examples:
-  
+
     Create modern team site with private group
       ${commands.SITE_ADD} --alias team1 --title Team 1
 
@@ -342,7 +342,7 @@ class SpoSiteAddCommand extends SpoCommand {
       ${commands.SITE_ADD} --alias team1 --title Team 1 --lcid 1043
 
     Create modern team site with the specified users as owners
-      ${commands.SITE_ADD} --alias team1 --title Team 1 --owners 'steve@contoso.com, bob@contoso.com'
+      ${commands.SITE_ADD} --alias team1 --title Team 1 --owners "steve@contoso.com, bob@contoso.com"
 
     Create communication site using the Topic design
       ${commands.SITE_ADD} --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing
@@ -355,9 +355,9 @@ class SpoSiteAddCommand extends SpoCommand {
 
     Create communication site using the Blank design with description and classification
       ${commands.SITE_ADD} --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing --description Site of the marketing department --classification MBI --siteDesign Blank
-  
+
   More information
-    
+
     Creating SharePoint Communication Site using REST
       https://docs.microsoft.com/en-us/sharepoint/dev/apis/communication-site-creation-rest
 `);

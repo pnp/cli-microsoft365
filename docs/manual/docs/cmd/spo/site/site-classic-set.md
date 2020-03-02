@@ -63,7 +63,7 @@ spo site classic set --url https://contoso.sharepoint.com/sites/team --title Tea
 Add the specified user accounts as site collection administrators
 
 ```sh
-spo site classic set --url https://contoso.sharepoint.com/sites/team --owners joe@contoso.com,steve@contoso.com
+spo site classic set --url https://contoso.sharepoint.com/sites/team --owners "joe@contoso.com,steve@contoso.com"
 ```
 
 Lock the site preventing users from accessing it. Wait for the configuration to complete

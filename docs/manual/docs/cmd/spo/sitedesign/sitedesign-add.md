@@ -43,7 +43,7 @@ spo sitedesign add --title "Contoso team site" --webTemplate TeamSite --siteScri
 Create new default site design for provisioning modern communication sites
 
 ```sh
-spo sitedesign add --title "Contoso communication site" --webTemplate CommunicationSite --siteScripts 19b0e1b2-e3d1-473f-9394-f08c198ef43e --isDefault
+spo sitedesign add --title "Contoso communication site" --webTemplate CommunicationSite --siteScripts "19b0e1b2-e3d1-473f-9394-f08c198ef43e" --isDefault
 ```
 
 ## More information

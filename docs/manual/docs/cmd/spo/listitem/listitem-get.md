@@ -31,3 +31,10 @@ Get an item with ID _147_ from list with title _Demo List_ in site _https://cont
 ```sh
 spo listitem get --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x
 ```
+
+
+Get an items Title and Created column and with ID _147_ from list with title _Demo List_ in site _https://contoso.sharepoint.com/sites/project-x_
+
+```sh
+spo listitem get --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --fields "Title,Created"
+```

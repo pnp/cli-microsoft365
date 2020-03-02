@@ -158,9 +158,12 @@ class SpoListItemGetCommand extends SpoCommand {
     log(vorpal.find(this.name).helpInformation());
     log(
       `  Examples:
-  
+
     Get the item with ID of ${chalk.grey('147')} in list with title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
       ${commands.LISTITEM_GET} --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x
+
+    Get the items Title and Created column and with ID of ${chalk.grey('147')} in list with title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
+      ${commands.LISTITEM_GET} --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --fields "Title,Created"
 
    `);
   }
