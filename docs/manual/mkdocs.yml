@@ -449,6 +449,8 @@ nav:
     - 'GitHub Actions': 'concepts/github-actions.md'
   - Examples:
     - 'Introduction': 'examples/index.md'
+    - Azure Active Directory:
+      - 'Delete all Office 365 groups' : 'examples/aad/delete-o365-groups.md'
     - Microsoft Graph:
       - 'Authenticate with and call the Microsoft Graph' : 'examples/graph/call-graph.md'
     - SharePoint Online:
