@@ -3,7 +3,7 @@ import PeriodBasedReport from '../../../base/PeriodBasedReport';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
-class YammerGroupActivityCountsCommand extends PeriodBasedReport {
+class YammerReportGroupActivityCountsCommand extends PeriodBasedReport {
   public get name(): string {
     return commands.YAMMER_REPORT_GROUPACTIVITYCOUNTS;
   }
@@ -35,4 +35,4 @@ class YammerGroupActivityCountsCommand extends PeriodBasedReport {
   }
 }
 
-module.exports = new YammerGroupActivityCountsCommand();
+module.exports = new YammerReportGroupActivityCountsCommand();
