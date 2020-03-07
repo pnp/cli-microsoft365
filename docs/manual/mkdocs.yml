@@ -126,6 +126,7 @@ nav:
       - report:
         - report activitycounts: 'cmd/skype/report/report-activitycounts.md'
         - report activityusercounts: 'cmd/skype/report/report-activityusercounts.md'
+        - report activityuserdetail: 'cmd/skype/report/report-activityuserdetail.md'
     - SharePoint Framework (spfx):
       - doctor: 'cmd/spfx/doctor.md'
       - project:
