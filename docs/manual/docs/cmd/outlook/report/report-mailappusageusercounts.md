@@ -32,11 +32,11 @@ outlook report mailappusageusercounts --period D7
 Gets the count of unique users that connected to Exchange Online using any email app for the last week and exports the report data in the specified path in text format
 
 ```sh
-outlook report mailappusageusercounts --period D7 --output text --outputFile 'C:/report.txt'
+outlook report mailappusageusercounts --period D7 --output text --outputFile "mailappusageusercounts.txt"
 ```
 
 Gets the count of unique users that connected to Exchange Online using any email app for the last week and exports the report data in the specified path in json format
 
 ```sh
-outlook report mailappusageusercounts --period D7 --output json --outputFile 'C:/report.json'
+outlook report mailappusageusercounts --period D7 --output json --outputFile "mailappusageusercounts.json"
 ```

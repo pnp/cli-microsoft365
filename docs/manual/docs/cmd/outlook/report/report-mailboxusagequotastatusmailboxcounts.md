@@ -32,11 +32,11 @@ outlook report mailboxusagequotastatusmailboxcounts --period D7
 Gets the count of user mailboxes in each quota category for the last week and exports the report data in the specified path in text format
 
 ```sh
-outlook report mailboxusagequotastatusmailboxcounts --period D7 --output text --outputFile 'C:/report.txt'
+outlook report mailboxusagequotastatusmailboxcounts --period D7 --output text --outputFile "mailboxusagequotastatusmailboxcounts.txt"
 ```
 
 Gets the count of user mailboxes in each quota category for the last week and exports the report data in the specified path in json format
 
 ```sh
-outlook report mailboxusagequotastatusmailboxcounts --period D7 --output json --outputFile 'C:/report.json'
+outlook report mailboxusagequotastatusmailboxcounts --period D7 --output json --outputFile "mailboxusagequotastatusmailboxcounts.json"
 ```

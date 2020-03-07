@@ -41,11 +41,11 @@ spo report activityuserdetail --date 2019-05-01
 Gets details about SharePoint activity by user for the last week and exports the report data in the specified path in text format
 
 ```sh
-spo report activityuserdetail --period D7 --output text --outputFile 'report.txt'
+spo report activityuserdetail --period D7 --output text --outputFile "activityuserdetail.txt"
 ```
 
 Gets details about SharePoint activity by user for the last week and exports the report data in the specified path in json format
 
 ```sh
-spo report activityuserdetail --period D7 --output json --outputFile 'report.json'
+spo report activityuserdetail --period D7 --output json --outputFile "activityuserdetail.json"
 ```

@@ -36,11 +36,11 @@ spo report siteusagesitecounts --period D7
 Gets the total number of files across all sites and the number of active files for the last week and exports the report data in the specified path in text format
 
 ```sh
-spo report siteusagesitecounts --period D7 --output text --outputFile 'report.txt'
+spo report siteusagesitecounts --period D7 --output text --outputFile "siteusagesitecounts.txt"
 ```
 
 Gets the total number of files across all sites and the number of active files for the last week and exports the report data in the specified path in json format
 
 ```sh
-spo report siteusagesitecounts --period D7 --output json --outputFile 'report.json'
+spo report siteusagesitecounts --period D7 --output json --outputFile "siteusagesitecounts.json"
 ```

@@ -38,11 +38,11 @@ teams report useractivityuserdetail --date 2019-07-13
 Gets details about Microsoft Teams user activity by user for the last week and exports the report data in the specified path in text format
 
 ```sh
-teams report useractivityuserdetail --period D7 --output text --outputFile 'C:/report.txt'
+teams report useractivityuserdetail --period D7 --output text --outputFile "useractivityuserdetail.txt"
 ```
 
 Gets details about Microsoft Teams user activity by user for the last week and exports the report data in the specified path in json format
 
 ```sh
-teams report useractivityuserdetail --period D7 --output json --outputFile 'C:/report.json'
+teams report useractivityuserdetail --period D7 --output json --outputFile "useractivityuserdetail.json"
 ```

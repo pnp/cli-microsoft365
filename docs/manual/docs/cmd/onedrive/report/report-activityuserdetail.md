@@ -39,11 +39,11 @@ onedrive report activityuserdetail --date 2019-05-01
 Gets details about OneDrive activity by user for the last week and exports the report data in the specified path in text format
 
 ```sh
-onedrive report activityuserdetail --period D7 --output text --outputFile 'onedriveactivityuserdetail.txt'
+onedrive report activityuserdetail --period D7 --output text --outputFile "onedriveactivityuserdetail.txt"
 ```
 
 Gets details about OneDrive activity by user for the last week and exports the report data in the specified path in json format
 
 ```sh
-onedrive report activityuserdetail --period D7 --output json --outputFile 'onedriveactivityuserdetail.json'
+onedrive report activityuserdetail --period D7 --output json --outputFile "onedriveactivityuserdetail.json"
 ```

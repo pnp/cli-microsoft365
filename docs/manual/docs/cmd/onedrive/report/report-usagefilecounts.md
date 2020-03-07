@@ -36,11 +36,11 @@ onedrive report usagefilecounts --period D7
 Gets the total number of files across all sites and how many are active files for the last week and exports the report data in the specified path in text format
 
 ```sh
-onedrive report usagefilecounts --period D7 --output text --outputFile 'C:/report.txt'
+onedrive report usagefilecounts --period D7 --output text --outputFile "usagefilecounts.txt"
 ```
 
 Gets the total number of files across all sites and how many are active files for the last week and exports the report data in the specified path in json format
 
 ```sh
-onedrive report usagefilecounts --period D7 --output json --outputFile 'C:/report.json'
+onedrive report usagefilecounts --period D7 --output json --outputFile "usagefilecounts.json"
 ```

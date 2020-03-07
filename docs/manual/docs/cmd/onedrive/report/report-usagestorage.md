@@ -32,11 +32,11 @@ onedrive report usagestorage --period D7
 Gets the trend on the amount of storage you are using in OneDrive for Business for the last week and exports the report data in the specified path in text format
 
 ```sh
-onedrive report usagestorage --period D7 --output text --outputFile 'C:/report.txt'
+onedrive report usagestorage --period D7 --output text --outputFile "usagestorage.txt"
 ```
 
 Gets the trend on the amount of storage you are using in OneDrive for Business for the last week and exports the report data in the specified path in json format
 
 ```sh
-onedrive report usagestorage --period D7 --output json --outputFile 'C:/report.json'
+onedrive report usagestorage --period D7 --output json --outputFile "usagestorage.json"
 ```

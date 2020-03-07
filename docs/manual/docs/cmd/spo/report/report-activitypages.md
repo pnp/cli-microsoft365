@@ -31,11 +31,11 @@ spo report activitypages --period D7
 Gets the number of unique pages visited by users for the last week and exports the report data in the specified path in text format
 
 ```sh
-spo report activitypages --period D7 --output text --outputFile 'report.txt'
+spo report activitypages --period D7 --output text --outputFile "activitypages.txt"
 ```
 
 Gets the number of unique pages visited by users for the last week and exports the report data in the specified path in json format
 
 ```sh
-spo report activitypages --period D7 --output json --outputFile 'report.json'
+spo report activitypages --period D7 --output json --outputFile "activitypages.json"
 ```

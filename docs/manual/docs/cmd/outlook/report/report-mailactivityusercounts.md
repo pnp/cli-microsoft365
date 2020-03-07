@@ -32,11 +32,11 @@ outlook report mailactivityusercounts --period D7
 Gets the trends on the number of unique users who are performing email activities like send, read, and receive for the last week and exports the report data in the specified path in text format
 
 ```sh
-outlook report mailactivityusercounts --period D7 --output text --outputFile 'C:/report.txt'
+outlook report mailactivityusercounts --period D7 --output text --outputFile "mailactivityusercounts.txt"
 ```
 
 Gets the trends on the number of unique users who are performing email activities like send, read, and receive for the last week and exports the report data in the specified path in json format
 
 ```sh
-outlook report mailactivityusercounts --period D7 --output json --outputFile 'C:/report.json'
+outlook report mailactivityusercounts --period D7 --output json --outputFile "mailactivityusercounts.json"
 ```

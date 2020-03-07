@@ -32,11 +32,11 @@ outlook report mailboxusagedetail --period D7
 Gets details about mailbox usage for the last week and exports the report data in the specified path in text format
 
 ```sh
-outlook report mailboxusagedetail --period D7 --output text --outputFile 'C:/report.txt'
+outlook report mailboxusagedetail --period D7 --output text --outputFile "mailboxusagedetail.txt"
 ```
 
 Gets details about mailbox usage for the last week and exports the report data in the specified path in json format
 
 ```sh
-outlook report mailboxusagedetail --period D7 --output json --outputFile 'C:/report.json'
+outlook report mailboxusagedetail --period D7 --output json --outputFile "mailboxusagedetail.json"
 ```

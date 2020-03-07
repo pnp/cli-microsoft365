@@ -32,11 +32,11 @@ aad o365group report activitygroupcounts --period D7
 Get the daily total number of groups and how many of them were active based on activities for the last week and exports the report data in the specified path in text format
 
 ```sh
-aad o365group report activitygroupcounts --period D7 --output text --outputFile o365groupactivitygroupcounts.txt
+aad o365group report activitygroupcounts --period D7 --output text --outputFile "o365groupactivitygroupcounts.txt"
 ```
 
 Get the daily total number of groups and how many of them were active based on activities for the last week and exports the report data in the specified path in json format
 
 ```sh
-aad o365group report activitygroupcounts --period D7 --output json --outputFile o365groupactivitygroupcounts.json
+aad o365group report activitygroupcounts --period D7 --output json --outputFile "o365groupactivitygroupcounts.json"
 ```

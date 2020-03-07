@@ -32,11 +32,11 @@ spo report activityfilecounts --period D7
 Gets the number of unique, licensed users who interacted with files stored on SharePoint sites for the last week and exports the report data in the specified path in text format
 
 ```sh
-spo report activityfilecounts --period D7 --output text --outputFile 'report.txt'
+spo report activityfilecounts --period D7 --output text --outputFile "activityfilecounts.txt"
 ```
 
 Gets the number of unique, licensed users who interacted with files stored on SharePoint sites for the last week and exports the report data in the specified path in json format
 
 ```sh
-spo report activityfilecounts --period D7 --output json --outputFile 'report.json'
+spo report activityfilecounts --period D7 --output json --outputFile "activityfilecounts.json"
 ```

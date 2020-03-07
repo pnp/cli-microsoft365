@@ -35,11 +35,11 @@ spo report activityusercounts --period D7
 Gets the trend in the number of active users for the last week and exports the report data in the specified path in text format
 
 ```sh
-spo report activityusercounts --period D7 --output text --outputFile 'report.txt'
+spo report activityusercounts --period D7 --output text --outputFile "activityusercounts.txt"
 ```
 
 Gets the trend in the number of active users for the last week and exports the report data in the specified path in json format
 
 ```sh
-spo report activityusercounts --period D7 --output json --outputFile 'report.json'
+spo report activityusercounts --period D7 --output json --outputFile "activityusercounts.json"
 ```

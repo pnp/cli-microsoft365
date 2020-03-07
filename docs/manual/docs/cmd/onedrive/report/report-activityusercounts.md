@@ -32,11 +32,11 @@ onedrive report activityusercounts --period D7
 Gets the trend in the number of active OneDrive users for the last week and exports the report data in the specified path in text format
 
 ```sh
-onedrive report activityusercounts --period D7 --output text --outputFile 'C:/report.txt'
+onedrive report activityusercounts --period D7 --output text --outputFile "activityusercounts.txt"
 ```
 
 Gets the trend in the number of active OneDrive users for the last week and exports the report data in the specified path in json format
 
 ```sh
-onedrive report activityusercounts --period D7 --output json --outputFile 'C:/report.json'
+onedrive report activityusercounts --period D7 --output json --outputFile "activityusercounts.json"
 ```

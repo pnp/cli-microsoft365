@@ -32,11 +32,11 @@ outlook report mailboxusagestorage --period D7
 Gets the amount of mailbox storage used in your organization for the last week and exports the report data in the specified path in text format
 
 ```sh
-outlook report mailboxusagestorage --period D7 --output text --outputFile 'C:/report.txt'
+outlook report mailboxusagestorage --period D7 --output text --outputFile "mailboxusagestorage.txt"
 ```
 
 Gets the amount of mailbox storage used in your organization for the last week and exports the report data in the specified path in json format
 
 ```sh
-outlook report mailboxusagestorage --period D7 --output json --outputFile 'C:/report.json'
+outlook report mailboxusagestorage --period D7 --output json --outputFile "mailboxusagestorage.json"
 ```

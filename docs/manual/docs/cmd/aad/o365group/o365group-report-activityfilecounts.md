@@ -31,11 +31,11 @@ aad o365group report activityfilecounts --period D7
 Get the total number of files and how many of them were active across all group sites associated with an Office 365 Group for the last week and exports the report data in the specified path in text format
 
 ```sh
-aad o365group report activityfilecounts --period D7 --output text --outputFile o365groupactivityfilecounts.txt
+aad o365group report activityfilecounts --period D7 --output text --outputFile "o365groupactivityfilecounts.txt"
 ```
 
 Get the total number of files and how many of them were active across all group sites associated with an Office 365 Group for the last week and exports the report data in the specified path in json format
 
 ```sh
-aad o365group report activityfilecounts --period D7 --output json --outputFile o365groupactivityfilecounts.json
+aad o365group report activityfilecounts --period D7 --output json --outputFile "o365groupactivityfilecounts.json"
 ```

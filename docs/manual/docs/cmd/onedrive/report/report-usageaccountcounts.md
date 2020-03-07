@@ -36,11 +36,11 @@ onedrive report usageaccountcounts --period D7
 Gets the trend in the number of active OneDrive for Business sites for the last week and exports the report data in the specified path in text format
 
 ```sh
-onedrive report usageaccountcounts --period D7 --output text --outputFile 'C:/report.txt'
+onedrive report usageaccountcounts --period D7 --output text --outputFile "usageaccountcounts.txt"
 ```
 
 Gets the trend in the number of active OneDrive for Business sites for the last week and exports the report data in the specified path in json format
 
 ```sh
-onedrive report usageaccountcounts --period D7 --output json --outputFile 'C:/report.json'
+onedrive report usageaccountcounts --period D7 --output json --outputFile "usageaccountcounts.json"
 ```

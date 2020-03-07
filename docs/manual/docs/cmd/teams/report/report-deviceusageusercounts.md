@@ -31,11 +31,11 @@ teams report deviceusageusercounts --period D7
 Gets the number of Microsoft Teams daily unique users by device type for the last week and exports the report data in the specified path in text format
 
 ```sh
-teams report deviceusageusercounts --period D7 --output text --outputFile 'C:/report.txt'
+teams report deviceusageusercounts --period D7 --output text --outputFile "deviceusageusercounts.txt"
 ```
 
 Gets the number of Microsoft Teams daily unique users by device type for the last week and exports the report data in the specified path in json format
 
 ```sh
-teams report deviceusageusercounts --period D7 --output json --outputFile 'C:/report.json'
+teams report deviceusageusercounts --period D7 --output json --outputFile "deviceusageusercounts.json"
 ```

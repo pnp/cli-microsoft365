@@ -41,11 +41,11 @@ spo report siteusagedetail --date 2019-05-01
 Gets details about SharePoint site usage for the last week and exports the report data in the specified path in text format
 
 ```sh
-spo report siteusagedetail --period D7 --output text --outputFile 'report.txt'
+spo report siteusagedetail --period D7 --output text --outputFile "siteusagedetail.txt"
 ```
 
 Gets details about SharePoint site usage for the last week and exports the report data in the specified path in json format
 
 ```sh
-spo report siteusagedetail --period D7 --output json --outputFile 'report.json'
+spo report siteusagedetail --period D7 --output json --outputFile "siteusagedetail.json"
 ```

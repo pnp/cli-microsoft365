@@ -35,11 +35,11 @@ outlook report mailboxusagemailboxcount --period D7
 Gets the total number of user mailboxes in your organization and how many are active each day for the last week and exports the report data in the specified path in text format
 
 ```sh
-outlook report mailboxusagemailboxcount --period D7 --output text --outputFile 'C:/report.txt'
+outlook report mailboxusagemailboxcount --period D7 --output text --outputFile "mailboxusagemailboxcount.txt"
 ```
 
 Gets the total number of user mailboxes in your organization and how many are active each day for the last week and exports the report data in the specified path in json format
 
 ```sh
-outlook report mailboxusagemailboxcount --period D7 --output json --outputFile 'C:/report.json'
+outlook report mailboxusagemailboxcount --period D7 --output json --outputFile "mailboxusagemailboxcount.json"
 ```

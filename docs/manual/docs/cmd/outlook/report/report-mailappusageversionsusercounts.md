@@ -31,11 +31,11 @@ outlook report mailappusageversionsusercounts --period D7
 Gets the count of unique users by Outlook desktop version for the last week and exports the report data in the specified path in text format
 
 ```sh
-outlook report mailappusageversionsusercounts --period D7 --output text --outputFile 'C:/report.txt'
+outlook report mailappusageversionsusercounts --period D7 --output text --outputFile "mailappusageversionsusercounts.txt"
 ```
 
 Gets the count of unique users by Outlook desktop version for the last week and exports the report data in the specified path in json format
 
 ```sh
-outlook report mailappusageversionsusercounts --period D7 --output json --outputFile 'C:/report.json'
+outlook report mailappusageversionsusercounts --period D7 --output json --outputFile "mailappusageversionsusercounts.json"
 ```

@@ -26,11 +26,11 @@ class OutlookReportMailAppUsageUserCountsCommand extends PeriodBasedReport {
 
     Gets the count of unique users that connected to Exchange Online using any email app for the last week
     and exports the report data in the specified path in text format
-      ${commands.OUTLOOK_REPORT_MAILAPPUSAGEUSERCOUNTS} --period D7 --output text --outputFile 'C:/report.txt'
+      ${commands.OUTLOOK_REPORT_MAILAPPUSAGEUSERCOUNTS} --period D7 --output text --outputFile "mailappusageusercounts.txt"
 
     Gets the count of unique users that connected to Exchange Online using any email app for the last week
     and exports the report data in the specified path in json format
-      ${commands.OUTLOOK_REPORT_MAILAPPUSAGEUSERCOUNTS} --period D7 --output json --outputFile 'C:/report.json'
+      ${commands.OUTLOOK_REPORT_MAILAPPUSAGEUSERCOUNTS} --period D7 --output json --outputFile "mailappusageusercounts.json"
 `);
   }
 }

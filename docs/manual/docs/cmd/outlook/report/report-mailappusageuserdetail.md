@@ -39,11 +39,11 @@ outlook report mailappusageuserdetail --date 2019-05-01
 Gets details about which activities users performed on the various email apps for the last week and exports the report data in the specified path in text format
 
 ```sh
-outlook report mailappusageuserdetail --period D7 --output text --outputFile 'C:/report.txt'
+outlook report mailappusageuserdetail --period D7 --output text --outputFile "mailappusageuserdetail.txt"
 ```
 
 Gets details about which activities users performed on the various email apps for the last week and exports the report data in the specified path in json format
 
 ```sh
-outlook report mailappusageuserdetail --period D7 --output json --outputFile 'C:/report.json'
+outlook report mailappusageuserdetail --period D7 --output json --outputFile "mailappusageuserdetail.json"
 ```

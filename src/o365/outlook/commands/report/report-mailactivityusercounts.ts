@@ -26,11 +26,11 @@ class OutlookReportMailActivityUserCountsCommand extends PeriodBasedReport {
 
     Gets the trends on the number of unique users who are performing email activities like send, read, and receive for the last week
     and exports the report data in the specified path in text format
-      ${commands.OUTLOOK_REPORT_MAILACTIVITYUSERCOUNTS} --period D7 --output text --outputFile 'C:/report.txt'
+      ${commands.OUTLOOK_REPORT_MAILACTIVITYUSERCOUNTS} --period D7 --output text --outputFile "mailactivityusercounts.txt"
 
     Gets the trends on the number of unique users who are performing email activities like send, read, and receive for the last week
     and exports the report data in the specified path in json format
-      ${commands.OUTLOOK_REPORT_MAILACTIVITYUSERCOUNTS} --period D7 --output json --outputFile 'C:/report.json'
+      ${commands.OUTLOOK_REPORT_MAILACTIVITYUSERCOUNTS} --period D7 --output json --outputFile "mailactivityusercounts.json"
 `);
   }
 }

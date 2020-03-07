@@ -35,11 +35,11 @@ class TeamsReportDeviceUsageUserDetailCommand extends DateAndPeriodBasedReport {
 
     Gets information about Microsoft Teams device usage by user for the last week 
     and exports the report data in the specified path in text format
-      ${commands.TEAMS_REPORT_DEVICEUSAGEUSERDETAIL} --period D7 --output text --outputFile 'C:/report.txt'
+      ${commands.TEAMS_REPORT_DEVICEUSAGEUSERDETAIL} --period D7 --output text --outputFile "deviceusageuserdetails.txt"
 
     Gets information about Microsoft Teams device usage by user for the last week
     and exports the report data in the specified path in json format
-      ${commands.TEAMS_REPORT_DEVICEUSAGEUSERDETAIL} --period D7 --output json --outputFile 'C:/report.json'
+      ${commands.TEAMS_REPORT_DEVICEUSAGEUSERDETAIL} --period D7 --output json --outputFile "deviceusageuserdetails.json"
 `);
   }
 }

@@ -32,11 +32,11 @@ spo report siteusagestorage --period D7
 Gets the trend of storage allocated and consumed during the last week and exports the report data in the specified path in text format
 
 ```sh
-spo report siteusagestorage --period D7 --output text --outputFile 'report.txt'
+spo report siteusagestorage --period D7 --output text --outputFile "siteusagestorage.txt"
 ```
 
 Gets the trend of storage allocated and consumed during the last week and exports the report data in the specified path in json format
 
 ```sh
-spo report siteusagestorage --period D7 --output json --outputFile 'report.json'
+spo report siteusagestorage --period D7 --output json --outputFile "siteusagestorage.json"
 ```
