@@ -437,6 +437,8 @@ nav:
         - message remove: 'cmd/yammer/message/message-remove.md'
       - network:
         - network list: 'cmd/yammer/network/network-list.md'
+      - report:
+        - report groupsactivitycounts: 'cmd/yammer/report/report-groupsactivitycounts.md'
       - user:
         - user get: 'cmd/yammer/user/user-get.md'
         - user list: 'cmd/yammer/user/user-list.md'
