@@ -122,6 +122,9 @@ nav:
     - Microsoft Planner (planner):
       - task:
         - task list: 'cmd/planner/task/task-list.md'
+    - Skype (skype):
+      - report:
+        - report activitycounts: 'cmd/skype/report/report-activitycounts.md'
     - SharePoint Framework (spfx):
       - doctor: 'cmd/spfx/doctor.md'
       - project:
