@@ -1,5 +1,13 @@
 # Release notes
 
+## [v2.8.0](https://github.com/pnp/office365-cli/releases/tag/v2.8.0)
+
+### New commands
+
+**SharePoint Framework:**
+
+- [spfx doctor](../cmd/spfx/doctor.md) - verifies environment configuration for using the specific version of the SharePoint Framework [#1353](https://github.com/pnp/office365-cli/issues/1353)
+
 ## [v2.7.0](https://github.com/pnp/office365-cli/releases/tag/v2.7.0)
 
 ### New commands
