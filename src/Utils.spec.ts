@@ -106,6 +106,11 @@ describe('Utils', () => {
     assert.strictEqual(result, true);
   });
 
+  it('isValidTeamsChannelId returns true if valid channelId with new tacv2 format', () => {
+    const result = Utils.isValidTeamsChannelId('19:ABZTZ000000000000000000000rstfv@thread.tacv2');
+    assert.strictEqual(result, true);
+  });
+
   it('isValidTeamsChannelId returns false if invalid channelId (missing colon)', () => {
     const result = Utils.isValidTeamsChannelId('190000000000000000000000000000000@thread.skype');
     assert.strictEqual(result, false);
