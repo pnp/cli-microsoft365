@@ -39,6 +39,7 @@ while read script; do
     fi
   done
   if [ "$exists" = true ]; then
+    echo $scriptTitle
     sitesscriptstoremove+=("$script")
   fi
 
