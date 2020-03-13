@@ -174,6 +174,7 @@ export default {
   SITEDESIGN_RUN_STATUS_GET: `${prefix} sitedesign run status get`,
   SITEDESIGN_TASK_GET: `${prefix} sitedesign task get`,
   SITEDESIGN_TASK_LIST: `${prefix} sitedesign task list`,
+  SITEDESIGN_TASK_REMOVE: `${prefix} sitedesign task remove`,
   SITESCRIPT_ADD: `${prefix} sitescript add`,
   SITESCRIPT_GET: `${prefix} sitescript get`,
   SITESCRIPT_LIST: `${prefix} sitescript list`,
