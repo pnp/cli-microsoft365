@@ -332,6 +332,7 @@ nav:
         - sitedesign run status get: 'cmd/spo/sitedesign/sitedesign-run-status-get.md'
         - sitedesign task get: 'cmd/spo/sitedesign/sitedesign-task-get.md'
         - sitedesign task list: 'cmd/spo/sitedesign/sitedesign-task-list.md'
+        - sitedesign task remove: 'cmd/spo/sitedesign/sitedesign-task-remove.md'
       - sitescript:
         - sitescript add: 'cmd/spo/sitescript/sitescript-add.md'
         - sitescript get: 'cmd/spo/sitescript/sitescript-get.md'
