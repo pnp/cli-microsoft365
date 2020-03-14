@@ -39,11 +39,11 @@ skype report activityuserdetail --date 2019-05-01
 Gets details about Skype for Business activity by user for the last week and exports the report data in the specified path in text format
 
 ```sh
-skype report activityuserdetail --period D7 --output text --outputFile activityuserdetail.txt
+skype report activityuserdetail --period D7 --output text --outputFile 'activityuserdetail.txt'
 ```
 
 Gets details about Skype for Business activity by user for the last week and exports the report data in the specified path in json format
 
 ```sh
-skype report activityuserdetail --period D7 --output json --outputFile activityuserdetail.json
+skype report activityuserdetail --period D7 --output json --outputFile 'activityuserdetail.json'
 ```
