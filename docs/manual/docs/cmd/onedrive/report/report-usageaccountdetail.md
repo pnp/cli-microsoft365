@@ -39,11 +39,11 @@ onedrive report usageaccountdetail --date 2019-05-01
 Gets details about OneDrive usage by account for the last week and exports the report data in the specified path in text format
 
 ```sh
-onedrive report usageaccountdetail --period D7 --output text --outputFile 'onedriveusageaccountdetail.txt'
+onedrive report usageaccountdetail --period D7 --output text --outputFile "onedriveusageaccountdetail.txt"
 ```
 
 Gets details about OneDrive usage by account for the last week and exports the report data in the specified path in json format
 
 ```sh
-onedrive report usageaccountdetail --period D7 --output json --outputFile 'onedriveusageaccountdetail.json'
+onedrive report usageaccountdetail --period D7 --output json --outputFile "onedriveusageaccountdetail.json"
 ```
