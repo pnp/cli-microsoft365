@@ -29,11 +29,11 @@ class SkypeReportActivityUserDetailCommand extends DateAndPeriodBasedReport {
 
     Gets details about Skype for Business activity by user for the last week
     and exports the report data in the specified path in text format
-      ${commands.REPORT_ACTIVITYUSERDETAIL} --period D7 --output text --outputFile 'activityuserdetail.txt'
+      ${commands.REPORT_ACTIVITYUSERDETAIL} --period D7 --output text --outputFile "activityuserdetail.txt"
 
     Gets details about Skype for Business activity by user for the last week
     and exports the report data in the specified path in json format
-      ${commands.REPORT_ACTIVITYUSERDETAIL} --period D7 --output json --outputFile 'activityuserdetail.json'
+      ${commands.REPORT_ACTIVITYUSERDETAIL} --period D7 --output json --outputFile "activityuserdetail.json"
 `);
   }
 }
