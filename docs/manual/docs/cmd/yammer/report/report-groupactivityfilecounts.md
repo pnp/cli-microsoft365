@@ -32,11 +32,11 @@ yammer report groupactivityfilecounts --period D7
 Gets the number of Yammer messages posted, read, and liked in groups for the last week and exports the report data in the specified path in text format
 
 ```sh
-yammer report groupactivityfilecounts --period D7 --output text --outputFile 'groupactivityfilecounts.txt'
+yammer report groupactivityfilecounts --period D7 --output text --outputFile "groupactivityfilecounts.txt"
 ```
 
 Gets the number of Yammer messages posted, read, and liked in groups for the last week and exports the report data in the specified path in json format
 
 ```sh
-yammer report groupactivityfilecounts --period D7 --output json --outputFile 'groupactivityfilecounts.json'
+yammer report groupactivityfilecounts --period D7 --output json --outputFile "groupactivityfilecounts.json"
 ```
