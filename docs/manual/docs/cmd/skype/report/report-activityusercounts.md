@@ -32,11 +32,11 @@ skype report activityusercounts --period D7
 Get the trends on how many unique users organized and participated in conference sessions held in your organization through Skype for Business. The report also includes the number of peer-to-peer sessions for the last week and exports the report data in the specified path in text format
 
 ```sh
-skype report activityusercounts --period D7 --output text --outputFile 'activityusercounts.txt'
+skype report activityusercounts --period D7 --output text --outputFile "activityusercounts.txt"
 ```
 
 Get the trends on how many unique users organized and participated in conference sessions held in your organization through Skype for Business. The report also includes the number of peer-to-peer sessions for the last week and exports the report data in the specified path in json format
 
 ```sh
-skype report activityusercounts --period D7 --output json --outputFile 'activityusercounts.json'
+skype report activityusercounts --period D7 --output json --outputFile "activityusercounts.json"
 ```
