@@ -56,7 +56,7 @@ read foo
 for script in "${sitesscriptstoremove[@]}"; do
     scriptTitle=$(echo ${script} | jq -r '.Title')
     scriptId=$(echo ${script} | jq -r '.Id')
-    echo "Deleting Site script..."  $scriptTitle $scriptTitle
+    echo "Deleting Site script..."  $scriptTitle
     o365 spo sitescript remove --id $scriptId --confirm
 done
 
