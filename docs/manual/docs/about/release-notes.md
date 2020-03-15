@@ -8,6 +8,17 @@
 
 - [spfx doctor](../cmd/spfx/doctor.md) - verifies environment configuration for using the specific version of the SharePoint Framework [#1353](https://github.com/pnp/office365-cli/issues/1353)
 
+**Office 365:**
+
+- [tenant report activeuserdetail](../cmd/tenant/report/report-activeuserdetail.md) - gets details about Office 365 active users [#1300](https://github.com/pnp/office365-cli/issues/1300)
+- [tenant report servicesusercounts](../cmd/tenant/report/report-servicesusercounts.md) - gets the count of users by activity type and service [#1299](https://github.com/pnp/office365-cli/issues/1299)
+
+### Changes
+
+- added 'Delete all Office 365 groups' sample [#1140](https://github.com/pnp/office365-cli/issues/1140)
+- added 'Delete custom SharePoint site scripts' sample [#1139](https://github.com/pnp/office365-cli/issues/1139)
+- extended team channel name validation to allow 'tacv2'. [#1401](https://github.com/pnp/office365-cli/issues/1401)
+
 ## [v2.7.0](https://github.com/pnp/office365-cli/releases/tag/v2.7.0)
 
 ### New commands
