@@ -20,10 +20,20 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
+## Remarks
+
+If no domain name is specified, the command will return the tenant ID of the logged in tenant.
+
 ## Examples
 
 Get Office 365 tenant ID for the specified domain
 
 ```sh
 tenant id get --domainName contoso.com
+```
+
+Get Office 365 tenant ID of the logged in tenant
+
+```sh
+tenant id get
 ```
