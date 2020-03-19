@@ -3,9 +3,10 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import Command, {
   CommandOption,
-  CommandValidate,
   CommandError
 } from '../../../../Command';
+import auth from '../../../../Auth';
+import Utils from '../../../../Utils';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -27,8 +28,14 @@ class TenantIdGetCommand extends Command {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+    let domainName: string = args.options.domainName;
+    if (!domainName) {
+      const userName: string = Utils.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].value);
+      domainName = userName.split('@')[1];
+    }
+
     const requestOptions: any = {
-      url: `https://login.windows.net/${args.options.domainName}/.well-known/openid-configuration`,
+      url: `https://login.windows.net/${domainName}/.well-known/openid-configuration`,
       headers: {
         'content-type': 'application/json',
         accept: 'application/json',
@@ -56,7 +63,7 @@ class TenantIdGetCommand extends Command {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-d, --domainName <domainName>',
+        option: '-d, --domainName [domainName]',
         description: 'The domain name for which to retrieve the Office 365 tenant ID'
       }
     ];
@@ -65,23 +72,22 @@ class TenantIdGetCommand extends Command {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!args.options.domainName) {
-        return 'Required parameter domainName missing';
-      }
-
-      return true;
-    };
-  }
-
   public commandHelp(args: any, log: (help: string) => void): void {
     log(vorpal.find(commands.TENANT_ID_GET).helpInformation());
     log(
-      `Examples:
-  
+      `  Remarks:
+
+    If no domain name is specified, the command will return the tenant ID of
+    the tenant to which you are currently logged in.
+
+  Examples:
+
     Get Office 365 tenant ID for the specified domain
       ${commands.TENANT_ID_GET} --domainName contoso.com
+
+    Get Office 365 tenant ID of the the tenant to which you are currently logged
+    in
+      ${commands.TENANT_ID_GET}
 `);
   }
 }

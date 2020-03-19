@@ -1,5 +1,5 @@
 import commands from '../../commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
+import Command, { CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 const command: Command = require('./id-get');
 import * as assert from 'assert';
@@ -58,24 +58,92 @@ describe(commands.TENANT_ID_GET, () => {
     assert.notEqual(command.description, null);
   });
 
-  it('fails validation if domainName is not passed', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.notEqual(actual, true);
-  });
+  it('gets logged in Office 365 tenant ID if no domain name is passed', (done) => {
+    sinon.stub(Utils, 'getUserNameFromAccessToken').callsFake(() => {
+      return 'admin@contoso.onmicrosoft.com';
+    });
 
-  it('fails validation if domainName is undefined', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { domainName: undefined } });
-    assert.notEqual(actual, true);
-  });
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://login.windows.net/contoso.onmicrosoft.com/.well-known/openid-configuration`) {
+        return Promise.resolve(
+          {
+            "token_endpoint": "https://login.windows.net/31537af4-6d77-4bb9-a681-d2394888ea26/oauth2/token",
+            "token_endpoint_auth_methods_supported": [
+              "client_secret_post",
+              "private_key_jwt",
+              "client_secret_basic"
+            ],
+            "jwks_uri": "https://login.windows.net/common/discovery/keys",
+            "response_modes_supported": [
+              "query",
+              "fragment",
+              "form_post"
+            ],
+            "subject_types_supported": [
+              "pairwise"
+            ],
+            "id_token_signing_alg_values_supported": [
+              "RS256"
+            ],
+            "response_types_supported": [
+              "code",
+              "id_token",
+              "code id_token",
+              "token id_token",
+              "token"
+            ],
+            "scopes_supported": [
+              "openid"
+            ],
+            "issuer": "https://sts.windows.net/31537af4-6d77-4bb9-a681-d2394888ea26/",
+            "microsoft_multi_refresh_token": true,
+            "authorization_endpoint": "https://login.windows.net/31537af4-6d77-4bb9-a681-d2394888ea26/oauth2/authorize",
+            "http_logout_supported": true,
+            "frontchannel_logout_supported": true,
+            "end_session_endpoint": "https://login.windows.net/31537af4-6d77-4bb9-a681-d2394888ea26/oauth2/logout",
+            "claims_supported": [
+              "sub",
+              "iss",
+              "cloud_instance_name",
+              "cloud_instance_host_name",
+              "cloud_graph_host_name",
+              "msgraph_host",
+              "aud",
+              "exp",
+              "iat",
+              "auth_time",
+              "acr",
+              "amr",
+              "nonce",
+              "email",
+              "given_name",
+              "family_name",
+              "nickname"
+            ],
+            "check_session_iframe": "https://login.windows.net/31537af4-6d77-4bb9-a681-d2394888ea26/oauth2/checksession",
+            "userinfo_endpoint": "https://login.windows.net/31537af4-6d77-4bb9-a681-d2394888ea26/openid/userinfo",
+            "tenant_region_scope": "AS",
+            "cloud_instance_name": "microsoftonline.com",
+            "cloud_graph_host_name": "graph.windows.net",
+            "msgraph_host": "graph.microsoft.com",
+            "rbac_url": "https://pas.windows.net"
+          }
+        );
+      }
 
-  it('fails validation if domainName is blank', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { domainName: '' } });
-    assert.notEqual(actual, true);
-  });
+      return Promise.reject('Invalid Request');
+    });
 
-  it('passes validation on valid domainName', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { domainName: 'contoso.com' } });
-    assert.equal(actual, true);
+    cmdInstance.action({ options: {} }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith('31537af4-6d77-4bb9-a681-d2394888ea26'));
+        Utils.restore(Utils.getUserNameFromAccessToken);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 
   it('gets Office 365 tenant ID with correct domain name', (done) => {
