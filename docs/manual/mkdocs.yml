@@ -137,6 +137,7 @@ nav:
       - doctor: 'cmd/spfx/doctor.md'
       - project:
         - project externalize: 'cmd/spfx/project/project-externalize.md'
+        - project rename: 'cmd/spfx/project/project-rename.md'
         - project upgrade: 'cmd/spfx/project/project-upgrade.md'
     - SharePoint Online (spo):
       - get: 'cmd/spo/spo-get.md'
