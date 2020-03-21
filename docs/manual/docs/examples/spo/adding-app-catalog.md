@@ -1,4 +1,4 @@
-# Hide SharePoint list from Site Contents
+# Adding App Catalog to SharePoint site
 
 Author: [David Ramalho](https://sharepoint-tricks.com/tenant-app-catalog-vs-site-collection-app-catalog/)
 
@@ -7,8 +7,23 @@ When you just want to deploy certain SharePoint solution to a specific site, it'
 
 ```powershell tab="PowerShell Core"
 
-spo login https://contoso-admin.sharepoint.com
-spo site appcatalog add --url https://contoso.sharepoint/sites/site
+$site
+
+$site = "https://contoso.sharepoint.com/sites/site"
+o365 login
+o365 spo site appcatalog add --url $site
+Write-output "App Catalog Created on " $site
+```
+
+```bash tab="Bash"
+#!/bin/bash
+
+site=https://tricks365.sharepoint.com/sites/Com22
+
+o365 login
+o365 spo site appcatalog add --url $site
+echo "App Catalog Created on $site"
+
 
 ```
 

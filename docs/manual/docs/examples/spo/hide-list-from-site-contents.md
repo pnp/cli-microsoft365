@@ -14,6 +14,20 @@ $list = o365 spo list get --webUrl $site -t $listName -o json | ConvertFrom-Json
 o365 spo list set --webUrl $site -i $list.Id -t $listName --hidden true 
 
 ```
+```bash tab="Bash"
+#!/bin/bash
+
+# requires jq: https://stedolan.github.io/jq/
+
+site=https://tricks365.sharepoint.com/sites/Com22
+listName="Apps for SharePoint"
+
+o365 login
+listId=$(o365 spo list get --webUrl $site -t "$listName" -o json | jq ".Id")
+o365 spo list set --webUrl $site -i $listId -t $listName --hidden true 
+
+
+```
 
 Keywords:
 
