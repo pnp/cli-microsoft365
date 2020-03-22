@@ -110,7 +110,7 @@ Remove-SPOSite|Microsoft.Online.SharePoint.PowerShell|[spo site classic remove](
 Remove-SPOSiteCollectionAppCatalog|Microsoft.Online.SharePoint.PowerShell|[spo site appcatalog remove](../cmd/spo/site/site-appcatalog-remove.md)
 Remove-SPOSiteCollectionAppCatalogById|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOSiteDesign|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign remove](../cmd/spo/sitedesign/sitedesign-remove.md)
-Remove-SPOSiteDesignTask|Microsoft.Online.SharePoint.PowerShell|
+Remove-SPOSiteDesignTask|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign task remove](../cmd/spo/sitedesign/sitedesign-task-remove.md)
 Remove-SPOSiteGroup|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOSiteScript|Microsoft.Online.SharePoint.PowerShell|[spo sitescript remove](../cmd/spo/sitescript/sitescript-remove.md)
 Remove-SPOStorageEntity|Microsoft.Online.SharePoint.PowerShell|[spo storageentity remove](../cmd/spo/storageentity/storageentity-remove.md)

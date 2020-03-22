@@ -4,14 +4,32 @@
 
 ### New commands
 
-**SharePoint Framework:**
+**Microsoft Graph:**
 
-- [spfx doctor](../cmd/spfx/doctor.md) - verifies environment configuration for using the specific version of the SharePoint Framework [#1353](https://github.com/pnp/office365-cli/issues/1353)
+- [graph subscription add](../cmd/graph/subscription/subscription-add.md) - creates a Microsoft Graph subscription [#1100](https://github.com/pnp/office365-cli/issues/1100)
 
 **Office 365:**
 
 - [tenant report activeuserdetail](../cmd/tenant/report/report-activeuserdetail.md) - gets details about Office 365 active users [#1300](https://github.com/pnp/office365-cli/issues/1300)
 - [tenant report servicesusercounts](../cmd/tenant/report/report-servicesusercounts.md) - gets the count of users by activity type and service [#1299](https://github.com/pnp/office365-cli/issues/1299)
+
+**SharePoint:**
+
+- [spo sitedesign task remove](../cmd/spo/sitedesign/sitedesign-task-remove.md) - removes the specified site design scheduled for execution [#783](https://github.com/pnp/office365-cli/issues/783)
+
+**SharePoint Framework:**
+
+- [spfx doctor](../cmd/spfx/doctor.md) - verifies environment configuration for using the specific version of the SharePoint Framework [#1353](https://github.com/pnp/office365-cli/issues/1353)
+
+**Skype:**
+
+- [skype report activitycounts](../cmd/skype/report/report-activitycounts.md) - gets the trends on how many users organized and participated in conference sessions held in your organization through Skype for Business. The report also includes the number of peer-to-peer sessions [#1302](https://github.com/pnp/office365-cli/issues/1302)
+- [skype report activityusercounts](../cmd/skype/report/report-activityusercounts.md) - gets the trends on how many unique users organized and participated in conference sessions held in your organization through Skype for Business. The report also includes the number of peer-to-peer sessions [#1303](https://github.com/pnp/office365-cli/issues/1303)
+- [skype report activityuserdetail](../cmd/skype/report/report-activityuserdetail.md) - gets details about Skype for Business activity by user [#1301](https://github.com/pnp/office365-cli/issues/1301)
+
+**Yammer:**
+
+- [yammer report groupsactivitycounts](../cmd/yammer/report/report-groupsactivitycounts.md) - gets the number of Yammer messages posted, read, and liked in groups [#1390](https://github.com/pnp/office365-cli/issues/1390)
 
 ### Changes
 
