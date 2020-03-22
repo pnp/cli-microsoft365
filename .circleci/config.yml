@@ -101,13 +101,13 @@ workflows:
       - build:
           filters:
             branches:
-              ignore: /^(dev|master|v2)/
+              ignore: /^(dev|master|gh-pages)/
       - test:
           requires:
             - build
           filters:
             branches:
-              ignore: /^(dev|master|v2)/
+              ignore: /^(dev|master|gh-pages)/
   check_master:
     jobs:
       - build:
