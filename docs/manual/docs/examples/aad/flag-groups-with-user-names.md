@@ -12,21 +12,23 @@ Note: The filter condition can be changed as per your requirement.
 $groupsToFlag = @()
 
 $users = o365 aad user list --properties 'displayName,givenName,surname' -o json | ConvertFrom-Json
-$groups = o365 aad o365group list  -o json | ConvertFrom-Json
+$groups = o365 aad o365group list -o json | ConvertFrom-Json
 
 foreach ($user in $users) {
     $userGivenName = $user.givenName
     $userSurname = $user.surname
 
-    $groupsMatch = $groups | Where-Object { $_.mail -like "*$userGivenName*" -or $_.mail -like "*$userSurname*" }
+    if ($userGivenName -and $userSurname) {
+        $groupsMatch = $groups | Where-Object { $_.mail -like "*$userGivenName*" -or $_.mail -like "*$userSurname*" }
 
-    foreach ($group in $groupsMatch) {
-        $groupObject = New-Object -TypeName PSObject
-        $groupObject | Add-Member -MemberType NoteProperty -Name "groupId" -Value $group.id
-        $groupObject | Add-Member -MemberType NoteProperty -Name "groupMail" -Value $group.mail
-        $groupObject | Add-Member -MemberType NoteProperty -Name "userGivenName" -Value $userGivenName
-        $groupObject | Add-Member -MemberType NoteProperty -Name "userSurname" -Value $userSurname
-        $groupsToFlag += $groupObject
+        foreach ($group in $groupsMatch) {
+            $groupObject = New-Object -TypeName PSObject
+            $groupObject | Add-Member -MemberType NoteProperty -Name "groupId" -Value $group.id
+            $groupObject | Add-Member -MemberType NoteProperty -Name "groupMail" -Value $group.mail
+            $groupObject | Add-Member -MemberType NoteProperty -Name "userGivenName" -Value $userGivenName
+            $groupObject | Add-Member -MemberType NoteProperty -Name "userSurname" -Value $userSurname
+            $groupsToFlag += $groupObject
+        }
     }
 }
 
@@ -49,20 +51,23 @@ for user in `echo $users | jq -c '.[]'`; do
     userGivenName=`echo $user | jq -r '.givenName'`
     userSurname=`echo $user | jq -r '.surname'`
 
-    groupsMatch=$(echo $groups | jq -c --arg GivenName "$userGivenName" --arg Surname "$userSurname" 'map(select((.mail|ascii_downcase|contains($GivenName|ascii_downcase)) or (.mail|ascii_downcase|contains($Surname|ascii_downcase))))')
+    if [ ! -z "$userGivenName" ] || [ !-z "$userSurname" ]
+        then
+            groupsMatch=$(echo $groups | jq -c --arg GivenName "$userGivenName" --arg Surname "$userSurname" 'map(select((.mail|ascii_downcase|contains($GivenName|ascii_downcase)) or (.mail|ascii_downcase|contains($Surname|ascii_downcase))))')
 
-    for group in `echo $groupsMatch | jq -c '.[]'`; do
-        groupId=`echo $group | jq  -r '.id'`
-        groupMail=`echo $group | jq  -r '.mail'`
-        groupObject=$(jq -n -c \
-                --arg GroupId "$groupId" \
-                --arg GroupMail "$groupMail" \
-                --arg UserGivenName "$userGivenName" \
-                --arg UserSurname "$userSurname" \
-                '{groupId: $GroupId, groupMail: $GroupMail, userGivenName: $UserGivenName, userSurname: $UserSurname}')
+            for group in `echo $groupsMatch | jq -c '.[]'`; do 
+                groupId=`echo $group | jq  -r '.id'`
+                groupMail=`echo $group | jq  -r '.mail'`
+                groupObject=$(jq -n -c \
+                        --arg GroupId "$groupId" \
+                        --arg GroupMail "$groupMail" \
+                        --arg UserGivenName "$userGivenName" \
+                        --arg UserSurname "$userSurname" \
+                        '{groupId: $GroupId, groupMail: $GroupMail, userGivenName: $UserGivenName, userSurname: $UserSurname}')
 
-        groupsToFlag+=($groupObject)
-    done
+                groupsToFlag+=($groupObject)
+            done
+    fi
 done
 
 echo ${groupsToFlag[@]} | jq -csr '(.[0] |keys_unsorted | @tsv), (.[]|.|map(.) |@tsv)' | column -s$'\t' -t
