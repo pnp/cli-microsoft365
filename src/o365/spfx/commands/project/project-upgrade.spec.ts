@@ -345,12 +345,13 @@ describe(commands.PROJECT_UPGRADE, () => {
     });
   });
 
-  it('shows error if the current project version and the version to upgrade to are the same', () => {
+  it('shows regular message if the current project version and the version to upgrade to are the same', () => {
     sinon.stub(command as any, 'getProjectVersion').callsFake(_ => '1.5.0');
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.5.0' } }, (err?: any) => {
-      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Project doesn't need to be upgraded`, 6)));
+      assert.equal(typeof(err), 'undefined', 'Returns error');
+      assert(log.indexOf(`Project doesn't need to be upgraded`) > -1, `Doesn't return info message`);
     });
   });
 
