@@ -150,6 +150,7 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
   public static ERROR_NO_VERSION: number = 3;
   public static ERROR_UNSUPPORTED_FROM_VERSION: number = 4;
   public static ERROR_NO_DOWNGRADE: number = 5;
+  // no longer used. Left for backwards-compatibility
   public static ERROR_PROJECT_UP_TO_DATE: number = 6;
 
   public get name(): string {
@@ -213,7 +214,8 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
     }
 
     if (pos === posTo) {
-      cb(new CommandError('Project doesn\'t need to be upgraded', SpfxProjectUpgradeCommand.ERROR_PROJECT_UP_TO_DATE));
+      cmd.log(`Project doesn't need to be upgraded`);
+      cb();
       return;
     }
 
