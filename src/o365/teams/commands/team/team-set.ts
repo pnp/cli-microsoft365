@@ -1,26 +1,21 @@
 import config from '../../../../config';
 import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
 import {
   CommandOption, CommandValidate
 } from '../../../../Command';
 import Utils from '../../../../Utils';
-import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
+import { GroupUpdateService, Options} from '../../../aad/services/GroupUpdateService';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
-interface CommandArgs {
-  options: Options;
-}
-
-interface Options extends GlobalOptions {
+interface TeamSetOptions extends Options{
   teamId: string;
-  displayName?: string;
-  description?: string;
-  mailNickName?: string;
-  classification?: string;
-  visibility?: string;
+  visibility?:string;
+  imagePath?: string;
+}
+interface CommandArgs {
+  options: TeamSetOptions;
 }
 
 class TeamsSetCommand extends GraphCommand {
@@ -29,7 +24,7 @@ class TeamsSetCommand extends GraphCommand {
     'description',
     'mailNickName',
     'classification',
-    'visibility '
+    'visibility'
   ];
 
   public get name(): string {
@@ -48,49 +43,16 @@ class TeamsSetCommand extends GraphCommand {
     return telemetryProps;
   }
 
-  private mapRequestBody(options: Options): any {
-    const requestBody: any = {};
-    if (options.displayName) {
-      requestBody.displayName = options.displayName;
-    }
-    if (options.description) {
-      requestBody.description = options.description;
-    }
-    if (options.mailNickName) {
-      requestBody.mailNickName = options.mailNickName;
-    }
-    if (options.classification) {
-      requestBody.classification = options.classification;
-    }
-    if (options.visibility) {
-      requestBody.visibility = options.visibility;
-    }
-    return requestBody;
-  }
-
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const body: any = this.mapRequestBody(args.options);
-
-    const requestOptions: any = {
-      url: `${this.resource}/beta/groups/${encodeURIComponent(args.options.teamId)}`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      body: body,
-      json: true
-    };
-
-    request
-      .patch(requestOptions)
-      .then((): void => {
-        if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, cmd, cb));
+    this.MapTeamOptionProperties(args.options);
+    GroupUpdateService.UpdateGroup(cmd, this.resource, args.options, this.verbose, this.debug, cb, this.handleRejectedODataJsonPromise);
   }
 
+  private MapTeamOptionProperties(options: TeamSetOptions): void{
+    options.id = options.teamId;
+    options.isPrivate = options.visibility;
+    options.logoPath = options.imagePath;
+  }
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
@@ -106,6 +68,14 @@ class TeamsSetCommand extends GraphCommand {
         description: 'The description for the Microsoft Teams team'
       },
       {
+        option: '--owners [owners]',
+        description: 'Comma-separated list of Microsoft Teams team owners to add'
+      },
+      {
+        option: '--members [members]',
+        description: 'Comma-separated list of Microsoft Teams team members to add'
+      },
+      {
         option: '--mailNickName [mailNickName]',
         description: 'The mail alias for the Microsoft Teams team'
       },
@@ -117,6 +87,10 @@ class TeamsSetCommand extends GraphCommand {
         option: '--visibility [visibility]',
         description: 'The visibility of the Microsoft Teams team. Valid values Private|Public',
         autocomplete: ['Private', 'Public']
+      },
+      {
+        option: '--imagePath [imagePath]',
+        description: 'Path to the image file to set as the Microsoft Teams team picture'
       }
     ];
 
@@ -134,11 +108,11 @@ class TeamsSetCommand extends GraphCommand {
         return `${args.options.teamId} is not a valid GUID`;
       }
 
-      if (args.options.visibility) {
-        if (args.options.visibility.toLowerCase() !== 'private' && args.options.visibility.toLowerCase() !== 'public') {
-          return `${args.options.visibility} is not a valid visibility type. Allowed values are Private|Public`;
-        }
-      }
+      // if (args.options.visibility) {
+      //   if (args.options.visibility.toLowerCase() !== 'private' && args.options.visibility.toLowerCase() !== 'public') {
+      //     return `${args.options.visibility} is not a valid visibility type. Allowed values are Private|Public`;
+      //   }
+      // }
 
       return true;
     };
@@ -148,11 +122,7 @@ class TeamsSetCommand extends GraphCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  Remarks:
-
-    ${chalk.yellow('Attention:')} This command is based on an API that is currently in preview
-    and is subject to change once the API reached general availability.
-
+      `  
   Examples:
   
     Set Microsoft Teams team visibility as Private

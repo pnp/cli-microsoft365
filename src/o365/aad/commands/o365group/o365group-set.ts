@@ -1,6 +1,4 @@
 import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
 import * as fs from 'fs';
 import * as path from 'path';
 import {
@@ -9,6 +7,7 @@ import {
 } from '../../../../Command';
 import Utils from '../../../../Utils';
 import GraphCommand from '../../../base/GraphCommand';
+import { GroupUpdateService, Options } from '../../services/GroupUpdateService';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -16,18 +15,7 @@ interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  id: string;
-  displayName?: string;
-  description?: string;
-  owners?: string;
-  members?: string;
-  isPrivate?: string;
-  logoPath?: string;
-}
-
 class AadO365GroupSetCommand extends GraphCommand {
-  private static numRepeat: number = 15;
 
   public get name(): string {
     return commands.O365GROUP_SET;
@@ -38,190 +26,7 @@ class AadO365GroupSetCommand extends GraphCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    ((): Promise<void> => {
-      if (!args.options.displayName &&
-        !args.options.description &&
-        typeof args.options.isPrivate === 'undefined') {
-        return Promise.resolve();
-      }
-
-      if (this.verbose) {
-        cmd.log(`Updating Office 365 Group ${args.options.id}...`);
-      }
-
-      const update: any = {};
-      if (args.options.displayName) {
-        update.displayName = args.options.displayName;
-      }
-      if (args.options.description) {
-        update.description = args.options.description;
-      }
-      if (typeof args.options.isPrivate !== 'undefined') {
-        update.visibility = args.options.isPrivate == 'true' ? 'Private' : 'Public'
-      }
-
-      const requestOptions: any = {
-        url: `${this.resource}/v1.0/groups/${args.options.id}`,
-        headers: {
-          'accept': 'application/json;odata.metadata=none'
-        },
-        json: true,
-        body: update
-      };
-
-      return request.patch(requestOptions);
-    })()
-      .then((): Promise<void> => {
-        if (!args.options.logoPath) {
-          if (this.debug) {
-            cmd.log('logoPath not set. Skipping');
-          }
-
-          return Promise.resolve();
-        }
-
-        const fullPath: string = path.resolve(args.options.logoPath);
-        if (this.verbose) {
-          cmd.log(`Setting group logo ${fullPath}...`);
-        }
-
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/groups/${args.options.id}/photo/$value`,
-          headers: {
-            'content-type': this.getImageContentType(fullPath)
-          },
-          body: fs.readFileSync(fullPath)
-        };
-
-        return new Promise<void>((resolve: () => void, reject: (err: any) => void): void => {
-          this.setGroupLogo(requestOptions, AadO365GroupSetCommand.numRepeat, resolve, reject, cmd);
-        });
-      })
-      .then((): Promise<{ value: { id: string; }[] }> => {
-        if (!args.options.owners) {
-          if (this.debug) {
-            cmd.log('Owners not set. Skipping');
-          }
-
-          return Promise.resolve(undefined as any);
-        }
-
-        const owners: string[] = args.options.owners.split(',').map(o => o.trim());
-
-        if (this.verbose) {
-          cmd.log('Retrieving user information to set group owners...');
-        }
-
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/users?$filter=${owners.map(o => `userPrincipalName eq '${o}'`).join(' or ')}&$select=id`,
-          headers: {
-            'content-type': 'application/json'
-          },
-          json: true
-        };
-
-        return request.get(requestOptions);
-      })
-      .then((res?: { value: { id: string; }[] }): Promise<any> => {
-        if (!res) {
-          return Promise.resolve();
-        }
-
-        return Promise.all(res.value.map(u => request.post({
-          url: `${this.resource}/v1.0/groups/${args.options.id}/owners/$ref`,
-          headers: {
-            'content-type': 'application/json'
-          },
-          json: true,
-          body: {
-            "@odata.id": `https://graph.microsoft.com/v1.0/users/${u.id}`
-          }
-        })));
-      })
-      .then((): Promise<{ value: { id: string; }[] }> => {
-        if (!args.options.members) {
-          if (this.debug) {
-            cmd.log('Members not set. Skipping');
-          }
-
-          return Promise.resolve(undefined as any);
-        }
-
-        const members: string[] = args.options.members.split(',').map(o => o.trim());
-
-        if (this.verbose) {
-          cmd.log('Retrieving user information to set group members...');
-        }
-
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/users?$filter=${members.map(o => `userPrincipalName eq '${o}'`).join(' or ')}&$select=id`,
-          headers: {
-            'content-type': 'application/json'
-          },
-          json: true
-        };
-
-        return request.get(requestOptions);
-      })
-      .then((res?: { value: { id: string; }[] }): Promise<any> => {
-        if (!res) {
-          return Promise.resolve();
-        }
-
-        return Promise.all(res.value.map(u => request.post({
-          url: `${this.resource}/v1.0/groups/${args.options.id}/members/$ref`,
-          headers: {
-            'content-type': 'application/json'
-          },
-          json: true,
-          body: {
-            "@odata.id": `https://graph.microsoft.com/v1.0/users/${u.id}`
-          }
-        })));
-      })
-      .then((): void => {
-        if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
-        }
-
-        cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, cmd, cb));
-  }
-
-  private setGroupLogo(requestOptions: any, retryLeft: number, resolve: () => void, reject: (err: any) => void, cmd: CommandInstance): void {
-    request
-      .put(requestOptions)
-      .then((res: any): void => {
-        if (this.debug) {
-          cmd.log('Response:');
-          cmd.log(res);
-          cmd.log('');
-        }
-
-        resolve();
-      }, (err: any): void => {
-        if (--retryLeft > 0) {
-          setTimeout(() => {
-            this.setGroupLogo(requestOptions, retryLeft, resolve, reject, cmd);
-          }, 500 * (AadO365GroupSetCommand.numRepeat - retryLeft));
-        }
-        else {
-          reject(err);
-        }
-      });
-  }
-
-  private getImageContentType(imagePath: string): string {
-    let extension: string = imagePath.substr(imagePath.lastIndexOf('.')).toLowerCase();
-
-    switch (extension) {
-      case '.png':
-        return 'image/png';
-      case '.gif':
-        return 'image/gif';
-      default:
-        return 'image/jpeg';
-    }
+    GroupUpdateService.UpdateGroup(cmd, this.resource, args.options, this.verbose, this.debug, cb, this.handleRejectedODataJsonPromise);
   }
 
   public options(): CommandOption[] {
@@ -245,6 +50,14 @@ class AadO365GroupSetCommand extends GraphCommand {
       {
         option: '--members [members]',
         description: 'Comma-separated list of Office 365 Group members to add'
+      },
+      {
+        option: '--mailNickName [mailNickName]',
+        description: 'The mail alias for the Microsoft Teams team'
+      },
+      {
+        option: '--classification [classification]',
+        description: 'The classification for the Microsoft Teams team'
       },
       {
         option: '--isPrivate [isPrivate]',
@@ -345,6 +158,9 @@ class AadO365GroupSetCommand extends GraphCommand {
 
     Add new Office 365 Group members
       ${this.name} --id 28beab62-7540-4db1-a23f-29a6018a3848 --members "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
+
+    Set Office 365 Group classification as MBI
+      ${this.name} --id '28beab62-7540-4db1-a23f-29a6018a3848' --classification MBI
 
     Update Office 365 Group logo
       ${this.name} --id 28beab62-7540-4db1-a23f-29a6018a3848 --logoPath images/logo.png
