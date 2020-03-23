@@ -18,18 +18,19 @@ Option|Description
 `--description [description]`|The description for the Microsoft Teams team
 `--mailNickName [mailNickName]`|The mail alias for the Microsoft Teams team
 `--classification [classification]`|The classification for the Microsoft Teams team
-`--visibility [visibility]`|The visibility of the Microsoft Teams team. Valid values `Private|Public`
+`--visibility [visibility]`|The visibility of the Microsoft Teams team. Valid values `Private\|Public`
 `--imagePath [imagePath]`|Path to the image file to set as the team's picture`
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json|text`. Default `text`
+`-o, --output [output]`|Output type. `json\|text`. Default `text`
 `--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
 ## Remarks
 
-!!! attention
-    This command is based on an API that is currently in preview and is subject to change once the API reached general availability.
+When updating team owners and members, the command will add newly specified users to the previously set owners and members. The previously set users will not be replaced.
+
+When specifying the path to the team image you can use both relative and absolute paths. Note, that ~ in the path, will not be resolved and will most likely result in an error.
 
 ## Examples
 
