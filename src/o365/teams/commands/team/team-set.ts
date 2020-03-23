@@ -1,3 +1,5 @@
+import * as fs from 'fs';
+import * as path from 'path';
 import config from '../../../../config';
 import commands from '../../commands';
 import {
@@ -103,17 +105,23 @@ class TeamsSetCommand extends GraphCommand {
       if (!args.options.teamId) {
         return 'Required parameter teamId missing';
       }
-
       if (!Utils.isValidGuid(args.options.teamId)) {
         return `${args.options.teamId} is not a valid GUID`;
       }
-
-      // if (args.options.visibility) {
-      //   if (args.options.visibility.toLowerCase() !== 'private' && args.options.visibility.toLowerCase() !== 'public') {
-      //     return `${args.options.visibility} is not a valid visibility type. Allowed values are Private|Public`;
-      //   }
-      // }
-
+      if (args.options.visibility &&
+        args.options.visibility.toLowerCase() !== 'private' &&
+        args.options.visibility.toLowerCase() !== 'public') {
+          return `${args.options.visibility} is not a valid visibility type. Allowed values are Private|Public`;
+      }
+      if (args.options.imagePath) {
+        const fullPath: string = path.resolve(args.options.imagePath);
+        if (!fs.existsSync(fullPath)) {
+          return `File '${fullPath}' not found`;
+        }
+        if (fs.lstatSync(fullPath).isDirectory()) {
+          return `Path '${fullPath}' points to a directory`;
+        }
+      }
       return true;
     };
   }
