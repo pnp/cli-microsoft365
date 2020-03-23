@@ -1,13 +1,14 @@
-import commands from './commands';
-import GlobalOptions from '../../GlobalOptions';
+import commands from '../commands';
+import globalCommands from '../../commands/commands';
+import GlobalOptions from '../../../GlobalOptions';
 import Command, {
   CommandOption,
   CommandValidate,
   CommandAction
-} from '../../Command';
-import config from '../../config';
+} from '../../../Command';
+import config from '../../../config';
 
-const vorpal: Vorpal = require('../../vorpal-init');
+const vorpal: Vorpal = require('../../../vorpal-init');
 
 interface CommandArgs {
   options: Options;
@@ -17,13 +18,17 @@ interface Options extends GlobalOptions {
   service: string;
 }
 
-class ConsentCommand extends Command {
+class CliConsentCommand extends Command {
   public get name(): string {
     return `${commands.CONSENT}`;
   }
 
   public get description(): string {
     return 'Consent additional permissions for the Azure AD application used by the Office 365 CLI';
+  }
+
+  public alias(): string[] | undefined {
+    return [globalCommands.CONSENT];
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -33,6 +38,8 @@ class ConsentCommand extends Command {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+    this.showDeprecationWarning(cmd, globalCommands.CONSENT, commands.CONSENT);
+
     let scope = '';
     switch (args.options.service) {
       case 'yammer':
@@ -109,4 +116,4 @@ class ConsentCommand extends Command {
   }
 }
 
-module.exports = new ConsentCommand();
+module.exports = new CliConsentCommand();
