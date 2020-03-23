@@ -38,6 +38,7 @@ describe('Lazy loading commands', () => {
       yammerCommands.default
     ];
     const aliases: string[] = [
+      'consent',
       'accesstoken get',
       'flow connector export',
       'flow connector list',

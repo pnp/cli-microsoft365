@@ -1,11 +1,12 @@
-import commands from './commands';
-import Command, { CommandOption, CommandValidate } from '../../Command';
+import commands from '../commands';
+import globalCommands from '../../commands/commands';
+import Command, { CommandOption, CommandValidate } from '../../../Command';
 import * as sinon from 'sinon';
-import appInsights from '../../appInsights';
-const command: Command = require('./consent');
+import appInsights from '../../../appInsights';
+const command: Command = require('./cli-consent');
 import * as assert from 'assert';
-import Utils from '../../Utils';
-import config from '../../config';
+import Utils from '../../../Utils';
+import config from '../../../config';
 
 describe(commands.CONSENT, () => {
   let vorpal: Vorpal;
@@ -22,7 +23,7 @@ describe(commands.CONSENT, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../vorpal-init');
+    vorpal = require('../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -54,6 +55,16 @@ describe(commands.CONSENT, () => {
 
   it('has a description', () => {
     assert.notEqual(command.description, null);
+  });
+
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notEqual(typeof alias, 'undefined');
+  });
+
+  it('defines correct alias', () => {
+    const alias = command.alias();
+    assert.equal((alias && alias.indexOf(globalCommands.CONSENT) > -1), true);
   });
 
   it('shows consent URL for yammer permissions for the default multi-tenant app', (done) => {
