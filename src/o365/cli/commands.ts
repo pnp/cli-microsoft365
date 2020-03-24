@@ -6,5 +6,6 @@ export default {
   COMPLETION_PWSH_UPDATE: `${prefix} completion pwsh update`,
   COMPLETION_SH_SETUP: `${prefix} completion sh setup`,
   COMPLETION_SH_UPDATE: `${prefix} completion sh update`,
-  CONSENT: `${prefix} consent`
+  CONSENT: `${prefix} consent`,
+  RECONSENT: `${prefix} reconsent`
 };
