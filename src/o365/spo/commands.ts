@@ -199,6 +199,7 @@ export default {
   TENANT_RECYCLEBINITEM_LIST:  `${prefix} tenant recyclebinitem list`,
   TENANT_SETTINGS_LIST: `${prefix} tenant settings list`,
   TENANT_SETTINGS_SET: `${prefix} tenant settings set`,
+  TENANT_RECYCLEBINITEM_RESTORE: `${prefix} tenant recyclebinitem restore`,
   TERM_ADD: `${prefix} term add`,
   TERM_GET: `${prefix} term get`,
   TERM_LIST: `${prefix} term list`,
