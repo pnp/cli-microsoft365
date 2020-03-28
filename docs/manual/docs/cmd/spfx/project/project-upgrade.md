@@ -39,7 +39,7 @@ Using this command you can upgrade SharePoint Framework projects built using ver
 Get instructions to upgrade the current SharePoint Framework project to SharePoint Framework version 1.5.0 and save the findings in a Markdown file
 
 ```sh
-spfx project upgrade --toVersion 1.5.0 --output md --outputFile upgrade-report.md
+spfx project upgrade --toVersion 1.5.0 --output md --outputFile "upgrade-report.md"
 ```
 
 Get instructions to Upgrade the current SharePoint Framework project to SharePoint Framework version 1.5.0 and show the summary of the findings in the shell

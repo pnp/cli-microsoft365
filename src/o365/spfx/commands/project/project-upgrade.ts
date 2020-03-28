@@ -674,7 +674,7 @@ ${f.resolution}
   
     Get instructions to upgrade the current SharePoint Framework project to
     SharePoint Framework version 1.5.0 and save the findings in a Markdown file
-      ${this.name} --toVersion 1.5.0 --output md --outputFile upgrade-report.md
+      ${this.name} --toVersion 1.5.0 --output md --outputFile "upgrade-report.md"
 
     Get instructions to Upgrade the current SharePoint Framework project to
     SharePoint Framework version 1.5.0 and show the summary of the findings
