@@ -8,6 +8,7 @@ export default {
   YAMMER_MESSAGE_REMOVE: `${prefix} message remove`,
   YAMMER_NETWORK_LIST: `${prefix} network list`,
   YAMMER_REPORT_GROUPSACTIVITYCOUNTS: `${prefix} report groupsactivitycounts`,
+  YAMMER_REPORT_GROUPSACTIVITYDETAIL: `${prefix} report groupsactivitydetail`,
   YAMMER_USER_GET: `${prefix} user get`,
   YAMMER_USER_LIST: `${prefix} user list`
 };
