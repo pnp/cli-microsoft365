@@ -120,6 +120,9 @@ nav:
     - Microsoft Planner (planner):
       - task:
         - task list: 'cmd/planner/task/task-list.md'
+    - Service:
+      - status:
+        - status list: 'cmd/service/status/status-list.md'
     - SharePoint Framework (spfx):
       - doctor: 'cmd/spfx/doctor.md'
       - project:
