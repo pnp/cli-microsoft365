@@ -11,6 +11,7 @@ export default {
   YAMMER_REPORT_ACTIVITYUSERCOUNTS: `${prefix} report activityusercounts`,
   YAMMER_REPORT_ACTIVITYUSERDETAIL: `${prefix} report activityuserdetail`,
   YAMMER_REPORT_DEVICEUSAGEDISTRIBUTIONUSERCOUNTS: `${prefix} report deviceusagedistributionusercounts`,
+  YAMMER_REPORT_DEVICEUSAGEUSERCOUNTS: `${prefix} report deviceusageusercounts`,
   YAMMER_REPORT_DEVICEUSAGEUSERDETAIL: `${prefix} report deviceusageuserdetail`,
   YAMMER_REPORT_GROUPSACTIVITYCOUNTS: `${prefix} report groupsactivitycounts`,
   YAMMER_USER_GET: `${prefix} user get`,
