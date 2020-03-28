@@ -285,7 +285,7 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
   
     Get instructions to externalize dependencies for the current SharePoint 
     Framework project and save the findings in a Markdown file
-      ${this.name} --output md --outputFile deps-report.md
+      ${this.name} --output md --outputFile "deps-report.md"
 
     Get instructions to externalize the current SharePoint Framework project
     dependencies and show the summary of the findings in the terminal

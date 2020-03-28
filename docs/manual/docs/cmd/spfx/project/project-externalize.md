@@ -37,7 +37,7 @@ This command doesn't change your project files. Instead, it gives you a report w
 Get instructions to externalize the current SharePoint Framework project dependencies and save the findings in a Markdown file
 
 ```sh
-spfx project externalize --output md --outputFile deps-report.md
+spfx project externalize --output md --outputFile "deps-report.md"
 ```
 
 Get instructions to externalize the current SharePoint Framework project dependencies and show the summary of the findings in the terminal
