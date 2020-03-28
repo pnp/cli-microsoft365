@@ -434,6 +434,8 @@ nav:
         - report activeusercounts: 'cmd/tenant/report/report-activeusercounts.md'
         - report activeuserdetail: 'cmd/tenant/report/report-activeuserdetail.md'
         - report servicesusercounts: 'cmd/tenant/report/report-servicesusercounts.md'
+      - status:
+        - status list: 'cmd/tenant/status/status-list.md'
     - Yammer (yammer):
       - group:
         - group list: 'cmd/yammer/group/group-list.md'
