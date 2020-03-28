@@ -455,7 +455,8 @@ nav:
         - report deviceusageusercounts: 'cmd/yammer/report/report-deviceusageusercounts.md'
         - report deviceusageuserdetail: 'cmd/yammer/report/report-deviceusageuserdetail.md'
         - report groupsactivitycounts: 'cmd/yammer/report/report-groupsactivitycounts.md'
-        - report groupsactivitydetail: 'cmd/yammer/report/report-groupsactivitydetail.md'        
+        - report groupsactivitydetail: 'cmd/yammer/report/report-groupsactivitydetail.md'
+        - report groupsactivitygroupcounts: 'cmd/yammer/report/report-groupsactivitygroupcounts.md'
       - user:
         - user get: 'cmd/yammer/user/user-get.md'
         - user list: 'cmd/yammer/user/user-list.md'
