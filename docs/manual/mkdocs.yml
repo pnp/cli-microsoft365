@@ -445,6 +445,7 @@ nav:
       - network:
         - network list: 'cmd/yammer/network/network-list.md'
       - report:
+        - report activityuserdetail: 'cmd/yammer/report/report-activityuserdetail.md'
         - report groupsactivitycounts: 'cmd/yammer/report/report-groupsactivitycounts.md'
       - user:
         - user get: 'cmd/yammer/user/user-get.md'
