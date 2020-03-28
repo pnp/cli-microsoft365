@@ -33,8 +33,10 @@
 
 ### Changes
 
+- added 'Add App Catalog to SharePoint site' sample [#1413](https://github.com/pnp/office365-cli/pull/1413)
 - added 'Delete all Office 365 groups' sample [#1140](https://github.com/pnp/office365-cli/issues/1140)
 - added 'Delete custom SharePoint site scripts' sample [#1139](https://github.com/pnp/office365-cli/issues/1139)
+- added 'Hide SharePoint list from Site Contents' sample [#1413](https://github.com/pnp/office365-cli/pull/1413)
 - extended team channel name validation to allow 'tacv2'. [#1401](https://github.com/pnp/office365-cli/issues/1401)
 
 ## [v2.7.0](https://github.com/pnp/office365-cli/releases/tag/v2.7.0)
