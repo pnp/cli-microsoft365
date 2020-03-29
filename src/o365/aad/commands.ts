@@ -20,6 +20,7 @@ export default {
   O365GROUP_REPORT_ACTIVITYDETAIL: `${prefix} o365group report activitydetail`,
   O365GROUP_REPORT_ACTIVITYFILECOUNTS: `${prefix} o365group report activityfilecounts`,
   O365GROUP_REPORT_ACTIVITYGROUPCOUNTS: `${prefix} o365group report activitygroupcounts`,
+  O365GROUP_REPORT_ACTIVITYSTORAGE: `${prefix} o365group report activitystorage`,
   O365GROUP_RESTORE: `${prefix} o365group restore`,
   O365GROUP_USER_ADD: `${prefix} o365group user add`,
   O365GROUP_USER_LIST: `${prefix} o365group user list`,
