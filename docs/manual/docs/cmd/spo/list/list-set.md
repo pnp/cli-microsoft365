@@ -16,44 +16,44 @@ Option|Description
 `-i|--id <id>`|Id of the list to update
 `-u|--webUrl <webUrl>`|URL of the site where the list to update is located
 `-t|--title [title]`|The displayed title for the list
-`--allowDeletion [allowDeletion]`|Boolean value specifying whether the list can be deleted. Valid values are true|false
-`--allowEveryoneViewItems [allowEveryoneViewItems]`|Boolean value specifying whether everyone can view documents in the documentlibrary or attachments to items in the list. Valid values are true|false
-`--allowMultiResponses [allowMultiResponses]`|Boolean value specifying whether users are allowed to give multiple responses to the survey. Valid values are true|false
-`--contentTypesEnabled [contentTypesEnabled]`|Boolean value specifying whether content types are enabled for the list. Valid values are true|false
-`--crawlNonDefaultViews [crawlNonDefaultViews]`|Boolean value specifying whether to crawl non default views. Valid values are true|false
+`--allowDeletion [allowDeletion]`|Boolean value specifying whether the list can be deleted. Valid values are `true,false`
+`--allowEveryoneViewItems [allowEveryoneViewItems]`|Boolean value specifying whether everyone can view documents in the documentlibrary or attachments to items in the list. Valid values are `true,false`
+`--allowMultiResponses [allowMultiResponses]`|Boolean value specifying whether users are allowed to give multiple responses to the survey. Valid values are `true,false`
+`--contentTypesEnabled [contentTypesEnabled]`|Boolean value specifying whether content types are enabled for the list. Valid values are `true,false`
+`--crawlNonDefaultViews [crawlNonDefaultViews]`|Boolean value specifying whether to crawl non default views. Valid values are `true,false`
 `--defaultContentApprovalWorkflowId [defaultContentApprovalWorkflowId]`|Value that specifies the default workflow identifier for content approval on the list (GUID)
 `--defaultDisplayFormUrl [defaultDisplayFormUrl]`|Value that specifies the location of the default display form for the list
 `--defaultEditFormUrl [defaultEditFormUrl]`|Value that specifies the URL of the edit form to use for list items in the list
 `--description [description]`|The description for the list
-`--direction [direction]`|Value that specifies the reading order of the list. Valid values are NONE|LTR|RTL
-`--disableGridEditing [disableGridEditing]`|Property for assigning or retrieving grid editing on the list. Valid values are true|false
-`--draftVersionVisibility [draftVersionVisibility]`|Value that specifies the minimum permission required to view minor versions and drafts within the list. Allowed values Reader|Author|Approver. Default Reader
+`--direction [direction]`|Value that specifies the reading order of the list. Valid values are NONE,LTR,RTL
+`--disableGridEditing [disableGridEditing]`|Property for assigning or retrieving grid editing on the list. Valid values are `true,false`
+`--draftVersionVisibility [draftVersionVisibility]`|Value that specifies the minimum permission required to view minor versions and drafts within the list. Allowed values Reader,Author,Approver. Default Reader
 `--emailAlias [emailAlias]`|If e-mail notification is enabled, gets or sets the e-mail address to use tonotify to the owner of an item when an assignment has changed or the item has been updated.
-`--enableAssignToEmail [enableAssignToEmail]`|Boolean value specifying whether e-mail notification is enabled for the list. Valid values are true|false
-`--enableAttachments [enableAttachments]`|Boolean value that specifies whether attachments can be added to items in the list. Valid values are true|false
-`--enableDeployWithDependentList [enableDeployWithDependentList]`|Boolean value that specifies whether the list can be deployed with a dependent list. Valid values are true|false
-`--enableFolderCreation [enableFolderCreation]`|Boolean value that specifies whether folders can be created for the list. Valid values are true|false
-`--enableMinorVersions [enableMinorVersions]`|Boolean value that specifies whether minor versions are enabled when versioning is enabled for the document library. Valid values are true|false
-`--enableModeration [enableModeration]`|Boolean value that specifies whether Content Approval is enabled for the list. Valid values are true|false
-`--enablePeopleSelector [enablePeopleSelector]`|Enable user selector on event list. Valid values are true|false
-`--enableResourceSelector [enableResourceSelector]`|Enables resource selector on an event list. Valid values are true|false
-`--enableSchemaCaching [enableSchemaCaching]`|Boolean value specifying whether schema caching is enabled for the list. Valid values are true|false
-`--enableSyndication [enableSyndication]`|Boolean value that specifies whether RSS syndication is enabled for the list. Valid values are true|false
-`--enableThrottling [enableThrottling]`|Indicates whether throttling for this list is enabled or not. Valid values are true|false
-`--enableVersioning [enableVersioning]`|Boolean value that specifies whether versioning is enabled for the document library. Valid values are true|false
-`--enforceDataValidation [enforceDataValidation]`|Value that indicates whether certain field properties are enforced when an item is added or updated. Valid values are true|false
-`--excludeFromOfflineClient [excludeFromOfflineClient]`|Value that indicates whether the list should be downloaded to the client during offline synchronization. Valid values are true|false
-`--fetchPropertyBagForListView [fetchPropertyBagForListView]`|Specifies whether property bag information, as part of the list schema JSON,is retrieved when the list is being rendered on the client. Valid values are true|false
-`--followable [followable]`|Can a list be followed in an activity feed?. Valid values are true|false
-`--forceCheckout [forceCheckout]`|Boolean value that specifies whether forced checkout is enabled for the document library. Valid values are true|false
-`--forceDefaultContentType [forceDefaultContentType]`|Specifies whether we want to return the default Document root content type. Valid values are true|false
-`--hidden [hidden]`|Boolean value that specifies whether the list is hidden. Valid values are true|false
+`--enableAssignToEmail [enableAssignToEmail]`|Boolean value specifying whether e-mail notification is enabled for the list. Valid values are `true,false`
+`--enableAttachments [enableAttachments]`|Boolean value that specifies whether attachments can be added to items in the list. Valid values are `true,false`
+`--enableDeployWithDependentList [enableDeployWithDependentList]`|Boolean value that specifies whether the list can be deployed with a dependent list. Valid values are `true,false`
+`--enableFolderCreation [enableFolderCreation]`|Boolean value that specifies whether folders can be created for the list. Valid values are `true,false`
+`--enableMinorVersions [enableMinorVersions]`|Boolean value that specifies whether minor versions are enabled when versioning is enabled for the document library. Valid values are `true,false`
+`--enableModeration [enableModeration]`|Boolean value that specifies whether Content Approval is enabled for the list. Valid values are `true,false`
+`--enablePeopleSelector [enablePeopleSelector]`|Enable user selector on event list. Valid values are `true,false`
+`--enableResourceSelector [enableResourceSelector]`|Enables resource selector on an event list. Valid values are `true,false`
+`--enableSchemaCaching [enableSchemaCaching]`|Boolean value specifying whether schema caching is enabled for the list. Valid values are `true,false`
+`--enableSyndication [enableSyndication]`|Boolean value that specifies whether RSS syndication is enabled for the list. Valid values are `true,false`
+`--enableThrottling [enableThrottling]`|Indicates whether throttling for this list is enabled or not. Valid values are `true,false`
+`--enableVersioning [enableVersioning]`|Boolean value that specifies whether versioning is enabled for the document library. Valid values are `true,false`
+`--enforceDataValidation [enforceDataValidation]`|Value that indicates whether certain field properties are enforced when an item is added or updated. Valid values are `true,false`
+`--excludeFromOfflineClient [excludeFromOfflineClient]`|Value that indicates whether the list should be downloaded to the client during offline synchronization. Valid values are `true,false`
+`--fetchPropertyBagForListView [fetchPropertyBagForListView]`|Specifies whether property bag information, as part of the list schema JSON,is retrieved when the list is being rendered on the client. Valid values are `true,false`
+`--followable [followable]`|Can a list be followed in an activity feed?. Valid values are `true,false`
+`--forceCheckout [forceCheckout]`|Boolean value that specifies whether forced checkout is enabled for the document library. Valid values are `true,false`
+`--forceDefaultContentType [forceDefaultContentType]`|Specifies whether we want to return the default Document root content type. Valid values are `true,false`
+`--hidden [hidden]`|Boolean value that specifies whether the list is hidden. Valid values are `true,false`
 `--includedInMyFilesScope [includedInMyFilesScope]`|Specifies whether this list is accessible to an app principal that has been granted an OAuth scope that contains the string “myfiles” by a case-insensitive comparison when the current user is a site collection administrator of the personal site that contains the list
 `--irmEnabled [irmEnabled]`|Gets or sets a Boolean value that specifies whether Information Rights Management (IRM) is enabled for the list
 `--irmExpire [irmExpire]`|Gets or sets a Boolean value that specifies whether Information Rights Management (IRM) expiration is enabled for the list
 `--irmReject [irmReject]`|Gets or sets a Boolean value that specifies whether Information Rights Management (IRM) rejection is enabled for the list
 `--isApplicationList [isApplicationList]`|Indicates whether this list should be treated as a top level navigation object or not
-`--listExperienceOptions [listExperienceOptions]`|Gets or sets the list experience for the list. Allowed values Auto|NewExperience|ClassicExperience. Default Auto
+`--listExperienceOptions [listExperienceOptions]`|Gets or sets the list experience for the list. Allowed values Auto,NewExperience,ClassicExperience. Default Auto
 `--majorVersionLimit [majorVersionLimit]`|Gets or sets the maximum number of major versions allowed for an item in a document library that uses version control with major versions only.
 `--majorWithMinorVersionsLimit [majorWithMinorVersionsLimit]`|Gets or sets the maximum number of major versions that are allowed for an item in a document library that uses version control with both major and minor versions.
 `--multipleDataList [multipleDataList]`|Gets or sets a Boolean value that specifies whether the list in a Meeting Workspace sitecontains data for multiple meeting instances within the site
@@ -77,7 +77,7 @@ Option|Description
 `--validationMessage [validationMessage]`|Gets or sets the message that is displayed when validation fails for a list item.
 `--writeSecurity [writeSecurity]`|Gets or sets the Write security setting for the list. Valid values are 1 (All users can modify all items)|2 (Users can modify only items that they create)|4 (Users cannot modify any list item)
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json|text`. Default `text`
+`-o, --output [output]`|Output type. `json,text`. Default `text`
 `--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

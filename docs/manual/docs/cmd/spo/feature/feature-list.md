@@ -14,9 +14,9 @@ Option|Description
 ------|-----------
 `--help`|output usage information
 `-u, --url <url>`|URL of the site (collection) to retrieve the activated Features from
-`-s, --scope [scope]`|Scope of the Features to retrieve. Allowed values `Site|Web`. Default `Web`
+`-s, --scope [scope]`|Scope of the Features to retrieve. Allowed values `Site,Web`. Default `Web`
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json|text`. Default `text`
+`-o, --output [output]`|Output type. `json,text`. Default `text`
 `--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

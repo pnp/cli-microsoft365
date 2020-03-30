@@ -15,10 +15,10 @@ Option|Description
 `--help`|output usage information
 `-i, --id <id>`|ID of the app to uninstall
 `-s, --siteUrl <siteUrl>`|Absolute URL of the site to uninstall the app from
-`--scope [scope]`|Scope of the app catalog: `tenant|sitecollection`. Default `tenant`
+`--scope [scope]`|Scope of the app catalog: `tenant,sitecollection`. Default `tenant`
 `--confirm`|Don't prompt for confirming uninstalling the app
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json|text`. Default `text`
+`-o, --output [output]`|Output type. `json,text`. Default `text`
 `--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

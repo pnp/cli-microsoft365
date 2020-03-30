@@ -15,9 +15,9 @@ Option|Description
 `--help`|output usage information
 `-i, --id <id>`|ID of the app to upgrade
 `-s, --siteUrl <siteUrl>`|Absolute URL of the site to upgrade the app in
-`--scope [scope]`|Scope of the app catalog: `tenant|sitecollection`. Default `tenant`
+`--scope [scope]`|Scope of the app catalog: `tenant,sitecollection`. Default `tenant`
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json|text`. Default `text`
+`-o, --output [output]`|Output type. `json,text`. Default `text`
 `--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

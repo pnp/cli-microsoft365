@@ -22,9 +22,9 @@ Option|Description
 `-i, --groupId [groupId]`|The ID of the Office 365 group for which to update user
 `--teamId [teamId]`|The ID of the Microsoft Teams team for which to update user
 `-n, --userName <userName>`|UPN of the user for whom to update the role (eg. johndoe@example.com)
-`-r, --role <role>`|Role to set for the given user in the specified Office 365 Group or Microsoft Teams team. Allowed values: `Owner|Member`
+`-r, --role <role>`|Role to set for the given user in the specified Office 365 Group or Microsoft Teams team. Allowed values: `Owner,Member`
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json|text`. Default `text`
+`-o, --output [output]`|Output type. `json,text`. Default `text`
 `--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

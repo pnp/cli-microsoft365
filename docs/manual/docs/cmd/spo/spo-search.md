@@ -38,7 +38,7 @@ Option|Description
 `--processPersonalFavorites`|Set, to return personal favorites with the search results.
 `--rawOutput`|Set, to return the unparsed, raw results of the REST call to the search API.
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json|text`. Default `text`
+`-o, --output [output]`|Output type. `json,text`. Default `text`
 `--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

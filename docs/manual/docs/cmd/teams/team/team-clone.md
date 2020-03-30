@@ -15,12 +15,12 @@ Option|Description
 `--help`|output usage information
 `-i, --teamId <teamId>`|The ID of the Microsoft Teams team to clone
 `-n, --displayName <displayName>`|The display name for the new Microsoft Teams Team
-`-p, --partsToClone <partsToClone>`|A comma-separated list of the parts to clone. Allowed values are `apps|channels|members|settings|tabs`
+`-p, --partsToClone <partsToClone>`|A comma-separated list of the parts to clone. Allowed values are `apps,channels,members,settings,tabs`
 `-d, --description [description]`|The description for the new Microsoft Teams Team
 `-c, --classification [classification]`|The classification for the new Microsoft Teams Team. If not specified, will be copied from the original Microsoft Teams Team
-`-v, --visibility [visibility]`|Specify the visibility of the new Microsoft Teams Team. Allowed values are `Private|Public`.
+`-v, --visibility [visibility]`|Specify the visibility of the new Microsoft Teams Team. Allowed values are `Private,Public`.
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json|text`. Default `text`
+`-o, --output [output]`|Output type. `json,text`. Default `text`
 `--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

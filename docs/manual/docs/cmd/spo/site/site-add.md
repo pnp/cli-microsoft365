@@ -13,7 +13,7 @@ spo site add [options]
 Option|Description
 ------|-----------
 `--help`|output usage information
-`--type [type]`|Type of modern sites to list. Allowed values `TeamSite|CommunicationSite`, default `TeamSite`
+`--type [type]`|Type of modern sites to list. Allowed values `TeamSite,CommunicationSite`, default `TeamSite`
 `-u, --url <url>`|Site URL (applies only to communication sites)
 `-a, --alias <alias>`|Site alias, used in the URL and in the team site group e-mail (applies only to team sites)
 `-t, --title <title>`|Site title
@@ -23,11 +23,11 @@ Option|Description
 `--isPublic`|Determines if the associated group is public or not (applies only to team sites)
 `--shareByEmailEnabled`|Determines whether it's allowed to share file with guests (applies only to communication sites)
 `--allowFileSharingForGuestUsers`|(deprecated. Use `shareByEmailEnabled` instead) Determines whether it's allowed to share file with guests (applies only to communication sites)
-`--siteDesign [siteDesign]`|Type of communication site to create. Allowed values `Topic|Showcase|Blank`, default `Topic`. When creating a communication site, specify either `siteDesign` or `siteDesignId` (applies only to communication sites)
+`--siteDesign [siteDesign]`|Type of communication site to create. Allowed values `Topic,Showcase,Blank`, default `Topic`. When creating a communication site, specify either `siteDesign` or `siteDesignId` (applies only to communication sites)
 `--siteDesignId [siteDesignId]`|Id of the custom site design to use to create the site. When creating a communication site, specify either `siteDesign` or `siteDesignId` (applies only to communication sites)
 `--owners [owners]`|Comma-separated list of users to set as site owners (applies only to team sites)
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json|text`. Default `text`
+`-o, --output [output]`|Output type. `json,text`. Default `text`
 `--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

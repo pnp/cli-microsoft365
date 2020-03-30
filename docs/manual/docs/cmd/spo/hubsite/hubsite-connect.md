@@ -16,7 +16,7 @@ Option|Description
 `-u, --url <url>`|The URL of the site collection to connect to the hub site
 `-i, --hubSiteId <hubSiteId>`|The ID of the hub site to which to connect the site collection
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json|text`. Default `text`
+`-o, --output [output]`|Output type. `json,text`. Default `text`
 `--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

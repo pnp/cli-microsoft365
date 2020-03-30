@@ -216,10 +216,10 @@ View on [GitHub Marketplace](https://github.com/marketplace/actions/office-365-c
 | Name                      | Description                                        |          |
 | --------------------------|----------------------------------------------------| ---------|
 | `APP_FILE_PATH`           | Relative path of the app in your repo              | Required |
-| `SCOPE`                   | Scope of the app catalog: `tenant|sitecollection`. Default is `tenant` | Optional |
+| `SCOPE`                   | Scope of the app catalog: `tenant,sitecollection`. Default is `tenant` | Optional |
 | `SITE_COLLECTION_URL`     | The URL of the site collection where the solution package will be added | Required if scope is set to `sitecollection` |
-| `SKIP_FEATURE_DEPLOYMENT` | `true|false` If the app supports tenant-wide deployment, deploy it to the whole tenant. Default is `false` | Optional |
-| `OVERWRITE`               | `true|false` Set to overwrite the existing package file. Default is `false` | Optional |
+| `SKIP_FEATURE_DEPLOYMENT` | `true,false` If the app supports tenant-wide deployment, deploy it to the whole tenant. Default is `false` | Optional |
+| `OVERWRITE`               | `true,false` Set to overwrite the existing package file. Default is `false` | Optional |
 
 #### Output
 

@@ -25,15 +25,15 @@ Option|Description
 `--imageUrl [imageUrl]`|The URL of the image associated with the custom action
 `-e, --commandUIExtension [commandUIExtension]`|XML fragment that determines user interface properties of the custom action
 `--registrationId [registrationId]`|Specifies the identifier of the list or item content type that this action is associated with, or the file type or programmatic identifier
-`--registrationType [registrationType]`|Specifies the type of object associated with the custom action. Allowed values `None|List|ContentType|ProgId|FileType`. Default `None`
-`--rights [rights]`|A case-sensitive string array that contain the permissions needed for the custom action. Allowed values `EmptyMask|ViewListItems|AddListItems|EditListItems|DeleteListItems|ApproveItems|OpenItems|ViewVersions|DeleteVersions|CancelCheckout|ManagePersonalViews|ManageLists|ViewFormPages|AnonymousSearchAccessList|Open|ViewPages|AddAndCustomizePages|ApplyThemeAndBorder|ApplyStyleSheets|ViewUsageData|CreateSSCSite|ManageSubwebs|CreateGroups|ManagePermissions|BrowseDirectories|BrowseUserInfo|AddDelPrivateWebParts|UpdatePersonalWebParts|ManageWeb|AnonymousSearchAccessWebLists|UseClientIntegration|UseRemoteAPIs|ManageAlerts|CreateAlerts|EditMyUserInfo|EnumeratePermissions|FullMask`. Default `EmptyMask`
-`-s, --scope [scope]`|Scope of the existing custom action. Allowed values `Site|Web|All`. Default `All`. Note, this would not update the scope, but might speed up the execution of the scope of the custom action is known.
+`--registrationType [registrationType]`|Specifies the type of object associated with the custom action. Allowed values `None,List,ContentType,ProgId,FileType`. Default `None`
+`--rights [rights]`|A case-sensitive string array that contain the permissions needed for the custom action. Allowed values `EmptyMask,ViewListItems,AddListItems,EditListItems,DeleteListItems,ApproveItems,OpenItems,ViewVersions,DeleteVersions,CancelCheckout,ManagePersonalViews,ManageLists,ViewFormPages,AnonymousSearchAccessList,Open,ViewPages,AddAndCustomizePages,ApplyThemeAndBorder,ApplyStyleSheets,ViewUsageData,CreateSSCSite,ManageSubwebs,CreateGroups,ManagePermissions,BrowseDirectories,BrowseUserInfo,AddDelPrivateWebParts,UpdatePersonalWebParts,ManageWeb,AnonymousSearchAccessWebLists,UseClientIntegration,UseRemoteAPIs,ManageAlerts,CreateAlerts,EditMyUserInfo,EnumeratePermissions,FullMask`. Default `EmptyMask`
+`-s, --scope [scope]`|Scope of the existing custom action. Allowed values `Site,Web,All`. Default `All`. Note, this would not update the scope, but might speed up the execution of the scope of the custom action is known.
 `--scriptBlock [scriptBlock]`|Specifies a block of script to be executed. This attribute is only applicable when the Location attribute is set to ScriptLink
 `--scriptSrc [scriptSrc]`|Specifies a file that contains script to be executed. This attribute is only applicable when the Location attribute is set to ScriptLink
 `-c, --clientSideComponentId [clientSideComponentId]`|The Client Side Component Id (GUID) of the custom action
 `-p, --clientSideComponentProperties [clientSideComponentProperties]`|The Client Side Component Properties of the custom action. Specify values as a JSON string : `'{"testMessage":"Test message"}'`
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json|text`. Default `text`
+`-o, --output [output]`|Output type. `json,text`. Default `text`
 `--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

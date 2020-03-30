@@ -16,7 +16,7 @@ Option|Description
 `-t, --webTemplate [type]`|type of classic sites to list.
 `-f, --filter [filter]`|filter to apply when retrieving sites
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json|text`. Default `text`
+`-o, --output [output]`|Output type. `json,text`. Default `text`
 `--pretty`|Prettifies `json` output
 `--includeOneDriveSites`|option to include OneDrive sites or not.
 `--verbose`|Runs command with verbose logging

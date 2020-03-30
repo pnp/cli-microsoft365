@@ -15,7 +15,7 @@ Option|Description
 `--help`|output usage information
 `-i, --id <id>`|The ID of the site design to update
 `-t, --title [title]`|The new display name of the updated site design
-`-w, --webTemplate [webTemplate]`|The new template to add the site design to. Allowed values TeamSite|CommunicationSite
+`-w, --webTemplate [webTemplate]`|The new template to add the site design to. Allowed values `TeamSite,CommunicationSite`
 `-s, --siteScripts [siteScripts]`|Comma-separated list of new site script IDs. The scripts will run in the order listed
 `-d, --description [description]`|The new display description of updated site design
 `-m, --previewImageUrl [previewImageUrl]`|The new URL of a preview image. If none is specified SharePoint will use a generic image
@@ -23,7 +23,7 @@ Option|Description
 `-v, --version [version]`|The new version number for the site design
 `--isDefault [isDefault]`|Set to true if the site design is applied as the default site design
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json|text`. Default `text`
+`-o, --output [output]`|Output type. `json,text`. Default `text`
 `--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
