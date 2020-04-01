@@ -24,7 +24,7 @@ interface Options extends GlobalOptions {
   cdnType?: string;
 }
 
-class SpoOrgAssetlibAddCommand extends SpoCommand {
+class SpoOrgAssetsLibraryAddCommand extends SpoCommand {
   public get name(): string {
     return `${commands.ORGASSETSLIBRARY_ADD}`;
   }
@@ -100,11 +100,11 @@ class SpoOrgAssetlibAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--libraryUrl<libraryUrl>',
+        option: '--libraryUrl <libraryUrl>',
         description: 'The URL of the library to promote'
       },
       {
-        option: '--thumbnailUrl[thumbnailUrl]',
+        option: '--thumbnailUrl [thumbnailUrl]',
         description: 'The URL of the thumbnail to render'
       },
       {
@@ -137,4 +137,4 @@ class SpoOrgAssetlibAddCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoOrgAssetlibAddCommand();
+module.exports = new SpoOrgAssetsLibraryAddCommand();

@@ -65,11 +65,6 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
     assert.notEqual(command.description, null);
   });
 
-  // handles error in URL
-  // handles version with cdn type
-  // handles version with thumbnail
-  // handles already set error
-
   it('adds a new library as org assets library (debug)', (done) => {
     let orgAssetLibAddCallIssued = false;
 
