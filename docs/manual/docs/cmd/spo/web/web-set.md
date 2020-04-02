@@ -24,7 +24,7 @@ Option|Description
 `--footerEnabled [footerEnabled]`|Set to `true` to enable footer and to `false` to disable it
 `--searchScope [searchScope]`|Search scope to set in the site. Allowed values `DefaultScope`&#x7c;`Tenant`&#x7c;`Hub`&#x7c;`Site`
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json`&#x7c;`text`. Default `text`
+`-o, --output [output]`|Output type. <code>json&124;text</code>. Default `text`
 `--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

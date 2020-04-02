@@ -17,7 +17,7 @@ Option|Description
 `--name <name>`|The name for the component.
 `--template <template>`|Choose a template for the component. `Field`&#x7c;`Dataset`.
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json`&#x7c;`text`. Default `text`
+`-o, --output [output]`|Output type. <code>json&124;text</code>. Default `text`
 `--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

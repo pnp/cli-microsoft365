@@ -17,7 +17,7 @@ Option|Description
 `-t, --type [type]`|Type of CDN to manage. `Public`&#x7c;`Private`&#x7c;`Both`. Default `Public`
 `--noDefaultOrigins`|pass to not create the default Origins
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json`&#x7c;`text`. Default `text`
+`-o, --output [output]`|Output type. <code>json&124;text</code>. Default `text`
 `--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

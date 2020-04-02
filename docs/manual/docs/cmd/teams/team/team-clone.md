@@ -20,7 +20,7 @@ Option|Description
 `-c, --classification [classification]`|The classification for the new Microsoft Teams Team. If not specified, will be copied from the original Microsoft Teams Team
 `-v, --visibility [visibility]`|Specify the visibility of the new Microsoft Teams Team. Allowed values are `Private`&#x7c;`Public`.
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json`&#x7c;`text`. Default `text`
+`-o, --output [output]`|Output type. <code>json&124;text</code>. Default `text`
 `--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

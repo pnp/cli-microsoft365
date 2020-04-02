@@ -18,7 +18,7 @@ Option|Description
 `-s, --scope [scope]`|Scope of the Feature to disable. Allowed values `Site`&#x7c;`Web`. Default `Web`
 `--force`|Specifies whether to continue if an error occurs when disabling the feature
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json`&#x7c;`text`. Default `text`
+`-o, --output [output]`|Output type. <code>json&124;text</code>. Default `text`
 `--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

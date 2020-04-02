@@ -15,7 +15,7 @@ Option|Description
 `--help`|output usage information
 `-f, --outputFile [outputFile]`|Path to the file where the report should be stored in
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json`&#x7c;`text`&#x7c;`md`. Default `text`
+`-o, --output [output]`|Output type. <code>json&124;text</code>&#x7c;`md`. Default `text`
 `--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

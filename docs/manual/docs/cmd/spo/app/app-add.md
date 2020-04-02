@@ -18,7 +18,7 @@ Option|Description
 `-s, --scope [scope]`|Scope of the app catalog: `tenant`&#x7c;`sitecollection`. Default `tenant`
 `-u, --appCatalogUrl [appCatalogUrl]`|The URL of the app catalog where the solution package will be added. It must be specified when the scope is `sitecollection`
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json`&#x7c;`text`. Default `text`
+`-o, --output [output]`|Output type. <code>json&124;text</code>. Default `text`
 `--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
