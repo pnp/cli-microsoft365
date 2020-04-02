@@ -24,7 +24,7 @@ Option|Description
 `-n, --userName <userName>`|UPN of the user for whom to update the role (eg. johndoe@example.com)
 `-r, --role <role>`|Role to set for the given user in the specified Office 365 Group or Microsoft Teams team. Allowed values: `Owner`&#x7c;`Member`
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. <code>json&124;text</code>. Default `text`
+`-o, --output [output]`|Output type. `json`&#x7c;`text`. Default `text`
 `--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

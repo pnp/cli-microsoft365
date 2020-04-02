@@ -17,7 +17,7 @@ Option|Description
 `-u, --url <url>`|Url of the site or site collection to retrieve the custom action from
 `-s, --scope [scope]`|Scope of the custom action. Allowed values `Site`&#x7c;`Web`&#x7c;`All`. Default `All`
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. <code>json&124;text</code>. Default `text`
+`-o, --output [output]`|Output type. `json`&#x7c;`text`. Default `text`
 `--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

@@ -19,7 +19,7 @@ Option|Description
 `-t, --type [type]`|Type of the check in. Available values `Minor`&#x7c;`Major`&#x7c;`Overwrite`. Default is Major
 `--comment [comment]`|Comment to set when checking the file in. It\'s length must be less than 1024 letters. Default is empty string
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. <code>json&124;text</code>. Default `text`
+`-o, --output [output]`|Output type. `json`&#x7c;`text`. Default `text`
 `--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

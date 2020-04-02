@@ -15,7 +15,7 @@ Option|Description
 `--help`|output usage information
 `-s, --service <service>`|Service for which to consent permissions. Allowed values: `yammer`
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. <code>json&124;text</code>. Default `text`
+`-o, --output [output]`|Output type. `json`&#x7c;`text`. Default `text`
 `--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging

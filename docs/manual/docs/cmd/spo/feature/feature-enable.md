@@ -18,7 +18,7 @@ Option|Description
 `-s, --scope [scope]`|Scope of the Feature to enable. Allowed values `Site`&#x7c;`Web`. Default `Web`
 `--force`|Specifies whether to overwrite an existing feature with the same feature identifier. This parameter is ignored if there are no errors.
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. <code>json&124;text</code>. Default `text`
+`-o, --output [output]`|Output type. `json`&#x7c;`text`. Default `text`
 `--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
