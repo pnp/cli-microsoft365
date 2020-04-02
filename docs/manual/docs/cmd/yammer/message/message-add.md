@@ -18,7 +18,7 @@ Option|Description
 `-d, --directToUserIds [directToUserIds]`|Send a private message to one or more users, specified by ID. Alternatively, you can use the Yammer network e-mail addresses instead of the IDs
 `--groupId [groupId]`|Post the message to this group, specified by ID. If this is set then the networkId is inferred from it. A post without directToUserIds, repliedToId or groupId will default to All Company group
 `--networkId [networkId]`|Post a message in the "All Company" feed of this network, if repliedToId, directToUserIds and groupId are all omitted
-`-o, --output [output]`|Output type. `json\|text`. Default `text`
+`-o, --output [output]`|Output type. `json`&#x7c;`text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 

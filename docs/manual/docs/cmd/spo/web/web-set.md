@@ -18,13 +18,13 @@ Option|Description
 `-d, --description [description]`|New description for the subsite
 `--siteLogoUrl [siteLogoUrl]`|New site logo URL for the subsite
 `--quickLaunchEnabled [quickLaunchEnabled]`|Set to `true` to enable quick launch and to `false` to disable it
-`--headerLayout [headerLayout]`|Configures the site header. Allowed values `standard\|compact`
-`--headerEmphasis [headerEmphasis]`|Configures the site header background. Allowed values `0\|1\|2\|3`
+`--headerLayout [headerLayout]`|Configures the site header. Allowed values `standard`&#x7c;`compact`
+`--headerEmphasis [headerEmphasis]`|Configures the site header background. Allowed values `0`&#x7c;`1`&#x7c;`2`&#x7c;`3`
 `--megaMenuEnabled [megaMenuEnabled]`|Set to `true` to change the menu style to megamenu. Set to `false` to use the cascading menu style
 `--footerEnabled [footerEnabled]`|Set to `true` to enable footer and to `false` to disable it
-`--searchScope [searchScope]`|Search scope to set in the site. Allowed values `DefaultScope\|Tenant\|Hub\|Site`
+`--searchScope [searchScope]`|Search scope to set in the site. Allowed values `DefaultScope`&#x7c;`Tenant`&#x7c;`Hub`&#x7c;`Site`
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json\|text`. Default `text`
+`-o, --output [output]`|Output type. `json`&#x7c;`text`. Default `text`
 `--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
