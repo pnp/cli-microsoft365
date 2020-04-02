@@ -16,7 +16,7 @@ Option|Description
 `--libraryUrl <libraryUrl>`|The server relative URL of the library to be removed as a central location for organization assets
 `--confirm`|Don't prompt for confirming removing the organization asset library
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json`&#x7c;`text`. Default `text`
+`-o, --output [output]`|Output type. `json,text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
