@@ -1,5 +1,30 @@
 # Release notes
 
+## v2.9.0
+
+### New commands
+
+**Office 365:**
+
+- [tenant status list](../cmd/tenant/status/status-list.md) - Gets health status of the different services in Office 365 [#1272](https://github.com/pnp/office365-cli/issues/1272)
+
+**Yammer:**
+
+- [yammer report activitycounts](../cmd/yammer/report/report-activitycounts.md) - gets the trends on the amount of Yammer activity in your organization by how many messages were posted, read, and liked [#1383](https://github.com/pnp/office365-cli/issues/1383)
+- [yammer report activityusercounts](../cmd/yammer/report/report-activityusercounts.md) - gets the trends on the number of unique users who posted, read, and liked Yammer messages [#1384](https://github.com/pnp/office365-cli/issues/1384)
+- [yammer report activityuserdetail](../cmd/yammer/report/report-activityuserdetail.md) - gets details about Yammer activity by user [#1382](https://github.com/pnp/office365-cli/issues/1382)
+- [yammer report deviceusagedistributionusercounts](../cmd/yammer/report/report-deviceusagedistributionusercounts.md) - gets the number of users by device type [#1386](https://github.com/pnp/office365-cli/issues/1386)
+- [yammer report deviceusageuserdetail](../cmd/yammer/report/report-deviceusageuserdetail.md) - gets details about Yammer device usage by user [#1287](https://github.com/pnp/office365-cli/issues/1287)
+
+### Changes
+
+- added 'Scan Office 365 Groups created with User's First or Last Name' sample [#1342](https://github.com/pnp/office365-cli/issues/1342)
+- extended `tenant id get` with retrieving the ID of the current tenant [#1378](https://github.com/pnp/office365-cli/issues/1378)
+- changed communicating no need to upgrade spfx project as a non-error [#1407](https://github.com/pnp/office365-cli/issues/1407)
+- moved the 'consent' command to the 'cli' namespace [#1336](https://github.com/pnp/office365-cli/issues/1336)
+- implemented '--reconsent' as a CLI command. [#1337](https://github.com/pnp/office365-cli/issues/1337)
+- updated docs wrapping file names in quotes. [#1410](https://github.com/pnp/office365-cli/issues/1410)
+
 ## [v2.8.0](https://github.com/pnp/office365-cli/releases/tag/v2.8.0)
 
 ### New commands
