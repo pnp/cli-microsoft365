@@ -493,6 +493,7 @@ nav:
       - 'Delete custom color themes from SharePoint': 'sample-scripts/spo/remove-custom-themes.md'
       - 'Delete custom SharePoint site designs': 'sample-scripts/spo/remove-site-designs.md'
       - 'Delete custom SharePoint site scripts': 'sample-scripts/spo/remove-site-scripts.md'
+      - 'Disable the specified Tenant Wide Extension ': 'sample-scripts/spo/disable-tenant-wide-extension.md'
       - 'Ensure the Site Assets Library is created': 'sample-scripts/spo/ensure-siteassets-library.md'
       - 'Hide SharePoint list from Site Contents': 'sample-scripts/spo/hide-list-from-site-contents.md'
       - 'Lists active SharePoint site collection application catalogs': 'sample-scripts/spo/list-site-app-catalogs.md'
