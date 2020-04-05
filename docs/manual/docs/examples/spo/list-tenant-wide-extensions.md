@@ -11,7 +11,7 @@ $fields = "Id, Title, TenantWideExtensionDisabled, TenantWideExtensionLocation"
 
 o365 login
 $appcatalogurl = o365 spo tenant appcatalogurl get
-o365 spo listitem list --t $listname -u $appcatalogurl -f $fields
+o365 spo listitem list --t $listName -u $appcatalogurl -f $fields
 ```
 
 ```bash tab="Bash"
