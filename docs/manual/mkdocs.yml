@@ -486,6 +486,7 @@ nav:
       - 'Ensure the Site Assets Library is created': 'examples/spo/ensure-siteassets-library.md'
       - 'Hide SharePoint list from Site Contents': 'examples/spo/hide-list-from-site-contents.md'
       - 'Lists active SharePoint site collection application catalogs': 'examples/spo/list-site-app-catalogs.md'
+      - 'Lists all tenant-wide extensions': 'examples/spo/list-tenant-wide-extensions.md'
     - Microsoft Teams:
       - 'Deploy Microsoft Teams app from Azure DevOps': 'examples/teams/deploy-teams-app.md'
       - 'Govern orphaned Microsoft Teams': 'examples/teams/govern-orphan-teams.md'
