@@ -88,7 +88,7 @@ class SpoOrgAssetsLibraryAddCommand extends SpoCommand {
         return `Required parameter libraryUrl missing`;
       }
 
-      if (typeof args.options.thumbnailUrl !== 'undefined' && SpoCommand.isValidSharePointUrl(args.options.thumbnailUrl) != true) {
+      if (typeof args.options.thumbnailUrl !== 'undefined' && SpoCommand.isValidSharePointUrl(args.options.thumbnailUrl) !== true) {
         return SpoCommand.isValidSharePointUrl(args.options.thumbnailUrl);
       }
 
@@ -127,11 +127,11 @@ class SpoOrgAssetsLibraryAddCommand extends SpoCommand {
 
   Examples:
 
-  Promotes an existing library to become an organization assets library
-    ${commands.ORGASSETSLIBRARY_ADD} -libraryUrl https://contoso.sharepoint.com/assets
+    Promotes an existing library to become an organization assets library
+      ${commands.ORGASSETSLIBRARY_ADD} --libraryUrl https://contoso.sharepoint.com/assets
 
-  Promotes an existing library to become an organization assets library with Thumbnail
-    ${commands.ORGASSETSLIBRARY_ADD} -libraryUrl https://contoso.sharepoint.com/assets -thumbnailUrl https://contoso.sharepoint.com/assets/logo.png
+    Promotes an existing library to become an organization assets library with Thumbnail
+      ${commands.ORGASSETSLIBRARY_ADD} --libraryUrl https://contoso.sharepoint.com/assets --thumbnailUrl https://contoso.sharepoint.com/assets/logo.png
   `);
 
   }

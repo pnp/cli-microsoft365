@@ -17,6 +17,7 @@ Option|Description
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
+`--pretty`|Prettifies `json` output
 
 !!! important
     To use this command you have to have permissions to access the tenant admin site.
@@ -26,11 +27,11 @@ Option|Description
 Promotes an existing library to become an organization assets library
 
 ```sh
-spo orgassetslibrary add -libraryUrl https://contoso.sharepoint.com/assets
+spo orgassetslibrary add --libraryUrl https://contoso.sharepoint.com/assets
 ```
 
-  Promotes an existing library to become an organization assets library with Thumbnail
+Promotes an existing library to become an organization assets library with Thumbnail
 
 ```sh
-spo orgassetslibrary -libraryUrl https://contoso.sharepoint.com/assets -thumbnailUrl https://contoso.sharepoint.com/assets/logo.png
+spo orgassetslibrary --libraryUrl https://contoso.sharepoint.com/assets --thumbnailUrl https://contoso.sharepoint.com/assets/logo.png
 ```

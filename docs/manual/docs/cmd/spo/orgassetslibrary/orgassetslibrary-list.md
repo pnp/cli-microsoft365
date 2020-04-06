@@ -13,7 +13,9 @@ spo orgassetslibrary list [options]
 Option|Description
 ------|-----------
 `--help`|output usage information
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+`--libraryUrl <libraryUrl>`|The URL of the library to promote
+`--thumbnailUrl <thumbnailUrl>`|The URL of the thumbnail to render
+`--cdnType [cdnType]`|Specifies the CDN type. Public|Private. Default Private
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
