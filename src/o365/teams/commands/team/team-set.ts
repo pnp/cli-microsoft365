@@ -12,10 +12,9 @@ import { GroupUpdateService, Options} from '../../../aad/services/GroupUpdateSer
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
 interface TeamSetOptions extends Options{
-  teamId: string;
-  visibility?:string;
-  imagePath?: string;
+  visibility?: string;
 }
+
 interface CommandArgs {
   options: TeamSetOptions;
 }
@@ -46,19 +45,18 @@ class TeamsSetCommand extends GraphCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    this.MapTeamOptionProperties(args.options);
-    GroupUpdateService.UpdateGroup(cmd, this.resource, args.options, this.verbose, this.debug, cb, this.handleRejectedODataJsonPromise);
+    this.mapTeamOptionProperties(args.options);
+    GroupUpdateService.updateGroup(cmd, this.resource, args.options, this.verbose, this.debug, cb, this.handleRejectedODataJsonPromise);
   }
 
-  private MapTeamOptionProperties(options: TeamSetOptions): void{
-    options.id = options.teamId;
+  private mapTeamOptionProperties(options: TeamSetOptions): void {
     options.isPrivate = options.visibility;
-    options.logoPath = options.imagePath;
   }
+
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --teamId <teamId>',
+        option: '-i, --teamId <id>',
         description: 'The ID of the Microsoft Teams team for which to update settings'
       },
       {
@@ -91,7 +89,7 @@ class TeamsSetCommand extends GraphCommand {
         autocomplete: ['Private', 'Public']
       },
       {
-        option: '--imagePath [imagePath]',
+        option: '--logoPath [logoPath]',
         description: 'Path to the image file to set as the Microsoft Teams team picture'
       }
     ];
@@ -102,19 +100,19 @@ class TeamsSetCommand extends GraphCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.teamId) {
+      if (!args.options.id) {
         return 'Required parameter teamId missing';
       }
-      if (!Utils.isValidGuid(args.options.teamId)) {
-        return `${args.options.teamId} is not a valid GUID`;
+      if (!Utils.isValidGuid(args.options.id)) {
+        return `${args.options.id} is not a valid GUID`;
       }
       if (args.options.visibility &&
         args.options.visibility.toLowerCase() !== 'private' &&
         args.options.visibility.toLowerCase() !== 'public') {
           return `${args.options.visibility} is not a valid visibility type. Allowed values are Private|Public`;
       }
-      if (args.options.imagePath) {
-        const fullPath: string = path.resolve(args.options.imagePath);
+      if (args.options.logoPath) {
+        const fullPath: string = path.resolve(args.options.logoPath);
         if (!fs.existsSync(fullPath)) {
           return `File '${fullPath}' not found`;
         }
@@ -138,7 +136,10 @@ class TeamsSetCommand extends GraphCommand {
 
     Set Microsoft Teams team classification as MBI
       ${chalk.grey(config.delimiter)} ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --classification MBI
-`);
+
+    Set Microsoft Teams team picture
+      ${chalk.grey(config.delimiter)} ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --logoPath images/logo.png
+    `);
   }
 }
 

@@ -69,7 +69,7 @@ describe(commands.TEAMS_TEAM_SET, () => {
   it('validates for a correct input.', (done) => {
     const actual = (command.validate() as CommandValidate)({
       options: {
-        teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee',
+        id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee',
 
       }
     });
@@ -90,7 +90,7 @@ describe(commands.TEAMS_TEAM_SET, () => {
     });
 
     cmdInstance.action({
-      options: { debug: false, teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', visibility: 'Public' }
+      options: { debug: false, id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', visibility: 'Public' }
     }, (err?: any) => {
       try {
         assert.equal(typeof err, 'undefined');
@@ -115,7 +115,7 @@ describe(commands.TEAMS_TEAM_SET, () => {
     });
 
     cmdInstance.action({
-      options: { debug: false, teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', mailNickName: 'NewNickName' }
+      options: { debug: false, id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', mailNickName: 'NewNickName' }
     }, (err?: any) => {
       try {
         assert.equal(typeof err, 'undefined');
@@ -139,7 +139,7 @@ describe(commands.TEAMS_TEAM_SET, () => {
     });
 
     cmdInstance.action({
-      options: { debug: true, teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', description: 'desc' }
+      options: { debug: true, id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', description: 'desc' }
     }, (err?: any) => {
       try {
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
@@ -158,7 +158,7 @@ describe(commands.TEAMS_TEAM_SET, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: true, teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', imagePath: 'logo.png' } }, () => {
+    cmdInstance.action({ options: { debug: true, id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', logoPath: 'logo.png' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
         done();
@@ -178,7 +178,7 @@ describe(commands.TEAMS_TEAM_SET, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: true, teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', imagePath: 'logo.jpg' } }, () => {
+    cmdInstance.action({ options: { debug: true, id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', logoPath: 'logo.jpg' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
         done();
@@ -197,7 +197,7 @@ describe(commands.TEAMS_TEAM_SET, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: true, teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', imagePath: 'logo.gif' } }, () => {
+    cmdInstance.action({ options: { debug: true, id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', logoPath: 'logo.gif' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
         done();
@@ -220,7 +220,7 @@ describe(commands.TEAMS_TEAM_SET, () => {
       fn();
     });
 
-    cmdInstance.action({ options: { debug: false, teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', imagePath: 'logo.png' } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: false, id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', logoPath: 'logo.png' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -243,7 +243,7 @@ describe(commands.TEAMS_TEAM_SET, () => {
       fn();
     });
 
-    cmdInstance.action({ options: { debug: true, teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', imagePath: 'logo.png' } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: true, id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', logoPath: 'logo.png' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -265,7 +265,7 @@ describe(commands.TEAMS_TEAM_SET, () => {
     });
 
     cmdInstance.action({
-      options: { debug: true, teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', classification: 'MBI' }
+      options: { debug: true, id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', classification: 'MBI' }
     }, (err?: any) => {
       try {
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
@@ -296,7 +296,7 @@ describe(commands.TEAMS_TEAM_SET, () => {
     });
 
     cmdInstance.action({
-      options: { debug: false, teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', displayName: 'NewName' }
+      options: { debug: false, id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', displayName: 'NewName' }
     }, (err?: any) => {
       try {
         assert.equal(err.message, 'No team found with Group Id 8231f9f2-701f-4c6e-93ce-ecb563e3c1ee');
@@ -314,41 +314,41 @@ describe(commands.TEAMS_TEAM_SET, () => {
   });
 
   it('fails validation if the teamId is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { teamId: 'invalid' } });
+    const actual = (command.validate() as CommandValidate)({ options: { id: 'invalid' } });
     assert.notEqual(actual, true);
   });
 
   it('passes validation if the teamId is a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' } });
+    const actual = (command.validate() as CommandValidate)({ options: { id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' } });
     assert.equal(actual, true);
   });
 
   it('fails validation if visibility is not a valid visibility Private|Public', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', visibility: 'hidden' } });
+    const actual = (command.validate() as CommandValidate)({ options: { id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', visibility: 'hidden' } });
     assert.notEqual(actual, false);
   });
   it('passes validation if visibility is Public', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', visibility: 'Public' } });
+    const actual = (command.validate() as CommandValidate)({ options: { id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', visibility: 'Public' } });
     assert.equal(actual, true);
   });
 
   it('passes validation if visibility is Private', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', visibility: 'Private' } });
+    const actual = (command.validate() as CommandValidate)({ options: { id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', visibility: 'Private' } });
     assert.equal(actual, true);
   });
-  it('fails validation if imagePath points to a non-existent file', () => {
+  it('fails validation if logoPath points to a non-existent file', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const actual = (command.validate() as CommandValidate)({ options: { teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', imagePath: 'invalid' } });
+    const actual = (command.validate() as CommandValidate)({ options: { id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', logoPath: 'invalid' } });
     Utils.restore(fs.existsSync);
     assert.notEqual(actual, true);
   });
 
-  it('fails validation if imagePath points to a folder', () => {
+  it('fails validation if logoPath points to a folder', () => {
     const stats: fs.Stats = new fs.Stats();
     sinon.stub(stats, 'isDirectory').callsFake(() => true);
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
-    const actual = (command.validate() as CommandValidate)({ options: { teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', imagePath: 'folder' } });
+    const actual = (command.validate() as CommandValidate)({ options: { id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', logoPath: 'folder' } });
     Utils.restore([
       fs.existsSync,
       fs.lstatSync
@@ -356,12 +356,12 @@ describe(commands.TEAMS_TEAM_SET, () => {
     assert.notEqual(actual, true);
   });
 
-  it('passes validation if imagePath points to an existing file', () => {
+  it('passes validation if logoPath points to an existing file', () => {
     const stats: fs.Stats = new fs.Stats();
     sinon.stub(stats, 'isDirectory').callsFake(() => false);
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
-    const actual = (command.validate() as CommandValidate)({ options: { teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', imagePath: 'folder' } });
+    const actual = (command.validate() as CommandValidate)({ options: { id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', logoPath: 'folder' } });
     Utils.restore([
       fs.existsSync,
       fs.lstatSync

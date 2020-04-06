@@ -19,7 +19,7 @@ Option|Description
 `--mailNickName [mailNickName]`|The mail alias for the Microsoft Teams team
 `--classification [classification]`|The classification for the Microsoft Teams team
 `--visibility [visibility]`|The visibility of the Microsoft Teams team. Valid values `Private\|Public`
-`--imagePath [imagePath]`|Path to the image file to set as the team's picture`
+`--logoPath [logoPath]`|Path to the image file to set as the team's picture
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json\|text`. Default `text`
 `--pretty`|Prettifies `json` output

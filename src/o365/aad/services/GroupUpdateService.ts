@@ -13,13 +13,14 @@ export interface Options extends GlobalOptions {
   mailNickname?: string;
   classification?: string;
   isPrivate?: string;
+  visibility?: string;
   logoPath?: string;
 }
 export class GroupUpdateService {
 
   private static numRepeat: number = 15;
 
-  public static UpdateGroup(cmd: CommandInstance, 
+  public static updateGroup(cmd: CommandInstance, 
     resource: string, 
     options: Options,
     verbose: boolean,
@@ -44,8 +45,11 @@ export class GroupUpdateService {
       if (options.description) {
         update.description = options.description;
       }
+      if (options.visibility) {
+        update.visibility = options.description;
+      }
       if (typeof options.isPrivate !== 'undefined') {
-        update.visibility = options.isPrivate == 'true' ? 'Private' : 'Public'
+        update.visibility = options.isPrivate.toLowerCase() === 'true' ? 'Private' : 'Public'
       }
 
       const requestOptions: any = {

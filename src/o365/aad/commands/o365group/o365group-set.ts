@@ -26,7 +26,7 @@ class AadO365GroupSetCommand extends GraphCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    GroupUpdateService.UpdateGroup(cmd, this.resource, args.options, this.verbose, this.debug, cb, this.handleRejectedODataJsonPromise);
+    GroupUpdateService.updateGroup(cmd, this.resource, args.options, this.verbose, this.debug, cb, this.handleRejectedODataJsonPromise);
   }
 
   public options(): CommandOption[] {
@@ -62,6 +62,11 @@ class AadO365GroupSetCommand extends GraphCommand {
       {
         option: '--isPrivate [isPrivate]',
         description: 'Set to true if the Office 365 Group should be private and to false if it should be public (default)'
+      },
+      {
+        option: '--visibility [visibility]',
+        description: 'The visibility of the Microsoft Teams team. Valid values Private|Public',
+        autocomplete: ['Private', 'Public']
       },
       {
         option: '-l, --logoPath [logoPath]',
