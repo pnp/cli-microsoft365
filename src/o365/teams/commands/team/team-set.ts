@@ -7,11 +7,11 @@ import {
 } from '../../../../Command';
 import Utils from '../../../../Utils';
 import GraphCommand from '../../../base/GraphCommand';
-import { GroupUpdateService, Options} from '../../../aad/services/GroupUpdateService';
+import { GroupUpdateService, Options } from '../../../aad/services/GroupUpdateService';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
-interface TeamSetOptions extends Options{
+interface TeamSetOptions extends Options {
   visibility?: string;
 }
 
@@ -25,7 +25,8 @@ class TeamsSetCommand extends GraphCommand {
     'description',
     'mailNickName',
     'classification',
-    'visibility'
+    'visibility',
+    'isPrivate'
   ];
 
   public get name(): string {
@@ -84,6 +85,10 @@ class TeamsSetCommand extends GraphCommand {
         description: 'The classification for the Microsoft Teams team'
       },
       {
+        option: '--isPrivate [isPrivate]',
+        description: 'Set to true if the Office 365 Group should be private and to false if it should be public (default). Use either isPrivate or visibility, not both'
+      },
+      {
         option: '--visibility [visibility]',
         description: 'The visibility of the Microsoft Teams team. Valid values Private|Public',
         autocomplete: ['Private', 'Public']
@@ -109,8 +114,15 @@ class TeamsSetCommand extends GraphCommand {
       if (args.options.visibility &&
         args.options.visibility.toLowerCase() !== 'private' &&
         args.options.visibility.toLowerCase() !== 'public') {
-          return `${args.options.visibility} is not a valid visibility type. Allowed values are Private|Public`;
+        return `${args.options.visibility} is not a valid visibility type. Allowed values are Private|Public`;
       }
+
+      if (typeof args.options.isPrivate !== 'undefined' &&
+        args.options.isPrivate !== 'true' &&
+        args.options.isPrivate !== 'false') {
+        return `${args.options.isPrivate} is not a valid boolean value`;
+      }
+
       if (args.options.logoPath) {
         const fullPath: string = path.resolve(args.options.logoPath);
         if (!fs.existsSync(fullPath)) {
@@ -133,6 +145,8 @@ class TeamsSetCommand extends GraphCommand {
   
     Set Microsoft Teams team visibility as Private
       ${chalk.grey(config.delimiter)} ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --visibility Private
+    or 
+      ${chalk.grey(config.delimiter)} ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --isPrivate true
 
     Set Microsoft Teams team classification as MBI
       ${chalk.grey(config.delimiter)} ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --classification MBI

@@ -18,7 +18,8 @@ Option|Description
 `-d, --description [description]`|Description for the Office 365 Group
 `--owners [owners]`|Comma-separated list of Office 365 Group owners to add
 `--members [members]`|Comma-separated list of Office 365 Group members to add
-`--isPrivate [isPrivate]`|Set to true if the Office 365 Group should be private and to false if it should be public (default)
+`--isPrivate [isPrivate]`|Set to true if the Office 365 Group should be private and to false if it should be public (default). Use either `isPrivate` or `visibility`, not both.
+`--visibility [visibility]`|The visibility of the Microsoft Teams team. Valid values `Private\|Public`. Use either `isPrivate` or `visibility`, not both.
 `-l, --logoPath [logoPath]`|Local path to the image file to use as group logo
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`

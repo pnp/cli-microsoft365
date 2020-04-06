@@ -150,6 +150,54 @@ describe(commands.TEAMS_TEAM_SET, () => {
       }
     });
   });
+
+  it('updates Team visibility to public through isPrivate option', (done) => {
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee') {
+        if (JSON.stringify(opts.body) === JSON.stringify({
+          visibility: 'Public'
+        })) {
+          return Promise.resolve();
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({ options: { debug: false, id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', isPrivate: 'false' } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('updates Team visibility to private through isPrivate option', (done) => {
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee') {
+        if (JSON.stringify(opts.body) === JSON.stringify({
+          visibility: 'Private'
+        })) {
+          return Promise.resolve();
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({ options: { debug: false, id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', isPrivate: 'true' } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
   it('updates Team image with a png image (debug)', (done) => {
     sinon.stub(request, 'put').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee/photo/$value' &&
@@ -334,6 +382,21 @@ describe(commands.TEAMS_TEAM_SET, () => {
 
   it('passes validation if visibility is Private', () => {
     const actual = (command.validate() as CommandValidate)({ options: { id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', visibility: 'Private' } });
+    assert.equal(actual, true);
+  });
+
+  it('fails validation if isPrivate is invalid boolean', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', isPrivate: 'invalid' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('passes validation if isPrivate is true', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', isPrivate: 'true' } });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation if isPrivate is false', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', isPrivate: 'false' } });
     assert.equal(actual, true);
   });
   it('fails validation if logoPath points to a non-existent file', () => {

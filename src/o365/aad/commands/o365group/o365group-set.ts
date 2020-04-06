@@ -61,11 +61,11 @@ class AadO365GroupSetCommand extends GraphCommand {
       },
       {
         option: '--isPrivate [isPrivate]',
-        description: 'Set to true if the Office 365 Group should be private and to false if it should be public (default)'
+        description: 'Set to true if the Office 365 Group should be private and to false if it should be public (default). Use either isPrivate or visibility, not both'
       },
       {
         option: '--visibility [visibility]',
-        description: 'The visibility of the Microsoft Teams team. Valid values Private|Public',
+        description: 'The visibility of the Microsoft Teams team. Valid values Private|Public. Use either isPrivate or visibility, not both',
         autocomplete: ['Private', 'Public']
       },
       {
@@ -157,6 +157,8 @@ class AadO365GroupSetCommand extends GraphCommand {
 
     Change Office 365 Group visibility to public
       ${this.name} --id 28beab62-7540-4db1-a23f-29a6018a3848 --isPrivate false
+    or
+      ${this.name} --id 28beab62-7540-4db1-a23f-29a6018a3848 --visibility Private
 
     Add new Office 365 Group owners
       ${this.name} --id 28beab62-7540-4db1-a23f-29a6018a3848 --owners "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
