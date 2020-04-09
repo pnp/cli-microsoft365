@@ -1901,7 +1901,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.9.1', output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[0];
-      assert.equal(findings.length, 18);
+      assert.equal(findings.length, 17);
     });
   });
 
