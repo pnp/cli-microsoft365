@@ -4,7 +4,7 @@ import { ScssRule } from "./ScssRule";
 import { Occurrence, Utils } from "../";
 
 export class FN022002_SCSS_add_fabric_react extends ScssRule {
-  constructor(private importValue: string) {
+  constructor(private importValue: string, private addIfContains?: string) {
     super();
   }
 
@@ -48,11 +48,14 @@ export class FN022002_SCSS_add_fabric_react extends ScssRule {
 
     const occurrences: Occurrence[] = [];
     project.scssFiles.forEach((file: ScssFile) => {
-      if ((file.source as string).indexOf(this.importValue) === -1) {
-        this.addOccurrence(this.resolution, file.path, project.path, occurrences);
+      const source: string = file.source as string;
+      if (source.indexOf(this.importValue) === -1) {
+        if (!this.addIfContains || source.indexOf(this.addIfContains) > -1) {
+          this.addOccurrence(this.resolution, file.path, project.path, occurrences);
+        }
       }
     });
-    
+
     if (occurrences.length > 0) {
       this.addFindingWithOccurrences(occurrences, findings);
     }
