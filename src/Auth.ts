@@ -1,7 +1,4 @@
-import * as os from 'os';
 import { TokenStorage } from './auth/TokenStorage';
-import { KeychainTokenStorage } from './auth/KeychainTokenStorage';
-import { WindowsTokenStorage } from './auth/WindowsTokenStorage';
 import { FileTokenStorage } from './auth/FileTokenStorage';
 import { AuthenticationContext, TokenResponse, ErrorResponse, UserCodeInfo, Logging, LoggingLevel } from 'adal-node';
 import { CommandError } from './Command';
@@ -292,7 +289,7 @@ export class Auth {
         cert = buf.toString('utf8');
       } else {
         var buf = Buffer.from(this.service.certificate as string, 'base64');
-        let p12Asn1 = asn1.fromDer(buf.toString('binary'), false); 
+        let p12Asn1 = asn1.fromDer(buf.toString('binary'), false);
 
         let p12Parsed = pkcs12.pkcs12FromAsn1(p12Asn1, false, this.service.password);
 
@@ -389,21 +386,7 @@ export class Auth {
   }
 
   public getTokenStorage(): TokenStorage {
-    const platform: NodeJS.Platform = os.platform();
-    let tokenStorage: TokenStorage;
-    switch (platform) {
-      case 'darwin':
-        tokenStorage = new KeychainTokenStorage();
-        break;
-      case 'win32':
-        tokenStorage = new WindowsTokenStorage();
-        break;
-      default:
-        tokenStorage = new FileTokenStorage();
-        break;
-    }
-
-    return tokenStorage;
+    return new FileTokenStorage();
   }
 }
 

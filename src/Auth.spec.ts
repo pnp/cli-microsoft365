@@ -3,8 +3,6 @@ import * as assert from 'assert';
 import Utils from './Utils';
 import { Auth, Service, AuthType } from './Auth';
 import * as os from 'os';
-import { KeychainTokenStorage } from './auth/KeychainTokenStorage';
-import { WindowsTokenStorage } from './auth/WindowsTokenStorage';
 import { FileTokenStorage } from './auth/FileTokenStorage';
 import { TokenStorage } from './auth/TokenStorage';
 import { CommandError } from './Command';
@@ -637,37 +635,7 @@ describe('Auth', () => {
     });
   });
 
-  it('configures KeychainTokenStorage as token storage when OS is macOS', (done) => {
-    sinon.stub(os, 'platform').callsFake(() => 'darwin');
-    const actual = auth.getTokenStorage();
-    try {
-      assert(actual instanceof KeychainTokenStorage);
-      done();
-    }
-    catch (e) {
-      done(e);
-    }
-    finally {
-      Utils.restore(os.platform);
-    }
-  });
-
-  it('configures WindowsTokenStorage as token storage when OS is Windows', (done) => {
-    sinon.stub(os, 'platform').callsFake(() => 'win32');
-    const actual = auth.getTokenStorage();
-    try {
-      assert(actual instanceof WindowsTokenStorage);
-      done();
-    }
-    catch (e) {
-      done(e);
-    }
-    finally {
-      Utils.restore(os.platform);
-    }
-  });
-
-  it('configures FileTokenStorage as token storage when OS is Linux', (done) => {
+  it('configures FileTokenStorage as token storage', (done) => {
     sinon.stub(os, 'platform').callsFake(() => 'linux');
     const actual = auth.getTokenStorage();
     try {
