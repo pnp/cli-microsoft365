@@ -41,19 +41,7 @@ When you log in to Office 365 in the Office 365 CLI, the CLI will persist the in
 
 Depending on the Office 365 CLI commands you have used, the CLI might persist some additional information. For example, when using commands that interact with SharePoint Online, the CLI will store the URL of your SharePoint Online tenant as well as its ID.
 
-Where the connection information is persisted, depends on the operating system that you are using.
-
-### macOS
-
-On the macOS, the Office 365 CLI persists its connection information in the system Keychain as a generic credential. You can view what information is stored by opening **Keychain Access** and searching for `Office 365 CLI`.
-
-### Windows
-
-On Windows, the Office 365 CLI persists its connection information in the Windows Credential Manager. To view the persisted credentials, from the **Control Panel**, navigate to **User Accounts** and from the **Credential Manager** section open **Manage Windows Credentials**. Credentials stored by the Office 365 CLI will be listed in the **Generic Credentials** section named as `Office365Cli--x-y`, for example `Office365Cli--1-3`. Because there is a limit how long a password stored in the Windows Credential Manager can be, connection information stored by the Office 365 CLI will often be split over multiple chunks, where the last two number in the chunk specify the number of chunk and the total number of chunks.
-
-### Linux
-
-On Linux, the Office 365 CLI stores its connection information in a JSON file located at `~/.o365cli-tokens.json`. The contents of this file are not encrypted. The primary use case for supporting Linux operating system is to use the Office 365 CLI in Docker containers, where the tokens file is persisted in the container as long as the container is running. When the container is closed and removed, the file is removed as well. When you would start the container again, you would have to log in to Office 365 first, before you could use the Office 365 CLI.
+The Office 365 CLI stores its connection information in a JSON file located in the home directory of the current user, on MacOS and Linux, this is `~/.o365cli-tokens.json` and on Windows, this is `<root>\Users\<username>\.o365cli-tokens.json`. The contents of this file are not encrypted.
 
 ## Removing persisted connection information
 
