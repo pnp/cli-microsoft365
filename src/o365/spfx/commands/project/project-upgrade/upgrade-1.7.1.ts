@@ -13,6 +13,7 @@ import { FN010001_YORC_version } from "./rules/FN010001_YORC_version";
 import { FN002009_DEVDEP_microsoft_sp_tslint_rules } from "./rules/FN002009_DEVDEP_microsoft_sp_tslint_rules";
 import { FN014006_CODE_launch_sourceMapPathOverrides } from "./rules/FN014006_CODE_launch_sourceMapPathOverrides";
 import { FN020001_RES_types_react } from "./rules/FN020001_RES_types_react";
+import { FN018005_TEAMS_deprecated_manifest } from "./rules/FN018005_TEAMS_deprecated_manifest";
 
 module.exports = [
   new FN001001_DEP_microsoft_sp_core_library('1.7.1'),
@@ -29,5 +30,6 @@ module.exports = [
   new FN002009_DEVDEP_microsoft_sp_tslint_rules('1.7.1'),
   new FN010001_YORC_version('1.7.1'),
   new FN014006_CODE_launch_sourceMapPathOverrides('webpack:///.././src/*', '${webRoot}/src/*'),
-  new FN020001_RES_types_react('16.4.2')
+  new FN020001_RES_types_react('16.4.2'),
+  new FN018005_TEAMS_deprecated_manifest()
 ];

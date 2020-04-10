@@ -228,7 +228,6 @@ describe(commands.TENANT_RECYCLEBINITEM_LIST, () => {
 
     cmdInstance.action({ options: { debug: true } }, () => {
       try {
-        console.log(cmdInstanceLogSpy.lastCall);
         assert.equal(cmdInstanceLogSpy.lastCall.args[0][0]["DaysRemaining"], 92);
         assert.deepEqual(cmdInstanceLogSpy.lastCall.args[0][0]["DeletionTime"], new Date(2020, 0, 15, 11, 4, 3, 893));
         assert.equal(cmdInstanceLogSpy.lastCall.args[0][0]["Url"], 'https://contoso.sharepoint.com/sites/ClassicThrowaway');

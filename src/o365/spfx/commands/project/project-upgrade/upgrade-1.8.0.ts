@@ -21,6 +21,9 @@ import { FN012017_TSC_extends } from "./rules/FN012017_TSC_extends";
 import { FN012016_TSC_noUnusedLocals } from "./rules/FN012016_TSC_noUnusedLocals";
 import { FN001021_DEP_microsoft_sp_property_pane } from "./rules/FN001021_DEP_microsoft_sp_property_pane";
 import { FN016004_TS_property_pane_property_import } from "./rules/FN016004_TS_property_pane_property_import";
+import { FN018001_TEAMS_folder } from "./rules/FN018001_TEAMS_folder";
+import { FN018003_TEAMS_tab20x20_png } from "./rules/FN018003_TEAMS_tab20x20_png";
+import { FN018004_TEAMS_tab96x96_png } from "./rules/FN018004_TEAMS_tab96x96_png";
 
 module.exports = [
   new FN001001_DEP_microsoft_sp_core_library('1.8.0'),
@@ -45,5 +48,8 @@ module.exports = [
   new FN012015_TSC_strictNullChecks(false),
   new FN012016_TSC_noUnusedLocals(false),
   new FN012017_TSC_extends('./node_modules/@microsoft/rush-stack-compiler-2.7/includes/tsconfig-web.json'),
-  new FN016004_TS_property_pane_property_import()
+  new FN016004_TS_property_pane_property_import(),
+  new FN018001_TEAMS_folder(),
+  new FN018003_TEAMS_tab20x20_png(),
+  new FN018004_TEAMS_tab96x96_png()
 ];

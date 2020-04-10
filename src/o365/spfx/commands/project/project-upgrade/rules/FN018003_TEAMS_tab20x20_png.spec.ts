@@ -40,6 +40,52 @@ describe('FN018003_TEAMS_tab20x20_png', () => {
       path: '/usr/tmp',
       manifests: [{
         $schema: 'schema',
+        id: 'c93e90e5-6222-45c6-b241-995df0029e3c',
+        componentType: 'WebPart',
+        path: '/usr/tmp/webpart'
+      }]
+    };
+    rule.visit(project, findings);
+    assert.equal(findings.length, 0);
+  });
+
+  it('returns path to icon with the specified name when fixed name used', () => {
+    rule = new FN018003_TEAMS_tab20x20_png('tab20x20.png');
+    sinon.stub(fs, 'existsSync').callsFake(() => false);
+    const project: Project = {
+      path: '/usr/tmp',
+      manifests: [{
+        $schema: 'schema',
+        id: 'c93e90e5-6222-45c6-b241-995df0029e3c',
+        componentType: 'WebPart',
+        path: '/usr/tmp/webpart'
+      }]
+    };
+    rule.visit(project, findings);
+    assert.equal(findings[0].occurrences[0].file, 'teams/tab20x20.png');
+  });
+
+  it('returns path to icon with name following web part ID when no fixed name specified', () => {
+    sinon.stub(fs, 'existsSync').callsFake(() => false);
+    const project: Project = {
+      path: '/usr/tmp',
+      manifests: [{
+        $schema: 'schema',
+        id: 'c93e90e5-6222-45c6-b241-995df0029e3c',
+        componentType: 'WebPart',
+        path: '/usr/tmp/webpart'
+      }]
+    };
+    rule.visit(project, findings);
+    assert.equal(findings[0].occurrences[0].file, 'teams/c93e90e5-6222-45c6-b241-995df0029e3c_outline.png');
+  });
+
+  it(`doesn't return notification when web part ID not specified`, () => {
+    sinon.stub(fs, 'existsSync').callsFake(() => false);
+    const project: Project = {
+      path: '/usr/tmp',
+      manifests: [{
+        $schema: 'schema',
         componentType: 'WebPart',
         path: '/usr/tmp/webpart'
       }]

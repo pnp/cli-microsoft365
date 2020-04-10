@@ -270,6 +270,19 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
         });
       });
 
+    // remove findings without title
+    findings
+      .forEach(f => {
+        if (!f.title) {
+          // find the finding
+          const i: number = findings.findIndex(f1 => f1.id === f.id);
+          if (i > -1) {
+            // ...and remove it from findings
+            findings.splice(i, 1);
+          }
+        }
+      });
+
     // flatten
     const findingsToReport: FindingToReport[] = ([] as FindingToReport[]).concat.apply([], findings.map(f => {
       return f.occurrences.map(o => {

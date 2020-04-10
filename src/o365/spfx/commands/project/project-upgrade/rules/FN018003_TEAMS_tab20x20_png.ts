@@ -5,7 +5,11 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 export class FN018003_TEAMS_tab20x20_png extends Rule {
-  constructor() {
+  /**
+   * Creates instance of this rule
+   * @param fixedFileName Name to use for the copied file. If not specified, will generate the name based on web part's ID
+   */
+  constructor(private fixedFileName?: string) {
     super();
   }
 
@@ -50,10 +54,14 @@ export class FN018003_TEAMS_tab20x20_png extends Rule {
 
     const occurrences: Occurrence[] = [];
     webPartManifests.forEach(manifest => {
-      const webPartFolderName: string = path.basename(path.dirname(manifest.path));
-      const teamsFolderName: string = `teams_${webPartFolderName}`;
+      if (!manifest.id) {
+        return;
+      }
+
+      const teamsFolderName: string = 'teams';
       const teamsFolderPath: string = path.join(project.path, teamsFolderName);
-      const iconPath: string = path.join(teamsFolderPath, 'tab20x20.png');
+      const iconName: string = this.getIconName(manifest);
+      const iconPath: string = path.join(teamsFolderPath, iconName);
       if (!fs.existsSync(iconPath)) {
         occurrences.push({
           file: path.relative(project.path, iconPath),
@@ -65,5 +73,13 @@ export class FN018003_TEAMS_tab20x20_png extends Rule {
     if (occurrences.length > 0) {
       this.addFindingWithOccurrences(occurrences, findings);
     }
+  }
+
+  private getIconName(manifest: Manifest): string {
+    if (this.fixedFileName) {
+      return this.fixedFileName;
+    }
+
+    return `${manifest.id}_outline.png`;
   }
 }
