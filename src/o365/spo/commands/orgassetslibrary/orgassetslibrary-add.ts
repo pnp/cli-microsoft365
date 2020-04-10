@@ -88,8 +88,10 @@ class SpoOrgAssetsLibraryAddCommand extends SpoCommand {
         return `Required parameter libraryUrl missing`;
       }
 
-      if (typeof args.options.thumbnailUrl !== 'undefined' && SpoCommand.isValidSharePointUrl(args.options.thumbnailUrl) !== true) {
-        return SpoCommand.isValidSharePointUrl(args.options.thumbnailUrl);
+      const isValidThumbnailUrl = SpoCommand.isValidSharePointUrl((args.options.thumbnailUrl as string));
+
+      if (typeof args.options.thumbnailUrl !== 'undefined' &&  isValidThumbnailUrl !== true) {
+        return isValidThumbnailUrl
       }
 
       return SpoCommand.isValidSharePointUrl(args.options.libraryUrl);
