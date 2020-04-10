@@ -35,7 +35,7 @@ describe('FN018001_TEAMS_folder', () => {
   });
 
   it('doesn\'t return notifications if teams folder exists', () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    sinon.stub(fs, 'existsSync').callsFake((path: string) => path.endsWith('/teams'));
     const project: Project = {
       path: '/usr/tmp',
       manifests: [{
@@ -46,5 +46,42 @@ describe('FN018001_TEAMS_folder', () => {
     };
     rule.visit(project, findings);
     assert.equal(findings.length, 0);
+  });
+
+  it('returns 1 finding with 1 occurrence for one web part if the teams folder does not exists', () => {
+    sinon.stub(fs, 'existsSync').callsFake(() => false);
+    const project: Project = {
+      path: '/usr/tmp',
+      manifests: [{
+        $schema: 'schema',
+        componentType: 'WebPart',
+        path: '/usr/tmp/webpart'
+      }]
+    };
+    rule.visit(project, findings);
+    assert.equal(findings.length, 1, 'Incorrect number of findings');
+    assert.equal(findings[0].occurrences.length, 1, 'Incorrect number of occurrences');
+  });
+
+  it('returns 1 finding with 1 occurrence for two web parts if the teams folder does not exists', () => {
+    sinon.stub(fs, 'existsSync').callsFake(() => false);
+    const project: Project = {
+      path: '/usr/tmp',
+      manifests: [
+        {
+          $schema: 'schema',
+          componentType: 'WebPart',
+          path: '/usr/tmp/webpart1'
+        },
+        {
+          $schema: 'schema',
+          componentType: 'WebPart',
+          path: '/usr/tmp/webpart2'
+        }
+      ]
+    };
+    rule.visit(project, findings);
+    assert.equal(findings.length, 1, 'Incorrect number of findings');
+    assert.equal(findings[0].occurrences.length, 1, 'Incorrect number of occurrences');
   });
 });

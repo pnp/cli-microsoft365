@@ -1,4 +1,4 @@
-import { Finding, Occurrence } from "../";
+import { Finding } from "../";
 import { Project, Manifest } from "../../model";
 import { Rule } from "./Rule";
 import * as path from 'path';
@@ -48,21 +48,13 @@ export class FN018001_TEAMS_folder extends Rule {
       return;
     }
 
-    const occurrences: Occurrence[] = [];
-    webPartManifests.forEach(manifest => {
-      const webPartFolderName: string = path.basename(path.dirname(manifest.path));
-      const teamsFolderName: string = `teams_${webPartFolderName}`;
-      const teamsFolderPath: string = path.join(project.path, teamsFolderName);
-      if (!fs.existsSync(teamsFolderPath)) {
-        occurrences.push({
-          file: path.relative(project.path, teamsFolderPath),
-          resolution: `create_dir_cmdPathParam${project.path}NameParam${teamsFolderName}ItemTypeParam`
-        });
-      }
-    });
-
-    if (occurrences.length > 0) {
-      this.addFindingWithOccurrences(occurrences, findings);
+    const teamsFolderName: string = 'teams';
+    const teamsFolderPath: string = path.join(project.path, teamsFolderName);
+    if (!fs.existsSync(teamsFolderPath)) {
+      this.addFindingWithCustomInfo(this.title, this.description, [{
+        file: path.relative(project.path, teamsFolderPath),
+        resolution: `create_dir_cmdPathParam${project.path}NameParam${teamsFolderName}ItemTypeParam`
+      }], findings);
     }
   }
 }

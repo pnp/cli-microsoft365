@@ -99,9 +99,9 @@ export class FN018002_TEAMS_manifest extends Rule {
     const occurrences: Occurrence[] = [];
     webPartManifests.forEach(manifest => {
       const webPartFolderName: string = path.basename(path.dirname(manifest.path));
-      const teamsFolderName: string = `teams_${webPartFolderName}`;
+      const teamsFolderName: string = `teams`;
       const teamsFolderPath: string = path.join(project.path, teamsFolderName);
-      const teamsManifestPath: string = path.join(teamsFolderPath, 'manifest.json');
+      const teamsManifestPath: string = path.join(teamsFolderPath, `manifest_${webPartFolderName}.json`);
       if (fs.existsSync(teamsManifestPath)) {
         return;
       }

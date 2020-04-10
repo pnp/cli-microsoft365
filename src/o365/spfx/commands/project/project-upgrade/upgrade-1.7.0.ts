@@ -48,8 +48,8 @@ module.exports = [
   new FN010007_YORC_isDomainIsolated(false),
   new FN018001_TEAMS_folder(),
   new FN018002_TEAMS_manifest(),
-  new FN018003_TEAMS_tab20x20_png(),
-  new FN018004_TEAMS_tab96x96_png(),
+  new FN018003_TEAMS_tab20x20_png('tab20x20.png'),
+  new FN018004_TEAMS_tab96x96_png('tab96x96.png'),
   new FN019001_TSL_rulesDirectory(),
   new FN019002_TSL_extends('@microsoft/sp-tslint-rules/base-tslint.json')
 ];
