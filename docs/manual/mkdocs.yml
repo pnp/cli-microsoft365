@@ -416,6 +416,7 @@ nav:
       - tab:
         - tab add: 'cmd/teams/tab/tab-add.md'
         - tab list: 'cmd/teams/tab/tab-list.md'
+        - tab remove: 'cmd/teams/tab/tab-remove.md'
       - team:
         - team add: 'cmd/teams/team/team-add.md'
         - team archive: 'cmd/teams/team/team-archive.md'
