@@ -4,9 +4,17 @@
 
 ### New commands
 
+**Azure Active Directory:**
+
+- [aad o365group report activitystorage](../cmd/aad/o365group/o365group-report-activitystorage.md) - get the total storage used across all group mailboxes and group sites [#1286](https://github.com/pnp/office365-cli/issues/1286)
+
 **Office 365:**
 
-- [tenant status list](../cmd/tenant/status/status-list.md) - Gets health status of the different services in Office 365 [#1272](https://github.com/pnp/office365-cli/issues/1272)
+- [tenant status list](../cmd/tenant/status/status-list.md) - gets health status of the different services in Office 365 [#1272](https://github.com/pnp/office365-cli/issues/1272)
+
+**SharePoint:**
+
+- [spo orgassetslibrary add](../cmd/spo/orgassetslibrary/orgassetslibrary-add.md) - promotes an existing library to become an organization assets library [#1040](https://github.com/pnp/office365-cli/issues/1040)
 
 **Yammer:**
 
@@ -14,7 +22,10 @@
 - [yammer report activityusercounts](../cmd/yammer/report/report-activityusercounts.md) - gets the trends on the number of unique users who posted, read, and liked Yammer messages [#1384](https://github.com/pnp/office365-cli/issues/1384)
 - [yammer report activityuserdetail](../cmd/yammer/report/report-activityuserdetail.md) - gets details about Yammer activity by user [#1382](https://github.com/pnp/office365-cli/issues/1382)
 - [yammer report deviceusagedistributionusercounts](../cmd/yammer/report/report-deviceusagedistributionusercounts.md) - gets the number of users by device type [#1386](https://github.com/pnp/office365-cli/issues/1386)
+- [yammer report deviceusageusercounts](../cmd/yammer/report/report-deviceusageusercounts.md) - gets the number of daily users by device type [#1387](https://github.com/pnp/office365-cli/issues/1387)
 - [yammer report deviceusageuserdetail](../cmd/yammer/report/report-deviceusageuserdetail.md) - gets details about Yammer device usage by user [#1287](https://github.com/pnp/office365-cli/issues/1287)
+- [yammer report groupsactivitydetail](../cmd/yammer/report/report-groupsactivitydetail.md) - gets details about Yammer groups activity by group [#1388](https://github.com/pnp/office365-cli/issues/1388)
+- [yammer report groupsactivitygroupcounts](../cmd/yammer/report/report-groupsactivitygroupcounts.md) - gets the total number of groups that existed and how many included group conversation activity [#1389](https://github.com/pnp/office365-cli/issues/1389)
 
 ### Changes
 
@@ -22,8 +33,12 @@
 - extended `tenant id get` with retrieving the ID of the current tenant [#1378](https://github.com/pnp/office365-cli/issues/1378)
 - changed communicating no need to upgrade spfx project as a non-error [#1407](https://github.com/pnp/office365-cli/issues/1407)
 - moved the 'consent' command to the 'cli' namespace [#1336](https://github.com/pnp/office365-cli/issues/1336)
-- implemented '--reconsent' as a CLI command. [#1337](https://github.com/pnp/office365-cli/issues/1337)
-- updated docs wrapping file names in quotes. [#1410](https://github.com/pnp/office365-cli/issues/1410)
+- implemented '--reconsent' as a CLI command [#1337](https://github.com/pnp/office365-cli/issues/1337)
+- updated docs wrapping file names in quotes [#1410](https://github.com/pnp/office365-cli/issues/1410)
+- replaced `|` (pipe) with `,` (comma) in the docs [#1420](https://github.com/pnp/office365-cli/issues/1420)
+- added conditionally suggesting upgrading Office UI Fabric scss files [#1468](https://github.com/pnp/office365-cli/issues/1468)
+- added the 'Ensure site assets library is created' sample script [#1447](https://github.com/pnp/office365-cli/pull/1447)
+- added the 'List all tenant-wide extensions' sample script [#1443](https://github.com/pnp/office365-cli/pull/1443)
 
 ## [v2.8.0](https://github.com/pnp/office365-cli/releases/tag/v2.8.0)
 
