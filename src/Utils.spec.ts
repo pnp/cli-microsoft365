@@ -85,7 +85,7 @@ describe('Utils', () => {
     const result = Utils.isDateInRange("sharing is caring", 1);
     assert.equal(result, false);
   });
-  
+
   it('should validate a valid date without time is passed', () => {
     const result = Utils.isValidISODateTime("2019-01-01");
     assert.equal(result, true);
@@ -1062,5 +1062,193 @@ describe('Utils', () => {
   it('should get safe filename when file\'name.txt', () => {
     const result = Utils.getSafeFileName('file\'name.txt');
     assert.strictEqual(result, 'file\'\'name.txt');
-  })
+  });
+
+  it('isValidTheme returns true when valid theme is passed', () => {
+    const theme = `{
+        "themePrimary": "#d81e05",
+        "themeLighterAlt": "#fdf5f4",
+        "themeLighter": "#f9d6d2",
+        "themeLight": "#f4b4ac",
+        "themeTertiary": "#e87060",
+        "themeSecondary": "#dd351e",
+        "themeDarkAlt": "#c31a04",
+        "themeDark": "#a51603",
+        "themeDarker": "#791002",
+        "neutralLighterAlt": "#eeeeee",
+        "neutralLighter": "#f5f5f5",
+        "neutralLight": "#e1e1e1",
+        "neutralQuaternaryAlt": "#d1d1d1",
+        "neutralQuaternary": "#c8c8c8",
+        "neutralTertiaryAlt": "#c0c0c0",
+        "neutralTertiary": "#c2c2c2",
+        "neutralSecondary": "#858585",
+        "neutralPrimaryAlt": "#4b4b4b",
+        "neutralPrimary": "#333333",
+        "neutralDark": "#272727",
+        "black": "#1d1d1d",
+        "white": "#f5f5f5"
+    }`;
+    const actual = Utils.isValidTheme(theme);
+    const expected = true;
+    assert.equal(actual, expected);
+  });
+
+  it('isValidTheme returns false when theme passed is not valid json', () => {
+    const theme = `{ not valid }`;
+    const actual = Utils.isValidTheme(theme);
+    const expected = false;
+    assert.equal(actual, expected);
+  });
+
+  it('isValidTheme returns false when theme passed is not a json object', () => {
+    const theme = `[{
+        "themePrimary": "#d81e05",
+        "themeLighterAlt": "#fdf5f4",
+        "themeLighter": "#f9d6d2",
+        "themeLight": "#f4b4ac",
+        "themeTertiary": "#e87060",
+        "themeSecondary": "#dd351e",
+        "themeDarkAlt": "#c31a04",
+        "themeDark": "#a51603",
+        "themeDarker": "#791002",
+        "neutralLighterAlt": "#eeeeee",
+        "neutralLighter": "#f5f5f5",
+        "neutralLight": "#e1e1e1",
+        "neutralQuaternaryAlt": "#d1d1d1",
+        "neutralQuaternary": "#c8c8c8",
+        "neutralTertiaryAlt": "#c0c0c0",
+        "neutralTertiary": "#c2c2c2",
+        "neutralSecondary": "#858585",
+        "neutralPrimaryAlt": "#4b4b4b",
+        "neutralPrimary": "#333333",
+        "neutralDark": "#272727",
+        "black": "#1d1d1d",
+        "white": "#f5f5f5"
+    }]`;
+    const actual = Utils.isValidTheme(theme);
+    const expected = false;
+    assert.equal(actual, expected);
+  });
+
+  it('isValidTheme returns false when theme passed does not contain all valid properties', () => {
+    const theme = `{
+        "themeLighterAlt": "#fdf5f4",
+        "themeLighter": "#f9d6d2",
+        "themeLight": "#f4b4ac",
+        "themeTertiary": "#e87060",
+        "themeSecondary": "#dd351e",
+        "themeDarkAlt": "#c31a04",
+        "themeDark": "#a51603",
+        "themeDarker": "#791002",
+        "neutralLighterAlt": "#eeeeee",
+        "neutralLighter": "#f5f5f5",
+        "neutralLight": "#e1e1e1",
+        "neutralQuaternaryAlt": "#d1d1d1",
+        "neutralQuaternary": "#c8c8c8",
+        "neutralTertiaryAlt": "#c0c0c0",
+        "neutralTertiary": "#c2c2c2",
+        "neutralSecondary": "#858585",
+        "neutralPrimaryAlt": "#4b4b4b",
+        "neutralPrimary": "#333333",
+        "neutralDark": "#272727",
+        "black": "#1d1d1d",
+        "white": "#f5f5f5"
+    }`;
+    const actual = Utils.isValidTheme(theme);
+    const expected = false;
+    assert.equal(actual, expected);
+  });
+
+  it('isValidTheme returns false when theme passed contains additional properties', () => {
+    const theme = `{
+        "additionalProperty": "#aaabbb",
+        "themeLighterAlt": "#fdf5f4",
+        "themeLighter": "#f9d6d2",
+        "themeLight": "#f4b4ac",
+        "themeTertiary": "#e87060",
+        "themeSecondary": "#dd351e",
+        "themeDarkAlt": "#c31a04",
+        "themeDark": "#a51603",
+        "themeDarker": "#791002",
+        "neutralLighterAlt": "#eeeeee",
+        "neutralLighter": "#f5f5f5",
+        "neutralLight": "#e1e1e1",
+        "neutralQuaternaryAlt": "#d1d1d1",
+        "neutralQuaternary": "#c8c8c8",
+        "neutralTertiaryAlt": "#c0c0c0",
+        "neutralTertiary": "#c2c2c2",
+        "neutralSecondary": "#858585",
+        "neutralPrimaryAlt": "#4b4b4b",
+        "neutralPrimary": "#333333",
+        "neutralDark": "#272727",
+        "black": "#1d1d1d",
+        "white": "#f5f5f5"
+    }`;
+    const actual = Utils.isValidTheme(theme);
+    const expected = false;
+    assert.equal(actual, expected);
+  });
+
+  it('isValidTheme returns false when theme passed does not contain valid hex color value', () => {
+    const theme = `{
+        "themePrimary": "d81e05",
+        "themeLighterAlt": "#fdf5f4",
+        "themeLighter": "#f9d6d2",
+        "themeLight": "#f4b4ac",
+        "themeTertiary": "#e87060",
+        "themeSecondary": "#dd351e",
+        "themeDarkAlt": "#c31a04",
+        "themeDark": "#a51603",
+        "themeDarker": "#791002",
+        "neutralLighterAlt": "#eeeeee",
+        "neutralLighter": "#f5f5f5",
+        "neutralLight": "#e1e1e1",
+        "neutralQuaternaryAlt": "#d1d1d1",
+        "neutralQuaternary": "#c8c8c8",
+        "neutralTertiaryAlt": "#c0c0c0",
+        "neutralTertiary": "#c2c2c2",
+        "neutralSecondary": "#858585",
+        "neutralPrimaryAlt": "#4b4b4b",
+        "neutralPrimary": "#333333",
+        "neutralDark": "#272727",
+        "black": "#1d1d1d",
+        "white": "#f5f5f5"
+    }`;
+    const actual = Utils.isValidTheme(theme);
+    const expected = false;
+    assert.equal(actual, expected);
+  });
+
+  it('isValidTheme returns false when theme passed is not valid (issue #1463)', () => {
+    const theme = `{
+      "Palette": {
+        "themePrimary": "#d81e05",
+        "themeLighterAlt": "#fdf5f4",
+        "themeLighter": "#f9d6d2",
+        "themeLight": "#f4b4ac",
+        "themeTertiary": "#e87060",
+        "themeSecondary": "#dd351e",
+        "themeDarkAlt": "#c31a04",
+        "themeDark": "#a51603",
+        "themeDarker": "#791002",
+        "neutralLighterAlt": "#eeeeee",
+        "neutralLighter": "#f5f5f5",
+        "neutralLight": "#e1e1e1",
+        "neutralQuaternaryAlt": "#d1d1d1",
+        "neutralQuaternary": "#c8c8c8",
+        "neutralTertiaryAlt": "#c0c0c0",
+        "neutralTertiary": "#c2c2c2",
+        "neutralSecondary": "#858585",
+        "neutralPrimaryAlt": "#4b4b4b",
+        "neutralPrimary": "#333333",
+        "neutralDark": "#272727",
+        "black": "#1d1d1d",
+        "white": "#f5f5f5"
+      }
+    }`;
+    const actual = Utils.isValidTheme(theme);
+    const expected = false;
+    assert.equal(actual, expected);
+  });
 });

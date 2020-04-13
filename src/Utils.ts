@@ -597,4 +597,62 @@ export default class Utils {
     return input
       .replace(/'/g, "''")
   }
+
+  public static isValidTheme(input: string): boolean {
+    const validThemeProperties = [
+      "themePrimary",
+      "themeLighterAlt",
+      "themeLighter",
+      "themeLight",
+      "themeTertiary",
+      "themeSecondary",
+      "themeDarkAlt",
+      "themeDark",
+      "themeDarker",
+      "neutralLighterAlt",
+      "neutralLighter",
+      "neutralLight",
+      "neutralQuaternaryAlt",
+      "neutralQuaternary",
+      "neutralTertiaryAlt",
+      "neutralTertiary",
+      "neutralSecondary",
+      "neutralPrimaryAlt",
+      "neutralPrimary",
+      "neutralDark",
+      "black",
+      "white"
+    ];
+    let theme: any;
+
+    try {
+      theme = JSON.parse(input);
+    }
+    catch {
+      return false;
+    }
+
+    if (Array.isArray(theme)) {
+      return false;
+    }
+
+    const hasInvalidProperties = validThemeProperties.map((property) => {
+      return theme.hasOwnProperty(property);
+    }).includes(false);
+
+    if (hasInvalidProperties) {
+      return false;
+    }
+
+    const regex = new RegExp(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/);
+    const hasInvalidValues = validThemeProperties.map((property: string) => {
+      return regex.test(theme[property]);
+    }).includes(false);
+
+    if (hasInvalidValues) {
+      return false;
+    }
+
+    return true;
+  }
 }

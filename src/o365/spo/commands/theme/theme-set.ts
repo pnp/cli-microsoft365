@@ -131,6 +131,10 @@ class SpoThemeSetCommand extends SpoCommand {
         return `Path '${fullPath}' points to a directory`;
       }
 
+      if (!Utils.isValidTheme(fs.readFileSync(fullPath, 'utf-8'))) {
+        return 'File contents is not a valid theme';
+      }
+
       return true;
     };
   }
