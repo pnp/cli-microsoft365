@@ -2,6 +2,7 @@ const prefix: string = 'yammer';
 
 export default {
   YAMMER_GROUP_LIST: `${prefix} group list`,
+  YAMMER_GROUP_USER_REMOVE: `${prefix} group user remove`,
   YAMMER_MESSAGE_ADD: `${prefix} message add`,
   YAMMER_MESSAGE_GET: `${prefix} message get`,
   YAMMER_MESSAGE_LIST: `${prefix} message list`,
