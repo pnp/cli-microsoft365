@@ -68,7 +68,7 @@ class YammerGroupLeaveCommand extends YammerCommand {
       },
       {
         option: '--userId [id]',
-        description: 'Remove the user with the ID specified. Defaults to the current user.'
+        description: 'Remove the user with the ID specified. Defaults to the current user'
       }
     ];
 
