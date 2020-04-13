@@ -15,10 +15,11 @@ describe(commands.THEME_SET, () => {
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
+  let readFileSyncStub: sinon.SinonStub;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'ABC' }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
@@ -37,7 +38,7 @@ describe(commands.THEME_SET, () => {
       }
     };
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
-    sinon.stub(fs, 'readFileSync').callsFake(() => '123');
+    readFileSyncStub = sinon.stub(fs, 'readFileSync').callsFake(() => '123');
   });
 
   afterEach(() => {
@@ -46,7 +47,8 @@ describe(commands.THEME_SET, () => {
       fs.readFileSync,
       fs.existsSync,
       fs.lstatSync,
-      request.post
+      request.post,
+      Utils.isValidTheme
     ]);
   });
 
@@ -202,11 +204,49 @@ describe(commands.THEME_SET, () => {
     assert.notEqual(actual, true);
   });
 
-  it('passes validation when path points to a valid file', () => {
+  it('fails validation if file does not contain a valid theme', () => {
     const stats: fs.Stats = new fs.Stats();
+    const theme: string = '{ not valid }';
     sinon.stub(stats, 'isDirectory').callsFake(() => false);
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
+    readFileSyncStub.callsFake(() => theme);
+    sinon.stub(Utils, 'isValidTheme').callsFake(() => false);
+    const actual = (command.validate() as CommandValidate)({ options: { name: 'abc', filePath: 'contoso-blue.json', isInverted: false } });
+    assert.notEqual(actual, true);
+  });
+
+  it('passes validation when path points to a valid file', () => {
+    const stats: fs.Stats = new fs.Stats();
+    const theme = `{
+      "themePrimary": "#d81e05",
+      "themeLighterAlt": "#fdf5f4",
+      "themeLighter": "#f9d6d2",
+      "themeLight": "#f4b4ac",
+      "themeTertiary": "#e87060",
+      "themeSecondary": "#dd351e",
+      "themeDarkAlt": "#c31a04",
+      "themeDark": "#a51603",
+      "themeDarker": "#791002",
+      "neutralLighterAlt": "#eeeeee",
+      "neutralLighter": "#f5f5f5",
+      "neutralLight": "#e1e1e1",
+      "neutralQuaternaryAlt": "#d1d1d1",
+      "neutralQuaternary": "#c8c8c8",
+      "neutralTertiaryAlt": "#c0c0c0",
+      "neutralTertiary": "#c2c2c2",
+      "neutralSecondary": "#858585",
+      "neutralPrimaryAlt": "#4b4b4b",
+      "neutralPrimary": "#333333",
+      "neutralDark": "#272727",
+      "black": "#1d1d1d",
+      "white": "#f5f5f5"
+    }`;
+    sinon.stub(stats, 'isDirectory').callsFake(() => false);
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    sinon.stub(fs, 'lstatSync').callsFake(() => stats);
+    readFileSyncStub.callsFake(() => theme);
+    sinon.stub(Utils, 'isValidTheme').callsFake(() => true);
     const actual = (command.validate() as CommandValidate)({ options: { name: 'contoso-blue', filePath: 'contoso-blue.json', isInverted: false } });
 
     assert.equal(actual, true);
