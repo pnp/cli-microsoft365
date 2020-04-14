@@ -58,4 +58,21 @@ describe('FN003005_CFG_localizedResource_pathLib', () => {
     rule.visit(project, findings);
     assert.equal(findings.length, 1);
   });
+
+  it('returned notification has correct resolution', () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      configJson: {
+        localizedResources: {
+          'HelloWorldWebPartStrings': 'webparts/helloWorld/loc/{locale}.js'
+        }
+      }
+    };
+    rule.visit(project, findings);
+    assert.equal(findings[0].occurrences[0].resolution, JSON.stringify({
+      localizedResources: {
+        'HelloWorldWebPartStrings': 'lib/webparts/helloWorld/loc/{locale}.js'
+      }
+    }, null, 2));
+  });
 });
