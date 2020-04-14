@@ -41,9 +41,11 @@ export class FN003005_CFG_localizedResource_pathLib extends Rule {
     Object.keys(project.configJson.localizedResources).forEach(k => {
       const path: string = ((project.configJson as ConfigJson).localizedResources as Hash)[k];
       if (path.indexOf('lib/') !== 0) {
+        const resolution: any = { localizedResources: {} };
+        resolution.localizedResources[k] = `lib/${path}`;
         occurrences.push({
           file: this.file,
-          resolution: JSON.stringify({ localizedResources: { k: `lib/${path}` } }, null, 2)
+          resolution: JSON.stringify(resolution, null, 2)
         });
       }
     });
