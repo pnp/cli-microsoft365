@@ -473,26 +473,26 @@ nav:
     - 'Command completion': 'concepts/completion.md'
     - 'Communication with Office 365': 'concepts/communicating-o365.md'
     - 'GitHub Actions': 'concepts/github-actions.md'
-  - Examples:
-    - 'Introduction': 'examples/index.md'
+  - Sample Scripts:
+    - 'Introduction': 'sample-scripts/index.md'
     - Azure Active Directory:
-      - 'Delete all Office 365 groups' : 'examples/aad/delete-o365-groups.md'
-      - 'Scan for Office 365 Groups created with user''s first or last name' : 'examples/aad/flag-groups-with-user-names.md'
+      - 'Delete all Office 365 groups' : 'sample-scripts/aad/delete-o365-groups.md'
+      - 'Scan for Office 365 Groups created with user''s first or last name' : 'sample-scripts/aad/flag-groups-with-user-names.md'
     - Microsoft Graph:
-      - 'Authenticate with and call the Microsoft Graph' : 'examples/graph/call-graph.md'
+      - 'Authenticate with and call the Microsoft Graph' : 'sample-scripts/graph/call-graph.md'
     - SharePoint Online:
-      - 'Add App Catalog to SharePoint site': 'examples/spo/add-app-catalog.md'
-      - 'Delete all (non-group connected) modern SharePoint sites': 'examples/spo/delete-non-group-connected-modern-sites.md'
-      - 'Delete custom color themes from SharePoint': 'examples/spo/remove-custom-themes.md'
-      - 'Delete custom SharePoint site designs': 'examples/spo/remove-site-designs.md'
-      - 'Delete custom SharePoint site scripts': 'examples/spo/remove-site-scripts.md'
-      - 'Ensure the Site Assets Library is created': 'examples/spo/ensure-siteassets-library.md'
-      - 'Hide SharePoint list from Site Contents': 'examples/spo/hide-list-from-site-contents.md'
-      - 'Lists active SharePoint site collection application catalogs': 'examples/spo/list-site-app-catalogs.md'
-      - 'Lists all tenant-wide extensions': 'examples/spo/list-tenant-wide-extensions.md'
+      - 'Add App Catalog to SharePoint site': 'sample-scripts/spo/add-app-catalog.md'
+      - 'Delete all (non-group connected) modern SharePoint sites': 'sample-scripts/spo/delete-non-group-connected-modern-sites.md'
+      - 'Delete custom color themes from SharePoint': 'sample-scripts/spo/remove-custom-themes.md'
+      - 'Delete custom SharePoint site designs': 'sample-scripts/spo/remove-site-designs.md'
+      - 'Delete custom SharePoint site scripts': 'sample-scripts/spo/remove-site-scripts.md'
+      - 'Ensure the Site Assets Library is created': 'sample-scripts/spo/ensure-siteassets-library.md'
+      - 'Hide SharePoint list from Site Contents': 'sample-scripts/spo/hide-list-from-site-contents.md'
+      - 'Lists active SharePoint site collection application catalogs': 'sample-scripts/spo/list-site-app-catalogs.md'
+      - 'Lists all tenant-wide extensions': 'sample-scripts/spo/list-tenant-wide-extensions.md'
     - Microsoft Teams:
-      - 'Deploy Microsoft Teams app from Azure DevOps': 'examples/teams/deploy-teams-app.md'
-      - 'Govern orphaned Microsoft Teams': 'examples/teams/govern-orphan-teams.md'
+      - 'Deploy Microsoft Teams app from Azure DevOps': 'sample-scripts/teams/deploy-teams-app.md'
+      - 'Govern orphaned Microsoft Teams': 'sample-scripts/teams/govern-orphan-teams.md'
   - About:
     - 'Why this CLI': 'about/why-cli.md'
     - 'Comparison to SharePoint and Office 365 PowerShell': 'about/comparison-powershell.md'

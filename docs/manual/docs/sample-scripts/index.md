@@ -1,4 +1,4 @@
-# Examples
+# Sample Scripts
 
 This section contains a collection of sample scripts that automate managing the different services in Office 365.
 
