@@ -307,7 +307,11 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       if (opts.url === `https://graph.microsoft.com/beta/settings` &&
         JSON.stringify(opts.body) === `{"values":[{"name":"CustomBlockedWordsList"},{"name":"EnableMSStandardBlockedWords"},{"name":"ClassificationDescriptions"},{"name":"DefaultClassification","value":"HBI"},{"name":"PrefixSuffixNamingRequirement"},{"name":"AllowGuestsToBeGroupOwner"},{"name":"AllowGuestsToAccessGroups"},{"name":"GuestUsageGuidelinesUrl","value":"http://aka.ms/sppnp"},{"name":"GroupCreationAllowedGroupId"},{"name":"AllowToAddGuests"},{"name":"UsageGuidelinesUrl","value":"http://aka.ms/sppnp"},{"name":"ClassificationList","value":"HBI, LBI, Top Secret"},{"name":"EnableGroupCreation"}],"templateId":"d20c475c-6f96-449a-aee8-08146be187d3"}`) {
         enableRequestIssued = true;
+
+        return Promise.resolve();
       }
+
+      return Promise.reject();
     });
 
     cmdInstance.action({ options: { debug: true, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" } }, (err: any) => {
@@ -399,7 +403,11 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       if (opts.url === `https://graph.microsoft.com/beta/settings` &&
         JSON.stringify(opts.body) === `{"values":[{"name":"CustomBlockedWordsList"},{"name":"EnableMSStandardBlockedWords"},{"name":"ClassificationDescriptions"},{"name":"DefaultClassification","value":"HBI"},{"name":"PrefixSuffixNamingRequirement"},{"name":"AllowGuestsToBeGroupOwner"},{"name":"AllowGuestsToAccessGroups"},{"name":"GuestUsageGuidelinesUrl","value":"http://aka.ms/sppnp"},{"name":"GroupCreationAllowedGroupId"},{"name":"AllowToAddGuests"},{"name":"UsageGuidelinesUrl","value":"http://aka.ms/sppnp"},{"name":"ClassificationList","value":"HBI, LBI, Top Secret"},{"name":"EnableGroupCreation"}],"templateId":"d20c475c-6f96-449a-aee8-08146be187d3"}`) {
         enableRequestIssued = true;
+
+        return Promise.resolve();
       }
+
+      return Promise.reject();
     });
 
     cmdInstance.action({ options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" } }, (err: any) => {
@@ -491,7 +499,11 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       if (opts.url === `https://graph.microsoft.com/beta/settings` &&
         JSON.stringify(opts.body) === `{"values":[{"name":"CustomBlockedWordsList"},{"name":"EnableMSStandardBlockedWords"},{"name":"ClassificationDescriptions"},{"name":"DefaultClassification","value":"HBI"},{"name":"PrefixSuffixNamingRequirement"},{"name":"AllowGuestsToBeGroupOwner"},{"name":"AllowGuestsToAccessGroups"},{"name":"GuestUsageGuidelinesUrl"},{"name":"GroupCreationAllowedGroupId"},{"name":"AllowToAddGuests"},{"name":"UsageGuidelinesUrl","value":"http://aka.ms/sppnp"},{"name":"ClassificationList","value":"HBI, LBI, Top Secret"},{"name":"EnableGroupCreation"}],"templateId":"d20c475c-6f96-449a-aee8-08146be187d3"}`) {
         enableRequestIssued = true;
+
+        return Promise.resolve();
       }
+
+      return Promise.reject();
     });
 
     cmdInstance.action({ options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp" } }, (err: any) => {
@@ -583,7 +595,11 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       if (opts.url === `https://graph.microsoft.com/beta/settings` &&
         JSON.stringify(opts.body) === `{"values":[{"name":"CustomBlockedWordsList"},{"name":"EnableMSStandardBlockedWords"},{"name":"ClassificationDescriptions"},{"name":"DefaultClassification","value":"HBI"},{"name":"PrefixSuffixNamingRequirement"},{"name":"AllowGuestsToBeGroupOwner"},{"name":"AllowGuestsToAccessGroups"},{"name":"GuestUsageGuidelinesUrl","value":"http://aka.ms/sppnp"},{"name":"GroupCreationAllowedGroupId"},{"name":"AllowToAddGuests"},{"name":"UsageGuidelinesUrl"},{"name":"ClassificationList","value":"HBI, LBI, Top Secret"},{"name":"EnableGroupCreation"}],"templateId":"d20c475c-6f96-449a-aee8-08146be187d3"}`) {
         enableRequestIssued = true;
+
+        return Promise.resolve();
       }
+
+      return Promise.reject();
     });
 
     cmdInstance.action({ options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" } }, (err: any) => {
@@ -675,7 +691,11 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       if (opts.url === `https://graph.microsoft.com/beta/settings` &&
         JSON.stringify(opts.body) === `{"values":[{"name":"CustomBlockedWordsList"},{"name":"EnableMSStandardBlockedWords"},{"name":"ClassificationDescriptions"},{"name":"DefaultClassification","value":"HBI"},{"name":"PrefixSuffixNamingRequirement"},{"name":"AllowGuestsToBeGroupOwner"},{"name":"AllowGuestsToAccessGroups"},{"name":"GuestUsageGuidelinesUrl"},{"name":"GroupCreationAllowedGroupId"},{"name":"AllowToAddGuests"},{"name":"UsageGuidelinesUrl"},{"name":"ClassificationList","value":"HBI, LBI, Top Secret"},{"name":"EnableGroupCreation"}],"templateId":"d20c475c-6f96-449a-aee8-08146be187d3"}`) {
         enableRequestIssued = true;
+
+        return Promise.resolve();
       }
+
+      return Promise.reject();
     });
 
     cmdInstance.action({ options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI" } }, (err: any) => {

@@ -66,7 +66,7 @@ describe(commands.CONTENTTYPE_ADD, () => {
 
   it('creates site content type with minimal properties', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
         opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="8" ObjectPathId="7" /><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /></Actions><ObjectPaths><Property Id="7" ParentId="5" Name="ContentTypes" /><Method Id="9" ParentId="7" Name="Add"><Parameters><Parameter TypeId="{168f3091-4554-4f14-8866-b20d48e45b54}"><Property Name="Description" Type="Null" /><Property Name="Group" Type="Null" /><Property Name="Id" Type="String">0x0100FF0B2E33A3718B46A3909298D240FD93</Property><Property Name="Name" Type="String">PnP Tile</Property><Property Name="ParentContentType" Type="Null" /></Parameter></Parameters></Method><Property Id="5" ParentId="3" Name="Web" /><StaticProperty Id="3" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /></ObjectPaths></Request>`) {
         return Promise.resolve(JSON.stringify([
           {
@@ -95,7 +95,7 @@ describe(commands.CONTENTTYPE_ADD, () => {
 
   it('creates site content type with description and group (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
         opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="8" ObjectPathId="7" /><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /></Actions><ObjectPaths><Property Id="7" ParentId="5" Name="ContentTypes" /><Method Id="9" ParentId="7" Name="Add"><Parameters><Parameter TypeId="{168f3091-4554-4f14-8866-b20d48e45b54}"><Property Name="Description" Type="String">A tile</Property><Property Name="Group" Type="String">PnP Content Types</Property><Property Name="Id" Type="String">0x0100FF0B2E33A3718B46A3909298D240FD93</Property><Property Name="Name" Type="String">PnP Tile</Property><Property Name="ParentContentType" Type="Null" /></Parameter></Parameters></Method><Property Id="5" ParentId="3" Name="Web" /><StaticProperty Id="3" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /></ObjectPaths></Request>`) {
         return Promise.resolve(JSON.stringify([
           {
@@ -124,19 +124,19 @@ describe(commands.CONTENTTYPE_ADD, () => {
 
   it('creates list content type with minimal properties', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists/getByTitle('My%20list')?$select=Id`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/lists/getByTitle('My%20list')?$select=Id`) > -1) {
         return Promise.resolve({
           Id: '81f0ecee-75a8-46f0-b384-c8f4f9f31d99'
         });
       }
 
-      if (opts.url.indexOf('/_api/site?$select=Id') > -1) {
+      if ((opts.url as string).indexOf('/_api/site?$select=Id') > -1) {
         return Promise.resolve({
           Id: '276f6d32-f43b-4b26-ada6-7aa9d5bcab6a'
         });
       }
 
-      if (opts.url.indexOf('/_api/web?$select=Id') > -1) {
+      if ((opts.url as string).indexOf('/_api/web?$select=Id') > -1) {
         return Promise.resolve({
           Id: '942595c1-6100-4ad0-9dd4-19743732ffdc'
         });
@@ -145,7 +145,7 @@ describe(commands.CONTENTTYPE_ADD, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
         opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="8" ObjectPathId="7" /><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /></Actions><ObjectPaths><Property Id="7" ParentId="5" Name="ContentTypes" /><Method Id="9" ParentId="7" Name="Add"><Parameters><Parameter TypeId="{168f3091-4554-4f14-8866-b20d48e45b54}"><Property Name="Description" Type="Null" /><Property Name="Group" Type="Null" /><Property Name="Id" Type="String">0x0100FF0B2E33A3718B46A3909298D240FD93</Property><Property Name="Name" Type="String">PnP Tile</Property><Property Name="ParentContentType" Type="Null" /></Parameter></Parameters></Method><Identity Id="5" Name="1a48869e-c092-0000-1f61-81ec89809537|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:276f6d32-f43b-4b26-ada6-7aa9d5bcab6a:web:942595c1-6100-4ad0-9dd4-19743732ffdc:list:81f0ecee-75a8-46f0-b384-c8f4f9f31d99" /></ObjectPaths></Request>`) {
         return Promise.resolve(JSON.stringify([
           {
@@ -174,19 +174,19 @@ describe(commands.CONTENTTYPE_ADD, () => {
 
   it('creates list content type with description', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists/getByTitle('My%20list')?$select=Id`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/lists/getByTitle('My%20list')?$select=Id`) > -1) {
         return Promise.resolve({
           Id: '81f0ecee-75a8-46f0-b384-c8f4f9f31d99'
         });
       }
 
-      if (opts.url.indexOf('/_api/site?$select=Id') > -1) {
+      if ((opts.url as string).indexOf('/_api/site?$select=Id') > -1) {
         return Promise.resolve({
           Id: '276f6d32-f43b-4b26-ada6-7aa9d5bcab6a'
         });
       }
 
-      if (opts.url.indexOf('/_api/web?$select=Id') > -1) {
+      if ((opts.url as string).indexOf('/_api/web?$select=Id') > -1) {
         return Promise.resolve({
           Id: '942595c1-6100-4ad0-9dd4-19743732ffdc'
         });
@@ -195,7 +195,7 @@ describe(commands.CONTENTTYPE_ADD, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
         opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="8" ObjectPathId="7" /><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /></Actions><ObjectPaths><Property Id="7" ParentId="5" Name="ContentTypes" /><Method Id="9" ParentId="7" Name="Add"><Parameters><Parameter TypeId="{168f3091-4554-4f14-8866-b20d48e45b54}"><Property Name="Description" Type="String">A tile</Property><Property Name="Group" Type="Null" /><Property Name="Id" Type="String">0x0100FF0B2E33A3718B46A3909298D240FD93</Property><Property Name="Name" Type="String">PnP Tile</Property><Property Name="ParentContentType" Type="Null" /></Parameter></Parameters></Method><Identity Id="5" Name="1a48869e-c092-0000-1f61-81ec89809537|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:276f6d32-f43b-4b26-ada6-7aa9d5bcab6a:web:942595c1-6100-4ad0-9dd4-19743732ffdc:list:81f0ecee-75a8-46f0-b384-c8f4f9f31d99" /></ObjectPaths></Request>`) {
         return Promise.resolve(JSON.stringify([
           {
@@ -224,7 +224,7 @@ describe(commands.CONTENTTYPE_ADD, () => {
 
   it('escapes XML in user input', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
         opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="8" ObjectPathId="7" /><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /></Actions><ObjectPaths><Property Id="7" ParentId="5" Name="ContentTypes" /><Method Id="9" ParentId="7" Name="Add"><Parameters><Parameter TypeId="{168f3091-4554-4f14-8866-b20d48e45b54}"><Property Name="Description" Type="String">&lt;A tile</Property><Property Name="Group" Type="String">&lt;PnP Content Types</Property><Property Name="Id" Type="String">&lt;0x0100FF0B2E33A3718B46A3909298D240FD93</Property><Property Name="Name" Type="String">&lt;PnP Tile</Property><Property Name="ParentContentType" Type="Null" /></Parameter></Parameters></Method><Property Id="5" ParentId="3" Name="Web" /><StaticProperty Id="3" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /></ObjectPaths></Request>`) {
         return Promise.resolve(JSON.stringify([
           {
@@ -253,7 +253,7 @@ describe(commands.CONTENTTYPE_ADD, () => {
 
   it('correctly handles error when a content with the specified name already exists', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return Promise.resolve(JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8008.1219", "ErrorInfo": {
@@ -279,17 +279,17 @@ describe(commands.CONTENTTYPE_ADD, () => {
 
   it('correctly handles error when the specified list doesn\'t exist', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists/getByTitle('My%20list')?$select=Id`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/lists/getByTitle('My%20list')?$select=Id`) > -1) {
         return Promise.reject({ error: { 'odata.error': { message: { value: "List 'My list' does not exist at site with URL 'https://contoso.sharepoint.com/sites/sales'." } } } });
       }
 
-      if (opts.url.indexOf('/_api/site?$select=Id') > -1) {
+      if ((opts.url as string).indexOf('/_api/site?$select=Id') > -1) {
         return Promise.resolve({
           Id: '276f6d32-f43b-4b26-ada6-7aa9d5bcab6a'
         });
       }
 
-      if (opts.url.indexOf('/_api/web?$select=Id') > -1) {
+      if ((opts.url as string).indexOf('/_api/web?$select=Id') > -1) {
         return Promise.resolve({
           Id: '942595c1-6100-4ad0-9dd4-19743732ffdc'
         });

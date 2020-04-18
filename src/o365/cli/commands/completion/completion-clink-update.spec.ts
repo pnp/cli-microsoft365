@@ -15,7 +15,7 @@ describe(commands.COMPLETION_CLINK_UPDATE, () => {
 
   before(() => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
-    generateClinkCompletionStub = sinon.stub(autocomplete, 'getClinkCompletion').callsFake(() => { });
+    generateClinkCompletionStub = sinon.stub(autocomplete, 'getClinkCompletion').callsFake(() => '');
   });
 
   beforeEach(() => {

@@ -60,8 +60,9 @@ describe(commands.OAUTH2GRANT_LIST, () => {
 
   it('retrieves OAuth2 permission grants for the specified service principal (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/myorganization/oauth2PermissionGrants?api-version=1.6&$filter=clientId eq '141f7648-0c71-4752-9cdb-c7d5305b7e68'`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`/myorganization/oauth2PermissionGrants?api-version=1.6&$filter=clientId eq '141f7648-0c71-4752-9cdb-c7d5305b7e68'`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
             value: [{
@@ -115,8 +116,9 @@ describe(commands.OAUTH2GRANT_LIST, () => {
 
   it('retrieves OAuth2 permission grants for the specified service principal', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/myorganization/oauth2PermissionGrants?api-version=1.6&$filter=clientId eq '141f7648-0c71-4752-9cdb-c7d5305b7e68'`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`/myorganization/oauth2PermissionGrants?api-version=1.6&$filter=clientId eq '141f7648-0c71-4752-9cdb-c7d5305b7e68'`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
             value: [{
@@ -170,8 +172,9 @@ describe(commands.OAUTH2GRANT_LIST, () => {
 
   it('outputs all properties when output is JSON', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/myorganization/oauth2PermissionGrants?api-version=1.6&$filter=clientId eq '141f7648-0c71-4752-9cdb-c7d5305b7e68'`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`/myorganization/oauth2PermissionGrants?api-version=1.6&$filter=clientId eq '141f7648-0c71-4752-9cdb-c7d5305b7e68'`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
             value: [{
@@ -233,8 +236,9 @@ describe(commands.OAUTH2GRANT_LIST, () => {
 
   it('correctly handles no OAuth2 permission grants for the specified service principal found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/myorganization/oauth2PermissionGrants?api-version=1.6&$filter=clientId eq '141f7648-0c71-4752-9cdb-c7d5305b7e68'`) > -1) {
-        if (opts.headers.authorization &&
+      if ((opts.url as string).indexOf(`/myorganization/oauth2PermissionGrants?api-version=1.6&$filter=clientId eq '141f7648-0c71-4752-9cdb-c7d5305b7e68'`) > -1) {
+        if (opts.headers &&
+          opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {

@@ -18,7 +18,7 @@ describe(commands.FILE_CHECKIN, () => {
       if (getFileByServerRelativeUrlResp) {
         return getFileByServerRelativeUrlResp;
       } else {
-        if (opts.url.indexOf('/_api/web/GetFileByServerRelativeUrl(') > -1) {
+        if ((opts.url as string).indexOf('/_api/web/GetFileByServerRelativeUrl(') > -1) {
           return Promise.resolve();
         }
       }
@@ -26,7 +26,7 @@ describe(commands.FILE_CHECKIN, () => {
       if (getFileByIdResp) {
         return getFileByIdResp;
       } else {
-        if (opts.url.indexOf('/_api/web/GetFileById(') > -1) {
+        if ((opts.url as string).indexOf('/_api/web/GetFileById(') > -1) {
           return Promise.resolve();
         }
       }
@@ -84,7 +84,7 @@ describe(commands.FILE_CHECKIN, () => {
   it('command correctly handles file get reject request', (done) => {
     const err = 'Invalid request';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/GetFileById') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/GetFileById') > -1) {
         return Promise.reject(err);
       }
 

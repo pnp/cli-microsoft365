@@ -63,7 +63,7 @@ describe(commands.HUBSITE_LIST, () => {
 
   it('lists hub sites', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/hubsites`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/hubsites`) > -1) {
         return Promise.resolve({
           value: [
             {
@@ -117,7 +117,7 @@ describe(commands.HUBSITE_LIST, () => {
 
   it('lists hub sites (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/hubsites`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/hubsites`) > -1) {
         return Promise.resolve({
           value: [
             {
@@ -171,7 +171,7 @@ describe(commands.HUBSITE_LIST, () => {
 
   it('lists hub sites with all properties for JSON output', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/hubsites`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/hubsites`) > -1) {
         return Promise.resolve({
           value: [
             {
@@ -259,7 +259,7 @@ describe(commands.HUBSITE_LIST, () => {
       ]
     });
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/RenderListDataAsStream`) > -1
+      if ((opts.url as string).indexOf(`/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/RenderListDataAsStream`) > -1
         && JSON.stringify(opts.body) === JSON.stringify({
           parameters: {
             ViewXml: "<View><Query><Where><And><And><IsNull><FieldRef Name=\"TimeDeleted\"/></IsNull><Neq><FieldRef Name=\"State\"/><Value Type='Integer'>0</Value></Neq></And><Neq><FieldRef Name=\"HubSiteId\"/><Value Type='Text'>{00000000-0000-0000-0000-000000000000}</Value></Neq></And></Where><OrderBy><FieldRef Name='Title' Ascending='true' /></OrderBy></Query><ViewFields><FieldRef Name=\"Title\"/><FieldRef Name=\"SiteUrl\"/><FieldRef Name=\"SiteId\"/><FieldRef Name=\"HubSiteId\"/></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit></View>",
@@ -420,7 +420,7 @@ describe(commands.HUBSITE_LIST, () => {
       ]
     });
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/RenderListDataAsStream`) > -1
+      if ((opts.url as string).indexOf(`/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/RenderListDataAsStream`) > -1
         && JSON.stringify(opts.body) === JSON.stringify({
           parameters: {
             ViewXml: "<View><Query><Where><And><And><IsNull><FieldRef Name=\"TimeDeleted\"/></IsNull><Neq><FieldRef Name=\"State\"/><Value Type='Integer'>0</Value></Neq></And><Neq><FieldRef Name=\"HubSiteId\"/><Value Type='Text'>{00000000-0000-0000-0000-000000000000}</Value></Neq></And></Where><OrderBy><FieldRef Name='Title' Ascending='true' /></OrderBy></Query><ViewFields><FieldRef Name=\"Title\"/><FieldRef Name=\"SiteUrl\"/><FieldRef Name=\"SiteId\"/><FieldRef Name=\"HubSiteId\"/></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit></View>",
@@ -622,9 +622,9 @@ describe(commands.HUBSITE_LIST, () => {
       ]
     });
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/RenderListDataAsStream`) > -1
+      if ((opts.url as string).indexOf(`/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/RenderListDataAsStream`) > -1
         && opts.body.parameters.ViewXml.indexOf('<RowLimit Paged="TRUE">' + newBatchSize + '</RowLimit>') > -1) {
-        if (opts.url.indexOf('?Paged=TRUE') == -1) {
+        if ((opts.url as string).indexOf('?Paged=TRUE') == -1) {
           firstPagedRequest = true;
           return Promise.resolve({
             FilterLink: "?",
@@ -638,7 +638,7 @@ describe(commands.HUBSITE_LIST, () => {
             RowLimit: 3
           });
         }
-        if (opts.url.indexOf('?Paged=TRUE&p_Title=Another%20Hub%20Sub%202&p_ID=32&PageFirstRow=4&View=00000000-0000-0000-0000-00000000000') > -1) {
+        if ((opts.url as string).indexOf('?Paged=TRUE&p_Title=Another%20Hub%20Sub%202&p_ID=32&PageFirstRow=4&View=00000000-0000-0000-0000-00000000000') > -1) {
           secondPagedRequest = true
           return Promise.resolve({
             FilterLink: "?",
@@ -653,7 +653,7 @@ describe(commands.HUBSITE_LIST, () => {
             RowLimit: 3
           });
         }
-        if (opts.url.indexOf('?Paged=TRUE&p_Title=Hub%20sub%204&p_ID=29&PageFirstRow=7&View=00000000-0000-0000-0000-00000000000') > -1) {
+        if ((opts.url as string).indexOf('?Paged=TRUE&p_Title=Hub%20sub%204&p_ID=29&PageFirstRow=7&View=00000000-0000-0000-0000-00000000000') > -1) {
           thirdPagedRequest = true;
           return Promise.resolve({
             FilterLink: "?",
@@ -715,9 +715,9 @@ describe(commands.HUBSITE_LIST, () => {
       ]
     });
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/RenderListDataAsStream`) > -1
+      if ((opts.url as string).indexOf(`/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/RenderListDataAsStream`) > -1
         && opts.body.parameters.ViewXml.indexOf('<RowLimit Paged="TRUE">' + newBatchSize + '</RowLimit>') > -1) {
-        if (opts.url.indexOf('?Paged=TRUE') == -1) {
+        if ((opts.url as string).indexOf('?Paged=TRUE') == -1) {
           firstPagedRequest = true;
           return Promise.resolve({
             FilterLink: "?",
@@ -731,7 +731,7 @@ describe(commands.HUBSITE_LIST, () => {
             RowLimit: 3
           });
         }
-        if (opts.url.indexOf('?Paged=TRUE&p_Title=Another%20Hub%20Sub%202&p_ID=32&PageFirstRow=4&View=00000000-0000-0000-0000-00000000000') > -1) {
+        if ((opts.url as string).indexOf('?Paged=TRUE&p_Title=Another%20Hub%20Sub%202&p_ID=32&PageFirstRow=4&View=00000000-0000-0000-0000-00000000000') > -1) {
           secondPagedRequest = true
           return Promise.resolve({
             FilterLink: "?",
@@ -746,7 +746,7 @@ describe(commands.HUBSITE_LIST, () => {
             RowLimit: 3
           });
         }
-        if (opts.url.indexOf('?Paged=TRUE&p_Title=Hub%20sub%204&p_ID=29&PageFirstRow=7&View=00000000-0000-0000-0000-00000000000') > -1) {
+        if ((opts.url as string).indexOf('?Paged=TRUE&p_Title=Hub%20sub%204&p_ID=29&PageFirstRow=7&View=00000000-0000-0000-0000-00000000000') > -1) {
           thirdPagedRequest = true;
           return Promise.resolve({
             FilterLink: "?",
@@ -806,9 +806,9 @@ describe(commands.HUBSITE_LIST, () => {
       ]
     });
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/RenderListDataAsStream`) > -1
+      if ((opts.url as string).indexOf(`/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/RenderListDataAsStream`) > -1
         && opts.body.parameters.ViewXml.indexOf('<RowLimit Paged="TRUE">' + newBatchSize + '</RowLimit>') > -1) {
-        if (opts.url.indexOf('?Paged=TRUE') == -1) {
+        if ((opts.url as string).indexOf('?Paged=TRUE') == -1) {
           firstPagedRequest = true;
           return Promise.resolve({
             FilterLink: "?",
@@ -925,9 +925,9 @@ describe(commands.HUBSITE_LIST, () => {
       ]
     });
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/RenderListDataAsStream`) > -1
+      if ((opts.url as string).indexOf(`/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/RenderListDataAsStream`) > -1
         && opts.body.parameters.ViewXml.indexOf('<RowLimit Paged="TRUE">' + newBatchSize + '</RowLimit>') > -1) {
-        if (opts.url.indexOf('?Paged=TRUE') == -1) {
+        if ((opts.url as string).indexOf('?Paged=TRUE') == -1) {
           return Promise.resolve({
             FilterLink: "?",
             FirstRow: 1,
@@ -940,7 +940,7 @@ describe(commands.HUBSITE_LIST, () => {
             RowLimit: 3
           });
         }
-        if (opts.url.indexOf('?Paged=TRUE&p_Title=Another%20Hub%20Sub%202&p_ID=32&PageFirstRow=4&View=00000000-0000-0000-0000-00000000000') > -1) {
+        if ((opts.url as string).indexOf('?Paged=TRUE&p_Title=Another%20Hub%20Sub%202&p_ID=32&PageFirstRow=4&View=00000000-0000-0000-0000-00000000000') > -1) {
           return Promise.reject('An error has occurred');
         }
 

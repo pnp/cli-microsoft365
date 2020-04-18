@@ -111,8 +111,8 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
   });
 
   it('searches for package.json in the parent folder when it doesn\'t exist in the current folder', (done) => {
-    sinon.stub(fs, 'existsSync').callsFake((path: string) => {
-      if (path.endsWith('package.json')) {
+    sinon.stub(fs, 'existsSync').callsFake((path) => {
+      if (path.toString().endsWith('package.json')) {
         return false;
       }
       else {
@@ -134,8 +134,8 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
 
   it('correctly handles the case when .yo-rc.json exists but doesn\'t contain spfx project info', (done) => {
     const originalExistsSync = fs.existsSync;
-    sinon.stub(fs, 'existsSync').callsFake((path: string) => {
-      if (path.endsWith('.yo-rc.json') || path.endsWith('package.json')) {
+    sinon.stub(fs, 'existsSync').callsFake((path) => {
+      if (path.toString().endsWith('.yo-rc.json') || path.toString().endsWith('package.json')) {
         return true;
       }
       else {
@@ -143,11 +143,11 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string, options) => {
-      if (path.endsWith('.yo-rc.json')) {
+    sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
+      if (path.toString().endsWith('.yo-rc.json')) {
         return `{}`;
       }
-      else if (path.endsWith('package.json')) {
+      else if (path.toString().endsWith('package.json')) {
         return JSON.stringify({
           dependencies: {
             '@microsoft/sp-core-library': '1.8.1'
@@ -174,8 +174,8 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
 
   it('determines the current version from .yo-rc.json when available', (done) => {
     const originalExistsSync = fs.existsSync;
-    sinon.stub(fs, 'existsSync').callsFake((path: string) => {
-      if (path.endsWith('.yo-rc.json')) {
+    sinon.stub(fs, 'existsSync').callsFake((path) => {
+      if (path.toString().endsWith('.yo-rc.json')) {
         return true;
       }
       else {
@@ -183,8 +183,8 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string, options) => {
-      if (path.endsWith('.yo-rc.json')) {
+    sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
+      if (path.toString().endsWith('.yo-rc.json')) {
         return `{
           "@microsoft/generator-sharepoint": {
             "version": "0.4.1",
@@ -214,8 +214,8 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
 
   it('tries to determine the current version from package.json if .yo-rc.json doesn\'t exist', (done) => {
     const originalExistsSync = fs.existsSync;
-    sinon.stub(fs, 'existsSync').callsFake((path: string) => {
-      if (path.endsWith('.yo-rc.json')) {
+    sinon.stub(fs, 'existsSync').callsFake((path) => {
+      if (path.toString().endsWith('.yo-rc.json')) {
         return false;
       }
       else {
@@ -223,8 +223,8 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string, options) => {
-      if (path.endsWith('package.json')) {
+    sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
+      if (path.toString().endsWith('package.json')) {
         return `{
           "name": "spfx-041",
           "version": "0.0.1",
@@ -276,8 +276,8 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
 
   it('shows error if the project version couldn\'t be determined', (done) => {
     const originalExistsSync = fs.existsSync;
-    sinon.stub(fs, 'existsSync').callsFake((path: string) => {
-      if (path.endsWith('.yo-rc.json')) {
+    sinon.stub(fs, 'existsSync').callsFake((path) => {
+      if (path.toString().endsWith('.yo-rc.json')) {
         return false;
       }
       else {
@@ -299,8 +299,8 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
 
   it('determining project version doesn\'t fail if .yo-rc.json is empty', () => {
     const originalExistsSync = fs.existsSync;
-    sinon.stub(fs, 'existsSync').callsFake((path: string) => {
-      if (path.endsWith('.yo-rc.json')) {
+    sinon.stub(fs, 'existsSync').callsFake((path) => {
+      if (path.toString().endsWith('.yo-rc.json')) {
         return true;
       }
       else {
@@ -308,11 +308,11 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
-      if (path.endsWith('.yo-rc.json')) {
+    sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
+      if (path.toString().endsWith('.yo-rc.json')) {
         return '';
       }
-      else if (path.endsWith('package.json')) {
+      else if (path.toString().endsWith('package.json')) {
         return `{
           "name": "spfx-141",
           "version": "0.0.1",
@@ -358,8 +358,8 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
 
   it('determining project version doesn\'t fail if package.json is empty', () => {
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
-      if (path.endsWith('package.json')) {
+    sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
+      if (path.toString().endsWith('package.json')) {
         return '';
       }
       else {
@@ -376,8 +376,8 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
 
   it('loads config.json when available', () => {
     const originalExistsSync = fs.existsSync;
-    sinon.stub(fs, 'existsSync').callsFake((path: string) => {
-      if (path.endsWith('config.json')) {
+    sinon.stub(fs, 'existsSync').callsFake((path) => {
+      if (path.toString().endsWith('config.json')) {
         return true;
       }
       else {
@@ -385,8 +385,8 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string, options) => {
-      if (path.endsWith('config.json')) {
+    sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
+      if (path.toString().endsWith('config.json')) {
         return '{}';
       }
       else {
@@ -401,8 +401,8 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
 
   it('doesn\'t fail if package.json not available', () => {
     const originalExistsSync = fs.existsSync;
-    sinon.stub(fs, 'existsSync').callsFake((path: string) => {
-      if (path.endsWith('package.json')) {
+    sinon.stub(fs, 'existsSync').callsFake((path) => {
+      if (path.toString().endsWith('package.json')) {
         return false;
       }
       else {
@@ -417,8 +417,8 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
 
   it('doesn\'t fail if tsconfig.json not available', () => {
     const originalExistsSync = fs.existsSync;
-    sinon.stub(fs, 'existsSync').callsFake((path: string) => {
-      if (path.endsWith('tsconfig.json')) {
+    sinon.stub(fs, 'existsSync').callsFake((path) => {
+      if (path.toString().endsWith('tsconfig.json')) {
         return false;
       }
       else {
@@ -433,8 +433,8 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
 
   it('doesn\'t fail if config.json is empty', () => {
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
-      if (path.endsWith('config.json')) {
+    sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
+      if (path.toString().endsWith('config.json')) {
         return '';
       }
       else {
@@ -449,8 +449,8 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
 
   it('doesn\'t fail if package.json is empty', () => {
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
-      if (path.endsWith('package.json')) {
+    sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
+      if (path.toString().endsWith('package.json')) {
         return '';
       }
       else {
@@ -465,8 +465,8 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
 
   it('doesn\'t fail if .yo-rc.json is empty', () => {
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string, encoding: string) => {
-      if (path.endsWith('.yo-rc.json')) {
+    sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
+      if (path.toString().endsWith('.yo-rc.json')) {
         return '';
       }
       else {
@@ -484,14 +484,14 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
   it('e2e: shows correct number of findings for externalizing react web part 1.8.2 project', (done) => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-externalize/test-projects/spfx-182-webpart-react'));
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string, options) => {
-      if (path.endsWith('package.json') && path.indexOf('pnpjs') > -1) {
+    sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
+      if (path.toString().endsWith('package.json') && path.toString().indexOf('pnpjs') > -1) {
         return JSON.stringify({
           main: "./dist/pnpjs.es5.umd.bundle.js",
           module: "./dist/pnpjs.es5.umd.bundle.min.js"
         });
       }
-      else if (path.endsWith('package.json') && path.indexOf('spfx-182-webpart-react') > -1) { //adding library on the fly so we get at least one result
+      else if (path.toString().endsWith('package.json') && path.toString().indexOf('spfx-182-webpart-react') > -1) { //adding library on the fly so we get at least one result
         const pConfig = JSON.parse(originalReadFileSync(path, 'utf8'));
         pConfig.dependencies['@pnp/pnpjs'] = '1.3.5';
         return JSON.stringify(pConfig);
@@ -519,20 +519,20 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
   it('returns edit suggestions', (done) => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-externalize/test-projects/spfx-182-webpart-react'));
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string, options) => {
-      if (path.endsWith('package.json') && path.indexOf('logging') > -1) {
+    sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
+      if (path.toString().endsWith('package.json') && path.toString().indexOf('logging') > -1) {
         return JSON.stringify({
           main: "./dist/logging.es5.umd.bundle.js",
           module: "./dist/logging.es5.umd.bundle.min.js"
         });
       }
-      else if (path.endsWith('package.json') && path.indexOf('common') > -1) {
+      else if (path.toString().endsWith('package.json') && path.toString().indexOf('common') > -1) {
         return JSON.stringify({
           main: "./dist/common.es5.umd.bundle.js",
           module: "./dist/common.es5.umd.bundle.min.js"
         });
       }
-      else if (path.endsWith('package.json') && path.indexOf('spfx-182-webpart-react') > -1) { //adding library on the fly so we get at least one result
+      else if (path.toString().endsWith('package.json') && path.toString().indexOf('spfx-182-webpart-react') > -1) { //adding library on the fly so we get at least one result
         const pConfig = JSON.parse(originalReadFileSync(path, 'utf8'));
         pConfig.dependencies['@pnp/logging'] = '1.3.5';
         pConfig.dependencies['@pnp/common'] = '1.3.5';
@@ -563,32 +563,32 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
   it('handles failures properly', (done) => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-externalize/test-projects/spfx-182-webpart-react'));
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string, options) => {
-      if (path.endsWith('package.json') && path.indexOf('pnpjs') > -1) {
+    sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
+      if (path.toString().endsWith('package.json') && path.toString().indexOf('pnpjs') > -1) {
         return JSON.stringify({
           main: "./dist/pnpjs.es5.umd.bundle.js",
           module: "./dist/pnpjs.es5.umd.bundle.min.js"
         });
       }
-      else if (path.endsWith('package.json') && path.indexOf('tntjs') > -1) {
+      else if (path.toString().endsWith('package.json') && path.toString().indexOf('tntjs') > -1) {
         return JSON.stringify({
           main: "./dist/tntjs.es5.umd.bundle.js",
           module: "./dist/tntjs.es5.umd.bundle.min.js"
         });
       }
-      else if (path.endsWith('package.json') && path.indexOf('logging') > -1) {
+      else if (path.toString().endsWith('package.json') && path.toString().indexOf('logging') > -1) {
         return JSON.stringify({
           main: "./dist/logging.es5.umd.bundle.js",
           module: "./dist/logging.es5.umd.bundle.min.js"
         });
       }
-      else if (path.endsWith('package.json') && path.indexOf('common') > -1) {
+      else if (path.toString().endsWith('package.json') && path.toString().indexOf('common') > -1) {
         return JSON.stringify({
           main: "./dist/common.es5.umd.bundle.js",
           module: "./dist/common.es5.umd.bundle.min.js"
         });
       }
-      else if (path.endsWith('package.json') && path.indexOf('spfx-182-webpart-react') > -1) { //adding library on the fly so we get at least one result
+      else if (path.toString().endsWith('package.json') && path.toString().indexOf('spfx-182-webpart-react') > -1) { //adding library on the fly so we get at least one result
         const pConfig = JSON.parse(originalReadFileSync(path, 'utf8'));
         pConfig.dependencies['@pnp/pnpjs'] = '1.3.5';
         pConfig.dependencies['@pnp/tntjs'] = '1.3.5';
@@ -609,8 +609,8 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
     const originalWriteFileSync = fs.writeFileSync;
-    sinon.stub(fs, 'writeFileSync').callsFake((path: string, value: string, encoding: string) => {
-      if (path.endsWith('report.json')) {
+    sinon.stub(fs, 'writeFileSync').callsFake((path, value, encoding) => {
+      if (path.toString().endsWith('report.json')) {
         throw new Error('file is locked');
       }
       else {
@@ -664,14 +664,14 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
   it('returns text report with output format default', (done) => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-externalize/test-projects/spfx-182-webpart-react'));
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string, options) => {
-      if (path.endsWith('package.json') && path.indexOf('pnpjs') > -1) {
+    sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
+      if (path.toString().endsWith('package.json') && path.toString().indexOf('pnpjs') > -1) {
         return JSON.stringify({
           main: "./dist/pnpjs.es5.umd.bundle.js",
           module: "./dist/pnpjs.es5.umd.bundle.min.js"
         });
       }
-      else if (path.endsWith('package.json') && path.indexOf('spfx-182-webpart-react') > -1) { //adding library on the fly so we get at least one result
+      else if (path.toString().endsWith('package.json') && path.toString().indexOf('spfx-182-webpart-react') > -1) { //adding library on the fly so we get at least one result
         const pConfig = JSON.parse(originalReadFileSync(path, 'utf8'));
         pConfig.dependencies['@pnp/pnpjs'] = '1.3.5';
         return JSON.stringify(pConfig);
@@ -732,7 +732,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
   it('writes JSON externalize report to file when outputFile specified in json output mode', (done) => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-externalize/test-projects/spfx-182-webpart-react'));
     let typeofReport: string = '';
-    sinon.stub(fs, 'writeFileSync').callsFake((path: string, contents: any) => {
+    sinon.stub(fs, 'writeFileSync').callsFake((path, contents: any) => {
       typeofReport = typeof contents;
     });
 

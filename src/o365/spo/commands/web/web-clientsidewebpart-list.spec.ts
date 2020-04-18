@@ -121,7 +121,7 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
 
   it('handles error when calling client side webparts', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/GetClientSideWebParts') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/GetClientSideWebParts') > -1) {
         return Promise.reject("Error");
       }
       return Promise.resolve('abc');
@@ -167,7 +167,7 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
     };
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/GetClientSideWebParts') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/GetClientSideWebParts') > -1) {
         return Promise.resolve(clientsideWebPartRsp);
       }
       return Promise.resolve('abc');
@@ -215,7 +215,7 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
     };
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/GetClientSideWebParts') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/GetClientSideWebParts') > -1) {
         return Promise.resolve(clientsideWebPartRsp);
       }
       return Promise.resolve('abc');
@@ -262,7 +262,7 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
     };
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/GetClientSideWebParts') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/GetClientSideWebParts') > -1) {
         return Promise.resolve(clientsideWebPartRsp);
       }
       return Promise.resolve('abc');
@@ -325,7 +325,7 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
     };
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/GetClientSideWebParts') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/GetClientSideWebParts') > -1) {
         return Promise.resolve(clientsideWebPartRsp);
       }
       return Promise.resolve('abc');

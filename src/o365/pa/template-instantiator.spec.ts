@@ -3,7 +3,7 @@ import * as assert from 'assert';
 import * as fs from "fs";
 import * as sinon from 'sinon';
 import * as path from 'path';
-const uuidv4 = require('uuid/v4');
+import { v4 } from 'uuid';
 import TemplateInstantiator from './template-instantiator';
 import { PcfInitVariables } from './commands/pcf/pcf-init/pcf-init-variables';
 
@@ -22,7 +22,7 @@ describe('TemplateInstantiator', () => {
     "$controlnameplaceholder$": "Example1Name",
     "$pcfProjectName$": "ExampleComponentProject",
     "pcfprojecttype": "ExampleComponentProject",
-    "$pcfProjectGuid$": uuidv4()
+    "$pcfProjectGuid$": v4()
   };
 
   beforeEach(() => {

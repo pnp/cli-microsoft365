@@ -1,7 +1,7 @@
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import config from '../../../../config';
 import request from '../../../../request';
-const uuidv4 = require('uuid/v4');
+import { v4 } from 'uuid';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
@@ -68,7 +68,7 @@ class SpoTermSetAddCommand extends SpoCommand {
         const termGroupQuery: string = args.options.termGroupName ?
           `<Method Id="42" ParentId="40" Name="GetByName"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.termGroupName)}</Parameter></Parameters></Method>` :
           `<Method Id="42" ParentId="40" Name="GetById"><Parameters><Parameter Type="Guid">{${args.options.termGroupId}}</Parameter></Parameters></Method>`;
-        const termSetId: string = args.options.id || uuidv4();
+        const termSetId: string = args.options.id || v4();
 
         const requestOptions: any = {
           url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,

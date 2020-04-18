@@ -1,7 +1,7 @@
 import request from '../../../../request';
 import commands from '../../commands';
 import { CommandOption, CommandValidate } from '../../../../Command';
-const uuidv4 = require('uuid/v4');
+import { v4 } from 'uuid';
 import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -285,7 +285,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
             cmd.log(`Creating instance from definition of WebPart ${webPartId}...`);
           }
           const component: ClientSidePageComponent = webPartDefinition[0];
-          const id: string = uuidv4();
+          const id: string = v4();
           const componentId: string = component.Id.replace(/^\{|\}$/g, "").toLowerCase();
           const manifest: any = JSON.parse(component.Manifest);
           const preconfiguredEntries = manifest.preconfiguredEntries[0];

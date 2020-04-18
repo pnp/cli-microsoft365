@@ -106,7 +106,7 @@ describe(commands.SITE_GET, () => {
       "Url": "https://m365x324230.sharepoint.com/sites/project-x"
     };
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/site`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/site`) > -1) {
         return Promise.resolve(siteProperties);
       }
 
@@ -172,7 +172,7 @@ describe(commands.SITE_GET, () => {
       "Url": "https://m365x324230.sharepoint.com/sites/project-x"
     };
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/site`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/site`) > -1) {
         return Promise.resolve(siteProperties);
       }
 
@@ -192,7 +192,7 @@ describe(commands.SITE_GET, () => {
 
   it('correctly handles error when getting information for a site that doesn\'t exist', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/site') > -1) {
+      if ((opts.url as string).indexOf('/_api/site') > -1) {
         return Promise.reject(new Error("404 - \"404 FILE NOT FOUND\""));
       }
 

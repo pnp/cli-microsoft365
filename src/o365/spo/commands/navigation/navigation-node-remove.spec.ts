@@ -68,7 +68,7 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
 
   it('removes navigation node from the top navigation', (done) => {
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/navigation/topnavigationbar/getbyid(2003)`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/navigation/topnavigationbar/getbyid(2003)`) > -1) {
         return Promise.resolve();
       }
 
@@ -88,7 +88,7 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
 
   it('removes navigation node from the top navigation (debug)', (done) => {
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/navigation/topnavigationbar/getbyid(2003)`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/navigation/topnavigationbar/getbyid(2003)`) > -1) {
         return Promise.resolve();
       }
 
@@ -143,7 +143,7 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
 
   it('removes the navigation node when prompt confirmed', (done) => {
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/navigation/topnavigationbar/getbyid(2003)`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/navigation/topnavigationbar/getbyid(2003)`) > -1) {
         return Promise.resolve();
       }
 

@@ -33,7 +33,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       }
     };
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
         return Promise.resolve({
           IsPageCheckedOutToCurrentUser: true,
           Title: 'Page'
@@ -43,7 +43,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/savepage`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/savepage`) > -1) {
         body = opts.body;
         return Promise.resolve();
       }
@@ -81,7 +81,7 @@ describe(commands.PAGE_HEADER_SET, () => {
     Utils.restore([request.get, request.post]);
     let checkedOut = false;
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
         return Promise.resolve({
           IsPageCheckedOutToCurrentUser: false,
           Title: 'Page'
@@ -92,12 +92,12 @@ describe(commands.PAGE_HEADER_SET, () => {
     });
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/checkoutpage`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/checkoutpage`) > -1) {
         checkedOut = true;
         return Promise.resolve({});
       }
 
-      if (opts.url.indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`) > -1) {
         return Promise.resolve({});
       }
 
@@ -125,7 +125,7 @@ describe(commands.PAGE_HEADER_SET, () => {
     Utils.restore([request.get, request.post]);
     let checkingOut = false;
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
         return Promise.resolve({
           IsPageCheckedOutToCurrentUser: true,
           Title: 'Page'
@@ -136,12 +136,12 @@ describe(commands.PAGE_HEADER_SET, () => {
     });
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/checkoutpage`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/checkoutpage`) > -1) {
         checkingOut = true;
         return Promise.resolve({});
       }
 
-      if (opts.url.indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`) > -1) {
         return Promise.resolve({});
       }
 
@@ -272,26 +272,26 @@ describe(commands.PAGE_HEADER_SET, () => {
   it('sets page header to custom when custom type specified', (done) => {
     Utils.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
         return Promise.resolve({
           IsPageCheckedOutToCurrentUser: true,
           Title: 'Page'
         });
       }
 
-      if (opts.url.indexOf(`/_api/site?`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/site?`) > -1) {
         return Promise.resolve({
           Id: 'c7678ab2-c9dc-454b-b2ee-7fcffb983d4e'
         });
       }
 
-      if (opts.url.indexOf(`/_api/web?`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web?`) > -1) {
         return Promise.resolve({
           Id: '0df4d2d2-5ecf-45e9-94f5-c638106bfc65'
         });
       }
 
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('%2Fsites%2Fteam-a%2Fsiteassets%2Fhero.jpg')?$select=ListId,UniqueId`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('%2Fsites%2Fteam-a%2Fsiteassets%2Fhero.jpg')?$select=ListId,UniqueId`) > -1) {
         return Promise.resolve({
           ListId: 'e1557527-d333-49f2-9d60-ea8a3003fda8',
           UniqueId: '102f496d-23a2-415f-803a-232b8a6c7613'
@@ -356,26 +356,26 @@ describe(commands.PAGE_HEADER_SET, () => {
   it('sets page header to custom when custom type specified (debug)', (done) => {
     Utils.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
         return Promise.resolve({
           IsPageCheckedOutToCurrentUser: true,
           Title: 'Page'
         });
       }
 
-      if (opts.url.indexOf(`/_api/site?`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/site?`) > -1) {
         return Promise.resolve({
           Id: 'c7678ab2-c9dc-454b-b2ee-7fcffb983d4e'
         });
       }
 
-      if (opts.url.indexOf(`/_api/web?`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web?`) > -1) {
         return Promise.resolve({
           Id: '0df4d2d2-5ecf-45e9-94f5-c638106bfc65'
         });
       }
 
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('%2Fsites%2Fteam-a%2Fsiteassets%2Fhero.jpg')?$select=ListId,UniqueId`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('%2Fsites%2Fteam-a%2Fsiteassets%2Fhero.jpg')?$select=ListId,UniqueId`) > -1) {
         return Promise.resolve({
           ListId: 'e1557527-d333-49f2-9d60-ea8a3003fda8',
           UniqueId: '102f496d-23a2-415f-803a-232b8a6c7613'
@@ -493,26 +493,26 @@ describe(commands.PAGE_HEADER_SET, () => {
   it('sets focus coordinates to 0 0 if none specified', (done) => {
     Utils.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
         return Promise.resolve({
           IsPageCheckedOutToCurrentUser: true,
           Title: 'Page'
         });
       }
 
-      if (opts.url.indexOf(`/_api/site?`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/site?`) > -1) {
         return Promise.resolve({
           Id: 'c7678ab2-c9dc-454b-b2ee-7fcffb983d4e'
         });
       }
 
-      if (opts.url.indexOf(`/_api/web?`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web?`) > -1) {
         return Promise.resolve({
           Id: '0df4d2d2-5ecf-45e9-94f5-c638106bfc65'
         });
       }
 
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('%2Fsites%2Fteam-a%2Fsiteassets%2Fhero.jpg')?$select=ListId,UniqueId`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('%2Fsites%2Fteam-a%2Fsiteassets%2Fhero.jpg')?$select=ListId,UniqueId`) > -1) {
         return Promise.resolve({
           ListId: 'e1557527-d333-49f2-9d60-ea8a3003fda8',
           UniqueId: '102f496d-23a2-415f-803a-232b8a6c7613'
@@ -764,26 +764,26 @@ describe(commands.PAGE_HEADER_SET, () => {
   it('correctly handles error when the specified image doesn\'t exist', (done) => {
     Utils.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
         return Promise.resolve({
           IsPageCheckedOutToCurrentUser: true,
           Title: 'Page'
         });
       }
 
-      if (opts.url.indexOf(`/_api/site?`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/site?`) > -1) {
         return Promise.resolve({
           Id: 'c7678ab2-c9dc-454b-b2ee-7fcffb983d4e'
         });
       }
 
-      if (opts.url.indexOf(`/_api/web?`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web?`) > -1) {
         return Promise.resolve({
           Id: '0df4d2d2-5ecf-45e9-94f5-c638106bfc65'
         });
       }
 
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('%2Fsites%2Fteam-a%2Fsiteassets%2Fhero.jpg')?$select=ListId,UniqueId`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('%2Fsites%2Fteam-a%2Fsiteassets%2Fhero.jpg')?$select=ListId,UniqueId`) > -1) {
         return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
       }
 

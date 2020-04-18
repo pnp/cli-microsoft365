@@ -122,7 +122,7 @@ describe('SpoCommand', () => {
 
   it('reuses current digestcontext when expireat is a future date', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+      if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
         return Promise.resolve({
           FormDigestValue: 'abc'
         });
@@ -163,7 +163,7 @@ describe('SpoCommand', () => {
 
   it('reuses current digestcontext when expireat is a future date (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+      if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
         return Promise.resolve({
           FormDigestValue: 'abc'
         });
@@ -204,7 +204,7 @@ describe('SpoCommand', () => {
 
   it('retrieves new digestcontext when no context present', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+      if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
         return Promise.resolve({
           FormDigestValue: 'abc'
         });
@@ -239,7 +239,7 @@ describe('SpoCommand', () => {
 
   it('retrieves updated digestcontext when expireat is past date', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+      if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
         return Promise.resolve({
           FormDigestValue: 'abc'
         });
@@ -280,7 +280,7 @@ describe('SpoCommand', () => {
 
   it('retrieves updated digestcontext when expireat is past date (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+      if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
         return Promise.resolve({
           FormDigestValue: 'abc'
         });
@@ -321,7 +321,7 @@ describe('SpoCommand', () => {
 
   it('handles error when contextinfo could not be retrieved (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+      if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
         return Promise.reject('Invalid request');
       }
       return Promise.reject('Invalid request');

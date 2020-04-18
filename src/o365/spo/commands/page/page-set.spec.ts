@@ -62,7 +62,7 @@ describe(commands.PAGE_SET, () => {
 
   it('updates page layout to Article', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           PageLayoutType: 'Article',
           PromotedState: 0,
@@ -90,7 +90,7 @@ describe(commands.PAGE_SET, () => {
 
   it('updates page layout to Article (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           PageLayoutType: 'Article',
           PromotedState: 0,
@@ -118,7 +118,7 @@ describe(commands.PAGE_SET, () => {
 
   it('updates page layout to Article on root of tenant(debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           PageLayoutType: 'Article',
           PromotedState: 0,
@@ -146,7 +146,7 @@ describe(commands.PAGE_SET, () => {
 
   it('automatically appends the .aspx extension', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           PageLayoutType: 'Article',
           PromotedState: 0,
@@ -174,7 +174,7 @@ describe(commands.PAGE_SET, () => {
 
   it('updates page layout to Home', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           PageLayoutType: 'Home'
         })) {
@@ -197,7 +197,7 @@ describe(commands.PAGE_SET, () => {
 
   it('promotes the page as NewsPage', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
         opts.body.PromotedState === 2 &&
         opts.body.FirstPublishedDate) {
         return Promise.resolve();
@@ -219,16 +219,16 @@ describe(commands.PAGE_SET, () => {
 
   it('promotes the page as Template', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
         !opts.body) {
         return Promise.resolve({ Id: '1' });
       }
 
-      if (opts.url.indexOf(`/_api/SitePages/Pages(1)/SavePageAsTemplate`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePageAsTemplate`) > -1) {
         return Promise.resolve({ Id: '2', BannerImageUrl: 'url', CanvasContent1: 'content1', LayoutWebpartsContent: 'content' });
       }
 
-      if (opts.url.indexOf(`/_api/SitePages/Pages(2)/SavePage`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages(2)/SavePage`) > -1) {
         return Promise.resolve();
       }
 
@@ -248,14 +248,14 @@ describe(commands.PAGE_SET, () => {
 
   it('updates page layout to Home and promotes it as HomePage (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           PageLayoutType: 'Home'
         })) {
         return Promise.resolve();
       }
 
-      if (opts.url.indexOf('_api/web/rootfolder') > -1 &&
+      if ((opts.url as string).indexOf('_api/web/rootfolder') > -1 &&
         opts.body.WelcomePage === 'SitePages/page.aspx') {
         return Promise.resolve();
       }
@@ -276,7 +276,7 @@ describe(commands.PAGE_SET, () => {
 
   it('enables comments on the page', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields/SetCommentsDisabled(false)`) > -1) {
+      if ((opts.url as string).indexOf(`_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields/SetCommentsDisabled(false)`) > -1) {
         return Promise.resolve();
       }
 
@@ -296,7 +296,7 @@ describe(commands.PAGE_SET, () => {
 
   it('disables comments on the page (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields/SetCommentsDisabled(true)`) > -1) {
+      if ((opts.url as string).indexOf(`_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields/SetCommentsDisabled(true)`) > -1) {
         return Promise.resolve();
       }
 
@@ -316,7 +316,7 @@ describe(commands.PAGE_SET, () => {
 
   it('publishes page', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/Publish('')`) > -1) {
+      if ((opts.url as string).indexOf(`_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/Publish('')`) > -1) {
         return Promise.resolve();
       }
 
@@ -336,7 +336,7 @@ describe(commands.PAGE_SET, () => {
 
   it('publishes page with a message (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/Publish('Initial%20version')`) > -1) {
+      if ((opts.url as string).indexOf(`_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/Publish('Initial%20version')`) > -1) {
         return Promise.resolve();
       }
 
@@ -356,7 +356,7 @@ describe(commands.PAGE_SET, () => {
 
   it('escapes special characters in user input', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/Publish('Don%39t%20tell')`) > -1) {
+      if ((opts.url as string).indexOf(`_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/Publish('Don%39t%20tell')`) > -1) {
         return Promise.resolve();
       }
 

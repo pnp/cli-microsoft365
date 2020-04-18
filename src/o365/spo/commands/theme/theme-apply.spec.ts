@@ -67,7 +67,7 @@ describe(commands.THEME_APPLY, () => {
 
   it('applies theme when correct parameters are passed', (done) => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "3d92299e-e019-4000-c866-de7d45aa9628" }, 12, true]));
       }
       return Promise.reject('Invalid request');
@@ -95,7 +95,7 @@ describe(commands.THEME_APPLY, () => {
 
   it('applies theme when correct parameters are passed (debug)', (done) => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "3d92299e-e019-4000-c866-de7d45aa9628" }, 12, true]));
       }
       return Promise.reject('Invalid request');
@@ -124,14 +124,15 @@ describe(commands.THEME_APPLY, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers['X-RequestDigest'] &&
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers &&
+          opts.headers['X-RequestDigest'] &&
           opts.headers['X-RequestDigest'] === 'abc') {
           return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "3d92299e-e019-4000-c866-de7d45aa9628" }, 12, true]));
         }
       }
 
-      if (opts.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/ThemeManager/ApplyTheme`) > -1) {
         return Promise.resolve(JSON.stringify({
           "@odata.context": "https://contoso.sharepoint.com/sites/project-x/_api/$metadata#Edm.String",
           "value": "/sites/project-x/_catalogs/theme/Themed/6735E8EF"
@@ -170,14 +171,15 @@ describe(commands.THEME_APPLY, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers['X-RequestDigest'] &&
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers &&
+          opts.headers['X-RequestDigest'] &&
           opts.headers['X-RequestDigest'] === 'abc') {
           return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "3d92299e-e019-4000-c866-de7d45aa9628" }, 12, true]));
         }
       }
 
-      if (opts.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/ThemeManager/ApplyTheme`) > -1) {
         return Promise.resolve(JSON.stringify({
           "@odata.context": "https://contoso.sharepoint.com/sites/project-x/_api/$metadata#Edm.String",
           "value": "/sites/project-x/_catalogs/theme/Themed/6735E8EF"
@@ -216,14 +218,15 @@ describe(commands.THEME_APPLY, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers['X-RequestDigest'] &&
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers &&
+          opts.headers['X-RequestDigest'] &&
           opts.headers['X-RequestDigest'] === 'abc') {
           return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "3d92299e-e019-4000-c866-de7d45aa9628" }, 12, true]));
         }
       }
 
-      if (opts.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/ThemeManager/ApplyTheme`) > -1) {
         return Promise.resolve(JSON.stringify({
           "@odata.context": "https://contoso.sharepoint.com/sites/project-x/_api/$metadata#Edm.String",
           "value": "/sites/project-x/_catalogs/theme/Themed/6735E8EF"
@@ -262,14 +265,15 @@ describe(commands.THEME_APPLY, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers['X-RequestDigest'] &&
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers &&
+          opts.headers['X-RequestDigest'] &&
           opts.headers['X-RequestDigest'] === 'abc') {
           return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "3d92299e-e019-4000-c866-de7d45aa9628" }, 12, true]));
         }
       }
 
-      if (opts.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/ThemeManager/ApplyTheme`) > -1) {
         return Promise.resolve(JSON.stringify({
           "@odata.context": "https://contoso.sharepoint.com/sites/project-x/_api/$metadata#Edm.String",
           "value": "/sites/project-x/_catalogs/theme/Themed/6735E8EF"
@@ -308,14 +312,15 @@ describe(commands.THEME_APPLY, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers['X-RequestDigest'] &&
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers &&
+          opts.headers['X-RequestDigest'] &&
           opts.headers['X-RequestDigest'] === 'abc') {
           return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "3d92299e-e019-4000-c866-de7d45aa9628" }, 12, true]));
         }
       }
 
-      if (opts.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/ThemeManager/ApplyTheme`) > -1) {
         return Promise.resolve(JSON.stringify({
           "@odata.context": "https://contoso.sharepoint.com/sites/project-x/_api/$metadata#Edm.String",
           "value": "/sites/project-x/_catalogs/theme/Themed/6735E8EF"
@@ -354,14 +359,15 @@ describe(commands.THEME_APPLY, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers['X-RequestDigest'] &&
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers &&
+          opts.headers['X-RequestDigest'] &&
           opts.headers['X-RequestDigest'] === 'abc') {
           return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "3d92299e-e019-4000-c866-de7d45aa9628" }, 12, true]));
         }
       }
 
-      if (opts.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/ThemeManager/ApplyTheme`) > -1) {
         return Promise.resolve(JSON.stringify({
           "@odata.context": "https://contoso.sharepoint.com/sites/project-x/_api/$metadata#Edm.String",
           "value": "/sites/project-x/_catalogs/theme/Themed/6735E8EF"
@@ -400,14 +406,15 @@ describe(commands.THEME_APPLY, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers['X-RequestDigest'] &&
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers &&
+          opts.headers['X-RequestDigest'] &&
           opts.headers['X-RequestDigest'] === 'abc') {
           return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "3d92299e-e019-4000-c866-de7d45aa9628" }, 12, true]));
         }
       }
 
-      if (opts.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/ThemeManager/ApplyTheme`) > -1) {
         return Promise.resolve(JSON.stringify({
           "@odata.context": "https://contoso.sharepoint.com/sites/project-x/_api/$metadata#Edm.String",
           "value": "/sites/project-x/_catalogs/theme/Themed/6735E8EF"
@@ -446,14 +453,15 @@ describe(commands.THEME_APPLY, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers['X-RequestDigest'] &&
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers &&
+          opts.headers['X-RequestDigest'] &&
           opts.headers['X-RequestDigest'] === 'abc') {
           return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "3d92299e-e019-4000-c866-de7d45aa9628" }, 12, true]));
         }
       }
 
-      if (opts.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/ThemeManager/ApplyTheme`) > -1) {
         return Promise.resolve(JSON.stringify({
           "@odata.context": "https://contoso.sharepoint.com/sites/project-x/_api/$metadata#Edm.String",
           "value": "/sites/project-x/_catalogs/theme/Themed/6735E8EF"
@@ -490,7 +498,7 @@ describe(commands.THEME_APPLY, () => {
 
   it('correctly handles error when applying custom theme', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return Promise.resolve(JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "requestObjectIdentity ClientSvc error" } }]));
       }
       return Promise.reject('Invalid request');
@@ -515,7 +523,7 @@ describe(commands.THEME_APPLY, () => {
 
   it('handles unknown error command error correctly', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return Promise.resolve(JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "ClientSvc unknown error" } }]));
       }
       return Promise.reject('Invalid request');
@@ -542,14 +550,15 @@ describe(commands.THEME_APPLY, () => {
   it('handles command error correctly', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers['X-RequestDigest'] &&
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers &&
+          opts.headers['X-RequestDigest'] &&
           opts.headers['X-RequestDigest'] === 'abc') {
           return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": "{ErrorMessage:error occurred}", "TraceCorrelationId": "3d92299e-e019-4000-c866-de7d45aa9628" }, 12, false]));
         }
       }
 
-      if (opts.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/ThemeManager/ApplyTheme`) > -1) {
         return Promise.resolve(JSON.stringify({
           "error": {
             "code": "-2147024891, System.UnauthorizedAccessException",

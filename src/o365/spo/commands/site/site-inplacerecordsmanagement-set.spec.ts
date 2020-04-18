@@ -59,7 +59,7 @@ describe(commands.SITE_INPLACERECORDSMANAGEMENT_SET, () => {
   it('correctly handles error when in-place records management already activated', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
 
-      if (opts.url.indexOf('_api/site/features/add') > -1) {
+      if ((opts.url as string).indexOf('_api/site/features/add') > -1) {
         return Promise.reject({
           error: {
             "odata.error": {
@@ -90,7 +90,7 @@ describe(commands.SITE_INPLACERECORDSMANAGEMENT_SET, () => {
   it('correctly handles error when in-place records management already deactivated', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
 
-      if (opts.url.indexOf('_api/site/features/remove') > -1) {
+      if ((opts.url as string).indexOf('_api/site/features/remove') > -1) {
         return Promise.reject({
           error: {
             "odata.error": {
@@ -121,7 +121,7 @@ describe(commands.SITE_INPLACERECORDSMANAGEMENT_SET, () => {
   it('should deactivate in-place records management', (done) => {
     const requestStub = sinon.stub(request, 'post').callsFake((opts) => {
 
-      if (opts.url.indexOf('_api/site/features/remove') > -1) {
+      if ((opts.url as string).indexOf('_api/site/features/remove') > -1) {
         return Promise.resolve();
       }
 
@@ -145,7 +145,7 @@ describe(commands.SITE_INPLACERECORDSMANAGEMENT_SET, () => {
   it('should activate in-place records management (verbose)', (done) => {
     const requestStub = sinon.stub(request, 'post').callsFake((opts) => {
 
-      if (opts.url.indexOf('_api/site/features/add') > -1) {
+      if ((opts.url as string).indexOf('_api/site/features/add') > -1) {
         return Promise.resolve();
       }
 
@@ -168,7 +168,7 @@ describe(commands.SITE_INPLACERECORDSMANAGEMENT_SET, () => {
   it('should activate in-place records management', (done) => {
     const requestStub = sinon.stub(request, 'post').callsFake((opts) => {
 
-      if (opts.url.indexOf('_api/site/features/add') > -1) {
+      if ((opts.url as string).indexOf('_api/site/features/add') > -1) {
         return Promise.resolve();
       }
 

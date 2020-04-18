@@ -111,7 +111,7 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
   it('handles client.svc promise error', (done) => {
     // get tenant app catalog
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+      if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
         return Promise.reject('An error has occurred');
       }
       return Promise.reject('Invalid request');
@@ -135,7 +135,7 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
   it('handles error while getting tenant appcatalog', (done) => {
     // get tenant app catalog
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+      if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
         return Promise.resolve(JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": {
@@ -165,7 +165,7 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
   it('lists the tenant settings (debug)', (done) => {
     // get tenant app catalog
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+      if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
         return Promise.resolve(JSON.stringify([
           {
           "SchemaVersion":"15.0.0.0","LibraryVersion":"16.0.8015.1218","ErrorInfo":null,"TraceCorrelationId":"6148899e-a042-6000-ee90-5bfa05d08b79"
@@ -220,7 +220,7 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
   it('handles tenant settings error', (done) => {
     // get tenant app catalog
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+      if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
         return Promise.resolve(JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": { "ErrorMessage": "Timed out" }, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"

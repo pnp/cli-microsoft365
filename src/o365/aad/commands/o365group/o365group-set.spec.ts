@@ -164,6 +164,7 @@ describe(commands.O365GROUP_SET, () => {
   it('updates Office 365 Group logo with a png image', (done) => {
     sinon.stub(request, 'put').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/28beab62-7540-4db1-a23f-29a6018a3848/photo/$value' &&
+        opts.headers &&
         opts.headers['content-type'] === 'image/png') {
         return Promise.resolve();
       }
@@ -185,6 +186,7 @@ describe(commands.O365GROUP_SET, () => {
   it('updates Office 365 Group logo with a jpg image (debug)', (done) => {
     sinon.stub(request, 'put').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/photo/$value' &&
+        opts.headers &&
         opts.headers['content-type'] === 'image/jpeg') {
         return Promise.resolve();
       }
@@ -206,6 +208,7 @@ describe(commands.O365GROUP_SET, () => {
   it('updates Office 365 Group logo with a gif image', (done) => {
     sinon.stub(request, 'put').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/photo/$value' &&
+        opts.headers &&
         opts.headers['content-type'] === 'image/gif') {
         return Promise.resolve();
       }
@@ -234,6 +237,7 @@ describe(commands.O365GROUP_SET, () => {
     });
     sinon.stub(global, 'setTimeout').callsFake((fn, to) => {
       fn();
+      return {} as any;
     });
 
     cmdInstance.action({ options: { debug: false, id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', logoPath: 'logo.png' } }, (err?: any) => {
@@ -257,6 +261,7 @@ describe(commands.O365GROUP_SET, () => {
     });
     sinon.stub(global, 'setTimeout').callsFake((fn, to) => {
       fn();
+      return {} as any;
     });
 
     cmdInstance.action({ options: { debug: true, id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', logoPath: 'logo.png' } }, (err?: any) => {

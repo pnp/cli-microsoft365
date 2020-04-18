@@ -22,7 +22,7 @@ describe(commands.FOLDER_ADD, () => {
 
     stubPostResponses = (addResp: any = null) => {
       return sinon.stub(request, 'post').callsFake((opts) => {
-        if (opts.url.indexOf('/_api/web/folders') > -1) {
+        if ((opts.url as string).indexOf('/_api/web/folders') > -1) {
           if (addResp) {
             return addResp;
           } else {

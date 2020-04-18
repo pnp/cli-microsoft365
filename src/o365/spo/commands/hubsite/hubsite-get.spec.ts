@@ -62,7 +62,7 @@ describe(commands.HUBSITE_GET, () => {
 
   it('gets information about the specified hub site', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/hubsites/getbyid('ee8b42c3-3e6f-4822-87c1-c21ad666046b')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/hubsites/getbyid('ee8b42c3-3e6f-4822-87c1-c21ad666046b')`) > -1) {
         return Promise.resolve({
           "Description": null,
           "ID": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
@@ -100,7 +100,7 @@ describe(commands.HUBSITE_GET, () => {
 
   it('gets information about the specified hub site (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/hubsites/getbyid('ee8b42c3-3e6f-4822-87c1-c21ad666046b')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/hubsites/getbyid('ee8b42c3-3e6f-4822-87c1-c21ad666046b')`) > -1) {
         return Promise.resolve({
           "Description": null,
           "ID": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",

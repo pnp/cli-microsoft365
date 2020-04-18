@@ -65,7 +65,7 @@ describe(commands.WEB_ADD, () => {
     let configuredNavigation: boolean = false;
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('_api/web/webinfos/add') > -1) {
+      if ((opts.url as string).indexOf('_api/web/webinfos/add') > -1) {
         return Promise.resolve({
           Configuration: 0,
           Created: "2018-01-24T18:24:20",
@@ -81,7 +81,7 @@ describe(commands.WEB_ADD, () => {
         });
       }
 
-      if (opts.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
+      if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
         configuredNavigation = true;
       }
 
@@ -125,7 +125,7 @@ describe(commands.WEB_ADD, () => {
     let configuredNavigation: boolean = false;
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('_api/web/webinfos/add') > -1) {
+      if ((opts.url as string).indexOf('_api/web/webinfos/add') > -1) {
         return Promise.resolve({
           Configuration: 0,
           Created: "2018-01-24T18:24:20",
@@ -141,14 +141,14 @@ describe(commands.WEB_ADD, () => {
         });
       }
 
-      if (opts.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
+      if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
         configuredNavigation = true;
       }
 
       return Promise.reject('Invalid request');
     });
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('_api/web/effectivebasepermissions') > -1) {
+      if ((opts.url as string).indexOf('_api/web/effectivebasepermissions') > -1) {
         // PermissionKind.ManageLists, PermissionKind.AddListItems, PermissionKind.DeleteListItems
         return Promise.resolve(
           {
@@ -196,7 +196,7 @@ describe(commands.WEB_ADD, () => {
     let configuredNavigation: boolean = false;
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('_api/web/webinfos/add') > -1) {
+      if ((opts.url as string).indexOf('_api/web/webinfos/add') > -1) {
         return Promise.resolve({
           Configuration: 0,
           Created: "2018-01-24T18:24:20",
@@ -212,14 +212,14 @@ describe(commands.WEB_ADD, () => {
         });
       }
 
-      if (opts.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
+      if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
         configuredNavigation = true;
       }
 
       return Promise.reject('Invalid request');
     });
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('_api/web/effectivebasepermissions') > -1) {
+      if ((opts.url as string).indexOf('_api/web/effectivebasepermissions') > -1) {
         // PermissionKind.ManageLists, PermissionKind.AddListItems, PermissionKind.DeleteListItems
         return Promise.resolve(
           {
@@ -269,7 +269,7 @@ describe(commands.WEB_ADD, () => {
 
     // Create web
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('_api/web/webinfos/add') > -1) {
+      if ((opts.url as string).indexOf('_api/web/webinfos/add') > -1) {
         return Promise.resolve({
           Configuration: 0,
           Created: "2018-01-24T18:24:20",
@@ -285,7 +285,7 @@ describe(commands.WEB_ADD, () => {
         });
       }
 
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1 &&
+      if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.body.indexOf("UseShared") > -1) {
         configuredNavigation = true;
 
@@ -308,7 +308,7 @@ describe(commands.WEB_ADD, () => {
     });
     // Full permission.
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('_api/web/effectivebasepermissions') > -1) {
+      if ((opts.url as string).indexOf('_api/web/effectivebasepermissions') > -1) {
         return Promise.resolve(
           {
             High: 2147483647,
@@ -345,7 +345,7 @@ describe(commands.WEB_ADD, () => {
 
     // Create web
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('_api/web/webinfos/add') > -1) {
+      if ((opts.url as string).indexOf('_api/web/webinfos/add') > -1) {
         return Promise.resolve({
           Configuration: 0,
           Created: "2018-01-24T18:24:20",
@@ -361,7 +361,7 @@ describe(commands.WEB_ADD, () => {
         });
       }
 
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1 &&
+      if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.body.indexOf("UseShared") > -1) {
         configuredNavigation = true;
 
@@ -384,7 +384,7 @@ describe(commands.WEB_ADD, () => {
     });
     // Full permission.
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('_api/web/effectivebasepermissions') > -1) {
+      if ((opts.url as string).indexOf('_api/web/effectivebasepermissions') > -1) {
         return Promise.resolve(
           {
             High: 2147483647,
@@ -418,7 +418,7 @@ describe(commands.WEB_ADD, () => {
   it('correctly handles the set inheritNavigation error', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       // Create web
-      if (opts.url.indexOf('_api/web/webinfos/add') > -1) {
+      if ((opts.url as string).indexOf('_api/web/webinfos/add') > -1) {
         return Promise.resolve({
           Configuration: 0,
           Created: "2018-01-24T18:24:20",
@@ -434,7 +434,7 @@ describe(commands.WEB_ADD, () => {
         });
       }
 
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+      if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
         // SetInheritNavigation failed.
         return Promise.resolve(JSON.stringify([
           {
@@ -449,7 +449,7 @@ describe(commands.WEB_ADD, () => {
     });
     // Full permission.
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('_api/web/effectivebasepermissions') > -1) {
+      if ((opts.url as string).indexOf('_api/web/effectivebasepermissions') > -1) {
         return Promise.resolve(
           {
             High: 2147483647,
@@ -483,7 +483,7 @@ describe(commands.WEB_ADD, () => {
 
   it('correctly handles the createweb call error', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('_api/web/webinfos/add') > -1) {
+      if ((opts.url as string).indexOf('_api/web/webinfos/add') > -1) {
         return Promise.reject({
           error: {
             "odata.error": {
@@ -522,7 +522,7 @@ describe(commands.WEB_ADD, () => {
 
   it('creates web and handles the effectivebasepermission call error', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('_api/web/webinfos/add') > -1) {
+      if ((opts.url as string).indexOf('_api/web/webinfos/add') > -1) {
         return Promise.resolve({
           Configuration: 0,
           Created: "2018-01-24T18:24:20",
@@ -541,7 +541,7 @@ describe(commands.WEB_ADD, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('_api/web/effectivebasepermissions') > -1) {
+      if ((opts.url as string).indexOf('_api/web/effectivebasepermissions') > -1) {
         return Promise.reject({
           error: {
             "odata.error": {

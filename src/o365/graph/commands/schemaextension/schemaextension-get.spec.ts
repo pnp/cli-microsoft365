@@ -61,7 +61,7 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
   });
   it('gets schema extension', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`schemaExtensions`)> -1) {
+      if ((opts.url as string).indexOf(`schemaExtensions`)> -1) {
         return Promise.resolve({
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#schemaExtensions/$entity",
           "id": "adatumisv_exo2",
@@ -126,7 +126,7 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
   });
   it('gets schema extension(debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`schemaExtensions`)> -1) {
+      if ((opts.url as string).indexOf(`schemaExtensions`)> -1) {
         return Promise.resolve({
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#schemaExtensions/$entity",
           "id": "adatumisv_exo2",
@@ -188,7 +188,7 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
   });
   it('handles error', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`schemaExtensions`)> -1) {
+      if ((opts.url as string).indexOf(`schemaExtensions`)> -1) {
         return Promise.reject('An error has occurred');
       }
 

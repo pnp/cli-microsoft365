@@ -60,7 +60,7 @@ describe(commands.NAVIGATION_NODE_LIST, () => {
 
   it('gets nodes from the top navigation', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/navigation/topnavigationbar`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/navigation/topnavigationbar`) > -1) {
         return Promise.resolve({ value: [{ "Id": 2003, "IsDocLib": true, "IsExternal": false, "IsVisible": true, "ListTemplateType": 0, "Title": "Node 1", "Url": "/sites/team-a/SitePages/page1.aspx" }, { "Id": 2004, "IsDocLib": true, "IsExternal": false, "IsVisible": true, "ListTemplateType": 0, "Title": "Node 2", "Url": "/sites/team-a/SitePages/page2.aspx" }] });
       }
 
@@ -80,7 +80,7 @@ describe(commands.NAVIGATION_NODE_LIST, () => {
 
   it('gets nodes from the quick launch', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/navigation/quicklaunch`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/navigation/quicklaunch`) > -1) {
         return Promise.resolve({ value: [{ "Id": 2003, "IsDocLib": true, "IsExternal": false, "IsVisible": true, "ListTemplateType": 0, "Title": "Node 1", "Url": "/sites/team-a/SitePages/page1.aspx" }, { "Id": 2004, "IsDocLib": true, "IsExternal": false, "IsVisible": true, "ListTemplateType": 0, "Title": "Node 2", "Url": "/sites/team-a/SitePages/page2.aspx" }] });
       }
 
@@ -100,7 +100,7 @@ describe(commands.NAVIGATION_NODE_LIST, () => {
 
   it('correctly handles random API error', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/navigation/topnavigationbar`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/navigation/topnavigationbar`) > -1) {
         return Promise.reject({ error: 'An error has occurred' });
       }
 
@@ -120,7 +120,7 @@ describe(commands.NAVIGATION_NODE_LIST, () => {
 
   it('correctly handles random API error (string error)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/navigation/topnavigationbar`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/navigation/topnavigationbar`) > -1) {
         return Promise.reject('An error has occurred');
       }
 

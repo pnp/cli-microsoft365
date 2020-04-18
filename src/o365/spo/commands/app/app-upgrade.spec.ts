@@ -62,12 +62,13 @@ describe(commands.APP_UPGRADE, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf('/common/oauth2/token') > -1) {
+      if ((opts.url as string).indexOf('/common/oauth2/token') > -1) {
         return Promise.resolve('abc');
       }
 
-      if (opts.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/upgrade`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/upgrade`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve();
         }
@@ -102,12 +103,13 @@ describe(commands.APP_UPGRADE, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf('/common/oauth2/token') > -1) {
+      if ((opts.url as string).indexOf('/common/oauth2/token') > -1) {
         return Promise.resolve('abc');
       }
 
-      if (opts.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/upgrade`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/upgrade`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve();
         }
@@ -142,12 +144,13 @@ describe(commands.APP_UPGRADE, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf('/common/oauth2/token') > -1) {
+      if ((opts.url as string).indexOf('/common/oauth2/token') > -1) {
         return Promise.resolve('abc');
       }
 
-      if (opts.url.indexOf(`/_api/web/sitecollectionappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/upgrade`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`/_api/web/sitecollectionappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/upgrade`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve();
         }
@@ -182,12 +185,13 @@ describe(commands.APP_UPGRADE, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf('/common/oauth2/token') > -1) {
+      if ((opts.url as string).indexOf('/common/oauth2/token') > -1) {
         return Promise.resolve('abc');
       }
 
-      if (opts.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/upgrade`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/upgrade`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.reject({
             error: JSON.stringify({
@@ -222,12 +226,13 @@ describe(commands.APP_UPGRADE, () => {
 
   it('correctly handles random API error', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/common/oauth2/token') > -1) {
+      if ((opts.url as string).indexOf('/common/oauth2/token') > -1) {
         return Promise.resolve('abc');
       }
 
-      if (opts.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/upgrade`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/upgrade`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.reject({ error: 'An error has occurred' });
         }
@@ -252,12 +257,13 @@ describe(commands.APP_UPGRADE, () => {
 
   it('correctly handles random API error (error message is not ODataError)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/common/oauth2/token') > -1) {
+      if ((opts.url as string).indexOf('/common/oauth2/token') > -1) {
         return Promise.resolve('abc');
       }
 
-      if (opts.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/upgrade`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/upgrade`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.reject({ error: JSON.stringify({ message: 'An error has occurred' }) });
         }
@@ -282,12 +288,13 @@ describe(commands.APP_UPGRADE, () => {
 
   it('correctly handles API OData error', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/common/oauth2/token') > -1) {
+      if ((opts.url as string).indexOf('/common/oauth2/token') > -1) {
         return Promise.resolve('abc');
       }
 
-      if (opts.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/upgrade`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/upgrade`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.reject({
             error: JSON.stringify({

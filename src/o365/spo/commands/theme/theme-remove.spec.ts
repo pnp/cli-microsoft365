@@ -87,7 +87,7 @@ describe(commands.THEME_REMOVE, () => {
   it('removes theme successfully without prompting with confirmation argument', (done) => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
 
-      if (opts.url.indexOf('/_api/thememanager/DeleteTenantTheme') > -1) {
+      if ((opts.url as string).indexOf('/_api/thememanager/DeleteTenantTheme') > -1) {
         return Promise.resolve('Correct Url')
       }
 
@@ -118,7 +118,7 @@ describe(commands.THEME_REMOVE, () => {
   it('removes theme successfully without prompting with confirmation argument (debug)', (done) => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
 
-      if (opts.url.indexOf('/_api/thememanager/DeleteTenantTheme') > -1) {
+      if ((opts.url as string).indexOf('/_api/thememanager/DeleteTenantTheme') > -1) {
         return Promise.resolve('Correct Url')
       }
 
@@ -149,7 +149,7 @@ describe(commands.THEME_REMOVE, () => {
   it('removes theme successfully when prompt confirmed', (done) => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
 
-      if (opts.url.indexOf('/_api/thememanager/DeleteTenantTheme') > -1) {
+      if ((opts.url as string).indexOf('/_api/thememanager/DeleteTenantTheme') > -1) {
         return Promise.resolve('Correct Url')
       }
 
@@ -183,7 +183,7 @@ describe(commands.THEME_REMOVE, () => {
   it('handles error when removing theme', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
 
-      if (opts.url.indexOf('/_api/thememanager/DeleteTenantTheme') > -1) {
+      if ((opts.url as string).indexOf('/_api/thememanager/DeleteTenantTheme') > -1) {
         return Promise.reject('An error has occurred');
       }
 

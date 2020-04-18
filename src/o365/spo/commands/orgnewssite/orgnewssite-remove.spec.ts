@@ -72,8 +72,9 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
 
   it('completes a remove request - confirm parameter', (done) => {
     const svcListRequest = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers['X-RequestDigest']) {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers &&
+          opts.headers['X-RequestDigest']) {
           return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "8992299e-a003-4000-7686-fda36e26a53c" }, 22, []]));
         }
       }
@@ -102,8 +103,9 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
 
   it('completes a remove request - prompt confirmed', (done) => {
     const svcListRequest = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers['X-RequestDigest']) {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers &&
+          opts.headers['X-RequestDigest']) {
           return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "8992299e-a003-4000-7686-fda36e26a53c" }, 22, []]));
         }
       }
@@ -135,8 +137,9 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
 
   it('handles error during remove request', (done) => {
     const svcListRequest = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers['X-RequestDigest']) {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers &&
+          opts.headers['X-RequestDigest']) {
           return Promise.resolve(JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": {

@@ -60,7 +60,7 @@ describe(commands.SITE_ADD, () => {
 
   it('creates modern team site using the correct endpoint', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -77,7 +77,7 @@ describe(commands.SITE_ADD, () => {
 
   it('creates modern team site using the correct endpoint (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
         return Promise.resolve({ SiteUrl: 'https://contoso.sharepoint.com/sites/team1', ErrorMessage: null });
       }
 
@@ -96,7 +96,7 @@ describe(commands.SITE_ADD, () => {
     const expected = 'Team 1';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
         actual = opts.body.displayName;
         return Promise.resolve({ ErrorMessage: null });
       }
@@ -119,7 +119,7 @@ describe(commands.SITE_ADD, () => {
     const expected = 'team1';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
         actual = opts.body.alias;
         return Promise.resolve({ ErrorMessage: null });
       }
@@ -142,7 +142,7 @@ describe(commands.SITE_ADD, () => {
     const expected = true;
     let actual = false;
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
         actual = opts.body.isPublic;
         return Promise.resolve({ ErrorMessage: null });
       }
@@ -165,7 +165,7 @@ describe(commands.SITE_ADD, () => {
     const expected = undefined;
     let actual = false;
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
         actual = opts.body.isPublic;
         return Promise.resolve({ ErrorMessage: null });
       }
@@ -188,7 +188,7 @@ describe(commands.SITE_ADD, () => {
     const expected = 'Site for team 1';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
         actual = opts.body.optionalParams.Description;
         return Promise.resolve({ ErrorMessage: null });
       }
@@ -211,7 +211,7 @@ describe(commands.SITE_ADD, () => {
     const expected = '';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
         actual = opts.body.optionalParams.Description;
         return Promise.resolve({ ErrorMessage: null });
       }
@@ -234,7 +234,7 @@ describe(commands.SITE_ADD, () => {
     const expected = 'LBI';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
         actual = opts.body.optionalParams.CreationOptions.Classification;
         return Promise.resolve({ ErrorMessage: null });
       }
@@ -257,7 +257,7 @@ describe(commands.SITE_ADD, () => {
     const expected = '';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
         actual = opts.body.optionalParams.CreationOptions.Classification;
         return Promise.resolve({ ErrorMessage: null });
       }
@@ -280,7 +280,7 @@ describe(commands.SITE_ADD, () => {
     const expected = true;
     let actual = false;
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
         actual = opts.body.optionalParams.CreationOptions.results.indexOf('SPSiteLanguage:1033') > -1;
         return Promise.resolve({ ErrorMessage: null });
       }
@@ -303,7 +303,7 @@ describe(commands.SITE_ADD, () => {
     const expected = JSON.stringify({ results: ['admin@contoso.com'] });
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
         actual = JSON.stringify(opts.body.optionalParams.Owners);
         return Promise.resolve({ ErrorMessage: null });
       }
@@ -326,7 +326,7 @@ describe(commands.SITE_ADD, () => {
     const expected = JSON.stringify({ results: ['admin@contoso.com', 'steve@contoso.com'] });
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
         actual = JSON.stringify(opts.body.optionalParams.Owners);
         return Promise.resolve({ ErrorMessage: null });
       }
@@ -349,7 +349,7 @@ describe(commands.SITE_ADD, () => {
     const expected = JSON.stringify({ results: ['admin@contoso.com', 'steve@contoso.com'] });
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
         actual = JSON.stringify(opts.body.optionalParams.Owners);
         return Promise.resolve({ ErrorMessage: null });
       }
@@ -370,7 +370,7 @@ describe(commands.SITE_ADD, () => {
 
   it('correctly handles error when modern team site with the specified alias already exists', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
         return Promise.resolve({ ErrorMessage: 'The group alias already exists.' });
       }
 
@@ -406,7 +406,7 @@ describe(commands.SITE_ADD, () => {
 
   it('creates communication site using the correct endpoint', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/SPSiteManager/Create`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         return Promise.resolve({ SiteStatus: 2, SiteUrl: "https://contoso.sharepoint.com/sites/marketing" });
       }
 
@@ -425,7 +425,7 @@ describe(commands.SITE_ADD, () => {
     const expected = 'Marketing';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/SPSiteManager/Create`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.body.request.Title;
         return Promise.resolve({});
       }
@@ -448,7 +448,7 @@ describe(commands.SITE_ADD, () => {
     const expected = 'https://contoso.sharepoint.com/sites/marketing';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/SPSiteManager/Create`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.body.request.Url;
         return Promise.resolve({});
       }
@@ -471,7 +471,7 @@ describe(commands.SITE_ADD, () => {
     const expected = true;
     let actual = false;
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/SPSiteManager/Create`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.body.request.ShareByEmailEnabled;
         return Promise.resolve({});
       }
@@ -494,7 +494,7 @@ describe(commands.SITE_ADD, () => {
     const expected = true;
     let actual = false;
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/SPSiteManager/Create`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.body.request.ShareByEmailEnabled;
         return Promise.resolve({});
       }
@@ -533,7 +533,7 @@ describe(commands.SITE_ADD, () => {
     const expected = undefined;
     let actual = false;
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/SPSiteManager/Create`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.body.request.ShareByEmailEnabled;
         return Promise.resolve({});
       }
@@ -556,7 +556,7 @@ describe(commands.SITE_ADD, () => {
     const expected = 'Site for the marketing department';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/SPSiteManager/Create`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.body.request.Description;
         return Promise.resolve({});
       }
@@ -579,7 +579,7 @@ describe(commands.SITE_ADD, () => {
     const expected = '';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/SPSiteManager/Create`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.body.request.Description;
         return Promise.resolve({});
       }
@@ -602,7 +602,7 @@ describe(commands.SITE_ADD, () => {
     const expected = 'LBI';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/SPSiteManager/Create`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.body.request.Classification;
         return Promise.resolve({});
       }
@@ -625,7 +625,7 @@ describe(commands.SITE_ADD, () => {
     const expected = '';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
         actual = opts.body.request.Classification;
         return Promise.resolve({});
       }
@@ -648,7 +648,7 @@ describe(commands.SITE_ADD, () => {
     const expected = '00000000-0000-0000-0000-000000000000';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/SPSiteManager/Create`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.body.request.SiteDesignId;
         return Promise.resolve({});
       }
@@ -671,7 +671,7 @@ describe(commands.SITE_ADD, () => {
     const expected = '6142d2a0-63a5-4ba0-aede-d9fefca2c767';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/SPSiteManager/Create`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.body.request.SiteDesignId;
         return Promise.resolve({});
       }
@@ -694,7 +694,7 @@ describe(commands.SITE_ADD, () => {
     const expected = 'f6cc5403-0d63-442e-96c0-285923709ffc';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/SPSiteManager/Create`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.body.request.SiteDesignId;
         return Promise.resolve({});
       }
@@ -717,7 +717,7 @@ describe(commands.SITE_ADD, () => {
     const expected = '00000000-0000-0000-0000-000000000000';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/SPSiteManager/Create`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.body.request.SiteDesignId;
         return Promise.resolve({});
       }
@@ -740,7 +740,7 @@ describe(commands.SITE_ADD, () => {
     const expected = '92398ab7-45c7-486b-81fa-54da2ee0738a';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/SPSiteManager/Create`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.body.request.SiteDesignId;
         return Promise.resolve({});
       }
@@ -763,7 +763,7 @@ describe(commands.SITE_ADD, () => {
     const expected = 1033;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/SPSiteManager/Create`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.body.request.Lcid;
         return Promise.resolve({});
       }

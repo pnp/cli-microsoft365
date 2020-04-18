@@ -17,7 +17,7 @@ describe(commands.O365GROUP_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
     auth.service.connected = true;
   });
@@ -322,6 +322,7 @@ describe(commands.O365GROUP_ADD, () => {
     });
     sinon.stub(request, 'put').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/photo/$value' &&
+        opts.headers &&
         opts.headers['content-type'] === 'image/png') {
         return Promise.resolve();
       }
@@ -402,6 +403,7 @@ describe(commands.O365GROUP_ADD, () => {
     });
     sinon.stub(request, 'put').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/photo/$value' &&
+        opts.headers &&
         opts.headers['content-type'] === 'image/jpeg') {
         return Promise.resolve();
       }
@@ -482,6 +484,7 @@ describe(commands.O365GROUP_ADD, () => {
     });
     sinon.stub(request, 'put').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/photo/$value' &&
+        opts.headers &&
         opts.headers['content-type'] === 'image/gif') {
         return Promise.resolve();
       }
@@ -569,6 +572,7 @@ describe(commands.O365GROUP_ADD, () => {
     });
     sinon.stub(global, 'setTimeout').callsFake((fn, to) => {
       fn();
+      return {} as any;
     });
 
     cmdInstance.action({ options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.png' } }, (err?: any) => {
@@ -631,6 +635,7 @@ describe(commands.O365GROUP_ADD, () => {
     });
     sinon.stub(global, 'setTimeout').callsFake((fn, to) => {
       fn();
+      return {} as any;
     });
 
     cmdInstance.action({ options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.png' } }, (err?: any) => {

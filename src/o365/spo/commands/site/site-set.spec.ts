@@ -257,7 +257,7 @@ describe(commands.SITE_SET, () => {
 
   it('correctly handles site not found error', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return Promise.reject(new Error("404 - \"404 FILE NOT FOUND\""));
       }
 
@@ -277,7 +277,7 @@ describe(commands.SITE_SET, () => {
 
   it('correctly handles API error', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return Promise.resolve(JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7303.1206", "ErrorInfo": {

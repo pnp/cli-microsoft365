@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from 'path';
-const uuidv4 = require('uuid/v4');
+import { v4 } from 'uuid';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import Command, {
@@ -62,7 +62,7 @@ class PaSolutionInitCommand extends Command {
         "$publisherName$": publisherName,
         "$customizationPrefix$": publisherPrefix,
         "$customizationOptionValuePrefix$": customizationOptionValuePrefix,
-        "$cdsProjectGuid$": uuidv4(),
+        "$cdsProjectGuid$": v4(),
         "solutionprojecttype": workingDirectoryName,
         "$solutionName$": workingDirectoryName
       };

@@ -68,7 +68,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
 
   it('removes existing tenant property without prompting with confirmation argument', (done) => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
+      if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
         return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": null, "TraceCorrelationId": "4456299e-d09e-4000-ae61-ddde716daa27" }, 31, { "IsNull": false }, 33, { "IsNull": false }, 35, { "IsNull": false }]));
       }
       return Promise.reject('Invalid request');
@@ -127,7 +127,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
 
   it('removes tenant property when prompt confirmed', (done) => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
+      if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
         return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": null, "TraceCorrelationId": "4456299e-d09e-4000-ae61-ddde716daa27" }, 31, { "IsNull": false }, 33, { "IsNull": false }, 35, { "IsNull": false }]));
       }
       return Promise.reject('Invalid request');
@@ -151,7 +151,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
 
   it('correctly reports when trying to remove an nonexistent property', (done) => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
+      if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
         return Promise.resolve(JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": {
@@ -226,7 +226,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
   });
 
   it('doesn\'t fail if the parent doesn\'t define options', () => {
-    sinon.stub(Command.prototype, 'options').callsFake(() => { return undefined; });
+    sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
     const options = (command.options() as CommandOption[]);
     Utils.restore(Command.prototype.options);
     assert(options.length > 0);

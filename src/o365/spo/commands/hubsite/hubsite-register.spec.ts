@@ -62,7 +62,7 @@ describe(commands.HUBSITE_REGISTER, () => {
 
   it('registers site as a hub site', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/site/RegisterHubSite`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/site/RegisterHubSite`) > -1) {
         return Promise.resolve({
           "Description": null,
           "ID": "255a50b2-527f-4413-8485-57f4c17a24d1",
@@ -100,7 +100,7 @@ describe(commands.HUBSITE_REGISTER, () => {
 
   it('registers site as a hub site (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/site/RegisterHubSite`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/site/RegisterHubSite`) > -1) {
         return Promise.resolve({
           "Description": null,
           "ID": "255a50b2-527f-4413-8485-57f4c17a24d1",

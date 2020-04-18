@@ -61,7 +61,7 @@ describe(commands.MAIL_SEND, () => {
   it('Send an email to one recipient (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
         return Promise.resolve();
       }
 
@@ -90,7 +90,7 @@ describe(commands.MAIL_SEND, () => {
   it('Send an email to one recipient', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
         return Promise.resolve();
       }
 
@@ -119,7 +119,7 @@ describe(commands.MAIL_SEND, () => {
   it('Send an email to one recipient and from someone (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
         return Promise.resolve();
       }
 
@@ -148,7 +148,7 @@ describe(commands.MAIL_SEND, () => {
   it('Send an email to one recipient and from someone', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
         return Promise.resolve();
       }
 
@@ -177,7 +177,7 @@ describe(commands.MAIL_SEND, () => {
   it('Send an email to one recipient and from some peoples (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
         return Promise.resolve();
       }
 
@@ -206,7 +206,7 @@ describe(commands.MAIL_SEND, () => {
   it('Send an email to one recipient and from some peoples', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
         return Promise.resolve();
       }
 
@@ -235,7 +235,7 @@ describe(commands.MAIL_SEND, () => {
   it('Send an email to one recipient and CC someone (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
         return Promise.resolve();
       }
 
@@ -264,7 +264,7 @@ describe(commands.MAIL_SEND, () => {
   it('Send an email to one recipient and CC someone', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
         return Promise.resolve();
       }
 
@@ -293,7 +293,7 @@ describe(commands.MAIL_SEND, () => {
   it('Send an email to one recipient and BCC someone (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
         return Promise.resolve();
       }
 
@@ -322,7 +322,7 @@ describe(commands.MAIL_SEND, () => {
   it('Send an email to one recipient and BCC someone', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
         return Promise.resolve();
       }
 
@@ -351,7 +351,7 @@ describe(commands.MAIL_SEND, () => {
   it('Send an email to one recipient with additional header (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
         return Promise.resolve();
       }
 
@@ -380,7 +380,7 @@ describe(commands.MAIL_SEND, () => {
   it('Send an email to one recipient with additional header', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
         return Promise.resolve();
       }
 

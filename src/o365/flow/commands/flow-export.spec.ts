@@ -25,7 +25,7 @@ describe(commands.FLOW_EXPORT, () => {
   const nonZipFileFlowId = '694d21e4-49be-4e19-987b-074889e45c75';
 
   let postFakes = (opts: any) => {
-    if (opts.url.indexOf(notFoundEnvironmentId) > -1) {
+    if ((opts.url as string).indexOf(notFoundEnvironmentId) > -1) {
       return Promise.reject({
         "error": {
           "code": "EnvironmentAccessDenied",
@@ -41,7 +41,7 @@ describe(commands.FLOW_EXPORT, () => {
         }]
       });
     }
-    if (opts.url.indexOf('/listPackageResources?api-version=2016-11-01') > -1) {
+    if ((opts.url as string).indexOf('/listPackageResources?api-version=2016-11-01') > -1) {
       return Promise.resolve(
         {
           "baseResourceIds": [`/providers/Microsoft.Flow/flows/${foundFlowId}`],
@@ -50,7 +50,7 @@ describe(commands.FLOW_EXPORT, () => {
         }
       );
     }
-    if (opts.url.indexOf('/exportPackage?api-version=2016-11-01') > -1 && JSON.stringify(opts.body || {}).indexOf(nonZipFileFlowId) > -1) {
+    if ((opts.url as string).indexOf('/exportPackage?api-version=2016-11-01') > -1 && JSON.stringify(opts.body || {}).indexOf(nonZipFileFlowId) > -1) {
       return Promise.resolve(
         {
           "details": { "createdTime": "2018-09-16T04:24:28.365117Z", "packageTelemetryId": "448a7d93-7ce3-4e6a-88c9-57cf2479e62e" },
@@ -60,7 +60,7 @@ describe(commands.FLOW_EXPORT, () => {
         }
       );
     }
-    if (opts.url.indexOf('/exportPackage?api-version=2016-11-01') > -1) {
+    if ((opts.url as string).indexOf('/exportPackage?api-version=2016-11-01') > -1) {
       return Promise.resolve(
         {
           "details": { "createdTime": "2018-09-16T04:24:28.365117Z", "packageTelemetryId": "448a7d93-7ce3-4e6a-88c9-57cf2479e62e" },
@@ -70,7 +70,7 @@ describe(commands.FLOW_EXPORT, () => {
         }
       );
     }
-    if (opts.url.indexOf('/exportToARMTemplate?api-version=2016-11-01') > -1) {
+    if ((opts.url as string).indexOf('/exportToARMTemplate?api-version=2016-11-01') > -1) {
       return Promise.resolve(
         {
         }
@@ -80,7 +80,7 @@ describe(commands.FLOW_EXPORT, () => {
   }
 
   let getFakes = (opts: any) => {
-    if (opts.url.indexOf(notFoundEnvironmentId) > -1) {
+    if ((opts.url as string).indexOf(notFoundEnvironmentId) > -1) {
       return Promise.reject({
         "error": {
           "code": "EnvironmentAccessDenied",
@@ -88,7 +88,7 @@ describe(commands.FLOW_EXPORT, () => {
         }
       });
     }
-    if (opts.url.indexOf(notFoundFlowId) > -1) {
+    if ((opts.url as string).indexOf(notFoundFlowId) > -1) {
       return Promise.resolve({
         errors: [{
           "code": "ConnectionAuthorizationFailed",

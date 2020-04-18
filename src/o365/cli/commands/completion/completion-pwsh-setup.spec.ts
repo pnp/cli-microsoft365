@@ -98,7 +98,7 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
 
   it('creates profile file when it does not exist and appends the completion script to it', (done) => {
     const profilePath: string = '/Users/steve/.config/powershell/Microsoft.PowerShell_profile.ps1';
-    sinon.stub(fs, 'existsSync').callsFake((path) => path.indexOf('.ps1') < 0);
+    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().indexOf('.ps1') < 0);
     const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
     const appendFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'appendFileSync').callsFake(() => { });
 
@@ -116,7 +116,7 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
 
   it('creates profile file when it does not exist and appends the completion script to it', (done) => {
     const profilePath: string = '/Users/steve/.config/powershell/Microsoft.PowerShell_profile.ps1';
-    sinon.stub(fs, 'existsSync').callsFake((path) => path.indexOf('.ps1') < 0);
+    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().indexOf('.ps1') < 0);
     const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
     const appendFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'appendFileSync').callsFake(() => { });
 
@@ -197,7 +197,7 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
   it('handles exception when creating profile file', (done) => {
     const profilePath: string = '/Users/steve/.config/powershell/Microsoft.PowerShell_profile.ps1';
     const error: string = 'Unexpected error';
-    sinon.stub(fs, 'existsSync').callsFake((path) => path.indexOf('.ps1') < 0);
+    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().indexOf('.ps1') < 0);
     const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake((path) => { throw error; });
     const appendFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'appendFileSync').callsFake(() => { });
 

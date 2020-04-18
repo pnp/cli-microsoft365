@@ -10,7 +10,7 @@ describe('KeychainTokenStorage', () => {
   it('executes right command to get password from Keychain', (done) => {
     let file = '';
     let args: string[] = [];
-    sinon.stub(childProcess, 'execFile').callsFake((f, a) => { file = f; args = a });
+    sinon.stub(childProcess, 'execFile').callsFake((f, a) => { file = f; args = a as any; return {} as childProcess.ChildProcess; });
     keychain.get();
     try {
       assert.equal(file, '/usr/bin/security');
@@ -97,7 +97,7 @@ describe('KeychainTokenStorage', () => {
   it('executes right command to set password in Keychain', (done) => {
     let file = '';
     let args: string[] = [];
-    sinon.stub(childProcess, 'execFile').callsFake((f, a) => { file = f; args = a });
+    sinon.stub(childProcess, 'execFile').callsFake((f, a) => { file = f; args = a as any; return {} as childProcess.ChildProcess; });
     const token = 'ABC';
     keychain.set(token);
     try {
@@ -157,7 +157,7 @@ describe('KeychainTokenStorage', () => {
   it('executes right command to remove password from Keychain', (done) => {
     let file = '';
     let args: string[] = [];
-    sinon.stub(childProcess, 'execFile').callsFake((f, a) => { file = f; args = a });
+    sinon.stub(childProcess, 'execFile').callsFake((f, a) => { file = f; args = a as any; return {} as childProcess.ChildProcess; });
     keychain.remove();
     try {
       assert.equal(file, '/usr/bin/security');

@@ -53,7 +53,7 @@ describe(commands.APPPAGE_SET, () => {
   it("updates the single-part app page", done => {
     sinon.stub(request, "post").callsFake(opts => {
       if (
-        opts.url.indexOf(`_api/sitepages/Pages/UpdateFullPageApp`) > -1 &&
+        (opts.url as string).indexOf(`_api/sitepages/Pages/UpdateFullPageApp`) > -1 &&
         opts.body.webPartDataAsJson === "{}"
       ) {
         return Promise.resolve("Done");
@@ -87,7 +87,7 @@ describe(commands.APPPAGE_SET, () => {
   it("fails to update the single-part app page if request is rejected", done => {
     sinon.stub(request, "post").callsFake(opts => {
       if (
-        opts.url.indexOf(`_api/sitepages/Pages/UpdateFullPageApp`) > -1 &&
+        (opts.url as string).indexOf(`_api/sitepages/Pages/UpdateFullPageApp`) > -1 &&
         opts.body.serverRelativeUrl.indexOf("failme")
       ) {
         return Promise.reject("Failed to update the single-part app page");

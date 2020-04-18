@@ -69,7 +69,7 @@ describe(commands.SITEDESIGN_REMOVE, () => {
 
   it('removes the specified site design without prompting for confirmation when confirm option specified', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.DeleteSiteDesign`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.DeleteSiteDesign`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b'
         })) {
@@ -94,7 +94,7 @@ describe(commands.SITEDESIGN_REMOVE, () => {
 
   it('removes the specified site design without prompting for confirmation when confirm option specified (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.DeleteSiteDesign`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.DeleteSiteDesign`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b'
         })) {

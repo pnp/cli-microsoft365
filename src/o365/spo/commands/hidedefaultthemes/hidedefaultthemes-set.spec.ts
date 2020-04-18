@@ -63,7 +63,7 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
   it('sets the value of the HideDefaultThemes setting', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf('/_api/thememanager/SetHideDefaultThemes') > -1) {
+      if ((opts.url as string).indexOf('/_api/thememanager/SetHideDefaultThemes') > -1) {
         return Promise.resolve('Correct Url')
       }
 
@@ -98,7 +98,7 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
   it('sets the value of the HideDefaultThemes setting (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf('/_api/thememanager/SetHideDefaultThemes') > -1) {
+      if ((opts.url as string).indexOf('/_api/thememanager/SetHideDefaultThemes') > -1) {
         return Promise.resolve('Correct Url')
       }
 
@@ -133,7 +133,7 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
   it('handles error when setting the value of the HideDefaultThemes setting', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf('/_api/thememanager/SetHideDefaultThemes') > -1) {
+      if ((opts.url as string).indexOf('/_api/thememanager/SetHideDefaultThemes') > -1) {
         return Promise.reject('An error has occurred');
       }
 

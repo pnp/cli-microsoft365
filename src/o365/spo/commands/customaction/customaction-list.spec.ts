@@ -60,7 +60,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
 
   it('getCustomActions called once when scope is Web', (done) => {
     const getRequestSpy = sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/Web/UserCustomActions') > -1) {
+      if ((opts.url as string).indexOf('/_api/Web/UserCustomActions') > -1) {
         return Promise.resolve({ value: [] });
       }
 
@@ -97,7 +97,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
 
   it('getCustomActions called once when scope is Site', (done) => {
     const getRequestSpy = sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/Site/UserCustomActions') > -1) {
+      if ((opts.url as string).indexOf('/_api/Site/UserCustomActions') > -1) {
         return Promise.resolve({ value: [] });
       }
 
@@ -133,7 +133,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
 
   it('returns all properties for output JSON', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/Site/UserCustomActions') > -1) {
+      if ((opts.url as string).indexOf('/_api/Site/UserCustomActions') > -1) {
         return Promise.resolve({ value: [{ "ClientSideComponentId": "b41916e7-e69d-467f-b37f-ff8ecf8f99f2", "ClientSideComponentProperties": "{\"testMessage\":\"Test message\"}", "CommandUIExtension": null, "Description": null, "Group": null, "Id": "8b86123a-3194-49cf-b167-c044b613a48a", "ImageUrl": null, "Location": "ClientSideExtension.ApplicationCustomizer", "Name": "YourName", "RegistrationId": null, "RegistrationType": 0, "Rights": { "High": "0", "Low": "0" }, "Scope": 3, "ScriptBlock": null, "ScriptSrc": null, "Sequence": 0, "Title": "YourAppCustomizer", "Url": null, "VersionOfUserCustomAction": "16.0.1.0" }, { "ClientSideComponentId": "b41916e7-e69d-467f-b37f-ff8ecf8f99f2", "ClientSideComponentProperties": "{\"testMessage\":\"Test message\"}", "CommandUIExtension": null, "Description": null, "Group": null, "Id": "9115bb61-d9f1-4ed4-b7b7-e5d1834e60f5", "ImageUrl": null, "Location": "ClientSideExtension.ApplicationCustomizer", "Name": "YourName", "RegistrationId": null, "RegistrationType": 0, "Rights": { "High": "0", "Low": "0" }, "Scope": 3, "ScriptBlock": null, "ScriptSrc": null, "Sequence": 0, "Title": "YourAppCustomizer", "Url": null, "VersionOfUserCustomAction": "16.0.1.0" }] });
       }
 
@@ -163,11 +163,11 @@ describe(commands.CUSTOMACTION_LIST, () => {
 
   it('getCustomActions called twice when scope is All', (done) => {
     const getRequestSpy = sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/Web/UserCustomActions') > -1) {
+      if ((opts.url as string).indexOf('/_api/Web/UserCustomActions') > -1) {
         return Promise.resolve({ value: [] });
       }
 
-      if (opts.url.indexOf('/_api/Site/UserCustomActions') > -1) {
+      if ((opts.url as string).indexOf('/_api/Site/UserCustomActions') > -1) {
         return Promise.resolve({ value: [] });
       }
 
@@ -198,7 +198,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
 
   it('searchAllScopes called when scope is All', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/Web/UserCustomActions') > -1) {
+      if ((opts.url as string).indexOf('/_api/Web/UserCustomActions') > -1) {
         return Promise.resolve('abc');
       }
 
@@ -232,11 +232,11 @@ describe(commands.CUSTOMACTION_LIST, () => {
 
   it('searchAllScopes correctly handles no custom actions when All scope specified', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/Web/UserCustomActions') > -1) {
+      if ((opts.url as string).indexOf('/_api/Web/UserCustomActions') > -1) {
         return Promise.resolve({ value: [] });
       }
 
-      if (opts.url.indexOf('/_api/Site/UserCustomActions') > -1) {
+      if ((opts.url as string).indexOf('/_api/Site/UserCustomActions') > -1) {
         return Promise.resolve({ value: [] });
       }
 
@@ -263,11 +263,11 @@ describe(commands.CUSTOMACTION_LIST, () => {
 
   it('correctly handles no custom actions when All scope specified (verbose)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/Web/UserCustomActions') > -1) {
+      if ((opts.url as string).indexOf('/_api/Web/UserCustomActions') > -1) {
         return Promise.resolve({ value: [] });
       }
 
-      if (opts.url.indexOf('/_api/Site/UserCustomActions') > -1) {
+      if ((opts.url as string).indexOf('/_api/Site/UserCustomActions') > -1) {
         return Promise.resolve({ value: [] });
       }
 
@@ -295,7 +295,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
   it('correctly handles web custom action reject request', (done) => {
     const err = 'Invalid web custom action reject request';
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/Web/UserCustomActions') > -1) {
+      if ((opts.url as string).indexOf('/_api/Web/UserCustomActions') > -1) {
         return Promise.reject(err);
       }
 
@@ -322,11 +322,11 @@ describe(commands.CUSTOMACTION_LIST, () => {
   it('correctly handles site custom action reject request', (done) => {
     const err = 'Invalid site custom action reject request';
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/Web/UserCustomActions') > -1) {
+      if ((opts.url as string).indexOf('/_api/Web/UserCustomActions') > -1) {
         return Promise.resolve({ value: [] });
       }
 
-      if (opts.url.indexOf('/_api/Site/UserCustomActions') > -1) {
+      if ((opts.url as string).indexOf('/_api/Site/UserCustomActions') > -1) {
         return Promise.reject(err);
       }
 
@@ -374,7 +374,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
   });
 
   it('doesn\'t fail if the parent doesn\'t define options', () => {
-    sinon.stub(Command.prototype, 'options').callsFake(() => { return undefined; });
+    sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
     const options = (command.options() as CommandOption[]);
     Utils.restore(Command.prototype.options);
     assert(options.length > 0);
@@ -387,7 +387,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
 
   it('retrieves all available user custom actions', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/Web/UserCustomActions') > -1) {
+      if ((opts.url as string).indexOf('/_api/Web/UserCustomActions') > -1) {
         return Promise.resolve({
           value: [
             {
@@ -399,7 +399,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
         });
       }
 
-      if (opts.url.indexOf('/_api/Site/UserCustomActions') > -1) {
+      if ((opts.url as string).indexOf('/_api/Site/UserCustomActions') > -1) {
         return Promise.resolve({
           value: [
             {
@@ -441,7 +441,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
 
   it('correctly handles no scope entered (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/Web/UserCustomActions') > -1) {
+      if ((opts.url as string).indexOf('/_api/Web/UserCustomActions') > -1) {
         return Promise.resolve({
           value: [
             {
@@ -453,7 +453,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
         });
       }
 
-      if (opts.url.indexOf('/_api/Site/UserCustomActions') > -1) {
+      if ((opts.url as string).indexOf('/_api/Site/UserCustomActions') > -1) {
         return Promise.resolve({
           value: [
             {

@@ -186,6 +186,8 @@ describe(commands.O365GROUP_USER_ADD, () => {
         JSON.stringify(opts.body) === `{"@odata.id":"https://graph.microsoft.com/v1.0/directoryObjects/00000000-0000-0000-0000-000000000001"}`) {
         addMemberRequestIssued = true;
       }
+
+      return Promise.resolve();
     });
 
     cmdInstance.action = command.action();
@@ -219,6 +221,8 @@ describe(commands.O365GROUP_USER_ADD, () => {
         JSON.stringify(opts.body) === `{"@odata.id":"https://graph.microsoft.com/v1.0/directoryObjects/00000000-0000-0000-0000-000000000001"}`) {
         addMemberRequestIssued = true;
       }
+
+      return Promise.resolve();
     });
 
     cmdInstance.action = command.action();
@@ -252,6 +256,8 @@ describe(commands.O365GROUP_USER_ADD, () => {
         JSON.stringify(opts.body) === `{"@odata.id":"https://graph.microsoft.com/v1.0/directoryObjects/00000000-0000-0000-0000-000000000001"}`) {
         addMemberRequestIssued = true;
       }
+
+      return Promise.resolve();
     });
 
     cmdInstance.action = command.action();
@@ -285,6 +291,8 @@ describe(commands.O365GROUP_USER_ADD, () => {
         JSON.stringify(opts.body) === `{"@odata.id":"https://graph.microsoft.com/v1.0/directoryObjects/00000000-0000-0000-0000-000000000001"}`) {
         addMemberRequestIssued = true;
       }
+
+      return Promise.resolve();
     });
 
     cmdInstance.action = command.action();
@@ -317,6 +325,8 @@ describe(commands.O365GROUP_USER_ADD, () => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/members/$ref`) {
         addMemberRequestIssued = true;
       }
+
+      return Promise.resolve();
     });
 
     cmdInstance.action = command.action();

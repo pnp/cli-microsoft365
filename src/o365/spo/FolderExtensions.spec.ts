@@ -14,7 +14,7 @@ describe('FolderExtensions', () => {
     folderAddResp: any = null
   ) => {
     return sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/GetFolderByServerRelativePath') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativePath') > -1) {
         if (folderAddResp) {
           return folderAddResp;
         } else {
@@ -30,7 +30,7 @@ describe('FolderExtensions', () => {
     getFolderByServerRelativeUrlResp: any = null
   ) => {
     return sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/GetFolderByServerRelativeUrl(') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl(') > -1) {
         if (getFolderByServerRelativeUrlResp) {
           return getFolderByServerRelativeUrlResp;
         } else {

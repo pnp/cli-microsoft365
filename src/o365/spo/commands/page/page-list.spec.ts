@@ -60,7 +60,7 @@ describe(commands.PAGE_LIST, () => {
 
   it('lists all modern pages', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists/SitePages/rootfolder/files?$expand=ListItemAllFields/ClientSideApplicationId&$orderby=Name`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/lists/SitePages/rootfolder/files?$expand=ListItemAllFields/ClientSideApplicationId&$orderby=Name`) > -1) {
         return Promise.resolve({
           "value": [
             {
@@ -202,7 +202,7 @@ describe(commands.PAGE_LIST, () => {
 
   it('lists all modern pages (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists/SitePages/rootfolder/files?$expand=ListItemAllFields/ClientSideApplicationId&$orderby=Name`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/lists/SitePages/rootfolder/files?$expand=ListItemAllFields/ClientSideApplicationId&$orderby=Name`) > -1) {
         return Promise.resolve({
           "value": [
             {
@@ -344,7 +344,7 @@ describe(commands.PAGE_LIST, () => {
 
   it('lists all properties for all modern pages in JSON output mode', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists/SitePages/rootfolder/files?$expand=ListItemAllFields/ClientSideApplicationId&$orderby=Name`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/lists/SitePages/rootfolder/files?$expand=ListItemAllFields/ClientSideApplicationId&$orderby=Name`) > -1) {
         return Promise.resolve({
           "value": [
             {
@@ -588,7 +588,7 @@ describe(commands.PAGE_LIST, () => {
 
   it('correctly handles no modern pages', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists/SitePages/rootfolder/files?$expand=ListItemAllFields/ClientSideApplicationId&$orderby=Name`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/lists/SitePages/rootfolder/files?$expand=ListItemAllFields/ClientSideApplicationId&$orderby=Name`) > -1) {
         return Promise.resolve({ value: [] });
       }
 

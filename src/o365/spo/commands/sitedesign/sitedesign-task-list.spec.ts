@@ -60,7 +60,7 @@ describe(commands.SITEDESIGN_TASK_LIST, () => {
 
   it('gets information about site designs scheduled for execution on the specified site', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignTasks`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignTasks`) > -1) {
         return Promise.resolve({
           "value": [
             {
@@ -100,7 +100,7 @@ describe(commands.SITEDESIGN_TASK_LIST, () => {
 
   it('gets information about site designs scheduled for execution on the specified site (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignTasks`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignTasks`) > -1) {
         return Promise.resolve({
           "value": [
             {
@@ -140,7 +140,7 @@ describe(commands.SITEDESIGN_TASK_LIST, () => {
 
   it('outputs all information in JSON output mode', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignTasks`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignTasks`) > -1) {
         return Promise.resolve({
           "value": [
             {

@@ -239,7 +239,7 @@ describe('Command', () => {
 
   it('initiates command 1 with vorpal', () => {
     const cmd = new MockCommand1();
-    const vorpalCommandStub = sinon.stub(vorpal, 'command').callsFake(() => vcmd);
+    const vorpalCommandStub = sinon.stub(vorpal, 'command').callsFake(() => vcmd as any);
     cmd.init(vorpal);
     Utils.restore(vorpal.command);
     assert(vorpalCommandStub.calledOnce);
@@ -247,7 +247,7 @@ describe('Command', () => {
 
   it('initiates command 2 with vorpal', () => {
     const cmd = new MockCommand2();
-    const vorpalCommandStub = sinon.stub(vorpal, 'command').callsFake(() => vcmd);
+    const vorpalCommandStub = sinon.stub(vorpal, 'command').callsFake(() => vcmd as any);
     cmd.init(vorpal);
     Utils.restore(vorpal.command);
     assert(vorpalCommandStub.calledOnce);
@@ -258,7 +258,7 @@ describe('Command', () => {
     let name;
     sinon.stub(vorpal, 'command').callsFake((_name) => {
       name = _name;
-      return vcmd;
+      return vcmd as any;
     });
     cmd.init(vorpal);
     Utils.restore(vorpal.command);
@@ -270,7 +270,7 @@ describe('Command', () => {
     let description;
     sinon.stub(vorpal, 'command').callsFake((_name, _description) => {
       description = _description;
-      return vcmd;
+      return vcmd as any;
     });
     cmd.init(vorpal);
     Utils.restore(vorpal.command);
@@ -282,7 +282,7 @@ describe('Command', () => {
     let autocomplete;
     sinon.stub(vorpal, 'command').callsFake((_name, _description, _autocomplete) => {
       autocomplete = _autocomplete;
-      return vcmd;
+      return vcmd as any;
     });
     cmd.init(vorpal);
     Utils.restore(vorpal.command);
@@ -291,7 +291,7 @@ describe('Command', () => {
 
   it('configures command action', () => {
     const cmd = new MockCommand1();
-    sinon.stub(vorpal, 'command').callsFake(() => vcmd);
+    sinon.stub(vorpal, 'command').callsFake(() => vcmd as any);
     cmd.init(vorpal);
     Utils.restore(vorpal.command);
     assert(actionSpy.calledOnce);
@@ -299,7 +299,7 @@ describe('Command', () => {
 
   it('configures options when available', () => {
     const cmd = new MockCommand1();
-    sinon.stub(vorpal, 'command').callsFake(() => vcmd);
+    sinon.stub(vorpal, 'command').callsFake(() => vcmd as any);
     cmd.init(vorpal);
     Utils.restore(vorpal.command);
     assert(optionSpy.calledThrice); // there are three options
@@ -307,7 +307,7 @@ describe('Command', () => {
 
   it('configures alias when available', () => {
     const cmd = new MockCommand1();
-    sinon.stub(vorpal, 'command').callsFake(() => vcmd);
+    sinon.stub(vorpal, 'command').callsFake(() => vcmd as any);
     cmd.init(vorpal);
     Utils.restore(vorpal.command);
     assert(aliasSpy.calledOnce);
@@ -315,7 +315,7 @@ describe('Command', () => {
 
   it('configures validation when available', () => {
     const cmd = new MockCommand1();
-    sinon.stub(vorpal, 'command').callsFake(() => vcmd);
+    sinon.stub(vorpal, 'command').callsFake(() => vcmd as any);
     cmd.init(vorpal);
     Utils.restore(vorpal.command);
     assert(validateSpy.calledOnce);
@@ -323,7 +323,7 @@ describe('Command', () => {
 
   it('doesn\'t configure validation when unavailable', () => {
     const cmd = new MockCommand2();
-    sinon.stub(vorpal, 'command').callsFake(() => vcmd);
+    sinon.stub(vorpal, 'command').callsFake(() => vcmd as any);
     cmd.init(vorpal);
     Utils.restore(vorpal.command);
     assert(validateSpy.notCalled);
@@ -331,7 +331,7 @@ describe('Command', () => {
 
   it('configures cancellation when available', () => {
     const cmd = new MockCommand1();
-    sinon.stub(vorpal, 'command').callsFake(() => vcmd);
+    sinon.stub(vorpal, 'command').callsFake(() => vcmd as any);
     cmd.init(vorpal);
     Utils.restore(vorpal.command);
     assert(cancelSpy.calledOnce);
@@ -339,7 +339,7 @@ describe('Command', () => {
 
   it('doesn\'t configure cancellation when unavailable', () => {
     const cmd = new MockCommand2();
-    sinon.stub(vorpal, 'command').callsFake(() => vcmd);
+    sinon.stub(vorpal, 'command').callsFake(() => vcmd as any);
     cmd.init(vorpal);
     Utils.restore(vorpal.command);
     assert(cancelSpy.notCalled);
@@ -347,7 +347,7 @@ describe('Command', () => {
 
   it('configures help when available', () => {
     const cmd = new MockCommand1();
-    sinon.stub(vorpal, 'command').callsFake(() => vcmd);
+    sinon.stub(vorpal, 'command').callsFake(() => vcmd as any);
     cmd.init(vorpal);
     Utils.restore(vorpal.command);
     assert(helpSpy.calledOnce);
@@ -355,7 +355,7 @@ describe('Command', () => {
 
   it('configures types when available', () => {
     const cmd = new MockCommand1();
-    sinon.stub(vorpal, 'command').callsFake(() => vcmd);
+    sinon.stub(vorpal, 'command').callsFake(() => vcmd as any);
     cmd.init(vorpal);
     Utils.restore(vorpal.command);
     assert(typesSpy.calledOnce);
@@ -363,7 +363,7 @@ describe('Command', () => {
 
   it('doesn\'t configure type when unavailable', () => {
     const cmd = new MockCommand2();
-    sinon.stub(vorpal, 'command').callsFake(() => vcmd);
+    sinon.stub(vorpal, 'command').callsFake(() => vcmd as any);
     cmd.init(vorpal);
     Utils.restore(vorpal.command);
     assert(typesSpy.notCalled);
@@ -562,7 +562,7 @@ describe('Command', () => {
         process.argv = argv;
       }
     });
-    sinon.stub(process, 'exit').callsFake(() => { });
+    sinon.stub(process, 'exit');
     cmd.init(vorpal);
     process.argv = ['node', 'o365', 'mock-command', '--option3', '00123'];
     vorpal.parse(['node', 'o365', 'mock-command', '--option3', '00123']);
@@ -586,7 +586,7 @@ describe('Command', () => {
         process.argv = argv;
       }
     });
-    sinon.stub(process, 'exit').callsFake(() => { });
+    sinon.stub(process, 'exit');
     cmd.init(vorpal);
     process.argv = ['node', 'o365', 'mock-command', '--option1', '00123'];
     vorpal.parse(['node', 'o365', 'mock-command', '--option1', '00123']);
@@ -610,7 +610,7 @@ describe('Command', () => {
         process.argv = argv;
       }
     });
-    sinon.stub(process, 'exit').callsFake(() => { });
+    sinon.stub(process, 'exit');
     cmd.init(vorpal);
     process.argv = ['node', 'o365', 'mock-command', '--option2', '00123'];
     vorpal.parse(['node', 'o365', 'mock-command', '--option2', '00123']);
@@ -634,7 +634,7 @@ describe('Command', () => {
         process.argv = argv;
       }
     });
-    sinon.stub(process, 'exit').callsFake(() => { });
+    sinon.stub(process, 'exit');
     cmd.init(vorpal);
     process.argv = ['node', 'o365', 'mock-command', '--option1', '00123'];
     vorpal.parse(['node', 'o365', 'mock-command', '--option1', '00123']);
@@ -658,7 +658,7 @@ describe('Command', () => {
         process.argv = argv;
       }
     });
-    sinon.stub(process, 'exit').callsFake(() => { });
+    sinon.stub(process, 'exit');
     cmd.init(vorpal);
     process.argv = ['node', 'o365', 'mock-command', '--option1', '00123'];
     vorpal.parse(['node', 'o365', 'mock-command', '--option1', '00123']);

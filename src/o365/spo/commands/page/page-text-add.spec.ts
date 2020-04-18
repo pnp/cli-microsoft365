@@ -65,7 +65,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
   it('adds text to an empty modern page', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
         return Promise.resolve({
           ListItemAllFields: {
             CommentsDisabled: false,
@@ -131,7 +131,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
     });
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')/ListItemAllFields`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')/ListItemAllFields`) > -1 &&
         JSON.stringify(opts.body).indexOf(`&quot;,&quot;position&quot;&#58;&#123;&quot;controlIndex&quot;&#58;1,&quot;sectionFactor&quot;&#58;12,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1&#125;&#125;\\"><div data-sp-rte=\\"\\"><p>Hello world</p></div></div></div>"}`) > -1) {
         return Promise.resolve({});
       }
@@ -162,7 +162,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
   it('adds text to an empty modern page (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
         return Promise.resolve({
           ListItemAllFields: {
             CommentsDisabled: false,
@@ -228,7 +228,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
     });
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
         JSON.stringify(opts.body).indexOf(`&quot;,&quot;position&quot;&#58;&#123;&quot;controlIndex&quot;&#58;1,&quot;sectionFactor&quot;&#58;12,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1&#125;&#125;\\"><div data-sp-rte=\\"\\"><p>Hello world</p></div></div></div>"}`) > -1) {
         return Promise.resolve({});
       }
@@ -259,7 +259,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
   it('adds text to an empty modern page on root of tenant (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/_api/web/getfilebyserverrelativeurl('/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/_api/web/getfilebyserverrelativeurl('/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
         return Promise.resolve({
           ListItemAllFields: {
             CommentsDisabled: false,
@@ -325,7 +325,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
     });
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/_api/web/getfilebyserverrelativeurl('/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/_api/web/getfilebyserverrelativeurl('/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
         JSON.stringify(opts.body).indexOf(`&quot;,&quot;position&quot;&#58;&#123;&quot;controlIndex&quot;&#58;1,&quot;sectionFactor&quot;&#58;12,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1&#125;&#125;\\"><div data-sp-rte=\\"\\"><p>Hello world</p></div></div></div>"}`) > -1) {
         return Promise.resolve({});
       }
@@ -357,7 +357,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
   it('appends text to a modern page which already had some text', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (
-        opts.url.indexOf(
+        (opts.url as string).indexOf(
           `/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`
         ) > -1
       ) {
@@ -426,7 +426,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
     });
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')/ListItemAllFields`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')/ListItemAllFields`) > -1 &&
         JSON.stringify(opts.body).endsWith(`&quot;position&quot;&#58;&#123;&quot;controlIndex&quot;&#58;2,&quot;sectionFactor&quot;&#58;12,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1&#125;&#125;"><div data-sp-rte=""><p>Hello world 2</p></div></div></div>`)) {
         return Promise.resolve({});
       }
@@ -458,7 +458,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
   it('adds text in the specified order to a modern page which already had some text', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (
-        opts.url.indexOf(
+        (opts.url as string).indexOf(
           `/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`
         ) > -1
       ) {
@@ -527,7 +527,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
     });
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')/ListItemAllFields`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')/ListItemAllFields`) > -1 &&
         JSON.stringify(opts.body).endsWith(`position&quot;&#58;&#123;&quot;controlIndex&quot;&#58;3,&quot;sectionFactor&quot;&#58;12,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1&#125;&#125;"><div data-sp-rte=""><p>Hello world 2</p></div></div></div>`)) {
         return Promise.resolve({});
       }
@@ -560,7 +560,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
   it('adds text to a modern page without specifying the page file extension', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (
-        opts.url.indexOf(
+        (opts.url as string).indexOf(
           `/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`
         ) > -1
       ) {
@@ -629,7 +629,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
     });
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')/ListItemAllFields`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')/ListItemAllFields`) > -1 &&
         JSON.stringify(opts.body).endsWith(`position&quot;&#58;&#123;&quot;controlIndex&quot;&#58;1,&quot;sectionFactor&quot;&#58;12,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1&#125;&#125;\"><div data-sp-rte=\"\"><p>Hello world</p></div></div></div>`)) {
         return Promise.resolve({});
       }
@@ -660,7 +660,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
   it('correctly handles OData error when adding text to a non-existing page', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/foo.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/foo.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
         return Promise.reject({ error: { 'odata.error': { message: { value: 'The file /sites/team-a/SitePages/foo.aspx does not exist' } } } });
       }
 
@@ -689,7 +689,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
   it('correctly handles OData error when adding text to a page', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
         return Promise.resolve({
           ListItemAllFields: {
             CommentsDisabled: false,
@@ -780,7 +780,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
   it('correctly handles error if target page is not a modern page', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
         return Promise.resolve({
           ListItemAllFields: {
             CommentsDisabled: false,
@@ -859,7 +859,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
   it('correctly handles invalid section error when adding text to modern page', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
         return Promise.resolve({
           ListItemAllFields: {
             CommentsDisabled: false,
@@ -947,7 +947,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
   it('correctly handles invalid column error when adding text to modern page', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
         return Promise.resolve({
           ListItemAllFields: {
             CommentsDisabled: false,
@@ -1036,7 +1036,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
   it('correctly handles error when parsing modern page contents', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
         return Promise.resolve({
           ListItemAllFields: {
             CommentsDisabled: false,

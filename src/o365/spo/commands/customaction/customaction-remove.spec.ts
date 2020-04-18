@@ -17,12 +17,12 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
   const defaultPostCallsStub = (): sinon.SinonStub => {
     return sinon.stub(request, 'post').callsFake((opts) => {
       // fakes remove custom action success (site)
-      if (opts.url.indexOf('/_api/Web/UserCustomActions(') > -1) {
+      if ((opts.url as string).indexOf('/_api/Web/UserCustomActions(') > -1) {
         return Promise.resolve(undefined);
       }
 
       // fakes remove custom action success (site collection)
-      if (opts.url.indexOf('/_api/Site/UserCustomActions(') > -1) {
+      if ((opts.url as string).indexOf('/_api/Site/UserCustomActions(') > -1) {
         return Promise.resolve(undefined);
       }
 
@@ -275,12 +275,12 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
   it('should removeScopedCustomAction be called twice when scope is All, but item not found on web level', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       // fakes remove custom action success (site)
-      if (opts.url.indexOf('/_api/Web/UserCustomActions(') > -1) {
+      if ((opts.url as string).indexOf('/_api/Web/UserCustomActions(') > -1) {
         return Promise.resolve({ "odata.null": true });
       }
 
       // fakes remove custom action success (site collection)
-      if (opts.url.indexOf('/_api/Site/UserCustomActions(') > -1) {
+      if ((opts.url as string).indexOf('/_api/Site/UserCustomActions(') > -1) {
         return Promise.resolve(undefined);
       }
 
@@ -343,12 +343,12 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
   it('should searchAllScopes correctly handles custom action odata.null when All scope specified', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       // fakes remove custom action success (site)
-      if (opts.url.indexOf('/_api/Web/UserCustomActions(') > -1) {
+      if ((opts.url as string).indexOf('/_api/Web/UserCustomActions(') > -1) {
         return Promise.resolve({ "odata.null": true });
       }
 
       // fakes remove custom action success (site collection)
-      if (opts.url.indexOf('/_api/Site/UserCustomActions(') > -1) {
+      if ((opts.url as string).indexOf('/_api/Site/UserCustomActions(') > -1) {
         return Promise.resolve({ "odata.null": true });
       }
 
@@ -379,12 +379,12 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
   it('should searchAllScopes correctly handles custom action odata.null when All scope specified (verbose)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       // fakes remove custom action success (site)
-      if (opts.url.indexOf('/_api/Web/UserCustomActions(') > -1) {
+      if ((opts.url as string).indexOf('/_api/Web/UserCustomActions(') > -1) {
         return Promise.resolve({ "odata.null": true });
       }
 
       // fakes remove custom action success (site collection)
-      if (opts.url.indexOf('/_api/Site/UserCustomActions(') > -1) {
+      if ((opts.url as string).indexOf('/_api/Site/UserCustomActions(') > -1) {
         return Promise.resolve({ "odata.null": true });
       }
 
@@ -417,7 +417,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
 
     sinon.stub(request, 'post').callsFake((opts) => {
       // fakes remove custom action success (site)
-      if (opts.url.indexOf('/_api/Web/UserCustomActions(') > -1) {
+      if ((opts.url as string).indexOf('/_api/Web/UserCustomActions(') > -1) {
         return Promise.reject(err);
       }
 
@@ -449,11 +449,11 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
 
     sinon.stub(request, 'post').callsFake((opts) => {
       // should return null to proceed with site when scope is All
-      if (opts.url.indexOf('/_api/Web/UserCustomActions(') > -1) {
+      if ((opts.url as string).indexOf('/_api/Web/UserCustomActions(') > -1) {
         return Promise.resolve({ "odata.null": true });
       }
 
-      if (opts.url.indexOf('/_api/Site/UserCustomActions(') > -1) {
+      if ((opts.url as string).indexOf('/_api/Site/UserCustomActions(') > -1) {
         return Promise.reject(err);
       }
 
@@ -503,7 +503,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
   });
 
   it('doesn\'t fail if the parent doesn\'t define options', () => {
-    sinon.stub(Command.prototype, 'options').callsFake(() => { return undefined; });
+    sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
     const options = (command.options() as CommandOption[]);
     Utils.restore(Command.prototype.options);
     assert(options.length > 0);

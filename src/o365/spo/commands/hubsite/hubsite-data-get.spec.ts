@@ -60,7 +60,7 @@ describe(commands.HUBSITE_DATA_GET, () => {
 
   it('gets information about the specified hub site', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/HubSiteData(false)`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/HubSiteData(false)`) > -1) {
         return Promise.resolve({
           value: JSON.stringify({
             "themeKey": null,
@@ -96,7 +96,7 @@ describe(commands.HUBSITE_DATA_GET, () => {
 
   it('gets information about the specified hub site with forced refresh', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/HubSiteData(true)`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/HubSiteData(true)`) > -1) {
         return Promise.resolve({
           value: JSON.stringify({
             "themeKey": null,
@@ -132,7 +132,7 @@ describe(commands.HUBSITE_DATA_GET, () => {
 
   it('gets information about the specified hub site (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/HubSiteData`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/HubSiteData`) > -1) {
         return Promise.resolve({
           value: JSON.stringify({
             "themeKey": null,
@@ -168,7 +168,7 @@ describe(commands.HUBSITE_DATA_GET, () => {
 
   it('gets information about the specified hub site', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/HubSiteData`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/HubSiteData`) > -1) {
         return Promise.resolve({ "odata.null": true });
       }
 
@@ -188,7 +188,7 @@ describe(commands.HUBSITE_DATA_GET, () => {
 
   it('gets information about the specified hub site (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/HubSiteData`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/HubSiteData`) > -1) {
         return Promise.resolve({ "odata.null": true });
       }
 

@@ -62,8 +62,9 @@ describe(commands.FIELD_SET, () => {
 
   it('updates site column specified by name', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers['X-RequestDigest'] !== 'ABC') {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers &&
+          opts.headers['X-RequestDigest'] !== 'ABC') {
           return Promise.reject('Invalid request');
         }
 
@@ -106,8 +107,9 @@ describe(commands.FIELD_SET, () => {
 
   it('updates site column specified by id, pushing the changes to existing lists', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers['X-RequestDigest'] !== 'ABC') {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers &&
+          opts.headers['X-RequestDigest'] !== 'ABC') {
           return Promise.reject('Invalid request');
         }
 
@@ -150,8 +152,9 @@ describe(commands.FIELD_SET, () => {
 
   it('updates list column specified by id, list specified by id', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers['X-RequestDigest'] !== 'ABC') {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers &&
+          opts.headers['X-RequestDigest'] !== 'ABC') {
           return Promise.reject('Invalid request');
         }
 
@@ -209,8 +212,9 @@ describe(commands.FIELD_SET, () => {
 
   it('updates list column specified by name, list specified by name', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers['X-RequestDigest'] !== 'ABC') {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers &&
+          opts.headers['X-RequestDigest'] !== 'ABC') {
           return Promise.reject('Invalid request');
         }
 
@@ -268,8 +272,9 @@ describe(commands.FIELD_SET, () => {
 
   it('correctly escapes XML in list title', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers['X-RequestDigest'] !== 'ABC') {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers &&
+          opts.headers['X-RequestDigest'] !== 'ABC') {
           return Promise.reject('Invalid request');
         }
 
@@ -327,8 +332,9 @@ describe(commands.FIELD_SET, () => {
 
   it('correctly escapes XML in field name', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers['X-RequestDigest'] !== 'abc') {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers &&
+          opts.headers['X-RequestDigest'] !== 'abc') {
           return Promise.reject('Invalid request');
         }
 
@@ -371,8 +377,9 @@ describe(commands.FIELD_SET, () => {
 
   it('correctly escapes XML in field properties', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers['X-RequestDigest'] !== 'abc') {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers &&
+          opts.headers['X-RequestDigest'] !== 'abc') {
           return Promise.reject('Invalid request');
         }
 
@@ -415,8 +422,9 @@ describe(commands.FIELD_SET, () => {
 
   it('correctly handles an error when the field specified by id doesn\'t exist', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers['X-RequestDigest'] !== 'ABC') {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers &&
+          opts.headers['X-RequestDigest'] !== 'ABC') {
           return Promise.reject('Invalid request');
         }
 
@@ -452,8 +460,9 @@ describe(commands.FIELD_SET, () => {
 
   it('correctly handles an error when the field specified by title doesn\'t exist', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers['X-RequestDigest'] !== 'ABC') {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers &&
+          opts.headers['X-RequestDigest'] !== 'ABC') {
           return Promise.reject('Invalid request');
         }
 
@@ -489,8 +498,9 @@ describe(commands.FIELD_SET, () => {
 
   it('correctly handles an error when the list specified by id doesn\'t exist', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers['X-RequestDigest'] !== 'ABC') {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers &&
+          opts.headers['X-RequestDigest'] !== 'ABC') {
           return Promise.reject('Invalid request');
         }
 
@@ -526,8 +536,9 @@ describe(commands.FIELD_SET, () => {
 
   it('correctly handles an error when the list specified by title doesn\'t exist', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers['X-RequestDigest'] !== 'ABC') {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers &&
+          opts.headers['X-RequestDigest'] !== 'ABC') {
           return Promise.reject('Invalid request');
         }
 
@@ -563,8 +574,9 @@ describe(commands.FIELD_SET, () => {
 
   it('correctly handles an error when updating the field failed', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.headers['X-RequestDigest'] !== 'ABC') {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers &&
+          opts.headers['X-RequestDigest'] !== 'ABC') {
           return Promise.reject('Invalid request');
         }
 

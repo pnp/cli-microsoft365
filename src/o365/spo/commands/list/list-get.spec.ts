@@ -60,7 +60,7 @@ describe(commands.LIST_GET, () => {
 
   it('retrieves and prints all details of list if title option is passed', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      //if (opts.url.indexOf('/_api/web/lists/GetByTitle(') > -1) {
+      //if ((opts.url as string).indexOf('/_api/web/lists/GetByTitle(') > -1) {
         return Promise.resolve(
           {
             "AllowContentTypes": true,
@@ -188,7 +188,7 @@ describe(commands.LIST_GET, () => {
   it('command correctly handles list get reject request', (done) => {
     const err = 'Invalid request';
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/lists/GetByTitle(') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/lists/GetByTitle(') > -1) {
         return Promise.reject(err);
       }
 
@@ -216,7 +216,7 @@ describe(commands.LIST_GET, () => {
 
   it('uses correct API url when id option is passed', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/lists(guid') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/lists(guid') > -1) {
         return Promise.resolve('Correct Url')
       }
 

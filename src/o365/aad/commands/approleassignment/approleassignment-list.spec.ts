@@ -368,30 +368,30 @@ class RequestStub {
     // 3. get the app roles of the resource
 
     // query for service principal
-    if (opts.url.indexOf(`/myorganization/servicePrincipals?api-version=1.6&$expand=appRoleAssignments&$filter=`) > -1) {
+    if ((opts.url as string).indexOf(`/myorganization/servicePrincipals?api-version=1.6&$expand=appRoleAssignments&$filter=`) > -1) {
       // by app id
-      if (opts.url.indexOf(`appId eq '${CommandActionParameters.appIdWithRoleAssignments}'`) > -1) {
+      if ((opts.url as string).indexOf(`appId eq '${CommandActionParameters.appIdWithRoleAssignments}'`) > -1) {
         return Promise.resolve(ServicePrincipalCollections.ServicePrincipalByAppId);
       }
       // by display name
-      if (opts.url.indexOf(`displayName eq '${encodeURIComponent(CommandActionParameters.appNameWithRoleAssignments)}'`) > -1) {
+      if ((opts.url as string).indexOf(`displayName eq '${encodeURIComponent(CommandActionParameters.appNameWithRoleAssignments)}'`) > -1) {
         return Promise.resolve(ServicePrincipalCollections.ServicePrincipalByDisplayName);
       }
       // by app id: no app role assignments
-      if (opts.url.indexOf(`appId eq '${CommandActionParameters.appIdWithNoRoleAssignments}'`) > -1) {
+      if ((opts.url as string).indexOf(`appId eq '${CommandActionParameters.appIdWithNoRoleAssignments}'`) > -1) {
         return Promise.resolve(ServicePrincipalCollections.ServicePrincipalByAppIdNotFound);
       }
       // by app id: does not exist
-      if (opts.url.indexOf(`appId eq '${CommandActionParameters.invalidAppId}'`) > -1) {
+      if ((opts.url as string).indexOf(`appId eq '${CommandActionParameters.invalidAppId}'`) > -1) {
         return Promise.resolve(ServicePrincipalCollections.ServicePrincipalByAppIdNotFound);
       }
     }
 
-    if (opts.url.indexOf(`/myorganization/servicePrincipals/${InternalRequestStub.customAppId}?api-version=1.6`) > -1) {
+    if ((opts.url as string).indexOf(`/myorganization/servicePrincipals/${InternalRequestStub.customAppId}?api-version=1.6`) > -1) {
         return Promise.resolve(ServicePrincipalObject.servicePrincipalCustomAppWithAppRole);
     }
 
-    if (opts.url.indexOf(`/myorganization/servicePrincipals/${InternalRequestStub.microsoftGraphAppId}?api-version=1.6`) > -1) {
+    if ((opts.url as string).indexOf(`/myorganization/servicePrincipals/${InternalRequestStub.microsoftGraphAppId}?api-version=1.6`) > -1) {
       return Promise.resolve(ServicePrincipalObject.servicePrincipalMicrosoftGraphWithAppRole);
     }
 

@@ -47,7 +47,7 @@ describe('Page', () => {
     let getCallIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/_api/web/getfilebyserverrelativeurl('/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/_api/web/getfilebyserverrelativeurl('/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
         getCallIssued = true;
         return Promise.resolve({
           "ListItemAllFields": {
@@ -128,7 +128,7 @@ describe('Page', () => {
     let getCallIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
         getCallIssued = true;
         return Promise.resolve({
           "ListItemAllFields": {

@@ -179,7 +179,7 @@ describe(commands.TEAMS_TAB_ADD, () => {
 
   it('creates tab in channel within the Microsoft Teams team in the tenant', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`https://graph.microsoft.com/v1.0/teams/3b4797e5-bdf3-48e1-a552-839af71562ef`) > -1) {
+      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/teams/3b4797e5-bdf3-48e1-a552-839af71562ef`) > -1) {
         return Promise.resolve({
           "id": "19:f3dcbb1674574677abcae89cb626f1e6@thread.skype",
           "displayName": "testweb",
@@ -217,7 +217,7 @@ describe(commands.TEAMS_TAB_ADD, () => {
   });
   it('creates tab in channel within the Microsoft Teams team in the tenant with all options', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`https://graph.microsoft.com/v1.0/teams/3b4797e5-bdf3-48e1-a552-839af71562ef`) > -1) {
+      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/teams/3b4797e5-bdf3-48e1-a552-839af71562ef`) > -1) {
         return Promise.resolve({
           "id": "19:f3dcbb1674574677abcae89cb626f1e6@thread.skype",
           "displayName": "testweb",

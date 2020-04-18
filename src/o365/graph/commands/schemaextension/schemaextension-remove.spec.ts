@@ -66,7 +66,7 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
 
   it('removes schema extension', (done) => {
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url.indexOf(`/v1.0/schemaExtensions/`) > -1) {
+      if ((opts.url as string).indexOf(`/v1.0/schemaExtensions/`) > -1) {
         return Promise.resolve();
       }
 
@@ -86,7 +86,7 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
 
   it('removes schema extension (debug)', (done) => {
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url.indexOf(`/v1.0/schemaExtensions/`) > -1) {
+      if ((opts.url as string).indexOf(`/v1.0/schemaExtensions/`) > -1) {
         return Promise.resolve();
       }
 
@@ -141,7 +141,7 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
 
   it('removes schema extension when prompt confirmed', (done) => {
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url.indexOf(`v1.0/schemaExtensions/`) > -1) {
+      if ((opts.url as string).indexOf(`v1.0/schemaExtensions/`) > -1) {
         return Promise.resolve();
       }
 

@@ -66,7 +66,7 @@ describe(commands.THEME_GET, () => {
   it('gets theme when correct parameters are passed', (done) => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
 
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return Promise.resolve(JSON.stringify([{ SchemaVersion: '15.0.0.0', LibraryVersion: '16.0.7428.1202', ErrorInfo: null, TraceCorrelationId: '6038519e-2044-5000-58c3-114f8e60e920' }, 12, { IsNull: false }, 14, { IsNull: false }, 15, { _ObjectType_: 'Microsoft.Online.SharePoint.TenantManagement.ThemeProperties', IsInverted: true, Name: 'Custom22', Palette: { themeLight: '#affefe' } }]));
       }
 
@@ -97,7 +97,7 @@ describe(commands.THEME_GET, () => {
   it('gets theme when correct parameters are passed (debug)', (done) => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
 
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return Promise.resolve(JSON.stringify([{ SchemaVersion: '15.0.0.0', LibraryVersion: '16.0.7428.1202', ErrorInfo: null, TraceCorrelationId: '6038519e-2044-5000-58c3-114f8e60e920' }, 12, { IsNull: false }, 14, { IsNull: false }, 15, { _ObjectType_: 'Microsoft.Online.SharePoint.TenantManagement.ThemeProperties', IsInverted: true, Name: 'Custom22', Palette: { themeLight: '#affefe' } }]));
       }
 
@@ -126,7 +126,7 @@ describe(commands.THEME_GET, () => {
   it('handles error correctly', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
 
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return Promise.resolve(JSON.stringify([{ SchemaVersion: '15.0.0.0', LibraryVersion: '16.0.7428.1202', ErrorInfo: { ErrorMessage: 'Unknown Error', ErrorValue: null, TraceCorrelationId: 'fc38519e-a04a-5000-58c3-143b1f230a55', ErrorCode: -1, ErrorTypeName: 'Microsoft.SharePoint.Client.UnknownError' }, TraceCorrelationId: 'fc38519e-a04a-5000-58c3-143b1f230a55' }]));
       }
       return Promise.reject('Invalid request');
@@ -151,7 +151,7 @@ describe(commands.THEME_GET, () => {
   it('handles empty error correctly', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
 
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return Promise.resolve(JSON.stringify([{ SchemaVersion: '15.0.0.0', LibraryVersion: '16.0.7428.1202', ErrorInfo: { ErrorMessage: '', ErrorValue: null, TraceCorrelationId: 'fc38519e-a04a-5000-58c3-143b1f230a55', ErrorCode: -1, ErrorTypeName: 'Microsoft.SharePoint.Client.UnknownError' }, TraceCorrelationId: 'fc38519e-a04a-5000-58c3-143b1f230a55' }]));
       }
       return Promise.reject('Invalid request');
@@ -175,7 +175,7 @@ describe(commands.THEME_GET, () => {
 
   it('handles request error correctly', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return Promise.reject('An error has occurred');
       }
       return Promise.reject('Invalid request');

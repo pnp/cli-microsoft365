@@ -122,7 +122,7 @@ describe(commands.PAGE_SECTION_GET, () => {
 
   it('lists sections on the modern page', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve(apiResponse);
       }
 
@@ -152,7 +152,7 @@ describe(commands.PAGE_SECTION_GET, () => {
 
   it('lists sections on the modern page - no sections available', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve({
           "ListItemAllFields": {
             "FileSystemObjectType": 0,
@@ -230,7 +230,7 @@ describe(commands.PAGE_SECTION_GET, () => {
 
   it('lists sections on the modern page (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve(apiResponse);
       }
 
@@ -262,7 +262,7 @@ describe(commands.PAGE_SECTION_GET, () => {
 
   it('lists sections on the modern page when the specified page name doesn\'t contain extension', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve(apiResponse);
       }
 
@@ -294,7 +294,7 @@ describe(commands.PAGE_SECTION_GET, () => {
 
   it('lists all information about sections on the modern page in json output mode', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve(apiResponse);
       }
 
@@ -328,7 +328,7 @@ describe(commands.PAGE_SECTION_GET, () => {
 
   it('shows error when the specified page is a classic page', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve({
           "ListItemAllFields": {
             "CommentsDisabled": false,
