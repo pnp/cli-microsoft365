@@ -46,4 +46,4 @@ spo theme apply --name Blue --webUrl https://contoso.sharepoint.com/sites/projec
 ## More information
 
 - SharePoint site theming: [https://docs.microsoft.com/en-us/sharepoint/dev/declarative-customization/site-theming/sharepoint-site-theming-overview](https://docs.microsoft.com/en-us/sharepoint/dev/declarative-customization/site-theming/sharepoint-site-theming-overview)
-- Theme Generator: [https://developer.microsoft.com/en-us/fabric#/styles/themegenerator](https://developer.microsoft.com/en-us/fabric#/styles/themegenerator)
+- Theme Generator: [https://aka.ms/themedesigner](https://aka.ms/themedesigner)
