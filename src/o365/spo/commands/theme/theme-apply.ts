@@ -224,7 +224,7 @@ class SpoThemeApplyCommand extends SpoCommand {
       https://docs.microsoft.com/en-us/sharepoint/dev/declarative-customization/site-theming/sharepoint-site-theming-overview
 
     Theme Generator
-      https://developer.microsoft.com/en-us/fabric#/styles/themegenerator
+      https://aka.ms/themedesigner
       `);
   }
 }
