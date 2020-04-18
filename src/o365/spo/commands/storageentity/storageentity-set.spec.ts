@@ -65,8 +65,9 @@ describe(commands.STORAGEENTITY_SET, () => {
 
   it('sets tenant property', (done) => {
     const postStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
-        if (opts.headers['X-RequestDigest'] &&
+      if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
+        if (opts.headers &&
+          opts.headers['X-RequestDigest'] &&
           opts.body) {
           if (opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="24" ObjectPathId="23" /><ObjectPath Id="26" ObjectPathId="25" /><ObjectPath Id="28" ObjectPathId="27" /><Method Name="SetStorageEntity" Id="29" ObjectPathId="27"><Parameters><Parameter Type="String">Property1</Parameter><Parameter Type="String">Lorem</Parameter><Parameter Type="String">ipsum</Parameter><Parameter Type="String">dolor</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="23" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="25" ParentId="23" Name="GetSiteByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/appcatalog</Parameter></Parameters></Method><Property Id="27" ParentId="25" Name="RootWeb" /></ObjectPaths></Request>`) {
             return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": null, "TraceCorrelationId": "4456299e-d09e-4000-ae61-ddde716daa27" }, 31, { "IsNull": false }, 33, { "IsNull": false }, 35, { "IsNull": false }]));
@@ -78,7 +79,7 @@ describe(commands.STORAGEENTITY_SET, () => {
     cmdInstance.action({ options: { debug: true, key: 'Property1', value: 'Lorem', description: 'ipsum', comment: 'dolor', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       try {
         assert.equal(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery');
-        assert.equal(postStub.lastCall.args[0].headers['X-RequestDigest'], 'ABC');
+        assert.equal((postStub.lastCall.args[0].headers as any)['X-RequestDigest'], 'ABC');
         assert.equal(postStub.lastCall.args[0].body, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="24" ObjectPathId="23" /><ObjectPath Id="26" ObjectPathId="25" /><ObjectPath Id="28" ObjectPathId="27" /><Method Name="SetStorageEntity" Id="29" ObjectPathId="27"><Parameters><Parameter Type="String">Property1</Parameter><Parameter Type="String">Lorem</Parameter><Parameter Type="String">ipsum</Parameter><Parameter Type="String">dolor</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="23" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="25" ParentId="23" Name="GetSiteByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/appcatalog</Parameter></Parameters></Method><Property Id="27" ParentId="25" Name="RootWeb" /></ObjectPaths></Request>`);
         done();
       }
@@ -90,7 +91,7 @@ describe(commands.STORAGEENTITY_SET, () => {
 
   it('sets tenant property without description and comment', (done) => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
+      if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
         return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": null, "TraceCorrelationId": "4456299e-d09e-4000-ae61-ddde716daa27" }, 31, { "IsNull": false }, 33, { "IsNull": false }, 35, { "IsNull": false }]));
       }
 
@@ -112,7 +113,7 @@ describe(commands.STORAGEENTITY_SET, () => {
 
   it('sets tenant property without description and comment (debug)', (done) => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
+      if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
         return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": null, "TraceCorrelationId": "4456299e-d09e-4000-ae61-ddde716daa27" }, 31, { "IsNull": false }, 33, { "IsNull": false }, 35, { "IsNull": false }]));
       }
 
@@ -134,7 +135,7 @@ describe(commands.STORAGEENTITY_SET, () => {
 
   it('escapes XML in user input', (done) => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
+      if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
         return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": null, "TraceCorrelationId": "4456299e-d09e-4000-ae61-ddde716daa27" }, 31, { "IsNull": false }, 33, { "IsNull": false }, 35, { "IsNull": false }]));
       }
 
@@ -155,7 +156,7 @@ describe(commands.STORAGEENTITY_SET, () => {
 
   it('correctly handles a generic error when setting tenant property', (done) => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
+      if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
         return Promise.resolve(JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": {
@@ -184,7 +185,7 @@ describe(commands.STORAGEENTITY_SET, () => {
 
   it('correctly handles access denied error when setting tenant property', (done) => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
+      if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
         return Promise.resolve(JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": {
@@ -279,7 +280,7 @@ describe(commands.STORAGEENTITY_SET, () => {
   });
 
   it('doesn\'t fail if the parent doesn\'t define options', () => {
-    sinon.stub(Command.prototype, 'options').callsFake(() => { return undefined; });
+    sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
     const options = (command.options() as CommandOption[]);
     Utils.restore(Command.prototype.options);
     assert(options.length > 0);

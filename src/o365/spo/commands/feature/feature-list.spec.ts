@@ -60,7 +60,7 @@ describe(commands.FEATURE_LIST, () => {
 
   it('retrieves available features from site collection', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
+      if ((opts.url as string).indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
         return Promise.resolve({
           value: [
             {
@@ -107,7 +107,7 @@ describe(commands.FEATURE_LIST, () => {
 
   it('retrieves available features from site', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/Web/Features?$select=DisplayName,DefinitionId') > -1) {
+      if ((opts.url as string).indexOf('/_api/Web/Features?$select=DisplayName,DefinitionId') > -1) {
         return Promise.resolve({
           value: [
             {
@@ -154,11 +154,11 @@ describe(commands.FEATURE_LIST, () => {
 
   it('retrieves available features from site (default) when no scope is entered', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
+      if ((opts.url as string).indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
         return Promise.reject('Invalid request');
       }
 
-      if (opts.url.indexOf('/_api/Web/Features?$select=DisplayName,DefinitionId') > -1) {
+      if ((opts.url as string).indexOf('/_api/Web/Features?$select=DisplayName,DefinitionId') > -1) {
         return Promise.resolve({
           value: [
             {
@@ -204,7 +204,7 @@ describe(commands.FEATURE_LIST, () => {
 
   it('returns all properties for output JSON', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
+      if ((opts.url as string).indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
         return Promise.resolve({
           value: [
             {
@@ -264,7 +264,7 @@ describe(commands.FEATURE_LIST, () => {
 
   it('correctly handles no features in site collection', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
+      if ((opts.url as string).indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
         return Promise.resolve(JSON.stringify({ value: [] }));
       }
 
@@ -290,7 +290,7 @@ describe(commands.FEATURE_LIST, () => {
 
   it('correctly handles no features in site', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/Web/Features?$select=DisplayName,DefinitionId') > -1) {
+      if ((opts.url as string).indexOf('/_api/Web/Features?$select=DisplayName,DefinitionId') > -1) {
         return Promise.resolve(JSON.stringify({ value: [] }));
       }
 
@@ -316,7 +316,7 @@ describe(commands.FEATURE_LIST, () => {
 
   it('correctly handles no features in site collection (verbose)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
+      if ((opts.url as string).indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
         return Promise.resolve(JSON.stringify({ value: [] }));
       }
 
@@ -352,7 +352,7 @@ describe(commands.FEATURE_LIST, () => {
 
   it('correctly handles no features in site (verbose)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/Web/Features?$select=DisplayName,DefinitionId') > -1) {
+      if ((opts.url as string).indexOf('/_api/Web/Features?$select=DisplayName,DefinitionId') > -1) {
         return Promise.resolve(JSON.stringify({ value: [] }));
       }
 
@@ -389,7 +389,7 @@ describe(commands.FEATURE_LIST, () => {
   it('correctly handles web feature reject request', (done) => {
     const err = 'Invalid web Features reject request';
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/Web/Features?$select=DisplayName,DefinitionId') > -1) {
+      if ((opts.url as string).indexOf('/_api/Web/Features?$select=DisplayName,DefinitionId') > -1) {
         return Promise.reject(err);
       }
 
@@ -416,7 +416,7 @@ describe(commands.FEATURE_LIST, () => {
   it('correctly handles site Features reject request', (done) => {
     const err = 'Invalid site Features reject request';
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
+      if ((opts.url as string).indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
         return Promise.reject(err);
       }
 
@@ -464,7 +464,7 @@ describe(commands.FEATURE_LIST, () => {
   });
 
   it('doesn\'t fail if the parent doesn\'t define options', () => {
-    sinon.stub(Command.prototype, 'options').callsFake(() => { return undefined; });
+    sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
     const options = (command.options() as CommandOption[]);
     Utils.restore(Command.prototype.options);
     assert(options.length > 0);
@@ -477,7 +477,7 @@ describe(commands.FEATURE_LIST, () => {
 
   it('retrieves all Web features', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/Web/Features?$select=DisplayName,DefinitionId') > -1) {
+      if ((opts.url as string).indexOf('/_api/Web/Features?$select=DisplayName,DefinitionId') > -1) {
         return Promise.resolve({
           value: [
             {
@@ -508,7 +508,7 @@ describe(commands.FEATURE_LIST, () => {
 
   it('retrieves all site features', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
+      if ((opts.url as string).indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
         return Promise.resolve({
           value: [
             {

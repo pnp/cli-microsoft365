@@ -220,13 +220,13 @@ describe(commands.PCF_INIT, () => {
   });
 
   it('passes validation when the current directory doesn\'t contain any files with extension proj', () => {
-    sinon.stub(fs, 'readdirSync').callsFake(() => ['file1.exe', 'file2.xml', 'file3.json']);
+    sinon.stub(fs, 'readdirSync').callsFake(() => ['file1.exe', 'file2.xml', 'file3.json'] as any);
     const actual = (command.validate() as CommandValidate)({ options: { name: 'Example1Name', namespace: 'Example1.Namespace', template: 'Field' } });
     assert.equal(actual, true);
   });
 
   it('fails validation when the current directory contains files with extension proj', () => {
-    sinon.stub(fs, 'readdirSync').callsFake(() => ['file1.exe', 'file2.proj', 'file3.json']);
+    sinon.stub(fs, 'readdirSync').callsFake(() => ['file1.exe', 'file2.proj', 'file3.json'] as any);
     const actual = (command.validate() as CommandValidate)({ options: { name: 'Example1Name', namespace: 'Example1.Namespace', template: 'Field' } });
     assert.notEqual(actual, true);
   });

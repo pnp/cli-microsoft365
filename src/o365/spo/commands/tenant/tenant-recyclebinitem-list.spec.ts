@@ -110,7 +110,7 @@ describe(commands.TENANT_RECYCLEBINITEM_LIST, () => {
 
   it('handles client.svc promise error', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+      if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
         return Promise.reject('An error has occurred');
       }
       return Promise.reject('Invalid request');
@@ -133,7 +133,7 @@ describe(commands.TENANT_RECYCLEBINITEM_LIST, () => {
 
   it('handles error while getting tenant recycle bin', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+      if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
         return Promise.resolve(JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": {
@@ -161,7 +161,7 @@ describe(commands.TENANT_RECYCLEBINITEM_LIST, () => {
   });
   it('includes all properties for json output', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return Promise.resolve(JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.19527.12077", "ErrorInfo": null, "TraceCorrelationId": "85bb2b9f-5099-2000-af64-2c100126d549"
@@ -204,7 +204,7 @@ describe(commands.TENANT_RECYCLEBINITEM_LIST, () => {
   it('lists the tenant recyclebin items (debug)', (done) => {
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+      if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
         return Promise.resolve(JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.19527.12077", "ErrorInfo": null, "TraceCorrelationId": "85bb2b9f-5099-2000-af64-2c100126d549"
@@ -245,7 +245,7 @@ describe(commands.TENANT_RECYCLEBINITEM_LIST, () => {
 
   it('Orders retrieved sites by url ascending', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return Promise.resolve(JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.19527.12077", "ErrorInfo": null, "TraceCorrelationId": "85bb2b9f-5099-2000-af64-2c100126d549"
@@ -299,7 +299,7 @@ describe(commands.TENANT_RECYCLEBINITEM_LIST, () => {
 
   it('handles tenant recyclebin timeout', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+      if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
         return Promise.resolve(JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": { "ErrorMessage": "Timed out" }, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"

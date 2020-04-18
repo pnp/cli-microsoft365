@@ -63,11 +63,12 @@ describe(commands.APP_LIST, () => {
 
   it('retrieves available apps from the tenant app catalog', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('SP_TenantSettings_Current') > -1) {
+      if ((opts.url as string).indexOf('SP_TenantSettings_Current') > -1) {
         return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" });
       }
-      if (opts.url.indexOf('/_api/web/tenantappcatalog/AvailableApps') > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf('/_api/web/tenantappcatalog/AvailableApps') > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
             value: [
@@ -120,8 +121,9 @@ describe(commands.APP_LIST, () => {
 
   it('retrieves available apps from the site app catalog', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/sitecollectionappcatalog/AvailableApps') > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf('/_api/web/sitecollectionappcatalog/AvailableApps') > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
             value: [
@@ -174,12 +176,13 @@ describe(commands.APP_LIST, () => {
 
   it('includes all properties for output json', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('SP_TenantSettings_Current') > -1) {
+      if ((opts.url as string).indexOf('SP_TenantSettings_Current') > -1) {
         return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" });
       }
 
-      if (opts.url.indexOf('/_api/web/tenantappcatalog/AvailableApps') > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf('/_api/web/tenantappcatalog/AvailableApps') > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
             value: [
@@ -249,11 +252,12 @@ describe(commands.APP_LIST, () => {
 
   it('correctly handles no apps in the tenant app catalog', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('SP_TenantSettings_Current') > -1) {
+      if ((opts.url as string).indexOf('SP_TenantSettings_Current') > -1) {
         return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" });
       }
-      if (opts.url.indexOf('/_api/web/tenantappcatalog/AvailableApps') > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf('/_api/web/tenantappcatalog/AvailableApps') > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve(JSON.stringify({ value: [] }));
         }
@@ -295,8 +299,9 @@ describe(commands.APP_LIST, () => {
 
   it('correctly handles no apps in the site app catalog', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/sitecollectionappcatalog/AvailableApps') > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf('/_api/web/sitecollectionappcatalog/AvailableApps') > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve(JSON.stringify({ value: [] }));
         }
@@ -321,11 +326,12 @@ describe(commands.APP_LIST, () => {
 
   it('correctly handles no apps in the tenant app catalog (verbose)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('SP_TenantSettings_Current') > -1) {
+      if ((opts.url as string).indexOf('SP_TenantSettings_Current') > -1) {
         return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" });
       }
-      if (opts.url.indexOf('/_api/web/tenantappcatalog/AvailableApps') > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf('/_api/web/tenantappcatalog/AvailableApps') > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve(JSON.stringify({ value: [] }));
         }

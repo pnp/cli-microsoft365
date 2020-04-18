@@ -73,13 +73,13 @@ describe(commands.DOCTOR, () => {
   it('passes all checks for SPFx v1.10 project when all requirements met', (done) => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
-      if (file === 'npm' && args.length === 1 && args[0] === '-v') {
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
         callback(undefined, '6.13.4');
-        return;
+        return {} as child_process.ChildProcess;
       }
 
-      const packageName: string = args[1];
+      const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
           callback(undefined, packageVersionResponse(packageName, '1.10.0'));
@@ -99,6 +99,7 @@ describe(commands.DOCTOR, () => {
         default:
           callback(new Error(`${file} ENOENT`));
       }
+      return {} as child_process.ChildProcess;
     });
 
     cmdInstance.action({ options: { debug: false } }, () => {
@@ -121,13 +122,13 @@ describe(commands.DOCTOR, () => {
   it('passes all checks for SPFx v1.10 project when all requirements met (debug)', (done) => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
-      if (file === 'npm' && args.length === 1 && args[0] === '-v') {
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
         callback(undefined, '6.13.4');
-        return;
+        return {} as child_process.ChildProcess;
       }
 
-      const packageName: string = args[1];
+      const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
           callback(undefined, packageVersionResponse(packageName, '1.10.0'));
@@ -147,6 +148,7 @@ describe(commands.DOCTOR, () => {
         default:
           callback(new Error(`${file} ENOENT`));
       }
+      return {} as child_process.ChildProcess;
     });
 
     cmdInstance.action({ options: { debug: true } }, () => {
@@ -169,19 +171,19 @@ describe(commands.DOCTOR, () => {
   it('passes all checks for SPFx v1.10 generator installed locally when all requirements met', (done) => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
-      if (file === 'npm' && args.length === 1 && args[0] === '-v') {
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
         callback(undefined, '6.13.4');
-        return;
+        return {} as child_process.ChildProcess;
       }
 
-      const packageName: string = args[1];
+      const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
           callback(undefined, '{}');
           break;
         case '@microsoft/generator-sharepoint':
-          callback(undefined, args[args.length - 1] === '-g' ? '{}' : packageVersionResponse(packageName, '1.10.0'));
+          callback(undefined, (args as string[])[(args as string[]).length - 1] === '-g' ? '{}' : packageVersionResponse(packageName, '1.10.0'));
           break;
         case 'yo':
           callback(undefined, packageVersionResponse(packageName, '3.1.1'));
@@ -198,6 +200,7 @@ describe(commands.DOCTOR, () => {
         default:
           callback(new Error(`${file} ENOENT`));
       }
+      return {} as child_process.ChildProcess;
     });
 
     cmdInstance.action({ options: { debug: false } }, () => {
@@ -220,19 +223,19 @@ describe(commands.DOCTOR, () => {
   it('passes all checks for SPFx v1.10 generator installed locally when all requirements met (debug)', (done) => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
-      if (file === 'npm' && args.length === 1 && args[0] === '-v') {
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
         callback(undefined, '6.13.4');
-        return;
+        return {} as child_process.ChildProcess;
       }
 
-      const packageName: string = args[1];
+      const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
           callback(undefined, '{}');
           break;
         case '@microsoft/generator-sharepoint':
-          callback(undefined, args[args.length - 1] === '-g' ? '{}' : packageVersionResponse(packageName, '1.10.0'));
+          callback(undefined, (args as string[])[(args as string[]).length - 1] === '-g' ? '{}' : packageVersionResponse(packageName, '1.10.0'));
           break;
         case 'yo':
           callback(undefined, packageVersionResponse(packageName, '3.1.1'));
@@ -249,6 +252,7 @@ describe(commands.DOCTOR, () => {
         default:
           callback(new Error(`${file} ENOENT`));
       }
+      return {} as child_process.ChildProcess;
     });
 
     cmdInstance.action({ options: { debug: true } }, () => {
@@ -271,19 +275,19 @@ describe(commands.DOCTOR, () => {
   it('passes all checks for SPFx v1.10 generator installed globally when all requirements met', (done) => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
-      if (file === 'npm' && args.length === 1 && args[0] === '-v') {
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
         callback(undefined, '6.13.4');
-        return;
+        return {} as child_process.ChildProcess;
       }
 
-      const packageName: string = args[1];
+      const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
           callback(undefined, '{}');
           break;
         case '@microsoft/generator-sharepoint':
-          callback(undefined, args[args.length - 1] === '-g' ? packageVersionResponse(packageName, '1.10.0') : '{}');
+          callback(undefined, (args as string[])[(args as string[]).length - 1] === '-g' ? packageVersionResponse(packageName, '1.10.0') : '{}');
           break;
         case 'yo':
           callback(undefined, packageVersionResponse(packageName, '3.1.1'));
@@ -300,6 +304,7 @@ describe(commands.DOCTOR, () => {
         default:
           callback(new Error(`${file} ENOENT`));
       }
+      return {} as child_process.ChildProcess;
     });
 
     cmdInstance.action({ options: { debug: false } }, () => {
@@ -320,18 +325,19 @@ describe(commands.DOCTOR, () => {
   });
 
   it('fails with error when SPFx not found', (done) => {
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
-      const packageName: string = args[1];
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
           callback(undefined, '{}');
-          break;
+          return {} as child_process.ChildProcess;
         case '@microsoft/generator-sharepoint':
           callback(undefined, '{}');
-          break;
+          return {} as child_process.ChildProcess;
         default:
           callback(new Error(`${file} ENOENT`));
       }
+      return {} as child_process.ChildProcess;
     });
 
     cmdInstance.action({ options: { debug: false } }, (err: any) => {
@@ -348,18 +354,19 @@ describe(commands.DOCTOR, () => {
   });
 
   it('fails with error when SPFx not found (debug)', (done) => {
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
-      const packageName: string = args[1];
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
           callback(undefined, '{}');
-          break;
+          return {} as child_process.ChildProcess;
         case '@microsoft/generator-sharepoint':
           callback(undefined, '{}');
-          break;
+          return {} as child_process.ChildProcess;
         default:
           callback(new Error(`${file} ENOENT`));
-      }
+          return {} as child_process.ChildProcess;
+        }
     });
 
     cmdInstance.action({ options: { debug: true } }, (err: any) => {
@@ -376,15 +383,16 @@ describe(commands.DOCTOR, () => {
   });
 
   it('passes SPO compatibility check for SPFx v1.10.0', (done) => {
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
-      const packageName: string = args[1];
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
           callback(undefined, packageVersionResponse(packageName, '1.10.0'));
-          break;
+          return {} as child_process.ChildProcess;
       }
 
       callback(new Error(`${file} ENOENT`));
+      return {} as child_process.ChildProcess;
     });
 
     cmdInstance.action({ options: { debug: false, env: 'spo' } }, () => {
@@ -399,15 +407,16 @@ describe(commands.DOCTOR, () => {
   });
 
   it('passes SP2019 compatibility check for SPFx v1.4.1', (done) => {
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
-      const packageName: string = args[1];
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
           callback(undefined, packageVersionResponse(packageName, '1.4.1'));
-          break;
+          return {} as child_process.ChildProcess;
       }
 
       callback(new Error(`${file} ENOENT`));
+      return {} as child_process.ChildProcess;
     });
 
     cmdInstance.action({ options: { debug: false, env: 'sp2019' } }, () => {
@@ -422,15 +431,16 @@ describe(commands.DOCTOR, () => {
   });
 
   it('fails SP2019 compatibility check for SPFx v1.5.0', (done) => {
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
-      const packageName: string = args[1];
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
           callback(undefined, packageVersionResponse(packageName, '1.5.0'));
-          break;
+          return {} as child_process.ChildProcess;
       }
 
       callback(new Error(`${file} ENOENT`));
+      return {} as child_process.ChildProcess;
     });
 
     cmdInstance.action({ options: { debug: false, env: 'sp2019' } }, () => {
@@ -446,15 +456,16 @@ describe(commands.DOCTOR, () => {
   });
 
   it('passes SP2016 compatibility check for SPFx v1.1.0', (done) => {
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
-      const packageName: string = args[1];
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
           callback(undefined, packageVersionResponse(packageName, '1.1.0'));
-          break;
+          return {} as child_process.ChildProcess;
       }
 
       callback(new Error(`${file} ENOENT`));
+      return {} as child_process.ChildProcess;
     });
 
     cmdInstance.action({ options: { debug: false, env: 'sp2016' } }, () => {
@@ -469,15 +480,16 @@ describe(commands.DOCTOR, () => {
   });
 
   it('fails SP2016 compatibility check for SPFx v1.2.0', (done) => {
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
-      const packageName: string = args[1];
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
           callback(undefined, packageVersionResponse(packageName, '1.2.0'));
-          break;
+          return {} as child_process.ChildProcess;
       }
 
       callback(new Error(`${file} ENOENT`));
+      return {} as child_process.ChildProcess;
     });
 
     cmdInstance.action({ options: { debug: false, env: 'sp2016' } }, () => {
@@ -495,15 +507,16 @@ describe(commands.DOCTOR, () => {
   it('passes Node check when version meets single range prerequisite', (done) => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
-      const packageName: string = args[1];
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
           callback(undefined, packageVersionResponse(packageName, '1.10.0'));
-          break;
+          return {} as child_process.ChildProcess;
       }
 
       callback(new Error(`${file} ENOENT`));
+      return {} as child_process.ChildProcess;
     });
 
     cmdInstance.action({ options: { debug: false } }, () => {
@@ -520,15 +533,16 @@ describe(commands.DOCTOR, () => {
   it('passes Node check when version meets double range prerequisite', (done) => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v8.0.0');
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
-      const packageName: string = args[1];
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
           callback(undefined, packageVersionResponse(packageName, '1.9.0'));
-          break;
+          return {} as child_process.ChildProcess;
       }
 
       callback(new Error(`${file} ENOENT`));
+      return {} as child_process.ChildProcess;
     });
 
     cmdInstance.action({ options: { debug: false } }, () => {
@@ -545,15 +559,16 @@ describe(commands.DOCTOR, () => {
   it('fails Node check when version does not meet single range prerequisite', (done) => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v12.0.0');
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
-      const packageName: string = args[1];
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
           callback(undefined, packageVersionResponse(packageName, '1.10.0'));
-          break;
+          return {} as child_process.ChildProcess;
       }
 
       callback(new Error(`${file} ENOENT`));
+      return {} as child_process.ChildProcess;
     });
 
     cmdInstance.action({ options: { debug: false } }, () => {
@@ -571,15 +586,16 @@ describe(commands.DOCTOR, () => {
   it('fails Node check when version does not meet double range prerequisite', (done) => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v12.0.0');
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
-      const packageName: string = args[1];
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
           callback(undefined, packageVersionResponse(packageName, '1.9.0'));
-          break;
+          return {} as child_process.ChildProcess;
       }
 
       callback(new Error(`${file} ENOENT`));
+      return {} as child_process.ChildProcess;
     });
 
     cmdInstance.action({ options: { debug: false } }, () => {
@@ -597,13 +613,13 @@ describe(commands.DOCTOR, () => {
   it('passes npm check when version meets single range prerequisite', (done) => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v8.0.0');
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
-      if (file === 'npm' && args.length === 1 && args[0] === '-v') {
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
         callback(undefined, '5.0.0');
-        return;
+        return {} as child_process.ChildProcess;
       }
 
-      const packageName: string = args[1];
+      const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
           callback(undefined, packageVersionResponse(packageName, '1.6.0'));
@@ -611,6 +627,7 @@ describe(commands.DOCTOR, () => {
         default:
           callback(new Error(`${file} ENOENT`));
       }
+      return {} as child_process.ChildProcess;
     });
 
     cmdInstance.action({ options: { debug: false } }, () => {
@@ -630,13 +647,13 @@ describe(commands.DOCTOR, () => {
 
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v8.0.0');
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
-      if (file === 'npm.cmd' && args.length === 1 && args[0] === '-v') {
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      if (file === 'npm.cmd' && args && args.length === 1 && args[0] === '-v') {
         callback(undefined, '5.0.0');
-        return;
+        return {} as child_process.ChildProcess;
       }
 
-      const packageName: string = args[1];
+      const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
           callback(undefined, packageVersionResponse(packageName, '1.6.0'));
@@ -644,6 +661,7 @@ describe(commands.DOCTOR, () => {
         default:
           callback(new Error(`${file} ENOENT`));
       }
+      return {} as child_process.ChildProcess;
     });
 
     cmdInstance.action({ options: { debug: false } }, () => {
@@ -660,13 +678,13 @@ describe(commands.DOCTOR, () => {
   it('passes npm check when version meets double range prerequisite', (done) => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.0.0');
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
-      if (file === 'npm' && args.length === 1 && args[0] === '-v') {
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
         callback(undefined, '6.0.0');
-        return;
+        return {} as child_process.ChildProcess;
       }
 
-      const packageName: string = args[1];
+      const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
           callback(undefined, packageVersionResponse(packageName, '1.10.0'));
@@ -674,6 +692,7 @@ describe(commands.DOCTOR, () => {
         default:
           callback(new Error(`${file} ENOENT`));
       }
+      return {} as child_process.ChildProcess;
     });
 
     cmdInstance.action({ options: { debug: false } }, () => {
@@ -690,13 +709,13 @@ describe(commands.DOCTOR, () => {
   it('fails npm check when version does not meet single range prerequisite', (done) => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v8.0.0');
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
-      if (file === 'npm' && args.length === 1 && args[0] === '-v') {
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
         callback(undefined, '4.0.0');
-        return;
+        return {} as child_process.ChildProcess;
       }
 
-      const packageName: string = args[1];
+      const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
           callback(undefined, packageVersionResponse(packageName, '1.6.0'));
@@ -704,6 +723,7 @@ describe(commands.DOCTOR, () => {
         default:
           callback(new Error(`${file} ENOENT`));
       }
+      return {} as child_process.ChildProcess;
     });
 
     cmdInstance.action({ options: { debug: false } }, () => {
@@ -721,13 +741,13 @@ describe(commands.DOCTOR, () => {
   it('fails npm check when version does not meet double range prerequisite', (done) => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.0.0');
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
-      if (file === 'npm' && args.length === 1 && args[0] === '-v') {
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
         callback(undefined, '7.0.0');
-        return;
+        return {} as child_process.ChildProcess;
       }
 
-      const packageName: string = args[1];
+      const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
           callback(undefined, packageVersionResponse(packageName, '1.10.0'));
@@ -735,6 +755,7 @@ describe(commands.DOCTOR, () => {
         default:
           callback(new Error(`${file} ENOENT`));
       }
+      return {} as child_process.ChildProcess;
     });
 
     cmdInstance.action({ options: { debug: false } }, () => {
@@ -752,8 +773,9 @@ describe(commands.DOCTOR, () => {
   it('fails with friendly error message when npm not found', (done) => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.0.0');
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
       callback(new Error(`${file} ENOENT`));
+      return {} as child_process.ChildProcess;
     });
 
     cmdInstance.action({ options: { debug: false } }, (err: any) => {
@@ -771,13 +793,13 @@ describe(commands.DOCTOR, () => {
   it('passes yo check when yo found', (done) => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
-      if (file === 'npm' && args.length === 1 && args[0] === '-v') {
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
         callback(undefined, '6.13.4');
-        return;
+        return {} as child_process.ChildProcess;
       }
 
-      const packageName: string = args[1];
+      const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
           callback(undefined, packageVersionResponse(packageName, '1.10.0'));
@@ -788,6 +810,7 @@ describe(commands.DOCTOR, () => {
         default:
           callback(new Error(`${file} ENOENT`));
       }
+      return {} as child_process.ChildProcess;
     });
 
     cmdInstance.action({ options: { debug: false } }, () => {
@@ -804,13 +827,13 @@ describe(commands.DOCTOR, () => {
   it('fails yo check when yo not found', (done) => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
-      if (file === 'npm' && args.length === 1 && args[0] === '-v') {
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
         callback(undefined, '6.13.4');
-        return;
+        return {} as child_process.ChildProcess;
       }
 
-      const packageName: string = args[1];
+      const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
           callback(undefined, packageVersionResponse(packageName, '1.10.0'));
@@ -818,6 +841,7 @@ describe(commands.DOCTOR, () => {
         default:
           callback(new Error(`${file} ENOENT`));
       }
+      return {} as child_process.ChildProcess;
     });
 
     cmdInstance.action({ options: { debug: false } }, () => {
@@ -835,23 +859,25 @@ describe(commands.DOCTOR, () => {
   it('passes gulp check when gulp found', (done) => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
-      if (file === 'npm' && args.length === 1 && args[0] === '-v') {
-        callback(undefined, '6.13.4');
-        return;
+
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
+        callback(null, '6.13.4', '');
+        return {} as child_process.ChildProcess;
       }
 
-      const packageName: string = args[1];
+      const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
-          callback(undefined, packageVersionResponse(packageName, '1.10.0'));
+          callback(null, packageVersionResponse(packageName, '1.10.0'), '');
           break;
         case 'gulp':
-          callback(undefined, packageVersionResponse(packageName, '3.9.1'));
+          callback(null, packageVersionResponse(packageName, '3.9.1'), '');
           break;
         default:
-          callback(new Error(`${file} ENOENT`));
+          callback(new Error(`${file} ENOENT`), '', '');
       }
+      return {} as child_process.ChildProcess;
     });
 
     cmdInstance.action({ options: { debug: false } }, () => {
@@ -868,13 +894,13 @@ describe(commands.DOCTOR, () => {
   it('fails gulp check when gulp not found', (done) => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
-      if (file === 'npm' && args.length === 1 && args[0] === '-v') {
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
         callback(undefined, '6.13.4');
-        return;
+        return {} as child_process.ChildProcess;
       }
 
-      const packageName: string = args[1];
+      const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
           callback(undefined, packageVersionResponse(packageName, '1.10.0'));
@@ -882,6 +908,7 @@ describe(commands.DOCTOR, () => {
         default:
           callback(new Error(`${file} ENOENT`));
       }
+      return {} as child_process.ChildProcess;
     });
 
     cmdInstance.action({ options: { debug: false } }, () => {
@@ -899,13 +926,13 @@ describe(commands.DOCTOR, () => {
   it('passes react check when react not found', (done) => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
-      if (file === 'npm' && args.length === 1 && args[0] === '-v') {
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
         callback(undefined, '6.13.4');
-        return;
+        return {} as child_process.ChildProcess;
       }
 
-      const packageName: string = args[1];
+      const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
           callback(undefined, packageVersionResponse(packageName, '1.10.0'));
@@ -913,6 +940,7 @@ describe(commands.DOCTOR, () => {
         default:
           callback(new Error(`${file} ENOENT`));
       }
+      return {} as child_process.ChildProcess;
     });
 
     cmdInstance.action({ options: { debug: false } }, () => {
@@ -930,13 +958,13 @@ describe(commands.DOCTOR, () => {
   it('passes react check when react meets single range prerequisite', (done) => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v8.0.0');
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
-      if (file === 'npm' && args.length === 1 && args[0] === '-v') {
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
         callback(undefined, '5.0.0');
-        return;
+        return {} as child_process.ChildProcess;
       }
 
-      const packageName: string = args[1];
+      const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
           callback(undefined, packageVersionResponse(packageName, '1.6.0'));
@@ -947,6 +975,7 @@ describe(commands.DOCTOR, () => {
         default:
           callback(new Error(`${file} ENOENT`));
       }
+      return {} as child_process.ChildProcess;
     });
 
     cmdInstance.action({ options: { debug: false } }, () => {
@@ -963,13 +992,13 @@ describe(commands.DOCTOR, () => {
   it('passes react check when react meets specific version prerequisite', (done) => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
-      if (file === 'npm' && args.length === 1 && args[0] === '-v') {
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
         callback(undefined, '6.13.4');
-        return;
+        return {} as child_process.ChildProcess;
       }
 
-      const packageName: string = args[1];
+      const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
           callback(undefined, packageVersionResponse(packageName, '1.10.0'));
@@ -980,6 +1009,7 @@ describe(commands.DOCTOR, () => {
         default:
           callback(new Error(`${file} ENOENT`));
       }
+      return {} as child_process.ChildProcess;
     });
 
     cmdInstance.action({ options: { debug: false } }, () => {
@@ -996,13 +1026,13 @@ describe(commands.DOCTOR, () => {
   it('fails react check when react does not meet single range prerequisite', (done) => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v8.0.0');
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
-      if (file === 'npm' && args.length === 1 && args[0] === '-v') {
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
         callback(undefined, '5.0.0');
-        return;
+        return {} as child_process.ChildProcess;
       }
 
-      const packageName: string = args[1];
+      const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
           callback(undefined, packageVersionResponse(packageName, '1.6.0'));
@@ -1013,6 +1043,7 @@ describe(commands.DOCTOR, () => {
         default:
           callback(new Error(`${file} ENOENT`));
       }
+      return {} as child_process.ChildProcess;
     });
 
     cmdInstance.action({ options: { debug: false } }, () => {
@@ -1030,13 +1061,13 @@ describe(commands.DOCTOR, () => {
   it('fails react check when react does not meet specific version prerequisite', (done) => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
-      if (file === 'npm' && args.length === 1 && args[0] === '-v') {
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
         callback(undefined, '6.13.4');
-        return;
+        return {} as child_process.ChildProcess;
       }
 
-      const packageName: string = args[1];
+      const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
           callback(undefined, packageVersionResponse(packageName, '1.10.0'));
@@ -1047,6 +1078,7 @@ describe(commands.DOCTOR, () => {
         default:
           callback(new Error(`${file} ENOENT`));
       }
+      return {} as child_process.ChildProcess;
     });
 
     cmdInstance.action({ options: { debug: false } }, () => {
@@ -1064,13 +1096,13 @@ describe(commands.DOCTOR, () => {
   it('passes typescript check when typescript not found', (done) => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
-      if (file === 'npm' && args.length === 1 && args[0] === '-v') {
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
         callback(undefined, '6.13.4');
-        return;
+        return {} as child_process.ChildProcess;
       }
 
-      const packageName: string = args[1];
+      const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
           callback(undefined, packageVersionResponse(packageName, '1.10.0'));
@@ -1081,6 +1113,7 @@ describe(commands.DOCTOR, () => {
         default:
           callback(new Error(`${file} ENOENT`));
       }
+      return {} as child_process.ChildProcess;
     });
 
     cmdInstance.action({ options: { debug: false } }, () => {
@@ -1097,13 +1130,13 @@ describe(commands.DOCTOR, () => {
   it('fails typescript check when typescript found', (done) => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
-      if (file === 'npm' && args.length === 1 && args[0] === '-v') {
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
         callback(undefined, '6.13.4');
-        return;
+        return {} as child_process.ChildProcess;
       }
 
-      const packageName: string = args[1];
+      const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
           callback(undefined, packageVersionResponse(packageName, '1.10.0'));
@@ -1114,6 +1147,7 @@ describe(commands.DOCTOR, () => {
         default:
           callback(new Error(`${file} ENOENT`));
       }
+      return {} as child_process.ChildProcess;
     });
 
     cmdInstance.action({ options: { debug: false } }, () => {
@@ -1131,13 +1165,13 @@ describe(commands.DOCTOR, () => {
   it('returns error when used with an unsupported version of spfx', (done) => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
-      if (file === 'npm' && args.length === 1 && args[0] === '-v') {
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
         callback(undefined, '6.13.4');
-        return;
+        return {} as child_process.ChildProcess;
       }
 
-      const packageName: string = args[1];
+      const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
           callback(undefined, packageVersionResponse(packageName, '0.9.0'));
@@ -1145,6 +1179,7 @@ describe(commands.DOCTOR, () => {
         default:
           callback(new Error(`${file} ENOENT`));
       }
+      return {} as child_process.ChildProcess;
     });
 
     cmdInstance.action({ options: { debug: false } }, (err: any) => {
@@ -1168,20 +1203,21 @@ describe(commands.DOCTOR, () => {
     if (process.env.TERM) {
       sandbox.stub(process.env, 'TERM').value('16');
     }
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: (err?: Error, stdout?: string, stderr?: string) => void) => {
-      if (file === 'npm' && args.length === 1 && args[0] === '-v') {
-        callback(undefined, '6.13.4');
-        return;
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
+        callback(null, '6.13.4', '');
+        return {} as child_process.ChildProcess;
       }
 
-      const packageName: string = args[1];
+      const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
-          callback(undefined, packageVersionResponse(packageName, '1.10.0'));
+          callback(null, packageVersionResponse(packageName, '1.10.0'), '');
           break;
         default:
-          callback(new Error(`${file} ENOENT`));
+          callback({ message: `${file} ENOENT` } as any, '', '');
       }
+      return {} as child_process.ChildProcess;
     });
 
     cmdInstance.action({ options: { debug: false } }, () => {

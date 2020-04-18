@@ -1,7 +1,7 @@
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import config from '../../../../config';
 import request from '../../../../request';
-const uuidv4 = require('uuid/v4');
+import { v4 } from 'uuid';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
@@ -78,7 +78,7 @@ class SpoTermGroupAddCommand extends SpoCommand {
         }
 
         const termStore: TermStore = json[json.length - 1];
-        const termGroupId: string = args.options.id || uuidv4();
+        const termGroupId: string = args.options.id || v4();
 
         if (this.verbose) {
           cmd.log(`Adding taxonomy term group...`);

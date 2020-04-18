@@ -159,7 +159,7 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
 
   it('fails to remove channel when channel does not exists', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`channels?$filter=displayName eq 'channelName'`) > -1) {
+      if ((opts.url as string).indexOf(`channels?$filter=displayName eq 'channelName'`) > -1) {
         return Promise.resolve({ value: [] });
       }
       return Promise.reject('Invalid request');
@@ -308,7 +308,7 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
 
   it('removes the specified channel by name when prompt confirmed (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`channels?$filter=displayName eq 'channelName'`) > -1) {
+      if ((opts.url as string).indexOf(`channels?$filter=displayName eq 'channelName'`) > -1) {
         return Promise.resolve({
           value: [
             {

@@ -349,6 +349,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
 
     sinon.stub(request, 'delete').callsFake((opts) => {
       memberDeleteCallIssued = true;
+      return Promise.resolve();
     });
 
     cmdInstance.action = command.action();

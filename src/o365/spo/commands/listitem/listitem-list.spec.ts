@@ -18,7 +18,7 @@ describe(commands.LISTITEM_LIST, () => {
   let returnArrayLength = 0;
 
   let postFakes = (opts: any) => {
-    if (opts.url.indexOf('/GetItems') > -1) {
+    if ((opts.url as string).indexOf('/GetItems') > -1) {
       returnArrayLength = 2;
       return Promise.resolve({value: 
         [{
@@ -51,7 +51,7 @@ describe(commands.LISTITEM_LIST, () => {
   }
 
   let getFakes = (opts: any) => {
-    if (opts.url.indexOf('/items') > -1) {
+    if ((opts.url as string).indexOf('/items') > -1) {
       returnArrayLength = 2;
       return Promise.resolve({ value: 
         [{

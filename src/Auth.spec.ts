@@ -688,7 +688,7 @@ describe('Auth', () => {
     const mockStorage = {
       get: () => Promise.resolve(JSON.stringify(service))
     };
-    sinon.stub(auth, 'getTokenStorage').callsFake(() => mockStorage);
+    sinon.stub(auth, 'getTokenStorage').callsFake(() => mockStorage as any);
 
     auth
       .restoreAuth()
@@ -729,7 +729,7 @@ describe('Auth', () => {
     const mockStorage = {
       get: () => Promise.resolve('abc')
     };
-    sinon.stub(auth, 'getTokenStorage').callsFake(() => mockStorage);
+    sinon.stub(auth, 'getTokenStorage').callsFake(() => mockStorage as any);
 
     auth
       .restoreAuth()
@@ -747,7 +747,7 @@ describe('Auth', () => {
     const mockStorage = {
       get: () => Promise.reject('abc')
     };
-    sinon.stub(auth, 'getTokenStorage').callsFake(() => mockStorage);
+    sinon.stub(auth, 'getTokenStorage').callsFake(() => mockStorage as any);
 
     auth
       .restoreAuth()

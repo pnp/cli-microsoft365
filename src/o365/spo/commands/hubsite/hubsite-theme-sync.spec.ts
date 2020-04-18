@@ -60,7 +60,7 @@ describe(commands.HUBSITE_THEME_SYNC, () => {
 
   it('syncs hub site theme to a web', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/SyncHubSiteTheme`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/SyncHubSiteTheme`) > -1) {
         return Promise.resolve({ "odata.null": true });
       }
 
@@ -80,7 +80,7 @@ describe(commands.HUBSITE_THEME_SYNC, () => {
 
   it('syncs hub site theme to a web (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/SyncHubSiteTheme`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/SyncHubSiteTheme`) > -1) {
         return Promise.resolve({
           "odata.null": true
         });

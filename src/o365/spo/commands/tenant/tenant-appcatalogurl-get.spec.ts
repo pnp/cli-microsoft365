@@ -113,7 +113,7 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
     // get tenant app catalog
     sinon.stub(request, 'get').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf('SP_TenantSettings_Current') > -1) {
+      if ((opts.url as string).indexOf('SP_TenantSettings_Current') > -1) {
         return Promise.reject('An error has occurred');
       }
       return Promise.reject('Invalid request');
@@ -138,7 +138,7 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
     // get tenant app catalog
     sinon.stub(request, 'get').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf('SP_TenantSettings_Current') > -1) {
+      if ((opts.url as string).indexOf('SP_TenantSettings_Current') > -1) {
         return Promise.resolve(JSON.stringify({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" }));
       }
       return Promise.reject('Invalid request');
@@ -163,7 +163,7 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
     // get tenant app catalog
     sinon.stub(request, 'get').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf('SP_TenantSettings_Current') > -1) {
+      if ((opts.url as string).indexOf('SP_TenantSettings_Current') > -1) {
         return Promise.resolve(JSON.stringify({ "CorporateCatalogUrl": null }));
       }
       return Promise.reject('Invalid request');
@@ -188,7 +188,7 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
     // get tenant app catalog
     sinon.stub(request, 'get').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf('SP_TenantSettings_Current') > -1) {
+      if ((opts.url as string).indexOf('SP_TenantSettings_Current') > -1) {
         return Promise.resolve(JSON.stringify({ "CorporateCatalogUrl": null }));
       }
       return Promise.reject('Invalid request');

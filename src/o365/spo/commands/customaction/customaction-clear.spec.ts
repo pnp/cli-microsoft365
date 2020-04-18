@@ -17,12 +17,12 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   const defaultPostCallsStub = (): sinon.SinonStub => {
     return sinon.stub(request, 'post').callsFake((opts) => {
       // fakes clear custom actions success (site)
-      if (opts.url.indexOf('/_api/Web/UserCustomActions/clear') > -1) {
+      if ((opts.url as string).indexOf('/_api/Web/UserCustomActions/clear') > -1) {
         return Promise.resolve(undefined);
       }
 
       // fakes clear custom actions success (site collection)
-      if (opts.url.indexOf('/_api/Site/UserCustomActions/clear') > -1) {
+      if ((opts.url as string).indexOf('/_api/Site/UserCustomActions/clear') > -1) {
         return Promise.resolve(undefined);
       }
 
@@ -315,7 +315,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
 
     sinon.stub(request, 'post').callsFake((opts) => {
       // fakes clear custom actions success (site)
-      if (opts.url.indexOf('/_api/Web/UserCustomActions/clear') > -1) {
+      if ((opts.url as string).indexOf('/_api/Web/UserCustomActions/clear') > -1) {
         return Promise.reject(err);
       }
 
@@ -344,11 +344,11 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
 
     sinon.stub(request, 'post').callsFake((opts) => {
       // should return null to proceed with site when scope is All
-      if (opts.url.indexOf('/_api/Web/UserCustomActions/clear') > -1) {
+      if ((opts.url as string).indexOf('/_api/Web/UserCustomActions/clear') > -1) {
         return Promise.resolve({ "odata.null": true });
       }
 
-      if (opts.url.indexOf('/_api/Site/UserCustomActions/clear') > -1) {
+      if ((opts.url as string).indexOf('/_api/Site/UserCustomActions/clear') > -1) {
         return Promise.reject(err);
       }
 
@@ -395,7 +395,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   });
 
   it('doesn\'t fail if the parent doesn\'t define options', () => {
-    sinon.stub(Command.prototype, 'options').callsFake(() => { return undefined; });
+    sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
     const options = (command.options() as CommandOption[]);
     Utils.restore(Command.prototype.options);
     assert(options.length > 0);

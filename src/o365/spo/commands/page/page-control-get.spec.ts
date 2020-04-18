@@ -62,7 +62,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
 
   it('gets information about the control on a modern page', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve({
           "ListItemAllFields": {
             "CommentsDisabled": false,
@@ -139,7 +139,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
 
   it('gets information about the control with dynamicDataPaths and dynamicDataValues on a modern page', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve({
           "ListItemAllFields": {
             "CommentsDisabled": false,
@@ -216,7 +216,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
 
   it('gets information about the control on a modern page (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve({
           "ListItemAllFields": {
             "CommentsDisabled": false,
@@ -293,7 +293,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
 
   it('gets information about the control on a modern page when the specified page name doesn\'t contain extension', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve({
           "ListItemAllFields": {
             "CommentsDisabled": false,
@@ -370,7 +370,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
 
   it('gets raw information about the control on a modern page in json output mode', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve({
           "ListItemAllFields": {
             "CommentsDisabled": false,
@@ -447,7 +447,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
 
   it('handles empty columns', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve({
           "ListItemAllFields": {
             "CommentsDisabled": false,
@@ -530,7 +530,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
 
   it('handles text controls', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve({
           "ListItemAllFields": {
             "CommentsDisabled": false,
@@ -612,7 +612,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
 
   it('handles unknown types', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve({
           "ListItemAllFields": {
             "CommentsDisabled": false,
@@ -695,7 +695,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
 
   it('shows error when the specified page is a classic page', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve({
           "ListItemAllFields": {
             "CommentsDisabled": false,
@@ -769,7 +769,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
 
   it('correctly handles control not found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve({
           "ListItemAllFields": {
             "CommentsDisabled": false,
@@ -846,7 +846,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
 
   it('correctly handles control not found (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve({
           "ListItemAllFields": {
             "CommentsDisabled": false,

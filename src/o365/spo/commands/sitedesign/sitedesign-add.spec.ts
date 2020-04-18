@@ -64,7 +64,7 @@ describe(commands.SITEDESIGN_ADD, () => {
 
   it('adds new site design for a team site', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteDesign`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteDesign`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           info: {
             Title: 'Contoso',
@@ -111,7 +111,7 @@ describe(commands.SITEDESIGN_ADD, () => {
 
   it('adds new site design for a team site (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteDesign`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteDesign`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           info: {
             Title: 'Contoso',
@@ -158,7 +158,7 @@ describe(commands.SITEDESIGN_ADD, () => {
 
   it('adds new team site site design wilt multiple site script IDs', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteDesign`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteDesign`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           info: {
             Title: 'Contoso',
@@ -195,7 +195,7 @@ describe(commands.SITEDESIGN_ADD, () => {
 
   it('adds new site design for a communication site', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteDesign`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteDesign`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           info: {
             Title: 'Contoso',
@@ -242,7 +242,7 @@ describe(commands.SITEDESIGN_ADD, () => {
 
   it('adds new team site site design with description', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteDesign`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteDesign`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           info: {
             Title: 'Contoso',
@@ -290,7 +290,7 @@ describe(commands.SITEDESIGN_ADD, () => {
 
   it('adds new team site site design with previewImageUrl', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteDesign`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteDesign`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           info: {
             Title: 'Contoso',
@@ -338,7 +338,7 @@ describe(commands.SITEDESIGN_ADD, () => {
 
   it('adds new team site site design with previewImageAltText', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteDesign`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteDesign`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           info: {
             Title: 'Contoso',
@@ -386,7 +386,7 @@ describe(commands.SITEDESIGN_ADD, () => {
 
   it('adds new default team site site design', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteDesign`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteDesign`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           info: {
             Title: 'Contoso',
@@ -434,7 +434,7 @@ describe(commands.SITEDESIGN_ADD, () => {
 
   it('adds new team site site design with all options specified', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteDesign`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteDesign`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           info: {
             Title: 'Contoso',

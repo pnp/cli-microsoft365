@@ -341,7 +341,7 @@ describe('autocomplete', () => {
       before: "o365",
       fragment: 1,
       line: "o365 ",
-      reply: () => { }
+      reply: (data: Object | string[]) => { }
     };
     const replies: any[] = [];
     const replyStub = sinon.stub(evtData, 'reply').callsFake((r) => {
@@ -357,7 +357,7 @@ describe('autocomplete', () => {
       before: "spo",
       fragment: 2,
       line: "o365 spo ",
-      reply: () => { }
+      reply: (data: Object | string[]) => { }
     };
     const replies: any[] = [];
     const replyStub = sinon.stub(evtData, 'reply').callsFake((r) => {
@@ -384,7 +384,7 @@ describe('autocomplete', () => {
       before: "status",
       fragment: 3,
       line: "o365 spo status ",
-      reply: () => { }
+      reply: (data: Object | string[]) => { }
     };
     const replies: any[] = [];
     const replyStub = sinon.stub(evtData, 'reply').callsFake((r) => {
@@ -400,7 +400,7 @@ describe('autocomplete', () => {
       before: "--output",
       fragment: 4,
       line: "o365 spo status --output ",
-      reply: () => { }
+      reply: (data: Object | string[]) => { }
     };
     const replies: any[] = [];
     const replyStub = sinon.stub(evtData, 'reply').callsFake((r) => {
@@ -416,7 +416,7 @@ describe('autocomplete', () => {
       before: "json",
       fragment: 5,
       line: "o365 spo status --output json ",
-      reply: () => { }
+      reply: (data: Object | string[]) => { }
     };
     const replies: any[] = [];
     const replyStub = sinon.stub(evtData, 'reply').callsFake((r) => {
@@ -432,7 +432,7 @@ describe('autocomplete', () => {
       before: "--debug",
       fragment: 6,
       line: "o365 spo status --output json --debug ",
-      reply: () => { }
+      reply: (data: Object | string[]) => { }
     };
     const replies: any[] = [];
     const replyStub = sinon.stub(evtData, 'reply').callsFake((r) => {
@@ -448,7 +448,7 @@ describe('autocomplete', () => {
       before: "def",
       fragment: 2,
       line: "o365 abc def",
-      reply: () => { }
+      reply: (data: Object | string[]) => { }
     };
     const replies: any[] = [];
     const replyStub = sinon.stub(evtData, 'reply').callsFake((r) => {
@@ -464,7 +464,7 @@ describe('autocomplete', () => {
       before: "def",
       fragment: 3,
       line: "o365 abc def ",
-      reply: () => { }
+      reply: (data: Object | string[]) => { }
     };
     const replies: any[] = [];
     const replyStub = sinon.stub(evtData, 'reply').callsFake((r) => {

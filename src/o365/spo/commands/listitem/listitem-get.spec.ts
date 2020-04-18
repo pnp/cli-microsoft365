@@ -20,7 +20,7 @@ describe(commands.LISTITEM_GET, () => {
   let actualId = 0;
 
   let getFakes = (opts: any) => {
-    if (opts.url.indexOf('/items(') > -1) {
+    if ((opts.url as string).indexOf('/items(') > -1) {
       actualId = opts.url.match(/\/items\((\d+)\)/i)[1];
       return Promise.resolve(
         {

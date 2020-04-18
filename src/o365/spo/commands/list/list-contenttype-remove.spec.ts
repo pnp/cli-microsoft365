@@ -117,8 +117,9 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`/_api/web/lists(guid'`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`/_api/web/lists(guid'`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve();
         }
@@ -152,8 +153,9 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve();
         }
@@ -201,8 +203,9 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve();
         }
@@ -250,8 +253,9 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve();
         }
@@ -299,8 +303,9 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve();
         }
@@ -347,7 +352,7 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
   it('command correctly handles list get reject request', (done) => {
     const err = 'Invalid request';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/lists/GetByTitle(') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/lists/GetByTitle(') > -1) {
         return Promise.reject(err);
       }
 
@@ -378,7 +383,7 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
 
   it('uses correct API url when listTitle option is passed', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/lists/GetByTitle(') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/lists/GetByTitle(') > -1) {
         return Promise.resolve();
       }
 
@@ -409,7 +414,7 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
 
   it('uses correct API url when listId option is passed', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/lists(guid') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/lists(guid') > -1) {
         return Promise.resolve();
       }
 

@@ -48,8 +48,8 @@ describe('PnPJsRule', () => {
       }
     };
     const originalExistSync = fs.existsSync;
-    sinon.stub(fs, 'existsSync').callsFake((path: string) => {
-      if (path.indexOf('WebPart') > -1) {
+    sinon.stub(fs, 'existsSync').callsFake((path) => {
+      if (path.toString().indexOf('WebPart') > -1) {
         return false;
       }
       else {

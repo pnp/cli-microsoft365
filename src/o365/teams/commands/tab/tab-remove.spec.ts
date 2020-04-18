@@ -249,7 +249,7 @@ describe(commands.TEAMS_TAB_REMOVE, () => {
 
   it('removes the specified tab by id when prompt confirmed (debug)', (done) => {
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url.indexOf(`tabs/d66b8110-fcad-49e8-8159-0d488ddb7656`) > -1) {
+      if (opts.url.toString().indexOf(`tabs/d66b8110-fcad-49e8-8159-0d488ddb7656`) > -1) {
         return Promise.resolve();
       }
 
@@ -280,7 +280,7 @@ describe(commands.TEAMS_TAB_REMOVE, () => {
 
   it('removes the specified tab without prompting when confirmed specified (debug)', (done) => {
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url.indexOf(`tabs/d66b8110-fcad-49e8-8159-0d488ddb7656`) > -1) {
+      if (opts.url.toString().indexOf(`tabs/d66b8110-fcad-49e8-8159-0d488ddb7656`) > -1) {
         return Promise.resolve();
       }
 

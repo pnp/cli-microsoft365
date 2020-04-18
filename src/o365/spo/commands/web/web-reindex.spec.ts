@@ -70,7 +70,7 @@ describe(commands.WEB_REINDEX, () => {
     let propertyValue: string = '';
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.body.indexOf(`<Query Id="1" ObjectPathId="5">`) > -1) {
           return Promise.resolve(JSON.stringify([{
             "SchemaVersion": "15.0.0.0",
@@ -88,7 +88,7 @@ describe(commands.WEB_REINDEX, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/allproperties') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/allproperties') > -1) {
         return Promise.resolve({});
       }
 
@@ -119,7 +119,7 @@ describe(commands.WEB_REINDEX, () => {
     let propertyValue: string = '';
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.body.indexOf(`<Query Id="1" ObjectPathId="5">`) > -1) {
           return Promise.resolve(JSON.stringify([{
             "SchemaVersion": "15.0.0.0",
@@ -137,7 +137,7 @@ describe(commands.WEB_REINDEX, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/allproperties') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/allproperties') > -1) {
         return Promise.resolve({
           vti_x005f_searchversion: '1'
         });
@@ -170,7 +170,7 @@ describe(commands.WEB_REINDEX, () => {
     const propertyValue: string[] = [];
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.body.indexOf(`<Query Id="1" ObjectPathId="5">`) > -1) {
           return Promise.resolve(JSON.stringify([{
             "SchemaVersion": "15.0.0.0",
@@ -204,7 +204,7 @@ describe(commands.WEB_REINDEX, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/lists') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/lists') > -1) {
         return Promise.resolve({
           value: [
             {
@@ -262,7 +262,7 @@ describe(commands.WEB_REINDEX, () => {
     const propertyValue: string[] = [];
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.body.indexOf(`<Query Id="1" ObjectPathId="5">`) > -1) {
           return Promise.resolve(JSON.stringify([{
             "SchemaVersion": "15.0.0.0",
@@ -296,7 +296,7 @@ describe(commands.WEB_REINDEX, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/lists') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/lists') > -1) {
         return Promise.resolve({
           value: [
             {
@@ -351,7 +351,7 @@ describe(commands.WEB_REINDEX, () => {
 
   it('correctly handles error while requiring reindexing a list', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.body.indexOf(`<Query Id="1" ObjectPathId="5">`) > -1) {
           return Promise.resolve(JSON.stringify([{
             "SchemaVersion": "15.0.0.0",
@@ -385,7 +385,7 @@ describe(commands.WEB_REINDEX, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/lists') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/lists') > -1) {
         return Promise.resolve({
           value: [
             {

@@ -1,7 +1,7 @@
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-const uuidv4 = require('uuid/v4');
+import { v4 } from 'uuid';
 import {
   CommandOption,
   CommandValidate
@@ -145,7 +145,7 @@ class SpoFileAddCommand extends SpoCommand {
         }
 
         const fileStats: fs.Stats = fs.statSync(fullPath);
-        const fileSize: number = fileStats ? fileStats.size : 0;
+        const fileSize: number = fileStats.size;
         if (this.debug) {
           cmd.log(`File size is ${fileSize} bytes`);
         }
@@ -158,7 +158,7 @@ class SpoFileAddCommand extends SpoCommand {
           }
 
           // initiate chunked upload session
-          const uploadId: string = uuidv4();
+          const uploadId: string = v4();
           const requestOptions: any = {
             url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderPath)}')/Files/GetByPathOrAddStub(DecodedUrl='${encodeURIComponent(fileName)}')/StartUpload(uploadId=guid'${uploadId}')`,
             headers: {

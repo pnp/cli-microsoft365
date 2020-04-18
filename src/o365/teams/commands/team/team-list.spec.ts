@@ -81,7 +81,7 @@ describe(commands.TEAMS_TEAM_LIST, () => {
             }
           ]
         });
-      } else if (opts.url.startsWith(`https://graph.microsoft.com/beta/teams/`)) {
+      } else if ((opts.url as string).startsWith(`https://graph.microsoft.com/beta/teams/`)) {
         const id: string = (<string>opts.url).substring((<string>opts.url).lastIndexOf(`/`) + 1);
         return Promise.resolve({
           "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams/$entity",
@@ -238,7 +238,7 @@ describe(commands.TEAMS_TEAM_LIST, () => {
             }
           ]
         });
-      } else if (opts.url.startsWith(`https://graph.microsoft.com/beta/teams/`)) {
+      } else if ((opts.url as string).startsWith(`https://graph.microsoft.com/beta/teams/`)) {
         const id: string = (<string>opts.url).substring((<string>opts.url).lastIndexOf(`/`) + 1);
         return Promise.resolve({
           "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams/$entity",
@@ -328,7 +328,7 @@ describe(commands.TEAMS_TEAM_LIST, () => {
             }
           ]
         });
-      } else if (opts.url.startsWith(`https://graph.microsoft.com/beta/teams/`)) {
+      } else if ((opts.url as string).startsWith(`https://graph.microsoft.com/beta/teams/`)) {
         const id: string = (<string>opts.url).substring((<string>opts.url).lastIndexOf(`/`) + 1);
         return Promise.resolve({
           "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams/$entity",
@@ -441,7 +441,7 @@ describe(commands.TEAMS_TEAM_LIST, () => {
             }
           ]
         });
-      } else if (opts.url.startsWith(`https://graph.microsoft.com/beta/teams/`)) {
+      } else if ((opts.url as string).startsWith(`https://graph.microsoft.com/beta/teams/`)) {
         const id: string = (<string>opts.url).substring((<string>opts.url).lastIndexOf(`/`) + 1);
         return Promise.resolve({
           "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams/$entity",

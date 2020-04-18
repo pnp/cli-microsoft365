@@ -60,8 +60,9 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
 
   it('retrieves all webhooks of the specific list if title option is passed (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
             "value": [
@@ -120,8 +121,9 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
 
   it('retrieves all webhooks of the specific list if listTitle option is passed (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
             "value": [
@@ -180,8 +182,9 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
 
   it('retrieves all webhooks of the specific list if title option is passed', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
             "value": [
@@ -240,8 +243,9 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
 
   it('retrieves all webhooks of the specific list if listTitle option is passed', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
             "value": [
@@ -300,8 +304,9 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
 
   it('retrieves all webhooks of the specific list if id option is passed (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
             "value": [
@@ -360,8 +365,9 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
 
   it('retrieves all webhooks of the specific list if listId option is passed (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
             "value": [
@@ -420,8 +426,9 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
 
   it('retrieves all webhooks of the specific list if id option is passed', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
             "value": [
@@ -480,8 +487,9 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
 
   it('retrieves all webhooks of the specific list if listId option is passed', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
             "value": [
@@ -540,8 +548,9 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
 
   it('renders empty string for clientState, if no value for clientState was specified in the webhook', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
             "value": [
@@ -600,8 +609,9 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
 
   it('outputs user-friendly message when no webhooks found in verbose mode', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
             "value": []
@@ -631,8 +641,9 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
 
   it('outputs all properties when output is JSON', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
             "value": [
@@ -697,7 +708,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
 
   it('command correctly handles list get reject request', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+      if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
         return Promise.resolve({
           FormDigestValue: 'abc'
         });
@@ -708,7 +719,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
 
     const err = 'Invalid request';
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/lists/GetByTitle(') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/lists/GetByTitle(') > -1) {
         return Promise.reject(err);
       }
 
@@ -736,7 +747,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
 
   it('uses correct API url when id option is passed', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/lists(guid') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/lists(guid') > -1) {
         return Promise.resolve('Correct Url')
       }
 

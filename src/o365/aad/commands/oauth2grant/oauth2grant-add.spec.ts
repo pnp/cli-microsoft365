@@ -60,8 +60,9 @@ describe(commands.OAUTH2GRANT_ADD, () => {
 
   it('adds OAuth2 permission grant (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/myorganization/oauth2PermissionGrants?api-version=1.6`) > -1) {
-        if (opts.headers['content-type'] &&
+      if ((opts.url as string).indexOf(`/myorganization/oauth2PermissionGrants?api-version=1.6`) > -1) {
+        if (opts.headers &&
+          opts.headers['content-type'] &&
           opts.headers['content-type'].indexOf('application/json') === 0 &&
           opts.body.clientId === '6a7b1395-d313-4682-8ed4-65a6265a6320' &&
           opts.body.resourceId === '6a7b1395-d313-4682-8ed4-65a6265a6321' &&
@@ -86,8 +87,9 @@ describe(commands.OAUTH2GRANT_ADD, () => {
 
   it('adds OAuth2 permission grant', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/myorganization/oauth2PermissionGrants?api-version=1.6`) > -1) {
-        if (opts.headers.authorization &&
+      if ((opts.url as string).indexOf(`/myorganization/oauth2PermissionGrants?api-version=1.6`) > -1) {
+        if (opts.headers &&
+          opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers['content-type'] &&
           opts.headers['content-type'].indexOf('application/json') === 0 &&

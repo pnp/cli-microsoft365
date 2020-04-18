@@ -60,7 +60,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
 
   it('uses correct API url when list id option is passed', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/lists(guid') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/lists(guid') > -1) {
         return Promise.resolve('Correct Url')
       }
 
@@ -89,7 +89,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
 
   it('uses correct API url when list title option is passed', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/lists/GetByTitle(') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/lists/GetByTitle(') > -1) {
         return Promise.resolve('Correct Url')
       }
 
@@ -118,7 +118,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
 
   it('adds a webhook by passing list title (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions`) > -1) {
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions`) > -1) {
         return Promise.resolve({
           'clientState': 'null',
           'expirationDateTime': '2019-05-29T23:00:00.000Z',
@@ -159,7 +159,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
 
   it('adds a webhook by passing list id (verbose)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'0987cfd9-f02c-479b-9fb4-3f0550462848')/Subscriptions`) > -1) {
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'0987cfd9-f02c-479b-9fb4-3f0550462848')/Subscriptions`) > -1) {
         return Promise.resolve({
           'clientState': 'null',
           'expirationDateTime': '2019-05-29T23:00:00.000Z',
@@ -200,7 +200,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
 
   it('adds a webhook by passing list title', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions`) > -1) {
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions`) > -1) {
         return Promise.resolve({
           'clientState': 'null',
           'expirationDateTime': '2019-05-29T23:00:00.000Z',
@@ -241,7 +241,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
 
   it('adds a webhook by passing list title including a client state', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions`) > -1) {
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions`) > -1) {
         return Promise.resolve({
           'clientState': 'awesome state',
           'expirationDateTime': '2019-05-29T23:00:00.000Z',
@@ -283,7 +283,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
 
   it('adds a webhook by passing list title including a expiration date', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions`) > -1) {
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions`) > -1) {
         return Promise.resolve({
           'clientState': 'null',
           'expirationDateTime': '2019-01-09T23:00:00.000Z',

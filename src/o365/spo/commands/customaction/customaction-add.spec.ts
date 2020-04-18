@@ -16,11 +16,11 @@ describe(commands.CUSTOMACTION_ADD, () => {
   let defaultCommandOptions: any;
   let initDefaultPostStubs = (): sinon.SinonStub => {
     return sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/Web/UserCustomActions') > -1) {
+      if ((opts.url as string).indexOf('/_api/Web/UserCustomActions') > -1) {
         return Promise.resolve('abc');
       }
 
-      if (opts.url.indexOf('/_api/Site/UserCustomActions') > -1) {
+      if ((opts.url as string).indexOf('/_api/Site/UserCustomActions') > -1) {
         return Promise.resolve('abc');
       }
 
@@ -360,17 +360,17 @@ describe(commands.CUSTOMACTION_ADD, () => {
 
   it('retrieves and prints the added user custom actions details when verbose specified', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/common/oauth2/token') > -1) {
+      if ((opts.url as string).indexOf('/common/oauth2/token') > -1) {
         return Promise.resolve('abc');
       }
 
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+      if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
         return Promise.resolve({
           FormDigestValue: 'abc'
         });
       }
 
-      if (opts.url.indexOf('/_api/Web/UserCustomActions') > -1) {
+      if ((opts.url as string).indexOf('/_api/Web/UserCustomActions') > -1) {
         return Promise.resolve(
           {
             "ClientSideComponentId": "015e0fcf-fe9d-4037-95af-0a4776cdfbb4",
@@ -674,7 +674,7 @@ describe(commands.CUSTOMACTION_ADD, () => {
   });
 
   it('doesn\'t fail if the parent doesn\'t define options', () => {
-    sinon.stub(Command.prototype, 'options').callsFake(() => { return undefined; });
+    sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
     const options = (command.options() as CommandOption[]);
     Utils.restore(Command.prototype.options);
     assert(options.length > 0);

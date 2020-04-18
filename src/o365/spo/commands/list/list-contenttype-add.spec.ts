@@ -60,8 +60,9 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
 
   it('adds content type to the specific list if listTitle option is passed (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/ContentTypes/AddAvailableContentType`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/ContentTypes/AddAvailableContentType`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0 &&
           JSON.stringify(opts.body) === JSON.stringify({
             contentTypeId: '0x0120'
@@ -143,8 +144,9 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
 
   it('adds content type to the specific list if listTitle option is passed', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/ContentTypes/AddAvailableContentType`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/ContentTypes/AddAvailableContentType`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0 &&
           JSON.stringify(opts.body) === JSON.stringify({
             contentTypeId: '0x0120'
@@ -226,8 +228,9 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
 
   it('adds content type to the specific list if listId option is passed (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/ContentTypes/AddAvailableContentType`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/ContentTypes/AddAvailableContentType`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0 &&
           JSON.stringify(opts.body) === JSON.stringify({
             contentTypeId: '0x0120'
@@ -309,8 +312,9 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
 
   it('adds content type to the specific list if listId option is passed', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/ContentTypes/AddAvailableContentType`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/ContentTypes/AddAvailableContentType`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0 &&
           JSON.stringify(opts.body) === JSON.stringify({
             contentTypeId: '0x0120'
@@ -393,7 +397,7 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
   it('command correctly handles list get reject request', (done) => {
     const err = 'Invalid request';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/lists/GetByTitle(') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/lists/GetByTitle(') > -1) {
         return Promise.reject(err);
       }
 
@@ -422,7 +426,7 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
 
   it('uses correct API url when listTitle option is passed', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/lists/GetByTitle(') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/lists/GetByTitle(') > -1) {
         return Promise.resolve({
           "Description": "Create a new folder.",
           "DisplayFormTemplateName": "ListForm",
@@ -477,7 +481,7 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
 
   it('uses correct API url when listId option is passed', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/lists(guid') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/lists(guid') > -1) {
         return Promise.resolve({
           "Description": "Create a new folder.",
           "DisplayFormTemplateName": "ListForm",

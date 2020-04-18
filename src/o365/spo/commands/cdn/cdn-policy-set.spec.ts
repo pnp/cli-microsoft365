@@ -27,8 +27,9 @@ describe(commands.CDN_POLICY_SET, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
-        if (opts.headers['X-RequestDigest'] &&
+      if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
+        if (opts.headers &&
+          opts.headers['X-RequestDigest'] &&
           opts.body) {
           if (opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetTenantCdnPolicy" Id="12" ObjectPathId="8"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Enum">0</Parameter><Parameter Type="String">WOFF</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="8" Name="abc" /></ObjectPaths></Request>`) {
             return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": null, "TraceCorrelationId": "4456299e-d09e-4000-ae61-ddde716daa27" }, 31, { "IsNull": false }, 33, { "IsNull": false }, 35, { "IsNull": false }]));
@@ -168,15 +169,17 @@ describe(commands.CDN_POLICY_SET, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({ FormDigestValue: 'abc' });
         }
       }
 
-      if (opts.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
-        if (opts.headers['X-RequestDigest'] &&
+      if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
+        if (opts.headers &&
+          opts.headers['X-RequestDigest'] &&
           opts.body) {
           if (opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetTenantCdnPolicy" Id="12" ObjectPathId="8"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Enum">0</Parameter><Parameter Type="String">&lt;WOFF</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="8" Name="abc" /></ObjectPaths></Request>`) {
             return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": null, "TraceCorrelationId": "4456299e-d09e-4000-ae61-ddde716daa27" }, 31, { "IsNull": false }, 33, { "IsNull": false }, 35, { "IsNull": false }]));
@@ -201,15 +204,17 @@ describe(commands.CDN_POLICY_SET, () => {
   it('correctly handles an error when setting tenant CDN policy value', (done) => {
     Utils.restore(request.post);
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({ FormDigestValue: 'abc' });
         }
       }
 
-      if (opts.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
-        if (opts.headers['X-RequestDigest'] &&
+      if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
+        if (opts.headers &&
+          opts.headers['X-RequestDigest'] &&
           opts.body) {
           if (opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetTenantCdnPolicy" Id="12" ObjectPathId="8"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Enum">0</Parameter><Parameter Type="String">&lt;WOFF</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="8" Name="abc" /></ObjectPaths></Request>`) {
             return Promise.resolve(JSON.stringify([
@@ -274,7 +279,7 @@ describe(commands.CDN_POLICY_SET, () => {
   });
 
   it('doesn\'t fail if the parent doesn\'t define options', () => {
-    sinon.stub(Command.prototype, 'options').callsFake(() => { return undefined; });
+    sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
     const options = (command.options() as CommandOption[]);
     Utils.restore(Command.prototype.options);
     assert(options.length > 0);

@@ -25,7 +25,7 @@ describe(commands.LISTITEM_ADD, () => {
   let actualContentType = '';
 
   let postFakes = (opts: any) => {
-    if (opts.url.indexOf('AddValidateUpdateItemUsingPath') > -1) {
+    if ((opts.url as string).indexOf('AddValidateUpdateItemUsingPath') > -1) {
       const bodyString = JSON.stringify(opts.body);
       const ctMatch = bodyString.match(/\"?FieldName\"?:\s*\"?ContentType\"?,\s*\"?FieldValue\"?:\s*\"?(\w*)\"?/i);
       actualContentType = ctMatch ? ctMatch[1] : "";
@@ -37,13 +37,13 @@ describe(commands.LISTITEM_ADD, () => {
   }
 
   let getFakes = (opts: any) => {
-    if (opts.url.indexOf('contenttypes') > -1) {
+    if ((opts.url as string).indexOf('contenttypes') > -1) {
       return Promise.resolve({ value: [ {Id: { StringValue: expectedContentType }, Name: "Item" } ] });
     }
-    if (opts.url.indexOf('rootFolder') > -1) {
+    if ((opts.url as string).indexOf('rootFolder') > -1) {
       return Promise.resolve({ ServerRelativeUrl: '/sites/project-xxx/Lists/Demo%20List'});
     }
-    if (opts.url.indexOf('/items(') > -1) {
+    if ((opts.url as string).indexOf('/items(') > -1) {
       actualId = opts.url.match(/\/items\((\d+)\)/i)[1];
       return Promise.resolve(
         {

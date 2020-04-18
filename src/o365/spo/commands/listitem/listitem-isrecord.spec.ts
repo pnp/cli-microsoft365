@@ -17,7 +17,7 @@ describe(commands.LISTITEM_ISRECORD, () => {
   let postFakes = (opts: any) => {
     // requestObjectIdentity mock
     if (opts.body.indexOf('Name="Current"') > -1) {
-      if (opts.url.indexOf('returnerror.sharepoint.com') > -1) {
+      if ((opts.url as string).indexOf('returnerror.sharepoint.com') > -1) {
         cmdInstance.log("Returns error from requestObjectIdentity")
         return Promise.reject(JSON.stringify(
           [{ "ErrorInfo": "error occurred" }]
@@ -42,9 +42,9 @@ describe(commands.LISTITEM_ISRECORD, () => {
     }
 
     // IsRecord request mocks
-    if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+    if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
       // Unsuccessful response for when the item does not exist
-      if (opts.url.indexOf('itemdoesnotexist.sharepoint.com') > -1) {
+      if ((opts.url as string).indexOf('itemdoesnotexist.sharepoint.com') > -1) {
         return Promise.resolve(JSON.stringify(
           [
             {
@@ -69,14 +69,14 @@ describe(commands.LISTITEM_ISRECORD, () => {
 
   let getFakes = (opts: any) => {
     // Get list mock
-    if (opts.url.indexOf('/_api/web/lists') > -1 &&
-      opts.url.indexOf('$select=Id') > -1) {
+    if ((opts.url as string).indexOf('/_api/web/lists') > -1 &&
+      (opts.url as string).indexOf('$select=Id') > -1) {
       cmdInstance.log('faked!');
       return Promise.resolve({
         Id: '81f0ecee-75a8-46f0-b384-c8f4f9f31d99'
       });
     }
-    if (opts.url.indexOf('?select=Id') > -1) {
+    if ((opts.url as string).indexOf('?select=Id') > -1) {
       return Promise.resolve({ value: "f64041f2-9818-4b67-92ff-3bc5dbbef27e" });
     }
     return Promise.reject('Invalid request');

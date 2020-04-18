@@ -60,7 +60,7 @@ describe(commands.FIELD_GET, () => {
 
   it('gets information about a site column', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/fields/getbyid('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/fields/getbyid('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
         return Promise.resolve({
           "AutoIndexed": false,
           "CanBeDeleted": true,
@@ -158,7 +158,7 @@ describe(commands.FIELD_GET, () => {
 
   it('gets information about a list column', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists/getByTitle('Documents')/fields/getbyid('03e45e84-1992-4d42-9116-26f756012634')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/lists/getByTitle('Documents')/fields/getbyid('03e45e84-1992-4d42-9116-26f756012634')`) > -1) {
         return Promise.resolve({
           "AutoIndexed": false,
           "CanBeDeleted": false,
@@ -250,7 +250,7 @@ describe(commands.FIELD_GET, () => {
 
   it('should call the correct GET url when id and list url specified', (done) => {
     const getStub = sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         return Promise.resolve({
           "Id": "03e45e84-1992-4d42-9116-26f756012634"
         });
@@ -272,7 +272,7 @@ describe(commands.FIELD_GET, () => {
 
   it('should call the correct GET url when field title and list title specified (verbose)', (done) => {
     const getStub = sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         return Promise.resolve({
           "Id": "03e45e84-1992-4d42-9116-26f756012634"
         });
@@ -294,7 +294,7 @@ describe(commands.FIELD_GET, () => {
 
   it('should call the correct GET url when field title and list title specified', (done) => {
     const getStub = sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         return Promise.resolve({
           "Id": "03e45e84-1992-4d42-9116-26f756012634"
         });
@@ -316,7 +316,7 @@ describe(commands.FIELD_GET, () => {
 
   it('should call the correct GET url when field title and list url specified', (done) => {
     const getStub = sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         return Promise.resolve({
           "Id": "03e45e84-1992-4d42-9116-26f756012634"
         });
@@ -338,7 +338,7 @@ describe(commands.FIELD_GET, () => {
 
   it('correctly handles site column not found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/fields/getbyid('03e45e84-1992-4d42-9116-26f756012634')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/fields/getbyid('03e45e84-1992-4d42-9116-26f756012634')`) > -1) {
         return Promise.reject({
           error: {
             "odata.error": {
@@ -368,7 +368,7 @@ describe(commands.FIELD_GET, () => {
 
   it('correctly handles list column not found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists/getByTitle('Documents')/fields/getbyid('03e45e84-1992-4d42-9116-26f756012634')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/lists/getByTitle('Documents')/fields/getbyid('03e45e84-1992-4d42-9116-26f756012634')`) > -1) {
         return Promise.reject({
           error: {
             "odata.error": {
@@ -398,7 +398,7 @@ describe(commands.FIELD_GET, () => {
 
   it('correctly handles list not found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists/getByTitle('Documents')/fields/getbyid('03e45e84-1992-4d42-9116-26f756012634')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/lists/getByTitle('Documents')/fields/getbyid('03e45e84-1992-4d42-9116-26f756012634')`) > -1) {
         return Promise.reject({
           error: {
             "odata.error": {

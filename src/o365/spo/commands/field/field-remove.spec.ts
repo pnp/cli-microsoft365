@@ -136,8 +136,9 @@ describe(commands.FIELD_REMOVE, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`/_api/web/fields(guid'`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`/_api/web/fields(guid'`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve();
         }
@@ -175,7 +176,7 @@ describe(commands.FIELD_REMOVE, () => {
   it('command correctly handles field get reject request', (done) => {
     const err = 'Invalid request';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/fields/getbyinternalnameortitle(') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/fields/getbyinternalnameortitle(') > -1) {
         return Promise.reject(err);
       }
 
@@ -209,7 +210,7 @@ describe(commands.FIELD_REMOVE, () => {
 
   it('uses correct API url when id option is passed', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/fields/getbyid(\'') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/fields/getbyid(\'') > -1) {
         return Promise.resolve('Correct Url')
       }
 
@@ -240,7 +241,7 @@ describe(commands.FIELD_REMOVE, () => {
 
   it('calls the correct remove url when id and list url specified', (done) => {
     const getStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         return Promise.resolve({
           "Id": "03e45e84-1992-4d42-9116-26f756012634"
         });
@@ -262,7 +263,7 @@ describe(commands.FIELD_REMOVE, () => {
 
   it('calls the correct get url when field title and list title specified (verbose)', (done) => {
     const getStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         return Promise.resolve({
           "Id": "03e45e84-1992-4d42-9116-26f756012634"
         });
@@ -284,7 +285,7 @@ describe(commands.FIELD_REMOVE, () => {
 
   it('calls the correct get url when field title and list title specified', (done) => {
     const getStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         return Promise.resolve({
           "Id": "03e45e84-1992-4d42-9116-26f756012634"
         });
@@ -306,7 +307,7 @@ describe(commands.FIELD_REMOVE, () => {
 
   it('calls the correct get url when field title and list url specified', (done) => {
     const getStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         return Promise.resolve({
           "Id": "03e45e84-1992-4d42-9116-26f756012634"
         });
@@ -329,7 +330,7 @@ describe(commands.FIELD_REMOVE, () => {
   it('correctly handles site column not found', (done) => {
     const err = 'Invalid request';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/fields/getbyinternalnameortitle(') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/fields/getbyinternalnameortitle(') > -1) {
         return Promise.reject(err);
       }
       return Promise.reject('Invalid request');
@@ -350,7 +351,7 @@ describe(commands.FIELD_REMOVE, () => {
 
   it('correctly handles list column not found', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists/getByTitle('Documents')/fields/getbyid(`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/lists/getByTitle('Documents')/fields/getbyid(`) > -1) {
         return Promise.reject({
           error: {
             "odata.error": {
@@ -380,7 +381,7 @@ describe(commands.FIELD_REMOVE, () => {
 
   it('correctly handles list not found', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists/getByTitle('Documents')/fields/getbyid(`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/lists/getByTitle('Documents')/fields/getbyid(`) > -1) {
         return Promise.reject({
           error: {
             "odata.error": {

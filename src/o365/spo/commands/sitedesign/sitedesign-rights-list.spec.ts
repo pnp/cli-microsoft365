@@ -64,7 +64,7 @@ describe(commands.SITEDESIGN_RIGHTS_LIST, () => {
 
   it('gets information about permissions granted for the specified site design', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignRights`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignRights`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b'
         })) {
@@ -112,7 +112,7 @@ describe(commands.SITEDESIGN_RIGHTS_LIST, () => {
 
   it('gets information about permissions granted for the specified site design (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignRights`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignRights`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b'
         })) {
@@ -160,7 +160,7 @@ describe(commands.SITEDESIGN_RIGHTS_LIST, () => {
 
   it('returns original value for unknown permissions', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignRights`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignRights`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b'
         })) {

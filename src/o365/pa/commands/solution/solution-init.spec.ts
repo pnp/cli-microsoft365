@@ -174,13 +174,13 @@ describe(commands.SOLUTION_INIT, () => {
   });
 
   it('passes validation when the current directory doesn\'t contain any files with extension proj', () => {
-    sinon.stub(fs, 'readdirSync').callsFake(() => ['file1.exe', 'file2.xml', 'file3.json']);
+    sinon.stub(fs, 'readdirSync').callsFake(() => ['file1.exe', 'file2.xml', 'file3.json'] as any);
     const actual = (command.validate() as CommandValidate)({ options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix' } });
     assert.equal(actual, true);
   });
 
   it('fails validation when the current directory contains files with extension proj', () => {
-    sinon.stub(fs, 'readdirSync').callsFake(() => ['file1.exe', 'file2.cdsproj', 'file3.json']);
+    sinon.stub(fs, 'readdirSync').callsFake(() => ['file1.exe', 'file2.cdsproj', 'file3.json'] as any);
     const actual = (command.validate() as CommandValidate)({ options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix' } });
     assert.notEqual(actual, true);
   });
@@ -217,11 +217,11 @@ describe(commands.SOLUTION_INIT, () => {
 
   it('TemplateInstantiator.instantiate is called exactly twice when the CDS Assets Directory \'Other\' already exists in the current directory, but doesn\'t contain a Solution.xml file', () => {
     const originalExistsSync = fs.existsSync;
-    sinon.stub(fs, 'existsSync').callsFake((pathToCheck: string) => {
-      if(path.basename(pathToCheck).toLowerCase() === 'other') {
+    sinon.stub(fs, 'existsSync').callsFake((pathToCheck) => {
+      if(path.basename(pathToCheck.toString()).toLowerCase() === 'other') {
         return true;
       }
-      else if (path.basename(pathToCheck).toLowerCase() === 'solution.xml') {
+      else if (path.basename(pathToCheck.toString()).toLowerCase() === 'solution.xml') {
         return false;
       }
       else {
@@ -238,11 +238,11 @@ describe(commands.SOLUTION_INIT, () => {
 
   it('TemplateInstantiator.instantiate is called exactly once when the CDS Assets Directory \'Other\' already exists in the current directory and contains a Solution.xml file', () => {
     const originalExistsSync = fs.existsSync;
-    sinon.stub(fs, 'existsSync').callsFake((pathToCheck: string) => {
-      if(path.basename(pathToCheck).toLowerCase() === 'other') {
+    sinon.stub(fs, 'existsSync').callsFake((pathToCheck) => {
+      if(path.basename(pathToCheck.toString()).toLowerCase() === 'other') {
         return true;
       }
-      else if (path.basename(pathToCheck).toLowerCase() === 'solution.xml') {
+      else if (path.basename(pathToCheck.toString()).toLowerCase() === 'solution.xml') {
         return true;
       }
       else {

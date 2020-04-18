@@ -62,7 +62,8 @@ describe(commands.LIST_VIEW_SET, () => {
   it('updates the Title of the list view specified using its name', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('List%201')/views/getByTitle('All%20items')`) {
-        if (opts.headers.accept &&
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0 &&
           opts.headers['X-RequestDigest'] &&
           JSON.stringify(opts.body) === JSON.stringify({ Title: 'All events' })) {
@@ -87,7 +88,8 @@ describe(commands.LIST_VIEW_SET, () => {
   it('updates the Title and CustomFormatter of the list view specified using its ID', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'330f29c5-5c4c-465f-9f4b-7903020ae1cf')/views/getById('330f29c5-5c4c-465f-9f4b-7903020ae1ce')`) {
-        if (opts.headers.accept &&
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0 &&
           opts.headers['X-RequestDigest'] &&
           JSON.stringify(opts.body) === JSON.stringify({ Title: 'All events', CustomFormatter: 'abc' })) {

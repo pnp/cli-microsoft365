@@ -16,16 +16,16 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
   let declareItemAsRecordFakeCalled = false;
 
   let postFakes = (opts: any) => {
-    if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+    if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
 
       // requestObjectIdentity mock
       if (opts.body.indexOf('Name="Current"') > -1) {
 
-        if (opts.url.indexOf('rejectme.sharepoint.com') > -1) {
+        if ((opts.url as string).indexOf('rejectme.sharepoint.com') > -1) {
           return Promise.reject('Failed request')
         }
 
-        if (opts.url.indexOf('returnerror.sharepoint.com') > -1) {
+        if ((opts.url as string).indexOf('returnerror.sharepoint.com') > -1) {
           return Promise.reject(JSON.stringify(
             [{ "ErrorInfo": "error occurred" }]
           ))
@@ -51,7 +51,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
       if (opts.body.indexOf('Name="DeclareItemAsRecord') > -1
         || opts.body.indexOf('Name="DeclareItemAsRecordWithDeclarationDate') > -1) {
 
-        if (opts.url.indexOf('alreadydeclared') > -1) {
+        if ((opts.url as string).indexOf('alreadydeclared') > -1) {
           return Promise.resolve(JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8713.1223", "ErrorInfo": {
@@ -79,14 +79,14 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
   }
 
   let getFakes = (opts: any) => {
-    if (opts.url.indexOf('/_api/web/lists') > -1 &&
-      opts.url.indexOf('$select=Id') > -1) {
+    if ((opts.url as string).indexOf('/_api/web/lists') > -1 &&
+      (opts.url as string).indexOf('$select=Id') > -1) {
       cmdInstance.log('faked!');
       return Promise.resolve({
         Id: '81f0ecee-75a8-46f0-b384-c8f4f9f31d99'
       });
     }
-    if (opts.url.indexOf('/id') > -1) {
+    if ((opts.url as string).indexOf('/id') > -1) {
       return Promise.resolve({ value: "f64041f2-9818-4b67-92ff-3bc5dbbef27e" });
     }
     return Promise.reject('Invalid request');

@@ -62,7 +62,7 @@ describe(commands.HUBSITE_CONNECT, () => {
 
   it('connects site to the hub site', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/site/JoinHubSite('255a50b2-527f-4413-8485-57f4c17a24d1')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/site/JoinHubSite('255a50b2-527f-4413-8485-57f4c17a24d1')`) > -1) {
         return Promise.resolve({
           "odata.null": true
         });
@@ -84,7 +84,7 @@ describe(commands.HUBSITE_CONNECT, () => {
 
   it('connects site to the hub site (true)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/site/JoinHubSite('255a50b2-527f-4413-8485-57f4c17a24d1')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/site/JoinHubSite('255a50b2-527f-4413-8485-57f4c17a24d1')`) > -1) {
         return Promise.resolve({
           "odata.null": true
         });

@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from 'path';
-const uuidv4 = require('uuid/v4');
+import { v4 } from 'uuid';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import Command, {
@@ -66,7 +66,7 @@ class PaPcfInitCommand extends Command {
         "$controlnameplaceholder$": args.options.name,
         "$pcfProjectName$": workingDirectoryName,
         "pcfprojecttype": workingDirectoryName,
-        "$pcfProjectGuid$": uuidv4()
+        "$pcfProjectGuid$": v4()
       };
 
       if (this.verbose) {

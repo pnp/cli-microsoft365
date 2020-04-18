@@ -40,8 +40,8 @@ describe('DynamicRule', () => {
       }
     };
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string, options) => {
-      if (path.endsWith('@pnp/pnpjs/package.json')) {
+    sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
+      if (path.toString().endsWith('@pnp/pnpjs/package.json')) {
         return JSON.stringify({
           main: "./dist/pnpjs.es5.umd.bundle.js",
           module: "./dist/pnpjs.es5.umd.bundle.min.js"
@@ -68,8 +68,8 @@ describe('DynamicRule', () => {
       }
     };
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string, options) => {
-      if (path.endsWith('@pnp/sp-taxonomy/package.json') || path.endsWith('@pnp/sp-clientsvc/package.json')) {
+    sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
+      if (path.toString().endsWith('@pnp/sp-taxonomy/package.json') || path.toString().endsWith('@pnp/sp-clientsvc/package.json')) {
         return JSON.stringify({
           main: "./dist/pnpjs.es5.umd.bundle.js",
           module: "./dist/pnpjs.es5.umd.bundle.min.js"
@@ -95,8 +95,8 @@ describe('DynamicRule', () => {
       }
     };
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string, options) => {
-      if (path.endsWith('@pnp/pnpjs/package.json')) {
+    sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
+      if (path.toString().endsWith('@pnp/pnpjs/package.json')) {
         return JSON.stringify({
           main: "./dist/pnpjs.es5.umd.bundle.js",
         });
@@ -121,8 +121,8 @@ describe('DynamicRule', () => {
       }
     };
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string, options) => {
-      if (path.endsWith('@pnp/pnpjs/package.json')) {
+    sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
+      if (path.toString().endsWith('@pnp/pnpjs/package.json')) {
         return JSON.stringify({
         });
       }
@@ -145,8 +145,8 @@ describe('DynamicRule', () => {
       }
     };
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path: string) => {
-      if (path.endsWith('@pnp/pnpjs/package.json')) {
+    sinon.stub(fs, 'readFileSync').callsFake((path) => {
+      if (path.toString().endsWith('@pnp/pnpjs/package.json')) {
         return JSON.stringify({
           main: "./dist/pnpjs.es5.umd.bundle.js",
           module: "./dist/pnpjs.es5.umd.bundle.min.js"

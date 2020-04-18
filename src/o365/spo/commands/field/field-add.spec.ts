@@ -62,7 +62,7 @@ describe(commands.FIELD_ADD, () => {
 
   it('creates site column using XML with the default options', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/fields/CreateFieldAsXml`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/web/fields/CreateFieldAsXml`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           parameters: {
             SchemaXml: '<Field Type="DateTime" DisplayName="Start date-time" Required="FALSE" EnforceUniqueValues="FALSE" Indexed="FALSE" Format="DateTime" Group="PnP Columns" FriendlyDisplayFormat="Disabled" ID="{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}" SourceID="{4f118c69-66e0-497c-96ff-d7855ce0713d}" StaticName="PnPAlertStartDateTime" Name="PnPAlertStartDateTime"><Default>[today]</Default></Field>',
@@ -166,7 +166,7 @@ describe(commands.FIELD_ADD, () => {
 
   it('creates list column using XML with the DefaultValue option (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/lists/getByTitle('Events')/fields/CreateFieldAsXml`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/web/lists/getByTitle('Events')/fields/CreateFieldAsXml`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           parameters: {
             SchemaXml: '<Field Type="DateTime" DisplayName="Start date-time" Required="FALSE" EnforceUniqueValues="FALSE" Indexed="FALSE" Format="DateTime" Group="PnP Columns" FriendlyDisplayFormat="Disabled" ID="{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}" SourceID="{4f118c69-66e0-497c-96ff-d7855ce0713d}" StaticName="PnPAlertStartDateTime" Name="PnPAlertStartDateTime"><Default>[today]</Default></Field>',
@@ -270,7 +270,7 @@ describe(commands.FIELD_ADD, () => {
 
   it('creates site column using XML with the AddToAllContentTypes, AddFieldToDefaultView, AddFieldCheckDisplayName options', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/fields/CreateFieldAsXml`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/web/fields/CreateFieldAsXml`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           parameters: {
             SchemaXml: '<Field Type="DateTime" DisplayName="Start date-time" Required="FALSE" EnforceUniqueValues="FALSE" Indexed="FALSE" Format="DateTime" Group="PnP Columns" FriendlyDisplayFormat="Disabled" ID="{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}" SourceID="{4f118c69-66e0-497c-96ff-d7855ce0713d}" StaticName="PnPAlertStartDateTime" Name="PnPAlertStartDateTime"><Default>[today]</Default></Field>',
@@ -374,7 +374,7 @@ describe(commands.FIELD_ADD, () => {
 
   it('creates site column using XML with the AddToDefaultContentType, AddFieldInternalNameHint options', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/fields/CreateFieldAsXml`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/web/fields/CreateFieldAsXml`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           parameters: {
             SchemaXml: '<Field Type="DateTime" DisplayName="Start date-time" Required="FALSE" EnforceUniqueValues="FALSE" Indexed="FALSE" Format="DateTime" Group="PnP Columns" FriendlyDisplayFormat="Disabled" ID="{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}" SourceID="{4f118c69-66e0-497c-96ff-d7855ce0713d}" StaticName="PnPAlertStartDateTime" Name="PnPAlertStartDateTime"><Default>[today]</Default></Field>',
@@ -478,7 +478,7 @@ describe(commands.FIELD_ADD, () => {
 
   it('creates site column using XML with the AddToNoContentType option', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/fields/CreateFieldAsXml`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/web/fields/CreateFieldAsXml`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           parameters: {
             SchemaXml: '<Field Type="DateTime" DisplayName="Start date-time" Required="FALSE" EnforceUniqueValues="FALSE" Indexed="FALSE" Format="DateTime" Group="PnP Columns" FriendlyDisplayFormat="Disabled" ID="{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}" SourceID="{4f118c69-66e0-497c-96ff-d7855ce0713d}" StaticName="PnPAlertStartDateTime" Name="PnPAlertStartDateTime"><Default>[today]</Default></Field>',

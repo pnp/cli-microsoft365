@@ -69,7 +69,7 @@ describe(commands.LOGIN, () => {
   });
 
   it('logs in to Office 365', (done) => {
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve());
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve(''));
     cmdInstance.action({ options: { debug: false } }, () => {
       try {
         assert(auth.service.connected);
@@ -82,7 +82,7 @@ describe(commands.LOGIN, () => {
   });
 
   it('logs in to Office 365 (debug)', (done) => {
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve());
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve(''));
     cmdInstance.action({ options: { debug: true } }, () => {
       try {
         assert(auth.service.connected);
@@ -95,7 +95,7 @@ describe(commands.LOGIN, () => {
   });
 
   it('logs in to Office 365 using username and password when authType password set', (done) => {
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve());
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve(''));
     cmdInstance.action({ options: { debug: false, authType: 'password', userName: 'user', password: 'password' } }, () => {
       try {
         assert.equal(auth.service.authType, AuthType.Password, 'Incorrect authType set');

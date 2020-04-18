@@ -123,7 +123,7 @@ describe(commands.TEAMS_CHANNEL_SET, () => {
 
   it('fails to patch channel updates for the Microsoft Teams team when channel does not exists', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`channels?$filter=displayName eq 'Latest'`) > -1) {
+      if ((opts.url as string).indexOf(`channels?$filter=displayName eq 'Latest'`) > -1) {
         return Promise.resolve({ value: [] });
       }
       return Promise.reject('Invalid request');
@@ -151,7 +151,7 @@ describe(commands.TEAMS_CHANNEL_SET, () => {
 
   it('correctly patches channel updates for the Microsoft Teams team', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`channels?$filter=displayName eq 'Review'`) > -1) {
+      if ((opts.url as string).indexOf(`channels?$filter=displayName eq 'Review'`) > -1) {
         return Promise.resolve({
           value:
             [
@@ -165,7 +165,7 @@ describe(commands.TEAMS_CHANNEL_SET, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if ((opts.url.indexOf(`channels/19:8a53185a51ac44a3aef27397c3dfebfc@thread.skype`) > -1) &&
+      if (((opts.url as string).indexOf(`channels/19:8a53185a51ac44a3aef27397c3dfebfc@thread.skype`) > -1) &&
         JSON.stringify(opts.body) === JSON.stringify({ displayName: "New Review", description: "New Review" })
       ) {
         return Promise.resolve({});
@@ -195,7 +195,7 @@ describe(commands.TEAMS_CHANNEL_SET, () => {
 
   it('correctly patches channel updates for the Microsoft Teams team (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`channels?$filter=displayName eq 'Review'`) > -1) {
+      if ((opts.url as string).indexOf(`channels?$filter=displayName eq 'Review'`) > -1) {
         return Promise.resolve({
           value:
             [
@@ -209,7 +209,7 @@ describe(commands.TEAMS_CHANNEL_SET, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if ((opts.url.indexOf(`channels/19:8a53185a51ac44a3aef27397c3dfebfc@thread.skype`) > -1) &&
+      if (((opts.url as string).indexOf(`channels/19:8a53185a51ac44a3aef27397c3dfebfc@thread.skype`) > -1) &&
         JSON.stringify(opts.body) === JSON.stringify({ displayName: "New Review" })
       ) {
         return Promise.resolve({});

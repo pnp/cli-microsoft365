@@ -5,8 +5,8 @@ import * as requestPromise from 'request-promise-native';
 import Utils from './Utils';
 import * as https from 'https';
 import request = require('request');
-import { WriteStream } from 'fs';
 import auth from './Auth';
+import { ClientRequest } from 'http';
 
 describe('Request', () => {
   const cmdInstance = {
@@ -57,13 +57,9 @@ describe('Request', () => {
   });
 
   it('sets user agent on all requests', (done) => {
-    sinon.stub(https, 'request').callsFake((options) => {
+    sinon.stub(https, 'request').callsFake((options: any) => {
       _options = options;
-      return new WriteStream({
-        final: (cb) => {
-          cb();
-        }
-      });
+      return new ClientRequest('', () => { });
     });
 
     _request
@@ -84,13 +80,10 @@ describe('Request', () => {
   });
 
   it('uses gzip compression on all requests', (done) => {
-    sinon.stub(https, 'request').callsFake((options) => {
+    https.request
+    sinon.stub(https, 'request').callsFake((options: any) => {
       _options = options;
-      return new WriteStream({
-        final: (cb) => {
-          cb();
-        }
-      });
+      return new ClientRequest('', () => { });
     });
 
     _request
@@ -111,13 +104,9 @@ describe('Request', () => {
   });
 
   it('sets access token on all requests', (done) => {
-    sinon.stub(https, 'request').callsFake((options) => {
+    sinon.stub(https, 'request').callsFake((options: any) => {
       _options = options;
-      return new WriteStream({
-        final: (cb) => {
-          cb();
-        }
-      });
+      return new ClientRequest('', () => { });
     });
 
     _request
@@ -139,13 +128,9 @@ describe('Request', () => {
   });
 
   it(`doesn't set access token on anonymous requests`, (done) => {
-    sinon.stub(https, 'request').callsFake((options) => {
+    sinon.stub(https, 'request').callsFake((options: any) => {
       _options = options;
-      return new WriteStream({
-        final: (cb) => {
-          cb();
-        }
-      });
+      return new ClientRequest('', () => { });
     });
 
     _request
@@ -169,13 +154,9 @@ describe('Request', () => {
   });
 
   it(`removes the anonymous header on anonymous requests`, (done) => {
-    sinon.stub(https, 'request').callsFake((options) => {
+    sinon.stub(https, 'request').callsFake((options: any) => {
       _options = options;
-      return new WriteStream({
-        final: (cb) => {
-          cb();
-        }
-      });
+      return new ClientRequest('', () => { });
     });
 
     _request
@@ -398,6 +379,7 @@ describe('Request', () => {
     sinon.stub(global, 'setTimeout').callsFake((fn, to) => {
       timeout = to;
       fn();
+      return {} as any;
     });
 
     _request
@@ -437,6 +419,7 @@ describe('Request', () => {
     sinon.stub(global, 'setTimeout').callsFake((fn, to) => {
       timeout = to;
       fn();
+      return {} as any;
     });
 
     _request
@@ -478,6 +461,7 @@ describe('Request', () => {
     sinon.stub(global, 'setTimeout').callsFake((fn, to) => {
       timeout = to;
       fn();
+      return {} as any;
     });
 
     _request
@@ -515,6 +499,7 @@ describe('Request', () => {
     });
     sinon.stub(global, 'setTimeout').callsFake((fn, to) => {
       fn();
+      return {} as any;
     });
 
     _request
@@ -552,6 +537,7 @@ describe('Request', () => {
     });
     sinon.stub(global, 'setTimeout').callsFake((fn, to) => {
       fn();
+      return {} as any;
     });
 
     _request
@@ -589,6 +575,7 @@ describe('Request', () => {
     });
     sinon.stub(global, 'setTimeout').callsFake((fn, to) => {
       fn();
+      return {} as any;
     });
 
     _request
@@ -630,6 +617,7 @@ describe('Request', () => {
     });
     sinon.stub(global, 'setTimeout').callsFake((fn, to) => {
       fn();
+      return {} as any;
     });
 
     _request

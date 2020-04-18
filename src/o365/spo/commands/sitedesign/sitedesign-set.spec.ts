@@ -62,7 +62,7 @@ describe(commands.SITEDESIGN_SET, () => {
 
   it('updates site design title', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           updateInfo: {
             Id: '2a9f178a-4d1d-449c-9296-df509ab4702c',
@@ -108,7 +108,7 @@ describe(commands.SITEDESIGN_SET, () => {
 
   it('updates site design web template to TeamSite', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           updateInfo: {
             Id: '2a9f178a-4d1d-449c-9296-df509ab4702c',
@@ -154,7 +154,7 @@ describe(commands.SITEDESIGN_SET, () => {
 
   it('updates site design web template to CommunicationSite', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           updateInfo: {
             Id: '2a9f178a-4d1d-449c-9296-df509ab4702c',
@@ -200,7 +200,7 @@ describe(commands.SITEDESIGN_SET, () => {
 
   it('updates site design site scripts (one script)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           updateInfo: {
             Id: '2a9f178a-4d1d-449c-9296-df509ab4702c',
@@ -246,7 +246,7 @@ describe(commands.SITEDESIGN_SET, () => {
 
   it('updates site design site scripts (multiple scripts)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           updateInfo: {
             Id: '2a9f178a-4d1d-449c-9296-df509ab4702c',
@@ -292,7 +292,7 @@ describe(commands.SITEDESIGN_SET, () => {
 
   it('updates site design description', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           updateInfo: {
             Id: '2a9f178a-4d1d-449c-9296-df509ab4702c',
@@ -338,7 +338,7 @@ describe(commands.SITEDESIGN_SET, () => {
 
   it('updates site design previewImageUrl', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           updateInfo: {
             Id: '2a9f178a-4d1d-449c-9296-df509ab4702c',
@@ -384,7 +384,7 @@ describe(commands.SITEDESIGN_SET, () => {
 
   it('updates site design previewImageAltText', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           updateInfo: {
             Id: '2a9f178a-4d1d-449c-9296-df509ab4702c',
@@ -430,7 +430,7 @@ describe(commands.SITEDESIGN_SET, () => {
 
   it('updates site design version', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           updateInfo: {
             Id: '2a9f178a-4d1d-449c-9296-df509ab4702c',
@@ -476,7 +476,7 @@ describe(commands.SITEDESIGN_SET, () => {
 
   it('makes site design default', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           updateInfo: {
             Id: '2a9f178a-4d1d-449c-9296-df509ab4702c',
@@ -522,7 +522,7 @@ describe(commands.SITEDESIGN_SET, () => {
 
   it('makes site design not-default (explicit)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           updateInfo: {
             Id: '2a9f178a-4d1d-449c-9296-df509ab4702c',
@@ -568,7 +568,7 @@ describe(commands.SITEDESIGN_SET, () => {
 
   it('makes site design not-default (implicit)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           updateInfo: {
             Id: '2a9f178a-4d1d-449c-9296-df509ab4702c'
@@ -613,7 +613,7 @@ describe(commands.SITEDESIGN_SET, () => {
 
   it('updates all site design properties (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           "updateInfo": {
             "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",

@@ -23,7 +23,7 @@ describe(commands.LISTITEM_SET, () => {
   let actualContentType = '';
 
   let postFakes = (opts: any) => {
-    if (opts.url.indexOf('ValidateUpdateListItem') > -1) {
+    if ((opts.url as string).indexOf('ValidateUpdateListItem') > -1) {
       const bodyString = JSON.stringify(opts.body);
       const ctMatch = bodyString.match(/\"?FieldName\"?:\s*\"?ContentType\"?,\s*\"?FieldValue\"?:\s*\"?(\w*)\"?/i);
       actualContentType = ctMatch ? ctMatch[1] : "";
@@ -31,17 +31,17 @@ describe(commands.LISTITEM_SET, () => {
       return Promise.resolve({ value: [ { ItemId: expectedId }] });
     }
 
-    if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+    if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
       // requestObjectIdentity mock
       if (opts.body.indexOf('Name="Current"') > -1) {
 
-        if (opts.url.indexOf('rejectme.com') > -1 ) {
+        if ((opts.url as string).indexOf('rejectme.com') > -1 ) {
 
           return Promise.reject('Failed request')
 
         }
 
-        if (opts.url.indexOf('returnerror.com') > -1) {
+        if ((opts.url as string).indexOf('returnerror.com') > -1) {
 
           return Promise.resolve(JSON.stringify(
             [{"ErrorInfo": "error occurred"}]
@@ -85,10 +85,10 @@ describe(commands.LISTITEM_SET, () => {
   }
 
   let getFakes = (opts: any) => {
-    if (opts.url.indexOf('contenttypes') > -1) {
+    if ((opts.url as string).indexOf('contenttypes') > -1) {
       return Promise.resolve({ value: [ {Id: { StringValue: expectedContentType }, Name: "Item" } ] });
     }
-    if (opts.url.indexOf('/items(') > -1) {
+    if ((opts.url as string).indexOf('/items(') > -1) {
       actualId = opts.url.match(/\/items\((\d+)\)/i)[1];
       return Promise.resolve(
         {
@@ -104,7 +104,7 @@ describe(commands.LISTITEM_SET, () => {
         }
       );
     }
-    if (opts.url.indexOf('/id') > -1) {
+    if ((opts.url as string).indexOf('/id') > -1) {
       return Promise.resolve({ value: "f64041f2-9818-4b67-92ff-3bc5dbbef27e" });
     }
     return Promise.reject('Invalid request');

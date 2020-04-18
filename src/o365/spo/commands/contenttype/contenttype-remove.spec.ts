@@ -67,7 +67,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
 
   it('delete content type by id', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')`) > -1) {
         return Promise.resolve();
       }
 
@@ -88,7 +88,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
 
   it('delete content type by id - prompt', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')`) > -1) {
         return Promise.resolve();
       }
 
@@ -117,7 +117,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
 
   it('delete content type by id - prompt:continue', (done) => {
     const postCallbackStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')`) > -1) {
         return Promise.resolve();
       }
 
@@ -150,7 +150,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
 
   it('delete content type by id - prompt:declined', (done) => {
     const postCallbackStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')`) > -1) {
         return Promise.resolve();
       }
 
@@ -181,7 +181,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
 
   it('delete content type by name', (done) => {
     const getCallbackStub = sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/availableContentTypes?$filter=(Name eq 'TestContentType')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/availableContentTypes?$filter=(Name eq 'TestContentType')`) > -1) {
         return Promise.resolve({ "value": [{ "Name": "TestContentType", "StringId": "0x0100558D85B7216F6A489A499DB361E1AE2F" }] });
       }
 
@@ -189,7 +189,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
     });
 
     const postCallbackStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')`) > -1) {
         return Promise.resolve();
       }
 
@@ -212,7 +212,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
 
   it('delete content type by name - prompt', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/availableContentTypes?$filter=(Name eq 'TestContentType')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/availableContentTypes?$filter=(Name eq 'TestContentType')`) > -1) {
         return Promise.resolve({ "value": [{ "Name": "TestContentType", "StringId": "0x0100558D85B7216F6A489A499DB361E1AE2F" }] });
       }
 
@@ -220,7 +220,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
     });
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')`) > -1) {
         return Promise.resolve();
       }
 
@@ -247,7 +247,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
 
   it('delete content type by name - prompt:continue', (done) => {
     const getCallbackStub = sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/availableContentTypes?$filter=(Name eq 'TestContentType')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/availableContentTypes?$filter=(Name eq 'TestContentType')`) > -1) {
         return Promise.resolve({ "value": [{ "Name": "TestContentType", "StringId": "0x0100558D85B7216F6A489A499DB361E1AE2F" }] });
       }
 
@@ -255,7 +255,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
     });
 
     const postCallbackStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')`) > -1) {
         return Promise.resolve();
       }
 
@@ -279,7 +279,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
 
   it('delete content type by name - prompt:declined', (done) => {
     const postCallbackStub = sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/availableContentTypes?$filter=(Name eq 'TestContentType')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/availableContentTypes?$filter=(Name eq 'TestContentType')`) > -1) {
         return Promise.resolve({ "value": [{ "Name": "TestContentType", "StringId": "0x0100558D85B7216F6A489A499DB361E1AE2F" }] });
       }
 
@@ -287,7 +287,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
     });
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')`) > -1) {
         return Promise.resolve();
       }
 
@@ -310,7 +310,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
 
   it('correctly escapes special characters in the content type name', (done) => {
     const getStub = sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/availableContentTypes?$filter=(Name eq 'Test%20Content%20Type')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/availableContentTypes?$filter=(Name eq 'Test%20Content%20Type')`) > -1) {
         return Promise.resolve({ "value": [{ "Name": "Test Content Type", "StringId": "0x0100558D85B7216F6A489A499DB361E1AE2F" }] });
       }
 
@@ -318,7 +318,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
     });
 
     const postStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')`) > -1) {
         return Promise.resolve();
       }
 
@@ -340,7 +340,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
 
   it('correctly handles site content type not found by id', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')`) > -1) {
         return Promise.resolve({
           "odata.null": true
         });
@@ -363,7 +363,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
   it('correctly handles site content type not found by name', (done) => {
     //NonExistentContentType
     const getRequestStub = sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/availableContentTypes?$filter=(Name eq 'NonExistentContentType')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/availableContentTypes?$filter=(Name eq 'NonExistentContentType')`) > -1) {
         return Promise.resolve({ "value": [] });
       }
 
@@ -371,7 +371,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
     });
 
     const deleteRequestStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/contenttypes`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/contenttypes`) > -1) {
         return Promise.resolve({
           "odata.null": true
         });

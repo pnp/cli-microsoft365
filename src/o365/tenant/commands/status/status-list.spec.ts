@@ -153,7 +153,7 @@ describe(commands.TENANT_STATUS_LIST, () => {
   it('handles promise error while getting status of Office 365 services', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf('CurrentStatus') > -1) {
+      if ((opts.url as string).indexOf('CurrentStatus') > -1) {
         return Promise.reject('An error has occurred');
       }
       return Promise.reject('Invalid request');
@@ -177,7 +177,7 @@ describe(commands.TENANT_STATUS_LIST, () => {
   it('gets the status of Office 365 services', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf('CurrentStatus') > -1) {
+      if ((opts.url as string).indexOf('CurrentStatus') > -1) {
         return Promise.resolve(jsonOutput);
       }
       return Promise.reject('Invalid request');
@@ -202,7 +202,7 @@ describe(commands.TENANT_STATUS_LIST, () => {
   it('gets the status of Office 365 services (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf('CurrentStatus') > -1) {
+      if ((opts.url as string).indexOf('CurrentStatus') > -1) {
         return Promise.resolve(jsonOutput);
       }
       return Promise.reject('Invalid request');
@@ -227,7 +227,7 @@ describe(commands.TENANT_STATUS_LIST, () => {
   it('gets the status of Office 365 services as text', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf('CurrentStatus') > -1) {
+      if ((opts.url as string).indexOf('CurrentStatus') > -1) {
         return Promise.resolve(jsonOutput);
       }
       return Promise.reject('Invalid request');
@@ -252,7 +252,7 @@ describe(commands.TENANT_STATUS_LIST, () => {
   it('gets the status of Office 365 services as text (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf('CurrentStatus') > -1) {
+      if ((opts.url as string).indexOf('CurrentStatus') > -1) {
         return Promise.resolve(jsonOutput);
       }
       return Promise.reject('Invalid request');

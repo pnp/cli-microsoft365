@@ -68,7 +68,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
 
   it('disconnects the site from its hub site without prompting for confirmation when confirm option specified', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/site/JoinHubSite('00000000-0000-0000-0000-000000000000')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/site/JoinHubSite('00000000-0000-0000-0000-000000000000')`) > -1) {
         return Promise.resolve({
           "odata.null": true
         });
@@ -90,7 +90,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
 
   it('disconnects the site from its hub site without prompting for confirmation when confirm option specified (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/site/JoinHubSite('00000000-0000-0000-0000-000000000000')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/site/JoinHubSite('00000000-0000-0000-0000-000000000000')`) > -1) {
         return Promise.resolve({
           "odata.null": true
         });

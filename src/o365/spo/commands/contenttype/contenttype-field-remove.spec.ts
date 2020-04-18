@@ -25,17 +25,17 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
   let promptOptions: any;
 
   const getStubCalls = (opts: any) => {
-    if (opts.url.indexOf(`_api/site?$select=Id`) > -1) {
+    if ((opts.url as string).indexOf(`_api/site?$select=Id`) > -1) {
       return Promise.resolve({
         "Id": SITE_ID
       });
     }
-    if (opts.url.indexOf(`_api/web?$select=Id`) > -1) {
+    if ((opts.url as string).indexOf(`_api/web?$select=Id`) > -1) {
       return Promise.resolve({
         "Id": WEB_ID
       });
     }
-    if (opts.url.indexOf(`/_api/lists/GetByTitle('${LIST_TITLE}')?$select=Id`) > -1) {
+    if ((opts.url as string).indexOf(`/_api/lists/GetByTitle('${LIST_TITLE}')?$select=Id`) > -1) {
       return Promise.resolve({
         "Id": LIST_ID
       });
@@ -44,7 +44,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     return Promise.reject('Invalid request');
   }
   const postStubSuccCalls = (opts: any) => {
-    if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+    if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
       // Web CT
       if (opts.body.toLowerCase() === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName=".NET Library" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="77" ObjectPathId="76" /><ObjectPath Id="79" ObjectPathId="78" /><Method Name="DeleteObject" Id="80" ObjectPathId="78" /><Method Name="Update" Id="81" ObjectPathId="24"><Parameters><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Property Id="76" ParentId="24" Name="FieldLinks" /><Method Id="78" ParentId="76" Name="GetById"><Parameters><Parameter Type="Guid">{${FIELD_LINK_ID}}</Parameter></Parameters></Method><Identity Id="24" Name="6b3ec69e-00a7-0000-55a3-61f8d779d2b3|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${SITE_ID}:web:${WEB_ID}:contenttype:${CONTENT_TYPE_ID}" /></ObjectPaths></Request>`.toLowerCase()) {
         return Promise.resolve(`[
@@ -83,7 +83,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     return Promise.reject('Invalid request');
   }
   const postStubFailedCalls = (opts: any) => {
-    if (opts.url.indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+    if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
       // WEB CT
       if (opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName=".NET Library" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="77" ObjectPathId="76" /><ObjectPath Id="79" ObjectPathId="78" /><Method Name="DeleteObject" Id="80" ObjectPathId="78" /><Method Name="Update" Id="81" ObjectPathId="24"><Parameters><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Property Id="76" ParentId="24" Name="FieldLinks" /><Method Id="78" ParentId="76" Name="GetById"><Parameters><Parameter Type="Guid">{${FIELD_LINK_ID}}</Parameter></Parameters></Method><Identity Id="24" Name="6b3ec69e-00a7-0000-55a3-61f8d779d2b3|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${SITE_ID}:web:${WEB_ID}:contenttype:${CONTENT_TYPE_ID}" /></ObjectPaths></Request>`) {
         return Promise.resolve(`[

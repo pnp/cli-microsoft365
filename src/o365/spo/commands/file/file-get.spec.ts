@@ -62,7 +62,7 @@ describe(commands.FILE_GET, () => {
   it('command correctly handles file get reject request', (done) => {
     const err = 'Invalid request';
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/GetFileById') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/GetFileById') > -1) {
         return Promise.reject(err);
       }
 
@@ -88,7 +88,7 @@ describe(commands.FILE_GET, () => {
 
   it('uses correct API url when output json option is passed', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('select123=') > -1) {
+      if ((opts.url as string).indexOf('select123=') > -1) {
         return Promise.resolve('Correct Url1')
       }
 
@@ -117,7 +117,7 @@ describe(commands.FILE_GET, () => {
   it('retrieves file as binary string object', (done) => {
     let returnValue: string = 'BinaryFileString';
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/GetFileById(') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/GetFileById(') > -1) {
         return Promise.resolve(returnValue);
       }
 
@@ -144,7 +144,7 @@ describe(commands.FILE_GET, () => {
 
   it('retrieves and prints all details of file as ListItem object', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('?$expand=ListItemAllFields') > -1) {
+      if ((opts.url as string).indexOf('?$expand=ListItemAllFields') > -1) {
         return Promise.resolve({
           "ListItemAllFields": {
             "FileSystemObjectType": 0,
@@ -228,7 +228,7 @@ describe(commands.FILE_GET, () => {
 
   it('uses correct API url when id option is passed', (done) => {
     const getStub: any = sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/GetFileById(') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/GetFileById(') > -1) {
         return Promise.resolve('Correct Url')
       }
 
@@ -256,7 +256,7 @@ describe(commands.FILE_GET, () => {
 
   it('uses correct API url when url option is passed', (done) => {
     const getStub: any = sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/GetFileByServerRelativePath(') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/GetFileByServerRelativePath(') > -1) {
         return Promise.resolve('Correct Url')
       }
 
@@ -282,7 +282,7 @@ describe(commands.FILE_GET, () => {
 
   it('uses correct API url when url option is passed to get file as list item', (done) => {
     const getStub: any = sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/GetFileByServerRelativePath(') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/GetFileByServerRelativePath(') > -1) {
         return Promise.resolve('Correct Url')
       }
 
@@ -309,7 +309,7 @@ describe(commands.FILE_GET, () => {
 
   it('uses correct API url when tenant root URL option is passed', (done) => {
     const getStub: any = sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/GetFileByServerRelativePath(') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/GetFileByServerRelativePath(') > -1) {
         return Promise.resolve('Correct Url')
       }
 
@@ -364,7 +364,7 @@ describe(commands.FILE_GET, () => {
 
   it('writeFile called when option --asFile is specified', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/GetFileById(') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/GetFileById(') > -1) {
         return Promise.resolve('abc');
       }
 
@@ -399,7 +399,7 @@ describe(commands.FILE_GET, () => {
 
   it('writeFile called when option --asFile is specified (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/GetFileById(') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/GetFileById(') > -1) {
         return Promise.resolve('abc');
       }
 
@@ -434,7 +434,7 @@ describe(commands.FILE_GET, () => {
 
   it('writeFile not called when option --asFile and path is empty is specified', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/GetFileById(') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/GetFileById(') > -1) {
         return Promise.resolve('abc');
       }
 

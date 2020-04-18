@@ -62,7 +62,7 @@ describe(commands.SITEDESIGN_APPLY, () => {
 
   it('applies site design', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.ApplySiteDesign`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.ApplySiteDesign`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           siteDesignId: '9b142c22-037f-4a7f-9017-e9d8c0e34b98',
           webUrl: 'https://contoso.sharepoint.com'
@@ -94,7 +94,7 @@ describe(commands.SITEDESIGN_APPLY, () => {
 
   it('applies site design (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.ApplySiteDesign`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.ApplySiteDesign`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           siteDesignId: '9b142c22-037f-4a7f-9017-e9d8c0e34b98',
           webUrl: 'https://contoso.sharepoint.com'
@@ -126,7 +126,7 @@ describe(commands.SITEDESIGN_APPLY, () => {
 
   it('applies site design as task', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.AddSiteDesignTask`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.AddSiteDesignTask`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           siteDesignId: '9b142c22-037f-4a7f-9017-e9d8c0e34b98',
           webUrl: 'https://contoso.sharepoint.com'

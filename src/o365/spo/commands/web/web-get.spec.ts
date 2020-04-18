@@ -60,7 +60,7 @@ describe(commands.WEB_GET, () => {
 
   it('retrieves site information', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web') > -1) {
+      if ((opts.url as string).indexOf('/_api/web') > -1) {
         return Promise.resolve(
           {
             "value": [{
@@ -157,7 +157,7 @@ describe(commands.WEB_GET, () => {
 
   it('retrieves all site information with output option text', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web') > -1) {
+      if ((opts.url as string).indexOf('/_api/web') > -1) {
         return Promise.resolve(
           {
             "value": [{
@@ -255,7 +255,7 @@ describe(commands.WEB_GET, () => {
   it('command correctly handles web get reject request', (done) => {
     const err = 'Invalid request';
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/webs') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/webs') > -1) {
         return Promise.reject(err);
       }
 
@@ -288,7 +288,7 @@ describe(commands.WEB_GET, () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       cmdInstance.log('Test Url:');
       cmdInstance.log(opts.url);
-      if (opts.url.indexOf('select123=') > -1) {
+      if ((opts.url as string).indexOf('select123=') > -1) {
         return Promise.resolve('Correct Url1')
       }
 

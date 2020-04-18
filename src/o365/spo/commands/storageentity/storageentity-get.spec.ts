@@ -21,36 +21,41 @@ describe(commands.STORAGEENTITY_GET, () => {
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/GetStorageEntity('existingproperty')`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`/_api/web/GetStorageEntity('existingproperty')`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({ Comment: 'Lorem', Description: 'ipsum', Value: 'dolor' });
         }
       }
 
-      if (opts.url.indexOf(`/_api/web/GetStorageEntity('propertywithoutdescription')`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`/_api/web/GetStorageEntity('propertywithoutdescription')`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({ Comment: 'Lorem', Value: 'dolor' });
         }
       }
 
-      if (opts.url.indexOf(`/_api/web/GetStorageEntity('propertywithoutcomments')`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`/_api/web/GetStorageEntity('propertywithoutcomments')`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({ Description: 'ipsum', Value: 'dolor' });
         }
       }
 
-      if (opts.url.indexOf(`/_api/web/GetStorageEntity('nonexistingproperty')`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`/_api/web/GetStorageEntity('nonexistingproperty')`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({ "odata.null": true });
         }
       }
 
-      if (opts.url.indexOf(`/_api/web/GetStorageEntity('%23myprop')`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`/_api/web/GetStorageEntity('%23myprop')`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({ Description: 'ipsum', Value: 'dolor' });
         }
@@ -223,7 +228,7 @@ describe(commands.STORAGEENTITY_GET, () => {
   });
 
   it('doesn\'t fail if the parent doesn\'t define options', () => {
-    sinon.stub(Command.prototype, 'options').callsFake(() => { return undefined; });
+    sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
     const options = (command.options() as CommandOption[]);
     Utils.restore(Command.prototype.options);
     assert(options.length > 0);

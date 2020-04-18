@@ -131,7 +131,7 @@ describe(commands.LIST_LABEL_SET, () => {
 
   it('should set label for list (debug)', (done) => {
     const postStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/team1/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`) > -1) {
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team1/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`) > -1) {
         return Promise.resolve();
       }
 
@@ -172,7 +172,7 @@ describe(commands.LIST_LABEL_SET, () => {
 
   it('should set label for list using listId (debug)', (done) => {
     const postStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/team1/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`) > -1) {
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team1/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`) > -1) {
         return Promise.resolve();
       }
 
@@ -212,7 +212,7 @@ describe(commands.LIST_LABEL_SET, () => {
 
   it('should set label for list using listUrl option (verbose)', (done) => {
     const postStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/team1/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`) > -1) {
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team1/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`) > -1) {
         return Promise.resolve();
       }
 
@@ -245,7 +245,7 @@ describe(commands.LIST_LABEL_SET, () => {
 
   it('should set label for list using blockDelete,blockEdit,syncToItems options', (done) => {
     const postStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/team1/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`) > -1) {
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team1/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`) > -1) {
         return Promise.resolve();
       }
 

@@ -118,8 +118,9 @@ describe(commands.LISTITEM_REMOVE, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`/_api/web/lists(guid'`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`/_api/web/lists(guid'`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve();
         }
@@ -154,8 +155,9 @@ describe(commands.LISTITEM_REMOVE, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`/recycle()`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`/recycle()`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve();
         }
@@ -189,7 +191,7 @@ describe(commands.LISTITEM_REMOVE, () => {
   it('command correctly handles list get reject request', (done) => {
     const err = 'Invalid request';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/lists/GetByTitle(') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/lists/GetByTitle(') > -1) {
         return Promise.reject(err);
       }
 
@@ -218,7 +220,7 @@ describe(commands.LISTITEM_REMOVE, () => {
 
   it('uses correct API url when id option is passed', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/lists(guid') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/lists(guid') > -1) {
         return Promise.resolve('Correct Url')
       }
 
@@ -249,7 +251,7 @@ describe(commands.LISTITEM_REMOVE, () => {
 
   it('uses correct API url when recycle option is passed', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/recycle()') > -1) {
+      if ((opts.url as string).indexOf('/recycle()') > -1) {
         return Promise.resolve('Correct Url')
       }
 

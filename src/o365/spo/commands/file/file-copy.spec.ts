@@ -20,21 +20,21 @@ describe(commands.FILE_COPY, () => {
     waitForJobResult: any = null
   ) => {
     return sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/recycle()') > -1) {
+      if ((opts.url as string).indexOf('/recycle()') > -1) {
         if (recycleFile) {
           return recycleFile;
         }
         return Promise.resolve();
       }
 
-      if (opts.url.indexOf('/_api/site/CreateCopyJobs') > -1) {
+      if ((opts.url as string).indexOf('/_api/site/CreateCopyJobs') > -1) {
         if (createCopyJobs) {
           return createCopyJobs;
         }
         return Promise.resolve({ value: [{ "EncryptionKey": "6G35dpTMegtzqT3rsZ/av6agpsqx/SUyaAHBs9fJE6A=", "JobId": "cee65dc5-8d05-41cc-8657-92a12d213f76", "JobQueueUri": "https://spobn1sn1m001pr.queue.core.windows.net:443/1246pq20180429-5305d83990eb483bb93e7356252715b4?sv=2014-02-14&sig=JUwFF1B0KVC2h0o5qieHPUG%2BQE%2BEhJHNpbzFf8QmCGc%3D&st=2018-04-28T07%3A00%3A00Z&se=2018-05-20T07%3A00%3A00Z&sp=rap" }] });
       }
 
-      if (opts.url.indexOf('/_api/site/GetCopyJobProgress') > -1) {
+      if ((opts.url as string).indexOf('/_api/site/GetCopyJobProgress') > -1) {
         if (waitForJobResult) {
           return waitForJobResult;
         }
@@ -50,7 +50,7 @@ describe(commands.FILE_COPY, () => {
 
   let stubAllGetRequests: any = (fileExists: any = null) => {
     return sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('GetFileByServerRelativeUrl') > -1) {
+      if ((opts.url as string).indexOf('GetFileByServerRelativeUrl') > -1) {
         if (fileExists) {
           return fileExists;
         }

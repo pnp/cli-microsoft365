@@ -24,7 +24,7 @@ describe(commands.FOLDER_REMOVE, () => {
 
     stubPostResponses = (removeResp: any = null) => {
       return sinon.stub(request, 'post').callsFake((opts) => {
-        if (opts.url.indexOf('GetFolderByServerRelativeUrl') > -1) {
+        if ((opts.url as string).indexOf('GetFolderByServerRelativeUrl') > -1) {
           if (removeResp) {
             return removeResp;
           } else {

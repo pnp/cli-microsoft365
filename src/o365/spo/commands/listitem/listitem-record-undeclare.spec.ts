@@ -15,18 +15,18 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
   const expectedId = 147;
   let actualId = 0;
   let postFakes = (opts: any) => {
-    if (opts.url.indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+    if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
 
       // requestObjectIdentity mock
       if (opts.body.indexOf('Name="Current"') > -1) {
 
-        if (opts.url.indexOf('rejectme.com') > -1) {
+        if ((opts.url as string).indexOf('rejectme.com') > -1) {
 
           return Promise.reject('Failed request')
 
         }
 
-        if (opts.url.indexOf('returnerror.com') > -1) {
+        if ((opts.url as string).indexOf('returnerror.com') > -1) {
 
           return Promise.resolve(JSON.stringify(
             [{ "ErrorInfo": "error occurred" }]
@@ -61,7 +61,7 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
   }
 
   let getFakes = (opts: any) => {
-    if (opts.url.indexOf('/id') > -1) {
+    if ((opts.url as string).indexOf('/id') > -1) {
       return Promise.resolve({ value: "f64041f2-9818-4b67-92ff-3bc5dbbef27e" });
     }
     return Promise.reject('Invalid request');

@@ -60,7 +60,7 @@ describe(commands.FILE_LIST, () => {
 
   it('retrieves all files', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/GetFolderByServerRelativeUrl') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl') > -1) {
         return Promise.resolve(
           {"value":[{
             "CheckInComment": "",
@@ -130,7 +130,7 @@ describe(commands.FILE_LIST, () => {
 
   it('retrieves all files with output option text', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/GetFolderByServerRelativeUrl') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl') > -1) {
         return Promise.resolve(
           {"value":[
             {
@@ -169,7 +169,7 @@ describe(commands.FILE_LIST, () => {
   it('command correctly handles files list reject request', (done) => {
     const err = 'Invalid request';
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/GetFolderByServerRelativeUrl') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl') > -1) {
         return Promise.reject(err);
       }
 
@@ -194,7 +194,7 @@ describe(commands.FILE_LIST, () => {
 
   it('uses correct API url when output json option is passed', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('select123=') > -1) {
+      if ((opts.url as string).indexOf('select123=') > -1) {
         return Promise.resolve('Correct Url1')
       }
 

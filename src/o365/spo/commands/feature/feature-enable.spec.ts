@@ -121,8 +121,10 @@ describe(commands.FEATURE_ENABLE, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(requestUrl) > -1) {
-        if (opts.headers.accept && opts.headers.accept.indexOf('application/json') === 0) {
+      if ((opts.url as string).indexOf(requestUrl) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve();
         }
       }
@@ -155,8 +157,10 @@ describe(commands.FEATURE_ENABLE, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(requestUrl) > -1) {
-        if (opts.headers.accept && opts.headers.accept.indexOf('application/json') === 0) {
+      if ((opts.url as string).indexOf(requestUrl) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve();
         }
       }
@@ -189,7 +193,7 @@ describe(commands.FEATURE_ENABLE, () => {
     const requestUrl = `https://contoso.sharepoint.com/_api/web/features/add(featureId=guid'b2307a39-e878-458b-bc90-03bc578531d6',force=false)`
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(requestUrl) > -1) {
+      if ((opts.url as string).indexOf(requestUrl) > -1) {
         return Promise.reject(err);
       }
 

@@ -64,7 +64,7 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
 
   it('grants rights on the specified site design to the specified principal', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GrantSiteDesignRights`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GrantSiteDesignRights`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           "id": "9b142c22-037f-4a7f-9017-e9d8c0e34b98",
           "principalNames": ["PattiF"],
@@ -91,7 +91,7 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
 
   it('grants rights on the specified site design to the specified principal (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GrantSiteDesignRights`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GrantSiteDesignRights`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           "id": "9b142c22-037f-4a7f-9017-e9d8c0e34b98",
           "principalNames": ["PattiF"],
@@ -118,7 +118,7 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
 
   it('grants rights on the specified site design to the specified principals', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GrantSiteDesignRights`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GrantSiteDesignRights`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           "id": "9b142c22-037f-4a7f-9017-e9d8c0e34b98",
           "principalNames": ["PattiF", "AdeleV"],
@@ -145,7 +145,7 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
 
   it('grants rights on the specified site design to the specified principals (email)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GrantSiteDesignRights`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GrantSiteDesignRights`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           "id": "9b142c22-037f-4a7f-9017-e9d8c0e34b98",
           "principalNames": ["PattiF@contoso.com", "AdeleV@contoso.com"],
@@ -172,7 +172,7 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
 
   it('grants rights on the specified site design to the specified principals separated with an extra space', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GrantSiteDesignRights`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GrantSiteDesignRights`) > -1 &&
         JSON.stringify(opts.body) === JSON.stringify({
           "id": "9b142c22-037f-4a7f-9017-e9d8c0e34b98",
           "principalNames": ["PattiF", "AdeleV"],

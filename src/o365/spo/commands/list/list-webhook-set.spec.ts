@@ -58,7 +58,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
 
   it('uses correct API url when list id option is passed', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/lists(guid') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/lists(guid') > -1) {
         return Promise.resolve('Correct Url')
       }
 
@@ -87,7 +87,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
 
   it('uses correct API url when list title option is passed', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/lists/GetByTitle(') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/lists/GetByTitle(') > -1) {
         return Promise.resolve('Correct Url')
       }
 
@@ -121,7 +121,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
       expirationDateTime: '2018-10-09'
     });
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')`) > -1) {
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')`) > -1) {
         actual = JSON.stringify(opts.body);
         return Promise.resolve();
       }
@@ -157,7 +157,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
       expirationDateTime: '2018-10-09'
     });
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'cc27a922-8224-4296-90a5-ebbc54da2e77')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')`) > -1) {
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'cc27a922-8224-4296-90a5-ebbc54da2e77')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')`) > -1) {
         actual = JSON.stringify(opts.body);
         return Promise.resolve();
       }
@@ -193,7 +193,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
       expirationDateTime: '2018-10-09'
     });
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')`) > -1) {
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')`) > -1) {
         actual = JSON.stringify(opts.body);
         return Promise.resolve();
       }
@@ -228,7 +228,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
       notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
     });
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')`) > -1) {
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')`) > -1) {
         actual = JSON.stringify(opts.body);
         return Promise.resolve();
       }
@@ -262,7 +262,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
       expirationDateTime: '2019-03-02'
     });
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url.indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')`) > -1) {
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')`) > -1) {
         actual = JSON.stringify(opts.body);
         return Promise.resolve();
       }

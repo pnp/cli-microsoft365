@@ -60,8 +60,9 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
   it('retrieves the list of configured tenant properties', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/AllProperties?$select=storageentitiesindex`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`/_api/web/AllProperties?$select=storageentitiesindex`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({
             storageentitiesindex: JSON.stringify({
@@ -106,8 +107,9 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
   it('doesn\'t fail if no tenant properties have been configured', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/AllProperties?$select=storageentitiesindex`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`/_api/web/AllProperties?$select=storageentitiesindex`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({ storageentitiesindex: '' });
         }
@@ -128,8 +130,9 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
   it('doesn\'t fail if tenant properties web property value is empty', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/AllProperties?$select=storageentitiesindex`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`/_api/web/AllProperties?$select=storageentitiesindex`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({});
         }
@@ -160,8 +163,9 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
   it('doesn\'t fail if tenant properties web property value is empty JSON object', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/AllProperties?$select=storageentitiesindex`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`/_api/web/AllProperties?$select=storageentitiesindex`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({ storageentitiesindex: JSON.stringify({}) });
         }
@@ -182,8 +186,9 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
   it('doesn\'t fail if tenant properties web property value is empty JSON object (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/AllProperties?$select=storageentitiesindex`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`/_api/web/AllProperties?$select=storageentitiesindex`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({ storageentitiesindex: JSON.stringify({}) });
         }
@@ -214,8 +219,9 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
   it('doesn\'t fail if tenant properties web property value is invalid JSON', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/AllProperties?$select=storageentitiesindex`) > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf(`/_api/web/AllProperties?$select=storageentitiesindex`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({ storageentitiesindex: 'a' });
         }
@@ -257,7 +263,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
   });
 
   it('doesn\'t fail if the parent doesn\'t define options', () => {
-    sinon.stub(Command.prototype, 'options').callsFake(() => { return undefined; });
+    sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
     const options = (command.options() as CommandOption[]);
     Utils.restore(Command.prototype.options);
     assert(options.length > 0);

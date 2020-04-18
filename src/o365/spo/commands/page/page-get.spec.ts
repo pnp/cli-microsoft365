@@ -60,7 +60,7 @@ describe(commands.PAGE_GET, () => {
 
   it('gets information about a modern page', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve({
           "ListItemAllFields": {
             "CommentsDisabled": false,
@@ -143,7 +143,7 @@ describe(commands.PAGE_GET, () => {
 
   it('gets information about a modern page on root of tenant', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/SitePages/home.aspx')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/SitePages/home.aspx')`) > -1) {
         return Promise.resolve({
           "ListItemAllFields": {
             "CommentsDisabled": false,
@@ -226,7 +226,7 @@ describe(commands.PAGE_GET, () => {
 
   it('gets information about a modern page (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve({
           "ListItemAllFields": {
             "CommentsDisabled": false,
@@ -309,7 +309,7 @@ describe(commands.PAGE_GET, () => {
 
   it('gets information about a modern page when the specified page name doesn\'t contain extension', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve({
           "ListItemAllFields": {
             "CommentsDisabled": false,
@@ -392,7 +392,7 @@ describe(commands.PAGE_GET, () => {
 
   it('gets information about a modern page where the page doesn\'t have information about its layout', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve({
           "ListItemAllFields": {
             "CommentsDisabled": false,
@@ -473,7 +473,7 @@ describe(commands.PAGE_GET, () => {
 
   it('shows error when the specified page is a classic page', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve({
           "ListItemAllFields": {
             "CommentsDisabled": false,

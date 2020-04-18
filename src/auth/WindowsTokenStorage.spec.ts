@@ -14,7 +14,7 @@ describe('WindowsTokenStorage', () => {
   it('executes right command to get password from Windows Credential Manager', (done) => {
     let file = '';
     let args: string[] = [];
-    sinon.stub(childProcess, 'execFile').callsFake((f, a) => { file = f; args = a });
+    sinon.stub(childProcess, 'execFile').callsFake((f, a) => { file = f; args = a as any; return {} as childProcess.ChildProcess; });
     windowsCredsManager.get();
     try {
       assert.equal(file, path.join(__dirname, '../../bin/windows/creds.exe'));
@@ -256,7 +256,7 @@ describe('WindowsTokenStorage', () => {
 
   it('doesn\'t set new password if clearing existing passwords in Windows Credential Manager failed', (done) => {
     sinon.stub(windowsCredsManager, 'remove').callsFake(() => Promise.reject('An error has occurred when removing existing passwords'));
-    const execFileStub = sinon.stub(childProcess, 'execFile').callsFake(() => { });
+    const execFileStub = sinon.stub(childProcess, 'execFile').callsFake(() => { return {} as childProcess.ChildProcess; });
     windowsCredsManager
       .set('ABC')
       .then(() => {
@@ -294,7 +294,7 @@ describe('WindowsTokenStorage', () => {
     let file = '';
     let args: string[] = [];
     sinon.stub(windowsCredsManager, 'remove').callsFake(() => Promise.resolve());
-    sinon.stub(childProcess, 'execFile').callsFake((f, a) => { file = f; args = a }).callsArgWith(2, null, null, null);
+    sinon.stub(childProcess, 'execFile').callsFake((f, a) => { file = f; args = a as any; return {} as childProcess.ChildProcess; }).callsArgWith(2, null, null, null);
     windowsCredsManager
       .set('ABC')
       .then(() => {
@@ -321,7 +321,7 @@ describe('WindowsTokenStorage', () => {
 
   it('continues when adding short password to Windows Credential Manager succeeded', (done) => {
     sinon.stub(windowsCredsManager, 'remove').callsFake(() => Promise.resolve());
-    sinon.stub(childProcess, 'execFile').callsFake(() => { }).callsArgWith(2, null, null, null);
+    sinon.stub(childProcess, 'execFile').callsFake(() => { return {} as childProcess.ChildProcess; }).callsArgWith(2, null, null, null);
     windowsCredsManager
       .set('ABC')
       .then(() => {
@@ -341,7 +341,7 @@ describe('WindowsTokenStorage', () => {
 
   it('continues when adding long password to Windows Credential Manager succeeded', (done) => {
     sinon.stub(windowsCredsManager, 'remove').callsFake(() => Promise.resolve());
-    sinon.stub(childProcess, 'execFile').callsFake(() => { }).callsArgWith(2, null, null, null);
+    sinon.stub(childProcess, 'execFile').callsFake(() => { return {} as childProcess.ChildProcess; }).callsArgWith(2, null, null, null);
     windowsCredsManager
       .set(new Array(3000).fill('x').join(''))
       .then(() => {
@@ -361,7 +361,7 @@ describe('WindowsTokenStorage', () => {
 
   it('creates correct number of chunks for long password to be stored in Windows Credential Manager', (done) => {
     sinon.stub(windowsCredsManager, 'remove').callsFake(() => Promise.resolve());
-    const execFileStub = sinon.stub(childProcess, 'execFile').callsFake(() => { }).callsArgWith(2, null, null, null);
+    const execFileStub = sinon.stub(childProcess, 'execFile').callsFake(() => { return {} as childProcess.ChildProcess; }).callsArgWith(2, null, null, null);
     windowsCredsManager
       .set(new Array(3000).fill('x').join(''))
       .then(() => {
@@ -384,7 +384,7 @@ describe('WindowsTokenStorage', () => {
   it('correctly names chunks for long password to be stored in Windows Credential Manager', (done) => {
     const names: string[] = [];
     sinon.stub(windowsCredsManager, 'remove').callsFake(() => Promise.resolve());
-    sinon.stub(childProcess, 'execFile').callsFake((f, a) => { names.push(a[2]); }).callsArgWith(2, null, null, null);
+    sinon.stub(childProcess, 'execFile').callsFake((f, a) => { names.push((a as string[])[2]); return {} as childProcess.ChildProcess; }).callsArgWith(2, null, null, null);
     windowsCredsManager
       .set(new Array(3000).fill('x').join(''))
       .then(() => {
@@ -408,7 +408,7 @@ describe('WindowsTokenStorage', () => {
   it('correctly handles error when storing password in Windows Credential Manager', (done) => {
     const names: string[] = [];
     sinon.stub(windowsCredsManager, 'remove').callsFake(() => Promise.resolve());
-    sinon.stub(childProcess, 'execFile').callsFake((f, a) => { names.push(a[2]); }).callsArgWith(2, { message: 'An error has occurred' }, null, null);
+    sinon.stub(childProcess, 'execFile').callsFake((f, a) => { names.push((a as string[])[2]); return {} as childProcess.ChildProcess; }).callsArgWith(2, { message: 'An error has occurred' }, null, null);
     windowsCredsManager
       .set('ABC')
       .then(() => {
@@ -437,7 +437,7 @@ describe('WindowsTokenStorage', () => {
   it('executes right command to remove password from Windows Credential Manager', (done) => {
     let file = '';
     let args: string[] = [];
-    sinon.stub(childProcess, 'execFile').callsFake((f, a) => { file = f; args = a }).callsArgWith(2, null, null, null);
+    sinon.stub(childProcess, 'execFile').callsFake((f, a) => { file = f; args = a as any; return {} as childProcess.ChildProcess; }).callsArgWith(2, null, null, null);
     windowsCredsManager
       .remove()
       .then(() => {

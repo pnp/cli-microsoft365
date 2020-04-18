@@ -35,7 +35,7 @@ describe('FN018001_TEAMS_folder', () => {
   });
 
   it('doesn\'t return notifications if teams folder exists', () => {
-    sinon.stub(fs, 'existsSync').callsFake((path: string) => path.endsWith('/teams'));
+    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('/teams'));
     const project: Project = {
       path: '/usr/tmp',
       manifests: [{

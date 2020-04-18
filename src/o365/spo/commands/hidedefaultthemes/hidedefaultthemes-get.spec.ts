@@ -61,7 +61,7 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
 
   it('uses correct API url', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/thememanager/GetHideDefaultThemes') > -1) {
+      if ((opts.url as string).indexOf('/_api/thememanager/GetHideDefaultThemes') > -1) {
         return Promise.resolve('Correct Url')
       }
 
@@ -90,7 +90,7 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
 
   it('uses correct API url (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/thememanager/GetHideDefaultThemes') > -1) {
+      if ((opts.url as string).indexOf('/_api/thememanager/GetHideDefaultThemes') > -1) {
         return Promise.resolve('Correct Url')
       }
       return Promise.reject('Invalid request');
@@ -118,8 +118,9 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
 
   it('gets the current value of the HideDefaultThemes setting', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/thememanager/GetHideDefaultThemes') > -1) {
-        if (opts.headers.accept &&
+      if ((opts.url as string).indexOf('/_api/thememanager/GetHideDefaultThemes') > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
           return Promise.resolve({ value: true });
         }
@@ -143,7 +144,7 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
 
   it('gets the current value of the HideDefaultThemes setting - handle error', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/thememanager/GetHideDefaultThemes') > -1) {
+      if ((opts.url as string).indexOf('/_api/thememanager/GetHideDefaultThemes') > -1) {
         return Promise.reject('An error has occurred');
       }
       return Promise.reject('Invalid request');

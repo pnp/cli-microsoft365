@@ -20,6 +20,7 @@ describe(commands.SITE_RENAME, () => {
     sinon.stub(command as any, 'getRequestDigest').callsFake(() => { return { FormDigestValue: 'abc' }; });
     sinon.stub(global, 'setTimeout').callsFake((fn, to) => {
       fn();
+      return {} as any;
     });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
@@ -74,7 +75,7 @@ describe(commands.SITE_RENAME, () => {
 
   it('creates a site rename job using new url parameter', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1) {
         return Promise.resolve({
           "Option": 0,
           "Reserve": null,
@@ -109,7 +110,7 @@ describe(commands.SITE_RENAME, () => {
 
   it('creates a site rename job - json output', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1) {
         return Promise.resolve({
           "Option": 0,
           "Reserve": null,
@@ -159,7 +160,7 @@ describe(commands.SITE_RENAME, () => {
 
   it('creates a site rename job using new url parameter - suppressMarketplaceAppCheck flag', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1
+      if ((opts.url as string).indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1
         && opts.body.Option === 8) {
         return Promise.resolve({
           "Option": 8,
@@ -196,7 +197,7 @@ describe(commands.SITE_RENAME, () => {
   it('creates a site rename job using new url parameter - suppressWorkflow2013Check flag', (done) => {
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1
+      if ((opts.url as string).indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1
         && opts.body.Option === 16) {
         return Promise.resolve({
           "Option": 16,
@@ -233,7 +234,7 @@ describe(commands.SITE_RENAME, () => {
   it('creates a site rename job using new url parameter - both supress flags', (done) => {
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1
+      if ((opts.url as string).indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1
         && opts.body.Option === 24) {
         return Promise.resolve({
           "Option": 24,
@@ -269,7 +270,7 @@ describe(commands.SITE_RENAME, () => {
 
   it('creates a site rename job - wait for completion', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1) {
         return Promise.resolve({
           "Option": 0,
           "Reserve": null,
@@ -292,7 +293,8 @@ describe(commands.SITE_RENAME, () => {
     });
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/SiteRenameJobs/GetJobsBySiteUrl') > -1 &&
+      if ((opts.url as string).indexOf('/_api/SiteRenameJobs/GetJobsBySiteUrl') > -1 &&
+        opts.headers &&
         opts.headers['X-AttemptNumber'] &&
         parseInt(opts.headers['X-AttemptNumber']) <= 1) {
         return Promise.resolve(
@@ -321,7 +323,8 @@ describe(commands.SITE_RENAME, () => {
           }
         );
       }
-      else if (opts.url.indexOf('/_api/SiteRenameJobs/GetJobsBySiteUrl') > -1 &&
+      else if ((opts.url as string).indexOf('/_api/SiteRenameJobs/GetJobsBySiteUrl') > -1 &&
+        opts.headers &&
         opts.headers['X-AttemptNumber'] &&
         parseInt(opts.headers['X-AttemptNumber']) > 1) {
         return Promise.resolve(
@@ -365,7 +368,7 @@ describe(commands.SITE_RENAME, () => {
 
   it('handles API error - delayed failure - valid response', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1) {
         return Promise.resolve({
           "Option": 0,
           "Reserve": null,
@@ -388,7 +391,7 @@ describe(commands.SITE_RENAME, () => {
     });
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/SiteRenameJobs/GetJobsBySiteUrl') > -1) {
+      if ((opts.url as string).indexOf('/_api/SiteRenameJobs/GetJobsBySiteUrl') > -1) {
         return Promise.resolve(
           {
             "odata.metadata": "https://contoso-admin.sharepoint.com/_api/$metadata#SP.ApiData.SiteRenameJobEntityDatas",
@@ -437,7 +440,7 @@ describe(commands.SITE_RENAME, () => {
 
   it('handles API error - delayed failure - service error', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1) {
         return Promise.resolve({
           "Option": 0,
           "Reserve": null,
@@ -483,7 +486,7 @@ describe(commands.SITE_RENAME, () => {
 
   it('handles API error - immediate failure on creation', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1) {
 
         return Promise.resolve({
           "Option": 0,

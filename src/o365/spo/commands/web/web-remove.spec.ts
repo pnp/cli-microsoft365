@@ -161,7 +161,7 @@ describe(commands.WEB_REMOVE, () => {
     // Delete web
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf('_api/web') > -1) {
+      if ((opts.url as string).indexOf('_api/web') > -1) {
         return Promise.resolve(true);
       }
       return Promise.reject('Invalid request');
@@ -196,7 +196,7 @@ describe(commands.WEB_REMOVE, () => {
     // Delete web
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf('_api/web') > -1) {
+      if ((opts.url as string).indexOf('_api/web') > -1) {
         return Promise.resolve(true);
       }
       return Promise.reject('Invalid request');
@@ -232,7 +232,7 @@ describe(commands.WEB_REMOVE, () => {
     // Delete web
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf('_api/web') > -1) {
+      if ((opts.url as string).indexOf('_api/web') > -1) {
         return Promise.resolve(true);
       }
       return Promise.reject('Invalid request');
@@ -268,7 +268,7 @@ describe(commands.WEB_REMOVE, () => {
     // Delete web
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf('_api/web') > -1) {
+      if ((opts.url as string).indexOf('_api/web') > -1) {
         return Promise.resolve(true);
       }
       return Promise.reject('Invalid request');
@@ -303,7 +303,7 @@ describe(commands.WEB_REMOVE, () => {
     // Delete web
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url.indexOf('_api/web') > -1) {
+      if ((opts.url as string).indexOf('_api/web') > -1) {
         return Promise.reject('An error has occurred');
       }
       return Promise.reject('Invalid request');

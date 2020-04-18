@@ -1050,7 +1050,7 @@ describe(commands.SEARCH, () => {
 
   it('command correctly handles reject request', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/contextinfo') > -1) {
+      if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
         return Promise.resolve({
           FormDigestValue: 'abc'
         });
@@ -1061,7 +1061,7 @@ describe(commands.SEARCH, () => {
 
     const err = 'Invalid request';
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url.indexOf('/_api/web/webs') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/webs') > -1) {
         return Promise.reject(err);
       }
 

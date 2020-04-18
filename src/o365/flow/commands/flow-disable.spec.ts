@@ -60,7 +60,7 @@ describe(commands.FLOW_DISABLE, () => {
 
   it('disables the specified flow (debug)', (done) => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`providers/Microsoft.ProcessSimple/environments`) > -1) {
+      if ((opts.url as string).indexOf(`providers/Microsoft.ProcessSimple/environments`) > -1) {
 
         return Promise.resolve();
       }
@@ -82,7 +82,7 @@ describe(commands.FLOW_DISABLE, () => {
 
   it('disables the specified flow as admin', (done) => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url.indexOf(`providers/Microsoft.ProcessSimple/environments`) > -1) {
+      if ((opts.url as string).indexOf(`providers/Microsoft.ProcessSimple/environments`) > -1) {
 
         return Promise.resolve();
       }
