@@ -7,7 +7,7 @@
 
 > ### Pull Request Title
 >
-> Plese ensure that you have included a meaningful title describing your change.
+> Please ensure that you have included a meaningful title describing your change.
 >
 > For example...
 >
@@ -15,7 +15,7 @@
 > - Extends 'spo site list' command with support for returning deleted sites. Closes #1335
 > - Fixes 'spo listitem add' command. Closes #1297
 >
-> _(DELETE THIS PARAGRAPH AFTER READING)_
+> _(DELETE THIS SECTION AFTER READING)_
 >
 
 > ### Linked Issue
@@ -24,7 +24,7 @@
 >
 > You should link your pull request to an open issue using the `Closes` keyword, referencing the issue using `#` and the issue id. This will ensure that the issue is automatically closed when your pull request is merged.
 >
-> _(DELETE THIS PARAGRAPH AFTER READING)_
+> _(DELETE THIS SECTION AFTER READING)_
 >
 
 Closes #
@@ -37,7 +37,7 @@ Closes #
 >
 > To squash your commits, use the interactive rebase method, `git rebase -i HEAD~<commits>`, squashing the commits into a single commit and changing your commit message to be the same as your pull request title.
 >
-> _(DELETE THIS PARAGRAPH AFTER READING)_
+> _(DELETE THIS SECTION AFTER READING)_
 >
 
 > ### New Command = Five Files
@@ -52,16 +52,16 @@ Closes #
 > - docs/manual/mkdocs.yml
 > - docs/manual/docs/cmd/teams/tab/tab-add.md
 >
-> _(DELETE THIS PARAGRAPH AFTER READING)_
+> _(DELETE THIS SECTION AFTER READING)_
 >
 
-> ### Dev Only
+> ### Dev Branch Only
 >
 > You should only submit your changes to the **dev** branch.
 >
 > Pull requests submitted to other branches will be rejected.
 >
-> _(DELETE THIS PARAGRAPH AFTER READING)_
+> _(DELETE THIS SECTION AFTER READING)_
 >
 
 > ### Merge Conflicts
@@ -80,5 +80,5 @@ Closes #
 >
 > `git push origin <your-branch> -f`
 >
-> _(DELETE THIS PARAGRAPH AFTER READING)_
+> _(DELETE THIS SECTION AFTER READING)_
 >
