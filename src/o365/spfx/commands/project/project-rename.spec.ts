@@ -15,7 +15,7 @@ describe(commands.PROJECT_RENAME, () => {
   let cmdInstance: any;
   let trackEvent: any;
   let telemetry: any;
-  const projectPath: string = 'src/o365/spfx/commands/project/project-rename/test-projects/spfx-182-webpart-react';
+  const projectPath: string = 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-182-webpart-react';
 
   before(() => {
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
