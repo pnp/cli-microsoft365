@@ -19,7 +19,7 @@ Option|Description
 `--listUrl [listUrl]`|Server- or web-relative URL of the list where the field is located. Specify only one of `listTitle`, `listId` or `listUrl`
 `-i, --id [id]`|The ID of the field to remove. Specify `id` or `fieldTitle` but not both
 `--fieldTitle [fieldTitle]`|The display name (case-sensitive) of the field to remove. Specify `id` or `fieldTitle` but not both
-`--confirm`|Don't prompt for confirmation before removing the user from the group
+`--confirm`|Don't prompt for confirming removing the field
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json,text`. Default `text`
 `--pretty`|Prettifies `json` output
