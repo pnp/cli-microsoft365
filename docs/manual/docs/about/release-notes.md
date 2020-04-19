@@ -8,6 +8,10 @@
 
 - [aad o365group report activitystorage](../cmd/aad/o365group/o365group-report-activitystorage.md) - get the total storage used across all group mailboxes and group sites [#1286](https://github.com/pnp/office365-cli/issues/1286)
 
+**Microsoft Teams:**
+
+- [teams tab remove](../cmd/teams/tab/tab-remove.md) - removes a tab from the specified channel [#1449](https://github.com/pnp/office365-cli/issues/1449)
+
 **Office 365:**
 
 - [tenant status list](../cmd/tenant/status/status-list.md) - gets health status of the different services in Office 365 [#1272](https://github.com/pnp/office365-cli/issues/1272)
@@ -39,6 +43,10 @@
 - added conditionally suggesting upgrading Office UI Fabric scss files [#1468](https://github.com/pnp/office365-cli/issues/1468)
 - added the 'Ensure site assets library is created' sample script [#1447](https://github.com/pnp/office365-cli/pull/1447)
 - added the 'List all tenant-wide extensions' sample script [#1443](https://github.com/pnp/office365-cli/pull/1443)
+- fixed guidance for upgrading teams piece in `spfx project upgrade` [#1471](https://github.com/pnp/office365-cli/pull/1471)
+- extended `spo theme set` command with support for theme validation [#1466](https://github.com/pnp/office365-cli/pull/1466)
+- fixed resolution of `FN003005_CFG_localizedResource_pathLib` in `spfx project upgrade` [#1470](https://github.com/pnp/office365-cli/pull/1470)
+- updated Theme Generator URL on `spo theme set` & `spo theme  apply` commands [#1465](https://github.com/pnp/office365-cli/pull/1465)
 
 ## [v2.8.0](https://github.com/pnp/office365-cli/releases/tag/v2.8.0)
 
