@@ -34,13 +34,13 @@ Remove the current user from the group with the ID `5611239081`
 yammer group user remove --id 5611239081
 ```
 
-Remove the the user with the ID `66622349'` from the group with the ID `5611239081`
+Remove the the user with the ID `66622349` from the group with the ID `5611239081`
 
 ```sh
 yammer group user remove --id 5611239081 --userId 66622349
 ```
 
-Remove the the user with the ID `66622349'` from the group with the ID `5611239081` without asking for confirmation
+Remove the the user with the ID `66622349` from the group with the ID `5611239081` without asking for confirmation
 
 ```sh
 yammer group user remove --id 5611239081 --userId 66622349 --confirm
