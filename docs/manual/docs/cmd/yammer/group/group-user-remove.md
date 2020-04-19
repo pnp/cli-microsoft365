@@ -1,11 +1,11 @@
-# yammer group leave
+# yammer group user remove
 
-Leave a Yammer group
+Removes a user from a Yammer group
 
 ## Usage
 
 ```sh
-yammer group leave [options]
+yammer group user remove [options]
 ```
 
 ## Options
@@ -13,8 +13,9 @@ yammer group leave [options]
 Option|Description
 ------|-----------
 `--help`|output usage information
-`--id <userId>`|The Group ID of the group to leave
+`--id <userId>`|The Group ID to process
 `--userId [userId]`|Remove the user with the ID specified. Defaults to the current user
+`--confirm`|Don't prompt for confirmation before removing the user from the group
 `-o, --output [output]`|Output type. `json,text`. Default `text`
 `--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
@@ -30,11 +31,17 @@ Option|Description
 Remove the current user from the group with the ID `5611239081`
 
 ```sh
-yammer group leave --id 5611239081
+yammer group user remove --id 5611239081
 ```
 
 Remove the the user with the ID `66622349'` from the group with the ID `5611239081`
 
 ```sh
-yammer group leave --id 5611239081 --userId 66622349
+yammer group user remove --id 5611239081 --userId 66622349
 ```
+
+Remove the the user with the ID `66622349'` from the group with the ID `5611239081` without asking for confirmation
+
+```sh
+yammer group user remove --id 5611239081 --userId 66622349 --confirm
+``` 
