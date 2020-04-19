@@ -15,60 +15,91 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   id: number;
   userId?: number;
+  confirm?: boolean;
 }
 
-class YammerGroupLeaveCommand extends YammerCommand {
+class YammerGroupUserRemoveCommand extends YammerCommand {
   constructor() {
     super();
   }
 
   public get name(): string {
-    return `${commands.YAMMER_GROUP_LEAVE}`;
+    return `${commands.YAMMER_GROUP_USER_REMOVE}`;
   }
 
   public get description(): string {
-    return 'Leave a Yammer group';
+    return 'Removes a user from a Yammer group';
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.id = args.options.id !== undefined;
     telemetryProps.userId = args.options.userId !== undefined;
+    telemetryProps.confirm = (!(!args.options.confirm)).toString();
     return telemetryProps;
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    let endpoint = `${this.resource}/v1/group_memberships.json`;
+    const executeRemoveAction: () => void = (): void => {
+      let endpoint = `${this.resource}/v1/group_memberships.json`;
+    
+      const requestOptions: any = {
+        url: endpoint,
+        headers: {
+          accept: 'application/json;odata.metadata=none',
+          'content-type': 'application/json;odata=nometadata'
+        },
+        json: true,
+        body: {
+          group_id: args.options.id,
+          user_id: args.options.userId
+        }
+      };
 
-    const requestOptions: any = {
-      url: endpoint,
-      headers: {
-        accept: 'application/json;odata.metadata=none',
-        'content-type': 'application/json;odata=nometadata'
-      },
-      json: true,
-      body: {
-        group_id: args.options.id,
-        user_id: args.options.userId
-      }
+      request
+            .delete(requestOptions)
+            .then((res: any): void => {
+              cb();
+            }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
     };
+    
+    if (args.options.confirm) {
+      executeRemoveAction();
+    }
+    else {
+      let messagePrompt = `Are you sure you want to remove you from the Group ${args.options.id}?`;
+      if (args.options.userId)
+        messagePrompt = `Are you sure you want to remove the user ${args.options.userId} from the Group ${args.options.id}?`;
 
-    request
-        .delete(requestOptions)
-        .then((res: any): void => {
+      cmd.prompt({
+        type: 'confirm',
+        name: 'continue',
+        default: false,
+        message: messagePrompt,
+      }, (result: { continue: boolean }): void => {
+        if (!result.continue) {
           cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+        }
+        else {
+          executeRemoveAction();
+        }
+      });
+    }
   };
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
         option: '--id <id>',
-        description: 'The Group ID of the group to leave'
+        description: 'The Group ID to process'
       },
       {
         option: '--userId [id]',
         description: 'Remove the user with the ID specified. Defaults to the current user'
+      },
+      {
+        option: '--confirm',
+        description: 'Don\'t prompt for confirmation before removing the user from the group'
       }
     ];
 
@@ -111,8 +142,11 @@ class YammerGroupLeaveCommand extends YammerCommand {
     
     Remove the the user with the ID ${chalk.grey('66622349')} from the group with the ID ${chalk.grey('5611239081')}
       ${this.name} --id 5611239081 --userId 66622349
+
+    Remove the the user with the ID ${chalk.grey('66622349')} from the group with the ID ${chalk.grey('5611239081')} without asking for confirmation
+      ${this.name} --id 5611239081 --userId 66622349 --confirm
   `);
   }
 }
 
-module.exports = new YammerGroupLeaveCommand();
+module.exports = new YammerGroupUserRemoveCommand();
