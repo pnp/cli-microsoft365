@@ -13,7 +13,7 @@ interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
+export interface Options extends GlobalOptions {
   asTask: boolean;
   id: string;
   webUrl: string;

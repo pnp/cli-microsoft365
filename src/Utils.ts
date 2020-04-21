@@ -1,7 +1,7 @@
 import Table = require('easy-table');
 import * as os from 'os';
 const vorpal: Vorpal = require('./vorpal-init');
-import { CommandError } from './Command';
+import Command, { CommandError } from './Command';
 import * as url from 'url';
 import * as jmespath from 'jmespath';
 
@@ -654,5 +654,32 @@ export default class Utils {
     }
 
     return true;
+  }
+
+  public static executeCommand(command: Command, options: any, cmd: CommandInstance): Promise<void> {
+    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
+      const commandInstance: any = {
+        commandWrapper: {
+          command: command.name
+        },
+        action: command.action(),
+        log: (message: any): void => {
+          cmd.log(message);
+        },
+        prompt: cmd.prompt
+      };
+
+      if (options.debug) {
+        cmd.log(`Executing command ${command.name} with options ${JSON.stringify(options)}`);
+      }
+
+      commandInstance.action({ options: options }, (err: any): void => {
+        if (err) {
+          return reject(err);
+        }
+  
+        resolve();
+      });
+    });
   }
 }

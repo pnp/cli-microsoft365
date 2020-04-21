@@ -3,10 +3,54 @@ import * as assert from 'assert';
 import Utils from './Utils';
 const vorpal: Vorpal = require('./vorpal-init');
 import Table = require('easy-table');
-import { CommandError } from './Command';
+import Command, { CommandError } from './Command';
 import * as os from 'os';
+import appInsights from './appInsights';
+import auth from './Auth';
+
+class MockCommand extends Command {
+  public get name(): string {
+    return 'Mock command';
+  }
+
+  public get description(): string {
+    return 'Mock command description';
+  }
+
+  public commandAction(cmd: CommandInstance, args: any, cb: (err?: any) => void): void {
+    cmd.log('Hello from mock command');
+
+    if (this.debug) {
+      cmd.log('Hello debug');
+    }
+
+    if (args.options.error) {
+      return cb('An error has occurred');
+    }
+
+    cb();
+  }
+
+  public commandHelp(args: any, log: (message: string) => void): void {
+    log('MockCommand help');
+  }
+}
 
 describe('Utils', () => {
+  before(() => {
+    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    auth.service.connected = true;
+  });
+
+  after(() => {
+    Utils.restore([
+      auth.restoreAuth,
+      appInsights.trackEvent
+    ]);
+    auth.service.connected = false;
+  })
+
   it('isValidISODate returns true if value is in ISO Date format with - separator', () => {
     const result = Utils.isValidISODate("2019-03-22");
     assert.equal(result, true);
@@ -1250,5 +1294,82 @@ describe('Utils', () => {
     const actual = Utils.isValidTheme(theme);
     const expected = false;
     assert.equal(actual, expected);
+  });
+
+  it('executes the specified command', (done) => {
+    const command: Command = new MockCommand();
+    const commandInstance: CommandInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      log: (message: any): void => {
+      },
+      prompt: (object: any, callback: (result: any) => void) => { }
+    };
+    const logSpy: sinon.SinonSpy = sinon.spy(commandInstance, 'log');
+    Utils
+      .executeCommand(command, { debug: false }, commandInstance)
+      .then((): void => {
+        try {
+          assert(logSpy.calledWith('Hello from mock command'));
+          done();
+        }
+        catch (err) {
+          done(err);
+        }
+      }, (err): void => {
+        done(err);
+      })
+  });
+
+  it('executes the specified command in debug mode', (done) => {
+    const command: Command = new MockCommand();
+    const commandInstance: CommandInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      log: (message: any): void => {
+      },
+      prompt: (object: any, callback: (result: any) => void) => { }
+    };
+    const logSpy: sinon.SinonSpy = sinon.spy(commandInstance, 'log');
+    Utils
+      .executeCommand(command, { debug: true }, commandInstance)
+      .then((): void => {
+        try {
+          assert(logSpy.calledWith('Hello debug'));
+          done();
+        }
+        catch (err) {
+          done(err);
+        }
+      }, (err): void => {
+        done(err);
+      })
+  });
+
+  it('properly handles error executing a command', (done) => {
+    const command: Command = new MockCommand();
+    const commandInstance: CommandInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      log: (message: any): void => {
+      },
+      prompt: (object: any, callback: (result: any) => void) => { }
+    };
+    Utils
+      .executeCommand(command, { error: true }, commandInstance)
+      .then((): void => {
+        done(`Command didn't fail while expected`);
+      }, (err): void => {
+        try {
+          assert.equal(err, 'An error has occurred');
+          done();
+        }
+        catch (err) {
+          done(err);
+        }
+      })
   });
 });
