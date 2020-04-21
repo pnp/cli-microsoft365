@@ -8,21 +8,42 @@ Note: TenantWideExtensionDisabled column denotes the extension is enabled or dis
 
 
 ```powershell tab="PowerShell Core"
-$listName = "Tenant Wide Extensions" 
+$extensionName = Read-Host "Enter the Extension Name"
+$listName = "Tenant Wide Extensions"
 
-o365 login
 $appcatalogurl = o365 spo tenant appcatalogurl get
-o365 spo listitem set -t $listName -i 2 -u $appcatalogurl --TenantWideExtensionDisabled "true"
+$filterQuery = "Title eq '"+ $extensionName +"'"
+$appitems = o365 spo listitem list --title $listName --webUrl $appcatalogurl --fields "Id,Title" --filter $filterQuery --output json
+$extItems = $appitems.Replace("Id","ExtId") | ConvertFrom-JSON
+
+if($extItems.count -ge 0){
+o365 spo listitem set --listTitle $listName --id $extItems.ExtId --webUrl $appcatalogurl --TenantWideExtensionDisabled "true"; 
+  Write-Host("Extention disabled.");
+}else{
+  Write-Host("No extensions found with the name '"+$extensionName+"'.");
+}
 ```
 
 ```bash tab="Bash"
 #!/bin/bash
 
+# requires jq: https://stedolan.github.io/jq/
+
+echo "Enter the extension name to disable: "; read extensionName;
 listName="Tenant Wide Extensions"
 
-o365 login
 appcatalogurl=$(o365 spo tenant appcatalogurl get)
-o365 spo listitem set -t "$listName" -i 2 -u $appcatalogurl --TenantWideExtensionDisabled "true"
+filterQuery="Title eq '$extensionName'"
+appitemsjson=$(o365 spo listitem list --title "$listName" --webUrl "$appcatalogurl" --fields "Id,Title" --filter "$filterQuery" --output json)
+appitemid=( $(jq -r '.[].Id' <<< '$appitemsjson'))
+
+if [[ $appitemid -gt 0 ]]
+then
+ o365 spo listitem set --listTitle "$listName" --id "$appitemid" --webUrl "$appcatalogurl" --TenantWideExtensionDisabled "true"
+ echo "Extension disabled."
+else
+  echo "No extensions found with the name '$extensionName'."
+fi
 ```
 
 
