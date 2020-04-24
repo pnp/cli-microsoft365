@@ -72,6 +72,9 @@ class LoginCommand extends Command {
           auth.service.thumbprint = args.options.thumbprint;
           auth.service.password = args.options.password;
           break;
+        case 'identity':
+          auth.service.authType = AuthType.Identity;
+          auth.service.userName = args.options.userName;
       }
 
       auth
@@ -139,8 +142,8 @@ class LoginCommand extends Command {
     const options: CommandOption[] = [
       {
         option: '-t, --authType [authType]',
-        description: 'The type of authentication to use. Allowed values certificate|deviceCode|password. Default deviceCode',
-        autocomplete: ['certificate', 'deviceCode', 'password']
+        description: 'The type of authentication to use. Allowed values certificate|deviceCode|password|identity. Default deviceCode',
+        autocomplete: ['certificate', 'deviceCode', 'password', 'identity']
       },
       {
         option: '-u, --userName [userName]',
@@ -248,7 +251,16 @@ class LoginCommand extends Command {
       ${commands.LOGIN} --authType certificate --certificateFile /Users/user/dev/localhost.pem --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1
 
     Log in to Office 365 using a personal information exchange (.pfx) file
-      o365 login --authType certificate --certificateFile /Users/user/dev/localhost.pfx --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1 --password 'pass@word1'
+      ${commands.LOGIN} --authType certificate --certificateFile /Users/user/dev/localhost.pfx --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1 --password 'pass@word1'
+    
+    Log in to Office 365 using a system assigned managed identity. 
+    Applies to Azure Virtual Machines and Azure Functions with enabled managed identity 
+      ${commands.LOGIN} --authType identity
+
+    Log in to Office 365 using a user-assigned managed identity. 
+    Client id or principal id also known as object id value can be specified in the userName option.
+    Applies to Azure Virtual Machines and Azure Functions with enabled managed identity 
+      ${commands.LOGIN} --authType identity --userName ac9fbed5-804c-4362-a369-21a4ec51109e
 
 `);
   }

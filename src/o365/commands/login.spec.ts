@@ -125,6 +125,36 @@ describe(commands.LOGIN, () => {
     });
   });
 
+  it('logs in to Office 365 using system managed identity when authType identity set', (done) => {
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve(''));
+
+    cmdInstance.action({ options: { debug: false, authType: 'identity', userName:  'ac9fbed5-804c-4362-a369-21a4ec51109e' } }, () => {
+      try {
+        assert.equal(auth.service.authType, AuthType.Identity, 'Incorrect authType set');
+        assert.equal(auth.service.userName, 'ac9fbed5-804c-4362-a369-21a4ec51109e', 'Incorrect userName set');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('logs in to Office 365 using user-assigned managed identity when authType identity set', (done) => {
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve(''));
+
+    cmdInstance.action({ options: { debug: false, authType: 'identity' } }, () => {
+      try {
+        assert.equal(auth.service.authType, AuthType.Identity, 'Incorrect authType set');
+        assert.equal(auth.service.userName, undefined, 'Incorrect userName set');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('can be cancelled', () => {
     assert(command.cancel());
   });

@@ -13,7 +13,7 @@ login [options]
 Option|Description
 ------|-----------
 `--help`|output usage information
-`-t, --authType [authType]`|The type of authentication to use. Allowed values `certificate,deviceCode,password`. Default `deviceCode`
+`-t, --authType [authType]`|The type of authentication to use. Allowed values `certificate,deviceCode,password,identity`. Default `deviceCode`
 `-u, --userName [userName]`|Name of the user to authenticate. Required when `authType` is set to `password`
 `-p, --password [password]`|Password for the user. Required when `authType` is set to `password`
 `-c, --certificateFile [certificateFile]`|Path to the file with certificate private key. Required when `authType` is set to `certificate`
@@ -68,4 +68,16 @@ Log in to Office 365 using a personal information exchange (.pfx) file
 
 ```sh
 login --authType certificate --certificateFile /Users/user/dev/localhost.pfx --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1 --password 'pass@word1'
+```
+
+Log in to Office 365 using a system assigned managed identity. Applies to Azure Virtual Machines and Azure Functions with enabled managed identity
+
+```sh
+login --authType identity
+```
+
+Log in to Office 365 using a user-assigned managed identity. Client id or principal id also known as object id value can be specified in the userName option. Applies to Azure Virtual Machines and Azure Functions with enabled managed identity 
+
+```sh
+login --authType identity --userName ac9fbed5-804c-4362-a369-21a4ec51109e
 ```

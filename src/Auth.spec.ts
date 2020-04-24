@@ -9,6 +9,7 @@ import { FileTokenStorage } from './auth/FileTokenStorage';
 import { TokenStorage } from './auth/TokenStorage';
 import { CommandError } from './Command';
 import * as fs from 'fs';
+import request from './request';
 
 class MockTokenStorage implements TokenStorage {
   public get(): Promise<string> {
@@ -47,6 +48,9 @@ describe('Auth', () => {
 
   afterEach(() => {
     readFileSyncStub.restore();
+    Utils.restore([
+      request.get
+    ]);
   });
 
   it('returns existing access token if still valid', (done) => {
@@ -604,6 +608,515 @@ describe('Auth', () => {
       catch (e) {
         done(e);
       }
+    });
+  });
+
+  it('calls api with correct params using system managed identity flow when authType identity and Azure VM api', (done) => {
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+    const requestStub = sinon.stub(request, 'get').callsFake((opts) => {
+      return Promise.resolve({
+        "access_token": "eyJ0eXAiOiJKV1QiLCJ...",
+        "client_id": "a04566df-9a65-4e90-ae3d-574572a16423",
+        "expires_in": "86399",
+        "expires_on": "1587847593",
+        "ext_expires_in": "86399",
+        "not_before": "1587760893",
+        "resource": "https://veling.sharepoint.com/",
+        "token_type": "Bearer"
+      });
+    });
+
+    auth.service.authType = AuthType.Identity;
+    auth.service.userName = undefined;
+    auth.ensureAccessToken(resource, stdout, true).then(() => {
+      try {
+        assert.equal(requestStub.lastCall.args[0].url, 'http://169.254.169.254/metadata/identity/oauth2/token?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2018-02-01');
+        assert.equal((requestStub.lastCall.args[0] as any).headers.Metadata, true);
+        assert.equal((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    }, (err) => {
+      done(err);
+    });
+  });
+
+  it('gets token using system managed identity flow when authType identity and Azure VM api', (done) => {
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+    sinon.stub(request, 'get').callsFake((opts) => {
+      return Promise.resolve({
+        "access_token": "eyJ0eXAiOiJKV1QiLCJ...",
+        "client_id": "a04566df-9a65-4e90-ae3d-574572a16423",
+        "expires_in": "86399",
+        "expires_on": "1587847593",
+        "ext_expires_in": "86399",
+        "not_before": "1587760893",
+        "resource": "https://veling.sharepoint.com/",
+        "token_type": "Bearer"
+      });
+    });
+
+    auth.service.authType = AuthType.Identity;
+    auth.service.userName = undefined;
+    auth.ensureAccessToken(resource, stdout, true).then((accessToken) => {
+      try {
+        assert.equal(accessToken, 'eyJ0eXAiOiJKV1QiLCJ...');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    }, (err) => {
+      done(err);
+    });
+  });
+
+  it('calls api with correct params user-assigned managed identity flow when authType identity and client_id and Azure VM api', (done) => {
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+    const requestStub = sinon.stub(request, 'get').callsFake((opts) => {
+      return Promise.resolve({
+        "access_token": "eyJ0eXAiOiJKV1QiLCJ...",
+        "client_id": "a04566df-9a65-4e90-ae3d-574572a16423",
+        "expires_in": "86399",
+        "expires_on": "1587847593",
+        "ext_expires_in": "86399",
+        "not_before": "1587760893",
+        "resource": "https://veling.sharepoint.com/",
+        "token_type": "Bearer"
+      });
+    });
+
+    auth.service.authType = AuthType.Identity;
+    auth.service.userName = 'a04566df-9a65-4e90-ae3d-574572a16423';
+    auth.ensureAccessToken(resource, stdout, true).then(() => {
+      try {
+        assert.equal(requestStub.lastCall.args[0].url, 'http://169.254.169.254/metadata/identity/oauth2/token?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2018-02-01&client_id=a04566df-9a65-4e90-ae3d-574572a16423');
+        assert.equal((requestStub.lastCall.args[0] as any).headers.Metadata, true);
+        assert.equal((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    }, (err) => {
+      done(err);
+    });
+  });
+
+  it('calls api with correct params user-assigned managed identity flow when authType identity and principal_id and Azure VM api', (done) => {
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+    const requestStub = sinon.stub(request, 'get').callsFake((opts) => {
+
+      if ((opts.url as string).indexOf('&client_id=') !== -1) {
+
+        return Promise.reject({ error: { "error": "invalid_request", "error_description": "Identity not found" } });
+      }
+
+      return Promise.resolve({
+        "access_token": "eyJ0eXAiOiJKV1QiLCJ...",
+        "client_id": "a04566df-9a65-4e90-ae3d-574572a16423",
+        "expires_in": "86399",
+        "expires_on": "1587847593",
+        "ext_expires_in": "86399",
+        "not_before": "1587760893",
+        "resource": "https://veling.sharepoint.com/",
+        "token_type": "Bearer"
+      });
+    });
+
+    auth.service.authType = AuthType.Identity;
+    auth.service.userName = 'a04566df-9a65-4e90-ae3d-574572a16423';
+    auth.ensureAccessToken(resource, stdout, true).then((accessToken) => {
+      try {
+        assert.equal(requestStub.lastCall.args[0].url, 'http://169.254.169.254/metadata/identity/oauth2/token?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2018-02-01&principal_id=a04566df-9a65-4e90-ae3d-574572a16423');
+        assert.equal((requestStub.lastCall.args[0] as any).headers.Metadata, true);
+        assert.equal((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    }, (err) => {
+      done(err);
+    });
+  });
+
+  it('retrieves token using user-assigned managed identity flow when authType identity and principal_id and Azure VM api', (done) => {
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+    sinon.stub(request, 'get').callsFake((opts) => {
+
+      if ((opts.url as string).indexOf('&client_id=') !== -1) {
+
+        return Promise.reject({ error: { "error": "invalid_request", "error_description": "Identity not found" } });
+      }
+
+      return Promise.resolve({
+        "access_token": "eyJ0eXAiOiJKV1QiLCJ...",
+        "client_id": "a04566df-9a65-4e90-ae3d-574572a16423",
+        "expires_in": "86399",
+        "expires_on": "1587847593",
+        "ext_expires_in": "86399",
+        "not_before": "1587760893",
+        "resource": "https://veling.sharepoint.com/",
+        "token_type": "Bearer"
+      });
+    });
+
+    auth.service.authType = AuthType.Identity;
+    auth.service.userName = 'a04566df-9a65-4e90-ae3d-574572a16423';
+    auth.ensureAccessToken(resource, stdout, true).then((accessToken) => {
+      try {
+        assert.equal(accessToken, 'eyJ0eXAiOiJKV1QiLCJ...');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    }, (err) => {
+      done(err);
+    });
+  });
+
+  it('handles error when using user-assigned managed identity flow when authType identity and principal_id and Azure VM api', (done) => {
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+    const requestStub = sinon.stub(request, 'get').callsFake((opts) => {
+
+      if ((opts.url as string).indexOf('&client_id=') !== -1) {
+
+        return Promise.reject({ error: { "error": "invalid_request", "error_description": "Identity not found" } });
+      }
+
+      return Promise.reject({ error: { "error": "invalid_request", "error_description": "Identity not found" } });
+    });
+
+    auth.service.authType = AuthType.Identity;
+    auth.service.userName = 'a04566df-9a65-4e90-ae3d-574572a16423';
+    auth.ensureAccessToken(resource, stdout, true).then(() => {
+      done(new Error('something is wrong'));
+    }, (err) => {
+      try {
+        assert.equal(requestStub.lastCall.args[0].url, 'http://169.254.169.254/metadata/identity/oauth2/token?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2018-02-01&principal_id=a04566df-9a65-4e90-ae3d-574572a16423');
+        assert.equal((requestStub.lastCall.args[0] as any).headers.Metadata, true);
+        assert.equal((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
+        assert.equal(err.error.error_description, 'Identity not found');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('handles EACCES error when using user-assigned managed identity flow when authType identity and principal_id and Azure VM api', (done) => {
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+    const requestStub = sinon.stub(request, 'get').callsFake((opts) => {
+
+      if ((opts.url as string).indexOf('&client_id=') !== -1) {
+
+        return Promise.reject({ error: { "error": "invalid_request", "error_description": "Identity not found" } });
+      }
+
+      return Promise.reject({ error: { "errno": "EACCES", "code": "EACCES", "syscall": "connect", "address": "169.254.169.254", "port": 80 } });
+    });
+
+    auth.service.authType = AuthType.Identity;
+    auth.service.userName = 'a04566df-9a65-4e90-ae3d-574572a16423';
+    auth.ensureAccessToken(resource, stdout, true).then(() => {
+      done(new Error('something is wrong'));
+    }, (err) => {
+      try {
+        assert.equal(requestStub.lastCall.args[0].url, 'http://169.254.169.254/metadata/identity/oauth2/token?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2018-02-01&principal_id=a04566df-9a65-4e90-ae3d-574572a16423');
+        assert.equal((requestStub.lastCall.args[0] as any).headers.Metadata, true);
+        assert.equal((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
+        assert.notEqual(err.indexOf('Error while logging with Managed Identity. Please check if a Managed Identity is assigned to the current Azure resource.'), -1);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('calls api with correct params using system managed identity flow when authType identity and Azure Function api', (done) => {
+    process.env.IDENTITY_ENDPOINT = 'http://127.0.0.1:41932/MSI/token/';
+    process.env.IDENTITY_HEADER = 'AFBA957766234A0CA9F3B6FA3D9582C7';
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+    const requestStub = sinon.stub(request, 'get').callsFake((opts) => {
+      return Promise.resolve({
+        "access_token": "eyJ0eXAiOiJKV1QiLCJ...",
+        "client_id": "a04566df-9a65-4e90-ae3d-574572a16423",
+        "expires_in": "86399",
+        "expires_on": "1587847593",
+        "ext_expires_in": "86399",
+        "not_before": "1587760893",
+        "resource": "https://veling.sharepoint.com/",
+        "token_type": "Bearer"
+      });
+    });
+
+    auth.service.authType = AuthType.Identity;
+    auth.service.userName = undefined;
+    auth.ensureAccessToken(resource, stdout, true).then(() => {
+      try {
+        assert.equal(requestStub.lastCall.args[0].url, 'http://127.0.0.1:41932/MSI/token/?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2019-08-01');
+        assert.equal((requestStub.lastCall.args[0] as any).headers.Metadata, true);
+        assert.equal((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    }, (err) => {
+      done(err);
+    });
+  });
+
+  it('handles error when using system managed identity flow when authType identity and Azure Function api', (done) => {
+    process.env.IDENTITY_ENDPOINT = 'http://127.0.0.1:41932/MSI/token/';
+    process.env.IDENTITY_HEADER = 'AFBA957766234A0CA9F3B6FA3D9582C7';
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+    const requestStub = sinon.stub(request, 'get').callsFake((opts) => {
+      return Promise.reject({ error: { "StatusCode": 400, "Message": "No Managed Identity found for specified ClientId/ResourceId/PrincipalId.", "CorrelationId": "0507ee4d-c15f-421a-b96b-e71e351bc69a" } });
+    });
+
+    auth.service.authType = AuthType.Identity;
+    auth.service.userName = undefined;
+    auth.ensureAccessToken(resource, stdout, true).then(() => {
+      done(new Error('something is wrong'));
+    }, (err) => {
+      try {
+        assert.equal(requestStub.lastCall.args[0].url, 'http://127.0.0.1:41932/MSI/token/?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2019-08-01');
+        assert.equal((requestStub.lastCall.args[0] as any).headers.Metadata, true);
+        assert.equal((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
+        assert.notEqual(err.error.Message.indexOf('No Managed Identity found'), -1);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('calls api with correct params using user-assigned managed identity flow when authType identity and client_id and Azure Functions api', (done) => {
+    process.env.IDENTITY_ENDPOINT = 'http://127.0.0.1:41932/MSI/token/';
+    process.env.IDENTITY_HEADER = 'AFBA957766234A0CA9F3B6FA3D9582C7';
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+    const requestStub = sinon.stub(request, 'get').callsFake((opts) => {
+      return Promise.resolve({
+        "access_token": "eyJ0eXAiOiJKV1QiLCJ...",
+        "client_id": "a04566df-9a65-4e90-ae3d-574572a16423",
+        "expires_in": "86399",
+        "expires_on": "1587847593",
+        "ext_expires_in": "86399",
+        "not_before": "1587760893",
+        "resource": "https://veling.sharepoint.com/",
+        "token_type": "Bearer"
+      });
+    });
+
+    auth.service.authType = AuthType.Identity;
+    auth.service.userName = 'a04566df-9a65-4e90-ae3d-574572a16423';
+    auth.ensureAccessToken(resource, stdout, true).then(() => {
+      try {
+        assert.equal(requestStub.lastCall.args[0].url, 'http://127.0.0.1:41932/MSI/token/?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2019-08-01&client_id=a04566df-9a65-4e90-ae3d-574572a16423');
+        assert.equal((requestStub.lastCall.args[0] as any).headers.Metadata, true);
+        assert.equal((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    }, (err) => {
+      done(err);
+    });
+  });
+
+  it('calls api with correct params using user-assigned managed identity flow when authType identity and principal_id and Azure Functions api', (done) => {
+    process.env.IDENTITY_ENDPOINT = 'http://127.0.0.1:41932/MSI/token/';
+    process.env.IDENTITY_HEADER = 'AFBA957766234A0CA9F3B6FA3D9582C7';
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+    const requestStub = sinon.stub(request, 'get').callsFake((opts) => {
+
+      if ((opts.url as string).indexOf('&client_id=') !== -1) {
+
+        return Promise.reject({ error: { "StatusCode": 400, "Message": "No Managed Identity found for specified ClientId/ResourceId/PrincipalId.", "CorrelationId": "0507ee4d-c15f-421a-b96b-e71e351bc69a" } });
+      }
+
+      return Promise.resolve({"access_token":"eyJ0eXA","expires_on":"1587849030","resource":"https://veling.sharepoint.com","token_type":"Bearer","client_id":"A04566DF-9A65-4E90-AE3D-574572A16423"});
+    });
+
+    auth.service.authType = AuthType.Identity;
+    auth.service.userName = 'a04566df-9a65-4e90-ae3d-574572a16423';
+    auth.ensureAccessToken(resource, stdout, true).then(() => {
+      try {
+        assert.equal(requestStub.lastCall.args[0].url, 'http://127.0.0.1:41932/MSI/token/?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2019-08-01&principal_id=a04566df-9a65-4e90-ae3d-574572a16423');
+        assert.equal((requestStub.lastCall.args[0] as any).headers.Metadata, true);
+        assert.equal((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    }, (err) => {
+      done(err);
+    });
+  });
+
+  it('handles error when using user-assigned managed identity flow when authType identity and principal_id and Azure Functions api', (done) => {
+    process.env.IDENTITY_ENDPOINT = 'http://127.0.0.1:41932/MSI/token/';
+    process.env.IDENTITY_HEADER = 'AFBA957766234A0CA9F3B6FA3D9582C7';
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+    const requestStub = sinon.stub(request, 'get').callsFake((opts) => {
+
+      if ((opts.url as string).indexOf('&client_id=') !== -1) {
+
+        return Promise.reject({ error: { "StatusCode": 400, "Message": "No Managed Identity found for specified ClientId/ResourceId/PrincipalId.", "CorrelationId": "0507ee4d-c15f-421a-b96b-e71e351bc69a" } });
+      }
+
+      return Promise.reject({ error: { "StatusCode": 400, "Message": "No Managed Identity found for specified ClientId/ResourceId/PrincipalId.", "CorrelationId": "0507ee4d-c15f-421a-b96b-e71e351bc69a" } });
+    });
+
+    auth.service.authType = AuthType.Identity;
+    auth.service.userName = 'a04566df-9a65-4e90-ae3d-574572a16423';
+    auth.ensureAccessToken(resource, stdout, true).then(() => {
+      done(new Error('something is wrong'));
+    }, (err) => {
+      try {
+        assert.equal(requestStub.lastCall.args[0].url, 'http://127.0.0.1:41932/MSI/token/?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2019-08-01&principal_id=a04566df-9a65-4e90-ae3d-574572a16423');
+        assert.equal((requestStub.lastCall.args[0] as any).headers.Metadata, true);
+        assert.equal((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
+        assert.notEqual(err.error.Message.indexOf('No Managed Identity found'), -1);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('handles EACCES error when using user-assigned managed identity flow when authType identity and principal_id and Azure Functions api', (done) => {
+    process.env.IDENTITY_ENDPOINT = 'http://127.0.0.1:41932/MSI/token/';
+    process.env.IDENTITY_HEADER = 'AFBA957766234A0CA9F3B6FA3D9582C7';
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+    const requestStub = sinon.stub(request, 'get').callsFake((opts) => {
+
+      if ((opts.url as string).indexOf('&client_id=') !== -1) {
+
+        return Promise.reject({ error: { "StatusCode": 400, "Message": "No Managed Identity found for specified ClientId/ResourceId/PrincipalId.", "CorrelationId": "0507ee4d-c15f-421a-b96b-e71e351bc69a" } });
+      }
+
+      return Promise.reject({ error: { "errno": "EACCES", "code": "EACCES", "syscall": "connect", "address": "169.254.169.254", "port": 80 } });
+    });
+
+    auth.service.authType = AuthType.Identity;
+    auth.service.userName = 'a04566df-9a65-4e90-ae3d-574572a16423';
+    auth.ensureAccessToken(resource, stdout, false).then(() => {
+      done(new Error('something is wrong'));
+    }, (err) => {
+      try {
+        assert.equal(requestStub.lastCall.args[0].url, 'http://127.0.0.1:41932/MSI/token/?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2019-08-01&principal_id=a04566df-9a65-4e90-ae3d-574572a16423');
+        assert.equal((requestStub.lastCall.args[0] as any).headers.Metadata, true);
+        assert.equal((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
+        assert.notEqual(err.indexOf('Error while logging with Managed Identity. Please check if a Managed Identity is assigned to the current Azure resource.'), -1);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('handles undefined error when using user-assigned managed identity flow when authType identity and client_id and Azure Functions api', (done) => {
+    process.env.IDENTITY_ENDPOINT = 'http://127.0.0.1:41932/MSI/token/';
+    process.env.IDENTITY_HEADER = 'AFBA957766234A0CA9F3B6FA3D9582C7';
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+    const requestStub = sinon.stub(request, 'get').callsFake((opts) => {
+      return Promise.reject({ error: { "error": "invalid_request", "error_description": "Undefined" } });
+    });
+
+    auth.service.authType = AuthType.Identity;
+    auth.service.userName = 'a04566df-9a65-4e90-ae3d-574572a16423';
+    auth.ensureAccessToken(resource, stdout, true).then(() => {
+      done(new Error('something is wrong'));
+    }, (err) => {
+      try {
+        assert.equal(requestStub.lastCall.args[0].url, 'http://127.0.0.1:41932/MSI/token/?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2019-08-01&client_id=a04566df-9a65-4e90-ae3d-574572a16423');
+        assert.equal((requestStub.lastCall.args[0] as any).headers.Metadata, true);
+        assert.equal((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
+        assert.notEqual(err.error.error_description.indexOf('Undefined'), -1);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('handles undefined error when using user-assigned managed identity flow when authType identity and principal_id and Azure Functions api', (done) => {
+    process.env.IDENTITY_ENDPOINT = 'http://127.0.0.1:41932/MSI/token/';
+    process.env.IDENTITY_HEADER = 'AFBA957766234A0CA9F3B6FA3D9582C7';
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+    const requestStub = sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf('&client_id=') !== -1) {
+
+        return Promise.reject({ error: { "StatusCode": 400, "Message": "No Managed Identity found for specified ClientId/ResourceId/PrincipalId.", "CorrelationId": "0507ee4d-c15f-421a-b96b-e71e351bc69a" } });
+      }
+      return Promise.reject({ error: { "error": "Undefined" } });
+    });
+
+    auth.service.authType = AuthType.Identity;
+    auth.service.userName = 'a04566df-9a65-4e90-ae3d-574572a16423';
+    auth.ensureAccessToken(resource, stdout, true).then(() => {
+      done(new Error('something is wrong'));
+    }, (err) => {
+      try {
+        assert.equal(requestStub.lastCall.args[0].url, 'http://127.0.0.1:41932/MSI/token/?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2019-08-01&principal_id=a04566df-9a65-4e90-ae3d-574572a16423');
+        assert.equal((requestStub.lastCall.args[0] as any).headers.Metadata, true);
+        assert.equal((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
+        assert.notEqual(err.error.error.indexOf('Undefined'), -1);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('calls api with correct params using system managed identity flow when authType identity and Azure Function api using the old env variables', (done) => {
+    process.env = {
+      MSI_ENDPOINT: 'http://127.0.0.1:41932/MSI/token/',
+      MSI_SECRET: 'AFBA957766234A0CA9F3B6FA3D9582C7'
+    }
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+    const requestStub = sinon.stub(request, 'get').callsFake((opts) => {
+      return Promise.resolve(JSON.stringify({
+        "access_token": "eyJ0eXAiOiJKV1QiLCJ...",
+        "client_id": "a04566df-9a65-4e90-ae3d-574572a16423",
+        "expires_in": "86399",
+        "expires_on": "1587847593",
+        "ext_expires_in": "86399",
+        "not_before": "1587760893",
+        "resource": "https://veling.sharepoint.com/",
+        "token_type": "Bearer"
+      }));
+    });
+
+    auth.service.authType = AuthType.Identity;
+    auth.service.userName = undefined;
+    auth.ensureAccessToken(resource, stdout, true).then(() => {
+      try {
+        assert.equal(requestStub.lastCall.args[0].url, 'http://127.0.0.1:41932/MSI/token/?resource=https%3A%2F%2Fcontoso.sharepoint.com&api-version=2019-08-01');
+        assert.equal((requestStub.lastCall.args[0] as any).headers.Metadata, true);
+        assert.equal((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    }, (err) => {
+      done(err);
     });
   });
 

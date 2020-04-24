@@ -7,6 +7,7 @@ import { AuthenticationContext, TokenResponse, ErrorResponse, UserCodeInfo, Logg
 import { CommandError } from './Command';
 import config from './config';
 import { asn1, pkcs12, pki } from 'node-forge';
+import request from './request';
 
 export interface Hash<TValue> {
   [key: string]: TValue;
@@ -54,7 +55,8 @@ export interface Logger {
 export enum AuthType {
   DeviceCode,
   Password,
-  Certificate
+  Certificate,
+  Identity
 }
 
 export class Auth {
@@ -136,6 +138,9 @@ export class Auth {
             break;
           case AuthType.Certificate:
             getTokenPromise = this.ensureAccessTokenWithCertificate.bind(this);
+            break;
+          case AuthType.Identity:
+            getTokenPromise = this.ensureAccessTokenWithIdentity.bind(this);
             break;
         }
       }
@@ -292,7 +297,7 @@ export class Auth {
         cert = buf.toString('utf8');
       } else {
         var buf = Buffer.from(this.service.certificate as string, 'base64');
-        let p12Asn1 = asn1.fromDer(buf.toString('binary'), false); 
+        let p12Asn1 = asn1.fromDer(buf.toString('binary'), false);
 
         let p12Parsed = pkcs12.pkcs12FromAsn1(p12Asn1, false, this.service.password);
 
@@ -340,6 +345,117 @@ export class Auth {
           }
 
           resolve(<TokenResponse>response);
+        });
+    });
+  }
+
+  private ensureAccessTokenWithIdentity(resource: string, stdout: Logger, debug: boolean): Promise<TokenResponse> {
+    return new Promise<TokenResponse>((resolve: (tokenResponse: TokenResponse) => void, reject: (error: any) => void): void => {
+      const userName = this.service.userName;
+      if (debug) {
+        stdout.log('Wil try to retrieve access token using identity...');
+      }
+
+      const requestOptions: any = {
+        url: '',
+        headers: {
+          accept: 'application/json',
+          Metadata: true,
+          'x-anonymous': true
+        },
+        json: true
+      };
+
+      if (process.env.IDENTITY_HEADER && process.env.IDENTITY_ENDPOINT) {
+        // it is Azure Function or Azure Web App
+        requestOptions.url = `${process.env.IDENTITY_ENDPOINT}?resource=${encodeURIComponent(resource)}&api-version=2019-08-01`;
+        requestOptions.headers['X-IDENTITY-HEADER'] = process.env.IDENTITY_HEADER;
+
+        if (debug) {
+          stdout.log('IDENTITY_ENDPOINT and IDENTITY_HEADER env variables found it is Azure Function or WebApp...');
+        }
+
+      } else if (process.env.MSI_ENDPOINT && process.env.MSI_SECRET) {
+        // it is Azure Function or Azure Web App, but using the old names of the env variables
+        requestOptions.url = `${process.env.MSI_ENDPOINT}?resource=${encodeURIComponent(resource)}&api-version=2019-08-01`;
+        requestOptions.headers['X-IDENTITY-HEADER'] = process.env.MSI_SECRET;
+
+        if (debug) {
+          stdout.log('MSI_ENDPOINT and MSI_SECRET env variables found it is Azure Function or WebApp...');
+        }
+
+      } else {
+        // it is not Azure Function so lets attempt to get Managed Identity token by using the Azure Virtual Machine api
+        requestOptions.url = `http://169.254.169.254/metadata/identity/oauth2/token?resource=${encodeURIComponent(resource)}&api-version=2018-02-01`;
+      }
+
+      if (userName) {
+        // if name present then the identity is user-assigned managed identity
+        // the name option in this case is either client_id or principal_id (object_id) 
+        // of the managed identity service principal
+        requestOptions.url += `&client_id=${encodeURIComponent(userName as string)}`;
+
+        if (debug) {
+          stdout.log('Wil try to get token using client_id param...');
+        }
+      }
+
+      request
+        .get(requestOptions)
+        .then((res: any): void => {
+
+          resolve({ accessToken: res.access_token, expiresOn: parseInt(res.expires_on) * 1000 } as any);
+          return;
+        })
+        .catch((e: any) => {
+          if (!userName) {
+            reject(e);
+            return;
+          }
+
+          // since the userName option can be either client_id or principal_id (object_id) 
+          // and the first attempt was using client_id
+          // now lets see if the api returned 'not found' response and
+          // try to get token using principal_id (object_id)
+
+          let isNotFoundResponse = false;
+          if(e.error && e.error.Message) {
+            // check if it is Azure Function api 'not found' response
+            isNotFoundResponse = (e.error.Message.indexOf("No Managed Identity found") !== -1);
+          } else if(e.error && e.error.error_description) {
+            // check if it is Azure VM api 'not found' response
+            isNotFoundResponse = (e.error.error_description === "Identity not found");
+          }
+
+          if(!isNotFoundResponse) {
+            // it is not a 'not found' response then exit with error
+            reject(e);
+            return;
+          }
+
+          if (debug) {
+            stdout.log('Wil try to get token using principal_id (also known as object_id) param ...');
+          }
+
+          requestOptions.url = requestOptions.url.replace('&client_id=', '&principal_id=');
+          requestOptions.headers['x-anonymous'] = true;
+
+          request
+            .get(requestOptions)
+            .then((res: any): void => {
+              resolve({ accessToken: res.access_token, expiresOn: parseInt(res.expires_on) * 1000 } as any);
+            })
+            .catch((err: any) => {
+              // will give up and not try any further with the 'msi_res_id' (resource id) querty string param
+              // since it does not work with the Azure Functions api, but just with the Azure VM api
+              if(err.error.code === 'EACCES') {
+                // the CLI does not know if managed identity is actually assigned when EACCES code thrown
+                // so show meaningfull message since the raw error response could be missleading 
+                reject('Error while logging with Managed Identity. Please check if a Managed Identity is assigned to the current Azure resource.');
+              } else  {
+                reject(err);
+              }
+            });
         });
     });
   }
