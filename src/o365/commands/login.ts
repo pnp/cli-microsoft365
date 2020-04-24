@@ -72,6 +72,10 @@ class LoginCommand extends Command {
           auth.service.thumbprint = args.options.thumbprint;
           auth.service.password = args.options.password;
           break;
+        case 'identity':
+          auth.service.authType = AuthType.Identity;
+          auth.service.userName = args.options.userName;
+          break;
       }
 
       auth
@@ -139,8 +143,8 @@ class LoginCommand extends Command {
     const options: CommandOption[] = [
       {
         option: '-t, --authType [authType]',
-        description: 'The type of authentication to use. Allowed values certificate|deviceCode|password. Default deviceCode',
-        autocomplete: ['certificate', 'deviceCode', 'password']
+        description: 'The type of authentication to use. Allowed values certificate|deviceCode|password|identity. Default deviceCode',
+        autocomplete: ['certificate', 'deviceCode', 'password', 'identity']
       },
       {
         option: '-u, --userName [userName]',
@@ -232,6 +236,12 @@ class LoginCommand extends Command {
     environment variable to the ID of the Azure AD tenant, where you created
     the Azure AD application.
 
+    Managed identity in Azure Cloud Shell is the identity of the user. It is
+    neither system- nor user-assigned and it can't be configured.
+    To log in to Office 365 using managed identity in Azure Cloud Shell,
+    set ${chalk.grey('authType')} to ${chalk.grey('identity')} and don't specify
+    the ${chalk.grey('userName')} option.
+
   Examples:
   
     Log in to Office 365 using the device code
@@ -248,8 +258,23 @@ class LoginCommand extends Command {
       ${commands.LOGIN} --authType certificate --certificateFile /Users/user/dev/localhost.pem --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1
 
     Log in to Office 365 using a personal information exchange (.pfx) file
-      o365 login --authType certificate --certificateFile /Users/user/dev/localhost.pfx --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1 --password 'pass@word1'
+      ${commands.LOGIN} --authType certificate --certificateFile /Users/user/dev/localhost.pfx --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1 --password 'pass@word1'
+    
+    Log in to Office 365 using a system assigned managed identity. 
+    Applies to Azure resources with managed identity enabled, 
+    such as Azure Virtual Machines, Azure App Service or Azure Functions
+      ${commands.LOGIN} --authType identity
 
+    Log in to Office 365 using managed identity in Azure Cloud Shell.
+    Uses the identity of the current user.
+      ${commands.LOGIN} --authType identity
+
+    Log in to Office 365 using a user-assigned managed identity. 
+    Client id or principal id also known as object id value can be specified in
+    the userName option. Applies to Azure resources with managed identity
+    enabled, such as Azure Virtual Machines, Azure App Service or
+    Azure Functions
+      ${commands.LOGIN} --authType identity --userName ac9fbed5-804c-4362-a369-21a4ec51109e
 `);
   }
 }
