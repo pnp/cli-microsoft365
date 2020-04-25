@@ -480,6 +480,8 @@ nav:
       - 'Scan for Office 365 Groups created with user''s first or last name' : 'sample-scripts/aad/flag-groups-with-user-names.md'
     - Microsoft Graph:
       - 'Authenticate with and call the Microsoft Graph' : 'sample-scripts/graph/call-graph.md'
+    - Power Automate:
+      - 'Inventory Flows By Owner' : 'sample-scripts/flow/inventory-flows-by-author.md'
     - SharePoint Online:
       - 'Add App Catalog to SharePoint site': 'sample-scripts/spo/add-app-catalog.md'
       - 'Delete all (non-group connected) modern SharePoint sites': 'sample-scripts/spo/delete-non-group-connected-modern-sites.md'
