@@ -87,6 +87,7 @@ nav:
       - schemaextension:
         - schemaextension add: 'cmd/graph/schemaextension/schemaextension-add.md'
         - schemaextension get: 'cmd/graph/schemaextension/schemaextension-get.md'
+        - schemaextension list: 'cmd/graph/schemaextension/schemaextension-list.md'
         - schemaextension remove: 'cmd/graph/schemaextension/schemaextension-remove.md'
         - schemaextension set: 'cmd/graph/schemaextension/schemaextension-set.md'
       - subscription:
