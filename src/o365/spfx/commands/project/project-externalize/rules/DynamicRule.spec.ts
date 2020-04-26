@@ -56,7 +56,6 @@ describe('DynamicRule', () => {
     const findings = await rule.visit(project);
     assert.equal(findings.entries.length, 1);
   });
-
   it('doesnt return anything is package is unsupported', async () => {
     const project: Project = {
       path: '/usr/tmp',
@@ -84,8 +83,31 @@ describe('DynamicRule', () => {
     const findings = await rule.visit(project);
     assert.equal(findings.entries.length, 0);
   });
+  it('doesn\'t return anything if both module and main are missing', async () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      packageJson: {
+        dependencies: {
+          '@pnp/pnpjs': '1.3.5'
+        }
+      }
+    };
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path) => {
+      if (path.toString().endsWith('@pnp/pnpjs/package.json')) {
+        return JSON.stringify({
+        });
+      }
+      else {
+        return originalReadFileSync(path);
+      }
+    });
+    sinon.stub(request, 'head').callsFake(() => Promise.resolve());
+    const findings = await rule.visit(project);
+    assert.equal(findings.entries.length, 0);
+  });
 
-  it('returns from main if module is missing', async () => {
+  it('doesn\'t return anything if file is not present on CDN', async () => {
     const project: Project = {
       path: '/usr/tmp',
       packageJson: {
@@ -99,19 +121,19 @@ describe('DynamicRule', () => {
       if (path.toString().endsWith('@pnp/pnpjs/package.json')) {
         return JSON.stringify({
           main: "./dist/pnpjs.es5.umd.bundle.js",
+          module: "./dist/pnpjs.es5.umd.bundle.min.js"
         });
       }
       else {
-        return originalReadFileSync(path, options);
+        return originalReadFileSync(path);
       }
     });
-    sinon.stub(request, 'head').callsFake(() => Promise.resolve());
-    sinon.stub(request, 'post').callsFake(() => Promise.resolve({ scriptType: 'script' }));
+    sinon.stub(request, 'head').callsFake(() => Promise.reject());
+    sinon.stub(request, 'post').callsFake(() => Promise.resolve({ scriptType: 'UMD' }));
     const findings = await rule.visit(project);
-    assert.equal(findings.entries.length, 1);
+    assert.equal(findings.entries.length, 0);
   });
-
-  it('doesn\'t return anything if both module and main are missing', async () => {
+  it('doesn\'t return anything if module type is not supported', async () => {
     const project: Project = {
       path: '/usr/tmp',
       packageJson: {
@@ -124,6 +146,8 @@ describe('DynamicRule', () => {
     sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
       if (path.toString().endsWith('@pnp/pnpjs/package.json')) {
         return JSON.stringify({
+          main: "./dist/pnpjs.es5.umd.bundle.js",
+          module: "./dist/pnpjs.es5.umd.bundle.min.js"
         });
       }
       else {
@@ -131,11 +155,37 @@ describe('DynamicRule', () => {
       }
     });
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
+    sinon.stub(request, 'post').callsFake(() => Promise.resolve({ scriptType: 'CommonJs' }));
     const findings = await rule.visit(project);
     assert.equal(findings.entries.length, 0);
   });
-
-  it('doesn\'t return anything if file is not present on CDN', async () => {
+  it('adds missing file extension', async () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      packageJson: {
+        dependencies: {
+          '@pnp/pnpjs': '1.3.5'
+        }
+      }
+    };
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path) => {
+      if (path.toString().endsWith('@pnp/pnpjs/package.json')) {
+        return JSON.stringify({
+          main: "./dist/pnpjs.es5.umd.bundle",
+          module: "./dist/pnpjs.es5.umd.bundle.min"
+        });
+      }
+      else {
+        return originalReadFileSync(path);
+      }
+    });
+    sinon.stub(request, 'head').callsFake(() => Promise.resolve());
+    sinon.stub(request, 'post').callsFake(() => Promise.resolve({ scriptType: 'UMD' }));
+    const findings = await rule.visit(project);
+    assert.equal(findings.entries.length, 1);
+  });
+  it('uses exports from API', async () => {
     const project: Project = {
       path: '/usr/tmp',
       packageJson: {
@@ -156,9 +206,117 @@ describe('DynamicRule', () => {
         return originalReadFileSync(path);
       }
     });
-    sinon.stub(request, 'head').callsFake(() => Promise.reject());
-    sinon.stub(request, 'post').callsFake(() => Promise.resolve({ scriptType: 'module' }));
+    sinon.stub(request, 'head').callsFake(() => Promise.resolve());
+    sinon.stub(request, 'post').callsFake(() => Promise.resolve({ scriptType: 'UMD', exports: ['pnpjs'] }));
+    const findings = await rule.visit(project);
+    assert.equal(findings.entries.length, 1);
+    assert.equal(findings.entries[0].globalName, 'pnpjs');
+  });
+  it('considers all package entries', async () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      packageJson: {
+        dependencies: {
+          '@pnp/pnpjs': '1.3.5'
+        }
+      }
+    };
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
+      if (path.toString().endsWith('@pnp/pnpjs/package.json')) {
+        return JSON.stringify({
+          main: "./dist/pnpjs.es5.umd.bundle.js",
+          module: "./dist/pnpjs.es5.umd.bundle.min.js",
+          es2015: "./dist/pnpjs.es5.umd.bundle.min.js",
+          jspm: {
+            main: "./dist/pnpjs.es5.umd.bundle.min.js",
+            files: ["./dist/pnpjs.es5.umd.bundle.min.js"],
+          },
+          spm: {
+            main: "./dist/pnpjs.es5.umd.bundle.min.js",
+          }
+        });
+      }
+      else {
+        return originalReadFileSync(path, options);
+      }
+    });
+    sinon.stub(request, 'head').callsFake(() => Promise.resolve());
+    sinon.stub(request, 'post').callsFake(() => Promise.resolve({ scriptType: 'UMD' }));
+    const findings = await rule.visit(project);
+    assert.equal(findings.entries.length, 1);
+  });
+  it('doesnt return anything if package json is missing', async () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      packageJson: {
+        dependencies: {
+          '@pnp/pnpjs': '1.3.5'
+        }
+      }
+    };
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path) => {
+      if (path.toString().endsWith('@pnp/pnpjs/package.json')) {
+        throw new Error('file doesnt exist');
+      }
+      else {
+        return originalReadFileSync(path);
+      }
+    });
     const findings = await rule.visit(project);
     assert.equal(findings.entries.length, 0);
+  });
+  it('returns something for es2015 modules', async () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      packageJson: {
+        dependencies: {
+          '@pnp/pnpjs': '1.3.5'
+        }
+      }
+    };
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path) => {
+      if (path.toString().endsWith('@pnp/pnpjs/package.json')) {
+        return JSON.stringify({
+          main: "./dist/pnpjs.es5.umd.bundle.js",
+          module: "./dist/pnpjs.es5.umd.bundle.min.js"
+        });
+      }
+      else {
+        return originalReadFileSync(path);
+      }
+    });
+    sinon.stub(request, 'head').callsFake(() => Promise.resolve());
+    sinon.stub(request, 'post').callsFake(() => Promise.resolve({ scriptType: 'ES2015' }));
+    const findings = await rule.visit(project);
+    assert.equal(findings.entries.length, 1);
+  });
+  it('returns something for AMD modules', async () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      packageJson: {
+        dependencies: {
+          '@pnp/pnpjs': '1.3.5'
+        }
+      }
+    };
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path) => {
+      if (path.toString().endsWith('@pnp/pnpjs/package.json')) {
+        return JSON.stringify({
+          main: "./dist/pnpjs.es5.umd.bundle.js",
+          module: "./dist/pnpjs.es5.umd.bundle.min.js"
+        });
+      }
+      else {
+        return originalReadFileSync(path);
+      }
+    });
+    sinon.stub(request, 'head').callsFake(() => Promise.resolve());
+    sinon.stub(request, 'post').callsFake(() => Promise.resolve({ scriptType: 'AMD' }));
+    const findings = await rule.visit(project);
+    assert.equal(findings.entries.length, 1);
   });
 });
