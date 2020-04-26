@@ -445,6 +445,7 @@ nav:
       - message:
         - message add: 'cmd/yammer/message/message-add.md'
         - message get: 'cmd/yammer/message/message-get.md'
+        - message like set: 'cmd/yammer/message/message-like-set.md'
         - message list: 'cmd/yammer/message/message-list.md'
         - message remove: 'cmd/yammer/message/message-remove.md'
       - network:
