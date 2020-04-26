@@ -13,7 +13,7 @@ yammer group user remove [options]
 Option|Description
 ------|-----------
 `--help`|output usage information
-`--id <userId>`|The Group ID to process
+`--id <id>`|The Group ID to process
 `--userId [userId]`|Remove the user with the ID specified. Defaults to the current user
 `--confirm`|Don't prompt for confirmation before removing the user from the group
 `-o, --output [output]`|Output type. `json,text`. Default `text`
