@@ -185,6 +185,33 @@ describe('DynamicRule', () => {
     const findings = await rule.visit(project);
     assert.equal(findings.entries.length, 1);
   });
+  it('uses exports from API', async () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      packageJson: {
+        dependencies: {
+          '@pnp/pnpjs': '1.3.5'
+        }
+      }
+    };
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake((path) => {
+      if (path.toString().endsWith('@pnp/pnpjs/package.json')) {
+        return JSON.stringify({
+          main: "./dist/pnpjs.es5.umd.bundle.js",
+          module: "./dist/pnpjs.es5.umd.bundle.min.js"
+        });
+      }
+      else {
+        return originalReadFileSync(path);
+      }
+    });
+    sinon.stub(request, 'head').callsFake(() => Promise.resolve());
+    sinon.stub(request, 'post').callsFake(() => Promise.resolve({ scriptType: 'UMD', exports: ['pnpjs'] }));
+    const findings = await rule.visit(project);
+    assert.equal(findings.entries.length, 1);
+    assert.equal(findings.entries[0].globalName, 'pnpjs');
+  });
   it('considers all package entries', async () => {
     const project: Project = {
       path: '/usr/tmp',
