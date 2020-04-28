@@ -16,7 +16,7 @@ describe(commands.TEAMS_TEAM_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -39,8 +39,7 @@ describe(commands.TEAMS_TEAM_ADD, () => {
   afterEach(() => {
     Utils.restore([
       vorpal.find,
-      request.post,
-      request.put
+      request.post
     ]);
   });
 
@@ -60,70 +59,18 @@ describe(commands.TEAMS_TEAM_ADD, () => {
     assert.notEqual(command.description, null);
   });
 
-  it('fails validation if the groupId is not a valid guid.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        groupId: '61703ac8a-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    });
-    assert.notEqual(actual, true);
-    done();
-  });
-
-  it('fails validation if the groupId and name are specified', (done) => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        groupId: '61703ac8a-c49b-4fd4-8223-80c3',
-        name:'Architecture'
-      }
-    });
-    assert.notEqual(actual, true);
-    done();
-  });
-
-  it('fails validation if the groupId and description are specified', (done) => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        groupId: '61703ac8a-c49b-4fd4-8223-80c3',
-        description:'Architecture'
-      }
-    });
-    assert.notEqual(actual, true);
-    done();
-  });
-
-  it('passes validation if the groupId is a valid guid.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        groupId: '25bd7c99-619a-e411-80c3-a0d3c1f2861f'
-      }
-    });
-    assert.equal(actual, true);
-    done();
-  });
-
-  it('passes validation if the name and description exist with blank groupId', (done) => {
+  it('passes validation if name and description are passed', (done) => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         name: 'Architecture',
-        description:'Architecture Discussion'
+        description: 'Architecture Discussion'
       }
     });
     assert.equal(actual, true);
     done();
   });
 
-  it('fails validation if the groupId and name are blank.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        description: 'Architecture'
-      }
-    });
-    assert.notEqual(actual, true);
-    done();
-  });
-
-  it('fails validation if the groupId and description are blank.', (done) => {
+  it('fails validation if description is not passed', (done) => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         name: 'Architecture'
@@ -133,14 +80,20 @@ describe(commands.TEAMS_TEAM_ADD, () => {
     done();
   });
 
-  it('creates Microsoft Teams team in the tenant (debug)', (done) => {
+  it('fails validation if name is not passed', (done) => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        description: 'Architecture Discussion'
+      }
+    });
+    assert.notEqual(actual, true);
+    done();
+  });
+
+  it('creates Microsoft Teams team in the tenant (verbose)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/teams`) {
-        return Promise.resolve({
-          headers : {
-            location: "/teams('f9526e6a-1d0d-4421-8882-88a70975a00c')/operations('6cf64f96-08c3-4173-9919-eaf7684aae9a')"
-          }
-        });
+        return Promise.resolve();
       }
       return Promise.reject('Invalid request');
     });
@@ -148,116 +101,32 @@ describe(commands.TEAMS_TEAM_ADD, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({
       options: {
-        debug: true,
+        verbose: true,
         name: 'Architecture',
         description: 'Architecture Discussion'
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith('f9526e6a-1d0d-4421-8882-88a70975a00c'));
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
-
         done();
       }
       catch (e) {
         done(e);
       }
     });
-  });
-
-  it('creates Microsoft Teams team in the tenant', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/teams`) {
-        return Promise.resolve({
-          headers : {
-            location: "/teams('f9526e6a-1d0d-4421-8882-88a70975a00c')/operations('6cf64f96-08c3-4173-9919-eaf7684aae9a')"
-          }
-        });
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        name: 'Architecture',
-        description: 'Architecture Discussion'
-      }
-    }, () => {
-      try {
-        assert(cmdInstanceLogSpy.calledWith('f9526e6a-1d0d-4421-8882-88a70975a00c'));
-
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-
-  it('creates Microsoft Teams team for a group in the tenant (debug)', (done) => {
-    sinon.stub(request, 'put').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/groups/0ee1db97-37e3-4223-a44f-f389400ad1a0/team`) {
-        return Promise.resolve({
-          headers : {
-            location: "https://api.teams.skype.com/beta/groups('0ee1db97-37e3-4223-a44f-f389400ad1a0')/team('0ee1db97-37e3-4223-a44f-f389400ad1a0')"
-          }
-        });
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {  
-        debug: true,
-        groupId:'0ee1db97-37e3-4223-a44f-f389400ad1a0'
-      }
-    }, () => {
-      try {
-        assert(cmdInstanceLogSpy.calledWith('0ee1db97-37e3-4223-a44f-f389400ad1a0'));
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
-
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('creates Microsoft Teams team for a group in the tenant', (done) => {
-    sinon.stub(request, 'put').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/groups/f9526e6a-1d0d-4421-8882-88a70975a00c/team`) {
-        return Promise.resolve({
-          headers : {
-            location: "/teams('f9526e6a-1d0d-4421-8882-88a70975a00c')/operations('6cf64f96-08c3-4173-9919-eaf7684aae9a')"
-          }
-        });
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {  
-        groupId:'f9526e6a-1d0d-4421-8882-88a70975a00c'
-      }
-    }, () => {
-      done();
-    }, (err: any) => done(err));
   });
 
   it('correctly handles error when creating a Team', (done) => {
-    sinon.stub(request, 'put').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
       return Promise.reject('An error has occurred');
     });
 
     cmdInstance.action = command.action();
     cmdInstance.action({
-      options: {  
-        groupId:'f9526e6a-1d0d-4421-8882-88a70975a00c'
+      options: {
+        verbose: true,
+        name: 'Architecture',
+        description: 'Architecture Discussion'
       }
     }, (err?: any) => {
       try {
