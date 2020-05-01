@@ -21,10 +21,10 @@ export class FN012010_TSC_experimentalDecorators extends Rule {
 
   get resolution(): string {
     return `{
-      "compilerOptions": {
-        "experimentalDecorators": true
-      }
-    }`;
+  "compilerOptions": {
+    "experimentalDecorators": true
+  }
+}`;
   };
 
   get resolutionType(): string {
