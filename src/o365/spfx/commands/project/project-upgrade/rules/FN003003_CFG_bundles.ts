@@ -12,7 +12,7 @@ export class FN003003_CFG_bundles extends Rule {
   }
 
   get description(): string {
-    return `In config.json  add the 'bundles' property`;
+    return `In config.json add the 'bundles' property`;
   };
 
   get resolution(): string {
