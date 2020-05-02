@@ -38,10 +38,10 @@ Once you have MkDocs installed on your machine, in the command line:
 - run `cd ./docs/manual` to change directory to where the manual pages are stored
 - run `mkdocs serve` to start the local web server with MkDocs and view the documentation in the web browser
 
-Alternatively, you can use the mkdocs-material Docker image to test documentation:
+Alternatively, you can use the mkdocs-material Docker image to test documentation. In order to use docker you are required to specify the correct material version:
 
 - on macOS:
   - run `cd ./docs/manual` to change directory to where the manual pages are stored
-  - run `docker run --rm -it -p 8000:8000 -v ${PWD}:/docs squidfunk/mkdocs-material` to start the local web server with MkDocs and view the documentation in the web browser
+  - run `docker run --rm -it -p 8000:8000 -v ${PWD}:/docs squidfunk/mkdocs-material:3.1.0` to start the local web server with MkDocs and view the documentation in the web browser
 - on Windows:
-  - run `docker run --rm -it -p 8000:8000 -v c/projects/office365-cli/docs/manual:/docs squidfunk/mkdocs-material` to start the local web server with MkDocs and view the documentation in the web browser
+  - run `docker run --rm -it -p 8000:8000 -v c:/projects/office365-cli/docs/manual:/docs squidfunk/mkdocs-material:3.1.0` to start the local web server with MkDocs and view the documentation in the web browser
