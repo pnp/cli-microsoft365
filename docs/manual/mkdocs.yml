@@ -477,6 +477,7 @@ nav:
   - Sample Scripts:
     - 'Introduction': 'sample-scripts/index.md'
     - Azure Active Directory:
+      - 'Bulk add/remove users to Microsoft Teams and Office 365 Groups' : 'sample-scripts/aad/manage-group-users.md'
       - 'Delete all Office 365 groups' : 'sample-scripts/aad/delete-o365-groups.md'
       - 'Scan for Office 365 Groups created with user''s first or last name' : 'sample-scripts/aad/flag-groups-with-user-names.md'
     - Microsoft Graph:
