@@ -1,5 +1,21 @@
 # Release notes
 
+## v2.10.0
+
+### New commands
+
+**Yammer:**
+
+- [yammer group user add](../cmd/yammer/group/group-user-add.md) - adds a user to a Yammer Group [#1456](https://github.com/pnp/office365-cli/issues/1456)
+- [yammer group user remove](../cmd/yammer/group/group-user-remove.md) - removes a user from a Yammer group [#1457](https://github.com/pnp/office365-cli/issues/1457)
+
+### Changes
+
+- added support for more module types in spfx project externalize [#1192](https://github.com/pnp/office365-cli/issues/1192)
+- fixed indentation of resolution for FN012010 [#1467](https://github.com/pnp/office365-cli/issues/1467)
+- fixes description of FN003003 [#1469](https://github.com/pnp/office365-cli/issues/1469)
+- updated MPA docs with Docker image version [#1531](https://github.com/pnp/office365-cli/issues/1531)
+
 ## [v2.9.0](https://github.com/pnp/office365-cli/releases/tag/v2.9.0)
 
 ### New commands
