@@ -15,6 +15,10 @@
 - fixed indentation of resolution for FN012010 [#1467](https://github.com/pnp/office365-cli/issues/1467)
 - fixes description of FN003003 [#1469](https://github.com/pnp/office365-cli/issues/1469)
 - updated MPA docs with Docker image version [#1531](https://github.com/pnp/office365-cli/issues/1531)
+- simplified persisting login information [#1313](https://github.com/pnp/office365-cli/issues/1313)
+- updated the Authenticate with Microsoft Graph sample replacing the deprecated method [#1548](https://github.com/pnp/office365-cli/pull/1548)
+- included PowerShell completion script in the package [#1551](https://github.com/pnp/office365-cli/issues/1551)
+- added Flow inventory sample script [#1522](https://github.com/pnp/office365-cli/issues/1522)
 
 ## [v2.9.0](https://github.com/pnp/office365-cli/releases/tag/v2.9.0)
 
