@@ -60,7 +60,8 @@ class AadUserListCommand extends GraphItemsListCommand<any> {
       'properties',
       'debug',
       'verbose',
-      'output'
+      'output',
+      'pretty'
     ];
 
     Object.keys(options).forEach(key => {
