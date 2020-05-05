@@ -7,7 +7,7 @@ nav:
     - 'Logging in to Office 365': 'user-guide/connecting-office-365.md'
     - 'CLI output mode': 'user-guide/cli-output-mode.md'
   - Commands:
-    - consent: 'cmd/consent.md'
+    - consent: 'cmd/cli/cli-consent.md'
     - login: 'cmd/login.md'
     - logout: 'cmd/logout.md'
     - status: 'cmd/status.md'
@@ -57,6 +57,7 @@ nav:
         - user get: 'cmd/aad/user/user-get.md'
         - user list: 'cmd/aad/user/user-list.md'
     - CLI (cli):
+      - consent: 'cmd/cli/cli-consent.md'
       - reconsent: 'cmd/cli/cli-reconsent.md'
       - completion:
         - completion clink update: 'cmd/cli/completion/completion-clink-update.md'

@@ -1,8 +1,14 @@
-# consent
+# cli consent
 
 Consent additional permissions for the Azure AD application used by the Office 365 CLI
 
 ## Usage
+
+```sh
+cli consent [options]
+```
+
+## Alias
 
 ```sh
 consent [options]
@@ -22,7 +28,7 @@ Option|Description
 
 ## Remarks
 
-Using the `consent` command you can consent additional permissions for the Azure AD application used by the Office 365 CLI. This is for example necessary to use Yammer commands, which require the Yammer API permission that isn't granted to the CLI by default.
+Using the `cli consent` command you can consent additional permissions for the Azure AD application used by the Office 365 CLI. This is for example necessary to use Yammer commands, which require the Yammer API permission that isn't granted to the CLI by default.
 
 After executing the command, the Office 365 CLI will present you with a URL that you need to open in the web browser in order to consent the permissions for the selected Office 365 service.
 
@@ -33,5 +39,5 @@ To simplify things, rather than wondering which permissions you should grant for
 Consent permissions to the Yammer API
 
 ```sh
-consent --service yammer
+cli consent --service yammer
 ```

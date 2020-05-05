@@ -1,10 +1,8 @@
-import commands from '../../commands';
+import { CommandOption, CommandValidate } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import {
-  CommandOption, CommandValidate
-} from '../../../../Command';
-import YammerCommand from "../../../base/YammerCommand";
 import request from '../../../../request';
+import YammerCommand from '../../../base/YammerCommand';
+import commands from '../../commands';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -102,7 +100,7 @@ class YammerGroupUserAddCommand extends YammerCommand {
   
     ${chalk.yellow('Attention:')} In order to use this command, you need to grant the Azure AD
     application used by the Office 365 CLI the permission to the Yammer API.
-    To do this, execute the ${chalk.blue('consent --service yammer')} command.
+    To do this, execute the ${chalk.blue('cli consent --service yammer')} command.
 
     If the specified user is not a member of the network, the command will
     return an HTTP 400 error message.
