@@ -27,15 +27,15 @@ describe(commands.LISTITEM_SET, () => {
       const bodyString = JSON.stringify(opts.body);
       const ctMatch = bodyString.match(/\"?FieldName\"?:\s*\"?ContentType\"?,\s*\"?FieldValue\"?:\s*\"?(\w*)\"?/i);
       actualContentType = ctMatch ? ctMatch[1] : "";
-      if (bodyString.indexOf("fail updating me") > -1) return Promise.resolve({ value: [{ErrorMessage: 'failed updating'}] })
-      return Promise.resolve({ value: [ { ItemId: expectedId }] });
+      if (bodyString.indexOf("fail updating me") > -1) return Promise.resolve({ value: [{ ErrorMessage: 'failed updating' }] })
+      return Promise.resolve({ value: [{ ItemId: expectedId }] });
     }
 
     if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
       // requestObjectIdentity mock
       if (opts.body.indexOf('Name="Current"') > -1) {
 
-        if ((opts.url as string).indexOf('rejectme.com') > -1 ) {
+        if ((opts.url as string).indexOf('rejectme.com') > -1) {
 
           return Promise.reject('Failed request')
 
@@ -44,7 +44,7 @@ describe(commands.LISTITEM_SET, () => {
         if ((opts.url as string).indexOf('returnerror.com') > -1) {
 
           return Promise.resolve(JSON.stringify(
-            [{"ErrorInfo": "error occurred"}]
+            [{ "ErrorInfo": "error occurred" }]
           ))
 
         }
@@ -54,11 +54,11 @@ describe(commands.LISTITEM_SET, () => {
             {
               "SchemaVersion": "15.0.0.0",
               "LibraryVersion": "16.0.7618.1204",
-              "ErrorInfo":null,
+              "ErrorInfo": null,
               "TraceCorrelationId": "3e3e629e-30cc-5000-9f31-cf83b8e70021"
             },
             {
-              "_ObjectType_": "SP.Web", 
+              "_ObjectType_": "SP.Web",
               "_ObjectIdentity_": "d704ae73-d5ed-459e-80b0-b8103c5fb6e0|8f2be65d-f195-4699-b0de-24aca3384ba9:site:0ead8b78-89e5-427f-b1bc-6e5a77ac191c:web:4c076c07-e3f1-49a8-ad01-dbb70b263cd7",
               "ServerRelativeUrl": "\\u002fsites\\u002fprojectx"
             }
@@ -86,7 +86,7 @@ describe(commands.LISTITEM_SET, () => {
 
   let getFakes = (opts: any) => {
     if ((opts.url as string).indexOf('contenttypes') > -1) {
-      return Promise.resolve({ value: [ {Id: { StringValue: expectedContentType }, Name: "Item" } ] });
+      return Promise.resolve({ value: [{ Id: { StringValue: expectedContentType }, Name: "Item" }] });
     }
     if ((opts.url as string).indexOf('/items(') > -1) {
       actualId = opts.url.match(/\/items\((\d+)\)/i)[1];
@@ -109,10 +109,10 @@ describe(commands.LISTITEM_SET, () => {
     }
     return Promise.reject('Invalid request');
   }
-  
+
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'abc'
     }));
@@ -221,15 +221,15 @@ describe(commands.LISTITEM_SET, () => {
 
   it('fails to update a list item when \'fail me\' values are used', (done) => {
     actualId = 0;
-    
+
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    let options: any = { 
-      debug: false, 
-      listTitle: 'Demo List', 
+    let options: any = {
+      debug: false,
+      listTitle: 'Demo List',
       id: 47,
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       Title: "fail updating me"
     }
 
@@ -242,7 +242,7 @@ describe(commands.LISTITEM_SET, () => {
         done(e);
       }
     });
-    
+
   });
 
   it('returns listItemInstance object when list item is updated with correct values', (done) => {
@@ -251,11 +251,11 @@ describe(commands.LISTITEM_SET, () => {
 
     command.allowUnknownOptions();
 
-    let options: any = { 
-      debug: true, 
-      listTitle: 'Demo List', 
+    let options: any = {
+      debug: true,
+      listTitle: 'Demo List',
       id: 47,
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       Title: expectedTitle
     }
 
@@ -274,11 +274,11 @@ describe(commands.LISTITEM_SET, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    let options: any = { 
-      debug: false, 
-      listTitle: 'Demo List', 
+    let options: any = {
+      debug: false,
+      listTitle: 'Demo List',
       id: 47,
-      webUrl: 'https://contoso.sharepoint.com/sites/project-y', 
+      webUrl: 'https://contoso.sharepoint.com/sites/project-y',
       contentType: 'Item',
       Title: expectedTitle
     }
@@ -299,11 +299,11 @@ describe(commands.LISTITEM_SET, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    let options: any = { 
-      debug: true, 
-      listTitle: 'Demo List', 
+    let options: any = {
+      debug: true,
+      listTitle: 'Demo List',
       id: 47,
-      webUrl: 'https://contoso.sharepoint.com/sites/project-y', 
+      webUrl: 'https://contoso.sharepoint.com/sites/project-y',
       contentType: expectedContentType,
       Title: expectedTitle
     }
@@ -324,11 +324,11 @@ describe(commands.LISTITEM_SET, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    let options: any = { 
-      debug: false, 
-      listTitle: 'Demo List', 
+    let options: any = {
+      debug: false,
+      listTitle: 'Demo List',
       id: 47,
-      webUrl: 'https://contoso.sharepoint.com/sites/project-y', 
+      webUrl: 'https://contoso.sharepoint.com/sites/project-y',
       contentType: "Unexpected content type",
       Title: expectedTitle
     }
@@ -352,11 +352,11 @@ describe(commands.LISTITEM_SET, () => {
 
     actualId = 0;
 
-    let options: any = { 
-      debug: true, 
-      listTitle: 'Demo List', 
+    let options: any = {
+      debug: true,
+      listTitle: 'Demo List',
       id: 147,
-      webUrl: 'https://contoso.sharepoint.com/sites/project-y', 
+      webUrl: 'https://contoso.sharepoint.com/sites/project-y',
       Title: expectedTitle,
       systemUpdate: true
     }
@@ -378,11 +378,11 @@ describe(commands.LISTITEM_SET, () => {
 
     actualId = 0;
 
-    let options: any = { 
-      debug: true, 
-      listTitle: 'Demo List', 
+    let options: any = {
+      debug: true,
+      listTitle: 'Demo List',
       id: 147,
-      webUrl: 'https://rejectme.com/sites/project-y', 
+      webUrl: 'https://rejectme.com/sites/project-y',
       Title: expectedTitle,
       systemUpdate: true
     }
@@ -404,11 +404,11 @@ describe(commands.LISTITEM_SET, () => {
 
     actualId = 0;
 
-    let options: any = { 
-      debug: false, 
-      listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', 
+    let options: any = {
+      debug: false,
+      listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
       id: 147,
-      webUrl: 'https://returnerror.com/sites/project-y', 
+      webUrl: 'https://returnerror.com/sites/project-y',
       Title: expectedTitle,
       systemUpdate: true
     }
@@ -431,11 +431,11 @@ describe(commands.LISTITEM_SET, () => {
 
     actualId = 0;
 
-    let options: any = { 
-      debug: true, 
-      listTitle: 'Demo List', 
+    let options: any = {
+      debug: true,
+      listTitle: 'Demo List',
       id: 147,
-      webUrl: 'https://contoso.sharepoint.com/sites/project-y', 
+      webUrl: 'https://contoso.sharepoint.com/sites/project-y',
       Title: "systemUpdate error",
       contentType: "Item",
       systemUpdate: true
@@ -444,6 +444,35 @@ describe(commands.LISTITEM_SET, () => {
     cmdInstance.action({ options: options }, () => {
       try {
         assert(actualId !== expectedId);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('should ignore global options when creating request body', (done) => {
+    sinon.stub(request, 'get').callsFake(getFakes);
+    const postStubs = sinon.stub(request, 'post').callsFake(postFakes);
+
+    actualId = 0;
+
+    let options: any = {
+      debug: true,
+      verbose: true,
+      output: "text",
+      pretty: true,
+      listTitle: 'Demo List',
+      id: 147,
+      webUrl: 'https://contoso.sharepoint.com/sites/project-y',
+      Title: expectedTitle,
+      systemUpdate: false
+    }
+
+    cmdInstance.action({ options: options }, () => {
+      try {
+        assert.deepEqual(postStubs.firstCall.args[0].body, { formValues: [{ FieldName: 'Title', FieldValue: 'List Item 1' }] });
         done();
       }
       catch (e) {

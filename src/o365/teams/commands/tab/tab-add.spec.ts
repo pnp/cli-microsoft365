@@ -7,6 +7,7 @@ const command: Command = require('./tab-add');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import Sinon = require('sinon');
 
 describe(commands.TEAMS_TAB_ADD, () => {
   let vorpal: Vorpal;
@@ -215,6 +216,7 @@ describe(commands.TEAMS_TAB_ADD, () => {
       }
     });
   });
+
   it('creates tab in channel within the Microsoft Teams team in the tenant with all options', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/teams/3b4797e5-bdf3-48e1-a552-839af71562ef`) > -1) {
@@ -250,6 +252,56 @@ describe(commands.TEAMS_TAB_ADD, () => {
         }));
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
 
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('ignores global options when creating request body', (done) => {
+    const postStub: Sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/teams/3b4797e5-bdf3-48e1-a552-839af71562ef`) > -1) {
+        return Promise.resolve({
+          "id": "19:f3dcbb1674574677abcae89cb626f1e6@thread.skype",
+          "displayName": "testweb",
+          "webUrl": "https://teams.microsoft.com/l/channel/19:f3dcbb1674574677abcae89cb626f1e6@thread.skype/"
+        });
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        debug: true,
+        verbose: true,
+        output: "text",
+        pretty: true,
+        teamId: '3b4797e5-bdf3-48e1-a552-839af71562ef',
+        channelId: '9:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
+        appId: 'com.microsoft.teamspace.tab.web',
+        appName: 'testweb',
+        entityId: 'https://xxx.sharepoint.com/Shared%20Documents/',
+        removeUrl: 'https://xxx.sharepoint.com/Shared%20Documents/',
+        contentUrl: 'https://xxx.sharepoint.com/Shared%20Documents/',
+        websiteUrl: 'https://xxx.sharepoint.com/Shared%20Documents/',
+        unknown: 'unknown value'
+      }
+    }, () => {
+      try {
+        assert.deepEqual(postStub.firstCall.args[0].body, {
+          'teamsApp@odata.bind': 'https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/com.microsoft.teamspace.tab.web',
+          configuration: {
+            contentUrl: 'https://xxx.sharepoint.com/Shared%20Documents/',
+            entityId: 'https://xxx.sharepoint.com/Shared%20Documents/',
+            removeUrl: 'https://xxx.sharepoint.com/Shared%20Documents/',
+            unknown: 'unknown value',
+            websiteUrl: 'https://xxx.sharepoint.com/Shared%20Documents/'
+          },
+          displayName: 'testweb'
+        });
         done();
       }
       catch (e) {

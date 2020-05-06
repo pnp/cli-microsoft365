@@ -30,18 +30,18 @@ describe(commands.LISTITEM_ADD, () => {
       const ctMatch = bodyString.match(/\"?FieldName\"?:\s*\"?ContentType\"?,\s*\"?FieldValue\"?:\s*\"?(\w*)\"?/i);
       actualContentType = ctMatch ? ctMatch[1] : "";
       if (bodyString.indexOf("fail adding me") > -1) return Promise.resolve({ value: [] })
-      return Promise.resolve({ value: [ { FieldName: "Id", FieldValue: expectedId }] });
+      return Promise.resolve({ value: [{ FieldName: "Id", FieldValue: expectedId }] });
     }
-    
+
     return Promise.reject('Invalid request');
   }
 
   let getFakes = (opts: any) => {
     if ((opts.url as string).indexOf('contenttypes') > -1) {
-      return Promise.resolve({ value: [ {Id: { StringValue: expectedContentType }, Name: "Item" } ] });
+      return Promise.resolve({ value: [{ Id: { StringValue: expectedContentType }, Name: "Item" }] });
     }
     if ((opts.url as string).indexOf('rootFolder') > -1) {
-      return Promise.resolve({ ServerRelativeUrl: '/sites/project-xxx/Lists/Demo%20List'});
+      return Promise.resolve({ ServerRelativeUrl: '/sites/project-xxx/Lists/Demo%20List' });
     }
     if ((opts.url as string).indexOf('/items(') > -1) {
       actualId = opts.url.match(/\/items\((\d+)\)/i)[1];
@@ -64,7 +64,7 @@ describe(commands.LISTITEM_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     ensureFolderStub = sinon.stub(FolderExtensions.prototype, 'ensureFolder').resolves();
     auth.service.connected = true;
   });
@@ -172,14 +172,14 @@ describe(commands.LISTITEM_ADD, () => {
 
   it('fails to create a list item when \'fail me\' values are used', (done) => {
     actualId = 0;
-    
+
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    let options: any = { 
-      debug: false, 
-      listTitle: 'Demo List', 
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
+    let options: any = {
+      debug: false,
+      listTitle: 'Demo List',
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       Title: "fail adding me"
     }
 
@@ -192,7 +192,7 @@ describe(commands.LISTITEM_ADD, () => {
         done(e);
       }
     });
-    
+
   });
 
   it('returns listItemInstance object when list item is added with correct values', (done) => {
@@ -201,10 +201,10 @@ describe(commands.LISTITEM_ADD, () => {
 
     command.allowUnknownOptions();
 
-    let options: any = { 
-      debug: true, 
-      listTitle: 'Demo List', 
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
+    let options: any = {
+      debug: true,
+      listTitle: 'Demo List',
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       Title: expectedTitle
     }
 
@@ -223,7 +223,7 @@ describe(commands.LISTITEM_ADD, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    const options: any = { 
+    const options: any = {
       listId: 'cf8c72a1-0207-40ee-aebd-fca67d20bc8a',
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       Title: expectedTitle
@@ -244,10 +244,10 @@ describe(commands.LISTITEM_ADD, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    let options: any = { 
-      debug: true, 
-      listTitle: 'Demo List', 
-      webUrl: 'https://contoso.sharepoint.com/sites/project-y', 
+    let options: any = {
+      debug: true,
+      listTitle: 'Demo List',
+      webUrl: 'https://contoso.sharepoint.com/sites/project-y',
       contentType: expectedContentType,
       Title: expectedTitle
     }
@@ -268,10 +268,10 @@ describe(commands.LISTITEM_ADD, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    let options: any = { 
-      debug: false, 
-      listTitle: 'Demo List', 
-      webUrl: 'https://contoso.sharepoint.com/sites/project-y', 
+    let options: any = {
+      debug: false,
+      listTitle: 'Demo List',
+      webUrl: 'https://contoso.sharepoint.com/sites/project-y',
       contentType: "Unexpected content type",
       Title: expectedTitle
     }
@@ -294,9 +294,9 @@ describe(commands.LISTITEM_ADD, () => {
 
     cmdInstance.action({
       options: {
-        debug: false, 
-        listTitle: 'Demo List', 
-        webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
+        debug: false,
+        listTitle: 'Demo List',
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         Title: expectedTitle,
         contentType: expectedContentType,
         folder: "InsideFolder2"
@@ -319,9 +319,9 @@ describe(commands.LISTITEM_ADD, () => {
 
     cmdInstance.action({
       options: {
-        debug: true, 
-        listTitle: 'Demo List', 
-        webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
+        debug: true,
+        listTitle: 'Demo List',
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         Title: expectedTitle,
         contentType: expectedContentType,
         folder: "InsideFolder2/Folder3"
@@ -344,9 +344,9 @@ describe(commands.LISTITEM_ADD, () => {
 
     cmdInstance.action({
       options: {
-        debug: true, 
-        listTitle: 'Demo List', 
-        webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
+        debug: true,
+        listTitle: 'Demo List',
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         Title: expectedTitle,
         contentType: expectedContentType,
         folder: "InsideFolder2/Folder3/"
@@ -356,6 +356,36 @@ describe(commands.LISTITEM_ADD, () => {
         const addValidateUpdateItemUsingPathRequest = postStubs.getCall(postStubs.callCount - 1).args[0];
         const info = addValidateUpdateItemUsingPathRequest.body.listItemCreateInfo;
         assert.equal(info.FolderPath.DecodedUrl, '/sites/project-xxx/Lists/Demo%20List/InsideFolder2/Folder3');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('ignores global options when creating request body', (done) => {
+    sinon.stub(request, 'get').callsFake(getFakes);
+    const postStubs = sinon.stub(request, 'post').callsFake(postFakes);
+
+    cmdInstance.action({
+      options: {
+        debug: true,
+        verbose: true,
+        output: "text",
+        pretty: true,
+        listTitle: 'Demo List',
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        Title: expectedTitle,
+        contentType: expectedContentType,
+        folder: "InsideFolder2/Folder3/"
+      }
+    }, () => {
+      try {
+        assert.deepEqual(postStubs.firstCall.args[0].body, {
+          formValues: [{ FieldName: 'Title', FieldValue: 'List Item 1' }, { FieldName: 'ContentType', FieldValue: 'Item' }],
+          listItemCreateInfo: { FolderPath: { DecodedUrl: '/sites/project-xxx/Lists/Demo%20List/InsideFolder2/Folder3' } }
+        });
         done();
       }
       catch (e) {

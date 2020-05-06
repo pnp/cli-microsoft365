@@ -89,7 +89,8 @@ class SpoListViewSetCommand extends SpoCommand {
       'viewTitle',
       'debug',
       'verbose',
-      'output'
+      'output',
+      'pretty'
     ];
 
     Object.keys(options).forEach(key => {

@@ -16,7 +16,7 @@ describe(commands.GROUPSETTING_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -251,6 +251,131 @@ describe(commands.GROUPSETTING_SET, () => {
     }, () => {
       try {
         assert(settingsUpdated);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('ignores global options when creating request body', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings/c391b57d-5783-4c53-9236-cefb5c6ef323`) {
+        return Promise.resolve({
+          "id": "c391b57d-5783-4c53-9236-cefb5c6ef323", "displayName": null, "templateId": "62375ab9-6b52-47ed-826b-58e47e0e304b", "values": [{ "name": "CustomBlockedWordsList", "value": "" }, { "name": "EnableMSStandardBlockedWords", "value": "false" }, { "name": "ClassificationDescriptions", "value": "" }, { "name": "DefaultClassification", "value": "" }, { "name": "PrefixSuffixNamingRequirement", "value": "" }, { "name": "AllowGuestsToBeGroupOwner", "value": "false" }, { "name": "AllowGuestsToAccessGroups", "value": "true" }, { "name": "GuestUsageGuidelinesUrl", "value": "" }, { "name": "GroupCreationAllowedGroupId", "value": "" }, { "name": "AllowToAddGuests", "value": "true" }, { "name": "UsageGuidelinesUrl", "value": "" }, { "name": "ClassificationList", "value": "" }, { "name": "EnableGroupCreation", "value": "true" }]
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+    const patchStub = sinon.stub(request, 'patch').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings/c391b57d-5783-4c53-9236-cefb5c6ef323` &&
+        JSON.stringify(opts.body) === JSON.stringify({
+          displayName: null,
+          templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b',
+          values: [
+            {
+              name: 'UsageGuidelinesUrl',
+              value: 'https://contoso.sharepoint.com/sites/compliance'
+            },
+            {
+              name: 'ClassificationList',
+              value: 'HBI, MBI, LBI, GDPR'
+            },
+            {
+              name: 'DefaultClassification',
+              value: 'MBI'
+            },
+            {
+              name: 'CustomBlockedWordsList',
+              value: ''
+            },
+            {
+              name: 'EnableMSStandardBlockedWords',
+              value: 'false'
+            },
+            {
+              name: 'ClassificationDescriptions',
+              value: ''
+            },
+            {
+              name: 'PrefixSuffixNamingRequirement',
+              value: ''
+            },
+            {
+              name: 'AllowGuestsToBeGroupOwner',
+              value: 'false'
+            },
+            {
+              name: 'AllowGuestsToAccessGroups',
+              value: 'true'
+            },
+            {
+              name: 'GuestUsageGuidelinesUrl',
+              value: ''
+            },
+            {
+              name: 'GroupCreationAllowedGroupId',
+              value: ''
+            },
+            {
+              name: 'AllowToAddGuests',
+              value: 'true'
+            },
+            {
+              name: 'EnableGroupCreation',
+              value: 'true'
+            }
+          ]
+        })) {
+        return Promise.resolve({
+          displayName: null,
+          id: 'c391b57d-5783-4c53-9236-cefb5c6ef323',
+          templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b',
+          values: [{ "name": "UsageGuidelinesUrl", "value": "https://contoso.sharepoint.com/sites/compliance" }, { "name": "ClassificationList", "value": "HBI, MBI, LBI, GDPR" }, { "name": "DefaultClassification", "value": "MBI" }, { "name": "CustomBlockedWordsList", "value": "" }, { "name": "EnableMSStandardBlockedWords", "value": "false" }, { "name": "ClassificationDescriptions", "value": "" }, { "name": "PrefixSuffixNamingRequirement", "value": "" }, { "name": "AllowGuestsToBeGroupOwner", "value": "false" }, { "name": "AllowGuestsToAccessGroups", "value": "true" }, { "name": "GuestUsageGuidelinesUrl", "value": "" }, { "name": "GroupCreationAllowedGroupId", "value": "" }, { "name": "AllowToAddGuests", "value": "true" }, { "name": "EnableGroupCreation", "value": "true" }]
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        debug: true,
+        verbose: true,
+        output: "text",
+        pretty: true,
+        id: 'c391b57d-5783-4c53-9236-cefb5c6ef323',
+        UsageGuidelinesUrl: 'https://contoso.sharepoint.com/sites/compliance',
+        ClassificationList: 'HBI, MBI, LBI, GDPR',
+        DefaultClassification: 'MBI'
+      }
+    }, () => {
+      try {
+        assert.deepEqual(patchStub.firstCall.args[0].body, {
+          displayName: null,
+          templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b',
+          values: [
+            {
+              name: 'UsageGuidelinesUrl',
+              value: 'https://contoso.sharepoint.com/sites/compliance'
+            },
+            { name: 'ClassificationList', value: 'HBI, MBI, LBI, GDPR' },
+            { name: 'DefaultClassification', value: 'MBI' },
+            { name: 'CustomBlockedWordsList', value: '' },
+            { name: 'EnableMSStandardBlockedWords', value: 'false' },
+            { name: 'ClassificationDescriptions', value: '' },
+            { name: 'PrefixSuffixNamingRequirement', value: '' },
+            { name: 'AllowGuestsToBeGroupOwner', value: 'false' },
+            { name: 'AllowGuestsToAccessGroups', value: 'true' },
+            { name: 'GuestUsageGuidelinesUrl', value: '' },
+            { name: 'GroupCreationAllowedGroupId', value: '' },
+            { name: 'AllowToAddGuests', value: 'true' },
+            { name: 'EnableGroupCreation', value: 'true' }
+          ]
+        });
         done();
       }
       catch (e) {

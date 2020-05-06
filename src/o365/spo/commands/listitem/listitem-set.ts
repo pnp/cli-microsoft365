@@ -376,7 +376,9 @@ class SpoListItemSetCommand extends SpoCommand {
       'contentType',
       'systemUpdate',
       'debug',
-      'verbose'
+      'verbose',
+      'output',
+      'pretty'
     ];
 
     Object.keys(options).forEach(key => {
