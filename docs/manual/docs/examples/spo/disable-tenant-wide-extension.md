@@ -16,9 +16,9 @@ $filterQuery = "Title eq '"+ $extensionName +"'"
 $appitems = o365 spo listitem list --title $listName --webUrl $appcatalogurl --fields "Id,Title" --filter $filterQuery --output json
 $extItems = $appitems.Replace("Id","ExtId") | ConvertFrom-JSON
 
-if($extItems.count -ge 0){
-o365 spo listitem set --listTitle $listName --id $extItems.ExtId --webUrl $appcatalogurl --TenantWideExtensionDisabled "true"; 
-  Write-Host("Extention disabled.");
+if($extItems.count -gt 0){
+$isDisabled = o365 spo listitem set --listTitle $listName --id $extItems.ExtId --webUrl $appcatalogurl --TenantWideExtensionDisabled "true"; 
+  Write-Host("Extension disabled.");
 }else{
   Write-Host("No extensions found with the name '"+$extensionName+"'.");
 }
@@ -30,16 +30,16 @@ o365 spo listitem set --listTitle $listName --id $extItems.ExtId --webUrl $appca
 # requires jq: https://stedolan.github.io/jq/
 
 echo "Enter the extension name to disable: "; read extensionName;
-listName="Tenant Wide Extensions"
+listName="Tenant Wide Extensions";
 
 appcatalogurl=$(o365 spo tenant appcatalogurl get)
 filterQuery="Title eq '$extensionName'"
 appitemsjson=$(o365 spo listitem list --title "$listName" --webUrl "$appcatalogurl" --fields "Id,Title" --filter "$filterQuery" --output json)
-appitemid=( $(jq -r '.[].Id' <<< '$appitemsjson'))
+appitemid=( $(jq -r '.[].Id' <<< $appitemsjson))
 
 if [[ $appitemid -gt 0 ]]
 then
- o365 spo listitem set --listTitle "$listName" --id "$appitemid" --webUrl "$appcatalogurl" --TenantWideExtensionDisabled "true"
+ isDisabled=$(o365 spo listitem set --listTitle "$listName" --id "$appitemid" --webUrl "$appcatalogurl" --TenantWideExtensionDisabled "true")
  echo "Extension disabled."
 else
   echo "No extensions found with the name '$extensionName'."
