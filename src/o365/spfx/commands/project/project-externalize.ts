@@ -181,7 +181,7 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
         x[0].action, os.EOL,
         '```JavaScript', os.EOL,
         ...x.map(y => [y.targetValue, os.EOL]).reduce((y, z) => [...y, ...z]), '```', os.EOL]);
-      
+
     if (initialReport.length > 0) {
       return initialReport.reduce((x, y) => [...x, ...y]);
     }
@@ -264,7 +264,7 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
       `   ${chalk.yellow('Important:')} Run this command in the folder where the project for which you
     want to externalize dependencies is located. This command doesn't change
     your project files.
-      
+
   Remarks:
 
     ${chalk.yellow('Attention:')} This command is in preview and could change
@@ -279,11 +279,11 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
     Externalizing project dependencies is error-prone, especially when it comes
     to updating your solution's code. This is why at this moment, this command
     produces a report that you can use yourself to perform the necessary changes
-    and verify that everything is working as expected.  
+    and verify that everything is working as expected.
 
   Examples:
-  
-    Get instructions to externalize dependencies for the current SharePoint 
+
+    Get instructions to externalize dependencies for the current SharePoint
     Framework project and save the findings in a Markdown file
       ${this.name} --output md --outputFile "deps-report.md"
 

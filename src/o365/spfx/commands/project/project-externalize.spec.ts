@@ -710,7 +710,9 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     ]) as string;
     const emptyReport = (command as any).serializeTextReport([]) as string;
     assert(report.length > 87);
-    assert.equal(emptyReport.length, 122);
+
+    // Windows processes JSON.stringify different then OSX/Linux and adds two empty characters
+    assert(emptyReport.length === 122 || emptyReport.length === 124);
   });
 
   it('writes externalize report to file when outputFile specified', (done) => {
