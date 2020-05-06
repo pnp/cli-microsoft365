@@ -59,13 +59,13 @@ export class FN018004_TEAMS_tab96x96_png extends Rule {
       }
 
       const teamsFolderName: string = `teams`;
-      const teamsFolderPath: string = path.join(project.path, teamsFolderName);
+      const teamsFolderPath: string = path.posix.join(project.path, teamsFolderName);
       const iconName: string = this.getIconName(manifest);
-      const iconPath: string = path.join(teamsFolderPath, iconName);
+      const iconPath: string = path.posix.join(teamsFolderPath, iconName);
       if (!fs.existsSync(iconPath)) {
         occurrences.push({
-          file: path.relative(project.path, iconPath),
-          resolution: `copy_cmd ${path.join(__dirname, '..', 'assets', 'tab96x96.png')}DestinationParam${iconPath}`
+          file: path.posix.relative(project.path, iconPath),
+          resolution: `copy_cmd ${path.posix.join(__dirname, '..', 'assets', 'tab96x96.png')}DestinationParam${iconPath}`
         });
       }
     });
