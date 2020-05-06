@@ -78,7 +78,8 @@ class AadGroupSettingSetCommand extends GraphCommand {
       'id',
       'debug',
       'verbose',
-      'output'
+      'output',
+      'pretty'
     ];
 
     Object.keys(options).forEach(key => {

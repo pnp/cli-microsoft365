@@ -321,7 +321,9 @@ class SpoListItemAddCommand extends SpoCommand {
       'contentType',
       'folder',
       'debug',
-      'verbose'
+      'verbose',
+      'output',
+      'pretty'
     ];
 
     Object.keys(options).forEach(key => {

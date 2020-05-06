@@ -643,6 +643,38 @@ describe(commands.FILE_ADD, () => {
     });
   });
 
+  it('ignores global options when creating request body', (done) => {
+    const postRequests: sinon.SinonStub = stubPostResponses();
+    stubGetResponses();
+
+    cmdInstance.action({
+      options: {
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        folder: 'Shared%20Documents/t1',
+        path: 'C:\Users\Velin\Desktop\MS365.jpg',
+        contentType: 'Picture',
+        Title: 'abc',
+        publish: true,
+        debug: true,
+        verbose: true,
+        output: "text",
+        pretty: true
+      }
+    }, () => {
+      try {
+        assert.deepEqual(postRequests.secondCall.args[0].body, {
+          bNewDocumentUpdate: true,
+          checkInComment: '',
+          formValues: [{ FieldName: 'Title', FieldValue: 'abc' }, { FieldName: 'ContentType', FieldValue: 'Picture' }]
+        });
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('should perform single request upload for file up to 250 MB', (done) => {
     const postRequests: sinon.SinonStub = stubPostResponses();
     stubGetResponses();

@@ -16,7 +16,7 @@ describe(commands.LIST_VIEW_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'ABC' }));
     auth.service.connected = true;
   });
@@ -77,6 +77,32 @@ describe(commands.LIST_VIEW_SET, () => {
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com', listTitle: 'List 1', viewTitle: 'All items', Title: 'All events' } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('ignores global options when creating request body', (done) => {
+    const patchRequest: sinon.SinonStub = sinon.stub(request, 'patch').callsFake((opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('List%201')/views/getByTitle('All%20items')`) {
+        if (opts.headers &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0 &&
+          opts.headers['X-RequestDigest'] &&
+          JSON.stringify(opts.body) === JSON.stringify({ Title: 'All events' })) {
+          return Promise.resolve();
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({ options: { debug: false, verbose: false, output: "text", pretty: true, webUrl: 'https://contoso.sharepoint.com', listTitle: 'List 1', viewTitle: 'All items', Title: 'All events' } }, () => {
+      try {
+        assert.deepEqual(patchRequest.lastCall.args[0].body, { Title: 'All events' });
         done();
       }
       catch (e) {
