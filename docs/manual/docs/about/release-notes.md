@@ -23,6 +23,7 @@
 - updated the Authenticate with Microsoft Graph sample replacing the deprecated method [#1548](https://github.com/pnp/office365-cli/pull/1548)
 - included PowerShell completion script in the package [#1551](https://github.com/pnp/office365-cli/issues/1551)
 - added Flow inventory sample script [#1522](https://github.com/pnp/office365-cli/issues/1522)
+- added managed identity authentication [#1314](https://github.com/pnp/office365-cli/issues/1314)
 
 ## [v2.9.0](https://github.com/pnp/office365-cli/releases/tag/v2.9.0)
 
