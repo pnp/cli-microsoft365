@@ -34,7 +34,7 @@ export class FN011008_MAN_requiresCustomScript extends ManifestRule {
       if (typeof manifest.safeWithCustomScriptDisabled !== 'undefined') {
         this.addOccurrence(`{
   "requiresCustomScript": ${!manifest.safeWithCustomScriptDisabled}
-`, manifest.path, project.path, occurrences);
+}`, manifest.path, project.path, occurrences);
       }
     });
 
