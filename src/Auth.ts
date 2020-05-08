@@ -366,26 +366,51 @@ export class Auth {
         json: true
       };
 
-      if (process.env.IDENTITY_HEADER && process.env.IDENTITY_ENDPOINT) {
-        // it is Azure Function or Azure Web App
+      if (process.env.IDENTITY_ENDPOINT && process.env.IDENTITY_HEADER) {
+        if (debug) {
+          stdout.log('IDENTITY_ENDPOINT and IDENTITY_HEADER env variables found it is Azure Function, WebApp...');
+        }
+
         requestOptions.url = `${process.env.IDENTITY_ENDPOINT}?resource=${encodeURIComponent(resource)}&api-version=2019-08-01`;
         requestOptions.headers['X-IDENTITY-HEADER'] = process.env.IDENTITY_HEADER;
 
+      } else if (process.env.MSI_ENDPOINT && process.env.MSI_SECRET) {
         if (debug) {
-          stdout.log('IDENTITY_ENDPOINT and IDENTITY_HEADER env variables found it is Azure Function or WebApp...');
+          stdout.log('MSI_ENDPOINT and MSI_SECRET env variables found it is Azure Function or WebApp, but using the old names of the env variables...');
         }
 
-      } else if (process.env.MSI_ENDPOINT && process.env.MSI_SECRET) {
-        // it is Azure Function or Azure Web App, but using the old names of the env variables
         requestOptions.url = `${process.env.MSI_ENDPOINT}?resource=${encodeURIComponent(resource)}&api-version=2019-08-01`;
         requestOptions.headers['X-IDENTITY-HEADER'] = process.env.MSI_SECRET;
 
+      } else if (process.env.IDENTITY_ENDPOINT) {
         if (debug) {
-          stdout.log('MSI_ENDPOINT and MSI_SECRET env variables found it is Azure Function or WebApp...');
+          stdout.log('IDENTITY_ENDPOINT env variable found it is Azure Could Shell...');
+        }
+        if (userName && process.env.ACC_CLOUD) {
+          // reject for now since the Azure Clould Shell does not support user-manadged identity 
+          reject("Azure Clould Shell does not support user-managed identity. You can execute the command without the --userName option to login with user identity");
+          return;
         }
 
-      } else {
-        // it is not Azure Function so lets attempt to get Managed Identity token by using the Azure Virtual Machine api
+        requestOptions.url = `${process.env.IDENTITY_ENDPOINT}?resource=${encodeURIComponent(resource)}`;
+
+      } else if (process.env.MSI_ENDPOINT) {
+        if (debug) {
+          stdout.log('MSI_ENDPOINT env variable found it is Azure Could Shell, but using the old names of the env variables...');
+        }
+        if (userName && process.env.ACC_CLOUD) {
+          // reject for now since the Azure Clould Shell does not support user-manadged identity 
+          reject("Azure Clould Shell does not support user-managed identity. You can execute the command without the --userName option to login with user identity");
+          return;
+        }
+
+        requestOptions.url = `${process.env.MSI_ENDPOINT}?resource=${encodeURIComponent(resource)}`;
+      }
+       else {
+        if (debug) {
+          stdout.log('IDENTITY_ENDPOINT and MSI_ENDPOINT env variables not found. Attempt to get Managed Identity token by using the Azure Virtual Machine api...');
+        }
+
         requestOptions.url = `http://169.254.169.254/metadata/identity/oauth2/token?resource=${encodeURIComponent(resource)}&api-version=2018-02-01`;
       }
 
@@ -419,15 +444,15 @@ export class Auth {
           // try to get token using principal_id (object_id)
 
           let isNotFoundResponse = false;
-          if(e.error && e.error.Message) {
+          if (e.error && e.error.Message) {
             // check if it is Azure Function api 'not found' response
             isNotFoundResponse = (e.error.Message.indexOf("No Managed Identity found") !== -1);
-          } else if(e.error && e.error.error_description) {
+          } else if (e.error && e.error.error_description) {
             // check if it is Azure VM api 'not found' response
             isNotFoundResponse = (e.error.error_description === "Identity not found");
           }
 
-          if(!isNotFoundResponse) {
+          if (!isNotFoundResponse) {
             // it is not a 'not found' response then exit with error
             reject(e);
             return;
@@ -448,11 +473,11 @@ export class Auth {
             .catch((err: any) => {
               // will give up and not try any further with the 'msi_res_id' (resource id) querty string param
               // since it does not work with the Azure Functions api, but just with the Azure VM api
-              if(err.error.code === 'EACCES') {
+              if (err.error.code === 'EACCES') {
                 // the CLI does not know if managed identity is actually assigned when EACCES code thrown
                 // so show meaningfull message since the raw error response could be missleading 
                 reject('Error while logging with Managed Identity. Please check if a Managed Identity is assigned to the current Azure resource.');
-              } else  {
+              } else {
                 reject(err);
               }
             });

@@ -873,6 +873,126 @@ describe('Auth', () => {
     });
   });
 
+  it('calls api with correct params using system managed identity flow when authType identity and Azure Cloud Shell api', (done) => {
+    process.env = {
+      IDENTITY_ENDPOINT:'http://localhost:50342/oauth2/token'
+    }
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+    const requestStub = sinon.stub(request, 'get').callsFake((opts) => {
+      return Promise.resolve({
+        "access_token": "eyJ0eXAiOiJKV1QiLCJ...",
+        "client_id": "a04566df-9a65-4e90-ae3d-574572a16423",
+        "expires_in": "86399",
+        "expires_on": "1587847593",
+        "ext_expires_in": "86399",
+        "not_before": "1587760893",
+        "resource": "https://veling.sharepoint.com/",
+        "token_type": "Bearer"
+      });
+    });
+
+    auth.service.authType = AuthType.Identity;
+    auth.service.userName = undefined;
+    auth.ensureAccessToken(resource, stdout, true).then(() => {
+      try {
+        assert.equal(requestStub.lastCall.args[0].url, 'http://localhost:50342/oauth2/token?resource=https%3A%2F%2Fcontoso.sharepoint.com');
+        assert.equal((requestStub.lastCall.args[0] as any).headers.Metadata, true);
+        assert.equal((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    }, (err) => {
+      done(err);
+    });
+  });
+
+  it('fails with error when authType identity and Azure Cloud Shell api and IDENTITY_ENDPOINT, but userName option specified', (done) => {
+    process.env = {
+      IDENTITY_ENDPOINT:'http://localhost:50342/oauth2/token',
+      ACC_CLOUD: 'abc'
+    }
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+    sinon.stub(request, 'get').callsFake((opts) => {
+      return Promise.resolve();
+    });
+
+    auth.service.authType = AuthType.Identity;
+    auth.service.userName = 'abc';
+    auth.ensureAccessToken(resource, stdout, true).then(() => {
+      done(new Error('something is wrong'));
+    }, (err) => {
+      try {
+        assert.notEqual(err.indexOf('Azure Clould Shell does not support user-managed identity. You can execute the command without the --userName option to login with user identity'), -1);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('calls api with correct params using system managed identity flow when authType identity and Azure Cloud Shell api', (done) => {
+    process.env = {
+      MSI_ENDPOINT:'http://localhost:50342/oauth2/token'
+    }
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+    const requestStub = sinon.stub(request, 'get').callsFake((opts) => {
+      return Promise.resolve({
+        "access_token": "eyJ0eXAiOiJKV1QiLCJ...",
+        "client_id": "a04566df-9a65-4e90-ae3d-574572a16423",
+        "expires_in": "86399",
+        "expires_on": "1587847593",
+        "ext_expires_in": "86399",
+        "not_before": "1587760893",
+        "resource": "https://veling.sharepoint.com/",
+        "token_type": "Bearer"
+      });
+    });
+
+    auth.service.authType = AuthType.Identity;
+    auth.service.userName = undefined;
+    auth.ensureAccessToken(resource, stdout, true).then(() => {
+      try {
+        assert.equal(requestStub.lastCall.args[0].url, 'http://localhost:50342/oauth2/token?resource=https%3A%2F%2Fcontoso.sharepoint.com');
+        assert.equal((requestStub.lastCall.args[0] as any).headers.Metadata, true);
+        assert.equal((requestStub.lastCall.args[0] as any).headers['x-anonymous'], true);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    }, (err) => {
+      done(err);
+    });
+  });
+
+  it('fails with error when authType identity and Azure Cloud Shell api and MSI_ENDPOINT, but userName option specified', (done) => {
+    process.env = {
+      MSI_ENDPOINT:'http://localhost:50342/oauth2/token',
+      ACC_CLOUD: 'abc'
+    }
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+    sinon.stub(request, 'get').callsFake((opts) => {
+      return Promise.resolve();
+    });
+
+    auth.service.authType = AuthType.Identity;
+    auth.service.userName = 'abc';
+    auth.ensureAccessToken(resource, stdout, true).then(() => {
+      done(new Error('something is wrong'));
+    }, (err) => {
+      try {
+        assert.notEqual(err.indexOf('Azure Clould Shell does not support user-managed identity. You can execute the command without the --userName option to login with user identity'), -1);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('handles error when using system managed identity flow when authType identity and Azure Function api', (done) => {
     process.env.IDENTITY_ENDPOINT = 'http://127.0.0.1:41932/MSI/token/';
     process.env.IDENTITY_HEADER = 'AFBA957766234A0CA9F3B6FA3D9582C7';

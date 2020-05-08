@@ -254,12 +254,14 @@ class LoginCommand extends Command {
       ${commands.LOGIN} --authType certificate --certificateFile /Users/user/dev/localhost.pfx --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1 --password 'pass@word1'
     
     Log in to Office 365 using a system assigned managed identity. 
-    Applies to Azure Virtual Machines and Azure Functions with enabled managed identity 
+    Applies to Azure resources with managed identity enabled, 
+    such as Azure Cloud Shell, Azure Virtual Machines, Azure App Service or Azure Functions
       ${commands.LOGIN} --authType identity
 
     Log in to Office 365 using a user-assigned managed identity. 
     Client id or principal id also known as object id value can be specified in the userName option.
-    Applies to Azure Virtual Machines and Azure Functions with enabled managed identity 
+    Applies to Azure resources with managed identity enabled, 
+    such as Azure Virtual Machines, Azure App Service or Azure Functions
       ${commands.LOGIN} --authType identity --userName ac9fbed5-804c-4362-a369-21a4ec51109e
 
 `);
