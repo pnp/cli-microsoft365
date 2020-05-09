@@ -24,6 +24,9 @@
 - included PowerShell completion script in the package [#1551](https://github.com/pnp/office365-cli/issues/1551)
 - added Flow inventory sample script [#1522](https://github.com/pnp/office365-cli/issues/1522)
 - added managed identity authentication [#1314](https://github.com/pnp/office365-cli/issues/1314)
+- fixed 'teams team add' command [#1497](https://github.com/pnp/office365-cli/issues/1497)
+- extended 'spo site set' with additional options [#1478](https://github.com/pnp/office365-cli/issues/1478)
+- added the 'Bulk add/remove users to Microsoft Teams and Office 365 Groups' sample script [#1540](https://github.com/pnp/office365-cli/issues/1540)
 
 ## [v2.9.0](https://github.com/pnp/office365-cli/releases/tag/v2.9.0)
 
