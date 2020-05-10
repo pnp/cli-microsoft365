@@ -2,6 +2,7 @@ import { Finding, Occurrence } from "../";
 import { Project } from "../../model";
 import { TsRule } from "./TsRule";
 import * as ts from 'typescript';
+import * as os from 'os';
 
 export class FN016004_TS_property_pane_property_import extends TsRule {
   constructor() {
@@ -54,21 +55,26 @@ export class FN016004_TS_property_pane_property_import extends TsRule {
       obj.forEach(n => {
         const resource: string = n.getText();
         const importsText: string = resource.replace(/\s/g, '').substr(resource.indexOf('{'));
-        let importsToStay: string[] = importsText.substr(0, importsText.indexOf('}')).split(',');
+        const imports: string[] = importsText.substr(0, importsText.indexOf('}')).split(',');
+        const importsToStay: string[] = [];
         const importsToBeMoved: string[] = [];
 
-        propertyPaneObjects.forEach(p => {
-          if (resource.indexOf(p) > -1) {
-            importsToBeMoved.push(p);
-            importsToStay = importsToStay.filter(e => { return e !== p; });
+        imports.forEach(importName => {
+          if (propertyPaneObjects.indexOf(importName) > -1) {
+            importsToBeMoved.push(importName);
+          }
+          else {
+            importsToStay.push(importName);
           }
         })
 
         if (importsToBeMoved.length > 0) {
           const newBaseImportDeclaration: string = `import { ${importsToStay.join(', ')} } from "@microsoft/sp-webpart-base";`;
           const newPropertiesImportDeclaration: string = `import { ${importsToBeMoved.join(', ')} } from "@microsoft/sp-property-pane";`;
-          const resolution: string = `${newBaseImportDeclaration}
-${newPropertiesImportDeclaration}`;
+          let resolution: string = newPropertiesImportDeclaration;
+          if (importsToStay.length > 0) {
+            resolution = `${newBaseImportDeclaration}${os.EOL}${resolution}`;
+          }
 
           this.addOccurrence(resolution, file.path, project.path, n, occurrences);
         }

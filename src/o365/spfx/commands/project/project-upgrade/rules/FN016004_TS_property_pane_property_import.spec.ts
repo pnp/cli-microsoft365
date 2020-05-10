@@ -78,6 +78,35 @@ describe('FN016004_TS_property_pane_property_import', () => {
       ]
     };
     rule.visit(project, findings);
-    assert(findings[0].occurrences[0].resolution.indexOf('import { IPropertyPaneConfiguration, PropertyPaneLabel, PropertyPaneTextField } from "@microsoft/sp-property-pane";') > -1);
+    assert(findings[0].occurrences[0].resolution.indexOf('import { IPropertyPaneConfiguration, PropertyPaneTextField, PropertyPaneLabel } from "@microsoft/sp-property-pane";') > -1);
+  });
+
+  it('does not return an empty import when all imports are moved to @microsoft/sp-property-pane', () => {
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    sinon.stub(fs, 'readFileSync').callsFake(() => `import {
+      IPropertyPaneField,
+      PropertyPaneFieldType
+    } from '@microsoft/sp-webpart-base';`);
+    const project: Project = {
+      path: '/usr/tmp',
+      tsFiles: [
+        new TsFile('foo')
+      ]
+    };
+    rule.visit(project, findings);
+    assert.equal(findings[0].occurrences[0].resolution, 'import { IPropertyPaneField, PropertyPaneFieldType } from "@microsoft/sp-property-pane";');
+  });
+
+  it('does not add PropertyPaneCustomField when it is not used', () => {
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    sinon.stub(fs, 'readFileSync').callsFake(() => `import { IPropertyPaneCustomFieldProps } from '@microsoft/sp-webpart-base';`);
+    const project: Project = {
+      path: '/usr/tmp',
+      tsFiles: [
+        new TsFile('foo')
+      ]
+    };
+    rule.visit(project, findings);
+    assert.equal(findings[0].occurrences[0].resolution, 'import { IPropertyPaneCustomFieldProps } from "@microsoft/sp-property-pane";');
   });
 });
