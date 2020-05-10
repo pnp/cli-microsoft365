@@ -1,10 +1,8 @@
-import commands from '../../commands';
+import { CommandOption, CommandValidate } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import {
-  CommandOption, CommandValidate
-} from '../../../../Command';
-import YammerCommand from "../../../base/YammerCommand";
 import request from '../../../../request';
+import YammerCommand from '../../../base/YammerCommand';
+import commands from '../../commands';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -14,7 +12,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   id: number;
-  enable?: boolean;
+  enable?: string;
   confirm?: boolean;
 }
 
@@ -33,7 +31,6 @@ class YammerMessageLikeSetCommand extends YammerCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.id = args.options.id !== undefined;
     telemetryProps.enable = args.options.enable !== undefined;
     telemetryProps.confirm = (!(!args.options.confirm)).toString();
     return telemetryProps;
@@ -41,7 +38,7 @@ class YammerMessageLikeSetCommand extends YammerCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const executeLikeAction: () => void = (): void => {
-        let endpoint = `${this.resource}/v1/messages/liked_by/current.json`;
+        const endpoint = `${this.resource}/v1/messages/liked_by/current.json`;
         const requestOptions: any = {
           url: endpoint,
           headers: {
@@ -54,7 +51,7 @@ class YammerMessageLikeSetCommand extends YammerCommand {
           }
         };
 
-        if (args.options.enable != false) {
+        if (args.options.enable !== 'false') {
           request
               .post(requestOptions)
               .then((res: any): void => {
@@ -70,25 +67,30 @@ class YammerMessageLikeSetCommand extends YammerCommand {
         }
       };
 
-      if (args.options.confirm || args.options.enable != false) {
-        executeLikeAction();
+      if (args.options.enable === 'false') {
+        if (args.options.confirm) {
+          executeLikeAction();
+        }
+        else {
+          const messagePrompt = `Are you sure you want to remove the like from the message ${args.options.id}?`;
+      
+          cmd.prompt({
+            type: 'confirm',
+            name: 'continue',
+            default: false,
+            message: messagePrompt,
+          }, (result: { continue: boolean }): void => {
+            if (!result.continue) {
+              cb();
+            }
+            else {
+              executeLikeAction();
+            }
+          });
+        }
       }
       else {
-        let messagePrompt = `Are you sure you want to remove the like from the message ${args.options.id}?`;
-    
-        cmd.prompt({
-          type: 'confirm',
-          name: 'continue',
-          default: false,
-          message: messagePrompt,
-        }, (result: { continue: boolean }): void => {
-          if (!result.continue) {
-            cb();
-          }
-          else {
-            executeLikeAction();
-          }
-        });
+        executeLikeAction();
       }
   };
 
@@ -122,6 +124,12 @@ class YammerMessageLikeSetCommand extends YammerCommand {
         return `${args.options.id} is not a number`;
       }
 
+      if (args.options.enable &&
+        args.options.enable !== 'true' &&
+        args.options.enable !== 'false') {
+        return `${args.options.enable} is not a valid value for the enable option. Allowed values are true|false`;
+      }
+
       return true;
     };
   }
@@ -134,7 +142,7 @@ class YammerMessageLikeSetCommand extends YammerCommand {
   
     ${chalk.yellow('Attention:')} In order to use this command, you need to grant the Azure AD
     application used by the Office 365 CLI the permission to the Yammer API.
-    To do this, execute the ${chalk.blue('consent --service yammer')} command.
+    To do this, execute the ${chalk.blue('cli consent --service yammer')} command.
   
   Examples:
     

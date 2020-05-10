@@ -1,13 +1,14 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
+
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./message-like-set');
-import * as assert from 'assert';
+import Command, { CommandError, CommandOption, CommandValidate } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
 
+const command: Command = require('./message-like-set');
 describe(commands.YAMMER_MESSAGE_LIKE_SET, () => {
   let vorpal: Vorpal;
   let log: string[];
@@ -99,6 +100,21 @@ describe(commands.YAMMER_MESSAGE_LIKE_SET, () => {
     assert.notEqual(actual, true);
   });
 
+  it('enable must be true or false', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { id: 10123123, enable:'true' } });
+    assert.equal(actual, true);
+  });
+
+  it('enable must be true or false', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { id: 10123123, enable:'false' } });
+    assert.equal(actual, true);
+  });
+
+  it('enable must be true or false', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { id: 10123123, enable:'fals' } });
+    assert.notEqual(actual, true);
+  });
+
   it('supports debug mode', () => {
     const options = (command.options() as CommandOption[]);
     let containsOption = false;
@@ -144,8 +160,8 @@ describe(commands.YAMMER_MESSAGE_LIKE_SET, () => {
     assert(containsExamples);
   });
 
-  it('prompts before when confirmation argument not passed', (done) => {
-    cmdInstance.action({ options: { debug: false, id: 1231231, enable:false } }, () => {
+  it('prompts when confirmation argument not passed', (done) => {
+    cmdInstance.action({ options: { debug: false, id: 1231231, enable:'false' } }, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -181,6 +197,25 @@ describe(commands.YAMMER_MESSAGE_LIKE_SET, () => {
     });
   });
 
+  it('calls the service when liking a message and confirm passed', (done) => {
+    const requestPostedStub = sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === 'https://www.yammer.com/api/v1/messages/liked_by/current.json') {
+        return Promise.resolve();
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({ options: { debug: true, id: 1231231, confirm:'true' } }, () => {
+      try {
+        assert(requestPostedStub.called);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('calls the service when liking a message and enabled set to true', (done) => {
     const requestPostedStub = sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages/liked_by/current.json') {
@@ -189,11 +224,7 @@ describe(commands.YAMMER_MESSAGE_LIKE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    };
-
-    cmdInstance.action({ options: { debug: true, id: 1231231, enable: true } }, () => {
+    cmdInstance.action({ options: { debug: true, id: 1231231, enable: 'true' } }, () => {
       try {
         assert(requestPostedStub.called);
         done();
@@ -204,7 +235,7 @@ describe(commands.YAMMER_MESSAGE_LIKE_SET, () => {
     });
   });
 
-  it('calls the service when disliking a message', (done) => {
+  it('calls the service when disliking a message and confirming', (done) => {
     const requestPostedStub = sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages/liked_by/current.json') {
         return Promise.resolve();
@@ -212,7 +243,7 @@ describe(commands.YAMMER_MESSAGE_LIKE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, id: 1231231, enable: false, confirm: true } }, () => {
+    cmdInstance.action({ options: { debug: true, id: 1231231, enable: 'false', confirm: true } }, () => {
       try {
         assert(requestPostedStub.called);
         done();
@@ -223,7 +254,25 @@ describe(commands.YAMMER_MESSAGE_LIKE_SET, () => {
     });
   });
 
-  it('calls the service when disliking a message and confirmation is asked ', (done) => {
+  it('prompts when disliking and confirmation parameter is denied', (done) => {
+    cmdInstance.action({ options: { debug: false, id: 1231231, enable:'false', confirm:false } }, () => {
+      let promptIssued = false;
+
+      if (promptOptions && promptOptions.type === 'confirm') {
+        promptIssued = true;
+      }
+
+      try {
+        assert(promptIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('calls the service when disliking a message and confirmation is hit', (done) => {
     const requestDeleteStub = sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages/liked_by/current.json') {
         return Promise.resolve();
@@ -235,7 +284,7 @@ describe(commands.YAMMER_MESSAGE_LIKE_SET, () => {
       cb({ continue: true });
     };
 
-    cmdInstance.action({ options: { debug: true, id: 1231231, enable: false } }, () => {
+    cmdInstance.action({ options: { debug: true, id: 1231231, enable: 'false' } }, () => {
       try {
         assert(requestDeleteStub.called);
         done();
@@ -246,11 +295,11 @@ describe(commands.YAMMER_MESSAGE_LIKE_SET, () => {
     });
   });
 
-  it('aborts execution when prompt not confirmed', (done) => {
+  it('Aborts execution when enabled set to false and confirmation is not given', (done) => {
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     };
-    cmdInstance.action({ options: { debug: false, id: 1231231, enable: false } }, () => {
+    cmdInstance.action({ options: { debug: false, id: 1231231, enable: 'false' } }, () => {
       try {
         assert(requests.length === 0);
         done();
