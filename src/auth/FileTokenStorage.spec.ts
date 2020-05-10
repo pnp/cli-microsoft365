@@ -216,6 +216,7 @@ describe('FileTokenStorage', () => {
   it('succeeds with removing if the token file is empty', (done) => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'readFileSync').callsFake(() => '');
+    sinon.stub(fs, 'writeFile').callsFake(() => '').callsArgWith(3, null);
     fileStorage
       .remove()
       .then(() => {
@@ -228,6 +229,7 @@ describe('FileTokenStorage', () => {
   it('succeeds with removing if the token file contains empty JSON object', (done) => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'readFileSync').callsFake(() => '{}');
+    sinon.stub(fs, 'writeFile').callsFake(() => '').callsArgWith(3, null);
     fileStorage
       .remove()
       .then(() => {
