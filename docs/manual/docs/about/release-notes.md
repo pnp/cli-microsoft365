@@ -27,6 +27,14 @@
 - fixed 'teams team add' command [#1497](https://github.com/pnp/office365-cli/issues/1497)
 - extended 'spo site set' with additional options [#1478](https://github.com/pnp/office365-cli/issues/1478)
 - added the 'Bulk add/remove users to Microsoft Teams and Office 365 Groups' sample script [#1540](https://github.com/pnp/office365-cli/issues/1540)
+- updates the 'cli consent' command references [#1542](https://github.com/pnp/office365-cli/issues/1542)
+- fixed 'aad user list' command [#1553](https://github.com/pnp/office365-cli/issues/1553)
+- ensured all global options are ignored in request bodies [#1563](https://github.com/pnp/office365-cli/issues/1563)
+- fixed windows builds [#1544](https://github.com/pnp/office365-cli/issues/1544)
+- added missing '}' in FN011008 resolution [#1509](https://github.com/pnp/office365-cli/issues/1509)
+- fixed issue with logging out after running tests [#1570](https://github.com/pnp/office365-cli/issues/1570)
+- fixed incorrect import suggestions in FN016004 [#1484](https://github.com/pnp/office365-cli/issues/1484)
+- fixed indentation of FN011010 resolution [#1485](https://github.com/pnp/office365-cli/issues/1485)
 
 ## [v2.9.0](https://github.com/pnp/office365-cli/releases/tag/v2.9.0)
 
