@@ -17,7 +17,7 @@ export class FN011010_MAN_webpart_version extends ManifestRule {
 
   get resolution(): string {
     return `{
-      "version": "*",
+  "version": "*",
 }`;
   };
 
