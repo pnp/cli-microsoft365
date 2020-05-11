@@ -1,5 +1,5 @@
 import commands from '../../commands';
-import Command, { CommandOption, CommandError, CommandCancel } from '../../../../Command';
+import Command, { CommandOption, CommandError, CommandCancel, CommandValidate } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 const command: Command = require('./tenant-recyclebinitem-restore');
@@ -13,6 +13,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
   let log: any[];
   let requests: any[];
   let cmdInstance: any;
+  let maxAttempts: number = 5;
 
   let cmdInstanceLogSpy: sinon.SinonSpy;
 
@@ -128,23 +129,38 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
     assert(containsExamples);
   });
 
+  it('fails validation if the url option not specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: {} });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation if the url option is not a valid SharePoint site URL', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { url: 'foo' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('passes validation if the url option is a valid SharePoint site URL', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { url: 'https://contoso.sharepoint.com' } });
+    assert(actual);
+  });
+
   it('handles REST API call error', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RestoreDeletedSite`) > -1) {
-        if (opts.headers.accept && opts.headers.contenttype && opts.body &&
-          opts.headers.accept.indexOf('application/json') === 0 && opts.headers.contenttype.indexOf('application/json') === 0) {
-          return Promise.reject({ error: 'An error has occurred' });
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RestoreDeletedSite`) > -1) {
+        if (opts.headers && opts.headers.accept && opts.headers['content-type'] && opts.body &&
+          opts.headers.accept.indexOf('application/json') === 0 && opts.headers['content-type'].indexOf('application/json') === 0) {
+          return Promise.reject({ error: 'Invalid request' });
         }
       }
 
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/hr' } }, (err?: any) => {
+    cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com/sites/hr' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Invalid request')));
         done();
       }
       catch (e) {
@@ -162,10 +178,10 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RestoreDeletedSite`) > -1) {
-        if (opts.headers.accept && opts.headers.contenttype && opts.body &&
-          opts.headers.accept.indexOf('application/json') === 0 && opts.headers.contenttype.indexOf('application/json') === 0) {
-          return Promise.reject({ error: 'An error has occurred' });
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RestoreDeletedSite`) > -1) {
+        if (opts.headers && opts.headers.accept && opts.headers['content-type'] && opts.body &&
+          opts.headers.accept.indexOf('application/json') === 0 && opts.headers['content-type'].indexOf('application/json') === 0) {
+            return Promise.reject({ error: 'Invalid request' });
         }
       }
 
@@ -174,11 +190,12 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
 
     sinon.stub(global, 'setTimeout').callsFake((fn, to) => {
       fn();
+      return {} as any;
     });
 
-    cmdInstance.action({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/hr', wait: true } }, (err?: any) => {
+    cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com/sites/hr', wait: true } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Invalid request')));
         done();
       }
       catch (e) {
@@ -192,13 +209,229 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
     });
   });
 
-  it('did not restore the deleted Site Collection from the Tenant Recycle Bin', (done) => {
+  it('restores the deleted site collection from the tenant recycle bin', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RestoreDeletedSite`) > -1) {
-        if (opts.headers.accept && opts.headers.contenttype && opts.body &&
-          opts.headers.accept.indexOf('application/json') === 0 && opts.headers.contenttype.indexOf('application/json') === 0) {
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RestoreDeletedSite`) > -1) {
+        if (opts.headers && opts.headers.accept && opts.headers['content-type'] && opts.body &&
+          opts.headers.accept.indexOf('application/json') === 0 && opts.headers['content-type'].indexOf('application/json') === 0) {
+          return Promise.resolve({"HasTimedout": false, "IsComplete": true, "PollingInterval": 15000});
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com/sites/hr' } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore([
+          request.post
+        ]);
+      }
+    });
+  });
+
+  it('restores the deleted site collection from the tenant recycle bin (debug)', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RestoreDeletedSite`) > -1) {
+        if (opts.headers && opts.headers.accept && opts.headers['content-type'] && opts.body &&
+          opts.headers.accept.indexOf('application/json') === 0 && opts.headers['content-type'].indexOf('application/json') === 0) {
+          return Promise.resolve({"HasTimedout": false, "IsComplete": true, "PollingInterval": 15000});
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({ options: {debug: true, url: 'https://contoso.sharepoint.com/sites/hr' } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith('site collection restored'));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore([
+          request.post
+        ]);
+      }
+    });
+  });
+
+  it('restores the deleted site collection from the tenant recycle bin (verbose)', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RestoreDeletedSite`) > -1) {
+        if (opts.headers && opts.headers.accept && opts.headers['content-type'] && opts.body &&
+          opts.headers.accept.indexOf('application/json') === 0 && opts.headers['content-type'].indexOf('application/json') === 0) {
+          return Promise.resolve({"HasTimedout": false, "IsComplete": true, "PollingInterval": 15000});
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({ options: {verbose: true, url: 'https://contoso.sharepoint.com/sites/hr' } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith('site collection restored'));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore([
+          request.post
+        ]);
+      }
+    });
+  });
+
+  it('restores the deleted site collection from the tenant recycle bin, wait for completion', (done) => {
+    let attempt: number = 0;
+    const stub = sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RestoreDeletedSite`) > -1) {
+        if (opts.headers && opts.headers.accept && opts.headers['content-type'] && opts.body &&
+          opts.headers.accept.indexOf('application/json') === 0 && opts.headers['content-type'].indexOf('application/json') === 0) {
+            attempt++;
+            if (attempt <= maxAttempts) {
+              return Promise.resolve({"HasTimedout": false, "IsComplete": false, "PollingInterval": 15000});    
+            }
+            else {
+              return Promise.resolve({"HasTimedout": false, "IsComplete": true, "PollingInterval": 15000});
+            }
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(global, 'setTimeout').callsFake((fn, to) => {
+      fn();
+      return {} as any;
+    });
+
+    cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com/sites/hr', wait: true } }, () => {
+      try {
+        assert(stub.called);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore([
+          request.post
+        ]);
+      }
+    });
+  });
+
+  it('restores the deleted site collection from the tenant recycle bin, wait for completion (debug)', (done) => {
+    let attempt: number = 0;
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RestoreDeletedSite`) > -1) {
+        if (opts.headers && opts.headers.accept && opts.headers['content-type'] && opts.body &&
+          opts.headers.accept.indexOf('application/json') === 0 && opts.headers['content-type'].indexOf('application/json') === 0) {
+            attempt++;
+            if (attempt <= maxAttempts) {
+              return Promise.resolve({"HasTimedout": false, "IsComplete": false, "PollingInterval": 15000});    
+            }
+            else {
+              return Promise.resolve({"HasTimedout": false, "IsComplete": true, "PollingInterval": 15000});
+            }
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(global, 'setTimeout').callsFake((fn, to) => {
+      fn();
+      return {} as any;
+    });
+
+    cmdInstance.action({ options: {debug: true, url: 'https://contoso.sharepoint.com/sites/hr', wait: true } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith('site collection restored'));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore([
+          request.post
+        ]);
+      }
+    });
+  });
+
+  it('restores the deleted site collection from the tenant recycle bin, wait for completion (verbose)', (done) => {
+    let attempt: number = 0;
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RestoreDeletedSite`) > -1) {
+        if (opts.headers && opts.headers.accept && opts.headers['content-type'] && opts.body &&
+          opts.headers.accept.indexOf('application/json') === 0 && opts.headers['content-type'].indexOf('application/json') === 0) {
+            attempt++;
+            if (attempt <= maxAttempts) {
+              return Promise.resolve({"HasTimedout": false, "IsComplete": false, "PollingInterval": 15000});    
+            }
+            else {
+              return Promise.resolve({"HasTimedout": false, "IsComplete": true, "PollingInterval": 15000});
+            }
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(global, 'setTimeout').callsFake((fn, to) => {
+      fn();
+      return {} as any;
+    });
+
+    cmdInstance.action({ options: {verbose: true, url: 'https://contoso.sharepoint.com/sites/hr', wait: true } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith('site collection restored'));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore([
+          request.post
+        ]);
+      }
+    });
+  });
+
+  it('did not restore the deleted site collection from the tenant recycle bin', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RestoreDeletedSite`) > -1) {
+        if (opts.headers && opts.headers.accept && opts.headers['content-type'] && opts.body &&
+          opts.headers.accept.indexOf('application/json') === 0 && opts.headers['content-type'].indexOf('application/json') === 0) {
           return Promise.resolve(JSON.stringify([{"HasTimedout": true, "IsComplete": false, "PollingInterval": 15000}]));
         }
       }
@@ -206,9 +439,9 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/hr', wait: false } }, (err?: any) => {
+    cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com/sites/hr', wait: false } }, (err?: any) => {
       try {
-        assert.equal(err, "Site Collection has not been restored");
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('site collection has not been restored')));
         done();
       }
       catch (e) {
@@ -222,91 +455,21 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
     });
   });
 
-  it('restores the deleted Site Collection from the Tenant Recycle Bin (debug)', (done) => {
+  it('did not restore the deleted site collection from the tenant recycle bin, after waiting for completion (timeout)', (done) => {
+    let attempt: number = 0;
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RestoreDeletedSite`) > -1) {
-        if (opts.headers.accept && opts.headers.contenttype && opts.body &&
-          opts.headers.accept.indexOf('application/json') === 0 && opts.headers.contenttype.indexOf('application/json') === 0) {
-          return Promise.resolve({"HasTimedout": false, "IsComplete": true, "PollingInterval": 15000});
-        }
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    cmdInstance.action({ options: {debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/hr' } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RestoreDeletedSite`) > -1 &&
-          r.headers.accept && r.headers.contenttype && r.body &&
-          r.headers.accept.indexOf('application/json') === 0 && r.headers.contenttype.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        Utils.restore([
-          request.post
-        ]);
-      }
-    });
-  });
-
-  it('restores the deleted Site Collection from the Tenant Recycle Bin (verbose)', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      requests.push(opts);
-
-      if (opts.url.indexOf(`/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RestoreDeletedSite`) > -1) {
-        if (opts.headers.accept && opts.headers.contenttype && opts.body &&
-          opts.headers.accept.indexOf('application/json') === 0 && opts.headers.contenttype.indexOf('application/json') === 0) {
-          return Promise.resolve({"HasTimedout": false, "IsComplete": true, "PollingInterval": 15000});
-        }
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    cmdInstance.action({ options: {verbose: true, siteUrl: 'https://contoso.sharepoint.com/sites/hr' } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RestoreDeletedSite`) > -1 &&
-          r.headers.accept && r.headers.contenttype && r.body &&
-          r.headers.accept.indexOf('application/json') === 0 && r.headers.contenttype.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        assert(cmdInstanceLogSpy.calledWith('Site Collection restored'));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        Utils.restore([
-          request.post
-        ]);
-      }
-    });
-  });
-
-  it('restores the deleted Site Collection from the Tenant Recycle Bin, wait for completion (debug)', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      requests.push(opts);
-
-      if (opts.url.indexOf(`/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RestoreDeletedSite`) > -1) {
-        if (opts.headers.accept && opts.headers.contenttype && opts.body &&
-          opts.headers.accept.indexOf('application/json') === 0 && opts.headers.contenttype.indexOf('application/json') === 0) {
-          return Promise.resolve({"HasTimedout": false, "IsComplete": false, "PollingInterval": 15000});
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RestoreDeletedSite`) > -1) {
+        if (opts.headers && opts.headers.accept && opts.headers['content-type'] && opts.body &&
+          opts.headers.accept.indexOf('application/json') === 0 && opts.headers['content-type'].indexOf('application/json') === 0) {
+            attempt++;
+            if (attempt <= maxAttempts) {
+              return Promise.resolve({"HasTimedout": false, "IsComplete": false, "PollingInterval": 15000});    
+            }
+            else {
+              return Promise.resolve({"HasTimedout": true, "IsComplete": false, "PollingInterval": 15000});
+            }
         }
       }
 
@@ -315,19 +478,12 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
 
     sinon.stub(global, 'setTimeout').callsFake((fn, to) => {
       fn();
+      return {} as any;
     });
 
-    cmdInstance.action({ options: {debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/hr', wait: true } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RestoreDeletedSite`) > -1 &&
-          r.headers.accept && r.headers.contenttype && r.body &&
-          r.headers.accept.indexOf('application/json') === 0 && r.headers.contenttype.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
+    cmdInstance.action({ options: {url: 'https://contoso.sharepoint.com/sites/hr', wait: true } }, (err?: any) => {
       try {
-        assert(correctRequestIssued);
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Operation timeout')));
         done();
       }
       catch (e) {
@@ -341,14 +497,21 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
     });
   });
 
-  it('restores the deleted Site Collection from the Tenant Recycle Bin, wait for completion (verbose)', (done) => {
+  it('did not restore the deleted site collection from the tenant recycle bin, after waiting for completion (error thrown)', (done) => {
+    let attempt: number = 0;
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if (opts.url.indexOf(`/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RestoreDeletedSite`) > -1) {
-        if (opts.headers.accept && opts.headers.contenttype && opts.body &&
-          opts.headers.accept.indexOf('application/json') === 0 && opts.headers.contenttype.indexOf('application/json') === 0) {
-          return Promise.resolve({"HasTimedout": false, "IsComplete": false, "PollingInterval": 15000});
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RestoreDeletedSite`) > -1) {
+        if (opts.headers && opts.headers.accept && opts.headers['content-type'] && opts.body &&
+          opts.headers.accept.indexOf('application/json') === 0 && opts.headers['content-type'].indexOf('application/json') === 0) {
+            attempt++;
+            if (attempt <= maxAttempts) {
+              return Promise.resolve({"HasTimedout": false, "IsComplete": false, "PollingInterval": 15000});    
+            }
+            else {
+              return Promise.reject('Operation timeout');
+            }
         }
       }
 
@@ -357,99 +520,12 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
 
     sinon.stub(global, 'setTimeout').callsFake((fn, to) => {
       fn();
+      return {} as any;
     });
 
-    cmdInstance.action({ options: {verbose: true, siteUrl: 'https://contoso.sharepoint.com/sites/hr', wait: true } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RestoreDeletedSite`) > -1 &&
-          r.headers.accept && r.headers.contenttype && r.body &&
-          r.headers.accept.indexOf('application/json') === 0 && r.headers.contenttype.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
+    cmdInstance.action({ options: {url: 'https://contoso.sharepoint.com/sites/hr', wait: true } }, (err?: any) => {
       try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        Utils.restore([
-          request.post
-        ]);
-      }
-    });
-  });
-
-  it('restores the deleted Site Collection from the Tenant Recycle Bin', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      requests.push(opts);
-
-      if (opts.url.indexOf(`/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RestoreDeletedSite`) > -1) {
-        if (opts.headers.accept && opts.headers.contenttype && opts.body &&
-          opts.headers.accept.indexOf('application/json') === 0 && opts.headers.contenttype.indexOf('application/json') === 0) {
-          return Promise.resolve({"HasTimedout": false, "IsComplete": true, "PollingInterval": 15000});
-        }
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    cmdInstance.action({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/hr' } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RestoreDeletedSite`) > -1 &&
-        r.headers.accept && r.headers.contenttype && r.body &&
-          r.headers.accept.indexOf('application/json') === 0 && r.headers.contenttype.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        Utils.restore([
-          request.post
-        ]);
-      }
-    });
-  });
-
-  it('restores the deleted Site Collection from the Tenant Recycle Bin, wait for completion', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      requests.push(opts);
-
-      if (opts.url.indexOf(`/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RestoreDeletedSite`) > -1) {
-        if (opts.headers.accept && opts.headers.contenttype && opts.body &&
-          opts.headers.accept.indexOf('application/json') === 0 && opts.headers.contenttype.indexOf('application/json') === 0) {
-          return Promise.resolve({"HasTimedout": false, "IsComplete": false, "PollingInterval": 15000});
-        }
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    sinon.stub(global, 'setTimeout').callsFake((fn, to) => {
-      fn();
-    });
-
-    cmdInstance.action({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/hr', wait: true } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RestoreDeletedSite`) > -1 &&
-        r.headers.accept && r.headers.contenttype && r.body &&
-          r.headers.accept.indexOf('application/json') === 0 && r.headers.contenttype.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
+        assert(cmdInstanceLogSpy.calledWith('site collection has not been restored'));
         done();
       }
       catch (e) {
