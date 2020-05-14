@@ -14,6 +14,7 @@ nav:
     - status: 'cmd/status.md'
     - Azure Active Directory Graph (aad):
       - approleassignment:
+        - approleassignment add: 'cmd/aad/approleassignment/approleassignment-add.md'
         - approleassignment list: 'cmd/aad/approleassignment/approleassignment-list.md'
       - groupsetting:
         - groupsetting add: 'cmd/aad/groupsetting/groupsetting-add.md'
