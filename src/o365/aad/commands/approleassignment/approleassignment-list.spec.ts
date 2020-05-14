@@ -248,7 +248,7 @@ class ServicePrincipalObject {
     "tokenEncryptionKeyId": null
   };
 
-  static servicePrincipalCustomAppWithNoAppRole: any = 
+  static servicePrincipalCustomAppWithNoAppRole: any =
     {
       "odata.metadata": "https://graph.windows.net/myorganization/$metadata#directoryObjects/@Element",
       "odata.type": "Microsoft.DirectoryServices.ServicePrincipal",
@@ -353,6 +353,7 @@ class CommandActionParameters {
   static appIdWithRoleAssignments: string = "36e3a540-6f25-4483-9542-9f5fa00bb633";
   static appNameWithRoleAssignments: string = "Product Catalog daemon";
   static appIdWithNoRoleAssignments: string = "1c21749e-df7a-4fed-b3ab-921dce3bb124";
+  static objectIdWithRoleAssigments: string = "3aa76d8a-4145-40d1-89ca-b15bdb943bfd";
   static invalidAppId: string = "12345678-abcd-9876-fedc-0123456789ab";
 }
 
@@ -373,6 +374,10 @@ class RequestStub {
       if ((opts.url as string).indexOf(`appId eq '${CommandActionParameters.appIdWithRoleAssignments}'`) > -1) {
         return Promise.resolve(ServicePrincipalCollections.ServicePrincipalByAppId);
       }
+      // by object id
+      if ((opts.url as string).indexOf(`objectId eq '${CommandActionParameters.objectIdWithRoleAssigments}'`) > -1) {
+        return Promise.resolve(ServicePrincipalCollections.ServicePrincipalByAppId);
+      }
       // by display name
       if ((opts.url as string).indexOf(`displayName eq '${encodeURIComponent(CommandActionParameters.appNameWithRoleAssignments)}'`) > -1) {
         return Promise.resolve(ServicePrincipalCollections.ServicePrincipalByDisplayName);
@@ -388,7 +393,7 @@ class RequestStub {
     }
 
     if ((opts.url as string).indexOf(`/myorganization/servicePrincipals/${InternalRequestStub.customAppId}?api-version=1.6`) > -1) {
-        return Promise.resolve(ServicePrincipalObject.servicePrincipalCustomAppWithAppRole);
+      return Promise.resolve(ServicePrincipalObject.servicePrincipalCustomAppWithAppRole);
     }
 
     if ((opts.url as string).indexOf(`/myorganization/servicePrincipals/${InternalRequestStub.microsoftGraphAppId}?api-version=1.6`) > -1) {
@@ -520,6 +525,20 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
     });
   });
 
+  it('retrieves App Role assignments for the specified objectId and outputs text', (done) => {
+    sinon.stub(request, 'get').callsFake(RequestStub.retrieveAppRoles);
+
+    cmdInstance.action({ options: { output: 'text', objectId: CommandActionParameters.objectIdWithRoleAssigments } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(textOutput));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('correctly handles an appId that does not exist', (done) => {
     sinon.stub(request, 'get').callsFake(RequestStub.retrieveAppRoles);
 
@@ -533,7 +552,7 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
       }
     });
   });
-  
+
   it('correctly handles no app role assignments for the specified app', (done) => {
     sinon.stub(request, 'get').callsFake(RequestStub.retrieveAppRoles);
 
@@ -583,8 +602,18 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
     assert.notEqual(actual, true);
   });
 
+  it('fails validation if the objectId is not a valid GUID', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { objectId: '123' } });
+    assert.notEqual(actual, true);
+  });
+
   it('fails validation if both appId and displayName are specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { appId: CommandActionParameters.appIdWithNoRoleAssignments, displayName: CommandActionParameters.appNameWithRoleAssignments } });
+    assert.notEqual(actual, true);
+  })
+
+  it('fails validation if objectId and displayName are specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { displayName: CommandActionParameters.appNameWithRoleAssignments, objectId: CommandActionParameters.objectIdWithRoleAssigments } });
     assert.notEqual(actual, true);
   })
 

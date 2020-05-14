@@ -19,6 +19,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   appId?: string;
   displayName?: string;
+  objectId?: string;
 }
 
 class AadAppRoleAssignmentListCommand extends AadCommand {
@@ -34,6 +35,7 @@ class AadAppRoleAssignmentListCommand extends AadCommand {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.appId = typeof args.options.appId !== 'undefined';
     telemetryProps.displayName = typeof args.options.displayName !== 'undefined';
+    telemetryProps.objectId = typeof args.options.objectId !== 'undefined';
     return telemetryProps;
   }
 
@@ -41,9 +43,16 @@ class AadAppRoleAssignmentListCommand extends AadCommand {
     let sp: ServicePrincipal;
 
     // get the service principal associated with the appId
-    const spMatchQuery: string = args.options.appId ?
-      `appId eq '${encodeURIComponent(args.options.appId)}'` :
-      `displayName eq '${encodeURIComponent(args.options.displayName as string)}'`;
+    let spMatchQuery: string = '';
+    if (args.options.appId) {
+      spMatchQuery = `appId eq '${encodeURIComponent(args.options.appId)}'`;
+    }
+    else if (args.options.objectId) {
+      spMatchQuery = `objectId eq '${encodeURIComponent(args.options.objectId)}'`;
+    }
+    else {
+      spMatchQuery = `displayName eq '${encodeURIComponent(args.options.displayName as string)}'`;
+    }
 
     this
       .getServicePrincipalForApp(spMatchQuery)
@@ -137,6 +146,10 @@ class AadAppRoleAssignmentListCommand extends AadCommand {
       {
         option: '-n, --displayName [displayName]',
         description: 'Display name of the application for which the configured app roles should be retrieved'
+      },
+      {
+        option: '-o, --objectId [objectId]',
+        description: 'ObjectId of the application for which the configured app roles should be retrieved'
       }
     ];
 
@@ -146,16 +159,24 @@ class AadAppRoleAssignmentListCommand extends AadCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.appId && !args.options.displayName) {
-        return 'Specify either appId or displayName';
+      if (!args.options.appId && !args.options.displayName && !args.options.objectId) {
+        return 'Specify either appId, objectId or displayName';
       }
 
       if (args.options.appId && !Utils.isValidGuid(args.options.appId)) {
         return `${args.options.appId} is not a valid GUID`;
       }
 
-      if (args.options.appId && args.options.displayName) {
-        return 'Specify either appId or displayName but not both';
+      if (args.options.objectId && !Utils.isValidGuid(args.options.objectId)) {
+        return `${args.options.objectId} is not a valid GUID`;
+      }
+
+      let optionsSpecified: number = 0;
+      optionsSpecified += args.options.appId ? 1 : 0;
+      optionsSpecified += args.options.displayName ? 1 : 0;
+      optionsSpecified += args.options.objectId ? 1 : 0;
+      if (optionsSpecified > 1) {
+        return 'Specify either appId, objectId or displayName';
       }
 
       return true;
@@ -168,8 +189,9 @@ class AadAppRoleAssignmentListCommand extends AadCommand {
     log(
       `  Remarks:
   
-    Specify either the ${chalk.grey('appId')} or ${chalk.grey('displayName')} but not both. 
-    If you specify both values, the command will fail with an error.
+    Specify either the ${chalk.grey('appId')}, ${chalk.grey('objectId')} or ${chalk.grey('displayName')}. 
+    If you specify more than one option value, the command will fail
+    with an error.
    
   Examples:
   
@@ -180,6 +202,10 @@ class AadAppRoleAssignmentListCommand extends AadCommand {
     List app roles assigned to service principal with Application display name
     ${chalk.grey('MyAppName')}.
       ${commands.APPROLEASSIGNMENT_LIST} --displayName 'MyAppName'
+
+    List app roles assigned to service principal with ObjectId
+    ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531dd')}.
+      ${commands.APPROLEASSIGNMENT_LIST} --objectId b2307a39-e878-458b-bc90-03bc578531dd
 
   More information:
   
