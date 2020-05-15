@@ -7,6 +7,10 @@ export class FN011008_MAN_requiresCustomScript extends ManifestRule {
     return 'FN011008';
   }
 
+  get supersedes(): string[] {
+    return ['FN011009'];
+  }
+
   get title(): string {
     return 'Client-side component manifest requiresCustomScript property';
   }
