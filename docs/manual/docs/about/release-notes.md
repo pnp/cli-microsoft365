@@ -35,6 +35,7 @@
 - fixed issue with logging out after running tests [#1570](https://github.com/pnp/office365-cli/issues/1570)
 - fixed incorrect import suggestions in FN016004 [#1484](https://github.com/pnp/office365-cli/issues/1484)
 - fixed indentation of FN011010 resolution [#1485](https://github.com/pnp/office365-cli/issues/1485)
+- moved SPFx test projects to a common location [#1507](https://github.com/pnp/office365-cli/issues/1507)
 
 ## [v2.9.0](https://github.com/pnp/office365-cli/releases/tag/v2.9.0)
 
