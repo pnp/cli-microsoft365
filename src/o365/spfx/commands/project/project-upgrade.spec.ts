@@ -990,7 +990,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.3', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 5);
+      assert.equal(findings.length, 4);
     });
   });
 
@@ -1000,7 +1000,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.3', debug: true, output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[3];
-      assert.equal(findings.length, 5);
+      assert.equal(findings.length, 4);
     });
   });
 
@@ -2049,6 +2049,16 @@ describe(commands.PROJECT_UPGRADE, () => {
   //#endregion
 
   //#region superseded rules
+  it('ignores superseded findings (1.1.0 > 1.2.0)', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-110-webpart-react'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.2.0', output: 'json' } }, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
+      assert.equal(findings.length, 23);
+    });
+  });
+
   it('ignores superseded findings (1.6.0 > 1.8.0)', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-160-webpart-react'));
 
