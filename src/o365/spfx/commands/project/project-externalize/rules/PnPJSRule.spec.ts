@@ -40,7 +40,7 @@ describe('PnPJsRule', () => {
 
   it('doesnt return a shadow require when the type of component is not recognized', async () => {
     const project: Project = {
-      path: 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-182-webpart-react',
+      path: 'src/o365/spfx/commands/project/test-projects/spfx-182-webpart-react',
       packageJson: {
         dependencies: {
           '@pnp/pnpjs': '1.3.5'

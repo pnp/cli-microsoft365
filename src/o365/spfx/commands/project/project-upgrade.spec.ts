@@ -22,7 +22,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   let packagesDepUn: string[];
   let packagesDevUn: string[];
   let project141webPartNoLib: Project;
-  const projectPath: string = './src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-141-webpart-nolib';
+  const projectPath: string = './src/o365/spfx/commands/project/test-projects/spfx-141-webpart-nolib';
 
   before(() => {
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
@@ -837,7 +837,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('shows error when a upgrade rule failed', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-100-webpart-nolib'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-100-webpart-nolib'));
     (command as any).supportedVersions.splice(1, 0, '0');
 
     cmdInstance.action = command.action();
@@ -848,7 +848,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.0.0 project to 1.0.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-100-webpart-nolib'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-100-webpart-nolib'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.0.1', output: 'json' } }, (err?: any) => {
@@ -858,7 +858,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.0.0 project to 1.0.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-100-webpart-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-100-webpart-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.0.1', output: 'json' } }, (err?: any) => {
@@ -868,7 +868,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading ko web part 1.0.0 project to 1.0.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-100-webpart-ko'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-100-webpart-ko'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.0.1', output: 'json' } }, (err?: any) => {
@@ -878,7 +878,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.0.1 project to 1.0.2', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-101-webpart-nolib'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-101-webpart-nolib'));
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.0.2', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
@@ -887,7 +887,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.0.1 project to 1.0.2', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-101-webpart-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-101-webpart-react'));
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.0.2', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
@@ -896,7 +896,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading ko web part 1.0.1 project to 1.0.2', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-101-webpart-ko'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-101-webpart-ko'));
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.0.2', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
@@ -905,7 +905,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.0.2 project to 1.1.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-102-webpart-nolib'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-102-webpart-nolib'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.0', output: 'json' } }, (err?: any) => {
@@ -915,7 +915,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.0.2 project to 1.1.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-102-webpart-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-102-webpart-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.0', output: 'json' } }, (err?: any) => {
@@ -925,7 +925,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading ko web part 1.0.2 project to 1.1.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-102-webpart-ko'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-102-webpart-ko'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.0', output: 'json' } }, (err?: any) => {
@@ -935,7 +935,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.1.0 project to 1.1.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-110-webpart-nolib'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-110-webpart-nolib'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.1', output: 'json' } }, (err?: any) => {
@@ -945,7 +945,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.1.0 project to 1.1.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-110-webpart-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-110-webpart-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.1', debug: true, output: 'json' } }, (err?: any) => {
@@ -955,7 +955,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading application customizer 1.1.0 project to 1.1.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-110-applicationcustomizer'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-110-applicationcustomizer'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.1', output: 'json' } }, (err?: any) => {
@@ -965,7 +965,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.1.0 project to 1.1.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-110-listviewcommandset'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-110-listviewcommandset'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.1', output: 'json' } }, (err?: any) => {
@@ -975,7 +975,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.1.0 project to 1.1.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-110-fieldcustomizer-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-110-fieldcustomizer-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.1', output: 'json' } }, (err?: any) => {
@@ -985,7 +985,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.1.1 project to 1.1.3', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-111-webpart-nolib'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-111-webpart-nolib'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.3', output: 'json' } }, (err?: any) => {
@@ -995,7 +995,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.1.1 project to 1.1.3', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-111-webpart-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-111-webpart-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.3', debug: true, output: 'json' } }, (err?: any) => {
@@ -1005,7 +1005,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading application customizer 1.1.1 project to 1.1.3', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-111-applicationcustomizer'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-111-applicationcustomizer'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.3', output: 'json' } }, (err?: any) => {
@@ -1015,7 +1015,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.1.1 project to 1.1.3', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-111-listviewcommandset'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-111-listviewcommandset'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.3', output: 'json' } }, (err?: any) => {
@@ -1025,7 +1025,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.1.1 project to 1.1.3', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-111-fieldcustomizer-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-111-fieldcustomizer-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.3', output: 'json' } }, (err?: any) => {
@@ -1035,7 +1035,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.1.3 project to 1.2.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-113-webpart-nolib'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-113-webpart-nolib'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.2.0', output: 'json' } }, (err?: any) => {
@@ -1045,7 +1045,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading knockout web part 1.1.3 project to 1.2.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-113-webpart-ko'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-113-webpart-ko'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.2.0', output: 'json' } }, (err?: any) => {
@@ -1055,7 +1055,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.1.3 project to 1.2.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-113-webpart-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-113-webpart-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.2.0', debug: true, output: 'json' } }, (err?: any) => {
@@ -1065,7 +1065,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading application customizer 1.1.3 project to 1.2.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-113-applicationcustomizer'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-113-applicationcustomizer'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.2.0', output: 'json' } }, (err?: any) => {
@@ -1075,7 +1075,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.1.3 project to 1.2.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-113-listviewcommandset'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-113-listviewcommandset'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.2.0', output: 'json' } }, (err?: any) => {
@@ -1085,7 +1085,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.1.3 project to 1.2.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-113-fieldcustomizer-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-113-fieldcustomizer-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.2.0', output: 'json' } }, (err?: any) => {
@@ -1095,7 +1095,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.2.0 project to 1.3.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-120-webpart-nolib'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-120-webpart-nolib'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.0', output: 'json' } }, (err?: any) => {
@@ -1105,7 +1105,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.2.0 project to 1.3.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-120-webpart-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-120-webpart-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.0', debug: true, output: 'json' } }, (err?: any) => {
@@ -1115,7 +1115,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading application customizer 1.2.0 project to 1.3.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-120-applicationcustomizer'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-120-applicationcustomizer'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.0', output: 'json' } }, (err?: any) => {
@@ -1125,7 +1125,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.2.0 project to 1.3.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-120-listviewcommandset'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-120-listviewcommandset'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.0', output: 'json' } }, (err?: any) => {
@@ -1135,7 +1135,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.2.0 project to 1.3.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-120-fieldcustomizer-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-120-fieldcustomizer-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.0', output: 'json' } }, (err?: any) => {
@@ -1145,7 +1145,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.3.0 project to 1.3.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-130-webpart-nolib'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-130-webpart-nolib'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.1', output: 'json' } }, (err?: any) => {
@@ -1155,7 +1155,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.3.0 project to 1.3.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-130-webpart-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-130-webpart-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.1', debug: true, output: 'json' } }, (err?: any) => {
@@ -1165,7 +1165,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading application customizer 1.3.0 project to 1.3.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-130-applicationcustomizer'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-130-applicationcustomizer'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.1', output: 'json' } }, (err?: any) => {
@@ -1175,7 +1175,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.3.0 project to 1.3.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-130-listviewcommandset'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-130-listviewcommandset'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.1', output: 'json' } }, (err?: any) => {
@@ -1185,7 +1185,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.3.0 project to 1.3.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-130-fieldcustomizer-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-130-fieldcustomizer-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.1', output: 'json' } }, (err?: any) => {
@@ -1195,7 +1195,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.3.1 project to 1.3.2', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-131-webpart-nolib'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-131-webpart-nolib'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.2', output: 'json' } }, (err?: any) => {
@@ -1205,7 +1205,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.3.1 project to 1.3.2', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-131-webpart-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-131-webpart-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.2', debug: true, output: 'json' } }, (err?: any) => {
@@ -1215,7 +1215,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading application customizer 1.3.1 project to 1.3.2', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-131-applicationcustomizer'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-131-applicationcustomizer'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.2', output: 'json' } }, (err?: any) => {
@@ -1225,7 +1225,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.3.1 project to 1.3.2', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-131-listviewcommandset'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-131-listviewcommandset'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.2', output: 'json' } }, (err?: any) => {
@@ -1235,7 +1235,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.3.1 project to 1.3.2', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-131-fieldcustomizer-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-131-fieldcustomizer-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.2', output: 'json' } }, (err?: any) => {
@@ -1245,7 +1245,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.3.2 project to 1.3.4', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-132-webpart-nolib'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-132-webpart-nolib'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.4', output: 'json' } }, (err?: any) => {
@@ -1255,7 +1255,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.3.2 project to 1.3.4', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-132-webpart-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-132-webpart-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.4', debug: true, output: 'json' } }, (err?: any) => {
@@ -1265,7 +1265,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading application customizer 1.3.2 project to 1.3.4', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-132-applicationcustomizer'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-132-applicationcustomizer'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.4', output: 'json' } }, (err?: any) => {
@@ -1275,7 +1275,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.3.2 project to 1.3.4', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-132-listviewcommandset'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-132-listviewcommandset'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.4', output: 'json' } }, (err?: any) => {
@@ -1285,7 +1285,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.3.2 project to 1.3.4', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-132-fieldcustomizer-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-132-fieldcustomizer-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.4', output: 'json' } }, (err?: any) => {
@@ -1295,7 +1295,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.3.4 project to 1.4.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-134-webpart-nolib'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-134-webpart-nolib'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.4.0', output: 'json' } }, (err?: any) => {
@@ -1305,7 +1305,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.3.4 project to 1.4.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-134-webpart-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-134-webpart-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.4.0', output: 'json' } }, (err?: any) => {
@@ -1315,7 +1315,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading application customizer 1.3.4 project to 1.4.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-134-applicationcustomizer'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-134-applicationcustomizer'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.4.0', output: 'json' } }, (err?: any) => {
@@ -1325,7 +1325,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.3.4 project to 1.4.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-134-listviewcommandset'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-134-listviewcommandset'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.4.0', output: 'json' } }, (err?: any) => {
@@ -1335,7 +1335,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.3.4 project to 1.4.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-134-fieldcustomizer-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-134-fieldcustomizer-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.4.0', output: 'json' } }, (err?: any) => {
@@ -1345,7 +1345,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.4.0 project to 1.4.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-140-webpart-nolib'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-140-webpart-nolib'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.4.1', output: 'json' } }, (err?: any) => {
@@ -1355,7 +1355,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.4.0 project to 1.4.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-140-webpart-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-140-webpart-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.4.1', debug: true, output: 'json' } }, (err?: any) => {
@@ -1365,7 +1365,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading application customizer 1.4.0 project to 1.4.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-140-applicationcustomizer'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-140-applicationcustomizer'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.4.1', output: 'json' } }, (err?: any) => {
@@ -1375,7 +1375,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.4.0 project to 1.4.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-140-listviewcommandset'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-140-listviewcommandset'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.4.1', output: 'json' } }, (err?: any) => {
@@ -1385,7 +1385,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.4.0 project to 1.4.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-140-fieldcustomizer-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-140-fieldcustomizer-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.4.1', output: 'json' } }, (err?: any) => {
@@ -1395,7 +1395,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.4.1 project to 1.5.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-141-webpart-nolib'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-141-webpart-nolib'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.5.0', output: 'json' } }, (err?: any) => {
@@ -1405,7 +1405,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.4.1 project to 1.5.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-141-webpart-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-141-webpart-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.5.0', debug: true, output: 'json' } }, (err?: any) => {
@@ -1415,7 +1415,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading application customizer 1.4.1 project to 1.5.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-141-applicationcustomizer'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-141-applicationcustomizer'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.5.0', output: 'json' } }, (err?: any) => {
@@ -1425,7 +1425,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.4.1 project to 1.5.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-141-listviewcommandset'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-141-listviewcommandset'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.5.0', output: 'json' } }, (err?: any) => {
@@ -1435,7 +1435,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.4.1 project to 1.5.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-141-fieldcustomizer-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-141-fieldcustomizer-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.5.0', output: 'json' } }, (err?: any) => {
@@ -1445,7 +1445,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.5.0 project to 1.5.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-150-webpart-nolib'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-150-webpart-nolib'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.5.1', output: 'json' } }, (err?: any) => {
@@ -1455,7 +1455,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.5.0 project to 1.5.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-150-webpart-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-150-webpart-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.5.1', debug: true, output: 'json' } }, (err?: any) => {
@@ -1465,7 +1465,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading application customizer 1.5.0 project to 1.5.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-150-applicationcustomizer'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-150-applicationcustomizer'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.5.1', output: 'json' } }, (err?: any) => {
@@ -1475,7 +1475,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.5.0 project to 1.5.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-150-listviewcommandset'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-150-listviewcommandset'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.5.1', output: 'json' } }, (err?: any) => {
@@ -1485,7 +1485,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.5.0 project to 1.5.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-150-fieldcustomizer-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-150-fieldcustomizer-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.5.1', output: 'json' } }, (err?: any) => {
@@ -1495,7 +1495,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.5.1 project to 1.6.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-151-webpart-nolib'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-151-webpart-nolib'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.6.0', output: 'json' } }, (err?: any) => {
@@ -1505,7 +1505,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.5.1 project using MSGraphClient to 1.6.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-151-webpart-nolib-graph'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-151-webpart-nolib-graph'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.6.0', output: 'json' } }, (err?: any) => {
@@ -1515,7 +1515,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.5.1 project using AadHttpClient to 1.6.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-151-webpart-nolib-aad'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-151-webpart-nolib-aad'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.6.0', output: 'json' } }, (err?: any) => {
@@ -1525,7 +1525,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.5.1 project to 1.6.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-151-webpart-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-151-webpart-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.6.0', output: 'json' } }, (err?: any) => {
@@ -1535,7 +1535,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.5.1 project using MSGraphClient to 1.6.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-151-webpart-react-graph'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-151-webpart-react-graph'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.6.0', output: 'json' } }, (err?: any) => {
@@ -1545,7 +1545,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading application customizer 1.5.1 project to 1.6.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-151-applicationcustomizer'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-151-applicationcustomizer'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.6.0', output: 'json' } }, (err?: any) => {
@@ -1555,7 +1555,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.5.1 project to 1.6.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-151-listviewcommandset'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-151-listviewcommandset'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.6.0', output: 'json' } }, (err?: any) => {
@@ -1565,7 +1565,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.5.1 project to 1.6.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-151-fieldcustomizer-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-151-fieldcustomizer-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.6.0', output: 'json' } }, (err?: any) => {
@@ -1576,7 +1576,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   //#region 1.6.0
   it('e2e: shows correct number of findings for upgrading application customizer 1.6.0 project to 1.7.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-160-applicationcustomizer'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-160-applicationcustomizer'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.0', output: 'json' } }, (err?: any) => {
@@ -1586,7 +1586,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.6.0 project to 1.7.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-160-fieldcustomizer-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-160-fieldcustomizer-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.0', output: 'json' } }, (err?: any) => {
@@ -1596,7 +1596,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.6.0 project to 1.7.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-160-listviewcommandset'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-160-listviewcommandset'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.0', output: 'json' } }, (err?: any) => {
@@ -1606,7 +1606,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading ko web part 1.6.0 project to 1.7.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-160-webpart-ko'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-160-webpart-ko'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.0', output: 'json' } }, (err?: any) => {
@@ -1616,7 +1616,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.6.0 project to 1.7.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-160-webpart-nolib'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-160-webpart-nolib'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.0', output: 'json' } }, (err?: any) => {
@@ -1626,7 +1626,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.6.0 project to 1.7.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-160-webpart-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-160-webpart-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.0', output: 'json' } }, (err?: any) => {
@@ -1636,7 +1636,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: suggests creating small teams app icon using a fixed name for upgrading react web part 1.6.0 project to 1.7.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-160-webpart-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-160-webpart-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.0', output: 'json' } }, (err?: any) => {
@@ -1646,7 +1646,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: suggests creating large teams app icon using a fixed name for upgrading react web part 1.6.0 project to 1.7.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-160-webpart-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-160-webpart-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.0', output: 'json' } }, (err?: any) => {
@@ -1658,7 +1658,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   //#region 1.7.0
   it('e2e: shows correct number of findings for upgrading application customizer 1.7.0 project to 1.7.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-170-applicationcustomizer'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-170-applicationcustomizer'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.1', output: 'json' } }, (err?: any) => {
@@ -1668,7 +1668,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.7.0 project to 1.7.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-170-fieldcustomizer-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-170-fieldcustomizer-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.1', output: 'json' } }, (err?: any) => {
@@ -1678,7 +1678,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.7.0 project to 1.7.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-170-listviewcommandset'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-170-listviewcommandset'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.1', output: 'json' } }, (err?: any) => {
@@ -1688,7 +1688,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading ko web part 1.7.0 project to 1.7.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-170-webpart-ko'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-170-webpart-ko'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.1', output: 'json' } }, (err?: any) => {
@@ -1698,7 +1698,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.7.0 project to 1.7.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-170-webpart-nolib'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-170-webpart-nolib'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.1', output: 'json' } }, (err?: any) => {
@@ -1708,7 +1708,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.7.0 project to 1.7.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-170-webpart-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-170-webpart-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.1', output: 'json' } }, (err?: any) => {
@@ -1720,7 +1720,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   //#region 1.7.1
   it('e2e: shows correct number of findings for upgrading application customizer 1.7.1 project to 1.8.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-171-applicationcustomizer'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-171-applicationcustomizer'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.0', output: 'json' } }, (err?: any) => {
@@ -1730,7 +1730,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.7.1 project to 1.8.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-171-fieldcustomizer-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-171-fieldcustomizer-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.0', output: 'json' } }, (err?: any) => {
@@ -1740,7 +1740,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.7.1 project to 1.8.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-171-listviewcommandset'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-171-listviewcommandset'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.0', output: 'json' } }, (err?: any) => {
@@ -1750,7 +1750,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading ko web part 1.7.1 project to 1.8.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-171-webpart-ko'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-171-webpart-ko'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.0', output: 'json' } }, (err?: any) => {
@@ -1760,7 +1760,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.7.1 project to 1.8.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-171-webpart-nolib'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-171-webpart-nolib'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.0', output: 'json' } }, (err?: any) => {
@@ -1770,7 +1770,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.7.1 project to 1.8.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-171-webpart-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-171-webpart-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.0', output: 'json' } }, (err?: any) => {
@@ -1780,7 +1780,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: suggests creating small teams app icon using a dynamic name for upgrading react web part 1.7.1 project to 1.8.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-171-webpart-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-171-webpart-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.0', output: 'json' } }, (err?: any) => {
@@ -1790,7 +1790,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: suggests creating large teams app icon using a dynamic name for upgrading react web part 1.7.1 project to 1.8.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-171-webpart-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-171-webpart-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.0', output: 'json' } }, (err?: any) => {
@@ -1802,7 +1802,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   //#region 1.8.0
   it('e2e: shows correct number of findings for upgrading application customizer 1.8.0 project to 1.8.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-180-applicationcustomizer'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-180-applicationcustomizer'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.1', output: 'json' } }, (err?: any) => {
@@ -1812,7 +1812,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.8.0 project to 1.8.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-180-fieldcustomizer-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-180-fieldcustomizer-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.1', output: 'json' } }, (err?: any) => {
@@ -1822,7 +1822,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.8.0 project to 1.8.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-180-listviewcommandset'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-180-listviewcommandset'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.1', output: 'json' } }, (err?: any) => {
@@ -1832,7 +1832,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading ko web part 1.8.0 project to 1.8.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-180-webpart-ko'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-180-webpart-ko'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.1', output: 'json' } }, (err?: any) => {
@@ -1842,7 +1842,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.8.0 project to 1.8.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-180-webpart-nolib'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-180-webpart-nolib'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.1', output: 'json' } }, (err?: any) => {
@@ -1852,7 +1852,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.8.0 project to 1.8.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-180-webpart-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-180-webpart-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.1', output: 'json' } }, (err?: any) => {
@@ -1864,7 +1864,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   //#region 1.8.1
   it('e2e: shows correct number of findings for upgrading application customizer 1.8.1 project to 1.8.2', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-181-applicationcustomizer'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-181-applicationcustomizer'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.2', output: 'json' } }, (err?: any) => {
@@ -1874,7 +1874,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.8.1 project to 1.8.2', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-181-fieldcustomizer-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-181-fieldcustomizer-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.2', output: 'json' } }, (err?: any) => {
@@ -1884,7 +1884,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.8.1 project to 1.8.2', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-181-listviewcommandset'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-181-listviewcommandset'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.2', output: 'json' } }, (err?: any) => {
@@ -1894,7 +1894,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading ko web part 1.8.1 project to 1.8.2', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-181-webpart-ko'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-181-webpart-ko'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.2', output: 'json' } }, (err?: any) => {
@@ -1904,7 +1904,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.8.1 project to 1.8.2', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-181-webpart-nolib'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-181-webpart-nolib'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.2', output: 'json' } }, (err?: any) => {
@@ -1914,7 +1914,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.8.1 project to 1.8.2', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-181-webpart-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-181-webpart-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.2', output: 'json' } }, (err?: any) => {
@@ -1926,7 +1926,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   //#region 1.8.2
   it('e2e: shows correct number of findings for upgrading application customizer 1.8.2 project to 1.9.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-182-applicationcustomizer'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-182-applicationcustomizer'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.9.1', output: 'json' } }, (err?: any) => {
@@ -1936,7 +1936,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.8.2 project to 1.9.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-182-fieldcustomizer-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-182-fieldcustomizer-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.9.1', output: 'json' } }, (err?: any) => {
@@ -1946,7 +1946,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.8.2 project to 1.9.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-182-listviewcommandset'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-182-listviewcommandset'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.9.1', output: 'json' } }, (err?: any) => {
@@ -1956,7 +1956,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading ko web part 1.8.2 project to 1.9.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-182-webpart-ko'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-182-webpart-ko'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.9.1', output: 'json' } }, (err?: any) => {
@@ -1966,7 +1966,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.8.2 project to 1.9.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-182-webpart-nolib'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-182-webpart-nolib'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.9.1', output: 'json' } }, (err?: any) => {
@@ -1976,7 +1976,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.8.2 project to 1.9.1', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-182-webpart-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-182-webpart-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.9.1', output: 'json' } }, (err?: any) => {
@@ -1988,7 +1988,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   //#region 1.9.1
   it('e2e: shows correct number of findings for upgrading application customizer 1.9.1 project to 1.10.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-191-applicationcustomizer'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-191-applicationcustomizer'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.10.0', output: 'json' } }, (err?: any) => {
@@ -1998,7 +1998,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.9.1 project to 1.10.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-191-fieldcustomizer-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-191-fieldcustomizer-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.10.0', output: 'json' } }, (err?: any) => {
@@ -2008,7 +2008,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading list view command set 1.9.1 project to 1.10.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-191-listviewcommandset'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-191-listviewcommandset'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.10.0', output: 'json' } }, (err?: any) => {
@@ -2018,7 +2018,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading ko web part 1.9.1 project to 1.10.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-191-webpart-ko'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-191-webpart-ko'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.10.0', output: 'json' } }, (err?: any) => {
@@ -2028,7 +2028,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.9.1 project to 1.10.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-191-webpart-nolib'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-191-webpart-nolib'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.10.0', output: 'json' } }, (err?: any) => {
@@ -2038,7 +2038,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.9.1 project to 1.10.0', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-191-webpart-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-191-webpart-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.10.0', output: 'json' } }, (err?: any) => {
@@ -2050,7 +2050,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   //#region superseded rules
   it('ignores superseded findings (1.6.0 > 1.8.0)', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-160-webpart-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-160-webpart-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.0', output: 'json' } }, (err?: any) => {
@@ -2060,7 +2060,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('ignores superseded findings (1.7.1 > 1.8.2)', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-171-webpart-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-171-webpart-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.2', output: 'json' } }, (err?: any) => {
@@ -2070,7 +2070,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('ignores superseded findings (1.4.1 > 1.6.0)', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-141-webpart-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-141-webpart-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.6.0', output: 'json' } }, (err?: any) => {
@@ -2081,7 +2081,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   //#endregion
 
   it('shows all information with output format json', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-151-fieldcustomizer-react'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-151-fieldcustomizer-react'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { output: 'json' } }, (err?: any) => {
@@ -2090,7 +2090,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('returns markdown report with output format md', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-151-webpart-react-graph'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-151-webpart-react-graph'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { output: 'md', toVersion: '1.6.0' } }, (err?: any) => {
@@ -2099,7 +2099,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('returns text report with output format default', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-151-webpart-react-graph'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-151-webpart-react-graph'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.6.0' } }, (err?: any) => {
@@ -2108,7 +2108,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('writes upgrade report to file when outputFile specified', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-151-webpart-react-graph'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-151-webpart-react-graph'));
     const writeFileSyncSpy: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
 
     cmdInstance.action = command.action();
@@ -2118,7 +2118,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('writes JSON upgrade report to file when outputFile specified in json output mode', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-151-webpart-react-graph'));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-151-webpart-react-graph'));
     let typeofReport: string = '';
     sinon.stub(fs, 'writeFileSync').callsFake((path, contents: any) => {
       typeofReport = typeof contents;
