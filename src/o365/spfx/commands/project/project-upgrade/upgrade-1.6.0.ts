@@ -20,6 +20,7 @@ import { FN015005_FILE_src_index_ts } from "./rules/FN015005_FILE_src_index_ts";
 import { FN016001_TS_msgraphclient_packageName } from "./rules/FN016001_TS_msgraphclient_packageName";
 import { FN016002_TS_msgraphclient_instance } from "./rules/FN016002_TS_msgraphclient_instance";
 import { FN016003_TS_aadhttpclient_instance } from "./rules/FN016003_TS_aadhttpclient_instance";
+import { FN001023_DEP_microsoft_sp_component_base } from "./rules/FN001023_DEP_microsoft_sp_component_base";
 
 module.exports = [
   new FN001001_DEP_microsoft_sp_core_library('1.6.0'),
@@ -30,6 +31,7 @@ module.exports = [
   new FN001012_DEP_microsoft_sp_application_base('1.6.0'),
   new FN001013_DEP_microsoft_decorators('1.6.0'),
   new FN001014_DEP_microsoft_sp_listview_extensibility('1.6.0'),
+  new FN001023_DEP_microsoft_sp_component_base('1.6.0'),
   new FN002001_DEVDEP_microsoft_sp_build_web('1.6.0'),
   new FN002002_DEVDEP_microsoft_sp_module_interfaces('1.6.0'),
   new FN002003_DEVDEP_microsoft_sp_webpart_workbench('1.6.0'),

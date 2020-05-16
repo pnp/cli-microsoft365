@@ -16,6 +16,7 @@ import { FN002012_DEVDEP_microsoft_rush_stack_compiler_3_3 } from "./rules/FN002
 import { FN012017_TSC_extends } from "./rules/FN012017_TSC_extends";
 import { FN016004_TS_property_pane_property_import } from "./rules/FN016004_TS_property_pane_property_import";
 import { FN002011_DEVDEP_microsoft_rush_stack_compiler_2_9 } from "./rules/FN002011_DEVDEP_microsoft_rush_stack_compiler_2_9";
+import { FN001023_DEP_microsoft_sp_component_base } from "./rules/FN001023_DEP_microsoft_sp_component_base";
 
 module.exports = [
   new FN001001_DEP_microsoft_sp_core_library('1.10.0'),
@@ -27,6 +28,7 @@ module.exports = [
   new FN001013_DEP_microsoft_decorators('1.10.0'),
   new FN001014_DEP_microsoft_sp_listview_extensibility('1.10.0'),
   new FN001021_DEP_microsoft_sp_property_pane('1.10.0'),
+  new FN001023_DEP_microsoft_sp_component_base('1.10.0'),
   new FN002001_DEVDEP_microsoft_sp_build_web('1.10.0'),
   new FN002002_DEVDEP_microsoft_sp_module_interfaces('1.10.0'),
   new FN002003_DEVDEP_microsoft_sp_webpart_workbench('1.10.0'),

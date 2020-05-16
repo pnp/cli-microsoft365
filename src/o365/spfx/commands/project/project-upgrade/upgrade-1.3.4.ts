@@ -13,6 +13,7 @@ import { FN010001_YORC_version } from "./rules/FN010001_YORC_version";
 import { FN002007_DEVDEP_ajv } from "./rules/FN002007_DEVDEP_ajv";
 import { FN014002_CODE_extensions } from "./rules/FN014002_CODE_extensions";
 import { FN014003_CODE_launch } from "./rules/FN014003_CODE_launch";
+import { FN001023_DEP_microsoft_sp_component_base } from "./rules/FN001023_DEP_microsoft_sp_component_base";
 
 module.exports = [
   new FN001001_DEP_microsoft_sp_core_library('1.3.4'),
@@ -23,6 +24,7 @@ module.exports = [
   new FN001012_DEP_microsoft_sp_application_base('1.3.4'),
   new FN001013_DEP_microsoft_decorators('1.3.4'),
   new FN001014_DEP_microsoft_sp_listview_extensibility('1.3.4'),
+  new FN001023_DEP_microsoft_sp_component_base('1.3.4'),
   new FN002001_DEVDEP_microsoft_sp_build_web('1.3.4'),
   new FN002002_DEVDEP_microsoft_sp_module_interfaces('1.3.4'),
   new FN002003_DEVDEP_microsoft_sp_webpart_workbench('1.3.4'),

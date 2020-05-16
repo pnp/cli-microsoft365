@@ -20,6 +20,7 @@ import { FN015001_FILE_typings_tsd_d_ts } from "./rules/FN015001_FILE_typings_ts
 import { FN010005_YORC_environment } from "./rules/FN010005_YORC_environment";
 import { FN010006_YORC_framework } from "./rules/FN010006_YORC_framework";
 import { FN015002_FILE_typings__ms_odsp_d_ts } from "./rules/FN015002_FILE_typings__ms_odsp_d_ts";
+import { FN001023_DEP_microsoft_sp_component_base } from "./rules/FN001023_DEP_microsoft_sp_component_base";
 
 module.exports = [
   new FN001001_DEP_microsoft_sp_core_library('1.1.0'),
@@ -32,6 +33,7 @@ module.exports = [
   new FN001016_DEP_types_react_addons_update('0.14.14', true),
   new FN001017_DEP_types_react_addons_test_utils('0.14.15', true),
   new FN001018_DEP_microsoft_sp_client_base('', false),
+  new FN001023_DEP_microsoft_sp_component_base('1.1.0'),
   new FN002001_DEVDEP_microsoft_sp_build_web('1.1.0'),
   new FN002002_DEVDEP_microsoft_sp_module_interfaces('1.1.0'),
   new FN002003_DEVDEP_microsoft_sp_webpart_workbench('1.1.0'),

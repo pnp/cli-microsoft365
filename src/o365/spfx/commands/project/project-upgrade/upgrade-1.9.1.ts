@@ -22,6 +22,7 @@ import { FN001008_DEP_react } from "./rules/FN001008_DEP_react";
 import { FN001009_DEP_react_dom } from "./rules/FN001009_DEP_react_dom";
 import { FN022001_SCSS_remove_fabric_react } from "./rules/FN022001_SCSS_remove_fabric_react";
 import { FN022002_SCSS_add_fabric_react } from "./rules/FN022002_SCSS_add_fabric_react";
+import { FN001023_DEP_microsoft_sp_component_base } from "./rules/FN001023_DEP_microsoft_sp_component_base";
 
 module.exports = [
   new FN001001_DEP_microsoft_sp_core_library('1.9.1'),
@@ -36,6 +37,7 @@ module.exports = [
   new FN001013_DEP_microsoft_decorators('1.9.1'),
   new FN001014_DEP_microsoft_sp_listview_extensibility('1.9.1'),
   new FN001022_DEP_office_ui_fabric_react('6.189.2'),
+  new FN001023_DEP_microsoft_sp_component_base('1.9.1'),
   new FN002001_DEVDEP_microsoft_sp_build_web('1.9.1'),
   new FN002002_DEVDEP_microsoft_sp_module_interfaces('1.9.1'),
   new FN002003_DEVDEP_microsoft_sp_webpart_workbench('1.9.1'),

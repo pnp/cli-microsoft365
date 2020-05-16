@@ -847,6 +847,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     });
   });
 
+  //#region 1.0.0
   it('e2e: shows correct number of findings for upgrading no framework web part 1.0.0 project to 1.0.1', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-100-webpart-nolib'));
 
@@ -877,6 +878,18 @@ describe(commands.PROJECT_UPGRADE, () => {
     });
   });
 
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.0.0 project to 1.0.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-100-webpart-optionaldeps'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.0.1', output: 'json' } }, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
+      assert.equal(findings.length, 3);
+    });
+  });
+  //#endregion
+
+  //#region 1.0.1
   it('e2e: shows correct number of findings for upgrading no framework web part 1.0.1 project to 1.0.2', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-101-webpart-nolib'));
     cmdInstance.action = command.action();
@@ -904,6 +917,17 @@ describe(commands.PROJECT_UPGRADE, () => {
     });
   });
 
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.0.1 project to 1.0.2', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-101-webpart-optionaldeps'));
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.0.2', output: 'json' } }, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
+      assert.equal(findings.length, 2);
+    });
+  });
+  //#endregion
+
+  //#region 1.0.2
   it('e2e: shows correct number of findings for upgrading no framework web part 1.0.2 project to 1.1.0', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-102-webpart-nolib'));
 
@@ -934,6 +958,18 @@ describe(commands.PROJECT_UPGRADE, () => {
     });
   });
 
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.0.2 project to 1.1.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-102-webpart-optionaldeps'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.1.0', output: 'json' } }, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
+      assert.equal(findings.length, 17);
+    });
+  });
+  //#endregion
+
+  //#region 1.1.0
   it('e2e: shows correct number of findings for upgrading no framework web part 1.1.0 project to 1.1.1', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-110-webpart-nolib'));
 
@@ -946,6 +982,16 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   it('e2e: shows correct number of findings for upgrading react web part 1.1.0 project to 1.1.1', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-110-webpart-react'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.1.1', debug: true, output: 'json' } }, (err?: any) => {
+      const findings: Finding[] = log[3];
+      assert.equal(findings.length, 3);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.1.0 project to 1.1.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-110-webpart-optionaldeps'));
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.1', debug: true, output: 'json' } }, (err?: any) => {
@@ -983,7 +1029,9 @@ describe(commands.PROJECT_UPGRADE, () => {
       assert.equal(findings.length, 5);
     });
   });
+  //#endregion
 
+  //#region 1.1.1
   it('e2e: shows correct number of findings for upgrading no framework web part 1.1.1 project to 1.1.3', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-111-webpart-nolib'));
 
@@ -1000,6 +1048,16 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.3', debug: true, output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[3];
+      assert.equal(findings.length, 5);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.1.1 project to 1.1.3', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-111-webpart-optionaldeps'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.1.3', output: 'json' } }, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
       assert.equal(findings.length, 5);
     });
   });
@@ -1033,7 +1091,9 @@ describe(commands.PROJECT_UPGRADE, () => {
       assert.equal(findings.length, 4);
     });
   });
+  //#endregion
 
+  //#region 1.1.3
   it('e2e: shows correct number of findings for upgrading no framework web part 1.1.3 project to 1.2.0', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-113-webpart-nolib'));
 
@@ -1041,6 +1101,16 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action({ options: { toVersion: '1.2.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
       assert.equal(findings.length, 21);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.1.3 project to 1.2.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-113-webpart-optionaldeps'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.2.0', output: 'json' } }, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
+      assert.equal(findings.length, 22);
     });
   });
 
@@ -1093,7 +1163,9 @@ describe(commands.PROJECT_UPGRADE, () => {
       assert.equal(findings.length, 24);
     });
   });
+  //#endregion
 
+  //#region 1.2.0
   it('e2e: shows correct number of findings for upgrading no framework web part 1.2.0 project to 1.3.0', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-120-webpart-nolib'));
 
@@ -1111,6 +1183,16 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action({ options: { toVersion: '1.3.0', debug: true, output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[3];
       assert.equal(findings.length, 8);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.2.0 project to 1.3.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-120-webpart-optionaldeps'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.3.0', output: 'json' } }, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
+      assert.equal(findings.length, 9);
     });
   });
 
@@ -1143,7 +1225,9 @@ describe(commands.PROJECT_UPGRADE, () => {
       assert.equal(findings.length, 9);
     });
   });
+  //#endregion
 
+  //#region 1.3.0
   it('e2e: shows correct number of findings for upgrading no framework web part 1.3.0 project to 1.3.1', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-130-webpart-nolib'));
 
@@ -1160,6 +1244,16 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.1', debug: true, output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[3];
+      assert.equal(findings.length, 1);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.3.0 project to 1.3.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-130-webpart-optionaldeps'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.3.1', output: 'json' } }, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
       assert.equal(findings.length, 1);
     });
   });
@@ -1193,7 +1287,9 @@ describe(commands.PROJECT_UPGRADE, () => {
       assert.equal(findings.length, 1);
     });
   });
+  //#endregion
 
+  //#region 1.3.1
   it('e2e: shows correct number of findings for upgrading no framework web part 1.3.1 project to 1.3.2', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-131-webpart-nolib'));
 
@@ -1210,6 +1306,16 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.2', debug: true, output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[3];
+      assert.equal(findings.length, 1);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.3.1 project to 1.3.2', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-131-webpart-optionaldeps'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.3.2', output: 'json' } }, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
       assert.equal(findings.length, 1);
     });
   });
@@ -1243,7 +1349,9 @@ describe(commands.PROJECT_UPGRADE, () => {
       assert.equal(findings.length, 1);
     });
   });
+  //#endregion
 
+  //#region 1.3.2
   it('e2e: shows correct number of findings for upgrading no framework web part 1.3.2 project to 1.3.4', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-132-webpart-nolib'));
 
@@ -1261,6 +1369,16 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action({ options: { toVersion: '1.3.4', debug: true, output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[3];
       assert.equal(findings.length, 11);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.3.2 project to 1.3.4', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-132-webpart-optionaldeps'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.3.4', output: 'json' } }, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
+      assert.equal(findings.length, 12);
     });
   });
 
@@ -1293,7 +1411,9 @@ describe(commands.PROJECT_UPGRADE, () => {
       assert.equal(findings.length, 11);
     });
   });
+  //#endregion
 
+  //#region 1.3.4
   it('e2e: shows correct number of findings for upgrading no framework web part 1.3.4 project to 1.4.0', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-134-webpart-nolib'));
 
@@ -1311,6 +1431,16 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action({ options: { toVersion: '1.4.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
       assert.equal(findings.length, 26);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.3.4 project to 1.4.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-134-webpart-optionaldeps'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.4.0', output: 'json' } }, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
+      assert.equal(findings.length, 20);
     });
   });
 
@@ -1343,7 +1473,9 @@ describe(commands.PROJECT_UPGRADE, () => {
       assert.equal(findings.length, 25);
     });
   });
+  //#endregion
 
+  //#region 1.4.0
   it('e2e: shows correct number of findings for upgrading no framework web part 1.4.0 project to 1.4.1', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-140-webpart-nolib'));
 
@@ -1361,6 +1493,16 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action({ options: { toVersion: '1.4.1', debug: true, output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[3];
       assert.equal(findings.length, 9);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.4.0 project to 1.4.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-140-webpart-optionaldeps'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.4.1', output: 'json' } }, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
+      assert.equal(findings.length, 10);
     });
   });
 
@@ -1393,7 +1535,9 @@ describe(commands.PROJECT_UPGRADE, () => {
       assert.equal(findings.length, 8);
     });
   });
+  //#endregion
 
+  //#region 1.4.1
   it('e2e: shows correct number of findings for upgrading no framework web part 1.4.1 project to 1.5.0', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-141-webpart-nolib'));
 
@@ -1411,6 +1555,16 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action({ options: { toVersion: '1.5.0', debug: true, output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[3];
       assert.equal(findings.length, 26);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.4.1 project to 1.5.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-141-webpart-optionaldeps'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.5.0', output: 'json' } }, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
+      assert.equal(findings.length, 27);
     });
   });
 
@@ -1443,7 +1597,9 @@ describe(commands.PROJECT_UPGRADE, () => {
       assert.equal(findings.length, 25);
     });
   });
+  //#endregion
 
+  //#region 1.5.0
   it('e2e: shows correct number of findings for upgrading no framework web part 1.5.0 project to 1.5.1', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-150-webpart-nolib'));
 
@@ -1461,6 +1617,16 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action({ options: { toVersion: '1.5.1', debug: true, output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[3];
       assert.equal(findings.length, 9);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.5.0 project to 1.5.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-150-webpart-optionaldeps'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.5.1', output: 'json' } }, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
+      assert.equal(findings.length, 10);
     });
   });
 
@@ -1493,7 +1659,9 @@ describe(commands.PROJECT_UPGRADE, () => {
       assert.equal(findings.length, 8);
     });
   });
+  //#endregion
 
+  //#region 1.5.1
   it('e2e: shows correct number of findings for upgrading no framework web part 1.5.1 project to 1.6.0', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-151-webpart-nolib'));
 
@@ -1544,6 +1712,16 @@ describe(commands.PROJECT_UPGRADE, () => {
     });
   });
 
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.5.1 project to 1.6.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-151-webpart-optionaldeps'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.6.0', output: 'json' } }, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
+      assert.equal(findings.length, 17);
+    });
+  });
+
   it('e2e: shows correct number of findings for upgrading application customizer 1.5.1 project to 1.6.0', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-151-applicationcustomizer'));
 
@@ -1573,6 +1751,7 @@ describe(commands.PROJECT_UPGRADE, () => {
       assert.equal(findings.length, 15);
     });
   });
+  //#endregion
 
   //#region 1.6.0
   it('e2e: shows correct number of findings for upgrading application customizer 1.6.0 project to 1.7.0', () => {
@@ -1632,6 +1811,16 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action({ options: { toVersion: '1.7.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
       assert.equal(findings.length, 23);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.6.0 project to 1.7.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-160-webpart-optionaldeps'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.7.0', output: 'json' } }, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
+      assert.equal(findings.length, 20);
     });
   });
 
@@ -1716,6 +1905,16 @@ describe(commands.PROJECT_UPGRADE, () => {
       assert.equal(findings.length, 13);
     });
   });
+
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.7.0 project to 1.7.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-170-webpart-optionaldeps'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.7.1', output: 'json' } }, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
+      assert.equal(findings.length, 13);
+    });
+  });
   //#endregion
 
   //#region 1.7.1
@@ -1776,6 +1975,16 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action({ options: { toVersion: '1.8.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
       assert.equal(findings.length, 23);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.7.1 project to 1.8.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-171-webpart-optionaldeps'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.8.0', output: 'json' } }, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
+      assert.equal(findings.length, 22);
     });
   });
 
@@ -1860,6 +2069,16 @@ describe(commands.PROJECT_UPGRADE, () => {
       assert.equal(findings.length, 11);
     });
   });
+
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.8.0 project to 1.8.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-180-webpart-optionaldeps'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.8.1', output: 'json' } }, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
+      assert.equal(findings.length, 12);
+    });
+  });
   //#endregion
 
   //#region 1.8.1
@@ -1920,6 +2139,16 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action({ options: { toVersion: '1.8.2', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
       assert.equal(findings.length, 17);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.8.1 project to 1.8.2', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-181-webpart-optionaldeps'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.8.2', output: 'json' } }, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
+      assert.equal(findings.length, 14);
     });
   });
   //#endregion
@@ -1984,6 +2213,16 @@ describe(commands.PROJECT_UPGRADE, () => {
       assert.equal(findings.length, 21);
     });
   });
+
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.8.2 project to 1.9.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-182-webpart-optionaldeps'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.9.1', output: 'json' } }, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
+      assert.equal(findings.length, 14);
+    });
+  });
   //#endregion
 
   //#region 1.9.1
@@ -2044,6 +2283,16 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action({ options: { toVersion: '1.10.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
       assert.equal(findings.length, 14);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.9.1 project to 1.10.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-191-webpart-optionaldeps'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.10.0', output: 'json' } }, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
+      assert.equal(findings.length, 15);
     });
   });
   //#endregion
