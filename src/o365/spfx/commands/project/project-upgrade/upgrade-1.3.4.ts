@@ -15,6 +15,7 @@ import { FN014002_CODE_extensions } from "./rules/FN014002_CODE_extensions";
 import { FN014003_CODE_launch } from "./rules/FN014003_CODE_launch";
 import { FN001023_DEP_microsoft_sp_component_base } from "./rules/FN001023_DEP_microsoft_sp_component_base";
 import { FN001026_DEP_microsoft_sp_extension_base } from "./rules/FN001026_DEP_microsoft_sp_extension_base";
+import { FN001027_DEP_microsoft_sp_http } from "./rules/FN001027_DEP_microsoft_sp_http";
 
 module.exports = [
   new FN001001_DEP_microsoft_sp_core_library('1.3.4'),
@@ -27,6 +28,7 @@ module.exports = [
   new FN001014_DEP_microsoft_sp_listview_extensibility('1.3.4'),
   new FN001023_DEP_microsoft_sp_component_base('1.3.4'),
   new FN001026_DEP_microsoft_sp_extension_base('1.3.4'),
+  new FN001027_DEP_microsoft_sp_http('1.3.4'),
   new FN002001_DEVDEP_microsoft_sp_build_web('1.3.4'),
   new FN002002_DEVDEP_microsoft_sp_module_interfaces('1.3.4'),
   new FN002003_DEVDEP_microsoft_sp_webpart_workbench('1.3.4'),
