@@ -489,6 +489,7 @@ nav:
       - 'Inventory Flows By Owner' : 'sample-scripts/flow/inventory-flows-by-author.md'
     - SharePoint Online:
       - 'Add App Catalog to SharePoint site': 'sample-scripts/spo/add-app-catalog.md'
+      - 'Add custom client-side web part to modern page': 'sample-scripts/spo/add-custom-clientside-webpart-to-modern-page.md'
       - 'Delete all (non-group connected) modern SharePoint sites': 'sample-scripts/spo/delete-non-group-connected-modern-sites.md'
       - 'Delete custom color themes from SharePoint': 'sample-scripts/spo/remove-custom-themes.md'
       - 'Delete custom SharePoint site designs': 'sample-scripts/spo/remove-site-designs.md'
