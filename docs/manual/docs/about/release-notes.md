@@ -37,6 +37,11 @@
 - fixed indentation of FN011010 resolution [#1485](https://github.com/pnp/office365-cli/issues/1485)
 - moved SPFx test projects to a common location [#1507](https://github.com/pnp/office365-cli/issues/1507)
 - added suggesting upgrading dependency @microsoft/sp-component-base [#1512](https://github.com/pnp/office365-cli/issues/1512)
+- made FN011008 supersede FN011009 [#1510](https://github.com/pnp/office365-cli/issues/1510)
+- added FN017001 to the summary [#1511](https://github.com/pnp/office365-cli/issues/1511)
+- added suggesting upgrading dependency @microsoft/sp-diagnostics [#1513](https://github.com/pnp/office365-cli/issues/1513)
+- added suggesting upgrading dependency @microsoft/sp-dynamic-data [#1514](https://github.com/pnp/office365-cli/issues/1514)
+- added suggesting upgrading dependency @microsoft/sp-extension-base [#1515](https://github.com/pnp/office365-cli/issues/1515)
 
 ## [v2.9.0](https://github.com/pnp/office365-cli/releases/tag/v2.9.0)
 
