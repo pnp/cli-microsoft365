@@ -14,6 +14,7 @@ import { FN002009_DEVDEP_microsoft_sp_tslint_rules } from "./rules/FN002009_DEVD
 import { FN001021_DEP_microsoft_sp_property_pane } from "./rules/FN001021_DEP_microsoft_sp_property_pane";
 import { FN001023_DEP_microsoft_sp_component_base } from "./rules/FN001023_DEP_microsoft_sp_component_base";
 import { FN001024_DEP_microsoft_sp_diagnostics } from "./rules/FN001024_DEP_microsoft_sp_diagnostics";
+import { FN001025_DEP_microsoft_sp_dynamic_data } from "./rules/FN001025_DEP_microsoft_sp_dynamic_data";
 
 module.exports = [
   new FN001001_DEP_microsoft_sp_core_library('1.8.1'),
@@ -27,6 +28,7 @@ module.exports = [
   new FN001014_DEP_microsoft_sp_listview_extensibility('1.8.1'),
   new FN001023_DEP_microsoft_sp_component_base('1.8.1'),
   new FN001024_DEP_microsoft_sp_diagnostics('1.8.1'),
+  new FN001025_DEP_microsoft_sp_dynamic_data('1.8.1'),
   new FN002001_DEVDEP_microsoft_sp_build_web('1.8.1'),
   new FN002002_DEVDEP_microsoft_sp_module_interfaces('1.8.1'),
   new FN002003_DEVDEP_microsoft_sp_webpart_workbench('1.8.1'),
