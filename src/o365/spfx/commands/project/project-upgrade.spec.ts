@@ -1626,7 +1626,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.5.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 10);
+      assert.equal(findings.length, 11);
     });
   });
 
@@ -1718,7 +1718,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.6.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 17);
+      assert.equal(findings.length, 18);
     });
   });
 
@@ -1820,7 +1820,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 20);
+      assert.equal(findings.length, 21);
     });
   });
 
@@ -1912,7 +1912,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 13);
+      assert.equal(findings.length, 14);
     });
   });
   //#endregion
@@ -1984,7 +1984,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 22);
+      assert.equal(findings.length, 23);
     });
   });
 
@@ -2076,7 +2076,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 12);
+      assert.equal(findings.length, 13);
     });
   });
   //#endregion
@@ -2148,7 +2148,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.2', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 14);
+      assert.equal(findings.length, 15);
     });
   });
   //#endregion
@@ -2220,7 +2220,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.9.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 14);
+      assert.equal(findings.length, 15);
     });
   });
   //#endregion
@@ -2292,7 +2292,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.10.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 15);
+      assert.equal(findings.length, 16);
     });
   });
   //#endregion

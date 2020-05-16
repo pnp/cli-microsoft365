@@ -15,6 +15,7 @@ import { FN014006_CODE_launch_sourceMapPathOverrides } from "./rules/FN014006_CO
 import { FN020001_RES_types_react } from "./rules/FN020001_RES_types_react";
 import { FN018005_TEAMS_deprecated_manifest } from "./rules/FN018005_TEAMS_deprecated_manifest";
 import { FN001023_DEP_microsoft_sp_component_base } from "./rules/FN001023_DEP_microsoft_sp_component_base";
+import { FN001024_DEP_microsoft_sp_diagnostics } from "./rules/FN001024_DEP_microsoft_sp_diagnostics";
 
 module.exports = [
   new FN001001_DEP_microsoft_sp_core_library('1.7.1'),
@@ -26,6 +27,7 @@ module.exports = [
   new FN001013_DEP_microsoft_decorators('1.7.1'),
   new FN001014_DEP_microsoft_sp_listview_extensibility('1.7.1'),
   new FN001023_DEP_microsoft_sp_component_base('1.7.1'),
+  new FN001024_DEP_microsoft_sp_diagnostics('1.7.1'),
   new FN002001_DEVDEP_microsoft_sp_build_web('1.7.1'),
   new FN002002_DEVDEP_microsoft_sp_module_interfaces('1.7.1'),
   new FN002003_DEVDEP_microsoft_sp_webpart_workbench('1.7.1'),

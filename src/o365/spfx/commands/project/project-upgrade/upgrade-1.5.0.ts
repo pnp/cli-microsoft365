@@ -31,6 +31,7 @@ import { FN011004_MAN_fieldCustomizer_schema } from "./rules/FN011004_MAN_fieldC
 import { FN012001_TSC_module } from "./rules/FN012001_TSC_module";
 import { FN012002_TSC_moduleResolution } from "./rules/FN012002_TSC_moduleResolution";
 import { FN001023_DEP_microsoft_sp_component_base } from "./rules/FN001023_DEP_microsoft_sp_component_base";
+import { FN001024_DEP_microsoft_sp_diagnostics } from "./rules/FN001024_DEP_microsoft_sp_diagnostics";
 
 module.exports = [
   new FN001001_DEP_microsoft_sp_core_library('1.5.0'),
@@ -44,6 +45,7 @@ module.exports = [
   new FN001013_DEP_microsoft_decorators('1.5.0'),
   new FN001014_DEP_microsoft_sp_listview_extensibility('1.5.0'),
   new FN001023_DEP_microsoft_sp_component_base('1.5.0'),
+  new FN001024_DEP_microsoft_sp_diagnostics('1.5.0'),
   new FN002001_DEVDEP_microsoft_sp_build_web('1.5.0'),
   new FN002002_DEVDEP_microsoft_sp_module_interfaces('1.5.0'),
   new FN002003_DEVDEP_microsoft_sp_webpart_workbench('1.5.0'),
