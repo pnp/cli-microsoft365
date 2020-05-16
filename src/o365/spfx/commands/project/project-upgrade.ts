@@ -526,6 +526,13 @@ ${f.resolution}
     const packageManagerCommands: string[] = this.reducePackageManagerCommand(
       packagesDepExact, packagesDevExact, packagesDepUn, packagesDevUn);
 
+    if (this.packageManager === 'npm') {
+      const dedupeFinding: FindingToReport[] = findings.filter(f => f.id === 'FN017001');
+      if (dedupeFinding.length > 0) {
+        packageManagerCommands.push(dedupeFinding[0].resolution);
+      }
+    }
+
     return {
       commandsToExecute: commandsToExecute,
       packageManagerCommands: packageManagerCommands,
