@@ -61,6 +61,7 @@ describe(commands.PROJECT_UPGRADE, () => {
       fs.readFileSync,
       fs.statSync,
       fs.writeFileSync,
+      fs.mkdirSync,
       Utils1.getAllFiles
     ]);
   });
@@ -2386,6 +2387,48 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { output: 'json', toVersion: '1.6.0', outputFile: '/foo/report.md' } }, (err?: any) => {
       assert.equal(typeofReport, 'string');
+    });
+  });
+
+  it('writes CodeTour upgrade report to .tours folder when in tour output mode. Creates the folder when it does not exist', () => {
+    const projectPath: string = 'src/o365/spfx/commands/project/test-projects/spfx-151-webpart-react-graph';
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
+    const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(_ => {});
+    const existsSyncOriginal = fs.existsSync;
+    sinon.stub(fs, 'existsSync').callsFake(path => {
+      if (path.toString().indexOf('.tours') > -1) {
+        return false;
+      }
+      
+      return existsSyncOriginal(path);
+    });
+    const mkDirSyncStub: sinon.SinonStub = sinon.stub(fs, 'mkdirSync').callsFake(_ => {});
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { output: 'tour', toVersion: '1.6.0' } }, (err?: any) => {
+      assert(writeFileSyncStub.calledWith(path.join(process.cwd(), projectPath, '/.tours/upgrade.tour')), 'Tour file not created');
+      assert(mkDirSyncStub.calledWith(path.join(process.cwd(), projectPath, '/.tours')), '.tours folder not created');
+    });
+  });
+
+  it('writes CodeTour upgrade report to .tours folder when in tour output mode. Does not create the folder when it already exists', () => {
+    const projectPath: string = 'src/o365/spfx/commands/project/test-projects/spfx-151-webpart-react-graph';
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
+    const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(_ => {});
+    const existsSyncOriginal = fs.existsSync;
+    sinon.stub(fs, 'existsSync').callsFake(path => {
+      if (path.toString().indexOf('.tours') > -1) {
+        return true;
+      }
+      
+      return existsSyncOriginal(path);
+    });
+    const mkDirSyncStub: sinon.SinonStub = sinon.stub(fs, 'mkdirSync').callsFake(_ => {});
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { output: 'tour', toVersion: '1.6.0' } }, (err?: any) => {
+      assert(writeFileSyncStub.calledWith(path.join(process.cwd(), projectPath, '/.tours/upgrade.tour')), 'Tour file not created');
+      assert(mkDirSyncStub.notCalled, '.tours folder created');
     });
   });
 

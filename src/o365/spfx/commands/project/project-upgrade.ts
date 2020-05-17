@@ -13,6 +13,8 @@ import { FindingToReport } from './project-upgrade/FindingToReport';
 import { FN017001_MISC_npm_dedupe } from './project-upgrade/rules/FN017001_MISC_npm_dedupe';
 import { ReportData, ReportDataModification } from './ReportData';
 import { BaseProjectCommand } from './base-project-command';
+import { FindingTour } from './project-upgrade/FindingTour';
+import { FindingTourStep } from './project-upgrade/FindingTourStep';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -364,6 +366,9 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
       case 'json':
         this.writeReport(findingsToReport, cmd, args.options);
         break;
+      case 'tour':
+        this.writeReportTourFolder(this.getTourReport(findingsToReport, project), cmd, args.options);
+        break;
       case 'md':
         this.writeReport(this.getMdReport(findingsToReport), cmd, args.options);
         break;
@@ -372,6 +377,20 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
     }
 
     cb();
+  }
+
+  private writeReportTourFolder(findingsToReport: any, cmd: CommandInstance, options: Options): void {
+    const toursFolder: string = path.join(this.projectRootPath as string, '.tours');
+
+    if (!fs.existsSync(toursFolder)) {
+      fs.mkdirSync(toursFolder, { recursive: false });
+    }
+
+    // Override reports folder
+    options.outputFile = path.join(this.projectRootPath as string, '.tours', 'upgrade.tour');
+
+    // Write reports
+    this.writeReport(findingsToReport, cmd, options);
   }
 
   private writeReport(findingsToReport: any, cmd: CommandInstance, options: Options): void {
@@ -486,6 +505,76 @@ ${f.resolution}
     ];
 
     return s.join('').trim();
+  }
+
+  private getTourReport(findings: FindingToReport[], project: Project): string {
+    const tourFindings: FindingTour = {
+      title: `Upgrade project ${path.posix.basename(this.projectRootPath as string)} to v${this.toVersion}`,
+      steps: []
+    };
+
+    findings.forEach(f => {
+      const lineNumber: number = f.position && f.position.line ? f.position.line : this.getLineToModify(f, project.path);
+
+      let resolution: string = '';
+      switch (f.resolutionType) {
+        case 'cmd':
+          resolution = `Execute the following command:\r\n\r\n[\`${f.resolution}\`](command:codetour.sendTextToTerminal?["${f.resolution}"])`;
+          break;
+        case 'json':
+        case 'js':
+        case 'ts':
+        case 'scss':
+          resolution = `\r\n\`\`\`${f.resolutionType}\r\n${f.resolution}\r\n\`\`\``;
+          break;
+      }
+
+      // Make severity uppercase for the markdown
+      const sev: string = f.severity.toUpperCase();
+
+      // Create a tour step entry
+      const step: FindingTourStep = {
+        file: fs.existsSync(path.join(project.path, f.file)) ? f.file : 'package.json',
+        title: `${sev}: ${f.title}`,
+        description: `### ${sev}\r\n\r\n${f.description}\r\n\r\n${resolution}`,
+        line: lineNumber
+      };
+
+      tourFindings.steps.push(step);
+    });
+
+    // Add the finale
+    tourFindings.steps.push({
+      file: "./.tours/upgrade.tour",
+      title: "RECOMMENDED: Delete tour",
+      description: "### THAT'S IT!!!\r\nOnce you have tested that your upgrade is successful, you can delete the `.tour` folder and its contents. Otherwise, you'll be prompted to launch this CodeTour every time you open this project."
+    });
+
+    return JSON.stringify(tourFindings, null, 2);
+  }
+
+  private getLineToModify(finding: FindingToReport, rootPath: string): number {
+    const filePath: string = path.resolve(path.join(rootPath, finding.file));
+  
+    // Don't cause an issue if the file isn't there
+    if (!fs.existsSync(filePath)) {
+      return 1;
+    }
+
+    // Read the file content
+    const fileContent: string = fs.readFileSync(filePath, 'utf-8');
+  
+    // Try to find the line this relates to
+    const lines: string[] = fileContent.split('\n'); // os.EOL doesn't work here
+
+    const lineIndex: number = lines.findIndex((line: string) => line.indexOf(finding.title) > -1);
+    if (lineIndex < 1) {
+      return 1;
+    }
+    else {
+      // Lines are 1-based in files
+      return lineIndex + 1;
+    }
   }
 
   private getReportData(findings: FindingToReport[]): ReportData {
@@ -623,15 +712,15 @@ ${f.resolution}
       },
       {
         option: '-f, --outputFile [outputFile]',
-        description: 'Path to the file where the upgrade report should be stored in'
+        description: 'Path to the file where the upgrade report should be stored in. This option is ignored if output type is "tour"'
       }
     ];
 
     const parentOptions: CommandOption[] = super.options();
     parentOptions.forEach(o => {
       if (o.option.indexOf('--output') > -1) {
-        o.description = 'Output type. json|text|md. Default text';
-        o.autocomplete = ['json', 'text', 'md'];
+        o.description = 'Output type. json|text|md|tour. Default text';
+        o.autocomplete = ['json', 'text', 'md', 'tour'];
       }
     })
     return options.concat(parentOptions);
@@ -651,7 +740,7 @@ ${f.resolution}
         }
       }
 
-      if (args.options.outputFile) {
+      if (args.options.outputFile && args.options.output !== 'tour') {
         const dirPath: string = path.dirname(path.resolve(args.options.outputFile));
         if (!fs.existsSync(dirPath)) {
           return `Directory ${dirPath} doesn't exist. Please check the path and try again.`;
@@ -714,6 +803,11 @@ ${f.resolution}
     latest SharePoint Framework version supported by the Office 365 CLI using
     PowerShell
       ${this.name} --shell powershell
+
+    Get instructions to upgrade the current SharePoint Framework project to
+    the latest version of SharePoint Framework and save the findings in a 
+    CodeTour file
+        ${this.name} --output tour
 `);
   }
 }
