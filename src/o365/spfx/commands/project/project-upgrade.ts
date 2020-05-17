@@ -509,7 +509,7 @@ ${f.resolution}
 
   private getTourReport(findings: FindingToReport[]): string {
     const tourFindings: FindingTour = {
-      title: "Upgrade Project to SPFx 1.10.0",
+      title: "Upgrade Project",
       steps: []
     };
 
