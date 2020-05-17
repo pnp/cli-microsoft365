@@ -2389,6 +2389,20 @@ describe(commands.PROJECT_UPGRADE, () => {
     });
   });
 
+  it('writes CodeTour upgrade report to .tours folder when in tour output mode', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-151-webpart-react-graph'));
+    let typeofReport: string = '';
+    sinon.stub(fs, 'writeFileSync').callsFake((path, contents: any) => {
+      typeofReport = typeof contents;
+    });
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { output: 'tour', toVersion: '1.6.0' } }, (err?: any) => {
+      assert.equal(typeofReport, 'string');
+    });
+  });
+
+
   it('supports debug mode', () => {
     const options = (command.options() as CommandOption[]);
     let containsOption = false;
