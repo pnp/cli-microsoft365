@@ -101,49 +101,37 @@ workflows:
       - build:
           filters:
             branches:
-              ignore: /^(dev|master|gh-pages)/
+              ignore: /^(master|gh-pages)/
       - test:
           requires:
             - build
           filters:
             branches:
-              ignore: /^(dev|master|gh-pages)/
-  check_master:
-    jobs:
-      - build:
-          filters:
-            branches:
-              only: master
-      - test:
-          requires:
-            - build
-          filters:
-            branches:
-              only: master
+              ignore: /^(master|gh-pages)/
   release_next:
     jobs:
       - build:
           filters:
             branches:
-              only: dev
+              only: master
       - test:
           requires:
             - build
           filters:
             branches:
-              only: dev
+              only: master
       - publish_next:
           requires:
             - test
           filters:
             branches:
-              only: dev
+              only: master
       - deploy_docs:
           requires:
             - publish_next
           filters:
             branches:
-              only: dev
+              only: master
   release:
     jobs:
       - build:
