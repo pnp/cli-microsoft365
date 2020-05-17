@@ -12,6 +12,7 @@
 
 - [yammer group user add](../cmd/yammer/group/group-user-add.md) - adds a user to a Yammer Group [#1456](https://github.com/pnp/office365-cli/issues/1456)
 - [yammer group user remove](../cmd/yammer/group/group-user-remove.md) - removes a user from a Yammer group [#1457](https://github.com/pnp/office365-cli/issues/1457)
+- [yammer message like set](../cmd/yammer/message/message-like-set.md) - likes or unlikes a Yammer message [#1455](https://github.com/pnp/office365-cli/issues/1455)
 
 ### Changes
 
@@ -42,6 +43,8 @@
 - added suggesting upgrading dependency @microsoft/sp-diagnostics [#1513](https://github.com/pnp/office365-cli/issues/1513)
 - added suggesting upgrading dependency @microsoft/sp-dynamic-data [#1514](https://github.com/pnp/office365-cli/issues/1514)
 - added suggesting upgrading dependency @microsoft/sp-extension-base [#1515](https://github.com/pnp/office365-cli/issues/1515)
+- extended 'aad approleassignment list' with --objectId option [#1579](https://github.com/pnp/office365-cli/issues/1579)
+- added 'Using your own Azure AD identity' to docs [#1496](https://github.com/pnp/office365-cli/issues/1496)
 
 ## [v2.9.0](https://github.com/pnp/office365-cli/releases/tag/v2.9.0)
 
