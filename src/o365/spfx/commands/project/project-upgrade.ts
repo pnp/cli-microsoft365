@@ -513,14 +513,6 @@ ${f.resolution}
       steps: []
     };
 
-    let addedBuildStep: boolean = false;
-    const buildStep: FindingTourStep = {
-      file: "./package.json",
-      title: "REQUIRED: Build project",
-      description: "### REQUIRED\r\n\r\nBuild the project\r\n>> gulp build",
-      line: 1
-    };
-
     findings.forEach(f => {
 
       const lineNumber: number = f.position && f.position.line ? f.position.line : this.getLineToModify(f);
@@ -538,14 +530,6 @@ ${f.resolution}
           break;
       }
 
-      // If there is an NPM dedupe rule, instruct user to build
-      if (f.id === 'FN017001') {
-        tourFindings.steps.push(
-          buildStep
-        );
-        addedBuildStep = true;
-      }
-
       // Make severity uppercase for the markdown
       const sev: string = f.severity.toUpperCase();
 
@@ -561,11 +545,6 @@ ${f.resolution}
         step
       );
     });
-
-    // If we didn't add a build step, add one now
-    if (!addedBuildStep) {
-      tourFindings.steps.push(buildStep);
-    }
 
     // Add the finale
     tourFindings.steps.push({
@@ -588,7 +567,7 @@ ${f.resolution}
     const fileContent: string = fs.readFileSync(finding.file, 'utf-8');
 
     // Try to find the line this relates to
-    const splits: any = fileContent.split('\n');
+    const splits: any = fileContent.split(os.EOL);
 
     // Look for a line with the content to change
     const packageIndex: number = splits.findIndex((line:string) => line.indexOf(finding.title) > -1);
