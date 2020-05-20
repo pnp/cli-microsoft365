@@ -567,15 +567,15 @@ ${f.resolution}
     const fileContent: string = fs.readFileSync(finding.file, 'utf-8');
 
     // Try to find the line this relates to
-    const splits: any = fileContent.split(os.EOL);
+    const splits: string[] = fileContent.split(os.EOL);
 
     // Look for a line with the content to change
-    const packageIndex: number = splits.findIndex((line:string) => line.indexOf(finding.title) > -1);
-    if (packageIndex < 1) {
+    const lineIndex: number = splits.findIndex((line:string) => line.indexOf(finding.title) > -1);
+    if (lineIndex < 1) {
       return 1;
     } else {
       // Lines are 1-based in files
-      return packageIndex + 1;
+      return lineIndex + 1;
     }
   }
 
