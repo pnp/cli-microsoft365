@@ -45,6 +45,9 @@
 - added suggesting upgrading dependency @microsoft/sp-extension-base [#1515](https://github.com/pnp/office365-cli/issues/1515)
 - extended 'aad approleassignment list' with --objectId option [#1579](https://github.com/pnp/office365-cli/issues/1579)
 - added 'Using your own Azure AD identity' to docs [#1496](https://github.com/pnp/office365-cli/issues/1496)
+- added the 'Disable the specified tenant-wide extension' sample script [#1444](https://github.com/pnp/office365-cli/issues/1444)
+- added suggesting upgrading dependency @microsoft/sp-http [#1516](https://github.com/pnp/office365-cli/issues/1516)
+- added the 'Add custom client-side web part to modern page' sample script [#1438](https://github.com/pnp/office365-cli/issues/1438)
 
 ## [v2.9.0](https://github.com/pnp/office365-cli/releases/tag/v2.9.0)
 
