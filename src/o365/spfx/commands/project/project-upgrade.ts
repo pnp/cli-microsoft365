@@ -526,7 +526,7 @@ ${f.resolution}
         case 'js':
         case 'ts':
         case 'scss':
-          resolution = `Update the code as follows:\r\n\`\`\`${f.resolutionType}\r\n${f.resolution}\r\n\`\`\``;
+          resolution = `\r\n\`\`\`${f.resolutionType}\r\n${f.resolution}\r\n\`\`\``;
           break;
       }
 
