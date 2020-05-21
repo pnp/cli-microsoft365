@@ -509,7 +509,7 @@ ${f.resolution}
 
   private getTourReport(findings: FindingToReport[], cmd: CommandInstance): string {
     const tourFindings: FindingTour = {
-      title: "Upgrade Project",
+      title: `Upgrade project ${path.posix.basename(this.projectRootPath as string)} to v${this.toVersion}`,
       steps: []
     };
 
