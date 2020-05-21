@@ -367,7 +367,7 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
         this.writeReport(findingsToReport, cmd, args.options);
         break;
       case 'tour':
-        this.writeReportTourFolder(this.getTourReport(findingsToReport, cmd), cmd, args.options);
+        this.writeReportTourFolder(this.getTourReport(findingsToReport, project), cmd, args.options);
         break;
       case 'md':
         this.writeReport(this.getMdReport(findingsToReport), cmd, args.options);
@@ -507,13 +507,12 @@ ${f.resolution}
     return s.join('').trim();
   }
 
-  private getTourReport(findings: FindingToReport[], cmd: CommandInstance): string {
+  private getTourReport(findings: FindingToReport[], project: Project): string {
     const tourFindings: FindingTour = {
       title: `Upgrade project ${path.posix.basename(this.projectRootPath as string)} to v${this.toVersion}`,
       steps: []
     };
 
-    const project: Project = this.getProject(this.projectRootPath + '');
     findings.forEach(f => {
       const lineNumber: number = f.position && f.position.line ? f.position.line : this.getLineToModify(f, project.path);
 
@@ -560,12 +559,12 @@ ${f.resolution}
 
     const filePath: string = path.resolve(path.join(rootPath, finding.file));
   
-    // // Don't cause an issue if the file isn't there
+    // Don't cause an issue if the file isn't there
     if (!fs.existsSync(filePath)) {
       return 1;
     }
 
-    // // Read the file content
+    // Read the file content
     const fileContent: string = fs.readFileSync(filePath, 'utf-8');
   
     // Try to find the line this relates to
