@@ -367,7 +367,7 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
         this.writeReport(findingsToReport, cmd, args.options);
         break;
       case 'tour':
-        this.writeReportTourFolder(this.getTourReport(findingsToReport), cmd, args.options);
+        this.writeReportTourFolder(this.getTourReport(findingsToReport, cmd), cmd, args.options);
         break;
       case 'md':
         this.writeReport(this.getMdReport(findingsToReport), cmd, args.options);
@@ -381,14 +381,14 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
 
   private writeReportTourFolder(findingsToReport: any, cmd: CommandInstance, options: Options): void {
     const toursFolder: string = path.resolve(`${this.projectRootPath}/.tours`);
-    
+
     if (!fs.existsSync(toursFolder)) {
       fs.mkdirSync(toursFolder, { recursive: false });
     }
 
     // Override reports folder
     options.outputFile = `${this.projectRootPath}/.tours/upgrade.tour`;
-    
+
     // Write reports
     this.writeReport(findingsToReport, cmd, options);
   }
@@ -507,16 +507,16 @@ ${f.resolution}
     return s.join('').trim();
   }
 
-  private getTourReport(findings: FindingToReport[]): string {
+  private getTourReport(findings: FindingToReport[], cmd: CommandInstance): string {
     const tourFindings: FindingTour = {
       title: "Upgrade Project",
       steps: []
     };
 
+    const project: Project = this.getProject(this.projectRootPath + '');
     findings.forEach(f => {
+      const lineNumber: number = f.position && f.position.line ? f.position.line : this.getLineToModify(f, project.path);
 
-      const lineNumber: number = f.position && f.position.line ? f.position.line : this.getLineToModify(f);
-      
       let resolution: string = '';
       switch (f.resolutionType) {
         case 'cmd':
@@ -556,21 +556,22 @@ ${f.resolution}
     return JSON.stringify(tourFindings, null, 2);
   }
 
-  private getLineToModify(finding: FindingToReport): number {
+  private getLineToModify(finding: FindingToReport, rootPath: string): number {
 
-    // Don't cause an issue if the file isn't there
-    if (!fs.existsSync(finding.file)) {
+    const filePath: string = path.resolve(path.join(rootPath, finding.file));
+  
+    // // Don't cause an issue if the file isn't there
+    if (!fs.existsSync(filePath)) {
       return 1;
     }
 
-    // Read the file content
-    const fileContent: string = fs.readFileSync(finding.file, 'utf-8');
-
+    // // Read the file content
+    const fileContent: string = fs.readFileSync(filePath, 'utf-8');
+  
     // Try to find the line this relates to
-    const splits: string[] = fileContent.split(os.EOL);
+    const splits: string[] = fileContent.split('\n'); // os.EOL doesn't work here
 
-    // Look for a line with the content to change
-    const lineIndex: number = splits.findIndex((line:string) => line.indexOf(finding.title) > -1);
+    const lineIndex: number = splits.findIndex((line: string) => line.indexOf(finding.title) > -1);
     if (lineIndex < 1) {
       return 1;
     } else {
