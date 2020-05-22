@@ -17,6 +17,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   appId?: string;
   displayName?: string;
+  objectId?: string;
 }
 
 class AadSpGetCommand extends AadCommand {
@@ -32,6 +33,7 @@ class AadSpGetCommand extends AadCommand {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.appId = (!(!args.options.appId)).toString();
     telemetryProps.displayName = (!(!args.options.displayName)).toString();
+    telemetryProps.objectId = (!(!args.options.objectId)).toString();
     return telemetryProps;
   }
 
@@ -40,9 +42,16 @@ class AadSpGetCommand extends AadCommand {
       cmd.log(`Retrieving service principal information...`);
     }
 
-    const spMatchQuery: string = args.options.appId ?
-      `appId eq '${encodeURIComponent(args.options.appId)}'` :
-      `displayName eq '${encodeURIComponent(args.options.displayName as string)}'`;
+    let spMatchQuery: string = '';
+    if (args.options.appId) {
+      spMatchQuery = `appId eq '${encodeURIComponent(args.options.appId)}'`;
+    }
+    else if (args.options.objectId) {
+      spMatchQuery = `objectId eq '${encodeURIComponent(args.options.objectId)}'`;
+    }
+    else {
+      spMatchQuery = `displayName eq '${encodeURIComponent(args.options.displayName as string)}'`;
+    }
 
     const requestOptions: any = {
       url: `${this.resource}/myorganization/servicePrincipals?api-version=1.6&$filter=${spMatchQuery}`,
@@ -72,6 +81,10 @@ class AadSpGetCommand extends AadCommand {
       {
         option: '-n, --displayName [displayName]',
         description: 'Display name of the application for which the service principal should be retrieved'
+      },
+      {
+        option: '--objectId [objectId]',
+        description: 'ObjectId of the application for which the service principal should be retrieved'
       }
     ];
 
@@ -81,18 +94,20 @@ class AadSpGetCommand extends AadCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.appId && !args.options.displayName) {
-        return 'Specify either appId or displayName';
+      let optionsSpecified: number = 0;
+      optionsSpecified += args.options.appId ? 1 : 0;
+      optionsSpecified += args.options.displayName ? 1 : 0;
+      optionsSpecified += args.options.objectId ? 1 : 0;
+      if (optionsSpecified !== 1) {
+        return 'Specify either appId, objectId or displayName';
       }
 
-      if (args.options.appId) {
-        if (!Utils.isValidGuid(args.options.appId)) {
-          return `${args.options.appId} is not a valid GUID`;
-        }
+      if (args.options.appId && !Utils.isValidGuid(args.options.appId)) {
+        return `${args.options.appId} is not a valid appId GUID`;
       }
 
-      if (args.options.appId && args.options.displayName) {
-        return 'Specify either appId or displayName but not both';
+      if (args.options.objectId && !Utils.isValidGuid(args.options.objectId)) {
+        return `${args.options.objectId} is not a valid objectId GUID`;
       }
 
       return true;
@@ -105,8 +120,8 @@ class AadSpGetCommand extends AadCommand {
     log(
       `  Remarks:
   
-    When looking up information about a service principal you should specify either its ${chalk.grey('appId')}
-    or ${chalk.grey('displayName')} but not both. If you specify both values, the command will fail
+    Specify either the ${chalk.grey('appId')}, ${chalk.grey('objectId')} or ${chalk.grey('displayName')}. 
+    If you specify more than one option value, the command will fail
     with an error.
    
   Examples:
@@ -116,6 +131,9 @@ class AadSpGetCommand extends AadCommand {
 
     Return details about the ${chalk.grey('Microsoft Graph')} service principal.
       ${commands.SP_GET} --displayName "Microsoft Graph"
+
+    Return details about the service principal with ObjectId ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531dd')}.
+      ${commands.SP_GET} --objectId b2307a39-e878-458b-bc90-03bc578531dd
 
   More information:
   
