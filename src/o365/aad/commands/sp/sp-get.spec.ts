@@ -136,6 +136,32 @@ describe(commands.SP_GET, () => {
     });
   });
 
+  it('retrieves information about the specified service principal using its objectId', (done) => {
+    const sp: any = { "objectType": "ServicePrincipal", "objectId": "d03a0062-1aa6-43e1-8f49-d73e969c5812", "deletionTimestamp": null, "accountEnabled": true, "addIns": [], "alternativeNames": [], "appDisplayName": "SharePoint Online Client", "appId": "57fb890c-0dab-4253-a5e0-7188c88b2bb4", "appOwnerTenantId": null, "appRoleAssignmentRequired": false, "appRoles": [], "displayName": "SharePoint Online Client", "errorUrl": null, "homepage": null, "keyCredentials": [], "logoutUrl": null, "oauth2Permissions": [], "passwordCredentials": [], "preferredTokenSigningKeyThumbprint": null, "publisherName": null, "replyUrls": [], "samlMetadataUrl": null, "servicePrincipalNames": ["57fb890c-0dab-4253-a5e0-7188c88b2bb4"], "servicePrincipalType": "Application", "tags": [], "tokenEncryptionKeyId": null };
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/myorganization/servicePrincipals?api-version=1.6&$filter=objectId eq '57fb890c-0dab-4253-a5e0-7188c88b2bb4'`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve({ value: [sp] });
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({ options: { debug: false, objectId: '57fb890c-0dab-4253-a5e0-7188c88b2bb4' } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(sp));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('correctly handles no service principal found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/myorganization/servicePrincipals?api-version=1.6&$filter=displayName eq 'Foo'`) > -1) {
@@ -209,6 +235,21 @@ describe(commands.SP_GET, () => {
     const actual = (command.validate() as CommandValidate)({ options: { appId: '6a7b1395-d313-4682-8ed4-65a6265a6320', displayName: 'Microsoft Graph' } });
     assert.notEqual(actual, true);
   });
+
+  it('fails validation if the objectId is not a valid GUID', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { objectId: '123' } });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation if both appId and displayName are specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { appId: '123', displayName: 'abc' } });
+    assert.notEqual(actual, true);
+  })
+
+  it('fails validation if objectId and displayName are specified', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { displayName: 'abc', objectId: '123' } });
+    assert.notEqual(actual, true);
+  })
 
   it('supports debug mode', () => {
     const options = (command.options() as CommandOption[]);

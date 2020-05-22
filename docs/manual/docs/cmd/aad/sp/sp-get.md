@@ -15,6 +15,7 @@ Option|Description
 `--help`|output usage information
 `-i, --appId [appId]`|ID of the application for which the service principal should be retrieved
 `-n, --displayName [displayName]`|Display name of the application for which the service principal should be retrieved
+`--objectId [objectId]`|ObjectId of the application for which the service principal should be retrieved
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json,text`. Default `text`
 `--pretty`|Prettifies `json` output
@@ -23,7 +24,7 @@ Option|Description
 
 ## Remarks
 
-When looking up information about a service principal you should specify either its `appId` or `displayName` but not both. If you specify both values, the command will fail with an error.
+Specify either the `appId`, `objectId` or `displayName`. If you specify more than one option value, the command will fail with an error.
 
 ## Examples
 
@@ -37,6 +38,12 @@ Return details about the _Microsoft Graph_ service principal.
 
 ```sh
 aad sp get --displayName "Microsoft Graph"
+```
+
+Return details about the service principal with ObjectId _b2307a39-e878-458b-bc90-03bc578531dd_.
+
+```sh
+aad sp get --objectId b2307a39-e878-458b-bc90-03bc578531dd
 ```
 
 ## More information
