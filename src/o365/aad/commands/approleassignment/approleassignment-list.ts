@@ -148,7 +148,7 @@ class AadAppRoleAssignmentListCommand extends AadCommand {
         description: 'Display name of the application for which the configured app roles should be retrieved'
       },
       {
-        option: '-o, --objectId [objectId]',
+        option: '--objectId [objectId]',
         description: 'ObjectId of the application for which the configured app roles should be retrieved'
       }
     ];
