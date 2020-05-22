@@ -25,12 +25,11 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
-## Usage Notes
+## Remarks
 
 The first row of the csv file contains column headers. The column headers must match the internal name of the field
 in the SharePoint List.
 
-For a detailed explanation on how to format the fields within the csv, use spo help listitem command add.
 
 
 

@@ -13,6 +13,7 @@ import * as path from 'path';
 import { Transform } from 'stream';
 const vorpal: Vorpal = require('../../../../vorpal-init');
 const csv = require('@fast-csv/parse');
+import { v4 } from 'uuid';
 import { createReadStream } from 'fs';
 
 interface CommandArgs {
@@ -26,13 +27,13 @@ interface Options extends GlobalOptions {
   contentType?: string;
   folder?: string;
   path: string;
-  batchSize:number;
+  batchSize: number;
 }
 
 class SpoListItemAddCommand extends SpoCommand {
 
   public allowUnknownOptions(): boolean | undefined {
-    return false;
+    return;
   }
 
   public get name(): string {
@@ -59,16 +60,27 @@ class SpoListItemAddCommand extends SpoCommand {
     let maxBytesInBatch: number = 1000000; // max is  1048576
     let rowsInBatch: number = 0;
     let batchCounter = 0;
-      let recordsToAdd = "";
+    let recordsToAdd = "";
     let csvHeaders: Array<string>;
-    const generateUUID = function () {
-      var d = new Date().getTime();
-      var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        var r = (d + Math.random() * 16) % 16 | 0;
-        d = Math.floor(d / 16);
-        return (c == 'x' ? r : (r & 0x7 | 0x8)).toString(16);
-      });
-      return uuid;
+    const sendABatch = (batchCounter: number, rowsInBatch: number, changeSetId: string, recordsToAdd: string): Promise<any> => {
+      let batchContents = new Array();
+      let batchId = v4();
+      batchContents.push('--batch_' + batchId);
+      cmd.log(`Sending batch #${batchCounter} with ${rowsInBatch} items`);
+      batchContents.push('Content-Type: multipart/mixed; boundary="changeset_' + changeSetId + '"');
+      batchContents.push('Content-Length: ' + recordsToAdd.length);
+      batchContents.push('Content-Transfer-Encoding: binary');
+      batchContents.push('');
+      batchContents.push(recordsToAdd);
+      batchContents.push('');
+      const updateOptions: any = {
+        url: `${args.options.webUrl}/_api/$batch`,
+        headers: {
+          'Content-Type': `multipart/mixed; boundary="batch_${batchId}"`
+        },
+        body: batchContents.join('\r\n')
+      };
+      return request.post(updateOptions);
     }
     const parseResults = (response: any, cmd: CommandInstance, cb: (err?: any) => void): void => {
       let responseLines: Array<string> = response.toString().split('\n');
@@ -105,7 +117,7 @@ class SpoListItemAddCommand extends SpoCommand {
     const fileName: string = Utils.getSafeFileName(path.basename(fullPath));
     const listIdArgument = args.options.listId || '';
     const listTitleArgument = args.options.listTitle || '';
-    const batchSize: number=args.options.batchSize|| 10;
+    const batchSize: number = args.options.batchSize || 10;
     listRestUrl = (args.options.listId ?
       `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(listIdArgument)}')`
       : `${args.options.webUrl}/_api/web/lists/getByTitle('${encodeURIComponent(listTitleArgument)}')`);
@@ -184,7 +196,7 @@ class SpoListItemAddCommand extends SpoCommand {
           cmd.log(`Creating items in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
         }
         //start the batch -- each batch will get assigned its own id
-        let changeSetId = generateUUID();
+        let changeSetId = v4();
         let endpoint = `${listRestUrl}/AddValidateUpdateItemUsingPath()`;
         // get the csv  file passed in from the cmd line
         let fileStream = createReadStream(fileName);
@@ -269,24 +281,10 @@ class SpoListItemAddCommand extends SpoCommand {
                 if (rowsInBatch >= batchSize || recordsToAdd.length >= maxBytesInBatch) {
 
                   recordsToAdd += '--changeset_' + changeSetId + '--' + '\u000d\u000a';
-                  let batchContents = new Array();
-                  let batchId = generateUUID();
-                  batchContents.push('--batch_' + batchId);
-                  cmd.log(`Sending batch #${++batchCounter} with ${rowsInBatch} items`)
-                  batchContents.push('Content-Type: multipart/mixed; boundary="changeset_' + changeSetId + '"');
-                  batchContents.push('Content-Length: ' + recordsToAdd.length);
-                  batchContents.push('Content-Transfer-Encoding: binary');
-                  batchContents.push('');
-                  batchContents.push(recordsToAdd);
-                  batchContents.push('');
-                  const updateOptions: any = {
-                    url: `${args.options.webUrl}/_api/$batch`,
-                    headers: {
-                      'Content-Type': `multipart/mixed; boundary="batch_${batchId}"`
-                    },
-                    body: batchContents.join('\r\n')
-                  }
-                  request.post(updateOptions)
+                  ++batchCounter;
+                  cmd.log(`Sending batch #${batchCounter} with ${rowsInBatch} items`)
+
+                  sendABatch(batchCounter,rowsInBatch,changeSetId,recordsToAdd)
                     .catch((e) => {
                       cb(e);
                     })
@@ -294,7 +292,7 @@ class SpoListItemAddCommand extends SpoCommand {
                       parseResults(response, cmd, cb)
                       recordsToAdd = ``;
                       rowsInBatch = 0;
-                      changeSetId = generateUUID();
+                      changeSetId = v4();
                       this.push(row);
                       callback();
                     })
@@ -311,27 +309,10 @@ class SpoListItemAddCommand extends SpoCommand {
           .on("end", function () {
 
             if (recordsToAdd.length > 0) {
+              ++batchCounter;
+              cmd.log(`Sending final batch #${batchCounter} with ${rowsInBatch} items`)
 
-
-              let batchContents = new Array();
-              let batchId = generateUUID();
-              batchContents.push('--batch_' + batchId);
-              cmd.log(`Sending final batch #${++batchCounter} with ${rowsInBatch} items`)
-
-              batchContents.push('Content-Type: multipart/mixed; boundary="changeset_' + changeSetId + '"');
-              batchContents.push('Content-Length: ' + recordsToAdd.length);
-              batchContents.push('Content-Transfer-Encoding: binary');
-              batchContents.push('');
-              batchContents.push(recordsToAdd);
-              batchContents.push('');
-              const updateOptions: any = {
-                url: `${args.options.webUrl}/_api/$batch`,
-                headers: {
-                  'Content-Type': `multipart/mixed; boundary="batch_${batchId}"`
-                },
-                body: batchContents.join('\r\n')
-              }
-              request.post(updateOptions)
+              sendABatch(batchCounter,rowsInBatch,changeSetId,recordsToAdd)
                 .catch((e) => {
                   cb(e);
                 })
@@ -419,7 +400,7 @@ class SpoListItemAddCommand extends SpoCommand {
         return `${args.options.listId} in option listId is not a valid GUID`;
       }
       if (args.options.batchSize &&
-        args.options.batchSize > 1000){
+        args.options.batchSize > 1000) {
         return `batchsize ${args.options.batchSize} exceeds the 1000 item limit`;
       }
 
@@ -431,36 +412,36 @@ class SpoListItemAddCommand extends SpoCommand {
     const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  Examples:
+      `  Remarks:
+    The first row of the csv file contains column headers. The column headers must match the internal name of the field.
+    If you send a file with an invalid fieldname the command will display an error that includes all the valid field names:
+      Field Assignee was not found on the SharePoint list.  Valid fields follow
+      InternalName
+      ------------
+      ContentType
+      Title
+      Attachments
+      Order
+      FileLeafRef
+      MetaInfo
+
+    The rows in the csv must contain column values based on the type of the column:
+      Text: The text to be added to the column 
+      Number: the number to be added to the column
+      Single-Select Metadata: the metadata name folowed by the pipe (|) charachter, followed by the metadata Id followed by a semicolon (i.e. TermLabel1|fa2f6bfd-1fad-4d18-9c89-289fe6941377; )
+      Multie-Select Metadata: the metadata name folowed by the pipe (|) charachter, followed by the metadata Id followed by a semicolon. This is repeated for each term. (i.e. ermLabel1|cf8c72a1-0207-40ee-aebd-fca67d20bc8a;TermLabel2|e5cc320f-8b65-4882-afd5-f24d88d52b75; )
+      Single-Select Person: {'Key':'i:0#.f|membership|--UPN--'}  where --UPN-- is the UPN of the person to be added
+      Multi-Select Person: [{'Key':'i:0#.f|membership|--UPN1--'},{'Key':'i:0#.f|membership|--UPN2--'}]  where --UPN1-- and --UPN2-- are the UPNs of the persons to be added.
+      Hyperlink: the  url of the hyperlink followd bt the text to be displayed for the hyperlink. This must be enclosed in quotes. (i.e. "https://www.bing.com, Bing")
+
+
+  
+  Examples:
   
     Add an item with Title ${chalk.grey('Demo Item')} and content type name ${chalk.grey('Item')} to list with
     title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.LISTITEM_ADD} --contentType Item --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Item"
+      ${commands.LISTITEM_BATCH_ADD} --listTitle "Test" --webUrl https://contoso.sharepoint.com/sites/project-x --path .\test.csv
 
-    Add an item with Title ${chalk.grey('Demo Multi Managed Metadata Field')} and
-    a single-select metadata field named ${chalk.grey('SingleMetadataField')} to list with
-    title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.LISTITEM_ADD} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Single Managed Metadata Field" --SingleMetadataField "TermLabel1|fa2f6bfd-1fad-4d18-9c89-289fe6941377;"
-
-    Add an item with Title ${chalk.grey('Demo Multi Managed Metadata Field')} and a multi-select
-    metadata field named ${chalk.grey('MultiMetadataField')} to list with title ${chalk.grey('Demo List')}
-    in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.LISTITEM_ADD} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Multi Managed Metadata Field" --MultiMetadataField "TermLabel1|cf8c72a1-0207-40ee-aebd-fca67d20bc8a;TermLabel2|e5cc320f-8b65-4882-afd5-f24d88d52b75;"
-  
-    Add an item with Title ${chalk.grey('Demo Single Person Field')} and a single-select people
-    field named ${chalk.grey('SinglePeopleField')} to list with title ${chalk.grey('Demo List')} in site
-    ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.LISTITEM_ADD} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Single Person Field" --SinglePeopleField "[{'Key':'i:0#.f|membership|markh@conotoso.com'}]"
-      
-    Add an item with Title ${chalk.grey('Demo Multi Person Field')} and a multi-select people
-    field named ${chalk.grey('MultiPeopleField')} to list with title ${chalk.grey('Demo List')} in site
-    ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.LISTITEM_ADD} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Multi Person Field" --MultiPeopleField "[{'Key':'i:0#.f|membership|markh@conotoso.com'},{'Key':'i:0#.f|membership|adamb@conotoso.com'}]"
-    
-    Add an item with Title ${chalk.grey('Demo Hyperlink Field')} and a hyperlink field named
-    ${chalk.grey('CustomHyperlink')} to list with title ${chalk.grey('Demo List')} in site
-    ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.LISTITEM_ADD} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Hyperlink Field" --CustomHyperlink "https://www.bing.com, Bing"
    `);
   }
 

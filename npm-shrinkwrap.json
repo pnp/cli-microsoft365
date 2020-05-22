@@ -210,6 +210,11 @@
       "integrity": "sha512-YV+ZcSIiv30GhLM7WwxI+bsbcW34d3Yhl2JSFBNFL6qtfsoI9++hogxz+jTqeS86ynKcMUE0AsnLWQynfJnsfA==",
       "dev": true
     },
+    "@types/uuid": {
+      "version": "8.0.0",
+      "resolved": "https://registry.npmjs.org/@types/uuid/-/uuid-8.0.0.tgz",
+      "integrity": "sha512-xSQfNcvOiE5f9dyd4Kzxbof1aTrLobL278pGLKOZI6esGfZ7ts9Ka16CzIN6Y8hFHE1C7jIBZokULhK1bOgjRw=="
+    },
     "@types/xmldom": {
       "version": "0.1.29",
       "resolved": "https://registry.npmjs.org/@types/xmldom/-/xmldom-0.1.29.tgz",
@@ -1113,11 +1118,6 @@
       "version": "1.0.0",
       "resolved": "https://registry.npmjs.org/crypto-random-string/-/crypto-random-string-1.0.0.tgz",
       "integrity": "sha1-ojD2T1aDEOFJgAmUB5DsmVRbyn4="
-    },
-    "csv-parse": {
-      "version": "4.8.5",
-      "resolved": "https://registry.npmjs.org/csv-parse/-/csv-parse-4.8.5.tgz",
-      "integrity": "sha512-rpsLmlLWJZifmLzZEVGbZ9phWnJyi+cCbCGYr4vX2NaHFtgbmQPFk+WmMkmMkQXgsIUn6CgnK9cTuUAfFjoXbA=="
     },
     "dashdash": {
       "version": "1.14.1",
