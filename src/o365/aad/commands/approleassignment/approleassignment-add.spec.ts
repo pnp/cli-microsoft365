@@ -261,6 +261,36 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
     });
   });
 
+  it('rejects if more than one service principal found', (done) => {
+    postRequestStub();
+    sinon.stub(request, 'get').callsFake((opts: any): Promise<any> => {
+
+      if ((opts.url as string).indexOf(`/myorganization/servicePrincipals?api-version=1.6`) > -1) {
+
+        // fake first call for getting service principal 
+        if (opts.url.indexOf('publisherName') === -1) {
+          return Promise.resolve({ "value": [{ "objectType": "ServicePrincipal", "objectId": "57907bf8-73fa-43a6-89a5-1f603e29e452", "deletionTimestamp": null, "accountEnabled": true, "addIns": [], "alternativeNames": ["isExplicit=False", "/subscriptions/fc3ca501-0a89-44cb-9192-5b60d3273989/resourcegroups/VM/providers/Microsoft.Compute/virtualMachines/VM2"], "appDisplayName": null, "appId": "1437b558-aa5c-48b2-9d6d-173e6dec518f", "applicationTemplateId": null, "appOwnerTenantId": null, "appRoleAssignmentRequired": false, "appRoles": [], "displayName": "VM2", "errorUrl": null, "homepage": null, "informationalUrls": null, "keyCredentials": [{ "customKeyIdentifier": "58967EE4A371AA7FE6D9EB74561B13184BEF0D95", "endDate": "2020-08-11T22:34:00Z", "keyId": "5edf62fd-ae7a-4a99-af2e-fc5950aaed07", "startDate": "2020-05-13T22:34:00Z", "type": "AsymmetricX509Cert", "usage": "Verify", "value": null }], "logoutUrl": null, "notificationEmailAddresses": [], "oauth2Permissions": [], "passwordCredentials": [], "preferredSingleSignOnMode": null, "preferredTokenSigningKeyEndDateTime": null, "preferredTokenSigningKeyThumbprint": null, "publisherName": null, "replyUrls": [], "samlMetadataUrl": null, "samlSingleSignOnSettings": null, "servicePrincipalNames": ["1437b558-aa5c-48b2-9d6d-173e6dec518f", "https://identity.azure.net/YWHbMwZ1ULadKOWfcXN7SEUXOloxXzsngLdjjJ8rGlg="], "servicePrincipalType": "ManagedIdentity", "signInAudience": null, "tags": [], "tokenEncryptionKeyId": null },{ "objectType": "ServicePrincipal", "objectId": "57907bf8-73fa-43a6-89a5-1f603e29e452", "deletionTimestamp": null, "accountEnabled": true, "addIns": [], "alternativeNames": ["isExplicit=False", "/subscriptions/fc3ca501-0a89-44cb-9192-5b60d3273989/resourcegroups/VM/providers/Microsoft.Compute/virtualMachines/VM2"], "appDisplayName": null, "appId": "1437b558-aa5c-48b2-9d6d-173e6dec518f", "applicationTemplateId": null, "appOwnerTenantId": null, "appRoleAssignmentRequired": false, "appRoles": [], "displayName": "VM2", "errorUrl": null, "homepage": null, "informationalUrls": null, "keyCredentials": [{ "customKeyIdentifier": "58967EE4A371AA7FE6D9EB74561B13184BEF0D95", "endDate": "2020-08-11T22:34:00Z", "keyId": "5edf62fd-ae7a-4a99-af2e-fc5950aaed07", "startDate": "2020-05-13T22:34:00Z", "type": "AsymmetricX509Cert", "usage": "Verify", "value": null }], "logoutUrl": null, "notificationEmailAddresses": [], "oauth2Permissions": [], "passwordCredentials": [], "preferredSingleSignOnMode": null, "preferredTokenSigningKeyEndDateTime": null, "preferredTokenSigningKeyThumbprint": null, "publisherName": null, "replyUrls": [], "samlMetadataUrl": null, "samlSingleSignOnSettings": null, "servicePrincipalNames": ["1437b558-aa5c-48b2-9d6d-173e6dec518f", "https://identity.azure.net/YWHbMwZ1ULadKOWfcXN7SEUXOloxXzsngLdjjJ8rGlg="], "servicePrincipalType": "ManagedIdentity", "signInAudience": null, "tags": [], "tokenEncryptionKeyId": null }] });
+        }
+
+        // second get request for searching for service principals by resource options value specified
+        if (opts.url.indexOf('publisherName') !== -1) {
+          return Promise.resolve({ "value": [{ objectId: "5edf62fd-ae7a-4a99-af2e-fc5950aaed07", "appRoles": [{value: 'Scope1', id: '1'},{value: 'Scope2', id: '2'}] }] });
+        }
+      }
+      return Promise.reject();
+    });
+
+    cmdInstance.action({ options: { debug: true, appId: 'fff194f1-7dce-4428-8301-1badb5518201', resource: 'SharePoint', scope: 'Sites.Read.All' } }, (err?: any) => {
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("More than one service principal found. Please use the appId or objectId option to make sure the right service principal is specified.")));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('correctly handles API OData error', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       return Promise.reject({

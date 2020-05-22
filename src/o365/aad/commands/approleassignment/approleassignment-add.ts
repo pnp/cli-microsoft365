@@ -70,6 +70,10 @@ class AadAppRoleAssignmentAddCommand extends AadCommand {
       .get<{ value: ServicePrincipal[] }>(getServicePrinciplesRequestOptions)
       .then((servicePrincipalResult: { value: ServicePrincipal[] }): Promise<{ value: ServicePrincipal[] }> => {
 
+        if (servicePrincipalResult.value.length > 1) {
+          return Promise.reject('More than one service principal found. Please use the appId or objectId option to make sure the right service principal is specified.');
+        }
+
         objectId = servicePrincipalResult.value[0].objectId;
 
         let resource: string = encodeURIComponent(args.options.resource);
