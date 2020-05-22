@@ -63,6 +63,7 @@ class SpoListItemAddCommand extends SpoCommand {
     let recordsToAdd = "";
     let csvHeaders: Array<string>;
     const sendABatch = (batchCounter: number, rowsInBatch: number, changeSetId: string, recordsToAdd: string): Promise<any> => {
+      
       let batchContents = new Array();
       let batchId = v4();
       batchContents.push('--batch_' + batchId);
@@ -72,7 +73,9 @@ class SpoListItemAddCommand extends SpoCommand {
       batchContents.push('Content-Transfer-Encoding: binary');
       batchContents.push('');
       batchContents.push(recordsToAdd);
-      batchContents.push('');
+      
+      batchContents.push('--batch_' + batchId+'--');
+      cmd.log(batchContents);
       const updateOptions: any = {
         url: `${args.options.webUrl}/_api/$batch`,
         headers: {
@@ -112,6 +115,46 @@ class SpoListItemAddCommand extends SpoCommand {
       });
       return requestBody;
     }
+
+    const validateContentType = async (contentTypeName: string | undefined): Promise<any> => {
+      if (contentTypeName == undefined) {
+        return (Promise.resolve());
+      }
+      if (this.verbose) {
+        cmd.log(`Getting content types for list...`);
+      }
+      const ctRequestOptions: any = {
+        url: `${listRestUrl}/contenttypes?$select=Name,Id`,
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        json: true
+      };
+
+      return request
+        .get(ctRequestOptions)
+        .then((response: any): Promise<void> => {
+
+          const foundContentType = response.value.filter((ct: any) => {
+            const contentTypeMatch: boolean = ct.Id.StringValue === args.options.contentType || ct.Name === args.options.contentType;
+            if (this.verbose) {
+              cmd.log(`Checking content type value [${ct.Name}]: ${contentTypeMatch}`);
+            }
+            return contentTypeMatch;
+          });
+          if (this.verbose) {
+            cmd.log('content type filter output...');
+            cmd.log(foundContentType);
+          }
+          if (foundContentType.length !== 1) {
+            return Promise.reject(`Specified content type '${args.options.contentType}' doesn't exist on the target list`);
+          }else{
+            return (Promise.resolve())  
+          }
+
+
+        })
+    }
     let targetFolderServerRelativeUrl: string = ``;
     const fullPath: string = path.resolve(args.options.path);
     const fileName: string = Utils.getSafeFileName(path.basename(fullPath));
@@ -123,48 +166,13 @@ class SpoListItemAddCommand extends SpoCommand {
       : `${args.options.webUrl}/_api/web/lists/getByTitle('${encodeURIComponent(listTitleArgument)}')`);
 
     const folderExtensions: FolderExtensions = new FolderExtensions(cmd, this.debug);
+    validateContentType(args.options.contentType)
+      .catch((ctError) => {
+        cb(ctError)
+        cmd.log("error on ct")
+      })
+      .then(() => {
 
-    if (this.verbose) {
-      cmd.log(`Getting content types for list...`);
-    }
-
-    const requestOptions: any = {
-      url: `${listRestUrl}/contenttypes?$select=Name,Id`,
-      headers: {
-        'accept': 'application/json;odata=nometadata'
-      },
-      json: true
-    };
-
-    request
-      .get(requestOptions)
-      .then((response: any): Promise<void> => {
-        if (args.options.contentType) {
-          const foundContentType = response.value.filter((ct: any) => {
-            const contentTypeMatch: boolean = ct.Id.StringValue === args.options.contentType || ct.Name === args.options.contentType;
-            if (this.debug) {
-              cmd.log(`Checking content type value [${ct.Name}]: ${contentTypeMatch}`);
-            }
-            return contentTypeMatch;
-          });
-          if (this.debug) {
-            cmd.log('content type filter output...');
-            cmd.log(foundContentType);
-          }
-
-          if (foundContentType.length > 0) {
-            contentTypeName = foundContentType[0].Name;
-          }
-
-          // After checking for content types, throw an error if the name is blank
-          if (!contentTypeName || contentTypeName === '') {
-            return Promise.reject(`Specified content type '${args.options.contentType}' doesn't exist on the target list`);
-          }
-
-          if (this.debug) {
-            cmd.log(`using content type name: ${contentTypeName}`);
-          }
-        }
 
         if (args.options.folder) {
           if (this.debug) {
@@ -284,7 +292,7 @@ class SpoListItemAddCommand extends SpoCommand {
                   ++batchCounter;
                   cmd.log(`Sending batch #${batchCounter} with ${rowsInBatch} items`)
 
-                  sendABatch(batchCounter,rowsInBatch,changeSetId,recordsToAdd)
+                  sendABatch(batchCounter, rowsInBatch, changeSetId, recordsToAdd)
                     .catch((e) => {
                       cb(e);
                     })
@@ -310,9 +318,10 @@ class SpoListItemAddCommand extends SpoCommand {
 
             if (recordsToAdd.length > 0) {
               ++batchCounter;
+              recordsToAdd += '--changeset_' + changeSetId + '--' + '\u000d\u000a';
               cmd.log(`Sending final batch #${batchCounter} with ${rowsInBatch} items`)
 
-              sendABatch(batchCounter,rowsInBatch,changeSetId,recordsToAdd)
+              sendABatch(batchCounter, rowsInBatch, changeSetId, recordsToAdd)
                 .catch((e) => {
                   cb(e);
                 })
