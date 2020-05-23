@@ -17,6 +17,7 @@ import { v4 } from 'uuid';
 import { createReadStream } from 'fs';
 import requestPromise = require('request-promise-native');
 
+
 interface CommandArgs {
   options: Options;
 }
@@ -30,8 +31,8 @@ interface Options extends GlobalOptions {
   path: string;
   batchSize: number;
 }
-interface FieldNames{
-  value: {InternalName: string}[]
+interface FieldNames {
+  value: { InternalName: string }[]
 }
 class SpoListItemAddCommand extends SpoCommand {
 
@@ -79,28 +80,28 @@ class SpoListItemAddCommand extends SpoCommand {
     }
   }
 
-  public static  mapRequestBody (row: any, csvHeaders: Array<string>): any  {
+  public static mapRequestBody(row: any, csvHeaders: Array<string>): any {
     const requestBody: any = [];
     Object.keys(row).forEach(async key => {
       requestBody.push({ FieldName: csvHeaders[parseInt(key)], FieldValue: (<any>row)[key] });
     });
     return requestBody;
   }
-  public static sendABatch (batchCounter: number, rowsInBatch: number, changeSetId: string, recordsToAdd: string, webUrl:string, verbose:boolean, cmd: CommandInstance): Promise<string> {
-      
+  public static sendABatch(batchCounter: number, rowsInBatch: number, changeSetId: string, recordsToAdd: string, webUrl: string, verbose: boolean, cmd: CommandInstance): Promise<string> {
+
     const batchContents = new Array();
     const batchId = v4();
     batchContents.push('--batch_' + batchId);
-    if (this){
-    cmd.log(`Sending batch #${batchCounter} with ${rowsInBatch} items`);
+    if (verbose) {
+      cmd.log(`Sending batch #${batchCounter} with ${rowsInBatch} items`);
     }
     batchContents.push('Content-Type: multipart/mixed; boundary="changeset_' + changeSetId + '"');
     batchContents.push('Content-Length: ' + recordsToAdd.length);
     batchContents.push('Content-Transfer-Encoding: binary');
     batchContents.push('');
     batchContents.push(recordsToAdd);
-    
-    batchContents.push('--batch_' + batchId+'--');
+
+    batchContents.push('--batch_' + batchId + '--');
 
     const updateOptions: requestPromise.OptionsWithUrl = {
       url: `${webUrl}/_api/$batch`,
@@ -109,9 +110,10 @@ class SpoListItemAddCommand extends SpoCommand {
       },
       body: batchContents.join('\r\n')
     };
+    cmd.log(updateOptions)
     return request.post(updateOptions);
   }
-  public static  async   validateContentType  (contentTypeName: string | undefined,listRestUrl:string, webUrl:string, verbose:boolean, cmd: CommandInstance): Promise<any>  {
+  public static async   validateContentType(contentTypeName: string | undefined, listRestUrl: string, webUrl: string, verbose: boolean, cmd: CommandInstance): Promise<any> {
     if (contentTypeName == undefined) {
       return (Promise.resolve());
     }
@@ -143,13 +145,71 @@ class SpoListItemAddCommand extends SpoCommand {
         }
         if (foundContentType.length !== 1) {
           return Promise.reject(`Specified content type '${contentTypeName}' doesn't exist on the target list`);
-        }else{
-          return (Promise.resolve())  
+        } else {
+          return (Promise.resolve())
         }
 
 
       })
   }
+  public static async   getFolderUrl(folderName: string | undefined, listRestUrl: string, webUrl: string, verbose: boolean, debug:boolean, cmd: CommandInstance): Promise<any> {
+    if (folderName == undefined) {
+      cmd.log(listRestUrl)
+      const listRequestOptions: requestPromise.OptionsWithUrl = {
+        url: listRestUrl+"/RootFolder",
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        json: true
+      };
+      return request
+        .get(listRequestOptions)
+        .then((response: any): Promise<string> => {
+          cmd.log(response)
+          return Promise.resolve(response.ServerRelativeUrl);
+        })
+
+    }
+    else{
+ 
+      const requestOptions: requestPromise.OptionsWithUrl = {
+        url: `${listRestUrl}/rootFolder`,
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        json: true
+      }
+      return request
+        .get<any>(requestOptions)
+        .then(async (rootFolderResponse) => {
+
+          const targetFolderServerRelativeUrl = Utils.getServerRelativePath(rootFolderResponse["ServerRelativeUrl"], folderName);
+          const folderExtensions: FolderExtensions = new FolderExtensions(cmd, debug);
+          await folderExtensions.ensureFolder(webUrl, targetFolderServerRelativeUrl);
+          return targetFolderServerRelativeUrl;
+
+        });
+    }
+  }
+  public static async   getCaseSensitiveWebUrl( webUrl: string, cmd: CommandInstance): Promise<any> {
+
+      const WebRequestOptions: requestPromise.OptionsWithUrl = {
+        url: webUrl+"/_api/web",
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        json: true
+      };
+      return request
+        .get(WebRequestOptions)
+        .then((response: any): Promise<string> => {
+          cmd.log(response)
+          return Promise.resolve(response.Url);
+        })
+
+    }
+
+
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     let lineNumber: number = 0;
     let contentTypeName: string | null = null;
@@ -159,7 +219,7 @@ class SpoListItemAddCommand extends SpoCommand {
     let batchCounter = 0;
     let recordsToAdd = "";
     let csvHeaders: Array<string>;
-    let targetFolderServerRelativeUrl: string = ``;
+//    let targetFolderServerRelativeUrl: string = ``;
     const fullPath: string = path.resolve(args.options.path);
     const fileName: string = Utils.getSafeFileName(path.basename(fullPath));
     const listIdArgument = args.options.listId || '';
@@ -169,43 +229,28 @@ class SpoListItemAddCommand extends SpoCommand {
       `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(listIdArgument)}')`
       : `${args.options.webUrl}/_api/web/lists/getByTitle('${encodeURIComponent(listTitleArgument)}')`);
 
-    const folderExtensions: FolderExtensions = new FolderExtensions(cmd, this.debug);
-   SpoListItemAddCommand.validateContentType(args.options.contentType,listRestUrl,args.options.webUrl,this.verbose,cmd)
+    
+    SpoListItemAddCommand.validateContentType(args.options.contentType, listRestUrl, args.options.webUrl, this.verbose, cmd)
       .catch((ctError) => {
         cb(ctError)
         cmd.log("error on ct")
       })
-      .then(() => {
-
-
-        if (args.options.folder) {
-          if (this.debug) {
-            cmd.log('setting up folder lookup response ...');
-          }
-
-          const requestOptions: requestPromise.OptionsWithUrl = {
-            url: `${listRestUrl}/rootFolder`,
-            headers: {
-              'accept': 'application/json;odata=nometadata'
-            },
-            json: true
-          }
-
-          return request
-            .get<any>(requestOptions)
-            .then(rootFolderResponse => {
-              targetFolderServerRelativeUrl = Utils.getServerRelativePath(rootFolderResponse["ServerRelativeUrl"], args.options.folder as string);
-
-              return folderExtensions.ensureFolder(args.options.webUrl, targetFolderServerRelativeUrl);
-            });
-        }
-        else {
-          return Promise.resolve();
-        }
+      .then((): Promise<string | void> => {
+        return SpoListItemAddCommand.getCaseSensitiveWebUrl(args.options.webUrl,cmd);
+         
+       })
+      .then((caseCorrectedWebUrl:string|void): Promise<string | void> => {
+        listRestUrl = (args.options.listId ?
+          `${caseCorrectedWebUrl}/_api/web/lists(guid'${encodeURIComponent(listIdArgument)}')`
+          : `${caseCorrectedWebUrl}/_api/web/lists/getByTitle('${encodeURIComponent(listTitleArgument)}')`);
+    
+       return SpoListItemAddCommand.getFolderUrl(args.options.folder,listRestUrl as string,caseCorrectedWebUrl as string,this.verbose,this.debug,cmd);
+        
       })
-      .then((): any => {
+      .then((folderServerRelativeUrl: string | void): any => {
+        
         if (this.verbose) {
-          cmd.log(`Creating items in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
+          cmd.log(`Creating items in list ${folderServerRelativeUrl}`);
         }
         //start the batch -- each batch will get assigned its own id
         let changeSetId = v4();
@@ -213,7 +258,7 @@ class SpoListItemAddCommand extends SpoCommand {
         // get the csv  file passed in from the cmd line
         let fileStream = createReadStream(fileName);
         let csvStream: any = csv.parseStream(fileStream, { headers: false });
-        let verboseMode= this.verbose;
+        let verboseMode = this.verbose;
         csvStream
           .pipe(new Transform({ //https://github.com/C2FO/fast-csv/issues/328 Need to transform if  we are batching asynch
             objectMode: true,
@@ -226,14 +271,14 @@ class SpoListItemAddCommand extends SpoCommand {
                 // fetch the valid field names from the list. If you pass a bad field name to AddValidateUpdateItemUsingPath it returns xml not JSON
                 const fetchFieldsRequest: requestPromise.OptionsWithUrl = {
                   url: `${listRestUrl}/fields?$select=InternalName&$filter=ReadOnlyField eq false`,
-                  json:true,
+                  json: true,
                   headers: {
                     'Accept': `application/json;odata=nometadata`
                   },
                 }
                 request.get<FieldNames>(fetchFieldsRequest)
-                  .then((realFields:FieldNames) => {
-                    
+                  .then((realFields: FieldNames) => {
+
                     for (let header of csvHeaders) {
                       let fieldFound = false;
                       for (let spField of realFields.value) {
@@ -269,7 +314,7 @@ class SpoListItemAddCommand extends SpoCommand {
                 if (args.options.folder) {
                   requestBody.listItemCreateInfo = {
                     FolderPath: {
-                      DecodedUrl: targetFolderServerRelativeUrl
+                      DecodedUrl: folderServerRelativeUrl
                     }
                   };
                 }
@@ -296,16 +341,16 @@ class SpoListItemAddCommand extends SpoCommand {
 
                   recordsToAdd += '--changeset_' + changeSetId + '--' + '\r\n';
                   ++batchCounter;
-                  if (verboseMode){
-                  cmd.log(`Sending batch #${batchCounter} with ${rowsInBatch} items`)
+                  if (verboseMode) {
+                    cmd.log(`Sending batch #${batchCounter} with ${rowsInBatch} items`)
                   }
 
-                  SpoListItemAddCommand.sendABatch(batchCounter, rowsInBatch, changeSetId, recordsToAdd,args.options.webUrl,verboseMode,cmd)
+                  SpoListItemAddCommand.sendABatch(batchCounter, rowsInBatch, changeSetId, recordsToAdd, args.options.webUrl, verboseMode, cmd)
                     .catch((e) => {
                       cb(e);
                     })
-                    .then((response:string|void) => {
-                      
+                    .then((response: string | void) => {
+
                       SpoListItemAddCommand.parseResults(response as string, cmd, cb)
                       recordsToAdd = ``;
                       rowsInBatch = 0;
@@ -328,15 +373,15 @@ class SpoListItemAddCommand extends SpoCommand {
             if (recordsToAdd.length > 0) {
               ++batchCounter;
               recordsToAdd += '--changeset_' + changeSetId + '--' + '\r\n';
-              if(verboseMode){
-              cmd.log(`Sending final batch #${batchCounter} with ${rowsInBatch} items`)
+              if (verboseMode) {
+                cmd.log(`Sending final batch #${batchCounter} with ${rowsInBatch} items`)
               }
 
-              SpoListItemAddCommand.sendABatch(batchCounter, rowsInBatch, changeSetId, recordsToAdd,args.options.webUrl,verboseMode,cmd)
+              SpoListItemAddCommand.sendABatch(batchCounter, rowsInBatch, changeSetId, recordsToAdd, args.options.webUrl, verboseMode, cmd)
                 .catch((e) => {
                   cb(e);
                 })
-                .then((response:string|void) => {
+                .then((response: string | void) => {
                   SpoListItemAddCommand.parseResults(response as string, cmd, cb)
                 })
                 .finally(() => {
