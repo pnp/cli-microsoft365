@@ -2389,19 +2389,26 @@ describe(commands.PROJECT_UPGRADE, () => {
     });
   });
 
-  it('writes CodeTour upgrade report to .tours folder when in tour output mode', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-151-webpart-react-graph'));
-    let typeofReport: string = '';
-    sinon.stub(fs, 'writeFileSync').callsFake((path, contents: any) => {
-      typeofReport = typeof contents;
+  it('writes CodeTour upgrade report to .tours folder when in tour output mode. Creates the folder when it does not exist', () => {
+    const projectPath: string = 'src/o365/spfx/commands/project/test-projects/spfx-151-webpart-react-graph';
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
+    const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(_ => {});
+    const existsSyncOriginal = fs.existsSync;
+    sinon.stub(fs, 'existsSync').callsFake(path => {
+      if (path.toString().indexOf('.tours') > -1) {
+        return false;
+      }
+      
+      return existsSyncOriginal(path);
     });
+    const mkDirSyncStub: sinon.SinonStub = sinon.stub(fs, 'mkdirSync').callsFake(_ => {});
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { output: 'tour', toVersion: '1.6.0' } }, (err?: any) => {
-      assert.equal(typeofReport, 'string');
+      assert(writeFileSyncStub.calledWith(path.join(process.cwd(), projectPath, '/.tours/upgrade.tour')), 'Tour file not created');
+      assert(mkDirSyncStub.calledWith(path.join(process.cwd(), projectPath, '/.tours')), '.tours folder not created');
     });
   });
-
 
   it('supports debug mode', () => {
     const options = (command.options() as CommandOption[]);

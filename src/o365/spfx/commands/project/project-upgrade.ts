@@ -380,14 +380,14 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
   }
 
   private writeReportTourFolder(findingsToReport: any, cmd: CommandInstance, options: Options): void {
-    const toursFolder: string = path.resolve(`${this.projectRootPath}/.tours`);
+    const toursFolder: string = path.join(this.projectRootPath+'','.tours');
 
     if (!fs.existsSync(toursFolder)) {
       fs.mkdirSync(toursFolder, { recursive: false });
     }
 
     // Override reports folder
-    options.outputFile = `${this.projectRootPath}/.tours/upgrade.tour`;
+    options.outputFile = path.join(this.projectRootPath+'','.tours','upgrade.tour');
 
     // Write reports
     this.writeReport(findingsToReport, cmd, options);
