@@ -15,6 +15,7 @@ const vorpal: Vorpal = require('../../../../vorpal-init');
 const csv = require('@fast-csv/parse');
 import { v4 } from 'uuid';
 import { createReadStream } from 'fs';
+import requestPromise = require('request-promise-native');
 
 interface CommandArgs {
   options: Options;
@@ -29,7 +30,9 @@ interface Options extends GlobalOptions {
   path: string;
   batchSize: number;
 }
-
+interface FieldNames{
+  value: {InternalName: string}[]
+}
 class SpoListItemAddCommand extends SpoCommand {
 
   public allowUnknownOptions(): boolean | undefined {
@@ -76,7 +79,7 @@ class SpoListItemAddCommand extends SpoCommand {
       
       batchContents.push('--batch_' + batchId+'--');
       cmd.log(batchContents);
-      const updateOptions: any = {
+      const updateOptions: requestPromise.OptionsWithUrl = {
         url: `${args.options.webUrl}/_api/$batch`,
         headers: {
           'Content-Type': `multipart/mixed; boundary="batch_${batchId}"`
@@ -123,7 +126,7 @@ class SpoListItemAddCommand extends SpoCommand {
       if (this.verbose) {
         cmd.log(`Getting content types for list...`);
       }
-      const ctRequestOptions: any = {
+      const ctRequestOptions: requestPromise.OptionsWithUrl = {
         url: `${listRestUrl}/contenttypes?$select=Name,Id`,
         headers: {
           'accept': 'application/json;odata=nometadata'
@@ -179,7 +182,7 @@ class SpoListItemAddCommand extends SpoCommand {
             cmd.log('setting up folder lookup response ...');
           }
 
-          const requestOptions: any = {
+          const requestOptions: requestPromise.OptionsWithUrl = {
             url: `${listRestUrl}/rootFolder`,
             headers: {
               'accept': 'application/json;odata=nometadata'
@@ -205,7 +208,7 @@ class SpoListItemAddCommand extends SpoCommand {
         }
         //start the batch -- each batch will get assigned its own id
         let changeSetId = v4();
-        let endpoint = `${listRestUrl}/AddValidateUpdateItemUsingPath()`;
+        const endpoint = `${listRestUrl}/AddValidateUpdateItemUsingPath()`;
         // get the csv  file passed in from the cmd line
         let fileStream = createReadStream(fileName);
         let csvStream: any = csv.parseStream(fileStream, { headers: false })
@@ -219,18 +222,19 @@ class SpoListItemAddCommand extends SpoCommand {
                  */
                 csvHeaders = row;
                 // fetch the valid field names from the list. If you pass a bad field name to AddValidateUpdateItemUsingPath it returns xml not JSON
-                const fetchFieldsRequest: any = {
+                const fetchFieldsRequest: requestPromise.OptionsWithUrl = {
                   url: `${listRestUrl}/fields?$select=InternalName&$filter=ReadOnlyField eq false`,
+                  json:true,
                   headers: {
                     'Accept': `application/json;odata=nometadata`
                   },
                 }
-                request.get(fetchFieldsRequest)
-                  .then((realFields) => {
-                    const spFields = JSON.parse(realFields as string).value
+                request.get<FieldNames>(fetchFieldsRequest)
+                  .then((realFields:FieldNames) => {
+                    cmd.log(realFields)
                     for (let header of csvHeaders) {
                       let fieldFound = false;
-                      for (let spField of spFields) {
+                      for (let spField of realFields.value) {
                         if (header === spField.InternalName) {
                           fieldFound = true;
                           break;
@@ -238,7 +242,7 @@ class SpoListItemAddCommand extends SpoCommand {
                       }
                       if (!fieldFound) {
                         cmd.log(`Field ${header} was not found on the SharePoint list.  Valid fields follow`)
-                        cmd.log(spFields)
+                        cmd.log(realFields)
                         cb(`Error-- field ${header} was not found on the SharePoint list`)
                       }
                     }
