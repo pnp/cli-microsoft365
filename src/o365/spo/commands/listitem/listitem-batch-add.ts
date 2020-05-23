@@ -86,6 +86,70 @@ class SpoListItemAddCommand extends SpoCommand {
     });
     return requestBody;
   }
+  public static sendABatch (batchCounter: number, rowsInBatch: number, changeSetId: string, recordsToAdd: string, webUrl:string, verbose:boolean, cmd: CommandInstance): Promise<string> {
+      
+    const batchContents = new Array();
+    const batchId = v4();
+    batchContents.push('--batch_' + batchId);
+    if (this){
+    cmd.log(`Sending batch #${batchCounter} with ${rowsInBatch} items`);
+    }
+    batchContents.push('Content-Type: multipart/mixed; boundary="changeset_' + changeSetId + '"');
+    batchContents.push('Content-Length: ' + recordsToAdd.length);
+    batchContents.push('Content-Transfer-Encoding: binary');
+    batchContents.push('');
+    batchContents.push(recordsToAdd);
+    
+    batchContents.push('--batch_' + batchId+'--');
+
+    const updateOptions: requestPromise.OptionsWithUrl = {
+      url: `${webUrl}/_api/$batch`,
+      headers: {
+        'Content-Type': `multipart/mixed; boundary="batch_${batchId}"`
+      },
+      body: batchContents.join('\r\n')
+    };
+    return request.post(updateOptions);
+  }
+  public static  async   validateContentType  (contentTypeName: string | undefined,listRestUrl:string, webUrl:string, verbose:boolean, cmd: CommandInstance): Promise<any>  {
+    if (contentTypeName == undefined) {
+      return (Promise.resolve());
+    }
+    if (verbose) {
+      cmd.log(`Getting content types for list...`);
+    }
+    const ctRequestOptions: requestPromise.OptionsWithUrl = {
+      url: `${listRestUrl}/contenttypes?$select=Name,Id`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      json: true
+    };
+
+    return request
+      .get(ctRequestOptions)
+      .then((response: any): Promise<void> => {
+
+        const foundContentType = response.value.filter((ct: any) => {
+          const contentTypeMatch: boolean = ct.Id.StringValue === contentTypeName || ct.Name === contentTypeName;
+          if (verbose) {
+            cmd.log(`Checking content type value [${ct.Name}]: ${contentTypeMatch}`);
+          }
+          return contentTypeMatch;
+        });
+        if (verbose) {
+          cmd.log('content type filter output...');
+          cmd.log(foundContentType);
+        }
+        if (foundContentType.length !== 1) {
+          return Promise.reject(`Specified content type '${contentTypeName}' doesn't exist on the target list`);
+        }else{
+          return (Promise.resolve())  
+        }
+
+
+      })
+  }
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     let lineNumber: number = 0;
     let contentTypeName: string | null = null;
@@ -95,74 +159,6 @@ class SpoListItemAddCommand extends SpoCommand {
     let batchCounter = 0;
     let recordsToAdd = "";
     let csvHeaders: Array<string>;
-    const sendABatch = (batchCounter: number, rowsInBatch: number, changeSetId: string, recordsToAdd: string): Promise<string> => {
-      
-      const batchContents = new Array();
-      const batchId = v4();
-      batchContents.push('--batch_' + batchId);
-      if (this.verbose){
-      cmd.log(`Sending batch #${batchCounter} with ${rowsInBatch} items`);
-      }
-      batchContents.push('Content-Type: multipart/mixed; boundary="changeset_' + changeSetId + '"');
-      batchContents.push('Content-Length: ' + recordsToAdd.length);
-      batchContents.push('Content-Transfer-Encoding: binary');
-      batchContents.push('');
-      batchContents.push(recordsToAdd);
-      
-      batchContents.push('--batch_' + batchId+'--');
- 
-      const updateOptions: requestPromise.OptionsWithUrl = {
-        url: `${args.options.webUrl}/_api/$batch`,
-        headers: {
-          'Content-Type': `multipart/mixed; boundary="batch_${batchId}"`
-        },
-        body: batchContents.join('\r\n')
-      };
-      return request.post(updateOptions);
-    }
-   
-
-    
-
-    const validateContentType = async (contentTypeName: string | undefined): Promise<any> => {
-      if (contentTypeName == undefined) {
-        return (Promise.resolve());
-      }
-      if (this.verbose) {
-        cmd.log(`Getting content types for list...`);
-      }
-      const ctRequestOptions: requestPromise.OptionsWithUrl = {
-        url: `${listRestUrl}/contenttypes?$select=Name,Id`,
-        headers: {
-          'accept': 'application/json;odata=nometadata'
-        },
-        json: true
-      };
-
-      return request
-        .get(ctRequestOptions)
-        .then((response: any): Promise<void> => {
-
-          const foundContentType = response.value.filter((ct: any) => {
-            const contentTypeMatch: boolean = ct.Id.StringValue === args.options.contentType || ct.Name === args.options.contentType;
-            if (this.verbose) {
-              cmd.log(`Checking content type value [${ct.Name}]: ${contentTypeMatch}`);
-            }
-            return contentTypeMatch;
-          });
-          if (this.verbose) {
-            cmd.log('content type filter output...');
-            cmd.log(foundContentType);
-          }
-          if (foundContentType.length !== 1) {
-            return Promise.reject(`Specified content type '${args.options.contentType}' doesn't exist on the target list`);
-          }else{
-            return (Promise.resolve())  
-          }
-
-
-        })
-    }
     let targetFolderServerRelativeUrl: string = ``;
     const fullPath: string = path.resolve(args.options.path);
     const fileName: string = Utils.getSafeFileName(path.basename(fullPath));
@@ -174,7 +170,7 @@ class SpoListItemAddCommand extends SpoCommand {
       : `${args.options.webUrl}/_api/web/lists/getByTitle('${encodeURIComponent(listTitleArgument)}')`);
 
     const folderExtensions: FolderExtensions = new FolderExtensions(cmd, this.debug);
-    validateContentType(args.options.contentType)
+   SpoListItemAddCommand.validateContentType(args.options.contentType,listRestUrl,args.options.webUrl,this.verbose,cmd)
       .catch((ctError) => {
         cb(ctError)
         cmd.log("error on ct")
@@ -304,7 +300,7 @@ class SpoListItemAddCommand extends SpoCommand {
                   cmd.log(`Sending batch #${batchCounter} with ${rowsInBatch} items`)
                   }
 
-                  sendABatch(batchCounter, rowsInBatch, changeSetId, recordsToAdd)
+                  SpoListItemAddCommand.sendABatch(batchCounter, rowsInBatch, changeSetId, recordsToAdd,args.options.webUrl,verboseMode,cmd)
                     .catch((e) => {
                       cb(e);
                     })
@@ -336,7 +332,7 @@ class SpoListItemAddCommand extends SpoCommand {
               cmd.log(`Sending final batch #${batchCounter} with ${rowsInBatch} items`)
               }
 
-              sendABatch(batchCounter, rowsInBatch, changeSetId, recordsToAdd)
+              SpoListItemAddCommand.sendABatch(batchCounter, rowsInBatch, changeSetId, recordsToAdd,args.options.webUrl,verboseMode,cmd)
                 .catch((e) => {
                   cb(e);
                 })
