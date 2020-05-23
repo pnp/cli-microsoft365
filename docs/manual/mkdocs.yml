@@ -443,6 +443,9 @@ nav:
         - report servicesusercounts: 'cmd/tenant/report/report-servicesusercounts.md'
       - status:
         - status list: 'cmd/tenant/status/status-list.md'
+    - To Do (todo):
+      - list:
+        - list add: 'cmd/todo/list/list-add.md'
     - Yammer (yammer):
       - group:
         - group list: 'cmd/yammer/group/group-list.md'
