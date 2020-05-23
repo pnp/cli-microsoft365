@@ -96,7 +96,7 @@ class SpoListItemAddCommand extends SpoCommand {
     let csvHeaders: Array<string>;
     const sendABatch = (batchCounter: number, rowsInBatch: number, changeSetId: string, recordsToAdd: string): Promise<any> => {
       
-      let batchContents = new Array();
+      const batchContents = new Array();
       let batchId = v4();
       batchContents.push('--batch_' + batchId);
       cmd.log(`Sending batch #${batchCounter} with ${rowsInBatch} items`);
