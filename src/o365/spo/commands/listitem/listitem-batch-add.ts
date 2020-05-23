@@ -97,9 +97,11 @@ class SpoListItemAddCommand extends SpoCommand {
     const sendABatch = (batchCounter: number, rowsInBatch: number, changeSetId: string, recordsToAdd: string): Promise<any> => {
       
       const batchContents = new Array();
-      let batchId = v4();
+      const batchId = v4();
       batchContents.push('--batch_' + batchId);
+      if (this.verbose){
       cmd.log(`Sending batch #${batchCounter} with ${rowsInBatch} items`);
+      }
       batchContents.push('Content-Type: multipart/mixed; boundary="changeset_' + changeSetId + '"');
       batchContents.push('Content-Length: ' + recordsToAdd.length);
       batchContents.push('Content-Transfer-Encoding: binary');
@@ -213,7 +215,8 @@ class SpoListItemAddCommand extends SpoCommand {
         const endpoint = `${listRestUrl}/AddValidateUpdateItemUsingPath()`;
         // get the csv  file passed in from the cmd line
         let fileStream = createReadStream(fileName);
-        let csvStream: any = csv.parseStream(fileStream, { headers: false })
+        let csvStream: any = csv.parseStream(fileStream, { headers: false });
+        let verboseMode= this.verbose;
         csvStream
           .pipe(new Transform({ //https://github.com/C2FO/fast-csv/issues/328 Need to transform if  we are batching asynch
             objectMode: true,
@@ -296,7 +299,9 @@ class SpoListItemAddCommand extends SpoCommand {
 
                   recordsToAdd += '--changeset_' + changeSetId + '--' + '\r\n';
                   ++batchCounter;
+                  if (verboseMode){
                   cmd.log(`Sending batch #${batchCounter} with ${rowsInBatch} items`)
+                  }
 
                   sendABatch(batchCounter, rowsInBatch, changeSetId, recordsToAdd)
                     .catch((e) => {
@@ -325,7 +330,9 @@ class SpoListItemAddCommand extends SpoCommand {
             if (recordsToAdd.length > 0) {
               ++batchCounter;
               recordsToAdd += '--changeset_' + changeSetId + '--' + '\r\n';
+              if(verboseMode){
               cmd.log(`Sending final batch #${batchCounter} with ${rowsInBatch} items`)
+              }
 
               sendABatch(batchCounter, rowsInBatch, changeSetId, recordsToAdd)
                 .catch((e) => {
