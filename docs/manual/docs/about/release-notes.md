@@ -48,6 +48,7 @@
 - added the 'Disable the specified tenant-wide extension' sample script [#1444](https://github.com/pnp/office365-cli/issues/1444)
 - added suggesting upgrading dependency @microsoft/sp-http [#1516](https://github.com/pnp/office365-cli/issues/1516)
 - added the 'Add custom client-side web part to modern page' sample script [#1438](https://github.com/pnp/office365-cli/issues/1438)
+- added CodeTour report for spfx project upgrade [#1592](https://github.com/pnp/office365-cli/issues/1592)
 
 ## [v2.9.0](https://github.com/pnp/office365-cli/releases/tag/v2.9.0)
 
