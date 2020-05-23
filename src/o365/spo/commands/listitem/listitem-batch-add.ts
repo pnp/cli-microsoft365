@@ -55,7 +55,8 @@ class SpoListItemAddCommand extends SpoCommand {
     telemetryProps.folder = typeof args.options.folder !== 'undefined';
     return telemetryProps;
   }
-  public static parseResults(response: any, cmd: CommandInstance, cb: (err?: any) => void): void {
+  public static parseResults(response: string, cmd: CommandInstance, cb: (err?: any) => void): void {
+    cmd.log(typeof response)
     let responseLines: Array<string> = response.toString().split('\n');
     // read each line until you find JSON... 
     for (let responseLine of responseLines) {
@@ -94,7 +95,7 @@ class SpoListItemAddCommand extends SpoCommand {
     let batchCounter = 0;
     let recordsToAdd = "";
     let csvHeaders: Array<string>;
-    const sendABatch = (batchCounter: number, rowsInBatch: number, changeSetId: string, recordsToAdd: string): Promise<Array<string>> => {
+    const sendABatch = (batchCounter: number, rowsInBatch: number, changeSetId: string, recordsToAdd: string): Promise<string> => {
       
       const batchContents = new Array();
       const batchId = v4();
@@ -307,9 +308,9 @@ class SpoListItemAddCommand extends SpoCommand {
                     .catch((e) => {
                       cb(e);
                     })
-                    .then((response:Array<string>|void) => {
-                      cmd.log(response);
-                      SpoListItemAddCommand.parseResults(response, cmd, cb)
+                    .then((response:string|void) => {
+                      
+                      SpoListItemAddCommand.parseResults(response as string, cmd, cb)
                       recordsToAdd = ``;
                       rowsInBatch = 0;
                       changeSetId = v4();
@@ -339,8 +340,8 @@ class SpoListItemAddCommand extends SpoCommand {
                 .catch((e) => {
                   cb(e);
                 })
-                .then((response:Array<string>|void) => {
-                  SpoListItemAddCommand.parseResults(response, cmd, cb)
+                .then((response:string|void) => {
+                  SpoListItemAddCommand.parseResults(response as string, cmd, cb)
                 })
                 .finally(() => {
                   cmd.log(`Processed ${lineNumber} Rows`)
