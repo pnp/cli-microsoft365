@@ -94,7 +94,7 @@ class SpoListItemAddCommand extends SpoCommand {
     let batchCounter = 0;
     let recordsToAdd = "";
     let csvHeaders: Array<string>;
-    const sendABatch = (batchCounter: number, rowsInBatch: number, changeSetId: string, recordsToAdd: string): Promise<any> => {
+    const sendABatch = (batchCounter: number, rowsInBatch: number, changeSetId: string, recordsToAdd: string): Promise<Array<string>> => {
       
       const batchContents = new Array();
       const batchId = v4();
@@ -109,7 +109,7 @@ class SpoListItemAddCommand extends SpoCommand {
       batchContents.push(recordsToAdd);
       
       batchContents.push('--batch_' + batchId+'--');
-      cmd.log(batchContents);
+ 
       const updateOptions: requestPromise.OptionsWithUrl = {
         url: `${args.options.webUrl}/_api/$batch`,
         headers: {
@@ -236,7 +236,7 @@ class SpoListItemAddCommand extends SpoCommand {
                 }
                 request.get<FieldNames>(fetchFieldsRequest)
                   .then((realFields:FieldNames) => {
-                    cmd.log(realFields)
+                    
                     for (let header of csvHeaders) {
                       let fieldFound = false;
                       for (let spField of realFields.value) {
@@ -307,7 +307,8 @@ class SpoListItemAddCommand extends SpoCommand {
                     .catch((e) => {
                       cb(e);
                     })
-                    .then((response) => {
+                    .then((response:Array<string>|void) => {
+                      cmd.log(response);
                       SpoListItemAddCommand.parseResults(response, cmd, cb)
                       recordsToAdd = ``;
                       rowsInBatch = 0;
@@ -338,7 +339,7 @@ class SpoListItemAddCommand extends SpoCommand {
                 .catch((e) => {
                   cb(e);
                 })
-                .then((response) => {
+                .then((response:Array<string>|void) => {
                   SpoListItemAddCommand.parseResults(response, cmd, cb)
                 })
                 .finally(() => {
