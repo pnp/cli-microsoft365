@@ -55,7 +55,28 @@ class SpoListItemAddCommand extends SpoCommand {
     telemetryProps.folder = typeof args.options.folder !== 'undefined';
     return telemetryProps;
   }
+  public static parseResults(response: any, cmd: CommandInstance, cb: (err?: any) => void): void {
+    let responseLines: Array<string> = response.toString().split('\n');
+    // read each line until you find JSON... 
+    for (let responseLine of responseLines) {
+      try {
+        //check for error 
 
+        if (responseLine.startsWith("HTTP/1.1 5")) { //any 500 errors (like timeout), just stop
+          cmd.log("An HTTP 5xx error was returned from SharePoint. Please retry with a lower --batchsize ")
+          cb(responseLine);
+        }
+        // parse the JSON response...
+        var tryParseJson = JSON.parse(responseLine);
+        for (let result of tryParseJson.d.AddValidateUpdateItemUsingPath.results) {
+          if (result.HasException) {
+            cmd.log(result)
+          }
+        }
+      } catch (e) {
+      }
+    }
+  }
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     let lineNumber: number = 0;
     let contentTypeName: string | null = null;
@@ -88,28 +109,7 @@ class SpoListItemAddCommand extends SpoCommand {
       };
       return request.post(updateOptions);
     }
-    const parseResults = (response: any, cmd: CommandInstance, cb: (err?: any) => void): void => {
-      let responseLines: Array<string> = response.toString().split('\n');
-      // read each line until you find JSON... 
-      for (let responseLine of responseLines) {
-        try {
-          //check for error 
-
-          if (responseLine.startsWith("HTTP/1.1 5")) { //any 500 errors (like timeout), just stop
-            cmd.log("An HTTP 5xx error was returned from SharePoint. Please retry with a lower --batchsize ")
-            cb(responseLine);
-          }
-          // parse the JSON response...
-          var tryParseJson = JSON.parse(responseLine);
-          for (let result of tryParseJson.d.AddValidateUpdateItemUsingPath.results) {
-            if (result.HasException) {
-              cmd.log(result)
-            }
-          }
-        } catch (e) {
-        }
-      }
-    }
+   
 
     const mapRequestBody = (row: any, csvHeaders: Array<string>): any => {
       const requestBody: any = [];
@@ -301,7 +301,7 @@ class SpoListItemAddCommand extends SpoCommand {
                       cb(e);
                     })
                     .then((response) => {
-                      parseResults(response, cmd, cb)
+                      SpoListItemAddCommand.parseResults(response, cmd, cb)
                       recordsToAdd = ``;
                       rowsInBatch = 0;
                       changeSetId = v4();
@@ -330,7 +330,7 @@ class SpoListItemAddCommand extends SpoCommand {
                   cb(e);
                 })
                 .then((response) => {
-                  parseResults(response, cmd, cb)
+                  SpoListItemAddCommand.parseResults(response, cmd, cb)
                 })
                 .finally(() => {
                   cmd.log(`Processed ${lineNumber} Rows`)
