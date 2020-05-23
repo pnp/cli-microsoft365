@@ -77,6 +77,14 @@ class SpoListItemAddCommand extends SpoCommand {
       }
     }
   }
+
+  public static  mapRequestBody (row: any, csvHeaders: Array<string>): any  {
+    const requestBody: any = [];
+    Object.keys(row).forEach(async key => {
+      requestBody.push({ FieldName: csvHeaders[parseInt(key)], FieldValue: (<any>row)[key] });
+    });
+    return requestBody;
+  }
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     let lineNumber: number = 0;
     let contentTypeName: string | null = null;
@@ -111,13 +119,7 @@ class SpoListItemAddCommand extends SpoCommand {
     }
    
 
-    const mapRequestBody = (row: any, csvHeaders: Array<string>): any => {
-      const requestBody: any = [];
-      Object.keys(row).forEach(async key => {
-        requestBody.push({ FieldName: csvHeaders[parseInt(key)], FieldValue: (<any>row)[key] });
-      });
-      return requestBody;
-    }
+    
 
     const validateContentType = async (contentTypeName: string | undefined): Promise<any> => {
       if (contentTypeName == undefined) {
@@ -262,7 +264,7 @@ class SpoListItemAddCommand extends SpoCommand {
                 lineNumber++
                 rowsInBatch++;
                 const requestBody: any = {
-                  formValues: mapRequestBody(row, csvHeaders)
+                  formValues: SpoListItemAddCommand.mapRequestBody(row, csvHeaders)
                 };
                 if (args.options.folder) {
                   requestBody.listItemCreateInfo = {
@@ -278,21 +280,21 @@ class SpoListItemAddCommand extends SpoCommand {
                   });
                 }
                 // row is ready
-                recordsToAdd += '--changeset_' + changeSetId + '\u000d\u000a' +
-                  'Content-Type: application/http' + '\u000d\u000a' +
-                  'Content-Transfer-Encoding: binary' + '\u000d\u000a' +
-                  '\u000d\u000a' +
-                  'POST ' + endpoint + ' HTTP/1.1' + '\u000d\u000a' +
-                  'Content-Type: application/json;odata=verbose' + '\u000d\u000a' +
-                  'Accept: application/json;odata=verbose' + '\u000d\u000a' +
-                  '\u000d\u000a' +
-                  `${JSON.stringify(requestBody)}` + '\u000d\u000a' +
-                  '\u000d\u000a';
+                recordsToAdd += '--changeset_' + changeSetId + '\r\n' +
+                  'Content-Type: application/http' + '\r\n' +
+                  'Content-Transfer-Encoding: binary' + '\r\n' +
+                  '\r\n' +
+                  'POST ' + endpoint + ' HTTP/1.1' + '\r\n' +
+                  'Content-Type: application/json;odata=verbose' + '\r\n' +
+                  'Accept: application/json;odata=verbose' + '\r\n' +
+                  '\r\n' +
+                  `${JSON.stringify(requestBody)}` + '\r\n' +
+                  '\r\n';
 
                 /***  Send the batch if the buffer is getting full   **/
                 if (rowsInBatch >= batchSize || recordsToAdd.length >= maxBytesInBatch) {
 
-                  recordsToAdd += '--changeset_' + changeSetId + '--' + '\u000d\u000a';
+                  recordsToAdd += '--changeset_' + changeSetId + '--' + '\r\n';
                   ++batchCounter;
                   cmd.log(`Sending batch #${batchCounter} with ${rowsInBatch} items`)
 
@@ -322,7 +324,7 @@ class SpoListItemAddCommand extends SpoCommand {
 
             if (recordsToAdd.length > 0) {
               ++batchCounter;
-              recordsToAdd += '--changeset_' + changeSetId + '--' + '\u000d\u000a';
+              recordsToAdd += '--changeset_' + changeSetId + '--' + '\r\n';
               cmd.log(`Sending final batch #${batchCounter} with ${rowsInBatch} items`)
 
               sendABatch(batchCounter, rowsInBatch, changeSetId, recordsToAdd)
