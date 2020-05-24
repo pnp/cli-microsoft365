@@ -27,7 +27,6 @@ class TodoListRemoveCommand extends GraphCommand {
     return 'Removes a Microsoft To Do task list';
   }
 
-
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
 
     const getListId = () => {
