@@ -22,6 +22,7 @@ import { FN010006_YORC_framework } from "./rules/FN010006_YORC_framework";
 import { FN015002_FILE_typings__ms_odsp_d_ts } from "./rules/FN015002_FILE_typings__ms_odsp_d_ts";
 import { FN001023_DEP_microsoft_sp_component_base } from "./rules/FN001023_DEP_microsoft_sp_component_base";
 import { FN001027_DEP_microsoft_sp_http } from "./rules/FN001027_DEP_microsoft_sp_http";
+import { FN001029_DEP_microsoft_sp_loader } from "./rules/FN001029_DEP_microsoft_sp_loader";
 
 module.exports = [
   new FN001001_DEP_microsoft_sp_core_library('1.1.0'),
@@ -36,6 +37,7 @@ module.exports = [
   new FN001018_DEP_microsoft_sp_client_base('', false),
   new FN001023_DEP_microsoft_sp_component_base('1.1.0'),
   new FN001027_DEP_microsoft_sp_http('1.1.0'),
+  new FN001029_DEP_microsoft_sp_loader('1.1.0'),
   new FN002001_DEVDEP_microsoft_sp_build_web('1.1.0'),
   new FN002002_DEVDEP_microsoft_sp_module_interfaces('1.1.0'),
   new FN002003_DEVDEP_microsoft_sp_webpart_workbench('1.1.0'),
