@@ -463,6 +463,7 @@ nav:
       - list:
         - list add: 'cmd/todo/list/list-add.md'
         - list list: 'cmd/todo/list/list-list.md'
+        - list remove: 'cmd/todo/list/list-remove.md'
         - list set: 'cmd/todo/list/list-set.md'
     - Yammer (yammer):
       - group:
