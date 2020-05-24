@@ -34,6 +34,20 @@ interface Options extends GlobalOptions {
 interface FieldNames {
   value: { InternalName: string }[]
 }
+interface ContentTypes {
+  value: { 
+    Id: {
+      StringValue:string
+    },
+    Name:string
+   }[]
+}
+interface GetWebResponse {
+  Url:string
+}
+interface GetRootFolderResponse {
+  ServerRelativeUrl:string
+}
 class SpoListItemAddCommand extends SpoCommand {
 
   public allowUnknownOptions(): boolean | undefined {
@@ -57,7 +71,7 @@ class SpoListItemAddCommand extends SpoCommand {
     return telemetryProps;
   }
   public static parseResults(response: string, cmd: CommandInstance, cb: (err?: any) => void): void {
-    cmd.log(typeof response)
+    
     let responseLines: Array<string> = response.toString().split('\n');
     // read each line until you find JSON... 
     for (let responseLine of responseLines) {
@@ -110,7 +124,7 @@ class SpoListItemAddCommand extends SpoCommand {
       },
       body: batchContents.join('\r\n')
     };
-    cmd.log(updateOptions)
+
     return request.post(updateOptions);
   }
   public static async   validateContentType(contentTypeName: string | undefined, listRestUrl: string, webUrl: string, verbose: boolean, cmd: CommandInstance): Promise<any> {
@@ -129,8 +143,8 @@ class SpoListItemAddCommand extends SpoCommand {
     };
 
     return request
-      .get(ctRequestOptions)
-      .then((response: any): Promise<void> => {
+      .get<ContentTypes>(ctRequestOptions)
+      .then((response: ContentTypes): Promise<void> => {
 
         const foundContentType = response.value.filter((ct: any) => {
           const contentTypeMatch: boolean = ct.Id.StringValue === contentTypeName || ct.Name === contentTypeName;
@@ -154,7 +168,7 @@ class SpoListItemAddCommand extends SpoCommand {
   }
   public static async   getFolderUrl(folderName: string | undefined, listRestUrl: string, webUrl: string, verbose: boolean, debug:boolean, cmd: CommandInstance): Promise<any> {
     if (folderName == undefined) {
-      cmd.log(listRestUrl)
+
       const listRequestOptions: requestPromise.OptionsWithUrl = {
         url: listRestUrl+"/RootFolder",
         headers: {
@@ -163,9 +177,9 @@ class SpoListItemAddCommand extends SpoCommand {
         json: true
       };
       return request
-        .get(listRequestOptions)
-        .then((response: any): Promise<string> => {
-          cmd.log(response)
+        .get<GetRootFolderResponse>(listRequestOptions)
+        .then((response: GetRootFolderResponse): Promise<string> => {
+
           return Promise.resolve(response.ServerRelativeUrl);
         })
 
@@ -180,8 +194,8 @@ class SpoListItemAddCommand extends SpoCommand {
         json: true
       }
       return request
-        .get<any>(requestOptions)
-        .then(async (rootFolderResponse) => {
+        .get<GetRootFolderResponse>(requestOptions)
+        .then(async (rootFolderResponse:GetRootFolderResponse) => {
 
           const targetFolderServerRelativeUrl = Utils.getServerRelativePath(rootFolderResponse["ServerRelativeUrl"], folderName);
           const folderExtensions: FolderExtensions = new FolderExtensions(cmd, debug);
@@ -201,9 +215,9 @@ class SpoListItemAddCommand extends SpoCommand {
         json: true
       };
       return request
-        .get(WebRequestOptions)
-        .then((response: any): Promise<string> => {
-          cmd.log(response)
+        .get<GetWebResponse>(WebRequestOptions)
+        .then((response: GetWebResponse): Promise<string> => {
+   
           return Promise.resolve(response.Url);
         })
 
@@ -213,7 +227,7 @@ class SpoListItemAddCommand extends SpoCommand {
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     let lineNumber: number = 0;
     let contentTypeName: string | null = null;
-    let listRestUrl: string | null = null;
+   
     let maxBytesInBatch: number = 1000000; // max is  1048576
     let rowsInBatch: number = 0;
     let batchCounter = 0;
@@ -225,7 +239,7 @@ class SpoListItemAddCommand extends SpoCommand {
     const listIdArgument = args.options.listId || '';
     const listTitleArgument = args.options.listTitle || '';
     const batchSize: number = args.options.batchSize || 10;
-    listRestUrl = (args.options.listId ?
+  let  listRestUrl = (args.options.listId ?
       `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(listIdArgument)}')`
       : `${args.options.webUrl}/_api/web/lists/getByTitle('${encodeURIComponent(listTitleArgument)}')`);
 
@@ -289,8 +303,7 @@ class SpoListItemAddCommand extends SpoCommand {
                       }
                       if (!fieldFound) {
                         cmd.log(`Field ${header} was not found on the SharePoint list.  Valid fields follow`)
-                        cmd.log(realFields)
-                        cb(`Error-- field ${header} was not found on the SharePoint list`)
+                                              cb(`Error-- field ${header} was not found on the SharePoint list`)
                       }
                     }
                     lineNumber++
