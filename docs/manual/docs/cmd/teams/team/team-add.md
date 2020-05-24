@@ -13,8 +13,10 @@ teams team add [options]
 Option|Description
 ------|-----------
 `--help`|output usage information
-`-n, --name <name>`|Display name for the Microsoft Teams team
-`-d, --description <description>`|Description for the Microsoft Teams team
+`-n, --name [name]`|Display name for the Microsoft Teams team. Required if `templatePath` not supplied
+`-d, --description [description]`|Description for the Microsoft Teams team. Required if `templatePath` not supplied
+`--templatePath [templatePath]`|Local path to the file containing the template. If `name` or `description` are supplied, these take precedence over the template values
+`--wait`|Wait for the team to be provisioned before completing the command
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json,text`. Default `text`
 `--pretty`|Prettifies `json` output
@@ -35,3 +37,19 @@ Add a new Microsoft Teams team
 ```sh
 teams team add --name 'Architecture' --description 'Architecture Discussion'
 ```
+
+Add a new Microsoft Teams team using a template
+
+```sh
+teams team add --name 'Architecture' --description 'Architecture Discussion' --templatePath 'template.json'
+```
+
+Add a new Microsoft Teams team using a template and wait for the team to be provisioned
+
+```sh
+teams team add --name 'Architecture' --description 'Architecture Discussion' --templatePath 'template.json' --wait
+```
+
+## More information
+
+- Get started with Teams templates: [https://docs.microsoft.com/en-us/MicrosoftTeams/get-started-with-teams-templates](https://docs.microsoft.com/en-us/MicrosoftTeams/get-started-with-teams-templates)
