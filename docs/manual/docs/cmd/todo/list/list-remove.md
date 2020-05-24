@@ -24,8 +24,8 @@ Option|Description
 
 ## Remarks
 
-This command uses an API that is currently under preview and subject to changes.
-Please report any issue encountered with this command to the [Office 365 CLI GitHub repository issues](https://github.com/pnp/office365-cli/issues)
+!!! attention
+    This command is based on an API that is currently in preview and is subject to change once the API reached general availability.
 
 ## Examples
 
