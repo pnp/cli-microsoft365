@@ -85,7 +85,7 @@ class TodoListRemoveCommand extends GraphCommand {
           type: "confirm",
           name: "continue",
           default: false,
-          message: `Are you sure you want to remove the list ${args.options.id || args.options.name}?`
+          message: `Are you sure you want to remove the task list ${args.options.id || args.options.name}?`
         },
         (result: { continue: boolean }): void => {
           if (!result.continue) {
@@ -103,7 +103,7 @@ class TodoListRemoveCommand extends GraphCommand {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.name = typeof args.options.name !== 'undefined';
     telemetryProps.id = typeof args.options.id !== 'undefined';
-    telemetryProps.confirm = args.options.confirm;
+    telemetryProps.confirm = typeof args.options.confirm !== 'undefined';
     return telemetryProps;
   }
 
@@ -115,7 +115,7 @@ class TodoListRemoveCommand extends GraphCommand {
       },
       {
         option: '-i, --id [id]',
-        description: `The ID of the list to remove. Specify either id or name but not both`
+        description: `The ID of the task list to remove. Specify either id or name but not both`
       },
       {
         option: '--confirm',
@@ -142,15 +142,23 @@ class TodoListRemoveCommand extends GraphCommand {
   }
 
   public commandHelp(args: {}, log: (help: string) => void): void {
+    const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  
-  Examples:
+      `
+      Remarks:
+
+      ## Remarks
+
+    This command uses an API that is currently under preview and subject to changes. 
+    Please report any issue encountered with this command to the Office 365 CLI GitHub repository issues at https://github.com/pnp/office365-cli/issues
+      
+      Examples:
   
-    Remove the list "My task list"
+    Remove a task list with the name ${chalk.grey('My task list')}
       ${this.name} --name "My task list"
 
-    Remove the list with Id "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA="
+    Remove a task list with the ID ${chalk.grey("AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=")}
       ${this.name} --id "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA="
 `);
   }
