@@ -4,6 +4,10 @@
 
 ### New commands
 
+**Azure Active Directory:**
+
+- [aad approleassignment add](../cmd/aad/approleassignment/approleassignment-add.md) - adds service principal permissions also known as scopes and app role assignments for specified Azure AD application registration [#1581](https://github.com/pnp/office365-cli/issues/1581)
+
 **Microsoft Teams:**
 
 - [teams user app add](../cmd/teams/user/user-app-add.md) - install an app in the personal scope of the specified user [#1450](https://github.com/pnp/office365-cli/issues/1450)
@@ -49,6 +53,8 @@
 - added suggesting upgrading dependency @microsoft/sp-http [#1516](https://github.com/pnp/office365-cli/issues/1516)
 - added the 'Add custom client-side web part to modern page' sample script [#1438](https://github.com/pnp/office365-cli/issues/1438)
 - added CodeTour report for spfx project upgrade [#1592](https://github.com/pnp/office365-cli/issues/1592)
+- extended 'aad sp get' with --objectId option [#1567](https://github.com/pnp/office365-cli/issues/1567)
+- removed reserved shortcut from 'aad approleassignment list' objectId option [#1607](https://github.com/pnp/office365-cli/issues/1607)
 
 ## [v2.9.0](https://github.com/pnp/office365-cli/releases/tag/v2.9.0)
 
