@@ -1913,7 +1913,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 17);
+      assert.equal(findings.length, 18);
     });
   });
   //#endregion
@@ -1985,7 +1985,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 26);
+      assert.equal(findings.length, 27);
     });
   });
 
@@ -2077,7 +2077,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 16);
+      assert.equal(findings.length, 17);
     });
   });
   //#endregion
@@ -2149,7 +2149,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.2', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 18);
+      assert.equal(findings.length, 19);
     });
   });
   //#endregion
@@ -2221,7 +2221,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.9.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 18);
+      assert.equal(findings.length, 19);
     });
   });
   //#endregion
@@ -2293,7 +2293,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.10.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 19);
+      assert.equal(findings.length, 20);
     });
   });
   //#endregion
