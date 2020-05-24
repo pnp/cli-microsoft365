@@ -205,7 +205,7 @@ class SpoListItemAddCommand extends SpoCommand {
         });
     }
   }
-  public static async   getCaseSensitiveWebUrl( webUrl: string, cmd: CommandInstance): Promise<any> {
+  public static async   getCaseSensitiveWebUrl( webUrl: string, cmd: CommandInstance): Promise<string> {
 
       const WebRequestOptions: requestPromise.OptionsWithUrl = {
         url: webUrl+"/_api/web",
