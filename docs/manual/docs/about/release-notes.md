@@ -12,6 +12,10 @@
 
 - [teams user app add](../cmd/teams/user/user-app-add.md) - install an app in the personal scope of the specified user [#1450](https://github.com/pnp/office365-cli/issues/1450)
 
+**Microsoft To Do:**
+
+- [todo list add](../cmd/todo/list/list-add.md) - adds a Microsoft To Do task list [#1610](https://github.com/pnp/office365-cli/issues/1610)
+
 **Yammer:**
 
 - [yammer group user add](../cmd/yammer/group/group-user-add.md) - adds a user to a Yammer Group [#1456](https://github.com/pnp/office365-cli/issues/1456)
