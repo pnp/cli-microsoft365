@@ -14,6 +14,7 @@ import { FN001023_DEP_microsoft_sp_component_base } from "./rules/FN001023_DEP_m
 import { FN001026_DEP_microsoft_sp_extension_base } from "./rules/FN001026_DEP_microsoft_sp_extension_base";
 import { FN001027_DEP_microsoft_sp_http } from "./rules/FN001027_DEP_microsoft_sp_http";
 import { FN001029_DEP_microsoft_sp_loader } from "./rules/FN001029_DEP_microsoft_sp_loader";
+import { FN001030_DEP_microsoft_sp_module_interfaces } from "./rules/FN001030_DEP_microsoft_sp_module_interfaces";
 
 module.exports = [
   new FN001001_DEP_microsoft_sp_core_library('1.3.0'),
@@ -27,6 +28,7 @@ module.exports = [
   new FN001026_DEP_microsoft_sp_extension_base('1.3.0'),
   new FN001027_DEP_microsoft_sp_http('1.3.0'),
   new FN001029_DEP_microsoft_sp_loader('1.3.0'),
+  new FN001030_DEP_microsoft_sp_module_interfaces('1.3.0'),
   new FN002001_DEVDEP_microsoft_sp_build_web('1.3.0'),
   new FN002002_DEVDEP_microsoft_sp_module_interfaces('1.3.0'),
   new FN002003_DEVDEP_microsoft_sp_webpart_workbench('1.3.0'),
