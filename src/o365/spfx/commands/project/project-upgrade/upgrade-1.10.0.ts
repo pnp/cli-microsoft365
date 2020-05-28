@@ -25,6 +25,7 @@ import { FN001028_DEP_microsoft_sp_list_subscription } from "./rules/FN001028_DE
 import { FN001029_DEP_microsoft_sp_loader } from "./rules/FN001029_DEP_microsoft_sp_loader";
 import { FN001030_DEP_microsoft_sp_module_interfaces } from "./rules/FN001030_DEP_microsoft_sp_module_interfaces";
 import { FN001031_DEP_microsoft_sp_odata_types } from "./rules/FN001031_DEP_microsoft_sp_odata_types";
+import { FN001032_DEP_microsoft_sp_page_context } from "./rules/FN001032_DEP_microsoft_sp_page_context";
 
 module.exports = [
   new FN001001_DEP_microsoft_sp_core_library('1.10.0'),
@@ -45,6 +46,7 @@ module.exports = [
   new FN001029_DEP_microsoft_sp_loader('1.10.0'),
   new FN001030_DEP_microsoft_sp_module_interfaces('1.10.0'),
   new FN001031_DEP_microsoft_sp_odata_types('1.10.0'),
+  new FN001032_DEP_microsoft_sp_page_context('1.10.0'),
   new FN002001_DEVDEP_microsoft_sp_build_web('1.10.0'),
   new FN002002_DEVDEP_microsoft_sp_module_interfaces('1.10.0'),
   new FN002003_DEVDEP_microsoft_sp_webpart_workbench('1.10.0'),
