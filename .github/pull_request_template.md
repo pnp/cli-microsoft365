@@ -1,5 +1,5 @@
-> Thank you for submitting your change to the project, we really appreciate your help. 
-> 
+> Thank you for submitting your change to the project, we really appreciate your help.
+>
 > For us to be able to review and merge your changes as quickly as possible, please review our pull request process.
 >
 > _(DELETE THIS PARAGRAPH AFTER READING)_
@@ -42,8 +42,8 @@ Closes #
 
 > ### New Command = Five Files
 >
-> If your pull request contains the changes for a new command, it should contain five changed files. 
-> 
+> If your pull request contains the changes for a new command, it should contain five changed files.
+>
 > For example, a pull request for adding 'teams tab add' command, would include...
 >
 > - src/o365/teams/commands.ts
@@ -55,9 +55,9 @@ Closes #
 > _(DELETE THIS SECTION AFTER READING)_
 >
 
-> ### Dev Branch Only
+> ### Master Branch Only
 >
-> You should only submit your changes to the **dev** branch.
+> You should only submit your changes to the **master** branch.
 >
 > Pull requests submitted to other branches will be rejected.
 >
@@ -68,15 +68,15 @@ Closes #
 >
 > Merge conflicts occur when the branch you want to merge is out of date. To ensure this does not happen, you should ensure that your branch is up-to-date before submitting your pull request by executing the below git commands.
 >
-> `git checkout dev`
-> 
-> `git pull upstream dev`
-> 
-> `git push origin dev`
+> `git checkout master`
+>
+> `git pull upstream master`
+>
+> `git push origin master`
 >
 > `git checkout <your-branch>`
 >
-> `git rebase dev`
+> `git rebase master`
 >
 > `git push origin <your-branch> -f`
 >
