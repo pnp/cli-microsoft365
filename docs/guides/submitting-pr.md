@@ -9,21 +9,22 @@ We appreciate your initiative and would love to integrate your work with the res
 
     ```sh
     # assuming you are in the folder of your locally cloned fork....
-    git checkout dev
+    git checkout master
 
     # assuming you have a remote named `upstream` pointing to the official **office365-cli** repo
     git fetch upstream
 
-    # update your local dev branch to be a mirror of what's in the main repo
-    git pull --rebase upstream dev
+    # update your local master branch to be a mirror of what's in the main repo
+    git pull --rebase upstream master
 
     # switch to your branch where you are working, say "issue-xyz"
     git checkout issue-xyz
 
-    # update your branch to update its fork point to the current tip of dev & put your changes on top of it
-    git rebase dev
+    # update your branch to update its fork point to the current tip of master & put your changes on top of it
+    git rebase master
     ```
-- submit PR to the **dev** branch of the main repo. PRs submitted to other branches will be declined
+
+- submit PR to the **master** branch of the main repo. PRs submitted to other branches will be declined
 - let us know what's in the PR: is it a new command, bug fix or a minor update in the docs? The clearer the information you provide, the quicker your PR can be verified and merged
 - ideally 1 PR = 1 commit - this makes it easier to keep the log clear for everyone and track what's changed. If you're new to working with git, we'll squash your commits for you when merging your changes into the main repo
 - don't worry about changing the version or adding yourself to the list of contributors in package.json. We'll do that for you when merging your changes.

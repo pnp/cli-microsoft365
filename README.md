@@ -1,9 +1,9 @@
 <img src="./docs/manual/docs/images/pnp-office365-cli-blue.svg" alt="Office 365 CLI" height=78 />
 
-@latest (master) | @next (dev)
-:--------------: | :---------:
-[![CircleCI](https://circleci.com/gh/pnp/office365-cli/tree/master.svg?style=shield&circle-token=ce99e8046a231e1959248a61e7e32f9ae1abc8cf)](https://circleci.com/gh/pnp/office365-cli/tree/master)|[![CircleCI](https://circleci.com/gh/pnp/office365-cli/tree/dev.svg?style=shield&circle-token=ce99e8046a231e1959248a61e7e32f9ae1abc8cf)](https://circleci.com/gh/pnp/office365-cli/tree/dev)
-[![Coverage Status](https://coveralls.io/repos/github/pnp/office365-cli/badge.svg?branch=master)](https://coveralls.io/github/pnp/office365-cli?branch=master)|[![Coverage Status](https://coveralls.io/repos/github/pnp/office365-cli/badge.svg?branch=dev)](https://coveralls.io/github/pnp/office365-cli?branch=dev)
+@latest/@next (master) |
+:--------------: |
+[![CircleCI](https://circleci.com/gh/pnp/office365-cli/tree/master.svg?style=shield&circle-token=ce99e8046a231e1959248a61e7e32f9ae1abc8cf)](https://circleci.com/gh/pnp/office365-cli/tree/master)|
+[![Coverage Status](https://coveralls.io/repos/github/pnp/office365-cli/badge.svg?branch=master)](https://coveralls.io/github/pnp/office365-cli?branch=master)|
 
 # Office 365 CLI
 
