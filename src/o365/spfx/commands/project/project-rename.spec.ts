@@ -15,6 +15,7 @@ describe(commands.PROJECT_RENAME, () => {
   let cmdInstance: any;
   let trackEvent: any;
   let telemetry: any;
+  let writeFileSyncSpy: sinon.SinonStub;
   const projectPath: string = 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-182-webpart-react';
 
   before(() => {
@@ -36,6 +37,7 @@ describe(commands.PROJECT_RENAME, () => {
       }
     };
     telemetry = null;
+    writeFileSyncSpy = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
   });
 
   afterEach(() => {
@@ -65,7 +67,6 @@ describe(commands.PROJECT_RENAME, () => {
 
   it('calls telemetry', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
-    sinon.stub(fs, 'writeFileSync').callsFake(() => { });
 
     cmdInstance.action({ options: { newName: 'spfx-react' } }, () => {
       assert(trackEvent.called);
@@ -74,7 +75,6 @@ describe(commands.PROJECT_RENAME, () => {
 
   it('logs correct telemetry event', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
-    sinon.stub(fs, 'writeFileSync').callsFake(() => { });
 
     cmdInstance.action({ options: { newName: 'spfx-react' } }, () => {
       assert.equal(telemetry.name, commands.PROJECT_RENAME);
@@ -105,9 +105,22 @@ describe(commands.PROJECT_RENAME, () => {
     });
   });
 
+  it('updates only the files found and skips other files', (done) => {
+    cmdInstance.action({ options: { newName: 'spfx-react' } }, (err?: any) => {
+      try {
+        assert(writeFileSyncSpy.calledTwice);
+        done();
+      }
+      catch (ex) {
+        done(ex);
+      }
+    });
+  });
+
   it('replaces project name in package.json', (done) => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
-    let replacedContent = `{
+
+    const replacedContent = `{
   "name": "spfx-react",
   "version": "0.0.1",
   "private": true,
@@ -149,11 +162,9 @@ describe(commands.PROJECT_RENAME, () => {
   }
 }`;
 
-    const writeFileSyncSpy: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
-
     cmdInstance.action({ options: { newName: 'spfx-react' } }, (err?: any) => {
       try {
-        assert.equal(writeFileSyncSpy.getCall(0).args[1], replacedContent);
+        assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
         done();
       }
       catch (ex) {
@@ -165,7 +176,7 @@ describe(commands.PROJECT_RENAME, () => {
   it('replaces only project name in .yo-rc.json when --generateNewId is not passed', (done) => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
 
-    let replacedContent = `{
+    const replacedContent = `{
   "@microsoft/generator-sharepoint": {
     "version": "1.8.2",
     "libraryName": "spfx-react",
@@ -183,11 +194,9 @@ describe(commands.PROJECT_RENAME, () => {
   }
 }`;
 
-    const writeFileSyncSpy: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
-
     cmdInstance.action({ options: { newName: 'spfx-react' } }, (err?: any) => {
       try {
-        assert.equal(writeFileSyncSpy.getCall(1).args[1], replacedContent);
+        assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
         done();
       }
       catch (ex) {
@@ -203,7 +212,7 @@ describe(commands.PROJECT_RENAME, () => {
       return '69cb6882-acc1-4148-b059-31ae149ba077'
     });
 
-    let replacedContent = `{
+    const replacedContent = `{
   "@microsoft/generator-sharepoint": {
     "version": "1.8.2",
     "libraryName": "spfx-react",
@@ -221,11 +230,9 @@ describe(commands.PROJECT_RENAME, () => {
   }
 }`;
 
-    const writeFileSyncSpy: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
-
     cmdInstance.action({ options: { newName: 'spfx-react', generateNewId: true, debug: true } }, (err?: any) => {
       try {
-        assert.equal(writeFileSyncSpy.getCall(1).args[1], replacedContent);
+        assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
         done();
       }
       catch (ex) {
@@ -237,7 +244,7 @@ describe(commands.PROJECT_RENAME, () => {
   it('replaces only project name in package-solution.json when --generateNewId is not passed', (done) => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
 
-    let replacedContent = `{
+    const replacedContent = `{
   "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
   "solution": {
     "name": "spfx-react-client-side-solution",
@@ -251,11 +258,9 @@ describe(commands.PROJECT_RENAME, () => {
   }
 }`;
 
-    const writeFileSyncSpy: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
-
     cmdInstance.action({ options: { newName: 'spfx-react' } }, (err?: any) => {
       try {
-        assert.equal(writeFileSyncSpy.getCall(2).args[1], replacedContent);
+        assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
         done();
       }
       catch (ex) {
@@ -271,7 +276,7 @@ describe(commands.PROJECT_RENAME, () => {
       return '69cb6882-acc1-4148-b059-31ae149ba077'
     });
 
-    let replacedContent = `{
+    const replacedContent = `{
   "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
   "solution": {
     "name": "spfx-react-client-side-solution",
@@ -285,11 +290,9 @@ describe(commands.PROJECT_RENAME, () => {
   }
 }`;
 
-    const writeFileSyncSpy: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
-
     cmdInstance.action({ options: { newName: 'spfx-react', generateNewId: true } }, (err?: any) => {
       try {
-        assert.equal(writeFileSyncSpy.getCall(2).args[1], replacedContent);
+        assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
         done();
       }
       catch (ex) {
@@ -301,7 +304,7 @@ describe(commands.PROJECT_RENAME, () => {
   it('replaces project name in deploy-azure-storage.json', (done) => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
 
-    let replacedContent = `{
+    const replacedContent = `{
   "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/deploy-azure-storage.schema.json",
   "workingDir": "./temp/deploy/",
   "account": "<!-- STORAGE ACCOUNT NAME -->",
@@ -309,11 +312,9 @@ describe(commands.PROJECT_RENAME, () => {
   "accessKey": "<!-- ACCESS KEY -->"
 }`;
 
-    const writeFileSyncSpy: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
-
     cmdInstance.action({ options: { newName: 'spfx-react' } }, (err?: any) => {
       try {
-        assert.equal(writeFileSyncSpy.getCall(3).args[1], replacedContent);
+        assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
         done();
       }
       catch (ex) {
@@ -325,7 +326,7 @@ describe(commands.PROJECT_RENAME, () => {
   it('replaces project name in README.md', (done) => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
 
-    let replacedContent = `## spfx-react
+    const replacedContent = `## spfx-react
 
 This is where you include your WebPart documentation.
 
@@ -353,11 +354,9 @@ gulp bundle - TODO
 gulp package-solution - TODO
 `;
 
-    const writeFileSyncSpy: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
-
     cmdInstance.action({ options: { newName: 'spfx-react' } }, (err?: any) => {
       try {
-        assert.equal(writeFileSyncSpy.getCall(4).args[1], replacedContent);
+        assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
         done();
       }
       catch (ex) {

@@ -20,10 +20,6 @@ interface Options extends GlobalOptions {
 }
 
 class SpfxProjectRenameCommand extends BaseProjectCommand {
-  public constructor() {
-    super();
-  }
-
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
 
   public get name(): string {
@@ -31,12 +27,11 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
   }
 
   public get description(): string {
-    return 'Rename SharePoint Framework project';
+    return 'Renames SharePoint Framework project';
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.newName = (!(!args.options.newName)).toString();
     telemetryProps.generateNewId = args.options.generateNewId;
     return telemetryProps;
   }
@@ -104,16 +99,22 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
     ];
 
     const replaceFileContent = (filePath: string) => {
-      if (fs.existsSync(filePath)) {
-        let existingContent = fs.readFileSync(filePath, 'utf-8');
-        let updatedContent;
-        if (filePath.endsWith('.json')) {
-          updatedContent = JSON.parse(existingContent);
+      if (!fs.existsSync(filePath)) {
+        return;
+      }
+      const existingContent = fs.readFileSync(filePath, 'utf-8');
+      let updatedContent;
+      if (filePath.endsWith('.json')) {
+        updatedContent = JSON.parse(existingContent);
 
+        if (filePath.endsWith('package.json')) {
           if (updatedContent &&
             updatedContent.name) {
             updatedContent.name = args.options.newName;
           }
+        }
+
+        if (filePath.endsWith('.yo-rc.json')) {
           if (updatedContent &&
             updatedContent['@microsoft/generator-sharepoint'] &&
             updatedContent['@microsoft/generator-sharepoint'].libraryName) {
@@ -130,6 +131,9 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
             args.options.generateNewId) {
             updatedContent['@microsoft/generator-sharepoint'].libraryId = newId;
           }
+        }
+
+        if (filePath.endsWith('config/package-solution.json')) {
           if (updatedContent &&
             updatedContent.solution &&
             updatedContent.solution.name) {
@@ -146,18 +150,23 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
             updatedContent.paths.zippedPackage) {
             updatedContent.paths.zippedPackage = updatedContent.paths.zippedPackage.replace(new RegExp(projectName, 'g'), args.options.newName);
           }
+        }
+
+        if (filePath.endsWith('config/deploy-azure-storage.json')) {
           if (updatedContent &&
             updatedContent.container) {
             updatedContent.container = args.options.newName;
           }
-          fs.writeFileSync(filePath, JSON.stringify(updatedContent, null, 2), 'utf-8');
-        } else {
-          updatedContent = existingContent.replace(new RegExp(projectName, 'g'), args.options.newName);
-          fs.writeFileSync(filePath, updatedContent, 'utf-8');
         }
-        if (this.debug) {
-          cmd.log(`Updated ${filePath.split('/').pop()}`);
-        }
+
+        fs.writeFileSync(filePath, JSON.stringify(updatedContent, null, 2), 'utf-8');
+      }
+      if (filePath.endsWith('README.md')) {
+        updatedContent = existingContent.replace(new RegExp(projectName, 'g'), args.options.newName);
+        fs.writeFileSync(filePath, updatedContent, 'utf-8');
+      }
+      if (this.debug) {
+        cmd.log(`Updated ${filePath.split('/').pop()}`);
       }
     }
 
@@ -173,18 +182,22 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
       cmd.log('DONE');
     }
 
-    cb(`SharePoint Framework project successfully renamed to '${args.options.newName}'`);
+    cb();
   }
 
   public commandHelp(args: any, log: (help: string) => void): void {
+    const chalk = vorpal.chalk;
     log(vorpal.find(commands.PROJECT_RENAME).helpInformation());
     log(
-      `Examples:
-  
-    Rename SharePoint Framework project to contoso
+      `   ${chalk.yellow('Important:')} Run this command in the folder where the project for which you
+      want to externalize dependencies is located.
+
+  Examples:
+
+    Renames SharePoint Framework project to contoso
       ${commands.PROJECT_RENAME} --newName contoso
 
-    Rename SharePoint Framework project to contoso with new solution Id
+    Renames SharePoint Framework project to contoso with new solution Id
       ${commands.PROJECT_RENAME} --newName contoso --generateNewId
 `);
   }

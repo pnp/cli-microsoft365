@@ -26,13 +26,13 @@ Option|Description
 
 ## Examples
 
-Rename SharePoint Framework project to contoso
+Renames SharePoint Framework project to contoso
 
 ```sh
 spfx project rename --newName contoso
 ```
 
-Rename SharePoint Framework project to contoso with new solution Id
+Renames SharePoint Framework project to contoso with new solution Id
 
 ```sh
 spfx project rename --newName contoso --generateNewId
