@@ -1,6 +1,6 @@
 # spo site classic add
 
-Creates new classic site
+Creates new classic site.
 
 ## Usage
 
@@ -33,6 +33,9 @@ Option|Description
 
 !!! important
     To use this command you have to have permissions to access the tenant admin site.
+
+!!! important
+    This command is deprecated. Please use [spo site add](./site-add.md) instead.
 
 ## Remarks
 

@@ -60,6 +60,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     this.dots = '';
+    this.showDeprecationWarning(cmd, commands.SITE_CLASSIC_ADD, commands.SITE_ADD); 
 
     this
       .getSpoAdminUrl(cmd, this.debug)
@@ -427,6 +428,8 @@ class SpoSiteClassicAddCommand extends SpoCommand {
     log(
       `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
     the tenant admin site.
+
+    This command is deprecated. Please use ${chalk.yellow('spo site add')} instead.
    
   Remarks:
 
