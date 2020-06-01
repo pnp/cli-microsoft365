@@ -1,6 +1,8 @@
 # spo site classic add
 
-Creates new classic site
+Creates new classic site. 
+
+This command is deprecated. Please use "spo site add" instead.
 
 ## Usage
 

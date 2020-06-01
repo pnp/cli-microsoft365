@@ -1,13 +1,13 @@
+import { CommandCancel, CommandOption, CommandValidate } from '../../../../Command';
 import config from '../../../../config';
-import commands from '../../commands';
-import request from '../../../../request';
-import SpoCommand from '../../../base/SpoCommand';
-import Utils from '../../../../Utils';
-import { CommandOption, CommandValidate, CommandCancel } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo } from '../../spo';
-import { SiteProperties } from './SiteProperties';
 import { DeletedSiteProperties } from './DeletedSiteProperties';
+import { SiteProperties } from './SiteProperties';
 import { SpoOperation } from './SpoOperation';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -427,6 +427,8 @@ class SpoSiteClassicAddCommand extends SpoCommand {
     log(
       `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
     the tenant admin site.
+
+    This command is deprecated. Please use ${chalk.yellow('spo site add')} instead.
    
   Remarks:
 
