@@ -1280,7 +1280,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com' } }, () => {
+    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com' } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
         done();
@@ -1323,7 +1323,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com' } }, () => {
+    cmdInstance.action({ options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
         done();
@@ -1366,7 +1366,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com', lcid: 1033, webTemplate: 'PUBLISHING#0', resourceQuota: 100, resourceQuotaWarningLevel: 90, storageQuota: 300, storageQuotaWarningLevel: 275 } }, () => {
+    cmdInstance.action({ options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', lcid: 1033, webTemplate: 'PUBLISHING#0', resourceQuota: 100, resourceQuotaWarningLevel: 90, storageQuota: 300, storageQuotaWarningLevel: 275 } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
         done();
@@ -1429,7 +1429,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com', removeDeletedSite: true } }, () => {
+    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
         done();
@@ -1496,7 +1496,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com', removeDeletedSite: true } }, () => {
+    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
         done();
@@ -1565,7 +1565,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com', removeDeletedSite: true } }, () => {
+    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
         done();
@@ -1593,7 +1593,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com', removeDeletedSite: true } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred.')));
         done();
@@ -1631,7 +1631,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com', removeDeletedSite: true } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred.')));
         done();
@@ -1708,7 +1708,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com', removeDeletedSite: true } }, () => {
+    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
         done();
@@ -1785,7 +1785,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com', removeDeletedSite: true } }, () => {
+    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
         done();
@@ -1862,7 +1862,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com', removeDeletedSite: true } }, () => {
+    cmdInstance.action({ options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
         done();
@@ -1912,7 +1912,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com', removeDeletedSite: true } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred.')));
         done();
@@ -1981,7 +1981,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com', removeDeletedSite: true } }, () => {
+    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
         done();
@@ -2050,7 +2050,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com', removeDeletedSite: true } }, () => {
+    cmdInstance.action({ options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
         done();
@@ -2093,7 +2093,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com', wait: true } }, () => {
+    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
         done();
@@ -2170,7 +2170,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com', wait: true, removeDeletedSite: true } }, () => {
+    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true, removeDeletedSite: true } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
         done();
@@ -2228,7 +2228,7 @@ describe(commands.SITE_ADD, () => {
       return {} as any;
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com', wait: true } }, () => {
+    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
         done();
@@ -2331,7 +2331,7 @@ describe(commands.SITE_ADD, () => {
       return {} as any;
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com', wait: true, removeDeletedSite: true } }, () => {
+    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true, removeDeletedSite: true } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
         done();
@@ -2434,7 +2434,7 @@ describe(commands.SITE_ADD, () => {
       return {} as any;
     });
 
-    cmdInstance.action({ options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com', wait: true, removeDeletedSite: true } }, () => {
+    cmdInstance.action({ options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true, removeDeletedSite: true } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
         done();
@@ -2537,7 +2537,7 @@ describe(commands.SITE_ADD, () => {
       return {} as any;
     });
 
-    cmdInstance.action({ options: { debug: false, verbose: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com', wait: true, removeDeletedSite: true } }, () => {
+    cmdInstance.action({ options: { debug: false, verbose: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true, removeDeletedSite: true } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
         done();
@@ -2604,7 +2604,7 @@ describe(commands.SITE_ADD, () => {
       return {} as any;
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com', wait: true, removeDeletedSite: true } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true, removeDeletedSite: true } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred.')));
         done();
@@ -2718,7 +2718,7 @@ describe(commands.SITE_ADD, () => {
       return {} as any;
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com', wait: true, removeDeletedSite: true } }, () => {
+    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true, removeDeletedSite: true } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled);
         done();
@@ -2761,7 +2761,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team>', title: 'Team>', timeZone: 4, owner: 'admin@contoso.com>', lcid: 1033, webTemplate: 'PUBLISHING#0>', resourceQuota: 100, resourceQuotaWarningLevel: 90, storageQuota: 300, storageQuotaWarningLevel: 275 } }, () => {
+    cmdInstance.action({ options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team>', title: 'Team>', timeZone: 4, owners: 'admin@contoso.com>', lcid: 1033, webTemplate: 'PUBLISHING#0>', resourceQuota: 100, resourceQuotaWarningLevel: 90, storageQuota: 300, storageQuotaWarningLevel: 275 } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
         done();
@@ -2792,7 +2792,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com' } }, (err?: any) => {
+    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com' } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("A site already exists at url https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fteam.")));
         done();
@@ -2835,7 +2835,7 @@ describe(commands.SITE_ADD, () => {
   it('fails validation if the url is not specified', () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
-        type: "ClassicSite", title: 'Team', timeZone: 4, owner: 'admin@contoso.com'
+        type: "ClassicSite", title: 'Team', timeZone: 4, owners: 'admin@contoso.com'
       }
     });
     assert.notEqual(actual, true);
@@ -2844,7 +2844,7 @@ describe(commands.SITE_ADD, () => {
   it('fails validation if the url is not a valid url', () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
-        type: "ClassicSite", url: 'abc', title: 'Team', timeZone: 4, owner: 'admin@contoso.com'
+        type: "ClassicSite", url: 'abc', title: 'Team', timeZone: 4, owners: 'admin@contoso.com'
       }
     });
     assert.notEqual(actual, true);
@@ -2853,7 +2853,7 @@ describe(commands.SITE_ADD, () => {
   it('fails validation if the url is not a valid SharePoint url', () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
-        type: "ClassicSite", url: 'http://contoso', title: 'Team', timeZone: 4, owner: 'admin@contoso.com'
+        type: "ClassicSite", url: 'http://contoso', title: 'Team', timeZone: 4, owners: 'admin@contoso.com'
       }
     });
     assert.notEqual(actual, true);
@@ -2862,7 +2862,7 @@ describe(commands.SITE_ADD, () => {
   it('fails validation if the title is not specified', () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
-        type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', timeZone: 4, owner: 'admin@contoso.com'
+        type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', timeZone: 4, owners: 'admin@contoso.com'
       }
     });
     assert.notEqual(actual, true);
@@ -2880,7 +2880,7 @@ describe(commands.SITE_ADD, () => {
   it('fails validation if the timeZone is not specified', () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
-        type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', owner: 'admin@contoso.com'
+        type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', owners: 'admin@contoso.com'
       }
     });
     assert.notEqual(actual, true);
@@ -2890,7 +2890,7 @@ describe(commands.SITE_ADD, () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
-        owner: 'admin@contoso.com', timeZone: 'a'
+        owners: 'admin@contoso.com', timeZone: 'a'
       }
     });
     assert.notEqual(actual, true);
@@ -2900,7 +2900,7 @@ describe(commands.SITE_ADD, () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
-        owner: 'admin@contoso.com', timeZone: 4, lcid: 'a'
+        owners: 'admin@contoso.com', timeZone: 4, lcid: 'a'
       }
     });
     assert.notEqual(actual, true);
@@ -2910,7 +2910,7 @@ describe(commands.SITE_ADD, () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
-        owner: 'admin@contoso.com', timeZone: 4, resourceQuota: 'abc'
+        owners: 'admin@contoso.com', timeZone: 4, resourceQuota: 'abc'
       }
     });
     assert.notEqual(actual, true);
@@ -2920,7 +2920,7 @@ describe(commands.SITE_ADD, () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
-        owner: 'admin@contoso.com', timeZone: 4, resourceQuotaWarningLevel: 'abc'
+        owners: 'admin@contoso.com', timeZone: 4, resourceQuotaWarningLevel: 'abc'
       }
     });
     assert.notEqual(actual, true);
@@ -2930,7 +2930,7 @@ describe(commands.SITE_ADD, () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
-        owner: 'admin@contoso.com', timeZone: 4, resourceQuotaWarningLevel: 10
+        owners: 'admin@contoso.com', timeZone: 4, resourceQuotaWarningLevel: 10
       }
     });
     assert.notEqual(actual, true);
@@ -2940,7 +2940,7 @@ describe(commands.SITE_ADD, () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
-        owner: 'admin@contoso.com', timeZone: 4, resourceQuotaWarningLevel: 10, resourceQuota: 5
+        owners: 'admin@contoso.com', timeZone: 4, resourceQuotaWarningLevel: 10, resourceQuota: 5
       }
     });
     assert.notEqual(actual, true);
@@ -2950,7 +2950,7 @@ describe(commands.SITE_ADD, () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
-        owner: 'admin@contoso.com', timeZone: 4, storageQuota: 'abc'
+        owners: 'admin@contoso.com', timeZone: 4, storageQuota: 'abc'
       }
     });
     assert.notEqual(actual, true);
@@ -2960,7 +2960,7 @@ describe(commands.SITE_ADD, () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
-        owner: 'admin@contoso.com', timeZone: 4, storageQuotaWarningLevel: 'abc'
+        owners: 'admin@contoso.com', timeZone: 4, storageQuotaWarningLevel: 'abc'
       }
     });
     assert.notEqual(actual, true);
@@ -2970,7 +2970,7 @@ describe(commands.SITE_ADD, () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
-        owner: 'admin@contoso.com', timeZone: 4, storageQuotaWarningLevel: 10
+        owners: 'admin@contoso.com', timeZone: 4, storageQuotaWarningLevel: 10
       }
     });
     assert.notEqual(actual, true);
@@ -2980,7 +2980,7 @@ describe(commands.SITE_ADD, () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', alias: 'team',
-        owner: 'admin@contoso.com', timeZone: 4, storageQuotaWarningLevel: 10
+        owners: 'admin@contoso.com', timeZone: 4, storageQuotaWarningLevel: 10
       }
     });
     assert.notEqual(actual, true);
@@ -2990,7 +2990,7 @@ describe(commands.SITE_ADD, () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
-        owner: 'admin@contoso.com', timeZone: 4, storageQuotaWarningLevel: 10, storageQuota: 5
+        owners: 'admin@contoso.com', timeZone: 4, storageQuotaWarningLevel: 10, storageQuota: 5
       }
     });
     assert.notEqual(actual, true);
@@ -3000,7 +3000,7 @@ describe(commands.SITE_ADD, () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
-        owner: 'admin@contoso.com', timeZone: 4, alias: 'team'
+        owners: 'admin@contoso.com', timeZone: 4, alias: 'team'
       }
     });
     assert.notEqual(actual, true);
@@ -3010,17 +3010,27 @@ describe(commands.SITE_ADD, () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
-        owner: 'admin@contoso.com', timeZone: 4
+        owners: 'admin@contoso.com', timeZone: 4
       }
     });
     assert.equal(actual, true);
+  });
+
+  it('fails validation if the owner property passes two owners', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
+        owners: 'admin@contoso.com, admin2@contoso.com', timeZone: 4
+      }
+    });
+    assert.notEqual(actual, true);
   });
 
   it('passes validation if all options are correct', () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
-        owner: 'admin@contoso.com', timeZone: 4,
+        owners: 'admin@contoso.com', timeZone: 4,
         lcid: 1033, resourceQuota: 100, resourceQuotaWarningLevel: 90,
         storageQuota: 100, storageQuotaWarningLevel: 90
       }

@@ -30,8 +30,7 @@ interface Options extends GlobalOptions {
   shareByEmailEnabled?: boolean;
   siteDesign?: string;
   siteDesignId?: string;
-  owner: string;
-  timeZone: string | number;
+  timeZone?: string | number;
   webTemplate?: string;
   resourceQuota?: string | number;
   resourceQuotaWarningLevel?: string | number;
@@ -288,7 +287,7 @@ class SpoSiteAddCommand extends SpoCommand {
           headers: {
             'X-RequestDigest': this.context.FormDigestValue
           },
-          body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><ObjectPath Id="6" ObjectPathId="5" /><Query Id="7" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query></Query><Query Id="8" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="5" ParentId="3" Name="CreateSite"><Parameters><Parameter TypeId="{11f84fff-b8cf-47b6-8b50-34e692656606}"><Property Name="CompatibilityLevel" Type="Int32">0</Property><Property Name="Lcid" Type="UInt32">${lcid}</Property><Property Name="Owner" Type="String">${Utils.escapeXml(args.options.owner)}</Property><Property Name="StorageMaximumLevel" Type="Int64">${storageQuota}</Property><Property Name="StorageWarningLevel" Type="Int64">${storageQuotaWarningLevel}</Property><Property Name="Template" Type="String">${Utils.escapeXml(webTemplate)}</Property><Property Name="TimeZoneId" Type="Int32">${args.options.timeZone}</Property><Property Name="Title" Type="String">${Utils.escapeXml(args.options.title)}</Property><Property Name="Url" Type="String">${Utils.escapeXml(args.options.url)}</Property><Property Name="UserCodeMaximumLevel" Type="Double">${resourceQuota}</Property><Property Name="UserCodeWarningLevel" Type="Double">${resourceQuotaWarningLevel}</Property></Parameter></Parameters></Method></ObjectPaths></Request>`
+          body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><ObjectPath Id="6" ObjectPathId="5" /><Query Id="7" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query></Query><Query Id="8" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="5" ParentId="3" Name="CreateSite"><Parameters><Parameter TypeId="{11f84fff-b8cf-47b6-8b50-34e692656606}"><Property Name="CompatibilityLevel" Type="Int32">0</Property><Property Name="Lcid" Type="UInt32">${lcid}</Property><Property Name="Owner" Type="String">${Utils.escapeXml(args.options.owners)}</Property><Property Name="StorageMaximumLevel" Type="Int64">${storageQuota}</Property><Property Name="StorageWarningLevel" Type="Int64">${storageQuotaWarningLevel}</Property><Property Name="Template" Type="String">${Utils.escapeXml(webTemplate)}</Property><Property Name="TimeZoneId" Type="Int32">${args.options.timeZone}</Property><Property Name="Title" Type="String">${Utils.escapeXml(args.options.title)}</Property><Property Name="Url" Type="String">${Utils.escapeXml(args.options.url)}</Property><Property Name="UserCodeMaximumLevel" Type="Double">${resourceQuota}</Property><Property Name="UserCodeWarningLevel" Type="Double">${resourceQuotaWarningLevel}</Property></Parameter></Parameters></Method></ObjectPaths></Request>`
         };
 
         return request.post(requestOptions);
@@ -466,7 +465,7 @@ class SpoSiteAddCommand extends SpoCommand {
     const options: CommandOption[] = [
       {
         option: '--type [type]',
-        description: 'Type of modern sites to list. Allowed values TeamSite|CommunicationSite|ClassicSite, default TeamSite',
+        description: 'Type of sites to list. Allowed values TeamSite|CommunicationSite|ClassicSite, default TeamSite',
         autocomplete: ['TeamSite', 'CommunicationSite', 'ClassicSite']
       },
       {
@@ -474,19 +473,15 @@ class SpoSiteAddCommand extends SpoCommand {
         description: 'Site title'
       },
       {
-        option: '-a, --alias <alias>',
+        option: '-a, --alias [alias]',
         description: 'Site alias, used in the URL and in the team site group e-mail (applies to type TeamSite)'
       },
       {
-        option: '-u, --url <url>',
+        option: '-u, --url [url]',
         description: 'Site URL (applies to type CommunicationSite, ClassicSite)'
       },
       {
-        option: '--owner <owner>',
-        description: 'The account name of the site owner (applies to type ClassicSite)'
-      },
-      {
-        option: '-z, --timeZone <timeZone>',
+        option: '-z, --timeZone [timeZone]',
         description: 'Integer representing time zone to use for the site (applies to type ClassicSite)'
       },
       {
@@ -499,7 +494,7 @@ class SpoSiteAddCommand extends SpoCommand {
       },
       {
         option: '--owners [owners]',
-        description: 'Comma-separated list of users to set as site owners (applies to type TeamSite)'
+        description: 'Comma-separated list of users to set as site owners (applies to type TeamSite, ClassicSite)'
       },
       {
         option: '--isPublic',
@@ -583,7 +578,7 @@ class SpoSiteAddCommand extends SpoCommand {
           return 'Required option alias missing';
         }
 
-        if (args.options.url || args.options.siteDesign || args.options.removeDeletedSite || args.options.wait || args.options.owner || args.options.shareByEmailEnabled || args.options.allowFileSharingForGuestUsers || args.options.siteDesignId || args.options.timeZone || args.options.resourceQuota || args.options.resourceQuotaWarningLevel || args.options.storageQuota || args.options.storageQuotaWarningLevel || args.options.webTemplate) {
+        if (args.options.url || args.options.siteDesign || args.options.removeDeletedSite || args.options.wait || args.options.shareByEmailEnabled || args.options.allowFileSharingForGuestUsers || args.options.siteDesignId || args.options.timeZone || args.options.resourceQuota || args.options.resourceQuotaWarningLevel || args.options.storageQuota || args.options.storageQuotaWarningLevel || args.options.webTemplate) {
           return "Type TeamSites supports only the parameters title, lcid, alias, owners, classification, isPublic, and description";
         }
       }
@@ -615,7 +610,7 @@ class SpoSiteAddCommand extends SpoCommand {
           return 'Specify siteDesign or siteDesignId but not both';
         }
 
-        if (args.options.timeZone || args.options.isPublic || args.options.removeDeletedSite || args.options.wait || args.options.alias || args.options.owner || args.options.owners || args.options.resourceQuota || args.options.resourceQuotaWarningLevel || args.options.storageQuota || args.options.storageQuotaWarningLevel || args.options.webTemplate) {
+        if (args.options.timeZone || args.options.isPublic || args.options.removeDeletedSite || args.options.owners || args.options.wait || args.options.alias || args.options.resourceQuota || args.options.resourceQuotaWarningLevel || args.options.storageQuota || args.options.storageQuotaWarningLevel || args.options.webTemplate) {
           return "Type CommunicationSite supports only the parameters url, title, lcid, classification, siteDesign, shareByEmailEnabled, allowFileSharingForGuestUsers, siteDesignId, and description";
         }
       }
@@ -629,8 +624,12 @@ class SpoSiteAddCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
   
-        if (!args.options.owner) {
+        if (!args.options.owners) {
           return 'Required option owner missing';
+        }
+
+        if (args.options.owners.indexOf(",") > -1) {
+          return 'The ClassicSite supports only one owner in the owners options';
         }
   
         if (!args.options.timeZone) {
@@ -679,8 +678,8 @@ class SpoSiteAddCommand extends SpoCommand {
           return `storageQuotaWarningLevel cannot exceed storageQuota`;
         }
 
-        if (args.options.classification || args.options.shareByEmailEnabled || args.options.allowFileSharingForGuestUsers || args.options.siteDesignId || args.options.siteDesignId || args.options.owners || args.options.alias) {
-          return "Type ClassicSite supports only the parameters url, title, lcid, storageQuota, storageQuotaWarningLevel, resourceQuota, resourceQuotaWarningLevel, webTemplate, owner, and description";
+        if (args.options.classification || args.options.shareByEmailEnabled || args.options.allowFileSharingForGuestUsers || args.options.siteDesignId || args.options.siteDesignId || args.options.alias || args.options.isPublic) {
+          return "Type ClassicSite supports only the parameters url, title, lcid, storageQuota, storageQuotaWarningLevel, resourceQuota, resourceQuotaWarningLevel, webTemplate, owners, and description";
         }
       }
 

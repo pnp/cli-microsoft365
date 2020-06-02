@@ -13,15 +13,14 @@ spo site add [options]
 Option|Description
 ------|-----------
 `--help`|output usage information
-`--type [type]`|Type of modern sites to list. Allowed values `TeamSite,CommunicationSite,ClassicSite`, default `TeamSite`
+`--type [type]`|Type of sites to list. Allowed values `TeamSite,CommunicationSite,ClassicSite`, default `TeamSite`
 `-t, --title <title>`|Site title
-`-a, --alias <alias>`|Site alias, used in the URL and in the team site group e-mail (applies to type TeamSite)
-`-u, --url <url>`|Site URL  (applies to type CommunicationSite, ClassicSite)
-`--owner <owner>`|The account name of the site owner (applies to type ClassicSite)
-`-z, --timeZone <timeZone>`|Integer representing time zone to use for the site  (applies to type ClassicSite)
+`-a, --alias [alias]`|Site alias, used in the URL and in the team site group e-mail (applies to type TeamSite)
+`-u, --url [url]`|Site URL  (applies to type CommunicationSite, ClassicSite)
+`-z, --timeZone [timeZone]`|Integer representing time zone to use for the site (applies to type ClassicSite)
 `-d, --description [description]`|Site description
 `-l, --lcid [lcid]`|Site language in the LCID format, eg. _1033_ for _en-US_
-`--owners [owners]`|Comma-separated list of users to set as site owners (applies to type TeamSite)
+`--owners [owners]`|Comma-separated list of users to set as site owners (applies to type TeamSite, ClassicSite)
 `--isPublic`|Determines if the associated group is public or not (applies to type TeamSite)
 `-c, --classification [classification]`|Site classification (applies only to team sites and communication sites)
 `--siteDesign [siteDesign]`|Type of communication site to create. Allowed values `Topic,Showcase,Blank`, default `Topic`. When creating a communication site, specify either `siteDesign` or `siteDesignId` (applies to type CommunicationSite)
