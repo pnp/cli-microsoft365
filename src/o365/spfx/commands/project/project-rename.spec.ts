@@ -106,9 +106,21 @@ describe(commands.PROJECT_RENAME, () => {
   });
 
   it('updates only the files found and skips other files', (done) => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
+    sinon.stub(command as any, 'getProject').callsFake(_ => {
+      return {
+        path: projectPath,
+        packageJson: {
+          dependencies: {},
+          name: projectPath.split('/').pop()
+        }
+      }
+    });
+    sinon.stub(fs, 'existsSync').callsFake(_ => false);
     cmdInstance.action({ options: { newName: 'spfx-react' } }, (err?: any) => {
       try {
-        assert(writeFileSyncSpy.calledTwice);
+        assert(writeFileSyncSpy.notCalled);
+        Utils.restore((command as any).getProject);
         done();
       }
       catch (ex) {

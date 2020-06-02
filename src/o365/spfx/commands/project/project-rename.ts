@@ -90,81 +90,101 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
       }
     }
 
-    const filePaths: string[] = [
-      path.join(this.projectRootPath, 'package.json'),
-      path.join(this.projectRootPath, '.yo-rc.json'),
-      path.join(this.projectRootPath, 'config/package-solution.json'),
-      path.join(this.projectRootPath, 'config/deploy-azure-storage.json'),
-      path.join(this.projectRootPath, 'README.md')
-    ];
-
-    const replaceFileContent = (filePath: string) => {
+    const replacePackageJsonContent = (filePath: string) => {
       if (!fs.existsSync(filePath)) {
         return;
       }
       const existingContent = fs.readFileSync(filePath, 'utf-8');
-      let updatedContent;
-      if (filePath.endsWith('.json')) {
-        updatedContent = JSON.parse(existingContent);
-
-        if (filePath.endsWith('package.json')) {
-          if (updatedContent &&
-            updatedContent.name) {
-            updatedContent.name = args.options.newName;
-          }
-        }
-
-        if (filePath.endsWith('.yo-rc.json')) {
-          if (updatedContent &&
-            updatedContent['@microsoft/generator-sharepoint'] &&
-            updatedContent['@microsoft/generator-sharepoint'].libraryName) {
-            updatedContent['@microsoft/generator-sharepoint'].libraryName = args.options.newName;
-          }
-          if (updatedContent &&
-            updatedContent['@microsoft/generator-sharepoint'] &&
-            updatedContent['@microsoft/generator-sharepoint'].solutionName) {
-            updatedContent['@microsoft/generator-sharepoint'].solutionName = args.options.newName;
-          }
-          if (updatedContent &&
-            updatedContent['@microsoft/generator-sharepoint'] &&
-            updatedContent['@microsoft/generator-sharepoint'].libraryId &&
-            args.options.generateNewId) {
-            updatedContent['@microsoft/generator-sharepoint'].libraryId = newId;
-          }
-        }
-
-        if (filePath.endsWith('config/package-solution.json')) {
-          if (updatedContent &&
-            updatedContent.solution &&
-            updatedContent.solution.name) {
-            updatedContent.solution.name = updatedContent.solution.name.replace(new RegExp(projectName, 'g'), args.options.newName);
-          }
-          if (updatedContent &&
-            updatedContent.solution &&
-            updatedContent.solution.id &&
-            args.options.generateNewId) {
-            updatedContent.solution.id = newId;
-          }
-          if (updatedContent &&
-            updatedContent.paths &&
-            updatedContent.paths.zippedPackage) {
-            updatedContent.paths.zippedPackage = updatedContent.paths.zippedPackage.replace(new RegExp(projectName, 'g'), args.options.newName);
-          }
-        }
-
-        if (filePath.endsWith('config/deploy-azure-storage.json')) {
-          if (updatedContent &&
-            updatedContent.container) {
-            updatedContent.container = args.options.newName;
-          }
-        }
-
-        fs.writeFileSync(filePath, JSON.stringify(updatedContent, null, 2), 'utf-8');
+      const updatedContent = JSON.parse(existingContent);
+      if (updatedContent &&
+        updatedContent.name) {
+        updatedContent.name = args.options.newName;
       }
-      if (filePath.endsWith('README.md')) {
-        updatedContent = existingContent.replace(new RegExp(projectName, 'g'), args.options.newName);
-        fs.writeFileSync(filePath, updatedContent, 'utf-8');
+      fs.writeFileSync(filePath, JSON.stringify(updatedContent, null, 2), 'utf-8');
+      if (this.debug) {
+        cmd.log(`Updated ${filePath.split('/').pop()}`);
       }
+    }
+
+    const replaceYoRcJsonContent = (filePath: string) => {
+      if (!fs.existsSync(filePath)) {
+        return;
+      }
+      const existingContent = fs.readFileSync(filePath, 'utf-8');
+      const updatedContent = JSON.parse(existingContent);
+      if (updatedContent &&
+        updatedContent['@microsoft/generator-sharepoint'] &&
+        updatedContent['@microsoft/generator-sharepoint'].libraryName) {
+        updatedContent['@microsoft/generator-sharepoint'].libraryName = args.options.newName;
+      }
+      if (updatedContent &&
+        updatedContent['@microsoft/generator-sharepoint'] &&
+        updatedContent['@microsoft/generator-sharepoint'].solutionName) {
+        updatedContent['@microsoft/generator-sharepoint'].solutionName = args.options.newName;
+      }
+      if (updatedContent &&
+        updatedContent['@microsoft/generator-sharepoint'] &&
+        updatedContent['@microsoft/generator-sharepoint'].libraryId &&
+        args.options.generateNewId) {
+        updatedContent['@microsoft/generator-sharepoint'].libraryId = newId;
+      }
+      fs.writeFileSync(filePath, JSON.stringify(updatedContent, null, 2), 'utf-8');
+      if (this.debug) {
+        cmd.log(`Updated ${filePath.split('/').pop()}`);
+      }
+    }
+
+    const replacePackageSolutionJsonContent = (filePath: string) => {
+      if (!fs.existsSync(filePath)) {
+        return;
+      }
+      const existingContent = fs.readFileSync(filePath, 'utf-8');
+      const updatedContent = JSON.parse(existingContent);
+      if (updatedContent &&
+        updatedContent.solution &&
+        updatedContent.solution.name) {
+        updatedContent.solution.name = updatedContent.solution.name.replace(new RegExp(projectName, 'g'), args.options.newName);
+      }
+      if (updatedContent &&
+        updatedContent.solution &&
+        updatedContent.solution.id &&
+        args.options.generateNewId) {
+        updatedContent.solution.id = newId;
+      }
+      if (updatedContent &&
+        updatedContent.paths &&
+        updatedContent.paths.zippedPackage) {
+        updatedContent.paths.zippedPackage = updatedContent.paths.zippedPackage.replace(new RegExp(projectName, 'g'), args.options.newName);
+      }
+      fs.writeFileSync(filePath, JSON.stringify(updatedContent, null, 2), 'utf-8');
+      if (this.debug) {
+        cmd.log(`Updated ${filePath.split('/').pop()}`);
+      }
+    }
+
+    const replaceDeployAzureStorageJsonContent = (filePath: string) => {
+      if (!fs.existsSync(filePath)) {
+        return;
+      }
+      const existingContent = fs.readFileSync(filePath, 'utf-8');
+      const updatedContent = JSON.parse(existingContent);
+      if (updatedContent &&
+        updatedContent.container) {
+        updatedContent.container = args.options.newName;
+      }
+      fs.writeFileSync(filePath, JSON.stringify(updatedContent, null, 2), 'utf-8');
+      if (this.debug) {
+        cmd.log(`Updated ${filePath.split('/').pop()}`);
+      }
+    }
+
+    const replaceReadMeContent = (filePath: string) => {
+      if (!fs.existsSync(filePath)) {
+        return;
+      }
+      const existingContent = fs.readFileSync(filePath, 'utf-8');
+      const updatedContent = existingContent.replace(new RegExp(projectName, 'g'), args.options.newName);
+      fs.writeFileSync(filePath, updatedContent, 'utf-8');
       if (this.debug) {
         cmd.log(`Updated ${filePath.split('/').pop()}`);
       }
@@ -174,9 +194,11 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
       cmd.log(`Renaming SharePoint Framework project to '${args.options.newName}'`);
     }
 
-    filePaths.forEach((filePath) => {
-      replaceFileContent(filePath);
-    });
+    replacePackageJsonContent(path.join(this.projectRootPath, 'package.json'));
+    replaceYoRcJsonContent(path.join(this.projectRootPath, '.yo-rc.json'));
+    replacePackageSolutionJsonContent(path.join(this.projectRootPath, 'config/package-solution.json'));
+    replaceDeployAzureStorageJsonContent(path.join(this.projectRootPath, 'config/deploy-azure-storage.json'));
+    replaceReadMeContent(path.join(this.projectRootPath, 'README.md'));
 
     if (this.verbose) {
       cmd.log('DONE');
