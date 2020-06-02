@@ -557,9 +557,9 @@ class SpoSiteAddCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      let isClassicSite: boolean = args.options.type === 'ClassicSite';
-      let isCommunicationSite: boolean = args.options.type === 'CommunicationSite';
-      let isTeamSite: boolean = isCommunicationSite === false && isClassicSite === false;
+      const isClassicSite: boolean = args.options.type === 'ClassicSite';
+      const isCommunicationSite: boolean = args.options.type === 'CommunicationSite';
+      const isTeamSite: boolean = isCommunicationSite === false && isClassicSite === false;
 
       if (args.options.type) {
         if (args.options.type !== 'TeamSite' &&
