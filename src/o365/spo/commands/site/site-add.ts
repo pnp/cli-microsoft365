@@ -743,11 +743,6 @@ class SpoSiteAddCommand extends SpoCommand {
     it. Wait for the site provisioning to complete
       ${commands.SITE_ADD} --type ClassicSite --url https://contoso.sharepoint.com/sites/team --title Team --owner admin@contoso.onmicrosoft.com --timeZone 4 --webTemplate STS#0 --removeDeletedSite --wait
   
-  More information
-
-    Creating SharePoint Communication Site using REST
-      https://docs.microsoft.com/en-us/sharepoint/dev/apis/communication-site-creation-rest
-
   Remarks for classic sites:
 
     Using the ${chalk.blue('-z, --timeZone')} option you have to specify the
@@ -785,6 +780,11 @@ class SpoSiteAddCommand extends SpoCommand {
     using this flag, the ${chalk.blue(this.getCommandName())} command will keep
     running until it received confirmation from Office 365 that the site
     has been fully provisioned. 
+
+  More information
+
+    Creating SharePoint Communication Site using REST
+      https://docs.microsoft.com/en-us/sharepoint/dev/apis/communication-site-creation-rest
 `);
   }
 }
