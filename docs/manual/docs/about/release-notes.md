@@ -1,5 +1,13 @@
 # Release notes
 
+## v2.11.0
+
+### Changes
+
+- added suggesting upgrading dependency @microsoft/sp-module-interfaces [#1519](https://github.com/pnp/office365-cli/issues/1519)
+- added suggesting upgrading dependency @microsoft/sp-loader [#1518](https://github.com/pnp/office365-cli/issues/1518)
+- added suggesting upgrading dependency @microsoft/sp-list-subscription [#1517](https://github.com/pnp/office365-cli/issues/1517)
+
 ## [v2.10.0](https://github.com/pnp/office365-cli/releases/tag/v2.10.0)
 
 ### New commands
