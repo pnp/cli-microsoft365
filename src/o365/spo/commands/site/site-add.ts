@@ -465,7 +465,7 @@ class SpoSiteAddCommand extends SpoCommand {
     const options: CommandOption[] = [
       {
         option: '--type [type]',
-        description: 'Type of sites to list. Allowed values TeamSite|CommunicationSite|ClassicSite, default TeamSite',
+        description: 'Type of sites to add. Allowed values TeamSite|CommunicationSite|ClassicSite, default TeamSite',
         autocomplete: ['TeamSite', 'CommunicationSite', 'ClassicSite']
       },
       {
