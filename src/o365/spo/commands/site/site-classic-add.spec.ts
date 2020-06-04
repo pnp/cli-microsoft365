@@ -1,14 +1,17 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError, CommandValidate, CommandCancel } from '../../../../Command';
-import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
-import config from '../../../../config';
-import auth from '../../../../Auth';
-const command: Command = require('./site-classic-add');
 import * as assert from 'assert';
+import * as sinon from 'sinon';
+
+import appInsights from '../../../../appInsights';
+import auth from '../../../../Auth';
+import Command, {
+    CommandCancel, CommandError, CommandOption, CommandValidate
+} from '../../../../Command';
+import config from '../../../../config';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
 
+const command: Command = require('./site-classic-add');
 describe(commands.SITE_CLASSIC_ADD, () => {
   let vorpal: Vorpal;
   let log: string[];
@@ -102,7 +105,7 @@ describe(commands.SITE_CLASSIC_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(cmdInstanceLogSpy.callCount === 1);
         done();
       }
       catch (e) {
@@ -251,7 +254,7 @@ describe(commands.SITE_CLASSIC_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com', removeDeletedSite: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(cmdInstanceLogSpy.callCount === 1);
         done();
       }
       catch (e) {
@@ -318,7 +321,7 @@ describe(commands.SITE_CLASSIC_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com', removeDeletedSite: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(cmdInstanceLogSpy.callCount === 1);
         done();
       }
       catch (e) {
@@ -387,7 +390,7 @@ describe(commands.SITE_CLASSIC_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com', removeDeletedSite: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(cmdInstanceLogSpy.callCount === 1);
         done();
       }
       catch (e) {
@@ -530,7 +533,7 @@ describe(commands.SITE_CLASSIC_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com', removeDeletedSite: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(cmdInstanceLogSpy.callCount === 1);
         done();
       }
       catch (e) {
@@ -607,7 +610,7 @@ describe(commands.SITE_CLASSIC_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com', removeDeletedSite: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(cmdInstanceLogSpy.callCount === 1);
         done();
       }
       catch (e) {
@@ -803,7 +806,7 @@ describe(commands.SITE_CLASSIC_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com', removeDeletedSite: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(cmdInstanceLogSpy.callCount === 1);
         done();
       }
       catch (e) {
@@ -915,7 +918,7 @@ describe(commands.SITE_CLASSIC_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com', wait: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(cmdInstanceLogSpy.callCount === 1);
         done();
       }
       catch (e) {
@@ -992,7 +995,7 @@ describe(commands.SITE_CLASSIC_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com', wait: true, removeDeletedSite: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(cmdInstanceLogSpy.callCount === 1);
         done();
       }
       catch (e) {
@@ -1050,7 +1053,7 @@ describe(commands.SITE_CLASSIC_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com', wait: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(cmdInstanceLogSpy.callCount === 1);
         done();
       }
       catch (e) {
@@ -1153,7 +1156,7 @@ describe(commands.SITE_CLASSIC_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com', wait: true, removeDeletedSite: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(cmdInstanceLogSpy.callCount === 1);
         done();
       }
       catch (e) {
@@ -1540,7 +1543,7 @@ describe(commands.SITE_CLASSIC_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owner: 'admin@contoso.com', wait: true, removeDeletedSite: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(cmdInstanceLogSpy.callCount === 1);
         done();
       }
       catch (e) {

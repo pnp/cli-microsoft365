@@ -60,6 +60,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     this.dots = '';
+    this.showDeprecationWarning(cmd, commands.SITE_CLASSIC_ADD, commands.SITE_ADD); 
 
     this
       .getSpoAdminUrl(cmd, this.debug)
