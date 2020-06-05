@@ -4,6 +4,8 @@
 
 ### Changes
 
+- added suggesting upgrading dependency @microsoft/sp-page-context [#1521](https://github.com/pnp/office365-cli/issues/1521)
+- added suggesting upgrading dependency @microsoft/sp-odata-types [#1520](https://github.com/pnp/office365-cli/issues/1520)
 - added suggesting upgrading dependency @microsoft/sp-module-interfaces [#1519](https://github.com/pnp/office365-cli/issues/1519)
 - added suggesting upgrading dependency @microsoft/sp-loader [#1518](https://github.com/pnp/office365-cli/issues/1518)
 - added suggesting upgrading dependency @microsoft/sp-list-subscription [#1517](https://github.com/pnp/office365-cli/issues/1517)
