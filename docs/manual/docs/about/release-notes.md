@@ -4,6 +4,7 @@
 
 ### Changes
 
+- consolidated `spo site remove` and `spo site classic remove` commands [#1494](https://github.com/pnp/office365-cli/issues/1494)
 - added suggesting upgrading dependency @microsoft/sp-page-context [#1521](https://github.com/pnp/office365-cli/issues/1521)
 - added suggesting upgrading dependency @microsoft/sp-odata-types [#1520](https://github.com/pnp/office365-cli/issues/1520)
 - added suggesting upgrading dependency @microsoft/sp-module-interfaces [#1519](https://github.com/pnp/office365-cli/issues/1519)
