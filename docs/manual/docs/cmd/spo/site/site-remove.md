@@ -1,11 +1,17 @@
-# spo site classic remove
+# spo site remove
 
 Removes the specified site
 
 ## Usage
 
 ```sh
-spo site classic remove [options]
+spo site remove [options]
+```
+
+## Alias
+
+```sh
+spo site classic remove
 ```
 
 ## Options
@@ -29,30 +35,30 @@ Option|Description
 
 ## Remarks
 
-Deleting and creating classic site collections is by default asynchronous and depending on the current state of Office 365, might take up to few minutes. If you're building a script with steps that require the site to be fully deleted, you should use the `--wait` flag. When using this flag, the `spo site classic remove` command will keep running until it received confirmation from Office 365 that the site has been fully deleted.
+Deleting a site collection is by default asynchronous and depending on the current state of Office 365, might take up to few minutes. If you're building a script with steps that require the site to be fully deleted, you should use the `--wait` flag. When using this flag, the `spo site remove` command will keep running until it received confirmation from Office 365 that the site has been fully deleted.
 
 ## Examples
 
 Remove the specified site and place it in the Recycle Bin
 
 ```sh
-spo site classic remove --url https://contoso.sharepoint.com/sites/demosite
+spo site remove --url https://contoso.sharepoint.com/sites/demosite
 ```
 
 Remove the site without moving it to the Recycle Bin
 
 ```sh
-spo site classic remove --url https://contoso.sharepoint.com/sites/demosite --skipRecycleBin
+spo site remove --url https://contoso.sharepoint.com/sites/demosite --skipRecycleBin
 ```
 
 Remove the previously deleted site from the Recycle Bin
 
 ```sh
-spo site classic remove --url https://contoso.sharepoint.com/sites/demosite --fromRecycleBin
+spo site remove --url https://contoso.sharepoint.com/sites/demosite --fromRecycleBin
 ```
 
 Remove the site without moving it to the Recycle Bin and wait for completion
 
 ```sh
-spo site classic remove --url https://contoso.sharepoint.com/sites/demosite --wait --skipRecycleBin
+spo site remove --url https://contoso.sharepoint.com/sites/demosite --wait --skipRecycleBin
 ```

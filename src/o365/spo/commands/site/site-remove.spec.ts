@@ -3,16 +3,17 @@ import Command, { CommandOption, CommandError, CommandValidate, CommandCancel } 
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./site-classic-remove');
+const command: Command = require('./site-remove');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import config from '../../../../config';
 
-describe(commands.SITE_CLASSIC_REMOVE, () => {
+describe(commands.SITE_REMOVE, () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
+  let cmdClassicInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
   let requests: any[];
 
@@ -32,6 +33,15 @@ describe(commands.SITE_CLASSIC_REMOVE, () => {
     cmdInstance = {
       commandWrapper: {
         command: command.name
+      },
+      action: command.action(),
+      log: (msg: string) => {
+        log.push(msg);
+      }
+    };
+    cmdClassicInstance = {
+      commandWrapper: {
+        command: commands.SITE_REMOVE
       },
       action: command.action(),
       log: (msg: string) => {
@@ -62,11 +72,16 @@ describe(commands.SITE_CLASSIC_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.SITE_CLASSIC_REMOVE), true);
+    assert.equal(command.name.startsWith(commands.SITE_REMOVE), true);
   });
 
   it('has a description', () => {
     assert.notEqual(command.description, null);
+  });
+
+  it('defines correct alias', () => {
+    const alias = command.alias();
+    assert.equal((alias && alias.indexOf(commands.SITE_CLASSIC_REMOVE) > -1), true);
   });
 
   it('aborts removing site when prompt not confirmed', (done) => {
@@ -74,6 +89,21 @@ describe(commands.SITE_CLASSIC_REMOVE, () => {
       cb({ continue: false });
     };
     cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com/sites/demosite', debug: true, verbose: true } }, () => {
+      try {
+        assert(requests.length === 0);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('runs with alias and aborts when prompt not confirmed', (done) => {
+    cmdClassicInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: false });
+    };
+    cmdClassicInstance.action({ options: { url: 'https://contoso.sharepoint.com/sites/demosite', debug: true, verbose: true } }, () => {
       try {
         assert(requests.length === 0);
         done();
@@ -842,7 +872,7 @@ describe(commands.SITE_CLASSIC_REMOVE, () => {
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
     cmd.help({}, () => { });
-    assert(find.calledWith(commands.SITE_CLASSIC_REMOVE));
+    assert(find.calledWith(commands.SITE_REMOVE));
   });
 
   it('has help with examples', () => {

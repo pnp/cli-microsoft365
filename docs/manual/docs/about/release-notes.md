@@ -780,7 +780,7 @@
 - [spo page column get](../cmd/spo/page/page-column-get.md) - get information about a specific column of a modern page [#412](https://github.com/pnp/office365-cli/issues/412)
 - [spo page remove](../cmd/spo/page/page-remove.md) - removes a modern page [#363](https://github.com/pnp/office365-cli/issues/363)
 - [spo page section add](../cmd/spo/page/page-section-add.md) - adds section to modern page [#364](https://github.com/pnp/office365-cli/issues/364)
-- [spo site classic remove](../cmd/spo/site/site-classic-remove.md) - removes the specified site [#125](https://github.com/pnp/office365-cli/issues/125)
+- [spo site classic remove](../cmd/spo/site/site-remove.md) - removes the specified site [#125](https://github.com/pnp/office365-cli/issues/125)
 - [spo tenant settings list](../cmd/spo/tenant/tenant-settings-list.md) - lists the global tenant settings [#548](https://github.com/pnp/office365-cli/issues/548)
 - [spo term group get](../cmd/spo/term/term-group-get.md) - gets information about the specified taxonomy term group [#597](https://github.com/pnp/office365-cli/issues/597)
 - [spo term group list](../cmd/spo/term/term-group-list.md) - lists taxonomy term groups [#596](https://github.com/pnp/office365-cli/issues/596)

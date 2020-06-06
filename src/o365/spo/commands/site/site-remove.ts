@@ -22,18 +22,22 @@ interface Options extends GlobalOptions {
   confirm?: boolean;
 }
 
-class SpoSiteClassicRemoveCommand extends SpoCommand {
+class SpoSiteRemoveCommand extends SpoCommand {
   private context?: FormDigestInfo;
   private spoAdminUrl?: string;
   private dots?: string;
   private timeout?: NodeJS.Timer;
 
   public get name(): string {
-    return commands.SITE_CLASSIC_REMOVE;
+    return commands.SITE_REMOVE;
   }
 
   public get description(): string {
     return 'Removes the specified site';
+  }
+
+  public alias(): string[] | undefined {
+    return [commands.SITE_CLASSIC_REMOVE];
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -46,6 +50,8 @@ class SpoSiteClassicRemoveCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    this.showDeprecationWarning(cmd, commands.SITE_CLASSIC_REMOVE, commands.SITE_REMOVE);
+
     const removeSite = (): void => {
       this.dots = '';
 
@@ -259,9 +265,9 @@ class SpoSiteClassicRemoveCommand extends SpoCommand {
 
   Remarks:
 
-    Deleting and creating classic site collections is by default asynchronous
-    and depending on the current state of Office 365, might take up to few
-    minutes. If you're building a script with steps that require the site to be
+    Deleting a site collection is by default asynchronous and depending on the
+    current state of Office 365, might take up to few minutes.
+    If you're building a script with steps that require the site to be
     fully deleted, you should use the ${chalk.blue('--wait')} flag. When using this flag,
     the ${chalk.blue(this.getCommandName())} command will keep running until it received
     confirmation from Office 365 that the site has been fully deleted.
@@ -269,18 +275,18 @@ class SpoSiteClassicRemoveCommand extends SpoCommand {
   Examples:
 
     Remove the specified site and place it in the Recycle Bin
-      ${commands.SITE_CLASSIC_REMOVE} --url https://contoso.sharepoint.com/sites/demosite 
+      ${commands.SITE_REMOVE} --url https://contoso.sharepoint.com/sites/demosite 
 
     Remove the site without moving it to the Recycle Bin
-      ${commands.SITE_CLASSIC_REMOVE} --url https://contoso.sharepoint.com/sites/demosite --skipRecycleBin
+      ${commands.SITE_REMOVE} --url https://contoso.sharepoint.com/sites/demosite --skipRecycleBin
 
     Remove the previously deleted site from the Recycle Bin
-      ${commands.SITE_CLASSIC_REMOVE} --url https://contoso.sharepoint.com/sites/demosite --fromRecycleBin
+      ${commands.SITE_REMOVE} --url https://contoso.sharepoint.com/sites/demosite --fromRecycleBin
 
     Remove the site without moving it to the Recycle Bin and wait for completion 
-      ${commands.SITE_CLASSIC_REMOVE} --url https://contoso.sharepoint.com/sites/demosite --wait --skipRecycleBin
+      ${commands.SITE_REMOVE} --url https://contoso.sharepoint.com/sites/demosite --wait --skipRecycleBin
 `);
   }
 }
 
-module.exports = new SpoSiteClassicRemoveCommand();
+module.exports = new SpoSiteRemoveCommand();
