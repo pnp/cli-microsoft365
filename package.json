@@ -7,7 +7,10 @@
   "bin": {
     "office365": "./dist/index.js",
     "o365": "./dist/index.js",
-    "o365_comp": "./dist/autocomplete.js"
+    "o365_comp": "./dist/autocomplete.js",
+    "microsoft365": "./dist/index.js",
+    "m365": "./dist/index.js",
+    "m365_comp": "./dist/autocomplete.js"
   },
   "repository": {
     "type": "git",
@@ -25,8 +28,10 @@
   },
   "keywords": [
     "office 365",
+    "microsoft 365",
     "sharepoint framework",
     "o365",
+    "m365",
     "spfx",
     "sharepoint online",
     "sharepoint",

@@ -23,7 +23,7 @@ class Autocomplete {
       catch { }
     }
 
-    this.omelette = omelette('o365_comp|o365|office365');
+    this.omelette = omelette('o365_comp|o365|office365|m365_comp|m365|microsoft365');
     this.omelette.on('complete', this.handleAutocomplete.bind(this));
     this.omelette.init();
   }
