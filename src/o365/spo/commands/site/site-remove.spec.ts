@@ -10,6 +10,8 @@ import Utils from '../../../../Utils';
 import config from '../../../../config';
 
 describe(commands.SITE_REMOVE, () => {
+  const SITE_CLASSIC_REMOVE: string = `spo site classic remove`;
+  
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
@@ -41,7 +43,7 @@ describe(commands.SITE_REMOVE, () => {
     };
     cmdClassicInstance = {
       commandWrapper: {
-        command: commands.SITE_CLASSIC_REMOVE
+        command: SITE_CLASSIC_REMOVE
       },
       action: command.action(),
       log: (msg: string) => {
@@ -81,7 +83,7 @@ describe(commands.SITE_REMOVE, () => {
 
   it('defines correct alias', () => {
     const alias = command.alias();
-    assert.equal((alias && alias.indexOf(commands.SITE_CLASSIC_REMOVE) > -1), true);
+    assert.equal((alias && alias.indexOf(SITE_CLASSIC_REMOVE) > -1), true);
   });
 
   it('aborts removing site when prompt not confirmed', (done) => {

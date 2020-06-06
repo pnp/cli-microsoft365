@@ -9,6 +9,7 @@ import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo } from '..
 import { SpoOperation } from './SpoOperation';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
+const SITE_CLASSIC_REMOVE: string = `spo site classic remove`;
 
 interface CommandArgs {
   options: Options;
@@ -37,7 +38,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
   }
 
   public alias(): string[] | undefined {
-    return [commands.SITE_CLASSIC_REMOVE];
+    return [SITE_CLASSIC_REMOVE];
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -50,8 +51,8 @@ class SpoSiteRemoveCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    if (cmd.commandWrapper.command.indexOf(commands.SITE_CLASSIC_REMOVE) === 0) {
-      this.showDeprecationWarning(cmd, commands.SITE_CLASSIC_REMOVE, commands.SITE_REMOVE);
+    if (cmd.commandWrapper.command.indexOf(SITE_CLASSIC_REMOVE) === 0) {
+      this.showDeprecationWarning(cmd, SITE_CLASSIC_REMOVE, commands.SITE_REMOVE);
     }
 
     const removeSite = (): void => {
