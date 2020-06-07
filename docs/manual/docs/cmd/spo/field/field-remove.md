@@ -17,8 +17,9 @@ Option|Description
 `-l, --listTitle [listTitle]`|Title of the list where the field is located. Specify only one of `listTitle`, `listId` or `listUrl`
 `--listId [listId]`|ID of the list where the field is located. Specify only one of `listTitle`, `listId` or `listUrl`
 `--listUrl [listUrl]`|Server- or web-relative URL of the list where the field is located. Specify only one of `listTitle`, `listId` or `listUrl`
-`-i, --id [id]`|The ID of the field to remove. Specify `id` or `fieldTitle` but not both
-`--fieldTitle [fieldTitle]`|The display name (case-sensitive) of the field to remove. Specify `id` or `fieldTitle` but not both
+`-i, --id [id]`|The ID of the field to remove. Specify id, fieldTitle, or group individually
+`-t, --fieldTitle [fieldTitle]`|The display name (case-sensitive) of the field to remove. Specify id, fieldTitle, or group individually
+`-g, --group [group]`|Delete all fields assigned to the group (case-sensitive). Specify id, fieldTitle, or group individually
 `--confirm`|Don't prompt for confirming removing the field
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json,text`. Default `text`
@@ -44,4 +45,10 @@ Remove the list column with the specified display name, located in site _https:/
 
 ```sh
 spo field remove --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listUrl 'Lists/Events' --fieldTitle 'Title'
+```
+
+Remove all site columns associated to the group "MyGroup"
+
+```sh
+spo field remove --webUrl https://contoso.sharepoint.com/sites/contoso-sales --group 'MyGroup'
 ```
