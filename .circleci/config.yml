@@ -57,6 +57,20 @@ jobs:
       - run:
           name: Publish @next
           command: npm publish --tag next --access public
+  publish_v3:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/office365-cli
+      - run:
+          name: Write .npmrc
+          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+      - run:
+          name: Stamp beta to package version
+          command: node scripts/update-package-version.js $CIRCLE_SHA1
+      - run:
+          name: Publish @v3
+          command: npm publish --tag three --access public
   publish:
     <<: *defaults
     steps:
@@ -101,13 +115,31 @@ workflows:
       - build:
           filters:
             branches:
-              ignore: /^(master|gh-pages)/
+              ignore: /^(master|gh-pages|v3)/
       - test:
           requires:
             - build
           filters:
             branches:
-              ignore: /^(master|gh-pages)/
+              ignore: /^(master|gh-pages|v3)/
+  release_v3:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: v3
+      - test:
+          requires:
+            - build
+          filters:
+            branches:
+              only: v3
+      - publish_v3:
+          requires:
+            - test
+          filters:
+            branches:
+              only: v3
   release_next:
     jobs:
       - build:
