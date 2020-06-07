@@ -43,7 +43,8 @@ describe(commands.FIELD_REMOVE, () => {
   afterEach(() => {
     Utils.restore([
       vorpal.find,
-      request.post
+      request.post,
+      request.get
     ]);
   });
 
@@ -122,6 +123,21 @@ describe(commands.FIELD_REMOVE, () => {
       cb({ continue: false });
     };
     cmdInstance.action({ options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com' } }, () => {
+      try {
+        assert(requests.length === 0);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('aborts removing field when prompt not confirmed and passing the group parameter', (done) => {
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: false });
+    };
+    cmdInstance.action({ options: { debug: false, group: 'MyGroup', webUrl: 'https://contoso.sharepoint.com' } }, () => {
       try {
         assert(requests.length === 0);
         done();
@@ -253,6 +269,232 @@ describe(commands.FIELD_REMOVE, () => {
     cmdInstance.action({ options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', id: '03e45e84-1992-4d42-9116-26f756012634', listUrl: 'Lists/Events', confirm: true } }, () => {
       try {
         assert.equal(getStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/portal/_api/web/GetList(\'%2Fsites%2Fportal%2FLists%2FEvents\')/fields/getbyid(\'03e45e84-1992-4d42-9116-26f756012634\')');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('calls group and deletes two fields and asks for confirmation', (done) => {
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
+
+    const getStub = sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/GetList(\'%2Fsites%2Fportal%2FLists%2FEvents\')/fields`) {
+        return Promise.resolve({ "value": [{
+          "Id": "03e45e84-1992-4d42-9116-26f756012634",
+          "Group": "MyGroup"
+        },
+        {
+          "Id": "03e45e84-1992-4d42-9116-26f756012635",
+          "Group": "MyGroup"
+        },
+        {
+          "Id": "03e45e84-1992-4d42-9116-26f756012636",
+          "Group": "DifferentGroup"
+        }]});
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    const deletion = sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/web/GetList(\'%2Fsites%2Fportal%2FLists%2FEvents\')/fields/getbyid(\'03e45e84-1992-4d42-9116-26f756012634\')`) > -1) {
+        return Promise.resolve({
+          "Id": "03e45e84-1992-4d42-9116-26f756012634"
+        });
+      }
+
+      if ((opts.url as string).indexOf(`/_api/web/GetList(\'%2Fsites%2Fportal%2FLists%2FEvents\')/fields/getbyid(\'03e45e84-1992-4d42-9116-26f756012635\')`) > -1) {
+        return Promise.resolve({
+          "Id": "03e45e84-1992-4d42-9116-26f756012635"
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({ options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', group: 'MyGroup', listUrl: '/sites/portal/Lists/Events' } }, () => {
+      try {
+        assert(getStub.called);
+        assert.equal(deletion.firstCall.args[0].url, 'https://contoso.sharepoint.com/sites/portal/_api/web/GetList(\'%2Fsites%2Fportal%2FLists%2FEvents\')/fields/getbyid(\'03e45e84-1992-4d42-9116-26f756012634\')');
+        assert.equal(deletion.secondCall.args[0].url, 'https://contoso.sharepoint.com/sites/portal/_api/web/GetList(\'%2Fsites%2Fportal%2FLists%2FEvents\')/fields/getbyid(\'03e45e84-1992-4d42-9116-26f756012635\')');
+        assert.equal(deletion.callCount, 2);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('calls group and deletes two fields', (done) => {
+    const getStub = sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/fields`) {
+        return Promise.resolve({ "value": [{
+          "Id": "03e45e84-1992-4d42-9116-26f756012634",
+          "Group": "MyGroup"
+        },
+        {
+          "Id": "03e45e84-1992-4d42-9116-26f756012635",
+          "Group": "MyGroup"
+        },
+        {
+          "Id": "03e45e84-1992-4d42-9116-26f756012636",
+          "Group": "DifferentGroup"
+        }]});
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    const deletion = sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/web/fields/getbyid(\'03e45e84-1992-4d42-9116-26f756012634\')`) > -1) {
+        return Promise.resolve({
+          "Id": "03e45e84-1992-4d42-9116-26f756012634"
+        });
+      }
+
+      if ((opts.url as string).indexOf(`/_api/web/fields/getbyid(\'03e45e84-1992-4d42-9116-26f756012635\')`) > -1) {
+        return Promise.resolve({
+          "Id": "03e45e84-1992-4d42-9116-26f756012635"
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({ options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', group: 'MyGroup', confirm: true } }, () => {
+      try {
+        assert(getStub.called);
+        assert.equal(deletion.firstCall.args[0].url, 'https://contoso.sharepoint.com/sites/portal/_api/web/fields/getbyid(\'03e45e84-1992-4d42-9116-26f756012634\')');
+        assert.equal(deletion.secondCall.args[0].url, 'https://contoso.sharepoint.com/sites/portal/_api/web/fields/getbyid(\'03e45e84-1992-4d42-9116-26f756012635\')');
+        assert.equal(deletion.callCount, 2);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('calls group and deletes no fields', (done) => {
+    const getStub = sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/fields`) {
+        return Promise.resolve({ "value": [{
+          "Id": "03e45e84-1992-4d42-9116-26f756012634",
+          "Group": "MyGroup"
+        },
+        {
+          "Id": "03e45e84-1992-4d42-9116-26f756012635",
+          "Group": "MyGroup"
+        },
+        {
+          "Id": "03e45e84-1992-4d42-9116-26f756012636",
+          "Group": "DifferentGroup"
+        }]});
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    const deletion = sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/web/fields`) > -1) {
+        return Promise.resolve({
+          "Id": "03e45e84-1992-4d42-9116-26f756012634"
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({ options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', group: 'MyGroup1', confirm: true } }, () => {
+      try {
+        assert(getStub.called);
+        assert(deletion.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('handles failure when get operation fails', (done) => {
+    const err = 'Invalid request';
+    
+    const getStub = sinon.stub(request, 'get').callsFake((opts) => {
+      return Promise.reject(err);
+    });
+
+    const deletion = sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/web/fields/getbyid(\'03e45e84-1992-4d42-9116-26f756012635\')`) > -1) {
+        return Promise.resolve({
+          "Id": "03e45e84-1992-4d42-9116-26f756012635"
+        });
+      }
+
+      if ((opts.url as string).indexOf(`/_api/web/fields/getbyid(\'03e45e84-1992-4d42-9116-26f756012634\')`) > -1) {
+        return Promise.reject(err);
+      }
+
+      return Promise.reject(err);
+    });
+
+    cmdInstance.action({ options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', group: 'MyGroup', confirm: true } }, (error?: any) => {
+      try {
+        assert(getStub.called);
+        assert.equal(JSON.stringify(error), JSON.stringify(new CommandError(err)));
+        assert(deletion.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('handles failure when one deletion fails', (done) => {
+    const err = 'Invalid request';
+    
+    const getStub = sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/fields`) {
+        return Promise.resolve({ "value": [{
+          "Id": "03e45e84-1992-4d42-9116-26f756012634",
+          "Group": "MyGroup"
+        },
+        {
+          "Id": "03e45e84-1992-4d42-9116-26f756012635",
+          "Group": "MyGroup"
+        },
+        {
+          "Id": "03e45e84-1992-4d42-9116-26f756012636",
+          "Group": "DifferentGroup"
+        }]});
+      }
+      return Promise.reject(err);
+    });
+
+    const deletion = sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/web/fields/getbyid(\'03e45e84-1992-4d42-9116-26f756012635\')`) > -1) {
+        return Promise.resolve({
+          "Id": "03e45e84-1992-4d42-9116-26f756012635"
+        });
+      }
+
+      if ((opts.url as string).indexOf(`/_api/web/fields/getbyid(\'03e45e84-1992-4d42-9116-26f756012634\')`) > -1) {
+        return Promise.reject(err);
+      }
+
+      return Promise.reject(err);
+    });
+
+    cmdInstance.action({ options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', group: 'MyGroup', confirm: true } }, (error?: any) => {
+      try {
+        assert(getStub.called);
+        assert.equal(deletion.firstCall.args[0].url, 'https://contoso.sharepoint.com/sites/portal/_api/web/fields/getbyid(\'03e45e84-1992-4d42-9116-26f756012634\')');
+        assert.equal(deletion.callCount, 2);
+        assert.equal(JSON.stringify(error), JSON.stringify(new CommandError(err)));
         done();
       }
       catch (e) {
@@ -450,7 +692,7 @@ describe(commands.FIELD_REMOVE, () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } });
     assert(actual);
   });
-
+  
   it('fails validation if the field ID option is not specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com' } });
     assert.notEqual(actual, true);

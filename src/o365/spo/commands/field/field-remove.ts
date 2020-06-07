@@ -18,6 +18,7 @@ interface Options extends GlobalOptions {
   fieldTitle?: string;
   id?: string;
   listId?: string;
+  group?: string;
   listTitle?: string;
   listUrl?: string;
   webUrl: string;
@@ -38,36 +39,32 @@ class SpoFieldRemoveCommand extends SpoCommand {
     telemetryProps.listTitle = typeof args.options.listTitle !== 'undefined';
     telemetryProps.listUrl = typeof args.options.listUrl !== 'undefined';
     telemetryProps.id = typeof args.options.id !== 'undefined';
+    telemetryProps.group = typeof args.options.group !== 'undefined';
     telemetryProps.fieldTitle = typeof args.options.fieldTitle !== 'undefined';
     telemetryProps.confirm = (!(!args.options.confirm)).toString();
     return telemetryProps;
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const removeField: () => void = (): void => {
+    let messageEnd: string;
+    if (args.options.listId || args.options.listTitle) {
+      messageEnd = `in list ${args.options.listId || args.options.listTitle}`;
+    }
+    else {
+      messageEnd = `in site ${args.options.webUrl}`;
+    }
+
+    const removeField = (listRestUrl: string, fieldId: string | undefined, fieldTitle: string | undefined): Promise<void> => {
       if (this.verbose) {
-        cmd.log(`Removing field in site at ${args.options.webUrl}...`);
-      }
-
-      let listRestUrl: string = '';
-
-      if (args.options.listId) {
-        listRestUrl = `lists(guid'${encodeURIComponent(args.options.listId)}')/`;
-      }
-      else if (args.options.listTitle) {
-        listRestUrl = `lists/getByTitle('${encodeURIComponent(args.options.listTitle as string)}')/`;
-      }
-      else if (args.options.listUrl) {
-        const listServerRelativeUrl: string = Utils.getServerRelativePath(args.options.webUrl, args.options.listUrl);
-        listRestUrl = `GetList('${encodeURIComponent(listServerRelativeUrl)}')/`;
+        cmd.log(`Removing field ${fieldId || fieldTitle} ${messageEnd}...`);
       }
 
       let fieldRestUrl: string = '';
-      if (args.options.id) {
-        fieldRestUrl = `/getbyid('${encodeURIComponent(args.options.id)}')`;
+      if (fieldId) {
+        fieldRestUrl = `/getbyid('${encodeURIComponent(fieldId)}')`;
       }
       else {
-        fieldRestUrl = `/getbyinternalnameortitle('${encodeURIComponent(args.options.fieldTitle as string)}')`;
+        fieldRestUrl = `/getbyinternalnameortitle('${encodeURIComponent(fieldTitle as string)}')`;
       }
 
       const requestOptions: any = {
@@ -81,25 +78,70 @@ class SpoFieldRemoveCommand extends SpoCommand {
         json: true
       };
 
-      request
-        .post(requestOptions)
-        .then((): void => {
-          // REST post call doesn't return anything
-          cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      return request.post(requestOptions);
+    }
+
+    const prepareRemoval = (): void => {
+      let listRestUrl: string = '';
+
+      if (args.options.listId) {
+        listRestUrl = `lists(guid'${encodeURIComponent(args.options.listId)}')/`;
+      }
+      else if (args.options.listTitle) {
+        listRestUrl = `lists/getByTitle('${encodeURIComponent(args.options.listTitle as string)}')/`;
+      }
+      else if (args.options.listUrl) {
+        const listServerRelativeUrl: string = Utils.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+        listRestUrl = `GetList('${encodeURIComponent(listServerRelativeUrl)}')/`;
+      }
+
+      if (args.options.group) {
+        if (this.verbose) {
+          cmd.log(`Retrieving fields assigned to group ${args.options.group}...`);
+        }
+        const requestOptions: any = {
+          url: `${args.options.webUrl}/_api/web/${listRestUrl}fields`,
+          headers: {
+            accept: 'application/json;odata=nometadata'
+          },
+          json: true
+        };
+
+        request
+          .get(requestOptions)
+          .then((res: any): void => {
+            const filteredResults = res.value.filter((field: { Id: string | undefined, Group: string | undefined; }) => field.Group === args.options.group);
+            if (this.verbose) {
+              cmd.log(`${filteredResults.length} matches found...`);
+            }
+
+            var promises = [];
+            for (let index = 0; index < filteredResults.length; index++) {
+              promises.push(removeField(listRestUrl, filteredResults[index].Id, undefined));
+            }
+
+            Promise.all(promises).then(() => {
+              cb();
+            })
+              .catch((err) => {
+                this.handleRejectedODataJsonPromise(err, cmd, cb);
+              });
+          }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }
+      else {
+        removeField(listRestUrl, args.options.id, args.options.fieldTitle)
+          .then((): void => {
+            // REST post call doesn't return anything
+            cb();
+          }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }
     };
 
     if (args.options.confirm) {
-      removeField();
+      prepareRemoval();
     }
     else {
-      let confirmMessage: string = `Are you sure you want to remove the field ${args.options.id || args.options.fieldTitle} `;
-      if (args.options.listId || args.options.listTitle) {
-        confirmMessage += `from list ${args.options.listId || args.options.listTitle}?`;
-      }
-      else {
-        confirmMessage += `from site ${args.options.webUrl}?`;
-      }
+      const confirmMessage: string = `Are you sure you want to remove the ${args.options.group ? 'fields' : 'field'} ${args.options.id || args.options.fieldTitle || 'from group ' + args.options.group} ${messageEnd}?`;
 
       cmd.prompt({
         type: 'confirm',
@@ -111,7 +153,7 @@ class SpoFieldRemoveCommand extends SpoCommand {
           cb();
         }
         else {
-          removeField();
+          prepareRemoval();
         }
       });
     }
@@ -137,11 +179,15 @@ class SpoFieldRemoveCommand extends SpoCommand {
       },
       {
         option: '-i, --id [id]',
-        description: 'The ID of the field to remove. Specify id or fieldTitle but not both'
+        description: 'The ID of the field to remove. Specify id, fieldTitle, or group'
       },
       {
         option: '-t, --fieldTitle [fieldTitle]',
-        description: 'The display name (case-sensitive) of the field to remove. Specify id or fieldTitle but not both'
+        description: 'The display name (case-sensitive) of the field to remove. Specify id, fieldTitle, or group'
+      },
+      {
+        option: '-g, --group [group]',
+        description: 'Delete all fields from this group (case-sensitive). Specify id, fieldTitle, or group'
       },
       {
         option: '--confirm',
@@ -164,8 +210,8 @@ class SpoFieldRemoveCommand extends SpoCommand {
         return isValidSharePointUrl;
       }
 
-      if (!args.options.id && !args.options.fieldTitle) {
-        return 'Specify id or fieldTitle, one is required';
+      if (!args.options.id && !args.options.fieldTitle && !args.options.group) {
+        return 'Specify id, fieldTitle, or group. One is required';
       }
 
       if (args.options.id && !Utils.isValidGuid(args.options.id)) {
@@ -203,6 +249,9 @@ class SpoFieldRemoveCommand extends SpoCommand {
     ${chalk.grey('https://contoso.sharepoint.com/sites/contoso-sales')}.
     Retrieves the list by its url
       ${commands.FIELD_REMOVE} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listUrl 'Lists/Events' --fieldTitle 'Title'     
+    
+    Remove all site columns from group "MyGroup"
+      ${commands.FIELD_REMOVE} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --group 'MyGroup'
       `);
   }
 }
