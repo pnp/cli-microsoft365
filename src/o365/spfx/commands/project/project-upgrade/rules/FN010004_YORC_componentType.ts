@@ -1,9 +1,9 @@
 import { Finding } from "../";
-import { Project } from "../../model";
+import { Project, Manifest } from "../../model";
 import { Rule } from "./Rule";
 
 export class FN010004_YORC_componentType extends Rule {
-  constructor(private componentType: string) {
+  constructor() {
     super();
   }
 
@@ -20,11 +20,7 @@ export class FN010004_YORC_componentType extends Rule {
   };
 
   get resolution(): string {
-    return `{
-  "@microsoft/generator-sharepoint": {
-    "componentType": "${this.componentType}"
-  }
-}`;
+    return '';
   };
 
   get resolutionType(): string {
@@ -44,8 +40,35 @@ export class FN010004_YORC_componentType extends Rule {
       return;
     }
 
-    if (project.yoRcJson["@microsoft/generator-sharepoint"].componentType !== this.componentType) {
-      this.addFinding(findings);
+    let componentType: string | undefined;
+    if (project.manifests) {
+      for (let i: number = 0; i < project.manifests.length; i++) {
+        const manifest: Manifest = project.manifests[i];
+        if (manifest.componentType === 'WebPart') {
+          componentType = 'webpart';
+          break;
+        }
+
+        if (manifest.componentType === 'Extension') {
+          componentType = 'extension';
+          break;
+        }
+      }
+    }
+
+    if (!componentType) {
+      componentType = 'webpart';
+    }
+
+    if (project.yoRcJson["@microsoft/generator-sharepoint"].componentType !== componentType) {
+      this.addFindingWithOccurrences([{
+        file: this.file,
+        resolution: JSON.stringify({
+          "@microsoft/generator-sharepoint": {
+            "componentType": componentType
+          }
+        }, null, 2)
+      }], findings);
     }
   }
 }

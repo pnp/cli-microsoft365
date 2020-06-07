@@ -75,7 +75,7 @@ module.exports = [
   new FN010001_YORC_version('1.5.0'),
   new FN010002_YORC_isCreatingSolution(true),
   new FN010003_YORC_packageManager('npm'),
-  new FN010004_YORC_componentType('webpart'),
+  new FN010004_YORC_componentType(),
   new FN011001_MAN_webpart_schema('https://developer.microsoft.com/json-schemas/spfx/client-side-web-part-manifest.schema.json'),
   new FN011002_MAN_applicationCustomizer_schema('https://developer.microsoft.com/json-schemas/spfx/client-side-extension-manifest.schema.json'),
   new FN011003_MAN_listViewCommandSet_schema('https://developer.microsoft.com/json-schemas/spfx/command-set-extension-manifest.schema.json'),
