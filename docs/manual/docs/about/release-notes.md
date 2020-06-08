@@ -4,6 +4,9 @@
 
 ### Changes
 
+- added the 'remove wiki tab from a Microsoft Teams channel' sample script [#1506](https://github.com/pnp/office365-cli/issues/1506)
+- fixed suggesting incorrect componentType [#1574](https://github.com/pnp/office365-cli/issues/1574)
+- added `m365` and `microsoft365` executables [#1637](https://github.com/pnp/office365-cli/issues/1637)
 - consolidated `spo site remove` and `spo site classic remove` commands [#1494](https://github.com/pnp/office365-cli/issues/1494)
 - added suggesting upgrading dependency @microsoft/sp-page-context [#1521](https://github.com/pnp/office365-cli/issues/1521)
 - added suggesting upgrading dependency @microsoft/sp-odata-types [#1520](https://github.com/pnp/office365-cli/issues/1520)
