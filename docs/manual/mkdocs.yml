@@ -507,6 +507,7 @@ nav:
     - Microsoft Teams:
       - 'Deploy Microsoft Teams app from Azure DevOps': 'sample-scripts/teams/deploy-teams-app.md'
       - 'Govern orphaned Microsoft Teams': 'sample-scripts/teams/govern-orphan-teams.md'
+      - 'Remove Wiki tab in a Microsoft Teams channel': 'sample-scripts/teams/remove-wikitab-teams.md'
   - About:
     - 'Why this CLI': 'about/why-cli.md'
     - 'Comparison to SharePoint and Office 365 PowerShell': 'about/comparison-powershell.md'
