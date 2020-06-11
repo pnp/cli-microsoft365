@@ -353,6 +353,7 @@ nav:
         - storageentity remove: 'cmd/spo/storageentity/storageentity-remove.md'
         - storageentity set: 'cmd/spo/storageentity/storageentity-set.md'
       - tenant:
+        - tenant appcatalog add: 'cmd/spo/tenant/tenant-appcatalog-add.md'
         - tenant appcatalogurl get: 'cmd/spo/tenant/tenant-appcatalogurl-get.md'
         - tenant recyclebinitem list: 'cmd/spo/tenant/tenant-recyclebinitem-list.md'
         - tenant settings list: 'cmd/spo/tenant/tenant-settings-list.md'

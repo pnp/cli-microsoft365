@@ -1372,4 +1372,79 @@ describe('Utils', () => {
         }
       })
   });
+
+  it('executes the specified command with output', (done) => {
+    const command: Command = new MockCommand();
+    const commandInstance: CommandInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      log: (message: any): void => {
+      },
+      prompt: (object: any, callback: (result: any) => void) => { }
+    };
+    Utils
+      .executeCommandWithOutput(command, { debug: false }, commandInstance)
+      .then((result: string): void => {
+        try {
+          assert.equal(result, 'Hello from mock command');
+          done();
+        }
+        catch (err) {
+          done(err);
+        }
+      }, (err): void => {
+        done(err);
+      })
+  });
+
+  it('executes the specified command with output (debug)', (done) => {
+    const command: Command = new MockCommand();
+    const commandInstance: CommandInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      log: (message: any): void => {
+      },
+      prompt: (object: any, callback: (result: any) => void) => { }
+    };
+    Utils
+      .executeCommandWithOutput(command, { debug: true }, commandInstance)
+      .then((result: string): void => {
+        try {
+          assert.equal(result, 'Hello from mock command,Hello debug');
+          done();
+        }
+        catch (err) {
+          done(err);
+        }
+      }, (err): void => {
+        done(err);
+      })
+  });
+
+  it('properly handles error when executing the specified command with output', (done) => {
+    const command: Command = new MockCommand();
+    const commandInstance: CommandInstance = {
+      commandWrapper: {
+        command: command.name
+      },
+      log: (message: any): void => {
+      },
+      prompt: (object: any, callback: (result: any) => void) => { }
+    };
+    Utils
+      .executeCommandWithOutput(command, { error: true }, commandInstance)
+      .then((result: string): void => {
+        done('Expected failure but passed');
+      }, (err): void => {
+        try {
+          assert.equal(err, 'An error has occurred');
+          done();
+        }
+        catch (err) {
+          done(err);
+        }
+      })
+  });
 });
