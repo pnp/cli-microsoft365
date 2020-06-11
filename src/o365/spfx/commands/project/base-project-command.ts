@@ -176,9 +176,19 @@ export abstract class BaseProjectCommand extends Command {
     if (fs.existsSync(yoRcPath)) {
       try {
         const yoRc: any = JSON.parse(fs.readFileSync(yoRcPath, 'utf-8'));
-        if (yoRc && yoRc['@microsoft/generator-sharepoint'] &&
-          yoRc['@microsoft/generator-sharepoint'].version) {
-          return yoRc['@microsoft/generator-sharepoint'].version;
+        if (yoRc && yoRc['@microsoft/generator-sharepoint']) {
+          const version: string | undefined = yoRc['@microsoft/generator-sharepoint'].version;
+
+          if (version) {
+            switch (yoRc['@microsoft/generator-sharepoint'].environment) {
+              case 'onprem19':
+                return '1.4.1';
+              case 'onprem':
+                return '1.1.0';
+              default:
+                return version;
+            }
+          }
         }
       }
       catch { }

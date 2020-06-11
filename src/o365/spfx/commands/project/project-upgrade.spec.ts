@@ -187,6 +187,82 @@ describe(commands.PROJECT_UPGRADE, () => {
     });
   });
 
+  it('determines correct version from .yo-rc.json for an SP2019 project built using generator v1.10', () => {
+    const originalExistsSync = fs.existsSync;
+    sinon.stub(fs, 'existsSync').callsFake((path) => {
+      if (path.toString().endsWith('.yo-rc.json')) {
+        return true;
+      }
+      else {
+        return originalExistsSync(path);
+      }
+    });
+    const originalReadFileSync = fs.readFileSync;
+    const yoRcJson = `{
+      "@microsoft/generator-sharepoint": {
+        "isCreatingSolution": true,
+        "environment": "onprem19",
+        "version": "1.10.0",
+        "libraryName": "spfx-1100-sp-2019",
+        "libraryId": "04b9054d-025f-4e1a-9a85-732c57213b2f",
+        "packageManager": "npm",
+        "componentType": "webpart"
+      }
+    }`;
+    sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
+      if (path.toString().endsWith('.yo-rc.json')) {
+        return yoRcJson;
+      }
+      else {
+        return originalReadFileSync(path, options);
+      }
+    });
+    const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.4.1' } }, (err?: any) => {
+      assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '1.4.1');
+    });
+  });
+
+  it('determines correct version from .yo-rc.json for an SP2016 project built using generator v1.10', () => {
+    const originalExistsSync = fs.existsSync;
+    sinon.stub(fs, 'existsSync').callsFake((path) => {
+      if (path.toString().endsWith('.yo-rc.json')) {
+        return true;
+      }
+      else {
+        return originalExistsSync(path);
+      }
+    });
+    const originalReadFileSync = fs.readFileSync;
+    const yoRcJson = `{
+      "@microsoft/generator-sharepoint": {
+        "isCreatingSolution": true,
+        "environment": "onprem",
+        "version": "1.10.0",
+        "libraryName": "spfx-1100-sp-2016",
+        "libraryId": "300833cb-9264-4b53-8179-2eaf105c1d41",
+        "packageManager": "npm",
+        "componentType": "webpart"
+      }
+    }`;
+    sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
+      if (path.toString().endsWith('.yo-rc.json')) {
+        return yoRcJson;
+      }
+      else {
+        return originalReadFileSync(path, options);
+      }
+    });
+    const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.1.0' } }, (err?: any) => {
+      assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '1.1.0');
+    });
+  });
+
   it('tries to determine the current version from package.json if .yo-rc.json doesn\'t exist', () => {
     const originalExistsSync = fs.existsSync;
     sinon.stub(fs, 'existsSync').callsFake((path) => {
