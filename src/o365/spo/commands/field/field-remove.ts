@@ -54,7 +54,7 @@ class SpoFieldRemoveCommand extends SpoCommand {
       messageEnd = `from site ${args.options.webUrl}`;
     }
 
-    const removeField = async (listRestUrl: string, fieldId: string | undefined, fieldTitle: string | undefined) : Promise<void> => {
+    const removeField = (listRestUrl: string, fieldId: string | undefined, fieldTitle: string | undefined) : Promise<void> => {
       if (this.verbose) {
         cmd.log(`Removing field ${fieldId || fieldTitle} ${messageEnd}...`);
       }
@@ -109,7 +109,7 @@ class SpoFieldRemoveCommand extends SpoCommand {
   
         request
           .get(requestOptions)
-          .then(async (res: any): Promise<void> => {
+          .then((res: any): void => {
             let filteredResults = res.value.filter((field: { Id: string | undefined, Group: string | undefined; }) => field.Group === args.options.group);
             if (this.verbose) {
               cmd.log(`${filteredResults.length} matches found...`);
