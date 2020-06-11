@@ -493,7 +493,7 @@ describe(commands.FIELD_REMOVE, () => {
       try {
         assert(getStub.called);
         assert.equal(deletion.firstCall.args[0].url, 'https://contoso.sharepoint.com/sites/portal/_api/web/fields/getbyid(\'03e45e84-1992-4d42-9116-26f756012634\')');
-        assert.equal(deletion.callCount, 1);
+        assert.equal(deletion.callCount, 2);
         assert.equal(JSON.stringify(error), JSON.stringify(new CommandError(err)));
         done();
       }

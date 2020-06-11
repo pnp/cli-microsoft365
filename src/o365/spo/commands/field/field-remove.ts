@@ -115,20 +115,17 @@ class SpoFieldRemoveCommand extends SpoCommand {
               cmd.log(`${filteredResults.length} matches found...`);
             }
 
-            if (filteredResults.length === 0) {
+            var promises = [];
+            for (let index = 0; index < filteredResults.length; index++) {
+              promises.push(removeField(listRestUrl, filteredResults[index].Id, undefined));
+            }
+            
+            Promise.all(promises).then(() => {
               cb();
-            }
-            else {
-              try {
-                for (let index = 0; index < filteredResults.length; index++) {
-                  await removeField(listRestUrl, filteredResults[index].Id, undefined);
-                }
-                cb();
-              }
-              catch (err) {
-                this.handleRejectedODataJsonPromise(err, cmd, cb);
-              }
-            }
+            })
+            .catch((err) => {
+              this.handleRejectedODataJsonPromise(err, cmd, cb);
+            });
           }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
       }
       else {
