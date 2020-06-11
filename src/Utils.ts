@@ -682,4 +682,32 @@ export default class Utils {
       });
     });
   }
+
+  public static executeCommandWithOutput(command: Command, options: any, cmd: CommandInstance): Promise<string> {
+    return new Promise((resolve: (result: string) => void, reject: (error: any) => void): void => {
+      const log: string[] = [];
+      const commandInstance: any = {
+        commandWrapper: {
+          command: command.name
+        },
+        action: command.action(),
+        log: (message: any): void => {
+          log.push(message);
+        },
+        prompt: cmd.prompt
+      };
+
+      if (options.debug) {
+        cmd.log(`Executing command ${command.name} with options ${JSON.stringify(options)}`);
+      }
+
+      commandInstance.action({ options: options }, (err: any): void => {
+        if (err) {
+          return reject(err);
+        }
+  
+        resolve(log.join());
+      });
+    });
+  }
 }
