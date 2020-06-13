@@ -13,6 +13,8 @@
 - added suggesting upgrading dependency @microsoft/sp-module-interfaces [#1519](https://github.com/pnp/office365-cli/issues/1519)
 - added suggesting upgrading dependency @microsoft/sp-loader [#1518](https://github.com/pnp/office365-cli/issues/1518)
 - added suggesting upgrading dependency @microsoft/sp-list-subscription [#1517](https://github.com/pnp/office365-cli/issues/1517)
+- fixed detecting onprem SPFx projects' versions. [#1647](https://github.com/pnp/office365-cli/issues/1647)
+- extended 'teams team add' with support for Teams templates. [#916](https://github.com/pnp/office365-cli/issues/916)
 
 ## [v2.10.0](https://github.com/pnp/office365-cli/releases/tag/v2.10.0)
 
