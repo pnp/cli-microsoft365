@@ -502,6 +502,7 @@ nav:
       - 'Disable the specified Tenant Wide Extension ': 'sample-scripts/spo/disable-tenant-wide-extension.md'
       - 'Ensure the Site Assets Library is created': 'sample-scripts/spo/ensure-siteassets-library.md'
       - 'Hide SharePoint list from Site Contents': 'sample-scripts/spo/hide-list-from-site-contents.md'
+      - 'Insert pictures in a SharePoint Document Library into a Word document': 'sample-scripts/spo/insert-sp-library-pictures-into-word.md'
       - 'Lists active SharePoint site collection application catalogs': 'sample-scripts/spo/list-site-app-catalogs.md'
       - 'Lists all tenant-wide extensions': 'sample-scripts/spo/list-tenant-wide-extensions.md'
     - Microsoft Teams:
