@@ -8,7 +8,7 @@ Customers have multiple pictures in a SharePoint Document Library, and they need
 
 Prerequisites:
 
-- Window 10
+- Windows 10
 - Windows PowerShell
 - Office 365 CLI
 - Office 2007 or Higher version
