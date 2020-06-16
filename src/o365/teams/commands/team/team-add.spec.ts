@@ -1,5 +1,6 @@
 import commands from '../../commands';
-import Command, { CommandOption, CommandError, CommandValidate, CommandCancel } from '../../../../Command';
+// import Command, { CommandOption, CommandError, CommandValidate, CommandCancel } from '../../../../Command';
+import Command, { CommandOption, CommandValidate, CommandError, CommandCancel } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -117,10 +118,29 @@ describe(commands.TEAMS_TEAM_ADD, () => {
     done();
   });
 
-  it('creates Microsoft Teams team in the tenant (verbose) when no template is supplied', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+  it('creates Microsoft Teams team in the tenant when no template is supplied (verbose)', (done) => {
+    const requestStub = sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/teams`) {
-        return Promise.resolve();
+        return Promise.resolve({ statusCode: 202, headers: { location: "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')" } });
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    const getRequestStub = sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
+          "id": "8ad1effa-7ed1-4d03-bd60-fe177d8d56f1",
+          "operationType": "createTeam",
+          "createdDateTime": "2020-06-15T22:28:16.3007846Z",
+          "status": "inProgress",
+          "lastActionDateTime": "2020-06-15T22:28:16.3007846Z",
+          "attemptsCount": 1,
+          "targetResourceId": "79afc64f-c76b-4edc-87f3-a47a1264695a",
+          "targetResourceLocation": "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')",
+          "Value": "{\"apps\":[{\"Index\":1,\"Status\":\"InProgress\",\"UpdateTimestamp\":\"2020-06-15T22:28:16.8753199+00:00\",\"Reference\":\"com.microsoft.teamspace.tab.vsts\"},{\"Index\":2,\"Status\":\"InProgress\",\"UpdateTimestamp\":\"2020-06-15T22:28:16.8753199+00:00\",\"Reference\":\"1542629c-01b3-4a6d-8f76-1938b779e48d\"}],\"channels\":[{\"tabs\":[],\"Index\":1,\"Status\":\"NotStarted\",\"UpdateTimestamp\":\"2020-06-15T22:28:14.0279825+00:00\",\"Reference\":\"Class Announcements\"},{\"tabs\":[],\"Index\":2,\"Status\":\"NotStarted\",\"UpdateTimestamp\":\"2020-06-15T22:28:14.0279825+00:00\",\"Reference\":\"Homework\"}],\"WorkflowId\":\"northeurope.695866c1-c68a-435c-b707-432984ec721c\"}",
+          "error": null
+        });
       }
       return Promise.reject('Invalid request');
     });
@@ -134,6 +154,12 @@ describe(commands.TEAMS_TEAM_ADD, () => {
       }
     }, () => {
       try {
+        assert.deepEqual(requestStub.getCall(0).args[0].body, {
+          "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
+          displayName: 'Architecture',
+          description: 'Architecture Discussion'
+        });
+        assert(getRequestStub.called);
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
         done();
       }
@@ -152,7 +178,26 @@ describe(commands.TEAMS_TEAM_ADD, () => {
     }`);
     const requestStub = sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/teams`) {
-        return Promise.resolve();
+        return Promise.resolve({ statusCode: 202, headers: { location: "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')" } });
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    const getRequestStub = sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
+          "id": "8ad1effa-7ed1-4d03-bd60-fe177d8d56f1",
+          "operationType": "createTeam",
+          "createdDateTime": "2020-06-15T22:28:16.3007846Z",
+          "status": "inProgress",
+          "lastActionDateTime": "2020-06-15T22:28:16.3007846Z",
+          "attemptsCount": 1,
+          "targetResourceId": "79afc64f-c76b-4edc-87f3-a47a1264695a",
+          "targetResourceLocation": "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')",
+          "Value": "{\"apps\":[{\"Index\":1,\"Status\":\"InProgress\",\"UpdateTimestamp\":\"2020-06-15T22:28:16.8753199+00:00\",\"Reference\":\"com.microsoft.teamspace.tab.vsts\"},{\"Index\":2,\"Status\":\"InProgress\",\"UpdateTimestamp\":\"2020-06-15T22:28:16.8753199+00:00\",\"Reference\":\"1542629c-01b3-4a6d-8f76-1938b779e48d\"}],\"channels\":[{\"tabs\":[],\"Index\":1,\"Status\":\"NotStarted\",\"UpdateTimestamp\":\"2020-06-15T22:28:14.0279825+00:00\",\"Reference\":\"Class Announcements\"},{\"tabs\":[],\"Index\":2,\"Status\":\"NotStarted\",\"UpdateTimestamp\":\"2020-06-15T22:28:14.0279825+00:00\",\"Reference\":\"Homework\"}],\"WorkflowId\":\"northeurope.695866c1-c68a-435c-b707-432984ec721c\"}",
+          "error": null
+        });
       }
       return Promise.reject('Invalid request');
     });
@@ -165,20 +210,12 @@ describe(commands.TEAMS_TEAM_ADD, () => {
       }
     }, () => {
       try {
-        assert.deepEqual(requestStub.getCall(0).args, [{
-          url: `https://graph.microsoft.com/beta/teams`,
-          resolveWithFullResponse: true,
-          headers: {
-            accept: 'application/json;odata.metadata=none',
-            'content-type': 'application/json;odata.metadata=none'
-          },
-          body: {
-            "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
-            displayName: 'Sample Engineering Team',
-            description: 'This is a sample engineering team, used to showcase the range of properties supported by this API'
-          },
-          json: true
-        }]);
+        assert.deepEqual(requestStub.getCall(0).args[0].body, {
+          "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
+          displayName: 'Sample Engineering Team',
+          description: 'This is a sample engineering team, used to showcase the range of properties supported by this API'
+        });
+        assert(getRequestStub.called);
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
         done();
       }
@@ -197,7 +234,26 @@ describe(commands.TEAMS_TEAM_ADD, () => {
     }`);
     const requestStub = sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/teams`) {
-        return Promise.resolve();
+        return Promise.resolve({ statusCode: 202, headers: { location: "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')" } });
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    const getRequestStub = sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
+          "id": "8ad1effa-7ed1-4d03-bd60-fe177d8d56f1",
+          "operationType": "createTeam",
+          "createdDateTime": "2020-06-15T22:28:16.3007846Z",
+          "status": "inProgress",
+          "lastActionDateTime": "2020-06-15T22:28:16.3007846Z",
+          "attemptsCount": 1,
+          "targetResourceId": "79afc64f-c76b-4edc-87f3-a47a1264695a",
+          "targetResourceLocation": "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')",
+          "Value": "{\"apps\":[{\"Index\":1,\"Status\":\"InProgress\",\"UpdateTimestamp\":\"2020-06-15T22:28:16.8753199+00:00\",\"Reference\":\"com.microsoft.teamspace.tab.vsts\"},{\"Index\":2,\"Status\":\"InProgress\",\"UpdateTimestamp\":\"2020-06-15T22:28:16.8753199+00:00\",\"Reference\":\"1542629c-01b3-4a6d-8f76-1938b779e48d\"}],\"channels\":[{\"tabs\":[],\"Index\":1,\"Status\":\"NotStarted\",\"UpdateTimestamp\":\"2020-06-15T22:28:14.0279825+00:00\",\"Reference\":\"Class Announcements\"},{\"tabs\":[],\"Index\":2,\"Status\":\"NotStarted\",\"UpdateTimestamp\":\"2020-06-15T22:28:14.0279825+00:00\",\"Reference\":\"Homework\"}],\"WorkflowId\":\"northeurope.695866c1-c68a-435c-b707-432984ec721c\"}",
+          "error": null
+        });
       }
       return Promise.reject('Invalid request');
     });
@@ -211,20 +267,12 @@ describe(commands.TEAMS_TEAM_ADD, () => {
       }
     }, () => {
       try {
-        assert.deepEqual(requestStub.getCall(0).args, [{
-          url: `https://graph.microsoft.com/beta/teams`,
-          resolveWithFullResponse: true,
-          headers: {
-            accept: 'application/json;odata.metadata=none',
-            'content-type': 'application/json;odata.metadata=none'
-          },
-          body: {
-            "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
-            displayName: 'Sample Classroom Team',
-            description: 'This is a sample engineering team, used to showcase the range of properties supported by this API'
-          },
-          json: true
-        }]);
+        assert.deepEqual(requestStub.getCall(0).args[0].body, {
+          "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
+          displayName: 'Sample Classroom Team',
+          description: 'This is a sample engineering team, used to showcase the range of properties supported by this API'
+        });
+        assert(getRequestStub.called);
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
         done();
       }
@@ -243,7 +291,26 @@ describe(commands.TEAMS_TEAM_ADD, () => {
     }`);
     const requestStub = sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/teams`) {
-        return Promise.resolve();
+        return Promise.resolve({ statusCode: 202, headers: { location: "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')" } });
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    const getRequestStub = sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
+          "id": "8ad1effa-7ed1-4d03-bd60-fe177d8d56f1",
+          "operationType": "createTeam",
+          "createdDateTime": "2020-06-15T22:28:16.3007846Z",
+          "status": "inProgress",
+          "lastActionDateTime": "2020-06-15T22:28:16.3007846Z",
+          "attemptsCount": 1,
+          "targetResourceId": "79afc64f-c76b-4edc-87f3-a47a1264695a",
+          "targetResourceLocation": "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')",
+          "Value": "{\"apps\":[{\"Index\":1,\"Status\":\"InProgress\",\"UpdateTimestamp\":\"2020-06-15T22:28:16.8753199+00:00\",\"Reference\":\"com.microsoft.teamspace.tab.vsts\"},{\"Index\":2,\"Status\":\"InProgress\",\"UpdateTimestamp\":\"2020-06-15T22:28:16.8753199+00:00\",\"Reference\":\"1542629c-01b3-4a6d-8f76-1938b779e48d\"}],\"channels\":[{\"tabs\":[],\"Index\":1,\"Status\":\"NotStarted\",\"UpdateTimestamp\":\"2020-06-15T22:28:14.0279825+00:00\",\"Reference\":\"Class Announcements\"},{\"tabs\":[],\"Index\":2,\"Status\":\"NotStarted\",\"UpdateTimestamp\":\"2020-06-15T22:28:14.0279825+00:00\",\"Reference\":\"Homework\"}],\"WorkflowId\":\"northeurope.695866c1-c68a-435c-b707-432984ec721c\"}",
+          "error": null
+        });
       }
       return Promise.reject('Invalid request');
     });
@@ -257,20 +324,12 @@ describe(commands.TEAMS_TEAM_ADD, () => {
       }
     }, () => {
       try {
-        assert.deepEqual(requestStub.getCall(0).args, [{
-          url: `https://graph.microsoft.com/beta/teams`,
-          resolveWithFullResponse: true,
-          headers: {
-            accept: 'application/json;odata.metadata=none',
-            'content-type': 'application/json;odata.metadata=none'
-          },
-          body: {
-            "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
-            displayName: 'Sample Engineering Team',
-            description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'
-          },
-          json: true
-        }]);
+        assert.deepEqual(requestStub.getCall(0).args[0].body, {
+          "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
+          displayName: 'Sample Engineering Team',
+          description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'
+        });
+        assert(getRequestStub.called);
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
         done();
       }
@@ -289,7 +348,26 @@ describe(commands.TEAMS_TEAM_ADD, () => {
     }`);
     const requestStub = sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/teams`) {
-        return Promise.resolve();
+        return Promise.resolve({ statusCode: 202, headers: { location: "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')" } });
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    const getRequestStub = sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
+          "id": "8ad1effa-7ed1-4d03-bd60-fe177d8d56f1",
+          "operationType": "createTeam",
+          "createdDateTime": "2020-06-15T22:28:16.3007846Z",
+          "status": "inProgress",
+          "lastActionDateTime": "2020-06-15T22:28:16.3007846Z",
+          "attemptsCount": 1,
+          "targetResourceId": "79afc64f-c76b-4edc-87f3-a47a1264695a",
+          "targetResourceLocation": "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')",
+          "Value": "{\"apps\":[{\"Index\":1,\"Status\":\"InProgress\",\"UpdateTimestamp\":\"2020-06-15T22:28:16.8753199+00:00\",\"Reference\":\"com.microsoft.teamspace.tab.vsts\"},{\"Index\":2,\"Status\":\"InProgress\",\"UpdateTimestamp\":\"2020-06-15T22:28:16.8753199+00:00\",\"Reference\":\"1542629c-01b3-4a6d-8f76-1938b779e48d\"}],\"channels\":[{\"tabs\":[],\"Index\":1,\"Status\":\"NotStarted\",\"UpdateTimestamp\":\"2020-06-15T22:28:14.0279825+00:00\",\"Reference\":\"Class Announcements\"},{\"tabs\":[],\"Index\":2,\"Status\":\"NotStarted\",\"UpdateTimestamp\":\"2020-06-15T22:28:14.0279825+00:00\",\"Reference\":\"Homework\"}],\"WorkflowId\":\"northeurope.695866c1-c68a-435c-b707-432984ec721c\"}",
+          "error": null
+        });
       }
       return Promise.reject('Invalid request');
     });
@@ -304,20 +382,12 @@ describe(commands.TEAMS_TEAM_ADD, () => {
       }
     }, () => {
       try {
-        assert.deepEqual(requestStub.getCall(0).args, [{
-          url: `https://graph.microsoft.com/beta/teams`,
-          resolveWithFullResponse: true,
-          headers: {
-            accept: 'application/json;odata.metadata=none',
-            'content-type': 'application/json;odata.metadata=none'
-          },
-          body: {
-            "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
-            displayName: 'Sample Classroom Team',
-            description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'
-          },
-          json: true
-        }]);
+        assert.deepEqual(requestStub.getCall(0).args[0].body, {
+          "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
+          displayName: 'Sample Classroom Team',
+          description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'
+        });
+        assert(getRequestStub.called);
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
         done();
       }
@@ -341,9 +411,59 @@ describe(commands.TEAMS_TEAM_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    const getRequest = sinon.stub(request, 'get').callsFake((opts) => {
+    const getRequestStub = sinon.stub(request, 'get')
+    getRequestStub.onCall(0)
+      .callsFake((opts) => {
+        if (opts.url === `https://graph.microsoft.com/beta/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
+          return Promise.resolve({
+            "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
+            "id": "8ad1effa-7ed1-4d03-bd60-fe177d8d56f1",
+            "operationType": "createTeam",
+            "createdDateTime": "2020-06-15T22:28:16.3007846Z",
+            "status": "inProgress",
+            "lastActionDateTime": "2020-06-15T22:28:16.3007846Z",
+            "attemptsCount": 1,
+            "targetResourceId": "79afc64f-c76b-4edc-87f3-a47a1264695a",
+            "targetResourceLocation": "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')",
+            "Value": "{\"apps\":[{\"Index\":1,\"Status\":\"Failed\",\"UpdateTimestamp\":\"2020-06-15T22:28:16.8753199+00:00\",\"Reference\":\"com.microsoft.teamspace.tab.vsts\"},{\"Index\":2,\"Status\":\"InProgress\",\"UpdateTimestamp\":\"2020-06-15T22:28:16.8753199+00:00\",\"Reference\":\"1542629c-01b3-4a6d-8f76-1938b779e48d\"}],\"channels\":[{\"tabs\":[],\"Index\":1,\"Status\":\"NotStarted\",\"UpdateTimestamp\":\"2020-06-15T22:28:14.0279825+00:00\",\"Reference\":\"Class Announcements\"},{\"tabs\":[],\"Index\":2,\"Status\":\"NotStarted\",\"UpdateTimestamp\":\"2020-06-15T22:28:14.0279825+00:00\",\"Reference\":\"Homework\"}],\"WorkflowId\":\"northeurope.695866c1-c68a-435c-b707-432984ec721c\"}",
+            "error": null
+          });
+        }
+        return Promise.reject('Invalid request');
+      });
+    getRequestStub.onCall(1).callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
-        return Promise.resolve({ status: 'succeeded' });
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
+          "id": "8ad1effa-7ed1-4d03-bd60-fe177d8d56f1",
+          "operationType": "createTeam",
+          "createdDateTime": "2020-06-15T22:28:16.3007846Z",
+          "status": "inProgress",
+          "lastActionDateTime": "2020-06-15T22:28:16.3007846Z",
+          "attemptsCount": 1,
+          "targetResourceId": "79afc64f-c76b-4edc-87f3-a47a1264695a",
+          "targetResourceLocation": "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')",
+          "Value": "{\"apps\":[{\"Index\":1,\"Status\":\"Failed\",\"UpdateTimestamp\":\"2020-06-15T22:28:16.8753199+00:00\",\"Reference\":\"com.microsoft.teamspace.tab.vsts\"},{\"Index\":2,\"Status\":\"InProgress\",\"UpdateTimestamp\":\"2020-06-15T22:28:16.8753199+00:00\",\"Reference\":\"1542629c-01b3-4a6d-8f76-1938b779e48d\"}],\"channels\":[{\"tabs\":[],\"Index\":1,\"Status\":\"NotStarted\",\"UpdateTimestamp\":\"2020-06-15T22:28:14.0279825+00:00\",\"Reference\":\"Class Announcements\"},{\"tabs\":[],\"Index\":2,\"Status\":\"NotStarted\",\"UpdateTimestamp\":\"2020-06-15T22:28:14.0279825+00:00\",\"Reference\":\"Homework\"}],\"WorkflowId\":\"northeurope.695866c1-c68a-435c-b707-432984ec721c\"}",
+          "error": null
+        });
+      }
+      return Promise.reject('Invalid request');
+    });
+    getRequestStub.onCall(2).callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
+          "id": "8ad1effa-7ed1-4d03-bd60-fe177d8d56f1",
+          "operationType": "createTeam",
+          "createdDateTime": "2020-06-15T22:28:16.3007846Z",
+          "status": "succeeded",
+          "lastActionDateTime": "2020-06-15T22:28:16.3007846Z",
+          "attemptsCount": 1,
+          "targetResourceId": "79afc64f-c76b-4edc-87f3-a47a1264695a",
+          "targetResourceLocation": "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')",
+          "Value": "{\"apps\":[{\"Index\":1,\"Status\":\"Failed\",\"UpdateTimestamp\":\"2020-06-15T22:28:16.8753199+00:00\",\"Reference\":\"com.microsoft.teamspace.tab.vsts\"},{\"Index\":2,\"Status\":\"InProgress\",\"UpdateTimestamp\":\"2020-06-15T22:28:16.8753199+00:00\",\"Reference\":\"1542629c-01b3-4a6d-8f76-1938b779e48d\"}],\"channels\":[{\"tabs\":[],\"Index\":1,\"Status\":\"NotStarted\",\"UpdateTimestamp\":\"2020-06-15T22:28:14.0279825+00:00\",\"Reference\":\"Class Announcements\"},{\"tabs\":[],\"Index\":2,\"Status\":\"NotStarted\",\"UpdateTimestamp\":\"2020-06-15T22:28:14.0279825+00:00\",\"Reference\":\"Homework\"}],\"WorkflowId\":\"northeurope.695866c1-c68a-435c-b707-432984ec721c\"}",
+          "error": null
+        });
       }
       return Promise.reject('Invalid request');
     });
@@ -364,21 +484,11 @@ describe(commands.TEAMS_TEAM_ADD, () => {
       }
     }, () => {
       try {
-        assert.deepEqual(requestStub.getCall(0).args, [{
-          url: `https://graph.microsoft.com/beta/teams`,
-          resolveWithFullResponse: true,
-          headers: {
-            accept: 'application/json;odata.metadata=none',
-            'content-type': 'application/json;odata.metadata=none'
-          },
-          body: {
-            "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
-            displayName: 'Sample Classroom Team',
-            description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'
-          },
-          json: true
-        }]);
-        assert(getRequest.called);
+        assert.deepEqual(requestStub.getCall(0).args[0].body, {
+          "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
+          displayName: 'Sample Classroom Team',
+          description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'
+        });
         assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
         done();
       }
@@ -411,7 +521,7 @@ describe(commands.TEAMS_TEAM_ADD, () => {
     });
   });
 
-  it('correctly handles failed operation error when creating a Team when waiting for command to complete', (done) => {
+  it('correctly handles operation error when creating a Team when waiting for command to complete', (done) => {
     sinon.stub(fs, 'readFileSync').callsFake(() => `
     {
       "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
@@ -425,138 +535,41 @@ describe(commands.TEAMS_TEAM_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    const getRequest = sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
-        return Promise.resolve({ status: 'failed' });
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
-      fn();
-      return {} as any;
-    });
-
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        wait: true,
-        name: 'Sample Classroom Team',
-        description: 'This is a sample classroom team, used to showcase the range of properties supported by this API',
-        templatePath: 'template.json',
-      }
-    }, (err?: any) => {
-      try {
-        assert.deepEqual(requestStub.getCall(0).args, [{
-          url: `https://graph.microsoft.com/beta/teams`,
-          resolveWithFullResponse: true,
-          headers: {
-            accept: 'application/json;odata.metadata=none',
-            'content-type': 'application/json;odata.metadata=none'
-          },
-          body: {
-            "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
-            displayName: 'Sample Classroom Team',
-            description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'
-          },
-          json: true
-        }]);
-        assert(getRequest.called);
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('failed')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('correctly handles invalid operation error when creating a Team when waiting for command to complete', (done) => {
-    sinon.stub(fs, 'readFileSync').callsFake(() => `
-    {
-      "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
-      "displayName": "Sample Engineering Team",
-      "description": "This is a sample engineering team, used to showcase the range of properties supported by this API"
-    }`);
-    const requestStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/teams`) {
-        return Promise.resolve({ statusCode: 202, headers: { location: "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')" } });
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    const getRequest = sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
-        return Promise.resolve({ status: 'invalid' });
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
-      fn();
-      return {} as any;
-    });
-
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        verbose: true,
-        wait: true,
-        name: 'Sample Classroom Team',
-        description: 'This is a sample classroom team, used to showcase the range of properties supported by this API',
-        templatePath: 'template.json',
-      }
-    }, (err?: any) => {
-      try {
-        assert.deepEqual(requestStub.getCall(0).args, [{
-          url: `https://graph.microsoft.com/beta/teams`,
-          resolveWithFullResponse: true,
-          headers: {
-            accept: 'application/json;odata.metadata=none',
-            'content-type': 'application/json;odata.metadata=none'
-          },
-          body: {
-            "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
-            displayName: 'Sample Classroom Team',
-            description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'
-          },
-          json: true
-        }]);
-        assert(getRequest.called);
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('invalid')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('correctly handles InProgress operation status when creating a Team and waiting for the command to complete', (done) => {
-    sinon.stub(fs, 'readFileSync').callsFake(() => `
-    {
-      "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
-      "displayName": "Sample Engineering Team",
-      "description": "This is a sample engineering team, used to showcase the range of properties supported by this API"
-    }`);
-    const requestStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/teams`) {
-        return Promise.resolve({ statusCode: 202, headers: { location: "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')" } });
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    const getRequest = sinon.stub(request, 'get')
-    getRequest.onCall(0)
+    const getRequestStub = sinon.stub(request, 'get')
+    getRequestStub.onCall(0)
       .callsFake((opts) => {
         if (opts.url === `https://graph.microsoft.com/beta/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
-          return Promise.resolve({ status: "InProgress" });
+          return Promise.resolve({
+            "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
+            "id": "8ad1effa-7ed1-4d03-bd60-fe177d8d56f1",
+            "operationType": "createTeam",
+            "createdDateTime": "2020-06-15T22:28:16.3007846Z",
+            "status": "inProgress",
+            "lastActionDateTime": "2020-06-15T22:28:16.3007846Z",
+            "attemptsCount": 1,
+            "targetResourceId": "79afc64f-c76b-4edc-87f3-a47a1264695a",
+            "targetResourceLocation": "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')",
+            "Value": "{\"apps\":[{\"Index\":1,\"Status\":\"Failed\",\"UpdateTimestamp\":\"2020-06-15T22:28:16.8753199+00:00\",\"Reference\":\"com.microsoft.teamspace.tab.vsts\"},{\"Index\":2,\"Status\":\"InProgress\",\"UpdateTimestamp\":\"2020-06-15T22:28:16.8753199+00:00\",\"Reference\":\"1542629c-01b3-4a6d-8f76-1938b779e48d\"}],\"channels\":[{\"tabs\":[],\"Index\":1,\"Status\":\"NotStarted\",\"UpdateTimestamp\":\"2020-06-15T22:28:14.0279825+00:00\",\"Reference\":\"Class Announcements\"},{\"tabs\":[],\"Index\":2,\"Status\":\"NotStarted\",\"UpdateTimestamp\":\"2020-06-15T22:28:14.0279825+00:00\",\"Reference\":\"Homework\"}],\"WorkflowId\":\"northeurope.695866c1-c68a-435c-b707-432984ec721c\"}",
+            "error": null
+          });
         }
         return Promise.reject('Invalid request');
       });
-    getRequest.onCall(1).callsFake((opts) => {
+    getRequestStub.onCall(1).callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
-        return Promise.resolve({ status: "succeeded" });
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
+          "id": "8ad1effa-7ed1-4d03-bd60-fe177d8d56f1",
+          "operationType": "createTeam",
+          "createdDateTime": "2020-06-15T22:28:16.3007846Z",
+          "status": "failed",
+          "lastActionDateTime": "2020-06-15T22:28:16.3007846Z",
+          "attemptsCount": 1,
+          "targetResourceId": "79afc64f-c76b-4edc-87f3-a47a1264695a",
+          "targetResourceLocation": "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')",
+          "Value": "{\"apps\":[{\"Index\":1,\"Status\":\"Failed\",\"UpdateTimestamp\":\"2020-06-15T22:28:16.8753199+00:00\",\"Reference\":\"com.microsoft.teamspace.tab.vsts\"},{\"Index\":2,\"Status\":\"InProgress\",\"UpdateTimestamp\":\"2020-06-15T22:28:16.8753199+00:00\",\"Reference\":\"1542629c-01b3-4a6d-8f76-1938b779e48d\"}],\"channels\":[{\"tabs\":[],\"Index\":1,\"Status\":\"NotStarted\",\"UpdateTimestamp\":\"2020-06-15T22:28:14.0279825+00:00\",\"Reference\":\"Class Announcements\"},{\"tabs\":[],\"Index\":2,\"Status\":\"NotStarted\",\"UpdateTimestamp\":\"2020-06-15T22:28:14.0279825+00:00\",\"Reference\":\"Homework\"}],\"WorkflowId\":\"northeurope.695866c1-c68a-435c-b707-432984ec721c\"}",
+          "error": 'An error has occurred'
+        });
       }
       return Promise.reject('Invalid request');
     });
@@ -576,22 +589,94 @@ describe(commands.TEAMS_TEAM_ADD, () => {
       }
     }, (err?: any) => {
       try {
-        assert.deepEqual(requestStub.getCall(0).args, [{
-          url: `https://graph.microsoft.com/beta/teams`,
-          resolveWithFullResponse: true,
-          headers: {
-            accept: 'application/json;odata.metadata=none',
-            'content-type': 'application/json;odata.metadata=none'
-          },
-          body: {
-            "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
-            displayName: 'Sample Classroom Team',
-            description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'
-          },
-          json: true
-        }]);
-        assert(getRequest.calledTwice);
-        assert(cmdInstanceLogSpy.notCalled);
+        assert.deepEqual(requestStub.getCall(0).args[0].body, {
+          "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
+          displayName: 'Sample Classroom Team',
+          description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'
+        });
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly handles inProgress operation status when creating a Team and waiting for the command to complete', (done) => {
+    sinon.stub(fs, 'readFileSync').callsFake(() => `
+    {
+      "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
+      "displayName": "Sample Engineering Team",
+      "description": "This is a sample engineering team, used to showcase the range of properties supported by this API"
+    }`);
+    const requestStub = sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/teams`) {
+        return Promise.resolve({ statusCode: 202, headers: { location: "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')" } });
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    const getRequestStub = sinon.stub(request, 'get')
+    getRequestStub.onCall(0)
+      .callsFake((opts) => {
+        if (opts.url === `https://graph.microsoft.com/beta/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
+          return Promise.resolve({
+            "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
+            "id": "8ad1effa-7ed1-4d03-bd60-fe177d8d56f1",
+            "operationType": "createTeam",
+            "createdDateTime": "2020-06-15T22:28:16.3007846Z",
+            "status": "inProgress",
+            "lastActionDateTime": "2020-06-15T22:28:16.3007846Z",
+            "attemptsCount": 1,
+            "targetResourceId": "79afc64f-c76b-4edc-87f3-a47a1264695a",
+            "targetResourceLocation": "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')",
+            "Value": "{\"apps\":[{\"Index\":1,\"Status\":\"Failed\",\"UpdateTimestamp\":\"2020-06-15T22:28:16.8753199+00:00\",\"Reference\":\"com.microsoft.teamspace.tab.vsts\"},{\"Index\":2,\"Status\":\"InProgress\",\"UpdateTimestamp\":\"2020-06-15T22:28:16.8753199+00:00\",\"Reference\":\"1542629c-01b3-4a6d-8f76-1938b779e48d\"}],\"channels\":[{\"tabs\":[],\"Index\":1,\"Status\":\"NotStarted\",\"UpdateTimestamp\":\"2020-06-15T22:28:14.0279825+00:00\",\"Reference\":\"Class Announcements\"},{\"tabs\":[],\"Index\":2,\"Status\":\"NotStarted\",\"UpdateTimestamp\":\"2020-06-15T22:28:14.0279825+00:00\",\"Reference\":\"Homework\"}],\"WorkflowId\":\"northeurope.695866c1-c68a-435c-b707-432984ec721c\"}",
+            "error": null
+          });
+        }
+        return Promise.reject('Invalid request');
+      });
+    getRequestStub.onCall(1).callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
+          "id": "8ad1effa-7ed1-4d03-bd60-fe177d8d56f1",
+          "operationType": "createTeam",
+          "createdDateTime": "2020-06-15T22:28:16.3007846Z",
+          "status": "succeeded",
+          "lastActionDateTime": "2020-06-15T22:28:16.3007846Z",
+          "attemptsCount": 1,
+          "targetResourceId": "79afc64f-c76b-4edc-87f3-a47a1264695a",
+          "targetResourceLocation": "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')",
+          "Value": "{\"apps\":[{\"Index\":1,\"Status\":\"Failed\",\"UpdateTimestamp\":\"2020-06-15T22:28:16.8753199+00:00\",\"Reference\":\"com.microsoft.teamspace.tab.vsts\"},{\"Index\":2,\"Status\":\"InProgress\",\"UpdateTimestamp\":\"2020-06-15T22:28:16.8753199+00:00\",\"Reference\":\"1542629c-01b3-4a6d-8f76-1938b779e48d\"}],\"channels\":[{\"tabs\":[],\"Index\":1,\"Status\":\"NotStarted\",\"UpdateTimestamp\":\"2020-06-15T22:28:14.0279825+00:00\",\"Reference\":\"Class Announcements\"},{\"tabs\":[],\"Index\":2,\"Status\":\"NotStarted\",\"UpdateTimestamp\":\"2020-06-15T22:28:14.0279825+00:00\",\"Reference\":\"Homework\"}],\"WorkflowId\":\"northeurope.695866c1-c68a-435c-b707-432984ec721c\"}",
+          "error": null
+        });
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+      fn();
+      return {} as any;
+    });
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({
+      options: {
+        wait: true,
+        name: 'Sample Classroom Team',
+        description: 'This is a sample classroom team, used to showcase the range of properties supported by this API',
+        templatePath: 'template.json',
+      }
+    }, (err?: any) => {
+      try {
+        assert.deepEqual(requestStub.getCall(0).args[0].body, {
+          "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
+          displayName: 'Sample Classroom Team',
+          description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'
+        });
+        assert(cmdInstanceLogSpy.called);
         done();
       }
       catch (e) {
