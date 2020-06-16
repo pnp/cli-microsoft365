@@ -30,6 +30,8 @@ Option|Description
 
 If you want to add a Team to an existing Office 365 Group use the [aad o365group teamify](../../aad/o365group/o365group-teamify.md) command instead.
 
+This command will return different responses based on the presence of the `--wait` option. If present, the command will return a `group` resource in the response. If not present, the command will return a `teamsAsyncOperation` resource in the response.
+
 ## Examples
 
 Add a new Microsoft Teams team
@@ -53,3 +55,5 @@ teams team add --name 'Architecture' --description 'Architecture Discussion' --t
 ## More information
 
 - Get started with Teams templates: [https://docs.microsoft.com/en-us/MicrosoftTeams/get-started-with-teams-templates](https://docs.microsoft.com/en-us/MicrosoftTeams/get-started-with-teams-templates)
+- group resource type: [https://docs.microsoft.com/en-gb/graph/api/resources/group?view=graph-rest-beta](https://docs.microsoft.com/en-gb/graph/api/resources/group?view=graph-rest-beta)
+- teamsAsyncOperation resource type: [https://docs.microsoft.com/en-gb/graph/api/resources/teamsasyncoperation?view=graph-rest-beta](https://docs.microsoft.com/en-gb/graph/api/resources/teamsasyncoperation?view=graph-rest-beta)

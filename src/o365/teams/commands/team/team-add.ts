@@ -92,7 +92,7 @@ class TeamsTeamAddCommand extends GraphCommand {
     }
     else {
       requestBody = {
-        'template@odata.bind': 'https://graph.microsoft.com/beta/teamsTemplates/standard',
+        'template@odata.bind': `https://graph.microsoft.com/beta/teamsTemplates('standard')`,
         displayName: args.options.name,
         description: args.options.description
       }
@@ -111,18 +111,42 @@ class TeamsTeamAddCommand extends GraphCommand {
 
     request
       .post(requestOptions)
-      .then((response: any) => {
+      .then((res: any): Promise<TeamsAsyncOperation> => {
+        const requestOptions: any = {
+          url: `${this.resource}/beta${res.headers.location}`,
+          headers: {
+            accept: 'application/json;odata.metadata=minimal'
+          },
+          json: true
+        };
+
         return new Promise((resolve, reject) => {
-          if (!args.options.wait) {
-            resolve();
-          }
-          else {
-            this.timeout = setTimeout(() => {
-              this.waitUntilFinished(response.headers.location, resolve, reject, cmd, this.dots, this.timeout)
-            }, this.pollingInterval);
-          };
-        })
-      }).then(() => {
+          request.get<TeamsAsyncOperation>(requestOptions)
+            .then((teamsAsyncOperation: TeamsAsyncOperation) => {
+              if (!args.options.wait) {
+                resolve(teamsAsyncOperation);
+              } else {
+                this.timeout = setTimeout(() => {
+                  this.waitUntilFinished(requestOptions, resolve, reject, cmd, this.dots, this.timeout)
+                }, this.pollingInterval);
+              }
+            });
+        });
+      }).then((teamsAsyncOperation: TeamsAsyncOperation) => {
+        if (teamsAsyncOperation.status !== TeamsAsyncOperationStatus.Succeeded) {
+          return Promise.resolve(teamsAsyncOperation);
+        }
+
+        return request.get({
+          url: `${this.resource}/v1.0/groups/${teamsAsyncOperation.targetResourceId}`,
+          headers: {
+            accept: 'application/json;odata.metadata=minimal'
+          },
+          json: true
+        });
+      })
+      .then((output: any) => {
+        cmd.log(output);
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
         }
@@ -132,36 +156,28 @@ class TeamsTeamAddCommand extends GraphCommand {
       });
   }
 
-  private waitUntilFinished(operationUrl: string, resolve: () => void, reject: (error: any) => void, cmd: CommandInstance, dots?: string, timeout?: NodeJS.Timer): void {
+  private waitUntilFinished(requestOptions: any, resolve: (teamsAsyncOperation: TeamsAsyncOperation) => void, reject: (error: any) => void, cmd: CommandInstance, dots?: string, timeout?: NodeJS.Timer): void {
     if (!this.debug && this.verbose) {
       dots += '.';
       process.stdout.write(`\r${dots}`);
     }
 
-    const requestOptions: any = {
-      url: `${this.resource}/beta${operationUrl}`,
-      headers: {
-        accept: 'application/json;odata.metadata=minimal'
-      },
-      json: true
-    };
-
     request
       .get<TeamsAsyncOperation>(requestOptions)
-      .then((response: TeamsAsyncOperation): void => {
-        if (response.status === TeamsAsyncOperationStatus.Succeeded) {
+      .then((teamsAsyncOperation: TeamsAsyncOperation): void => {
+        if (teamsAsyncOperation.status === TeamsAsyncOperationStatus.Succeeded) {
           if (this.verbose) {
             process.stdout.write('\n');
           }
-          resolve();
+          resolve(teamsAsyncOperation);
           return;
         }
-        if (response.status === TeamsAsyncOperationStatus.Invalid || response.status === TeamsAsyncOperationStatus.Failed) {
-          reject(response.status);
+        if (teamsAsyncOperation.error) {
+          reject(teamsAsyncOperation.error);
           return;
         }
         timeout = setTimeout(() => {
-          this.waitUntilFinished(operationUrl, resolve, reject, cmd, dots)
+          this.waitUntilFinished(requestOptions, resolve, reject, cmd, dots)
         }, this.pollingInterval);
       }).catch(err => reject(err));
   }
@@ -230,6 +246,11 @@ class TeamsTeamAddCommand extends GraphCommand {
     If you want to add a Team to an existing Office 365 Group use the
     ${chalk.blue(aadcommands.O365GROUP_TEAMIFY)} command instead.
 
+    This command will return different responses based on the presence of
+    the ${chalk.grey('--wait')} option. If present, the command will return a ${chalk.grey('group')}
+    resource in the response. If not present, the command will return
+    a ${chalk.grey('teamsAsyncOperation')} resource in the response.
+
   Examples:
   
     Add a new Microsoft Teams team 
@@ -246,6 +267,12 @@ class TeamsTeamAddCommand extends GraphCommand {
 
     Get started with Teams templates
       https://docs.microsoft.com/en-us/MicrosoftTeams/get-started-with-teams-templates
+
+    group resource type
+      https://docs.microsoft.com/en-gb/graph/api/resources/group?view=graph-rest-beta
+
+    teamsAsyncOperation resource type
+      https://docs.microsoft.com/en-gb/graph/api/resources/teamsasyncoperation?view=graph-rest-beta
   `);
   }
 }
