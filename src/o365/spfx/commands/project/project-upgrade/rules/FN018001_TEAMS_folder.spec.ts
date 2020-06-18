@@ -1,5 +1,6 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
+import * as path from 'path';
 import * as sinon from 'sinon';
 import { Finding } from '../Finding';
 import { Project } from '../../model';
@@ -35,7 +36,7 @@ describe('FN018001_TEAMS_folder', () => {
   });
 
   it('doesn\'t return notifications if teams folder exists', () => {
-    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('/teams'));
+    sinon.stub(fs, 'existsSync').callsFake((filePath) => filePath.toString().endsWith(`${path.sep}teams`));
     const project: Project = {
       path: '/usr/tmp',
       manifests: [{
