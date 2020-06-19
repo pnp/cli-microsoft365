@@ -153,7 +153,7 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
 
   private serializeMdReport(findingsToReport: ExternalizeEntry[], editsToReport: FileEdit[]): string {
     const lines = [
-      `# Externalizing dependencies of project ${path.posix.basename(this.projectRootPath as string)}`, os.EOL,
+      `# Externalizing dependencies of project ${path.basename(this.projectRootPath as string)}`, os.EOL,
       os.EOL,
       `Date: ${(new Date().toLocaleDateString())}`, os.EOL,
       os.EOL,

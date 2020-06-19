@@ -1,5 +1,7 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
+import * as path from 'path';
+import * as os from 'os';
 import * as sinon from 'sinon';
 import { Finding } from '../Finding';
 import { Project } from '../../model';
@@ -33,15 +35,20 @@ describe('FN018002_TEAMS_manifest', () => {
   it(`looks for Teams manifest for a web part using the correct path`, () => {
     const existsSyncFake: sinon.SinonStub = sinon.stub(fs, 'existsSync').callsFake(() => true);
     const project: Project = {
-      path: '/usr/tmp',
+      path: os.platform() === 'win32' ? 'c:\\tmp' : '/usr/tmp',
       manifests: [{
         $schema: 'schema',
         componentType: 'WebPart',
-        path: '/usr/tmp/webpart/webpart.manifest.json'
+        path: os.platform() === 'win32' ? 'c:\\tmp\\webpart\\webpart.manifest.json' : '/usr/tmp/webpart/webpart.manifest.json'
       }]
     };
     rule.visit(project, findings);
-    assert(existsSyncFake.calledWith('/usr/tmp/teams/manifest_webpart.json'));
+    if (os.platform() === 'win32') {
+      assert(existsSyncFake.calledWith('c:\\tmp\\teams\\manifest_webpart.json'));
+    }
+    else {
+      assert(existsSyncFake.calledWith('/usr/tmp/teams/manifest_webpart.json'));
+    }
   });
 
   it(`doesn't return notifications if the Teams manifest for the given web part already exists`, () => {
@@ -154,7 +161,7 @@ describe('FN018002_TEAMS_manifest', () => {
       }]
     };
     rule.visit(project, findings);
-    assert.equal(findings[0].occurrences[0].file, 'teams/manifest_webpart.json');
+    assert.equal(findings[0].occurrences[0].file, path.join('teams', 'manifest_webpart.json'));
   });
 
   it('creates manifest with a unique name following the web part name (multiple web parts)', () => {
@@ -177,7 +184,7 @@ describe('FN018002_TEAMS_manifest', () => {
       ]
     };
     rule.visit(project, findings);
-    assert.equal(findings[0].occurrences[0].file, 'teams/manifest_webpart1.json', 'Incorrect manifest path for web part 1');
-    assert.equal(findings[0].occurrences[1].file, 'teams/manifest_webpart2.json', 'Incorrect manifest path for web part 2');
+    assert.equal(findings[0].occurrences[0].file, path.join('teams', 'manifest_webpart1.json'), 'Incorrect manifest path for web part 1');
+    assert.equal(findings[0].occurrences[1].file, path.join('teams', 'manifest_webpart2.json'), 'Incorrect manifest path for web part 2');
   });
 });
