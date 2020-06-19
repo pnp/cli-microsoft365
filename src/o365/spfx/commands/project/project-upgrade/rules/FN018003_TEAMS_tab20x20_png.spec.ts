@@ -1,5 +1,6 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
+import * as path from 'path';
 import * as sinon from 'sinon';
 import { Finding } from '../Finding';
 import { Project } from '../../model';
@@ -62,7 +63,7 @@ describe('FN018003_TEAMS_tab20x20_png', () => {
       }]
     };
     rule.visit(project, findings);
-    assert.equal(findings[0].occurrences[0].file, 'teams/tab20x20.png');
+    assert.equal(findings[0].occurrences[0].file, path.join('teams', 'tab20x20.png'));
   });
 
   it('returns path to icon with name following web part ID when no fixed name specified', () => {
@@ -77,7 +78,7 @@ describe('FN018003_TEAMS_tab20x20_png', () => {
       }]
     };
     rule.visit(project, findings);
-    assert.equal(findings[0].occurrences[0].file, 'teams/c93e90e5-6222-45c6-b241-995df0029e3c_outline.png');
+    assert.equal(findings[0].occurrences[0].file, path.join('teams', 'c93e90e5-6222-45c6-b241-995df0029e3c_outline.png'));
   });
 
   it(`doesn't return notification when web part ID not specified`, () => {
