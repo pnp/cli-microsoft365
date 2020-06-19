@@ -1907,7 +1907,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings[18].file, 'teams/tab20x20.png');
+      assert.equal(findings[18].file, path.join('teams', 'tab20x20.png'));
     });
   });
 
@@ -1917,7 +1917,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings[19].file, 'teams/tab96x96.png');
+      assert.equal(findings[19].file, path.join('teams', 'tab96x96.png'));
     });
   });
   //#endregion
@@ -2071,7 +2071,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings[20].file, 'teams/7c4a6c24-2154-4dcc-9eb4-d64b8a2c5daa_outline.png');
+      assert.equal(findings[20].file, path.join('teams', '7c4a6c24-2154-4dcc-9eb4-d64b8a2c5daa_outline.png'));
     });
   });
 
@@ -2081,7 +2081,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings[21].file, 'teams/7c4a6c24-2154-4dcc-9eb4-d64b8a2c5daa_color.png');
+      assert.equal(findings[21].file, path.join('teams', '7c4a6c24-2154-4dcc-9eb4-d64b8a2c5daa_color.png'));
     });
   });
   //#endregion
