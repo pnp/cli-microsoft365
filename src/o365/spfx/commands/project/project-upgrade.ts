@@ -469,7 +469,7 @@ ${f.resolution}
     });
 
     const s: string[] = [
-      `# Upgrade project ${path.posix.basename(this.projectRootPath as string)} to v${this.toVersion}`, os.EOL,
+      `# Upgrade project ${path.basename(this.projectRootPath as string)} to v${this.toVersion}`, os.EOL,
       os.EOL,
       `Date: ${(new Date().toLocaleDateString())}`, os.EOL,
       os.EOL,
@@ -509,7 +509,7 @@ ${f.resolution}
 
   private getTourReport(findings: FindingToReport[], project: Project): string {
     const tourFindings: FindingTour = {
-      title: `Upgrade project ${path.posix.basename(this.projectRootPath as string)} to v${this.toVersion}`,
+      title: `Upgrade project ${path.basename(this.projectRootPath as string)} to v${this.toVersion}`,
       steps: []
     };
 

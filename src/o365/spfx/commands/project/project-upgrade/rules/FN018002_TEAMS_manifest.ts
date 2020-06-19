@@ -98,10 +98,10 @@ export class FN018002_TEAMS_manifest extends Rule {
 
     const occurrences: Occurrence[] = [];
     webPartManifests.forEach(manifest => {
-      const webPartFolderName: string = path.posix.basename(path.posix.dirname(manifest.path));
+      const webPartFolderName: string = path.basename(path.dirname(manifest.path));
       const teamsFolderName: string = `teams`;
-      const teamsFolderPath: string = path.posix.join(project.path, teamsFolderName);
-      const teamsManifestPath: string = path.posix.join(teamsFolderPath, `manifest_${webPartFolderName}.json`);
+      const teamsFolderPath: string = path.join(project.path, teamsFolderName);
+      const teamsManifestPath: string = path.join(teamsFolderPath, `manifest_${webPartFolderName}.json`);
       if (fs.existsSync(teamsManifestPath)) {
         return;
       }
@@ -128,7 +128,7 @@ export class FN018002_TEAMS_manifest extends Rule {
         .replace(/__description__/g, webPartDescription);
 
       occurrences.push({
-        file: path.posix.relative(project.path, teamsManifestPath),
+        file: path.relative(project.path, teamsManifestPath),
         resolution: resolution
       });
     });
