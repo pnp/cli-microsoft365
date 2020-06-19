@@ -23,6 +23,10 @@ Option|Description
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
+## Remarks
+
+pageNumber is specified as a 0-based index. A value of 2 returns the third page of items. 
+
 ## Examples
 
 Get a list of schemaExtension objects created in the current tenant, that can be InDevelopment, Available, or Deprecated.
@@ -37,8 +41,12 @@ Get a list of schemaExtension objects created in the current tenant, with owner 
 graph schemaextension list --owner 617720dc-85fc-45d7-a187-cee75eaf239e
 ```
 
-## Additional information
+Get a list of schemaExtension objects created in the current tenant, with owner 617720dc-85fc-45d7-a187-cee75eaf239e and return the third page of results of 10
 
-pageNumber is specified as a 0-based index. A value of 2 returns the third page of items. 
+```sh
+graph schemaextension list --owner 617720dc-85fc-45d7-a187-cee75eaf239e  --pageNumber 2 --pageSize 10
+```
 
-More information: [https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/schemaextension_list](https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/schemaextension_list)
+## More information
+
+[https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/schemaextension_list](https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/schemaextension_list)

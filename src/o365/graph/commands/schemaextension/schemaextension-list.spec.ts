@@ -98,11 +98,7 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#schemaExtensions(*)",
-          "@odata.nextLink": "https://graph.microsoft.com/v1.0/schemaExtensions?$select=*&$top=1&$skiptoken=%7B%22token%22%3a%22%2bRID%3a~F7weALI27DgBAAAAAAAAAA%3d%3d%23RT%3a1%23TRC%3a1%23ISV%3a2%23IEO%3a65551%23QCF%3a1%23FPC%3aAgEAAADKACLAQgAg2BDELgAUgQAKAgRAAIDAAAYEAEWCgACY4BEAKwSQBegLBqhBAKAACEACCAAQAAAIsAGCMQQCAgAMAgiAJaACwAQfgGqADMAFIIAAJgYAoB4AYAAAACAxBwAAAEA4EAAyACEAIABGAGAAELBAiAkIBPGAADEAABEpAAKAAAgABDKAACBMJBAgARCIIBIACQgIwBiAD8AwAAEUgQgAAAhkfAADAAAAgBCAAg0ABQCgYQAMeAIiAACgXQARAECAEIAGgAuAOYA%3d%22%2c%22range%22%3a%7B%22min%22%3a%22%22%2c%22max%22%3a%2205C1DFFFFFFFFC%22%7D%7D",
-          "value": [
-              {
+        assert(cmdInstanceLogSpy.calledWith([{
                   "id": "adatumisv_exo2",
                   "description": "sample desccription",
                   "targetTypes": [
@@ -120,9 +116,8 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
                           "type": "String"
                       }
                   ]
-              }
-          ]
-      }));
+              }]
+         ));
         done();
       }
       catch (e) {
@@ -178,10 +173,7 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#schemaExtensions(*)",
-          "@odata.nextLink": "https://graph.microsoft.com/v1.0/schemaExtensions?$select=*&$top=1&$skiptoken=%7B%22token%22%3a%22%2bRID%3a~F7weALI27DgGAAAAAAAAAA%3d%3d%23RT%3a2%23TRC%3a2%23ISV%3a2%23IEO%3a65551%23QCF%3a1%23FPC%3aAgEAAADKAAaAIcAg2BDELgAUgQAKAgRAAIDAAAYEAEWCgACY4BEAKwSQBegLBqhBAKAACEACCAAQAAAIsAGCMQQCAgAMAgiAJaACwAQfgGqADMAFIIAAJgYAoB4AYAAAACAxBwAAAEA4EAAyACEAIABGAGAAELBAiAkIBPGAADEAABEpAAKAAAgABDKAACBMJBAgARCIIBIACQgIwBiAD8AwAAEUgQgAAAhkfAADAAAAgBCAAg0ABQCgYQAMeAIiAACgXQARAECAEIAGgAuAOYA%3d%22%2c%22range%22%3a%7B%22min%22%3a%22%22%2c%22max%22%3a%2205C1DFFFFFFFFC%22%7D%7D",
-          "value": [
+        assert(cmdInstanceLogSpy.calledWith([
               {
                   "id": "adatumisv_courses",
                   "description": "Extension description",
@@ -207,7 +199,7 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
                   ]
               }
           ]
-      }));
+      ));
         done();
       }
       catch (e) {
@@ -263,10 +255,7 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#schemaExtensions(*)",
-          "@odata.nextLink": "https://graph.microsoft.com/v1.0/schemaExtensions?$select=*&$top=1&$skiptoken=%7B%22token%22%3a%22%2bRID%3a~F7weALI27DgGAAAAAAAAAA%3d%3d%23RT%3a2%23TRC%3a2%23ISV%3a2%23IEO%3a65551%23QCF%3a1%23FPC%3aAgEAAADKAAaAIcAg2BDELgAUgQAKAgRAAIDAAAYEAEWCgACY4BEAKwSQBegLBqhBAKAACEACCAAQAAAIsAGCMQQCAgAMAgiAJaACwAQfgGqADMAFIIAAJgYAoB4AYAAAACAxBwAAAEA4EAAyACEAIABGAGAAELBAiAkIBPGAADEAABEpAAKAAAgABDKAACBMJBAgARCIIBIACQgIwBiAD8AwAAEUgQgAAAhkfAADAAAAgBCAAg0ABQCgYQAMeAIiAACgXQARAECAEIAGgAuAOYA%3d%22%2c%22range%22%3a%7B%22min%22%3a%22%22%2c%22max%22%3a%2205C1DFFFFFFFFC%22%7D%7D",
-          "value": [
+        assert(cmdInstanceLogSpy.calledWith([
               {
                   "id": "adatumisv_courses",
                   "description": "Extension description",
@@ -292,7 +281,7 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
                   ]
               }
           ]
-      }));
+      ));
         done();
       }
       catch (e) {
@@ -349,10 +338,7 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#schemaExtensions(*)",
-          "@odata.nextLink": "https://graph.microsoft.com/v1.0/schemaExtensions?$select=*&$top=1&$skiptoken=%7B%22token%22%3a%22%2bRID%3a~F7weALI27DgGAAAAAAAAAA%3d%3d%23RT%3a2%23TRC%3a2%23ISV%3a2%23IEO%3a65551%23QCF%3a1%23FPC%3aAgEAAADKAAaAIcAg2BDELgAUgQAKAgRAAIDAAAYEAEWCgACY4BEAKwSQBegLBqhBAKAACEACCAAQAAAIsAGCMQQCAgAMAgiAJaACwAQfgGqADMAFIIAAJgYAoB4AYAAAACAxBwAAAEA4EAAyACEAIABGAGAAELBAiAkIBPGAADEAABEpAAKAAAgABDKAACBMJBAgARCIIBIACQgIwBiAD8AwAAEUgQgAAAhkfAADAAAAgBCAAg0ABQCgYQAMeAIiAACgXQARAECAEIAGgAuAOYA%3d%22%2c%22range%22%3a%7B%22min%22%3a%22%22%2c%22max%22%3a%2205C1DFFFFFFFFC%22%7D%7D",
-          "value": [
+        assert(cmdInstanceLogSpy.calledWith([
               {
                   "id": "adatumisv_courses",
                   "description": "Extension description",
@@ -378,7 +364,7 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
                   ]
               }
           ]
-      }));
+      ));
         done();
       }
       catch (e) {
@@ -428,10 +414,7 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#schemaExtensions(*)",
-          "@odata.nextLink": "https://graph.microsoft.com/v1.0/schemaExtensions?$select=*&$top=1&$skiptoken=%7B%22token%22%3a%22%2bRID%3a~F7weALI27DgBAAAAAAAAAA%3d%3d%23RT%3a1%23TRC%3a1%23ISV%3a2%23IEO%3a65551%23QCF%3a1%23FPC%3aAgEAAADKACLAQgAg2BDELgAUgQAKAgRAAIDAAAYEAEWCgACY4BEAKwSQBegLBqhBAKAACEACCAAQAAAIsAGCMQQCAgAMAgiAJaACwAQfgGqADMAFIIAAJgYAoB4AYAAAACAxBwAAAEA4EAAyACEAIABGAGAAELBAiAkIBPGAADEAABEpAAKAAAgABDKAACBMJBAgARCIIBIACQgIwBiAD8AwAAEUgQgAAAhkfAADAAAAgBCAAg0ABQCgYQAMeAIiAACgXQARAECAEIAGgAuAOYA%3d%22%2c%22range%22%3a%7B%22min%22%3a%22%22%2c%22max%22%3a%2205C1DFFFFFFFFC%22%7D%7D",
-          "value": [
+        assert(cmdInstanceLogSpy.calledWith([
               {
                   "id": "adatumisv_exo2",
                   "description": "sample desccription",
@@ -452,7 +435,7 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
                   ]
               }
           ]
-      }));
+      ));
         done();
       }
       catch (e) {
@@ -467,6 +450,30 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
   it('fails validation if the owner is not a valid GUID', () => {
     const actual = (command.validate() as CommandValidate)({ options: { owner: '123' } });
     assert.notEqual(actual, true);
+  });
+  it('fails validation if the status is not a valid status', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { status: 'test' } });
+    assert.notEqual(actual, true);
+  });
+  it('passes validation if the status is a valid status', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { status: 'InDevelopment' } });
+    assert.equal(actual, true);
+  });
+  it('fails validation if the pageNumber is not positive number', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { pageNumber: '-1' } });
+    assert.notEqual(actual, true);
+  });
+  it('passes validation if the pageNumber is a positive number', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { pageNumber: '2' } });
+    assert.equal(actual, true);
+  });
+  it('fails validation if the pageSize is not positive number', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { pageSize: '-1' } });
+    assert.notEqual(actual, true);
+  });
+  it('passes validation if the pageSize is a positive number', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { pageSize: '2' } });
+    assert.equal(actual, true);
   });
 
   it('supports debug mode', () => {
