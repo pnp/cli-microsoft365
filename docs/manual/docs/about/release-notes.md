@@ -13,8 +13,14 @@
 - added suggesting upgrading dependency @microsoft/sp-module-interfaces [#1519](https://github.com/pnp/office365-cli/issues/1519)
 - added suggesting upgrading dependency @microsoft/sp-loader [#1518](https://github.com/pnp/office365-cli/issues/1518)
 - added suggesting upgrading dependency @microsoft/sp-list-subscription [#1517](https://github.com/pnp/office365-cli/issues/1517)
-- fixed detecting onprem SPFx projects' versions. [#1647](https://github.com/pnp/office365-cli/issues/1647)
-- extended 'teams team add' with support for Teams templates. [#916](https://github.com/pnp/office365-cli/issues/916)
+- fixed detecting onprem SPFx projects' versions [#1647](https://github.com/pnp/office365-cli/issues/1647)
+- extended 'teams team add' with support for Teams templates [#916](https://github.com/pnp/office365-cli/issues/916)
+- extended 'spo field remove' with removing all fields from a group [#1381](https://github.com/pnp/office365-cli/issues/1381)
+- fixed incorrect path in FN018001 [#1661](https://github.com/pnp/office365-cli/issues/1661)
+- fixed incorrect path in FN018003 and FN018004 [#1662](https://github.com/pnp/office365-cli/issues/1662)
+- fixed resolution of paths on Windows in 'spfx project upgrade'
+- added the 'Insert pictures in a SharePoint Document Library into a Word document' sample script [#1653](https://github.com/pnp/office365-cli/issues/1653)
+- extended 'teams team add' with support for returning team information [#1654](https://github.com/pnp/office365-cli/issues/1654)
 
 ## [v2.10.0](https://github.com/pnp/office365-cli/releases/tag/v2.10.0)
 
