@@ -126,7 +126,7 @@ describe(commands.LIST_LIST, () => {
       webUrl: 'https://contoso.sharepoint.com'
     } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({value: [{ 
+        assert(cmdInstanceLogSpy.calledWith([{ 
           AllowContentTypes: true,
           BaseTemplate: 109,
           BaseType: 1,
@@ -178,7 +178,7 @@ describe(commands.LIST_LIST, () => {
           TemplateFeatureId: null,
           Title: 'Documents',
           RootFolder: {ServerRelativeUrl: 'Documents'}
-        }]}));
+        }]));
         done();
       }
       catch (e) {

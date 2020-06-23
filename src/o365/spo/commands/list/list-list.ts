@@ -54,7 +54,9 @@ class ListListCommand extends SpoCommand {
       .get<ListInstanceCollection>(requestOptions)
       .then((listInstances: ListInstanceCollection): void => {
         if (args.options.output === 'json') {
-          cmd.log(listInstances);
+          if (listInstances.value) {
+            cmd.log(listInstances.value);
+          }
         }
         else {
           cmd.log(listInstances.value.map(l => {
