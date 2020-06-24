@@ -1,6 +1,6 @@
 # Release notes
 
-## v2.11.0
+## [v2.11.0](https://github.com/pnp/office365-cli/releases/tag/v2.11.0)
 
 ### Changes
 
@@ -21,6 +21,7 @@
 - fixed resolution of paths on Windows in 'spfx project upgrade'
 - added the 'Insert pictures in a SharePoint Document Library into a Word document' sample script [#1653](https://github.com/pnp/office365-cli/issues/1653)
 - extended 'teams team add' with support for returning team information [#1654](https://github.com/pnp/office365-cli/issues/1654)
+- fixes bug in returning lists [#1667](https://github.com/pnp/office365-cli/issues/1667)
 
 ## [v2.10.0](https://github.com/pnp/office365-cli/releases/tag/v2.10.0)
 
