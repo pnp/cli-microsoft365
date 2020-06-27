@@ -3,7 +3,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import {
   CommandOption,
-  CommandValidate
+  CommandValidate, CommandError
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
@@ -13,6 +13,7 @@ import * as path from 'path';
 import { Transform } from 'stream';
 const vorpal: Vorpal = require('../../../../vorpal-init');
 const csv = require('@fast-csv/parse');
+//import * as csv from '@fast-csv/parse'; causes build errors Property 'shouldSkipLine' implicitly has type 'any', because its get accessor lacks a return type annotation.
 import { v4 } from 'uuid';
 import { createReadStream } from 'fs';
 import requestPromise = require('request-promise-native');
@@ -35,18 +36,18 @@ interface FieldNames {
   value: { InternalName: string }[]
 }
 interface ContentTypes {
-  value: { 
+  value: {
     Id: {
-      StringValue:string
+      StringValue: string
     },
-    Name:string
-   }[]
+    Name: string
+  }[]
 }
 interface GetWebResponse {
-  Url:string
+  Url: string
 }
 interface GetRootFolderResponse {
-  ServerRelativeUrl:string
+  ServerRelativeUrl: string
 }
 class SpoListItemAddCommand extends SpoCommand {
 
@@ -71,7 +72,7 @@ class SpoListItemAddCommand extends SpoCommand {
     return telemetryProps;
   }
   public static parseResults(response: string, cmd: CommandInstance, cb: (err?: any) => void): void {
-    
+
     let responseLines: Array<string> = response.toString().split('\n');
     // read each line until you find JSON... 
     for (let responseLine of responseLines) {
@@ -80,7 +81,7 @@ class SpoListItemAddCommand extends SpoCommand {
 
         if (responseLine.startsWith("HTTP/1.1 5")) { //any 500 errors (like timeout), just stop
           cmd.log("An HTTP 5xx error was returned from SharePoint. Please retry with a lower --batchsize ")
-          cb(responseLine);
+          cb(new CommandError(responseLine));
         }
         // parse the JSON response...
         var tryParseJson = JSON.parse(responseLine);
@@ -127,7 +128,7 @@ class SpoListItemAddCommand extends SpoCommand {
 
     return request.post(updateOptions);
   }
-  public static async   validateContentType(contentTypeName: string | undefined, listRestUrl: string, webUrl: string, verbose: boolean, cmd: CommandInstance): Promise<any> {
+  public static async validateContentType(contentTypeName: string | undefined, listRestUrl: string, webUrl: string, verbose: boolean, cmd: CommandInstance): Promise<any> {
     if (contentTypeName == undefined) {
       return (Promise.resolve());
     }
@@ -166,11 +167,11 @@ class SpoListItemAddCommand extends SpoCommand {
 
       })
   }
-  public static async   getFolderUrl(folderName: string | undefined, listRestUrl: string, webUrl: string, verbose: boolean, debug:boolean, cmd: CommandInstance): Promise<any> {
+  public static async getFolderUrl(folderName: string | undefined, listRestUrl: string, webUrl: string, verbose: boolean, debug: boolean, cmd: CommandInstance): Promise<any> {
     if (folderName == undefined) {
 
       const listRequestOptions: requestPromise.OptionsWithUrl = {
-        url: listRestUrl+"/RootFolder",
+        url: listRestUrl + "/RootFolder",
         headers: {
           'accept': 'application/json;odata=nometadata'
         },
@@ -184,8 +185,8 @@ class SpoListItemAddCommand extends SpoCommand {
         })
 
     }
-    else{
- 
+    else {
+
       const requestOptions: requestPromise.OptionsWithUrl = {
         url: `${listRestUrl}/rootFolder`,
         headers: {
@@ -195,7 +196,7 @@ class SpoListItemAddCommand extends SpoCommand {
       }
       return request
         .get<GetRootFolderResponse>(requestOptions)
-        .then(async (rootFolderResponse:GetRootFolderResponse) => {
+        .then(async (rootFolderResponse: GetRootFolderResponse) => {
 
           const targetFolderServerRelativeUrl = Utils.getServerRelativePath(rootFolderResponse["ServerRelativeUrl"], folderName);
           const folderExtensions: FolderExtensions = new FolderExtensions(cmd, debug);
@@ -205,64 +206,64 @@ class SpoListItemAddCommand extends SpoCommand {
         });
     }
   }
-  public static async   getCaseSensitiveWebUrl( webUrl: string, cmd: CommandInstance): Promise<string> {
+  public static async getCaseSensitiveWebUrl(webUrl: string, cmd: CommandInstance): Promise<string> {
 
-      const WebRequestOptions: requestPromise.OptionsWithUrl = {
-        url: webUrl+"/_api/web",
-        headers: {
-          'accept': 'application/json;odata=nometadata'
-        },
-        json: true
-      };
-      return request
-        .get<GetWebResponse>(WebRequestOptions)
-        .then((response: GetWebResponse): Promise<string> => {
-   
-          return Promise.resolve(response.Url);
-        })
+    const WebRequestOptions: requestPromise.OptionsWithUrl = {
+      url: webUrl + "/_api/web",
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      json: true
+    };
+    return request
+      .get<GetWebResponse>(WebRequestOptions)
+      .then((response: GetWebResponse): Promise<string> => {
 
-    }
+        return Promise.resolve(response.Url);
+      })
+
+  }
 
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     let lineNumber: number = 0;
     let contentTypeName: string | null = null;
-   
+
     let maxBytesInBatch: number = 1000000; // max is  1048576
     let rowsInBatch: number = 0;
     let batchCounter = 0;
     let recordsToAdd = "";
     let csvHeaders: Array<string>;
-//    let targetFolderServerRelativeUrl: string = ``;
+    //    let targetFolderServerRelativeUrl: string = ``;
     const fullPath: string = path.resolve(args.options.path);
     const fileName: string = Utils.getSafeFileName(path.basename(fullPath));
     const listIdArgument = args.options.listId || '';
     const listTitleArgument = args.options.listTitle || '';
     const batchSize: number = args.options.batchSize || 10;
-  let  listRestUrl = (args.options.listId ?
+    let listRestUrl = (args.options.listId ?
       `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(listIdArgument)}')`
       : `${args.options.webUrl}/_api/web/lists/getByTitle('${encodeURIComponent(listTitleArgument)}')`);
 
-    
+
     SpoListItemAddCommand.validateContentType(args.options.contentType, listRestUrl, args.options.webUrl, this.verbose, cmd)
       .catch((ctError) => {
-        cb(ctError)
-        cmd.log("error on ct")
+        cb(new CommandError(ctError))
+
       })
       .then((): Promise<string | void> => {
-        return SpoListItemAddCommand.getCaseSensitiveWebUrl(args.options.webUrl,cmd);
-         
-       })
-      .then((caseCorrectedWebUrl:string|void): Promise<string | void> => {
+        return SpoListItemAddCommand.getCaseSensitiveWebUrl(args.options.webUrl, cmd);
+
+      })
+      .then((caseCorrectedWebUrl: string | void): Promise<string | void> => {
         listRestUrl = (args.options.listId ?
           `${caseCorrectedWebUrl}/_api/web/lists(guid'${encodeURIComponent(listIdArgument)}')`
           : `${caseCorrectedWebUrl}/_api/web/lists/getByTitle('${encodeURIComponent(listTitleArgument)}')`);
-    
-       return SpoListItemAddCommand.getFolderUrl(args.options.folder,listRestUrl as string,caseCorrectedWebUrl as string,this.verbose,this.debug,cmd);
-        
+
+        return SpoListItemAddCommand.getFolderUrl(args.options.folder, listRestUrl as string, caseCorrectedWebUrl as string, this.verbose, this.debug, cmd);
+
       })
       .then((folderServerRelativeUrl: string | void): any => {
-        
+
         if (this.verbose) {
           cmd.log(`Creating items in list ${folderServerRelativeUrl}`);
         }
@@ -302,8 +303,11 @@ class SpoListItemAddCommand extends SpoCommand {
                         }
                       }
                       if (!fieldFound) {
-                        cmd.log(`Field ${header} was not found on the SharePoint list.  Valid fields follow`)
-                                              cb(`Error-- field ${header} was not found on the SharePoint list`)
+                        cmd.log(`Field ${header} was not found on the SharePoint list.  Valid fields follow`);
+                        for(let realField of realFields.value ){
+                          cmd.log(realField.InternalName)
+                        }
+                        cb(new CommandError(`Error-- field ${header} was not found on the SharePoint list`));
                       }
                     }
                     lineNumber++
@@ -311,7 +315,7 @@ class SpoListItemAddCommand extends SpoCommand {
                     callback();
                   })
                   .catch((error) => {
-                    cb(error)
+                    cb(new CommandError(error))
                   })
 
               }
@@ -360,7 +364,7 @@ class SpoListItemAddCommand extends SpoCommand {
 
                   SpoListItemAddCommand.sendABatch(batchCounter, rowsInBatch, changeSetId, recordsToAdd, args.options.webUrl, verboseMode, cmd)
                     .catch((e) => {
-                      cb(e);
+                      cb(new CommandError(e));
                     })
                     .then((response: string | void) => {
 
@@ -392,7 +396,7 @@ class SpoListItemAddCommand extends SpoCommand {
 
               SpoListItemAddCommand.sendABatch(batchCounter, rowsInBatch, changeSetId, recordsToAdd, args.options.webUrl, verboseMode, cmd)
                 .catch((e) => {
-                  cb(e);
+                  cb(new CommandError(e));
                 })
                 .then((response: string | void) => {
                   SpoListItemAddCommand.parseResults(response as string, cmd, cb)
