@@ -358,10 +358,6 @@ class SpoListItemAddCommand extends SpoCommand {
 
                   recordsToAdd += '--changeset_' + changeSetId + '--' + '\r\n';
                   ++batchCounter;
-                  if (verboseMode) {
-                    cmd.log(`Sending batch #${batchCounter} with ${rowsInBatch} items`)
-                  }
-
                   SpoListItemAddCommand.sendABatch(batchCounter, rowsInBatch, changeSetId, recordsToAdd, args.options.webUrl, verboseMode, cmd)
                     .catch((e) => {
                       cb(new CommandError(e));
