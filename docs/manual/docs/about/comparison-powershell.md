@@ -359,7 +359,7 @@ Get-PnPUnifiedGroup|SharePointPnPPowerShellOnline|[aad o365group get](../cmd/aad
 Get-PnPUnifiedGroupMembers|SharePointPnPPowerShellOnline|
 Get-PnPUnifiedGroupOwners|SharePointPnPPowerShellOnline|
 Get-PnPUPABulkImportStatus|SharePointPnPPowerShellOnline|
-Get-PnPUser|SharePointPnPPowerShellOnline|
+Get-PnPUser|SharePointPnPPowerShellOnline|[spo user get](../cmd/spo/user/user-get.md)
 Get-PnPUserProfileProperty|SharePointPnPPowerShellOnline|
 Get-PnPView|SharePointPnPPowerShellOnline|[spo list view get](../cmd/spo/list/list-view-get.md), [spo list view list](../cmd/spo/list/list-view-list.md)
 Get-PnPWeb|SharePointPnPPowerShellOnline|[spo web get](../cmd/spo/web/web-get.md), [spo web list](../cmd/spo/web/web-list.md)

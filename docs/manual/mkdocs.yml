@@ -374,6 +374,8 @@ nav:
         - theme list: 'cmd/spo/theme/theme-list.md'
         - theme remove: 'cmd/spo/theme/theme-remove.md'
         - theme set: 'cmd/spo/theme/theme-set.md'
+      - user:
+        - user get: 'cmd/spo/user/user-get.md'
       - web:
         - web add: 'cmd/spo/web/web-add.md'
         - web clientsidewebpart list: 'cmd/spo/web/web-clientsidewebpart-list.md'

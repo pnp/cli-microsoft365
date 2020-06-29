@@ -212,6 +212,7 @@ export default {
   THEME_LIST: `${prefix} theme list`,
   THEME_REMOVE: `${prefix} theme remove`,
   THEME_SET: `${prefix} theme set`,
+  USER_GET: `${prefix} user get`,
   WEB_ADD: `${prefix} web add`,
   WEB_CLIENTSIDEWEBPART_LIST: `${prefix} web clientsidewebpart list`,
   WEB_GET: `${prefix} web get`,
