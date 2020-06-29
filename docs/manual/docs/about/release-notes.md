@@ -1,5 +1,13 @@
 # Release notes
 
+## [v2.12.0]
+
+### New commands
+
+**Microsoft Graph:**
+
+- [graph schemaextension list](../cmd/graph/schemaextension/schemaextension-list) - gets a list of schemaExtension objects created in the current tenant [#12](https://github.com/pnp/office365-cli/issues/12)
+
 ## [v2.11.0](https://github.com/pnp/office365-cli/releases/tag/v2.11.0)
 
 ### Changes
