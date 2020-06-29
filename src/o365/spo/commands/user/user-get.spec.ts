@@ -243,7 +243,6 @@ describe(commands.USER_GET, () => {
     });
     assert(containsTypeOption);
   });
-
   it('fails validation if the url option not specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: {} });
     assert.notEqual(actual, true);
