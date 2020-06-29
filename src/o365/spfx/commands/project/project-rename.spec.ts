@@ -45,6 +45,7 @@ describe(commands.PROJECT_RENAME, () => {
       vorpal.find,
       uuid.v4,
       (command as any).getProjectRoot,
+      (command as any).getProject,
       fs.existsSync,
       fs.readFileSync,
       fs.writeFileSync,
@@ -112,7 +113,7 @@ describe(commands.PROJECT_RENAME, () => {
         path: projectPath,
         packageJson: {
           dependencies: {},
-          name: projectPath.split('/').pop()
+          name: 'spfx'
         }
       }
     });
@@ -120,10 +121,31 @@ describe(commands.PROJECT_RENAME, () => {
     cmdInstance.action({ options: { newName: 'spfx-react' } }, (err?: any) => {
       try {
         assert(writeFileSyncSpy.notCalled);
-        Utils.restore((command as any).getProject);
         done();
       }
       catch (ex) {
+        done(ex);
+      }
+    });
+  });
+
+  it('handles error while updating the files', (done) => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
+    sinon.stub(command as any, 'getProject').callsFake(_ => {
+      return {
+        path: projectPath,
+        packageJson: {
+          dependencies: {},
+          name: 'spfx'
+        }
+      }
+    });
+    sinon.stub(fs, 'readFileSync').callsFake(() => { throw 'error'; });
+    cmdInstance.action({ options: { newName: 'spfx-react' } }, (err?: any) => {
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('error')));
+        done();
+      } catch (ex) {
         done(ex);
       }
     });

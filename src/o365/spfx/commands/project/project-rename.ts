@@ -81,7 +81,7 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
     const packageJson: any = this.getProject(this.projectRootPath).packageJson;
     const projectName: string = packageJson.name;
 
-    let newId: string;
+    let newId: string = '';
     if (args.options.generateNewId) {
       newId = uuid.v4();
       if (this.debug) {
@@ -90,121 +90,136 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
       }
     }
 
-    const replacePackageJsonContent = (filePath: string) => {
-      if (!fs.existsSync(filePath)) {
-        return;
-      }
-      const existingContent = fs.readFileSync(filePath, 'utf-8');
-      const updatedContent = JSON.parse(existingContent);
-      if (updatedContent &&
-        updatedContent.name) {
-        updatedContent.name = args.options.newName;
-      }
-      fs.writeFileSync(filePath, JSON.stringify(updatedContent, null, 2), 'utf-8');
-      if (this.debug) {
-        cmd.log(`Updated ${filePath.split('/').pop()}`);
-      }
-    }
-
-    const replaceYoRcJsonContent = (filePath: string) => {
-      if (!fs.existsSync(filePath)) {
-        return;
-      }
-      const existingContent = fs.readFileSync(filePath, 'utf-8');
-      const updatedContent = JSON.parse(existingContent);
-      if (updatedContent &&
-        updatedContent['@microsoft/generator-sharepoint'] &&
-        updatedContent['@microsoft/generator-sharepoint'].libraryName) {
-        updatedContent['@microsoft/generator-sharepoint'].libraryName = args.options.newName;
-      }
-      if (updatedContent &&
-        updatedContent['@microsoft/generator-sharepoint'] &&
-        updatedContent['@microsoft/generator-sharepoint'].solutionName) {
-        updatedContent['@microsoft/generator-sharepoint'].solutionName = args.options.newName;
-      }
-      if (updatedContent &&
-        updatedContent['@microsoft/generator-sharepoint'] &&
-        updatedContent['@microsoft/generator-sharepoint'].libraryId &&
-        args.options.generateNewId) {
-        updatedContent['@microsoft/generator-sharepoint'].libraryId = newId;
-      }
-      fs.writeFileSync(filePath, JSON.stringify(updatedContent, null, 2), 'utf-8');
-      if (this.debug) {
-        cmd.log(`Updated ${filePath.split('/').pop()}`);
-      }
-    }
-
-    const replacePackageSolutionJsonContent = (filePath: string) => {
-      if (!fs.existsSync(filePath)) {
-        return;
-      }
-      const existingContent = fs.readFileSync(filePath, 'utf-8');
-      const updatedContent = JSON.parse(existingContent);
-      if (updatedContent &&
-        updatedContent.solution &&
-        updatedContent.solution.name) {
-        updatedContent.solution.name = updatedContent.solution.name.replace(new RegExp(projectName, 'g'), args.options.newName);
-      }
-      if (updatedContent &&
-        updatedContent.solution &&
-        updatedContent.solution.id &&
-        args.options.generateNewId) {
-        updatedContent.solution.id = newId;
-      }
-      if (updatedContent &&
-        updatedContent.paths &&
-        updatedContent.paths.zippedPackage) {
-        updatedContent.paths.zippedPackage = updatedContent.paths.zippedPackage.replace(new RegExp(projectName, 'g'), args.options.newName);
-      }
-      fs.writeFileSync(filePath, JSON.stringify(updatedContent, null, 2), 'utf-8');
-      if (this.debug) {
-        cmd.log(`Updated ${filePath.split('/').pop()}`);
-      }
-    }
-
-    const replaceDeployAzureStorageJsonContent = (filePath: string) => {
-      if (!fs.existsSync(filePath)) {
-        return;
-      }
-      const existingContent = fs.readFileSync(filePath, 'utf-8');
-      const updatedContent = JSON.parse(existingContent);
-      if (updatedContent &&
-        updatedContent.container) {
-        updatedContent.container = args.options.newName;
-      }
-      fs.writeFileSync(filePath, JSON.stringify(updatedContent, null, 2), 'utf-8');
-      if (this.debug) {
-        cmd.log(`Updated ${filePath.split('/').pop()}`);
-      }
-    }
-
-    const replaceReadMeContent = (filePath: string) => {
-      if (!fs.existsSync(filePath)) {
-        return;
-      }
-      const existingContent = fs.readFileSync(filePath, 'utf-8');
-      const updatedContent = existingContent.replace(new RegExp(projectName, 'g'), args.options.newName);
-      fs.writeFileSync(filePath, updatedContent, 'utf-8');
-      if (this.debug) {
-        cmd.log(`Updated ${filePath.split('/').pop()}`);
-      }
-    }
-
     if (this.debug) {
       cmd.log(`Renaming SharePoint Framework project to '${args.options.newName}'`);
     }
 
-    replacePackageJsonContent(path.join(this.projectRootPath, 'package.json'));
-    replaceYoRcJsonContent(path.join(this.projectRootPath, '.yo-rc.json'));
-    replacePackageSolutionJsonContent(path.join(this.projectRootPath, 'config/package-solution.json'));
-    replaceDeployAzureStorageJsonContent(path.join(this.projectRootPath, 'config/deploy-azure-storage.json'));
-    replaceReadMeContent(path.join(this.projectRootPath, 'README.md'));
+    try {
+      this.replacePackageJsonContent(path.join(this.projectRootPath, 'package.json'), args, cmd);
+      this.replaceYoRcJsonContent(path.join(this.projectRootPath, '.yo-rc.json'), newId, args, cmd);
+      this.replacePackageSolutionJsonContent(path.join(this.projectRootPath, 'config', 'package-solution.json'), projectName, newId, args, cmd);
+      this.replaceDeployAzureStorageJsonContent(path.join(this.projectRootPath, 'config', 'deploy-azure-storage.json'), args, cmd);
+      this.replaceReadMeContent(path.join(this.projectRootPath, 'README.md'), projectName, args, cmd);
+    } catch (error) {
+      cb(new CommandError(error));
+      return;
+    }
 
     if (this.verbose) {
       cmd.log('DONE');
     }
 
     cb();
+  }
+
+  private replacePackageJsonContent = (filePath: string, args: CommandArgs, cmd: CommandInstance) => {
+    if (!fs.existsSync(filePath)) {
+      return;
+    }
+    const existingContent = fs.readFileSync(filePath, 'utf-8');
+    const updatedContent = JSON.parse(existingContent);
+    if (updatedContent &&
+      updatedContent.name) {
+      updatedContent.name = args.options.newName;
+    }
+    if (JSON.stringify(updatedContent, null, 2) !== JSON.stringify(existingContent, null, 2)) {
+      fs.writeFileSync(filePath, JSON.stringify(updatedContent, null, 2), 'utf-8');
+      if (this.debug) {
+        cmd.log(`Updated ${path.basename(filePath)}`);
+      }
+    }
+  }
+
+  private replaceYoRcJsonContent = (filePath: string, newId: string, args: CommandArgs, cmd: CommandInstance) => {
+    if (!fs.existsSync(filePath)) {
+      return;
+    }
+    const existingContent = fs.readFileSync(filePath, 'utf-8');
+    const updatedContent = JSON.parse(existingContent);
+    if (updatedContent &&
+      updatedContent['@microsoft/generator-sharepoint'] &&
+      updatedContent['@microsoft/generator-sharepoint'].libraryName) {
+      updatedContent['@microsoft/generator-sharepoint'].libraryName = args.options.newName;
+    }
+    if (updatedContent &&
+      updatedContent['@microsoft/generator-sharepoint'] &&
+      updatedContent['@microsoft/generator-sharepoint'].solutionName) {
+      updatedContent['@microsoft/generator-sharepoint'].solutionName = args.options.newName;
+    }
+    if (updatedContent &&
+      updatedContent['@microsoft/generator-sharepoint'] &&
+      updatedContent['@microsoft/generator-sharepoint'].libraryId &&
+      args.options.generateNewId) {
+      updatedContent['@microsoft/generator-sharepoint'].libraryId = newId;
+    }
+    if (JSON.stringify(updatedContent, null, 2) !== JSON.stringify(existingContent, null, 2)) {
+      fs.writeFileSync(filePath, JSON.stringify(updatedContent, null, 2), 'utf-8');
+      if (this.debug) {
+        cmd.log(`Updated ${path.basename(filePath)}`);
+      }
+    }
+  }
+
+  private replacePackageSolutionJsonContent = (filePath: string, projectName: string, newId: string, args: CommandArgs, cmd: CommandInstance) => {
+    if (!fs.existsSync(filePath)) {
+      return;
+    }
+    const existingContent = fs.readFileSync(filePath, 'utf-8');
+    const updatedContent = JSON.parse(existingContent);
+    if (updatedContent &&
+      updatedContent.solution &&
+      updatedContent.solution.name) {
+      updatedContent.solution.name = updatedContent.solution.name.replace(new RegExp(projectName, 'g'), args.options.newName);
+    }
+    if (updatedContent &&
+      updatedContent.solution &&
+      updatedContent.solution.id &&
+      args.options.generateNewId) {
+      updatedContent.solution.id = newId;
+    }
+    if (updatedContent &&
+      updatedContent.paths &&
+      updatedContent.paths.zippedPackage) {
+      updatedContent.paths.zippedPackage = updatedContent.paths.zippedPackage.replace(new RegExp(projectName, 'g'), args.options.newName);
+    }
+    if (JSON.stringify(updatedContent, null, 2) !== JSON.stringify(existingContent, null, 2)) {
+      fs.writeFileSync(filePath, JSON.stringify(updatedContent, null, 2), 'utf-8');
+      if (this.debug) {
+        cmd.log(`Updated ${path.basename(filePath)}`);
+      }
+    }
+  }
+
+  private replaceDeployAzureStorageJsonContent = (filePath: string, args: CommandArgs, cmd: CommandInstance) => {
+    if (!fs.existsSync(filePath)) {
+      return;
+    }
+    const existingContent = fs.readFileSync(filePath, 'utf-8');
+    const updatedContent = JSON.parse(existingContent);
+    if (updatedContent &&
+      updatedContent.container) {
+      updatedContent.container = args.options.newName;
+    }
+    if (JSON.stringify(updatedContent, null, 2) !== JSON.stringify(existingContent, null, 2)) {
+      fs.writeFileSync(filePath, JSON.stringify(updatedContent, null, 2), 'utf-8');
+      if (this.debug) {
+        cmd.log(`Updated ${path.basename(filePath)}`);
+      }
+    }
+  }
+
+  private replaceReadMeContent = (filePath: string, projectName: string, args: CommandArgs, cmd: CommandInstance) => {
+    if (!fs.existsSync(filePath)) {
+      return;
+    }
+    const existingContent = fs.readFileSync(filePath, 'utf-8');
+    const updatedContent = existingContent.replace(new RegExp(projectName, 'g'), args.options.newName);
+    if (updatedContent !== existingContent) {
+      fs.writeFileSync(filePath, updatedContent, 'utf-8');
+      if (this.debug) {
+        cmd.log(`Updated ${path.basename(filePath)}`);
+      }
+    }
   }
 
   public commandHelp(args: any, log: (help: string) => void): void {
