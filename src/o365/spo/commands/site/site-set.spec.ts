@@ -1158,17 +1158,6 @@ describe(commands.SITE_SET, () => {
     assert(containsOption);
   });
 
-  it('supports specifying site ID', () => {
-    const options = (command.options() as CommandOption[]);
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--id') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('supports specifying site url', () => {
     const options = (command.options() as CommandOption[]);
     let containsOption = false;

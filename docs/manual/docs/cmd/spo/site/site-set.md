@@ -14,7 +14,6 @@ Option|Description
 ------|-----------
 `--help`|output usage information
 `-u, --url <url>`|The URL of the site collection to update
-`-i, --id [id]`|The ID of the site collection to update (deprecated; id is automatically retrieved and does not need to be specified)
 `--classification [classification]`|The new classification for the site collection
 `--disableFlows [disableFlows]`|Set to `true` to disable using Microsoft Flow in this site collection
 `--isPublic [isPublic]`|Set to `true` to make the group linked to the site public or to `false` to make it private
