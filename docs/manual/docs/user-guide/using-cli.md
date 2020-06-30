@@ -4,41 +4,12 @@ Information in this section will help you understand how the Office 365 CLI work
 
 ## Start the CLI
 
-You can use the Office 365 CLI in two modes: immersive, where it launches a separate command prompt, and non-immersive, where you can execute Office 365 CLI commands directly from your shell.
-
-### Start the CLI in the immersive mode
-
-To start Office 365 CLI in the immersive mode, execute in the command line:
-
-```sh
-office365
-```
-
-or for short:
-
-```sh
-o365
-```
-
-In both cases, Office 365 CLI will start a new command prompt where you can directly interact with it and its commands.
-
-<script src="https://asciinema.org/a/158205.js" id="asciicast-158205" async></script>
-
-!!! info
-    When using the Office 365 CLI in immersive mode, it starts a new command prompt. In this command prompt, you have access only to Office 365 CLI commands. If you try to run any of the system commands, such as `ls`, you will get an error stating that you tried to execute an unknown command. If you need to use system commands or other CLIs while working with Office 365 CLI, consider using the non-immersive mode instead.
-
-The main benefit of using the Office 365 CLI in the immersive mode, is that you have direct access to all commands, without having to prepend them with `o365` and that you can have the CLI complete your input by pressing `TAB` without any additional configuration.
-
-To close the Office 365 CLI started in immersive mode, type `exit` in the CLI prompt.
-
-### Use the CLI in non-immersive mode
-
-Another way to use the Office 365 CLI is by executing specific commands directly from the command line.
+To use Office 365 CLI, execute specific commands directly from the command line.
 
 <script src="https://asciinema.org/a/158207.js" id="asciicast-158207" async></script>
 
 !!! attention
-    When using the Office 365 CLI this way, each CLI command must be prepended with `office365` or `o365` for short. Without this, your shell will not know how the particular command should be executed.
+    When using the Office 365 CLI, each CLI command must be prepended with `office365` or `o365` for short. Without this, your shell will not know how the particular command should be executed.
 
 Using the Office 365 CLI directly from the command line is invaluable if you want to write scripts consisting of a number of Office 365 CLI and other commands combined together. Additionally, you keep the access to all system commands and other CLIs available on your computer.
 
@@ -105,14 +76,4 @@ If you're experiencing problems when using the Office 365 CLI, you can use the `
 
 ## Command completion
 
-To help you use its commands, the Office 365 CLI offers you the ability to complete commands and options that you're typing in the prompt. Depending how you're using the Office 365 CLI, some additional setup might be required to enable command completion.
-
-### Completion in immersive mode
-
-When using the Office 365 CLI in the immersive mode, the CLI prompt helps you complete your input. By pressing the `TAB` key once, the CLI will complete your current input. By pressing `TAB` twice, it will show you all available commands or options.
-
-<script src="https://asciinema.org/a/158219.js" id="asciicast-158219" async></script>
-
-### Completion in non-immersive mode
-
-Also when running in non-immersive mode, the Office 365 CLI offers you support for completing your input. The configuration steps required to enable command completion, depend on which operating system and shell you're using. For more information on configuring command completion for the Office 365 CLI see the [command completion](../concepts/completion.md) article.
+To help you use its commands, Office 365 CLI offers you the ability to autocomplete commands and options that you're typing in the prompt. Some additional setup, specific for the shell and terminal that you use, is required to enable command completion for Office 365 CLI. For more information on configuring command completion for the Office 365 CLI see the [command completion](../concepts/completion.md) article.

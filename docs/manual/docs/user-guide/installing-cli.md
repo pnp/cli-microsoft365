@@ -82,7 +82,7 @@ npm install -g @pnp/office365-cli@latest
 This will download and install the latest public version of the Office 365 CLI. If you want to update to the latest beta version of the CLI, replace `@latest` with `@next`.
 
 !!! important
-    New version of the Office 365 CLI often contains new commands. If you're using the CLI in non-immersive mode, don't forget to update command completion for your terminal to get suggestions for the latest commands added in the CLI. For more information see the article on [command completion](../concepts/completion.md).
+    New version of the Office 365 CLI often contains new commands. Don't forget to update command completion for your terminal to get suggestions for the latest commands added in the CLI. For more information see the article on [command completion](../concepts/completion.md).
 
 ## Uninstall the CLI
 

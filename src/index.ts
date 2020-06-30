@@ -10,8 +10,7 @@ import Utils from './Utils';
 import { autocomplete } from './autocomplete';
 
 const packageJSON = require('../package.json');
-const vorpal: Vorpal = require('./vorpal-init'),
-  chalk = vorpal.chalk;
+const vorpal: Vorpal = require('./vorpal-init');
 
 const readdirR = (dir: string): string | string[] => {
   return fs.statSync(dir).isDirectory()
@@ -143,27 +142,18 @@ fs.realpath(__dirname, (err: NodeJS.ErrnoException | null, resolvedPath: string)
     return Utils.logOutput(stdout);
   });
 
-  let v: Vorpal | null = null;
-
   try {
-    if (process.argv.length > 2) {
-      vorpal.delimiter('');
-      vorpal.on('client_command_error', (err?: any): void => {
-        if (v) {
-          process.exit(1);
-        }
-      });
+    vorpal.delimiter('');
+    vorpal.on('client_command_error', (err?: any): void => {
+      process.exit(1);
+    });
+
+    if (process.argv.length <= 2) {
+      process.argv.push('help');
     }
 
     loadCommandFromArgs(process.argv, resolvedPath);
-    v = vorpal.parse(process.argv);
-    
-    // if no command has been passed/match, run immersive mode
-    if (!v._command) {
-      vorpal
-        .delimiter(chalk.red(config.delimiter + ' '))
-        .show();
-    }
+    vorpal.parse(process.argv);
   }
   catch (e) {
     appInsights.trackException({
