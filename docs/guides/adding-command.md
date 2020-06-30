@@ -138,7 +138,7 @@ class SpoMyCommand extends Command {
 }
 ```
 
-> **Important:** if you don't pass the error that occurred to the callback, in non-immersive mode, the CLI will exit with a 0 error code indicating a successful execution. If you use the CLI in a script, the script would continue executing which could lead to incorrect results.
+> **Important:** if you don't pass the error that occurred to the callback, the CLI will exit with a 0 error code indicating a successful execution. If you use the CLI in a script, the script would continue executing which could lead to incorrect results.
 
 ### Defining command help
 

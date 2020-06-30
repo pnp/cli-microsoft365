@@ -46,7 +46,7 @@ Running this command from the Windows Command Shell (cmd.exe) or PowerShell for 
 o365 spo customaction set -u https://contoso.sharepoint.com/sites/test -i 058140e3-0e37-44fc-a1d3-79c487d371a3 -p '{\"testMessage\":\"Test message\"}'
 ```
 
-Note, how the `clientSideComponentProperties` option (-p) has escaped double quotes `'{\"testMessage\":\"Test message\"}'` compared to execution from bash or immersive mode `'{"testMessage":"Test message"}'`.
+Note, how the `clientSideComponentProperties` option (-p) has escaped double quotes `'{\"testMessage\":\"Test message\"}'` compared to execution from bash `'{"testMessage":"Test message"}'`.
 
 The `--rights` option accepts **case-sensitive** values.
 
