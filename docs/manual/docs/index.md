@@ -20,32 +20,16 @@ yarn global add @pnp/office365-cli
 
 ## Getting started
 
-Start the Office 365 CLI by typing in the command line:
-
-```sh
-$ office365
-
-o365$ _
-```
-
-Running the `office365` command will start the immersive CLI with its own command prompt.
-
 Start managing the settings of your Office 365 tenant by logging in to it, using the `login` command, for example:
 
 ```sh
-o365$ login
+o365 login
 ```
 
 To list all available commands, type in the Office 365 CLI prompt `help`:
 
 ```sh
-o365$ help
-```
-
-To exit the CLI, type `exit`:
-
-```sh
-o365$ exit
+o365 help
 ```
 
 See the [User Guide](user-guide/installing-cli.md) to learn more about the Office 365 CLI and its capabilities.

@@ -12,9 +12,7 @@ First of all it's more convenient to use the Office 365 CLI. If you're using it 
 
 ### Building scripts
 
-Additionally, it makes it possible for you to write scripts that automate management of your tenant. When the Office 365 CLI is run in immersive (interactive) mode, the connection information is persisted in memory and is available to all commands run in the CLI command prompt. Unfortunately, one limitation of the immersive mode is that you can only run one command at a time and can't pass the output of one command into another.
-
-When running in the non-immersive (non-interactive) mode, each command is executed in an isolated context and has no access to the memory of any command executed before. So unless you would store the connection information in a variable and explicitly pass it to each command, the CLI would be unable to log in to your tenant. As you can imagine, working with the CLI in this way would be tedious and inconvenient.
+When working with Office 365 CLI, each command is executed in an isolated context and has no access to the memory of any command executed before. So unless you would store the connection information in a variable and explicitly pass it to each command, the CLI would be unable to log in to your tenant. As you can imagine, working with the CLI in this way would be tedious and inconvenient.
 
 By persisting the connection information the Office 365 CLI can be used to build scripts, for example:
 

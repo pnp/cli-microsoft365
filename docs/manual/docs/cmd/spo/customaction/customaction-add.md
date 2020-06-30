@@ -45,7 +45,7 @@ Running this command from the Windows Command Shell (cmd.exe) or PowerShell for 
 o365 spo customaction add -u https://contoso.sharepoint.com/sites/test -t "YourAppCustomizer" -n "YourName" -l "ClientSideExtension.ApplicationCustomizer" -c b41916e7-e69d-467f-b37f-ff8ecf8f99f2 -p '{\"testMessage\":\"Test message\"}'
 ```
 
-Note, how the clientSideComponentProperties option (-p) has escaped double quotes `'{\"testMessage\":\"Test message\"}'` compared to execution from bash or immersive mode `'{"testMessage":"Test message"}'`.
+Note, how the clientSideComponentProperties option (-p) has escaped double quotes `'{\"testMessage\":\"Test message\"}'` compared to execution from bash `'{"testMessage":"Test message"}'`.
 
 The `--rights` option accepts **case sensitive** values.
 

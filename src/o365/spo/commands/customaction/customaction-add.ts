@@ -312,7 +312,7 @@ class SpoCustomActionAddCommand extends SpoCommand {
       o365 ${commands.CUSTOMACTION_ADD} -u https://contoso.sharepoint.com/sites/test -t "YourAppCustomizer" -n "YourName" -l "ClientSideExtension.ApplicationCustomizer" -c b41916e7-e69d-467f-b37f-ff8ecf8f99f2 -p '{\"testMessage\":\"Test message\"}'
     
     Note, how the clientSideComponentProperties option (-p) has escaped double quotes
-    ${chalk.grey(`'{\"testMessage\":\"Test message\"}'`)} compared to execution from bash or immersive mode:
+    ${chalk.grey(`'{\"testMessage\":\"Test message\"}'`)} compared to execution from bash:
     ${chalk.grey(`'{"testMessage":"Test message"}'`)}.
 
     The ${chalk.grey(`--rights`)} option accepts case-sensitive values.
