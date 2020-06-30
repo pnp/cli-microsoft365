@@ -27,7 +27,6 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   classification?: string;
   disableFlows?: string;
-  id?: string;
   isPublic?: string;
   owners?: string;
   shareByEmailEnabled?: string;
@@ -50,7 +49,6 @@ class SpoSiteSetCommand extends SpoCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.id = typeof args.options.id === 'string';
     telemetryProps.classification = typeof args.options.classification === 'string';
     telemetryProps.disableFlows = args.options.disableFlows;
     telemetryProps.isPublic = args.options.isPublic;
@@ -62,10 +60,6 @@ class SpoSiteSetCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    if (args.options.id && this.verbose) {
-      cmd.log(vorpal.chalk.yellow(`Option 'id' is deprecated and will be removed in the next major version. ID is being automatically retrieved and doesn't need to be specified.`));
-    }
-
     this
       .loadSiteIds(args.options.url, cmd)
       .then((): Promise<void> => {
@@ -381,11 +375,6 @@ class SpoSiteSetCommand extends SpoCommand {
       const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.url);
       if (isValidSharePointUrl !== true) {
         return isValidSharePointUrl;
-      }
-
-      if (args.options.id &&
-        !Utils.isValidGuid(args.options.id)) {
-        return `${args.options.id} is not a valid GUID`;
       }
 
       if (typeof args.options.classification === 'undefined' &&
