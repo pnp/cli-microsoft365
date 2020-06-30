@@ -414,7 +414,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         description: 'Set to true, if the field should be required or to false if it should be optional'
       },
       {
-        option: '-h, --hidden [hidden]',
+        option: '--hidden [hidden]',
         description: 'Set to true, if the field should be hidden or to false if it should be visible'
       }
     ];

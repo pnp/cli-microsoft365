@@ -13,7 +13,7 @@ spo hidedefaultthemes set [options]
 Option|Description
 ------|-----------
 `--help`|output usage information
-`-h, --hideDefaultThemes <hideDefaultThemes>`|Set to `true` to hide default themes and to `false` to show them
+`--hideDefaultThemes <hideDefaultThemes>`|Set to `true` to hide default themes and to `false` to show them
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json,text`. Default `text`
 `--pretty`|Prettifies `json` output
