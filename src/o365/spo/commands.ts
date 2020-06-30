@@ -217,5 +217,6 @@ export default {
   WEB_LIST: `${prefix} web list`,
   WEB_REINDEX: `${prefix} web reindex`,
   WEB_REMOVE: `${prefix} web remove`,
-  WEB_SET: `${prefix} web set`
+  WEB_SET: `${prefix} web set`,
+  USER_REMOVE:`${prefix} user remove`
 };
