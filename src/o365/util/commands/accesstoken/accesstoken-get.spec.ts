@@ -1,5 +1,4 @@
 import commands from '../../commands';
-import globalCommands from '../../../commands/commands';
 import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 const command: Command = require('./accesstoken-get');
@@ -56,16 +55,6 @@ describe(commands.UTIL_ACCESSTOKEN_GET, () => {
 
   it('has a description', () => {
     assert.notEqual(command.description, null);
-  });
-
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notEqual(typeof alias, 'undefined');
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.equal((alias && alias.indexOf(globalCommands.ACCESSTOKEN_GET) > -1), true);
   });
 
   it('retrieves access token for the specified resource', (done) => {

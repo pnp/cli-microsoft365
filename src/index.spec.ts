@@ -39,7 +39,6 @@ describe('Lazy loading commands', () => {
     ];
     const aliases: string[] = [
       'consent',
-      'accesstoken get',
       'flow connector export',
       'flow connector list',
       'outlook sendmail',

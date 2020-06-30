@@ -1,5 +1,4 @@
 import commands from '../../commands';
-import globalCommands from '../../../commands/commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import Command, {
   CommandOption,
@@ -28,13 +27,7 @@ class AccessTokenGetCommand extends Command {
     return 'Gets access token for the specified resource';
   }
 
-  public alias(): string[] | undefined {
-    return [globalCommands.ACCESSTOKEN_GET];
-  }
-
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    this.showDeprecationWarning(cmd, globalCommands.ACCESSTOKEN_GET, commands.UTIL_ACCESSTOKEN_GET);
-
     auth
       .ensureAccessToken(args.options.resource, cmd, this.debug, args.options.new)
       .then((accessToken: string): void => {
