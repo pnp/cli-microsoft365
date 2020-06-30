@@ -153,8 +153,6 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
   public static ERROR_NO_VERSION: number = 3;
   public static ERROR_UNSUPPORTED_FROM_VERSION: number = 4;
   public static ERROR_NO_DOWNGRADE: number = 5;
-  // no longer used. Left for backwards-compatibility
-  public static ERROR_PROJECT_UP_TO_DATE: number = 6;
 
   public get name(): string {
     return commands.PROJECT_UPGRADE;
