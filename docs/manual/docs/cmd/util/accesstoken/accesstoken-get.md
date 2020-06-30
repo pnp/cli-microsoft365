@@ -8,12 +8,6 @@ Gets access token for the specified resource
 util accesstoken get [options]
 ```
 
-## Alias
-
-```sh
-accesstoken get
-```
-
 ## Options
 
 Option|Description
