@@ -27,7 +27,6 @@ Option|Description
 Remove user with id _10_ from web _https://contoso.sharepoint.com/sites/HR_ 
 
 ```sh
-spo user get --webUrl https://contoso.sharepoint.com/sites/project-x --email john.doe@mytenant.onmicrosoft.com
 spo user remove --webUrl https://contoso.sharepoint.com/sites/HR --id 10  --confirm
 ```
 
