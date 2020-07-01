@@ -139,7 +139,7 @@ describe(commands.USER_REMOVE, () => {
     assert(containsExamples);
   });
   
-  it('should pompt before removing user using id from web when confirmation argument not passed ', (done) => {
+  it('should prompt before removing user using id from web when confirmation argument not passed ', (done) => {
     cmdInstance.action({ 
       options: 
       { 
@@ -163,7 +163,7 @@ describe(commands.USER_REMOVE, () => {
     });
   });
 
-  it('should pompt before removing user using login name from web when confirmation argument not passed ', (done) => {
+  it('should prompt before removing user using login name from web when confirmation argument not passed ', (done) => {
     cmdInstance.action({ 
       options: 
       { 
@@ -187,7 +187,7 @@ describe(commands.USER_REMOVE, () => {
     });
   });
 
-  it('removes user by id successfully without pompting with confirmation argument', (done) => {
+  it('removes user by id successfully without prompting with confirmation argument', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf('_api/web/siteusers/removebyid(10)') > -1) {
@@ -221,7 +221,7 @@ describe(commands.USER_REMOVE, () => {
     });
   });
 
-  it('removes user by login name successfully without pompting with confirmation argument', (done) => {
+  it('removes user by login name successfully without prompting with confirmation argument', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf(`_api/web/siteusers/removeByLoginName('i%3A0%23.f%7Cmembership%7Cjohn.doe%40mytenant.onmicrosoft.com')`) > -1) {
