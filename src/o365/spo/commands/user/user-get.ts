@@ -109,11 +109,6 @@ class SpoUserGetCommand extends SpoCommand {
         return 'Specify id or email or loginName, one is required';
       }
 
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
-     
       if (args.options.id && args.options.email) {
         return 'Use either "email", "id" or "loginName", but not all.';
       }
@@ -125,7 +120,8 @@ class SpoUserGetCommand extends SpoCommand {
       if (args.options.loginName && args.options.email) {
         return 'Use either "email", "id" or "loginName", but not all.';
       }
-      return true;
+
+      return SpoCommand.isValidSharePointUrl(args.options.webUrl);
     };
   }
 

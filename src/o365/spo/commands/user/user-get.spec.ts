@@ -251,7 +251,7 @@ describe(commands.USER_GET, () => {
 
   
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'foo' } });
+    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'foo', id:1 } });
     assert.notEqual(actual, true);
   });
 
