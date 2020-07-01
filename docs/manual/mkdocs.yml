@@ -511,6 +511,7 @@ nav:
       - 'Insert pictures in a SharePoint Document Library into a Word document': 'sample-scripts/spo/insert-sp-library-pictures-into-word.md'
       - 'Lists active SharePoint site collection application catalogs': 'sample-scripts/spo/list-site-app-catalogs.md'
       - 'Lists all tenant-wide extensions': 'sample-scripts/spo/list-tenant-wide-extensions.md'
+      - 'Sync SharePoint document library documents with Azure storage container': 'sample-scripts/spo/sync-splib-into-az-storage-container.md'
     - Microsoft Teams:
       - 'Deploy Microsoft Teams app from Azure DevOps': 'sample-scripts/teams/deploy-teams-app.md'
       - 'Govern orphaned Microsoft Teams': 'sample-scripts/teams/govern-orphan-teams.md'
