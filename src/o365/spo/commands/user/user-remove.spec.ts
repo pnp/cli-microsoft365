@@ -95,6 +95,17 @@ describe(commands.USER_REMOVE, () => {
     assert.notEqual(actual, true);
   });
 
+  it('fails valiation if id or loginname oprions are passed',()=>{
+    const actual = (command.validate() as CommandValidate)({
+      options:{
+        webUrl: 'https://contoso.sharepoint.com' ,
+        id:10,
+        loginName:"i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
+      }
+    });
+    assert.notEqual(actual,true);
+  })
+
   it('should fail validation if the webUrl option is not a valid SharePoint site URL', () => {
     const actual = (command.validate() as CommandValidate)({
       options:
