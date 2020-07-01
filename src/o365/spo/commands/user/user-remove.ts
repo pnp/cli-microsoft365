@@ -108,7 +108,7 @@ class SpoWebUserRemoveCommand extends SpoCommand {
       },
       {
         option: '--confirm',
-        description: 'Do not prompt for confirmation before deleting the subsite'
+        description: 'Do not prompt for confirmation before removing user from web'
       }
     ];
 
@@ -147,7 +147,7 @@ class SpoWebUserRemoveCommand extends SpoCommand {
       ${commands.USER_REMOVE} --webUrl https://contoso.sharepoint.com/subsite --id 10  --confirm
 
     Remove user from specified web using login name without promptin for confirmation
-    ${commands.USER_REMOVE} --webUrl https://contoso.sharepoint.com/subsite --loginName "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"  --confirm
+    ${commands.USER_REMOVE} --webUrl https://contoso.sharepoint.com/subsite --loginName "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com" --confirm
  
   ` );
   }
