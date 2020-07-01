@@ -99,7 +99,8 @@ describe(commands.USER_REMOVE, () => {
     const actual = (command.validate() as CommandValidate)({
       options:
       {
-        webUrl: 'foo'
+        webUrl: 'foo',
+        id:10
       }
     });
     assert.notEqual(actual, true);

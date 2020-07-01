@@ -130,11 +130,7 @@ class SpoWebUserRemoveCommand extends SpoCommand {
         return 'Specify id or loginName, one is required';
       }
 
-      const isValidUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-      if (typeof isValidUrl === 'string') {
-        return isValidUrl;
-      }
-      return true;
+      return SpoCommand.isValidSharePointUrl(args.options.webUrl);
     };
   }
 
