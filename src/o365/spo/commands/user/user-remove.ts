@@ -14,8 +14,9 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   webUrl: string;
-  userId:string;
-  confirm?: boolean;
+  id:string;
+  loginName:string;
+  confirm: boolean;
 }
 
 class SpoWebUserRemoveCommand extends SpoCommand {
@@ -29,24 +30,36 @@ class SpoWebUserRemoveCommand extends SpoCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.id = (!(!args.options.id)).toString();
+    telemetryProps.loginName = (!(!args.options.loginName)).toString();
     telemetryProps.confirm = (!(!args.options.confirm)).toString();
     return telemetryProps;
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const removeUser = (): void => {
+      if (this.verbose) {
+        cmd.log(`Removing user from  subsite ${args.options.webUrl} ...`);
+      }
+
+      let requestUrl: string = '';
+
+      if (args.options.id) {
+        requestUrl = `${encodeURI(args.options.webUrl)}/_api/web/siteusers/removebyid(${args.options.id})`;
+      }
+
+      if(args.options.loginName){
+        requestUrl = `${encodeURI(args.options.webUrl)}/_api/web/siteusers/removeByLoginName('${encodeURIComponent(args.options.loginName as string)}')`;
+      }
+
       const requestOptions: any = {
-        url: `${encodeURI(args.options.webUrl)}/_api/web/siteusers/GetById(${args.options.userId})`,
+        url: requestUrl,
         headers: {
           accept: 'application/json;odata=nometadata',
           'X-HTTP-Method': 'DELETE'
         },
         json: true
       };
-
-      if (this.verbose) {
-        cmd.log(`Removing user ${args.options.userId} from  subsite ${args.options.webUrl} ...`);
-      }
 
       request
         .post(requestOptions)
@@ -86,8 +99,12 @@ class SpoWebUserRemoveCommand extends SpoCommand {
         description: 'URL of the subsite to remove'
       },
       {
-        option: '--userId <userId>',
-        description: 'User Id from the subsite'
+        option: '-i, --id [id]',
+        description: 'ID of the user to remove from web. Use either "id" or "loginName", but not all.'
+      },
+      {
+        option: '--loginName [loginName]',
+        description: 'Login name of the user to remove from web. Use either "id" or "loginName", but not all.'
       },
       {
         option: '--confirm',
@@ -105,6 +122,14 @@ class SpoWebUserRemoveCommand extends SpoCommand {
         return 'Required option webUrl missing';
       }
 
+      if (!args.options.id && !args.options.loginName) {
+        return 'Required option id or loginName missing, one is required';
+      }
+
+      if (args.options.id && args.options.loginName) {
+        return 'Specify id or loginName, one is required';
+      }
+
       const isValidUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
       if (typeof isValidUrl === 'string') {
         return isValidUrl;
@@ -118,8 +143,12 @@ class SpoWebUserRemoveCommand extends SpoCommand {
     log(
       `  Examples:
     
-    Remove user from specified site without promptin for confirmation
-      ${commands.USER_REMOVE} --webUrl https://contoso.sharepoint.com/subsite --userId  --confirm
+    Remove user from specified web using id without promptin for confirmation
+      ${commands.USER_REMOVE} --webUrl https://contoso.sharepoint.com/subsite --id 10  --confirm
+
+    Remove user from specified web using login name without promptin for confirmation
+    ${commands.USER_REMOVE} --webUrl https://contoso.sharepoint.com/subsite --loginName "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"  --confirm
+ 
   ` );
   }
 }

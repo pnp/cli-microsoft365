@@ -80,8 +80,17 @@ describe(commands.USER_REMOVE, () => {
   it('fails validation if the webUrl option is not specified', () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
-
+       
       }
+    });
+    assert.notEqual(actual, true);
+  });
+
+  it('fails validation if id or loginName options are not passed', () => {
+    const actual = (command.validate() as CommandValidate)({ 
+      options: { 
+        webUrl: 'https://contoso.sharepoint.com' 
+      } 
     });
     assert.notEqual(actual, true);
   });
@@ -94,15 +103,6 @@ describe(commands.USER_REMOVE, () => {
       }
     });
     assert.notEqual(actual, true);
-  });
-
-  it('passes validation if all required options are specified', () => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        webUrl: "https://contoso.sharepoint.com/subsite"
-      }
-    });
-    assert.equal(actual, true);
   });
 
   it('has help referring to the right command', () => {
@@ -138,9 +138,15 @@ describe(commands.USER_REMOVE, () => {
     Utils.restore(vorpal.find);
     assert(containsExamples);
   });
-
-  it('should prompt before deleting subsite when confirmation argument not passed', (done) => {
-    cmdInstance.action({ options: { webUrl: 'https://contoso.sharepoint.com/subsite' } }, () => {
+  
+  it('should pompt before removing user using id from web when confirmation argument not passed ', (done) => {
+    cmdInstance.action({ 
+      options: 
+      { 
+        webUrl: 'https://contoso.sharepoint.com/subsite',
+        id:10
+      } 
+    }, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -157,11 +163,34 @@ describe(commands.USER_REMOVE, () => {
     });
   });
 
-  it('deletes web successfully without prompting with confirmation argument', (done) => {
-    // Delete web
+  it('should pompt before removing user using login name from web when confirmation argument not passed ', (done) => {
+    cmdInstance.action({ 
+      options: 
+      { 
+        webUrl: 'https://contoso.sharepoint.com/subsite',
+        loginName:"i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
+      } 
+    }, () => {
+      let promptIssued = false;
+
+      if (promptOptions && promptOptions.type === 'confirm') {
+        promptIssued = true;
+      }
+
+      try {
+        assert(promptIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('removes user by id successfully without pompting with confirmation argument', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if ((opts.url as string).indexOf('_api/web') > -1) {
+      if ((opts.url as string).indexOf('_api/web/siteusers/removebyid(10)') > -1) {
         return Promise.resolve(true);
       }
       return Promise.reject('Invalid request');
@@ -170,13 +199,13 @@ describe(commands.USER_REMOVE, () => {
     cmdInstance.action({
       options: {
         webUrl: "https://contoso.sharepoint.com/subsite",
-        userId: "1",
+        id: 10,
         confirm: true
       }
     }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web`) > -1 &&
+        if (r.url.indexOf(`_api/web/siteusers/removebyid(10)`) > -1 &&
           r.headers['X-HTTP-Method'] === 'DELETE' &&
           r.headers['accept'] === 'application/json;odata=nometadata') {
           correctRequestIssued = true;
@@ -190,14 +219,46 @@ describe(commands.USER_REMOVE, () => {
         done(e);
       }
     });
-
   });
 
-  it('deletes web successfully when prompt confirmed', (done) => {
-    // Delete web
+  it('removes user by login name successfully without pompting with confirmation argument', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if ((opts.url as string).indexOf('_api/web') > -1) {
+      if ((opts.url as string).indexOf(`_api/web/siteusers/removeByLoginName('i%3A0%23.f%7Cmembership%7Cjohn.doe%40mytenant.onmicrosoft.com')`) > -1) {
+        return Promise.resolve(true);
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({
+      options: {
+        webUrl: "https://contoso.sharepoint.com/subsite",
+        loginName:"i:0#.f|membership|parker@tenant.onmicrosoft.com",
+        confirm: true
+      }
+    }, () => {
+      let correctRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf(`_api/web/siteusers/removeByLoginName('i%3A0%23.f%7Cmembership%7Cparker%40tenant.onmicrosoft.com')`) > -1 &&
+          r.headers['X-HTTP-Method'] === 'DELETE' &&
+          r.headers['accept'] === 'application/json;odata=nometadata') {
+          correctRequestIssued = true;
+        }
+      });
+      try {
+        assert(correctRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('removes user by id successfully from web when prompt confirmed', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+      if ((opts.url as string).indexOf('_api/web/siteusers/removebyid(10)') > -1) {
         return Promise.resolve(true);
       }
       return Promise.reject('Invalid request');
@@ -208,12 +269,13 @@ describe(commands.USER_REMOVE, () => {
     };
     cmdInstance.action({
       options: {
-        webUrl: "https://contoso.sharepoint.com/subsite"
+        webUrl: "https://contoso.sharepoint.com/subsite",
+        id:10
       }
     }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web`) > -1 &&
+        if (r.url.indexOf(`_api/web/siteusers/removebyid(10)`) > -1 &&
           r.headers['X-HTTP-Method'] === 'DELETE' &&
           r.headers['accept'] === 'application/json;odata=nometadata') {
           correctRequestIssued = true;
@@ -229,11 +291,46 @@ describe(commands.USER_REMOVE, () => {
     });
   });
 
-  it('deletes web successfully without prompting with confirmation argument (verbose)', (done) => {
-    // Delete web
+  it('removes user by login name successfully from web when prompt confirmed', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if ((opts.url as string).indexOf('_api/web') > -1) {
+      if ((opts.url as string).indexOf(`_api/web/siteusers/removeByLoginName`) > -1) {
+        return Promise.resolve(true);
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    };
+    cmdInstance.action({
+      options: {
+        webUrl: "https://contoso.sharepoint.com/subsite",
+        loginName:"i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
+      }
+    }, () => {
+      let correctRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf(`_api/web/siteusers/removeByLoginName`) > -1 &&
+          r.headers['X-HTTP-Method'] === 'DELETE' &&
+          r.headers['accept'] === 'application/json;odata=nometadata') {
+          correctRequestIssued = true;
+        }
+      });
+      try {
+        assert(correctRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+  
+  it('removes user from web successfully without prompting with confirmation argument (verbose)', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+      if ((opts.url as string).indexOf('_api/web/siteusers/removebyid(10)') > -1) {
         return Promise.resolve(true);
       }
       return Promise.reject('Invalid request');
@@ -243,12 +340,13 @@ describe(commands.USER_REMOVE, () => {
       options: {
         verbose: true,
         webUrl: "https://contoso.sharepoint.com/subsite",
+        id:10,
         confirm: true
       }
     }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web`) > -1 &&
+        if (r.url.indexOf(`_api/web/siteusers/removebyid(10)`) > -1 &&
           r.headers['X-HTTP-Method'] === 'DELETE' &&
           r.headers['accept'] === 'application/json;odata=nometadata') {
           correctRequestIssued = true;
@@ -264,12 +362,11 @@ describe(commands.USER_REMOVE, () => {
       }
     });
   });
-
-  it('deletes web successfully without prompting with confirmation argument (debug)', (done) => {
-    // Delete web
-    sinon.stub(request, 'post').callsFake((opts) => {
+  
+  it('removes user from web successfully without prompting with confirmation argument (debug)', (done) => {
+      sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if ((opts.url as string).indexOf('_api/web') > -1) {
+      if ((opts.url as string).indexOf('_api/web/siteusers/removebyid(10)') > -1) {
         return Promise.resolve(true);
       }
       return Promise.reject('Invalid request');
@@ -279,12 +376,13 @@ describe(commands.USER_REMOVE, () => {
       options: {
         debug: true,
         webUrl: "https://contoso.sharepoint.com/subsite",
+        id:10,
         confirm: true
       }
     }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web`) > -1 &&
+        if (r.url.indexOf(`_api/web/siteusers/removebyid(10)`) > -1 &&
           r.headers['X-HTTP-Method'] === 'DELETE' &&
           r.headers['accept'] === 'application/json;odata=nometadata') {
           correctRequestIssued = true;
@@ -300,11 +398,10 @@ describe(commands.USER_REMOVE, () => {
     });
   });
 
-  it('handles error when deleting web', (done) => {
-    // Delete web
+  it('handles error when removing using from web', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if ((opts.url as string).indexOf('_api/web') > -1) {
+      if ((opts.url as string).indexOf('_api/web/siteusers/removebyid(10)') > -1) {
         return Promise.reject('An error has occurred');
       }
       return Promise.reject('Invalid request');
@@ -313,6 +410,7 @@ describe(commands.USER_REMOVE, () => {
     cmdInstance.action({
       options: {
         webUrl: "https://contoso.sharepoint.com/subsite",
+        id:10,
         confirm: true
       }
     }, (err?: any) => {
