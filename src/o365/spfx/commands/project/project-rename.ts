@@ -6,7 +6,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import { BaseProjectCommand } from './base-project-command';
 import * as path from 'path';
 import * as fs from 'fs';
-const uuid = require('uuid');
+import { v4 } from 'uuid';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -83,7 +83,7 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
 
     let newId: string = '';
     if (args.options.generateNewId) {
-      newId = uuid.v4();
+      newId = this.generateNewId();
       if (this.debug) {
         cmd.log('Created new solution id');
         cmd.log(newId);
@@ -110,6 +110,10 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
     }
 
     cb();
+  }
+
+  private generateNewId = (): string => {
+    return v4();
   }
 
   private replacePackageJsonContent = (filePath: string, args: CommandArgs, cmd: CommandInstance) => {

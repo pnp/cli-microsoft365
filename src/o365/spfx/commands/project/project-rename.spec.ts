@@ -7,7 +7,6 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
 import Utils from '../../../../Utils';
-const uuid = require('uuid');
 
 describe(commands.PROJECT_RENAME, () => {
   let vorpal: Vorpal;
@@ -16,7 +15,7 @@ describe(commands.PROJECT_RENAME, () => {
   let trackEvent: any;
   let telemetry: any;
   let writeFileSyncSpy: sinon.SinonStub;
-  const projectPath: string = 'src/o365/spfx/commands/project/project-upgrade/test-projects/spfx-182-webpart-react';
+  const projectPath: string = 'src/o365/spfx/commands/project/test-projects/spfx-182-webpart-react';
 
   before(() => {
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
@@ -43,7 +42,7 @@ describe(commands.PROJECT_RENAME, () => {
   afterEach(() => {
     Utils.restore([
       vorpal.find,
-      uuid.v4,
+      (command as any).generateNewId,
       (command as any).getProjectRoot,
       (command as any).getProject,
       fs.existsSync,
@@ -196,7 +195,7 @@ describe(commands.PROJECT_RENAME, () => {
   }
 }`;
 
-    cmdInstance.action({ options: { newName: 'spfx-react' } }, (err?: any) => {
+    cmdInstance.action({ options: { newName: 'spfx-react', generateNewId: true } }, (err?: any) => {
       try {
         assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
         done();
@@ -242,7 +241,7 @@ describe(commands.PROJECT_RENAME, () => {
   it('replaces project name and id in .yo-rc.json when --generateNewId is passed', (done) => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
 
-    sinon.stub(uuid, 'v4').callsFake(() => {
+    sinon.stub((command as any), 'generateNewId').callsFake(() => {
       return '69cb6882-acc1-4148-b059-31ae149ba077'
     });
 
@@ -306,7 +305,7 @@ describe(commands.PROJECT_RENAME, () => {
   it('replaces project name and id in package-solution.json when --generateNewId is passed', (done) => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
 
-    sinon.stub(uuid, 'v4').callsFake(() => {
+    sinon.stub((command as any), 'generateNewId').callsFake(() => {
       return '69cb6882-acc1-4148-b059-31ae149ba077'
     });
 
