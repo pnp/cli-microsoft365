@@ -2374,6 +2374,78 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
   //#endregion
 
+  //#region 1.10.0
+  it('e2e: shows correct number of findings for upgrading application customizer 1.10.0 project to 1.11.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-1100-applicationcustomizer'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.11.0', output: 'json' } }, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
+      assert.equal(findings.length, 16);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading field customizer react 1.10.0 project to 1.11.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-1100-fieldcustomizer-react'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.11.0', output: 'json' } }, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
+      assert.equal(findings.length, 20);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading list view command set 1.10.0 project to 1.11.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-1100-listviewcommandset'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.11.0', output: 'json' } }, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
+      assert.equal(findings.length, 16);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading ko web part 1.10.0 project to 1.11.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-1100-webpart-ko'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.11.0', output: 'json' } }, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
+      assert.equal(findings.length, 17);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading no framework web part 1.10.0 project to 1.11.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-1100-webpart-nolib'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.11.0', output: 'json' } }, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
+      assert.equal(findings.length, 17);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading react web part 1.10.0 project to 1.11.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-1100-webpart-react'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.11.0', output: 'json' } }, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
+      assert.equal(findings.length, 22);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.10.0 project to 1.11.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-1100-webpart-optionaldeps'));
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { toVersion: '1.11.0', output: 'json' } }, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
+      assert.equal(findings.length, 27);
+    });
+  });
+  //#endregion
+
   //#region superseded rules
   it('ignores superseded findings (1.1.0 > 1.2.0)', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/o365/spfx/commands/project/test-projects/spfx-110-webpart-react'));
