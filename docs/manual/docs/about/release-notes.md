@@ -1,5 +1,15 @@
 # Release notes
 
+## [v3.0.0](https://github.com/pnp/office365-cli/releases/tag/v3.0.0)
+
+### Changes
+
+- removed deprecated 'id' option in 'spo site set' [#1536](https://github.com/pnp/office365-cli/issues/1536)
+- removed deprecated exit code in 'spfx project upgrade' [#1418](https://github.com/pnp/office365-cli/issues/1418)
+- removed immersive mode [#1600](https://github.com/pnp/office365-cli/issues/1600)
+- removed '-h' as option [#1680](https://github.com/pnp/office365-cli/issues/1680)
+- removed deprecated 'accesstoken get' alias [#1368](https://github.com/pnp/office365-cli/issues/1368)
+
 ## [v2.14.0](https://github.com/pnp/office365-cli/releases/tag/v2.14.0)
 
 ### New commands
