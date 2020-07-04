@@ -11,7 +11,8 @@
 **SharePoint:**
 
 - [spo tenant appcatalog add](../cmd/spo/tenant/tenant-appcatalog-add.md) - creates new tenant app catalog site [#1646](https://github.com/pnp/office365-cli/issues/1646)
-- [spo user get](../cmd/spo/user/user-get.md) - creates new tenant app catalog site [#1673](https://github.com/pnp/office365-cli/issues/1673)
+- [spo user get](../cmd/spo/user/user-get.md) - gets a site user within specific web [#1673](https://github.com/pnp/office365-cli/issues/1673)
+- [spo user remove](../cmd/spo/user/user-remove.md) - removes user from specific web [#1674](https://github.com/pnp/office365-cli/issues/1674)
 
 ## [v2.11.0](https://github.com/pnp/office365-cli/releases/tag/v2.11.0)
 
