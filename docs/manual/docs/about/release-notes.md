@@ -1,12 +1,17 @@
 # Release notes
 
-## [v2.12.0]
+## [v2.12.0](https://github.com/pnp/office365-cli/releases/tag/v2.12.0)
 
 ### New commands
 
 **Microsoft Graph:**
 
-- [graph schemaextension list](../cmd/graph/schemaextension/schemaextension-list) - gets a list of schemaExtension objects created in the current tenant [#12](https://github.com/pnp/office365-cli/issues/12)
+- [graph schemaextension list](../cmd/graph/schemaextension/schemaextension-list.md) - gets a list of schemaExtension objects created in the current tenant [#12](https://github.com/pnp/office365-cli/issues/12)
+
+**SharePoint:**
+
+- [spo tenant appcatalog add](../cmd/spo/tenant/tenant-appcatalog-add.md) - creates new tenant app catalog site [#1646](https://github.com/pnp/office365-cli/issues/1646)
+- [spo user get](../cmd/spo/user/user-get.md) - creates new tenant app catalog site [#1673](https://github.com/pnp/office365-cli/issues/1673)
 
 ## [v2.11.0](https://github.com/pnp/office365-cli/releases/tag/v2.11.0)
 
