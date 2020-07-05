@@ -380,6 +380,8 @@ nav:
       - user:
         - user get: 'cmd/spo/user/user-get.md'
         - user remove: 'cmd/spo/user/user-remove.md'
+      - userprofile:
+        - userprofile set: 'cmd/spo/userprofile/userprofile-set.md'
       - web:
         - web add: 'cmd/spo/web/web-add.md'
         - web clientsidewebpart list: 'cmd/spo/web/web-clientsidewebpart-list.md'
