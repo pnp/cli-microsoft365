@@ -542,7 +542,7 @@ Set-PnPTenantSite|SharePointPnPPowerShellOnline|[spo site classic set](../cmd/sp
 Set-PnPTheme|SharePointPnPPowerShellOnline|
 Set-PnPTraceLog|SharePointPnPPowerShellOnline|
 Set-PnPUnifiedGroup|SharePointPnPPowerShellOnline|[aad o365group set](../cmd/aad/o365group/o365group-set.md)
-Set-PnPUserProfileProperty|SharePointPnPPowerShellOnline|
+Set-PnPUserProfileProperty|SharePointPnPPowerShellOnline|[spo userprofile set](../cmd/spo/userprofile/userprofile-set.md)
 Set-PnPView|SharePointPnPPowerShellOnline|[spo list view set](../cmd/spo/list/list-view-set.md)
 Set-PnPWeb|SharePointPnPPowerShellOnline|[spo web set](../cmd/spo/web/web-set.md)
 Set-PnPWebhookSubscription|SharePointPnPPowerShellOnline|[spo list webhook set](../cmd/spo/list/list-webhook-set.md)
