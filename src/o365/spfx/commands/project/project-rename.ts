@@ -126,8 +126,9 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
       updatedContent.name) {
       updatedContent.name = args.options.newName;
     }
-    if (JSON.stringify(updatedContent, null, 2) !== JSON.stringify(existingContent, null, 2)) {
-      fs.writeFileSync(filePath, JSON.stringify(updatedContent, null, 2), 'utf-8');
+    const updatedContentString = JSON.stringify(updatedContent, null, 2);
+    if (updatedContentString !== existingContent) {
+      fs.writeFileSync(filePath, updatedContentString, 'utf-8');
       if (this.debug) {
         cmd.log(`Updated ${path.basename(filePath)}`);
       }
@@ -156,8 +157,9 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
       args.options.generateNewId) {
       updatedContent['@microsoft/generator-sharepoint'].libraryId = newId;
     }
-    if (JSON.stringify(updatedContent, null, 2) !== JSON.stringify(existingContent, null, 2)) {
-      fs.writeFileSync(filePath, JSON.stringify(updatedContent, null, 2), 'utf-8');
+    const updatedContentString = JSON.stringify(updatedContent, null, 2);
+    if (updatedContentString !== existingContent) {
+      fs.writeFileSync(filePath, updatedContentString, 'utf-8');
       if (this.debug) {
         cmd.log(`Updated ${path.basename(filePath)}`);
       }
@@ -186,8 +188,9 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
       updatedContent.paths.zippedPackage) {
       updatedContent.paths.zippedPackage = updatedContent.paths.zippedPackage.replace(new RegExp(projectName, 'g'), args.options.newName);
     }
-    if (JSON.stringify(updatedContent, null, 2) !== JSON.stringify(existingContent, null, 2)) {
-      fs.writeFileSync(filePath, JSON.stringify(updatedContent, null, 2), 'utf-8');
+    const updatedContentString = JSON.stringify(updatedContent, null, 2);
+    if (updatedContentString !== existingContent) {
+      fs.writeFileSync(filePath, updatedContentString, 'utf-8');
       if (this.debug) {
         cmd.log(`Updated ${path.basename(filePath)}`);
       }
@@ -204,8 +207,9 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
       updatedContent.container) {
       updatedContent.container = args.options.newName;
     }
-    if (JSON.stringify(updatedContent, null, 2) !== JSON.stringify(existingContent, null, 2)) {
-      fs.writeFileSync(filePath, JSON.stringify(updatedContent, null, 2), 'utf-8');
+    const updatedContentString = JSON.stringify(updatedContent, null, 2);
+    if (updatedContentString !== existingContent) {
+      fs.writeFileSync(filePath, updatedContentString, 'utf-8');
       if (this.debug) {
         cmd.log(`Updated ${path.basename(filePath)}`);
       }
