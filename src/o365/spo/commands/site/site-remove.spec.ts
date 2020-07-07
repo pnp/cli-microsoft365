@@ -79,11 +79,6 @@ describe(commands.SITE_REMOVE, () => {
     assert.notEqual(command.description, null);
   });
 
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.equal((alias && alias.indexOf(commands.SITE_CLASSIC_REMOVE) > -1), true);
-  });
-
   it('aborts removing site when prompt not confirmed', (done) => {
     cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });

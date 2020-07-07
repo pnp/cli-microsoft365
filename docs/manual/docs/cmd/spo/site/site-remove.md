@@ -8,12 +8,6 @@ Removes the specified site
 spo site remove [options]
 ```
 
-## Alias
-
-```sh
-spo site classic remove
-```
-
 ## Options
 
 Option|Description

@@ -3,11 +3,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as updateNotifier from 'update-notifier';
-import config from './config';
 import Command from './Command';
 import appInsights from './appInsights';
 import Utils from './Utils';
-import { autocomplete } from './autocomplete';
 
 const packageJSON = require('../package.json');
 const vorpal: Vorpal = require('./vorpal-init');
@@ -102,27 +100,6 @@ appInsights.trackEvent({
 updateNotifier({ pkg: packageJSON }).notify({ defer: false });
 
 fs.realpath(__dirname, (err: NodeJS.ErrnoException | null, resolvedPath: string): void => {
-  if (process.argv.indexOf('--completion:clink:generate') > -1) {
-    loadAllCommands(resolvedPath);
-    console.log(autocomplete.getClinkCompletion(vorpal));
-    process.exit();
-  }
-  if (process.argv.indexOf('--completion:sh:generate') > -1) {
-    loadAllCommands(resolvedPath);
-    autocomplete.generateShCompletion(vorpal);
-    process.exit();
-  }
-  if (process.argv.indexOf('--completion:sh:setup') > -1) {
-    loadAllCommands(resolvedPath);
-    autocomplete.generateShCompletion(vorpal);
-    autocomplete.setupShCompletion();
-    process.exit();
-  }
-  if (process.argv.indexOf('--reconsent') > -1) {
-    console.log(`To reconsent the PnP Office 365 Management Shell Azure AD application navigate in your web browser to https://login.microsoftonline.com/${config.tenant}/oauth2/authorize?client_id=${config.cliAadAppId}&response_type=code&prompt=admin_consent`);
-    process.exit();
-  }
-
   // disable linux-normalizing args to support JSON and XML values
   vorpal.isCommandArgKeyPairNormalized = false;
 

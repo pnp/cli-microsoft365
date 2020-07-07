@@ -8,12 +8,6 @@ Consent additional permissions for the Azure AD application used by the Office 3
 cli consent [options]
 ```
 
-## Alias
-
-```sh
-consent [options]
-```
-
 ## Options
 
 Option|Description
