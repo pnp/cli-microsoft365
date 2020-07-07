@@ -8,7 +8,7 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 import auth from '../../../../Auth';
 
-describe(commands.USER_GET, () => {
+describe(commands.GROUP_LIST, () => {
   let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
@@ -51,7 +51,7 @@ describe(commands.USER_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.USER_GET), true);
+    assert.equal(command.name.startsWith(commands.GROUP_LIST), true);
   });
 
   it('has a description', () => {
@@ -64,17 +64,12 @@ describe(commands.USER_GET, () => {
         return Promise.resolve(
           {
             "value": [{
-              "AllowRequestToJoinLeave":false,
-              "AutoAcceptRequestToJoinLeave":false,
-              "Description":'SharePoint Contoso',
               "Id":15,
+              "Title":"Contoso Members",
+              "LoginName":"Contoso Members",
+              "Description":"SharePoint Contoso",
               "IsHiddenInUI":false,
-              "LoginName":'Contoso Members',
-              "OnlyAllowMembersViewMembership":true,
-              "OwnerTitle":'Dipen Shah',
-              "PrincipalType":8,
-              "RequestToJoinLeaveEmailSetting":null,
-              "Title":'Contoso Members'
+              "PrincipalType":8
             }]
           }
         );
@@ -92,18 +87,12 @@ describe(commands.USER_GET, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith({
           value: [{
-            AllowMembersEditMembership:false,
-            AllowRequestToJoinLeave:false,
-            AutoAcceptRequestToJoinLeave:false,
-            Description:'SharePoint Contoso',
             Id:15,
+            Title:"Contoso Members",
+            LoginName:"Contoso Members",
+            Description:"SharePoint Contoso",
             IsHiddenInUI:false,
-            LoginName:'Contoso Members',
-            OnlyAllowMembersViewMembership:true,
-            OwnerTitle:'Dipen Shah',
-            PrincipalType:8,
-            RequestToJoinLeaveEmailSetting:null,
-            Title:'Contoso Members'
+            PrincipalType:8
           }]
         }));
         done();
@@ -114,16 +103,18 @@ describe(commands.USER_GET, () => {
     });
   });
 
-  it('retrieves all lists with output option text', (done) => {
+  it('retrieves all groups with output option text', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/sitegroups') > -1) {
         return Promise.resolve(
           {"value":[
             {
-              "Description":'SharePoint Contoso',
               "Id":15,
+              "Title":"Contoso Members",
+              "LoginName":"Contoso Members",
+              "Description":"SharePoint Contoso",
               "IsHiddenInUI":false,
-              "LoginName":'Contoso Members',
+              "PrincipalType":8
             }
           ]}
         );
@@ -131,6 +122,7 @@ describe(commands.USER_GET, () => {
       return Promise.reject('Invalid request');
     });
 
+    
     cmdInstance.action({ options: {
       output: 'text',
       debug: false,
@@ -139,10 +131,12 @@ describe(commands.USER_GET, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(
           [{
-            Description:'SharePoint Contoso',
             Id:15,
+            Title:"Contoso Members",
+            LoginName:"Contoso Members",
+            Description:"SharePoint Contoso",
             IsHiddenInUI:false,
-            LoginName:'Contoso Members',
+            PrincipalType:8
           }]
         ));
         done();
@@ -215,7 +209,7 @@ describe(commands.USER_GET, () => {
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
     cmd.help({}, () => { });
-    assert(find.calledWith(commands.USER_GET));
+    assert(find.calledWith(commands.GROUP_LIST));
   });
 
   it('has help with examples', () => {
