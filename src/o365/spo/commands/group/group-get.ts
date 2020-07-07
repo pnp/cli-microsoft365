@@ -14,9 +14,9 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  webUrl: string;
-  name: string;
+  webUrl: string;  
   id?: string;
+  name?: string;
 }
 
 class SpoUserGetCommand extends SpoCommand {

@@ -195,7 +195,7 @@ describe(commands.GROUP_GET, () => {
     assert.notEqual(actual, true);
   });
 
-  it('fails validation if id or name options are not passed', () => {
+  it('fails validation if both id and name options are not passed', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com' } });
     assert.notEqual(actual, true);
   });
