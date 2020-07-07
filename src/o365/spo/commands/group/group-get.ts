@@ -98,6 +98,10 @@ class SpoUserGetCommand extends SpoCommand {
         return 'Use either "id" or "name", but not all.';
       }
 
+      if (!args.options.id && !args.options.name) {
+        return 'Specify id or name, one is required';
+      }
+
       return SpoCommand.isValidSharePointUrl(args.options.webUrl);
     };
   }
