@@ -16,7 +16,6 @@ Option|Description
 `-i, --clientId <clientId>`|objectId of the service principal for which the configured OAuth2 permission grants should be retrieved
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json,text`. Default `text`
-`--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 

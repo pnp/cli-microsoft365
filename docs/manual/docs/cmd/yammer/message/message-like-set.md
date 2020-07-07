@@ -17,7 +17,6 @@ Option|Description
 `--enable [enable]`|Set to `true` to like a message. Set to `false` to unlike it. Default `true`
 `--confirm`|Don't prompt for confirmation before unliking a message
 `-o, --output [output]`|Output type. `json,text`. Default `text`
-`--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 

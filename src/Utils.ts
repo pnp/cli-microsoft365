@@ -153,12 +153,7 @@ export default class Utils {
       vorpal._command.args &&
       vorpal._command.args.options &&
       vorpal._command.args.options.output === 'json') {
-      if (vorpal._command.args.options.pretty) {
-        return JSON.stringify(logStatement, null, 2);
-      }
-      else {
-        return JSON.stringify(logStatement);
-      }
+      return JSON.stringify(logStatement, null, 2);
     }
 
     if (logStatement instanceof CommandError) {
@@ -677,7 +672,7 @@ export default class Utils {
         if (err) {
           return reject(err);
         }
-  
+
         resolve();
       });
     });
@@ -705,7 +700,7 @@ export default class Utils {
         if (err) {
           return reject(err);
         }
-  
+
         resolve(log.join());
       });
     });

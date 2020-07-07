@@ -100,7 +100,7 @@ describe(commands.LIST_VIEW_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, verbose: false, output: "text", pretty: true, webUrl: 'https://contoso.sharepoint.com', listTitle: 'List 1', viewTitle: 'All items', Title: 'All events' } }, () => {
+    cmdInstance.action({ options: { debug: false, verbose: false, output: "text", webUrl: 'https://contoso.sharepoint.com', listTitle: 'List 1', viewTitle: 'All items', Title: 'All events' } }, () => {
       try {
         assert.deepEqual(patchRequest.lastCall.args[0].body, { Title: 'All events' });
         done();

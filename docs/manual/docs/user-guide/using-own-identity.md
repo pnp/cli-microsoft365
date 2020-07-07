@@ -125,7 +125,7 @@ Returning back to your command line, you can now verify that the sign in has bee
 Finally, to test that we can indeed read SharePoint Online site collections, let's invoke the following command
 
 ```sh
-o365 spo site get --url https://trinder365dev.sharepoint.com -o json --pretty
+m365 spo site get --url https://trinder365dev.sharepoint.com -o json
 ```
 
 The JSON representation of the SharePoint Online site will be returned to the console.

@@ -657,8 +657,7 @@ describe(commands.FILE_ADD, () => {
         publish: true,
         debug: true,
         verbose: true,
-        output: "text",
-        pretty: true
+        output: "text"
       }
     }, () => {
       try {

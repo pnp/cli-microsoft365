@@ -75,8 +75,17 @@ true
 If the command returns an object, that object will be formatted as a JSON string. For example, getting information about a specific app, will return output similar to:
 
 ```sh
-$ o365 spo app get -i e6362993-d4fd-4c5a-8254-fd095a7291ad
-{"AppCatalogVersion":"1.0.0.0","CanUpgrade":false,"CurrentVersionDeployed":false,"Deployed":false,"ID":"e6362993-d4fd-4c5a-8254-fd095a7291ad","InstalledVersion":"","IsClientSideSolution":true,"Title":"spfx-140-online-client-side-solution"}
+$ m365 spo app get -i e6362993-d4fd-4c5a-8254-fd095a7291ad
+{
+  "AppCatalogVersion": "1.0.0.0",
+  "CanUpgrade": false,
+  "CurrentVersionDeployed": false,
+  "Deployed": false,
+  "ID": "e6362993-d4fd-4c5a-8254-fd095a7291ad",
+  "InstalledVersion": "",
+  "IsClientSideSolution": true,
+  "Title": "spfx-140-online-client-side-solution"
+}
 ```
 
 ### Arrays
@@ -84,26 +93,35 @@ $ o365 spo app get -i e6362993-d4fd-4c5a-8254-fd095a7291ad
 If the command returns information about multiple objects, the command will return a JSON array with each array item representing one object. For example, getting the list of available app, will return output similar to:
 
 ```sh
-$ o365 spo app list -o json
-[{"AppCatalogVersion":"1.0.0.0","CanUpgrade":false,"CurrentVersionDeployed":false,"Deployed":false,"ID":"e6362993-d4fd-4c5a-8254-fd095a7291ad","InstalledVersion":"","IsClientSideSolution":true,"Title":"spfx-140-online-client-side-solution"},{"AppCatalogVersion":"1.0.0.0","CanUpgrade":false,"CurrentVersionDeployed":false,"Deployed":false,"ID":"5ae74650-b00b-46a9-925f-9c9bd70a0cb6","InstalledVersion":"","IsClientSideSolution":true,"Title":"spfx-134-client-side-solution"}]
+$ m365 spo app list -o json
+[
+  {
+    "AppCatalogVersion": "1.0.0.0",
+    "CanUpgrade": false,
+    "CurrentVersionDeployed": false,
+    "Deployed": false,
+    "ID": "e6362993-d4fd-4c5a-8254-fd095a7291ad",
+    "InstalledVersion": "",
+    "IsClientSideSolution": true,
+    "Title": "spfx-140-online-client-side-solution"
+  },
+  {
+    "AppCatalogVersion": "1.0.0.0",
+    "CanUpgrade": false,
+    "CurrentVersionDeployed": false,
+    "Deployed": false,
+    "ID": "5ae74650-b00b-46a9-925f-9c9bd70a0cb6",
+    "InstalledVersion": "",
+    "IsClientSideSolution": true,
+    "Title": "spfx-134-client-side-solution"
+  }
+]
 ```
 
 Even if the array contains only one item, for consistency it will be returned as a one-element JSON array:
 
 ```sh
-$ o365 spo app list -o json
-[{"AppCatalogVersion":"1.0.0.0","CanUpgrade":false,"CurrentVersionDeployed":false,"Deployed":false,"ID":"e6362993-d4fd-4c5a-8254-fd095a7291ad","InstalledVersion":"","IsClientSideSolution":true,"Title":"spfx-140-online-client-side-solution"}]
-```
-
-!!! tip
-    Some `list` commands return different output in text and JSON mode. For readability, in the text mode they only include a few properties, so that the output can be formatted as a table and will fit on the screen. In JSON mode however, they will include all available properties so that it's possible to process the full set of information about the particular object. For more details, refer to the help of the particular command.
-
-### Pretty JSON output
-
-The default format returns JSON on a single line, however if you prefer this to be multi line and indented to improve readbility in you shell, you can use the `--pretty` flag to change the output format.
-
-```sh
-$ o365 spo app list -o json --pretty
+$ m365 spo app list -o json
 [
   {
     "AppCatalogVersion": "1.0.0.0",
@@ -117,6 +135,9 @@ $ o365 spo app list -o json --pretty
   }
 ]
 ```
+
+!!! tip
+    Some `list` commands return different output in text and JSON mode. For readability, in the text mode they only include a few properties, so that the output can be formatted as a table and will fit on the screen. In JSON mode however, they will include all available properties so that it's possible to process the full set of information about the particular object. For more details, refer to the help of the particular command.
 
 ### Verbose and debug output in JSON mode
 

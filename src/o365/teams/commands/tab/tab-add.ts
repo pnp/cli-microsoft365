@@ -148,8 +148,7 @@ class TeamsTabAddCommand extends GraphItemsListCommand<Tab> {
       'contentUrl',
       'removeUrl',
       'websiteUrl',
-      'output',
-      'pretty'
+      'output'
     ];
     if (options.appName) {
       requestBody.displayName = options.appName;

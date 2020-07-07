@@ -150,8 +150,7 @@ class SpoFieldSetCommand extends SpoCommand {
       'updateExistingLists',
       'debug',
       'verbose',
-      'output',
-      'pretty'
+      'output'
     ];
 
     let i: number = 667;

@@ -17,7 +17,6 @@ Option|Description
 `--userId [userId]`|ID of the user to remove from the group. If not specified, removes the current user
 `--confirm`|Don't prompt for confirmation before removing the user from the group
 `-o, --output [output]`|Output type. `json,text`. Default `text`
-`--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 

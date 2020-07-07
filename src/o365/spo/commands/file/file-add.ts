@@ -726,8 +726,7 @@ class SpoFileAddCommand extends SpoCommand {
       'publishComment',
       'debug',
       'verbose',
-      'output',
-      'pretty'
+      'output'
     ];
 
     Object.keys(options).forEach(key => {

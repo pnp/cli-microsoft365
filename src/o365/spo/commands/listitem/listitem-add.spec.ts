@@ -373,7 +373,6 @@ describe(commands.LISTITEM_ADD, () => {
         debug: true,
         verbose: true,
         output: "text",
-        pretty: true,
         listTitle: 'Demo List',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         Title: expectedTitle,
