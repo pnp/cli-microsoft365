@@ -1,5 +1,4 @@
 import commands from '../commands';
-import globalCommands from '../../commands/commands';
 import GlobalOptions from '../../../GlobalOptions';
 import Command, {
   CommandOption,
@@ -27,10 +26,6 @@ class CliConsentCommand extends Command {
     return 'Consent additional permissions for the Azure AD application used by the Office 365 CLI';
   }
 
-  public alias(): string[] | undefined {
-    return [globalCommands.CONSENT];
-  }
-
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.service = args.options.service;
@@ -38,8 +33,6 @@ class CliConsentCommand extends Command {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    this.showDeprecationWarning(cmd, globalCommands.CONSENT, commands.CONSENT);
-
     let scope = '';
     switch (args.options.service) {
       case 'yammer':

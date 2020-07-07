@@ -36,10 +36,6 @@ class SpoSiteRemoveCommand extends SpoCommand {
     return 'Removes the specified site';
   }
 
-  public alias(): string[] | undefined {
-    return [commands.SITE_CLASSIC_REMOVE];
-  }
-
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.skipRecycleBin = (!(!args.options.skipRecycleBin)).toString();
@@ -50,8 +46,6 @@ class SpoSiteRemoveCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    this.showDeprecationWarning(cmd, commands.SITE_CLASSIC_REMOVE, commands.SITE_REMOVE);
-
     const removeSite = (): void => {
       this.dots = '';
 
