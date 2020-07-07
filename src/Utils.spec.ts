@@ -246,7 +246,7 @@ describe('Utils', () => {
     assert.equal(actual, undefined);
   });
 
-  it('formats output as JSON when JSON output requested', (done) => {
+  it('formats output as pretty JSON when JSON output requested', (done) => {
     const sandbox = sinon.createSandbox();
     if (!vorpal._command) {
       (vorpal as any)._command = undefined;
@@ -254,35 +254,7 @@ describe('Utils', () => {
     sandbox.stub(vorpal, '_command').value({
       args: {
         options: {
-          output: 'json',
-          pretty: false
-        }
-      }
-    });
-    const o = { lorem: 'ipsum' };
-    const actual = Utils.logOutput([o]);
-    try {
-      assert.equal(actual, JSON.stringify(o));
-      done();
-    }
-    catch (e) {
-      done(e);
-    }
-    finally {
-      sandbox.restore();
-    }
-  });
-
-  it('formats output as pretty JSON when JSON output and pretty requested', (done) => {
-    const sandbox = sinon.createSandbox();
-    if (!vorpal._command) {
-      (vorpal as any)._command = undefined;
-    }
-    sandbox.stub(vorpal, '_command').value({
-      args: {
-        options: {
-          output: 'json',
-          pretty: true
+          output: 'json'
         }
       }
     });
@@ -497,7 +469,7 @@ describe('Utils', () => {
     try {
       assert.equal(actual, JSON.stringify({
         "WashingtonCities": "Bellevue, Olympia, Seattle"
-      }));
+      }, null, 2));
       done();
     }
     catch (e) {
@@ -532,7 +504,7 @@ describe('Utils', () => {
     };
     const actual = Utils.logOutput([o]);
     try {
-      assert.equal(actual, JSON.stringify(o));
+      assert.equal(actual, JSON.stringify(o, null, 2));
       done();
     }
     catch (e) {

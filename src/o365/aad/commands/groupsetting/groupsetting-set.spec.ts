@@ -346,7 +346,6 @@ describe(commands.GROUPSETTING_SET, () => {
         debug: true,
         verbose: true,
         output: "text",
-        pretty: true,
         id: 'c391b57d-5783-4c53-9236-cefb5c6ef323',
         UsageGuidelinesUrl: 'https://contoso.sharepoint.com/sites/compliance',
         ClassificationList: 'HBI, MBI, LBI, GDPR',

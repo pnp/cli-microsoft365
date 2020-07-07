@@ -17,7 +17,6 @@ Option|Description
 `--userId [userId]`|ID of the user to add to the group. If not specified, adds the current user
 `--email [email]`|E-mail of the user to add to the group
 `-o, --output [output]`|Output type. `json,text`. Default `text`
-`--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 

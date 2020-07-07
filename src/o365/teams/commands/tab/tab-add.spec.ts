@@ -278,7 +278,6 @@ describe(commands.TEAMS_TAB_ADD, () => {
         debug: true,
         verbose: true,
         output: "text",
-        pretty: true,
         teamId: '3b4797e5-bdf3-48e1-a552-839af71562ef',
         channelId: '9:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         appId: 'com.microsoft.teamspace.tab.web',

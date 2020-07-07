@@ -432,7 +432,7 @@ describe(commands.GROUPSETTING_ADD, () => {
     });
 
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, verbose: true, output: "text", pretty: true, templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b', UsageGuidelinesUrl: 'https://contoso.sharepoint.com/sites/compliance', ClassificationList: 'HBI, MBI, LBI, GDPR', DefaultClassification: 'MBI' } }, () => {
+    cmdInstance.action({ options: { debug: true, verbose: true, output: "text", templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b', UsageGuidelinesUrl: 'https://contoso.sharepoint.com/sites/compliance', ClassificationList: 'HBI, MBI, LBI, GDPR', DefaultClassification: 'MBI' } }, () => {
       try {
         assert.deepEqual(postStub.firstCall.args[0].body, {
           templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b',

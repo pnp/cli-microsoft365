@@ -256,8 +256,7 @@ describe(commands.USER_LIST, () => {
         surname: 'M',
         givenName: 'A',
         output: "json",
-        verbose: true,
-        pretty: true
+        verbose: true
       }
     }, () => {
       try {

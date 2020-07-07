@@ -22,7 +22,6 @@ Option|Description
 `-e, --environment <environment>`|The name of the environment for which to retrieve custom connectors
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json,text`. Default `text`
-`--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 

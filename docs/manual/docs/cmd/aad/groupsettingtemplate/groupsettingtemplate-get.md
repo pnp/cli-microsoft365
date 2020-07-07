@@ -17,7 +17,6 @@ Option|Description
 `-n, --displayName [displayName]`|The display name of the settings template to retrieve. Specify the `id` or `displayName` but not both
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json,text`. Default `text`
-`--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 

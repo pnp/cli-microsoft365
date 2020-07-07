@@ -462,7 +462,6 @@ describe(commands.LISTITEM_SET, () => {
       debug: true,
       verbose: true,
       output: "text",
-      pretty: true,
       listTitle: 'Demo List',
       id: 147,
       webUrl: 'https://contoso.sharepoint.com/sites/project-y',

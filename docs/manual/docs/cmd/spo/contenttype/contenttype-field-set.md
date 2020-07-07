@@ -20,7 +20,6 @@ Option|Description
 `--hidden [hidden]`|Set to `true`, if the field should be hidden or to `false` if it should be visible
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json,text`. Default `text`
-`--pretty`|Prettifies `json` output
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 

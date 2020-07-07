@@ -380,7 +380,7 @@ describe(commands.FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, verbose: true, output: "text", pretty: true, webUrl: 'https://contoso.sharepoint.com', listTitle: 'My List>', name: 'MyColumn', Description: 'My column' } }, () => {
+    cmdInstance.action({ options: { debug: true, verbose: true, output: "text", webUrl: 'https://contoso.sharepoint.com', listTitle: 'My List>', name: 'MyColumn', Description: 'My column' } }, () => {
       try {
         assert.equal(postStub.thirdCall.args[0].body, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="667" ObjectPathId="663" Name="Description"><Parameter Type="String">My column</Parameter></SetProperty><Method Name="UpdateAndPushChanges" Id="9000" ObjectPathId="663"><Parameters><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="663" Name="fe0ea19e-7022-0000-37ae-1357e77e046c|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:ff7a8065-9120-4c0a-982a-163ab9014179:web:e781d3dc-238d-44f7-8724-5e3e9eabcd6e:list:03cef05c-ba50-4dcf-a876-304f0626085c:field:5d021339-4d62-4fe9-9d2a-c99bc56a157a" /></ObjectPaths></Request>`);
         done();
