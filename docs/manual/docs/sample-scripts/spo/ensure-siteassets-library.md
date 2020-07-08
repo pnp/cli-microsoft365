@@ -26,7 +26,7 @@ function EnsureSiteAssetsLibrary {
   $list = $null
 
   Write-Host "-> Ensure Site Assets library: $siteUrl"
-  $lists = o365 spo list list --webUrl "$siteUrl" -o json | ConvertFrom-Json
+  $lists = m365 spo list list --webUrl "$siteUrl" -o json | ConvertFrom-Json
   if (($null -ne $lists) -and ($null -ne $lists.value)) {
     $list = $lists.value | Where-Object { $_.Title -eq "Site Assets" }
   }
@@ -36,7 +36,7 @@ function EnsureSiteAssetsLibrary {
 
     try {
       $resource = ($siteUrl -split "/")[2]
-      $accessToken = o365 util accesstoken get --resource "https://$resource"
+      $accessToken = m365 util accesstoken get --resource "https://$resource"
     }
     catch {
       throw "!! Unable to get AccessToken for EnsureSiteAssetsLibrary at '$siteUrl'`nERROR: $_"

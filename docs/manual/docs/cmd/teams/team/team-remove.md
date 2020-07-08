@@ -22,7 +22,7 @@ Option|Description
 
 ## Remarks
 
-When deleted, Office 365 groups are moved to a temporary container and can be restored within 30 days. After that time, they are permanently deleted. This applies only to Office 365 groups.
+When deleted, Microsoft 365 groups are moved to a temporary container and can be restored within 30 days. After that time, they are permanently deleted. This applies only to Microsoft 365 groups.
 
 ## Examples
 

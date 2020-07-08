@@ -2,7 +2,7 @@
 
 Author: [Joseph Velliah](https://sprider.blog/insert-pictures-in-a-sharepoint-document-library-into-a-word-document)
 
-This PowerShell script shows how to download and insert many pictures in a SharePoint Document Library into a Word document in a two-column table with file name using Office 365 CLI commands and PowerShell Script.
+This PowerShell script shows how to download and insert many pictures in a SharePoint Document Library into a Word document in a two-column table with file name using CLI for Microsoft 365 commands and PowerShell Script.
 
 Customers have multiple pictures in a SharePoint Document Library, and they need to automatically insert the pictures in Word as it will take a lot of time if operating from UI. So, they need a script to accomplish that.
 
@@ -10,7 +10,7 @@ Prerequisites:
 
 - Windows 10
 - Windows PowerShell
-- Office 365 CLI
+- CLI for Microsoft 365
 - Office 2007 or Higher version
 - SharePoint Online Site
 - Document Library with some images
@@ -27,7 +27,7 @@ $siteUrl = "https://tenant-name.sharepoint.com/sites/site-name"
 $docLibRootFolderName = "Shared Documents"
 
 # assumption - folder contains only images but feel free to change the filter conditions to limit the items/file types returned from document library
-$spolImagesCollection = o365 spo file list --webUrl $siteUrl --folder $docLibRootFolderName -o json | ConvertFrom-Json
+$spolImagesCollection = m365 spo file list --webUrl $siteUrl --folder $docLibRootFolderName -o json | ConvertFrom-Json
 
 if ($spolImagesCollection.Count -gt 0) {
   $numberOfRows = $spolImagesCollection.Count
@@ -51,7 +51,7 @@ if ($spolImagesCollection.Count -gt 0) {
 
     Write-Host "Processing: $docServerRelativeUrl"
 
-    o365 spo file get --webUrl $siteUrl --url $docServerRelativeUrl --asFile --path $targetFilePath
+    m365 spo file get --webUrl $siteUrl --url $docServerRelativeUrl --asFile --path $targetFilePath
     Write-Host "File downloaded: " $docServerRelativeUrl
 
     $table.Cell($rowNumber, 1).Range.Text = $spolImage.Name

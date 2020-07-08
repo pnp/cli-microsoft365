@@ -41,7 +41,7 @@ Option|Description
 Running this command from the Windows Command Shell (cmd.exe) or PowerShell for Windows OS XP, 7, 8, 8.1 without bash installed might require additional formatting for command options that have JSON, XML or JavaScript values because the command shell treat quotes differently. For example, this is how ApplicationCustomizer user custom action can be created from the Windows cmd.exe:
 
 ```sh
-o365 spo customaction add -u https://contoso.sharepoint.com/sites/test -t "YourAppCustomizer" -n "YourName" -l "ClientSideExtension.ApplicationCustomizer" -c b41916e7-e69d-467f-b37f-ff8ecf8f99f2 -p '{\"testMessage\":\"Test message\"}'
+m365 spo customaction add -u https://contoso.sharepoint.com/sites/test -t "YourAppCustomizer" -n "YourName" -l "ClientSideExtension.ApplicationCustomizer" -c b41916e7-e69d-467f-b37f-ff8ecf8f99f2 -p '{\"testMessage\":\"Test message\"}'
 ```
 
 Note, how the clientSideComponentProperties option (-p) has escaped double quotes `'{\"testMessage\":\"Test message\"}'` compared to execution from bash `'{"testMessage":"Test message"}'`.
@@ -71,7 +71,7 @@ spo customaction add -u https://contoso.sharepoint.com/sites/test -t "YourTitle"
 Creates custom action in **classic** Document Library edit context menu in site _https://contoso.sharepoint.com/sites/test_
 
 ```sh
-spo customaction add -u https://contoso.sharepoint.com/sites/test -t "YourTitle" -n "YourName" -l "EditControlBlock" --actionUrl "javascript:(function(){ return console.log('office365-cli rocks!'); })();" --registrationId 101 --registrationType List
+spo customaction add -u https://contoso.sharepoint.com/sites/test -t "YourTitle" -n "YourName" -l "EditControlBlock" --actionUrl "javascript:(function(){ return console.log('CLI for Microsoft 365 rocks!'); })();" --registrationId 101 --registrationType List
 ```
 
 Creates ScriptLink custom action with script source in **classic pages** in site collection _https://contoso.sharepoint.com/sites/test_
@@ -83,7 +83,7 @@ spo customaction add -u https://contoso.sharepoint.com/sites/test -t "YourTitle"
 Creates ScriptLink custom action with script block in **classic pages** in site _https://contoso.sharepoint.com/sites/test_
 
 ```sh
-spo customaction add -u https://contoso.sharepoint.com/sites/test -t "YourTitle" -n "YourName" -l "ScriptLink" --scriptBlock "(function(){ return console.log('Hello office365-cli!'); })();" --sequence 102
+spo customaction add -u https://contoso.sharepoint.com/sites/test -t "YourTitle" -n "YourName" -l "ScriptLink" --scriptBlock "(function(){ return console.log('Hello CLI for Microsoft 365!'); })();" --sequence 102
 ```
 
 Creates **classic List View** custom action located in the Ribbon in site _https://contoso.sharepoint.com/sites/test_

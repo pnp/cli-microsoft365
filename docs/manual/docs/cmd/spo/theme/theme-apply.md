@@ -26,7 +26,7 @@ Option|Description
 
 ## Remarks
 
-Following standard SharePoint themes are supported by the Office 365 CLI: Blue, Orange, Red, Purple, Green, Gray, Dark Yellow and Dark Blue.
+Following standard SharePoint themes are supported by the CLI for Microsoft 365: Blue, Orange, Red, Purple, Green, Gray, Dark Yellow and Dark Blue.
 
 ## Examples
 

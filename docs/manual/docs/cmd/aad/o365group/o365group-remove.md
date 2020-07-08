@@ -1,6 +1,6 @@
 # aad o365group remove
 
-Removes an Office 365 Group
+Removes an Microsoft 365 Group
 
 ## Usage
 
@@ -13,7 +13,7 @@ aad o365group remove [options]
 Option|Description
 ------|-----------
 `--help`|output usage information
-`-i, --id <id>`|The ID of the Office 365 Group to remove
+`-i, --id <id>`|The ID of the Microsoft 365 Group to remove
 `--confirm`|Don't prompt for confirming removing the group
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json,text`. Default `text`

@@ -1,6 +1,6 @@
 # spo cdn set
 
-Enable or disable the specified Office 365 CDN
+Enable or disable the specified Microsoft 365 CDN
 
 ## Usage
 
@@ -34,31 +34,31 @@ Using the `--noDefaultOrigins` option you can specify to skip the creation of th
 
 ## Examples
 
-Enable the Office 365 Public CDN on the current tenant
+Enable the Microsoft 365 Public CDN on the current tenant
 
 ```sh
 spo cdn set -t Public -e true
 ```
 
-Disable the Office 365 Public CDN on the current tenant
+Disable the Microsoft 365 Public CDN on the current tenant
 
 ```sh
 spo cdn set -t Public -e false
 ```
 
-Enable the Office 365 Private CDN on the current tenant
+Enable the Microsoft 365 Private CDN on the current tenant
 
 ```sh
 spo cdn set -t Private -e true
 ```
 
-Enable the Office 365 Private and Public CDN on the current tenant with default origins
+Enable the Microsoft 365 Private and Public CDN on the current tenant with default origins
 
 ```sh
 spo cdn set -t Both -e true
 ```
 
-Enable the Office 365 Private and Public CDN on the current tenant without default origins
+Enable the Microsoft 365 Private and Public CDN on the current tenant without default origins
 
 ```sh
 spo cdn set -t Both -e true --noDefaultOrigins
@@ -66,4 +66,4 @@ spo cdn set -t Both -e true --noDefaultOrigins
 
 ## More information
 
-- General availability of Office 365 CDN: [https://dev.office.com/blogs/general-availability-of-office-365-cdn](https://dev.office.com/blogs/general-availability-of-office-365-cdn)
+- General availability of Microsoft 365 CDN: [https://dev.office.com/blogs/general-availability-of-office-365-cdn](https://dev.office.com/blogs/general-availability-of-office-365-cdn)

@@ -5,31 +5,31 @@ Author: [Garry Trinder](https://github.com/garrytrinder)
 Installs or updates a Microsoft Teams app from an Azure DevOps pipeline. Deploys the app if it hasn't been deployed yet or updates the existing package if it's been previously deployed.
 
 ```powershell tab="PowerShell Core"
-o365 login -t password -u $(username) -p $(password)
+m365 login -t password -u $(username) -p $(password)
 
-$apps = o365 teams app list -o json | ConvertFrom-Json
+$apps = m365 teams app list -o json | ConvertFrom-Json
 $app = $apps | Where-Object { $_.externalId -eq $env:APPID}
 if ($app -eq $null) {
   # install app
-  o365 teams app publish -p  $(System.DefaultWorkingDirectory)/teams-app-CI/package/teams-app.zip
+  m365 teams app publish -p  $(System.DefaultWorkingDirectory)/teams-app-CI/package/teams-app.zip
 } else {
   # update app
-  o365 teams app update -i $app.id -p $(System.DefaultWorkingDirectory)/teams-app-CI/package/teams-app.zip
+  m365 teams app update -i $app.id -p $(System.DefaultWorkingDirectory)/teams-app-CI/package/teams-app.zip
 }
 ```
 
 ```bash tab="Bash"
-o365 login -t password -u $(username) -p $(password)
+m365 login -t password -u $(username) -p $(password)
 
-app=$(o365 teams app list -o json | jq '.[] | select(.externalId == "'"$APPID"'")')
+app=$(m365 teams app list -o json | jq '.[] | select(.externalId == "'"$APPID"'")')
 
 if [ -z "$app" ]; then
   # install app
-  o365 teams app publish -p "$(System.DefaultWorkingDirectory)/teams-app-CI/package/teams-app.zip"
+  m365 teams app publish -p "$(System.DefaultWorkingDirectory)/teams-app-CI/package/teams-app.zip"
 else
   # update app
   appId=$(echo $app | jq '.id')
-  o365 teams app update -i $appId -p "$(System.DefaultWorkingDirectory)/teams-app-CI/package/teams-app.zip"
+  m365 teams app update -i $appId -p "$(System.DefaultWorkingDirectory)/teams-app-CI/package/teams-app.zip"
 fi
 ```
 

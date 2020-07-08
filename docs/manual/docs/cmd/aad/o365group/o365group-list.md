@@ -1,6 +1,6 @@
 # aad o365group list
 
-Lists Office 365 Groups in the current tenant
+Lists Microsoft 365 Groups in the current tenant
 
 ## Usage
 
@@ -25,52 +25,52 @@ Option|Description
 
 ## Remarks
 
-Using the `--includeSiteUrl` option, you can retrieve the URL of the site associated with the particular Office 365 Group. If you however retrieve too many groups and will try to get their site URLs, you will most likely get an error as the command will get throttled, issuing too many requests, too frequently. If you get an error, consider narrowing down the result set using the `--displayName` and `--mailNickname` filters.
+Using the `--includeSiteUrl` option, you can retrieve the URL of the site associated with the particular Microsoft 365 Group. If you however retrieve too many groups and will try to get their site URLs, you will most likely get an error as the command will get throttled, issuing too many requests, too frequently. If you get an error, consider narrowing down the result set using the `--displayName` and `--mailNickname` filters.
 
-Retrieving the URL of the site associated with the particular Office 365 Group is not possible when retrieving deleted groups.
+Retrieving the URL of the site associated with the particular Microsoft 365 Group is not possible when retrieving deleted groups.
 
-Using the `--orphaned` option, you can retrieve Office 365 Groups without owners.
+Using the `--orphaned` option, you can retrieve Microsoft 365 Groups without owners.
 
 ## Examples
 
-List all Office 365 Groups in the tenant
+List all Microsoft 365 Groups in the tenant
 
 ```sh
 aad o365group list
 ```
 
-List Office 365 Groups with display name starting with _Project_
+List Microsoft 365 Groups with display name starting with _Project_
 
 ```sh
 aad o365group list --displayName Project
 ```
 
-List Office 365 Groups mail nick name starting with _team_
+List Microsoft 365 Groups mail nick name starting with _team_
 
 ```sh
 aad o365group list --mailNickname team
 ```
 
-List deleted Office 365 Groups with display name starting with _Project_
+List deleted Microsoft 365 Groups with display name starting with _Project_
 
 ```sh
 aad o365group list --displayName Project --deleted
 ```
 
-List deleted Office 365 Groups mail nick name starting with _team_
+List deleted Microsoft 365 Groups mail nick name starting with _team_
 
 ```sh
 aad o365group list --mailNickname team --deleted
 ```
 
-List Office 365 Groups with display name starting with _Project_ including
+List Microsoft 365 Groups with display name starting with _Project_ including
 the URL of the corresponding SharePoint site
 
 ```sh
 aad o365group list --displayName Project --includeSiteUrl
 ```
 
-List Office 365 Groups without owners
+List Microsoft 365 Groups without owners
 
 ```sh
 aad o365group list --orphaned

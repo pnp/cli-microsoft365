@@ -1,5 +1,5 @@
 {
-  "name": "@pnp/office365-cli",
+  "name": "@pnp/cli-microsoft365",
   "version": "3.0.0",
   "lockfileVersion": 1,
   "requires": true,

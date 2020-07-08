@@ -23,14 +23,14 @@ Option|Description
 
 ## Remarks
 
-This commands updates the list of commands and their options used by command completion in Clink (cmder). You should run this command each time after upgrading the Office 365 CLI.
+This commands updates the list of commands and their options used by command completion in Clink (cmder). You should run this command each time after upgrading the CLI for Microsoft 365.
 
 ## Examples
 
-Write the list of commands for Clink (cmder) command completion to a file named `o365.lua` in the current directory
+Write the list of commands for Clink (cmder) command completion to a file named `m365.lua` in the current directory
 
 ```powershell
-cli completion clink update > o365.lua
+cli completion clink update > m365.lua
 ```
 
 ## More information

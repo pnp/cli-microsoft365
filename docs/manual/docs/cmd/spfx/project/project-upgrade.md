@@ -47,19 +47,19 @@ Get instructions to Upgrade the current SharePoint Framework project to SharePoi
 spfx project upgrade --toVersion 1.5.0
 ```
 
-Get instructions to upgrade the current SharePoint Framework project to the latest SharePoint Framework version supported by the Office 365 CLI using pnpm
+Get instructions to upgrade the current SharePoint Framework project to the latest SharePoint Framework version supported by the CLI for Microsoft 365 using pnpm
 
 ```sh
 spfx project upgrade --packageManager pnpm
 ```
 
-Get instructions to upgrade the current SharePoint Framework project to the latest SharePoint Framework version supported by the Office 365 CLI
+Get instructions to upgrade the current SharePoint Framework project to the latest SharePoint Framework version supported by the CLI for Microsoft 365
 
 ```sh
 spfx project upgrade
 ```
 
-Get instructions to upgrade the current SharePoint Framework project to the latest SharePoint Framework version supported by the Office 365 CLI using PowerShell
+Get instructions to upgrade the current SharePoint Framework project to the latest SharePoint Framework version supported by the CLI for Microsoft 365 using PowerShell
 
 ```sh
 spfx project upgrade --shell powershell

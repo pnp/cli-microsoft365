@@ -21,7 +21,7 @@ Option|Description
 
 ## Remarks
 
-This commands sets up command completion for the Office 365 CLI in PowerShell by registering a custom PowerShell argument completer in the specified profile. Because Office 365 CLI is not a native PowerShell module, it requires a custom completer to provide completion.
+This commands sets up command completion for the CLI for Microsoft 365 in PowerShell by registering a custom PowerShell argument completer in the specified profile. Because CLI for Microsoft 365 is not a native PowerShell module, it requires a custom completer to provide completion.
 
 If the specified profile path doesn't exist, the CLI will try to create it.
 

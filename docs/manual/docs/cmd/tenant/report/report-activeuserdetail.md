@@ -1,6 +1,6 @@
 # tenant report activeuserdetail
 
-Gets details about Office 365 active users
+Gets details about Microsoft 365 active users
 
 ## Usage
 
@@ -27,25 +27,25 @@ As this report is only available for the past 28 days, date parameter value shou
 
 ## Examples
 
-Gets details about Office 365 active users for the last week
+Gets details about Microsoft 365 active users for the last week
 
 ```sh
 tenant report activeuserdetail --period D7
 ```
 
-Gets details about Office 365 active users for May 1, 2019
+Gets details about Microsoft 365 active users for May 1, 2019
 
 ```sh
 tenant report activeuserdetail --date 2019-05-01
 ```
 
-Gets details about Office 365 active users for the last week and exports the report data in the specified path in text format
+Gets details about Microsoft 365 active users for the last week and exports the report data in the specified path in text format
 
 ```sh
 tenant report activeuserdetail --period D7 --output text --outputFile "activeuserdetail.txt"
 ```
 
-Gets details about Office 365 active users for the last week and exports the report data in the specified path in json format
+Gets details about Microsoft 365 active users for the last week and exports the report data in the specified path in json format
 
 ```sh
 tenant report activeuserdetail --period D7 --output json --outputFile "activeuserdetail.json"

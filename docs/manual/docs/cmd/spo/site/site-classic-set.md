@@ -49,7 +49,7 @@ For more information on locking classic sites see [https://technet.microsoft.com
 
 For more information on configuring no script sites see [https://support.office.com/en-us/article/Turn-scripting-capabilities-on-or-off-1f2c515f-5d7e-448a-9fd7-835da935584f](https://support.office.com/en-us/article/Turn-scripting-capabilities-on-or-off-1f2c515f-5d7e-448a-9fd7-835da935584f).
 
-Setting site properties is by default asynchronous and depending on the current state of Office 365, might take up to few minutes. If you're building a script with steps that require the site to be fully configured, you should use the `--wait` flag. When using this flag, the `spo site classic set` command will keep running until it received confirmation from Office 365 that the site has been fully configured.
+Setting site properties is by default asynchronous and depending on the current state of Microsoft 365, might take up to few minutes. If you're building a script with steps that require the site to be fully configured, you should use the `--wait` flag. When using this flag, the `spo site classic set` command will keep running until it received confirmation from Microsoft 365 that the site has been fully configured.
 
 ## Examples
 

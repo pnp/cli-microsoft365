@@ -1,6 +1,6 @@
 # status
 
-Shows Office 365 login status
+Shows Microsoft 365 login status
 
 ## Usage
 
@@ -20,11 +20,11 @@ Option|Description
 
 ## Remarks
 
-If you are logged in to Office 365, the `status` command will show you information about the user or application name used to sign in and the details about the stored refresh and access tokens and their expiration date and time when run in debug mode.
+If you are logged in to Microsoft 365, the `status` command will show you information about the user or application name used to sign in and the details about the stored refresh and access tokens and their expiration date and time when run in debug mode.
 
 ## Examples
 
-Show the information about the current login to the Office 365
+Show the information about the current login to the Microsoft 365
 
 ```sh
 status

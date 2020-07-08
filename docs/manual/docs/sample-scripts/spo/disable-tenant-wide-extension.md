@@ -10,13 +10,13 @@ Note: TenantWideExtensionDisabled column denotes the extension is enabled or dis
 $extensionName = Read-Host "Enter the Extension Name"
 $listName = "Tenant Wide Extensions"
 
-$appCatalogUrl = o365 spo tenant appcatalogurl get
+$appCatalogUrl = m365 spo tenant appcatalogurl get
 $filterQuery = "Title eq '" + $extensionName + "'"
-$appItems = o365 spo listitem list --title $listName --webUrl $appCatalogUrl --fields "Id,Title" --filter $filterQuery --output json
+$appItems = m365 spo listitem list --title $listName --webUrl $appCatalogUrl --fields "Id,Title" --filter $filterQuery --output json
 $extItems = $appItems.Replace("Id", "ExtId") | ConvertFrom-JSON
 
 if ($extItems.count -gt 0) {
-  o365 spo listitem set --listTitle $listName --id $extItems.ExtId --webUrl $appCatalogUrl --TenantWideExtensionDisabled "true" >$null 2>&1
+  m365 spo listitem set --listTitle $listName --id $extItems.ExtId --webUrl $appCatalogUrl --TenantWideExtensionDisabled "true" >$null 2>&1
   Write-Host("Extension disabled.");
 }
 else {
@@ -32,14 +32,14 @@ else {
 echo "Enter the extension name to disable: "; read extensionName;
 listName="Tenant Wide Extensions";
 
-appCatalogUrl=$(o365 spo tenant appcatalogurl get)
+appCatalogUrl=$(m365 spo tenant appcatalogurl get)
 filterQuery="Title eq '$extensionName'"
-appItemsJson=$(o365 spo listitem list --title "$listName" --webUrl "$appCatalogUrl" --fields "Id,Title" --filter "$filterQuery" --output json)
+appItemsJson=$(m365 spo listitem list --title "$listName" --webUrl "$appCatalogUrl" --fields "Id,Title" --filter "$filterQuery" --output json)
 appItemId=( $(jq -r '.[].Id' <<< $appItemsJson))
 
 if [[ $appItemId -gt 0 ]]
 then
- o365 spo listitem set --listTitle "$listName" --id "$appItemId" --webUrl "$appCatalogUrl" --TenantWideExtensionDisabled "true" >/dev/null 2>&1
+ m365 spo listitem set --listTitle "$listName" --id "$appItemId" --webUrl "$appCatalogUrl" --TenantWideExtensionDisabled "true" >/dev/null 2>&1
  echo "Extension disabled."
 else
   echo "No extensions found with the name '$extensionName'."

@@ -1,6 +1,6 @@
 # spo cdn get
 
-View current status of the specified Office 365 CDN
+View current status of the specified Microsoft 365 CDN
 
 ## Usage
 
@@ -42,4 +42,4 @@ spo cdn get -t Private
 
 ## More information
 
-- General availability of Office 365 CDN: [https://dev.office.com/blogs/general-availability-of-office-365-cdn](https://dev.office.com/blogs/general-availability-of-office-365-cdn)
+- General availability of Microsoft 365 CDN: [https://dev.office.com/blogs/general-availability-of-office-365-cdn](https://dev.office.com/blogs/general-availability-of-office-365-cdn)

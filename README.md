@@ -1,53 +1,53 @@
-<img src="./docs/manual/docs/images/pnp-office365-cli-blue.svg" alt="Office 365 CLI" height=78 />
+<img src="./docs/manual/docs/images/pnp-cli-microsoft365-blue.svg" alt="CLI for Microsoft 365" height=78 />
 
 @latest/@next (master) |
 :--------------: |
 [![CircleCI](https://circleci.com/gh/pnp/office365-cli/tree/master.svg?style=shield&circle-token=ce99e8046a231e1959248a61e7e32f9ae1abc8cf)](https://circleci.com/gh/pnp/office365-cli/tree/master)|
 [![Coverage Status](https://coveralls.io/repos/github/pnp/office365-cli/badge.svg?branch=master)](https://coveralls.io/github/pnp/office365-cli?branch=master)|
 
-# Office 365 CLI
+# CLI for Microsoft 365
 
-Using the Office 365 CLI, you can manage your Microsoft Office 365 tenant and SharePoint Framework projects on any platform. No matter if you are on Windows, macOS or Linux, using Bash, Cmder or PowerShell, using the Office 365 CLI you can configure Office 365, manage SharePoint Framework projects and build automation scripts.
+Using the CLI for Microsoft 365, you can manage your Microsoft 365 tenant and SharePoint Framework projects on any platform. No matter if you are on Windows, macOS or Linux, using Bash, Cmder or PowerShell, using the CLI for Microsoft 365 you can configure Microsoft 365, manage SharePoint Framework projects and build automation scripts.
 
-[![asciicast](https://asciinema.org/a/265151.png)](https://asciinema.org/a/265151)
+[![asciicast](https://asciinema.org/a/346365.png)](https://asciinema.org/a/346365)
 
 ## Installation
 
-The Office 365 CLI is distributed as an NPM package. To use it, install it globally using:
+The CLI for Microsoft 365 is distributed as an NPM package. To use it, install it globally using:
 
 ```sh
-npm i -g @pnp/office365-cli
+npm i -g @pnp/cli-microsoft365
 ```
 
 or using yarn:
 
 ```sh
-yarn global add @pnp/office365-cli
+yarn global add @pnp/cli-microsoft365
 ```
 
-The beta version of the Office 365 CLI can be installed by using the `@next` tag:
+The beta version of the CLI for Microsoft 365 can be installed by using the `@next` tag:
 
 ```sh
-npm i -g @pnp/office365-cli@next
+npm i -g @pnp/cli-microsoft365@next
 ```
 
 ## Getting started
 
-Start managing the settings of your Office 365 tenant by logging in to it, using the `login` command, for example:
+Start managing the settings of your Microsoft 365 tenant by logging in to it, using the `login` command, for example:
 
 ```sh
-o365 login
+m365 login
 ```
 
-> Office 365 CLI will automatically detect the URL of your tenant based on the account that you use to sign in.
+> CLI for Microsoft 365 will automatically detect the URL of your tenant based on the account that you use to sign in.
 
-To list all available commands, type in the Office 365 CLI prompt `help`:
+To list all available commands, type in the CLI for Microsoft 365 prompt `help`:
 
 ```sh
-o365 help
+m365 help
 ```
 
-See the [User Guide](docs/manual/docs/user-guide/installing-cli.md) to learn more about the Office 365 CLI and its capabilities.
+See the [User Guide](docs/manual/docs/user-guide/installing-cli.md) to learn more about the CLI for Microsoft 365 and its capabilities.
 
 ## Sharing is Caring
 

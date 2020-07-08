@@ -23,7 +23,7 @@ Option|Description
 ## Remarks
 
 !!! attention
-    In order to use this command, you need to grant the Azure AD application used by the Office 365 CLI the permission to the Yammer API. To do this, execute the `cli consent --service yammer` command.
+    In order to use this command, you need to grant the Azure AD application used by the CLI for Microsoft 365 the permission to the Yammer API. To do this, execute the `cli consent --service yammer` command.
 
 All operations return a single user object. Operations executed with the `email` parameter return an array of user objects.
 

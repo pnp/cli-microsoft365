@@ -6,7 +6,7 @@ Have you been creating a lot of beautiful themes lately and testing them in your
 
 ```powershell tab="PowerShell Core"
 $sparksjoy = "Cat Lovers United", "Multicolored theme"
-$themes = o365 spo theme list -o json | ConvertFrom-Json
+$themes = m365 spo theme list -o json | ConvertFrom-Json
 $themes = $themes | where {-not ($sparksjoy -contains $_.name)}
 $themes | Format-Table name
 if ($themes.Count -eq 0) { break }
@@ -17,7 +17,7 @@ foreach ($theme in $themes)
 {
   $progress++
   write-host $progress / $total":" $theme.name
-  o365 spo theme remove --name "$($theme.name)" --confirm
+  m365 spo theme remove --name "$($theme.name)" --confirm
 }
 ```
 
@@ -39,7 +39,7 @@ while read theme; do
   if [ "$exists" = false ]; then
     themestoremove+=("$theme")
   fi
-done < <(o365 spo theme list -o json | jq -r '.[].name')
+done < <(m365 spo theme list -o json | jq -r '.[].name')
 
 if [ ${#themestoremove[@]} = 0 ]; then
   exit 1
@@ -51,7 +51,7 @@ read foo
 
 for theme in "${themestoremove[@]}"; do
   echo "Deleting $theme..."
-  o365 spo theme remove --name "$theme" --confirm
+  m365 spo theme remove --name "$theme" --confirm
 done
 ```
 

@@ -46,9 +46,9 @@ Closes #
 >
 > For example, a pull request for adding 'teams tab add' command, would include...
 >
-> - src/o365/teams/commands.ts
-> - src/o365/teams/commands/tab/teams-tab-add.ts
-> - src/o365/teams/commands/tab/teams-tab-add.spec.ts
+> - src/m365/teams/commands.ts
+> - src/m365/teams/commands/tab/teams-tab-add.ts
+> - src/m365/teams/commands/tab/teams-tab-add.spec.ts
 > - docs/manual/mkdocs.yml
 > - docs/manual/docs/cmd/teams/tab/tab-add.md
 >

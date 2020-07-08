@@ -1,18 +1,18 @@
-# Scan for Office 365 Groups created with user's first or last name
+# Scan for Microsoft 365 Groups created with user's first or last name
 
 Author: [Joseph Velliah](https://sprider.blog/governance-scan-office-365-groups-created-with-user-first-or-last-name-using-office-365-cli-commands)
 
-We can use the group naming policy to enforce a consistent naming strategy for groups created by users in our organization. A naming policy can help us and our users identify the function of the group. We can use the policy to block specific words from being used in group names and aliases. But what if we need to find out the list of Office 365 groups created with user’s givenName or surname as their mail?
+We can use the group naming policy to enforce a consistent naming strategy for groups created by users in our organization. A naming policy can help us and our users identify the function of the group. We can use the policy to block specific words from being used in group names and aliases. But what if we need to find out the list of Microsoft 365 groups created with user’s givenName or surname as their mail?
 
-This sample script scans the Office 365 groups that may contain user’s first or last name as the group mail.
+This sample script scans the Microsoft 365 groups that may contain user’s first or last name as the group mail.
 
 Note: The filter condition can be changed as per your requirement.
 
 ```powershell tab="PowerShell Core"
 $groupsToFlag = @()
 
-$users = o365 aad user list --properties 'displayName,givenName,surname' -o json | ConvertFrom-Json
-$groups = o365 aad o365group list -o json | ConvertFrom-Json
+$users = m365 aad user list --properties 'displayName,givenName,surname' -o json | ConvertFrom-Json
+$groups = m365 aad o365group list -o json | ConvertFrom-Json
 
 foreach ($user in $users) {
   $userGivenName = $user.givenName
@@ -43,8 +43,8 @@ defaultIFS=$IFS
 IFS=$'\n'
 
 groupsToFlag=()
-users=`o365 aad user list --properties 'displayName,givenName,surname' -o json`
-groups=`o365 aad o365group list  -o json`
+users=`m365 aad user list --properties 'displayName,givenName,surname' -o json`
+groups=`m365 aad o365group list  -o json`
 
 for user in `echo $users | jq -c '.[]'`; do
   userGivenName=`echo $user | jq -r '.givenName'`
@@ -76,5 +76,5 @@ exit 1
 
 Keywords:
 
-- Office 365 Group
+- Microsoft 365 Group
 - Governance

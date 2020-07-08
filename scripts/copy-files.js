@@ -25,21 +25,21 @@ const copyFile = (file, sourceDir, destinationDir) => {
   fs.copyFileSync(file, path.join(destinationFilePath, fileName));
 };
 
-const assetsDir = 'dist/o365/spfx/commands/project/project-upgrade/assets';
+const assetsDir = 'dist/m365/spfx/commands/project/project-upgrade/assets';
 mkdirNotExistsSync(assetsDir);
-fs.copyFileSync('src/o365/spfx/commands/project/project-upgrade/assets/tab20x20.png', path.join(assetsDir, 'tab20x20.png'));
-fs.copyFileSync('src/o365/spfx/commands/project/project-upgrade/assets/tab96x96.png', path.join(assetsDir, 'tab96x96.png'));
+fs.copyFileSync('src/m365/spfx/commands/project/project-upgrade/assets/tab20x20.png', path.join(assetsDir, 'tab20x20.png'));
+fs.copyFileSync('src/m365/spfx/commands/project/project-upgrade/assets/tab96x96.png', path.join(assetsDir, 'tab96x96.png'));
 
-const paPcfInitAssetsSourceDir = 'src/o365/pa/commands/pcf/pcf-init/assets';
-const paPcfInitCmdDir = 'dist/o365/pa/commands/pcf/pcf-init';
-const paPcfInitAssetsDir = 'dist/o365/pa/commands/pcf/pcf-init/assets';
+const paPcfInitAssetsSourceDir = 'src/m365/pa/commands/pcf/pcf-init/assets';
+const paPcfInitCmdDir = 'dist/m365/pa/commands/pcf/pcf-init';
+const paPcfInitAssetsDir = 'dist/m365/pa/commands/pcf/pcf-init/assets';
 mkdirNotExistsSync(paPcfInitCmdDir);
 mkdirNotExistsSync(paPcfInitAssetsDir);
 getFilePaths(paPcfInitAssetsSourceDir).forEach(file => copyFile(file, paPcfInitAssetsSourceDir, paPcfInitAssetsDir));
 
-const paSolutionInitAssetsSourceDir = 'src/o365/pa/commands/solution/solution-init/assets';
-const paSolutionInitCmdDir = 'dist/o365/pa/commands/solution/solution-init';
-const paSolutionInitAssetsDir = 'dist/o365/pa/commands/solution/solution-init/assets';
+const paSolutionInitAssetsSourceDir = 'src/m365/pa/commands/solution/solution-init/assets';
+const paSolutionInitCmdDir = 'dist/m365/pa/commands/solution/solution-init';
+const paSolutionInitAssetsDir = 'dist/m365/pa/commands/solution/solution-init/assets';
 mkdirNotExistsSync(paSolutionInitCmdDir);
 mkdirNotExistsSync(paSolutionInitAssetsDir);
 getFilePaths(paSolutionInitAssetsSourceDir).forEach(file => copyFile(file, paSolutionInitAssetsSourceDir, paSolutionInitAssetsDir));

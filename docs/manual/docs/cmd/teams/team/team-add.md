@@ -27,7 +27,7 @@ Option|Description
 !!! attention
     This command is based on an API that is currently in preview and is subject to change once the API reached general availability.
 
-If you want to add a Team to an existing Office 365 Group use the [aad o365group teamify](../../aad/o365group/o365group-teamify.md) command instead.
+If you want to add a Team to an existing Microsoft 365 Group use the [aad o365group teamify](../../aad/o365group/o365group-teamify.md) command instead.
 
 This command will return different responses based on the presence of the `--wait` option. If present, the command will return a `group` resource in the response. If not present, the command will return a `teamsAsyncOperation` resource in the response.
 

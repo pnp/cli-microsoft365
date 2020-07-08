@@ -1,6 +1,6 @@
 # aad o365group restore
 
-Restores a deleted Office 365 Group
+Restores a deleted Microsoft 365 Group
 
 ## Usage
 
@@ -13,7 +13,7 @@ aad o365group restore [options]
 Option|Description
 ------|-----------
 `--help`|output usage information
-`-i, --id <id>`|The ID of the Office 365 Group to restore
+`-i, --id <id>`|The ID of the Microsoft 365 Group to restore
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json,text`. Default `text`
 `--verbose`|Runs command with verbose logging
@@ -21,7 +21,7 @@ Option|Description
 
 ## Examples
 
-Restores the Office 365 Group with id _28beab62-7540-4db1-a23f-29a6018a3848_
+Restores the Microsoft 365 Group with id _28beab62-7540-4db1-a23f-29a6018a3848_
 
 ```sh
 aad o365group restore --id 28beab62-7540-4db1-a23f-29a6018a3848

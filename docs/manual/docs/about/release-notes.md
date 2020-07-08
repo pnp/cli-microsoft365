@@ -121,7 +121,7 @@
 - added managed identity authentication [#1314](https://github.com/pnp/office365-cli/issues/1314)
 - fixed 'teams team add' command [#1497](https://github.com/pnp/office365-cli/issues/1497)
 - extended 'spo site set' with additional options [#1478](https://github.com/pnp/office365-cli/issues/1478)
-- added the 'Bulk add/remove users to Microsoft Teams and Office 365 Groups' sample script [#1540](https://github.com/pnp/office365-cli/issues/1540)
+- added the 'Bulk add/remove users to Microsoft Teams and Microsoft 365 Groups' sample script [#1540](https://github.com/pnp/office365-cli/issues/1540)
 - updates the 'cli consent' command references [#1542](https://github.com/pnp/office365-cli/issues/1542)
 - fixed 'aad user list' command [#1553](https://github.com/pnp/office365-cli/issues/1553)
 - ensured all global options are ignored in request bodies [#1563](https://github.com/pnp/office365-cli/issues/1563)
@@ -158,9 +158,9 @@
 
 - [teams tab remove](../cmd/teams/tab/tab-remove.md) - removes a tab from the specified channel [#1449](https://github.com/pnp/office365-cli/issues/1449)
 
-**Office 365:**
+**Microsoft 365:**
 
-- [tenant status list](../cmd/tenant/status/status-list.md) - gets health status of the different services in Office 365 [#1272](https://github.com/pnp/office365-cli/issues/1272)
+- [tenant status list](../cmd/tenant/status/status-list.md) - gets health status of the different services in Microsoft 365 [#1272](https://github.com/pnp/office365-cli/issues/1272)
 
 **SharePoint:**
 
@@ -179,7 +179,7 @@
 
 ### Changes
 
-- added 'Scan Office 365 Groups created with User's First or Last Name' sample [#1342](https://github.com/pnp/office365-cli/issues/1342)
+- added 'Scan Microsoft 365 Groups created with User's First or Last Name' sample [#1342](https://github.com/pnp/office365-cli/issues/1342)
 - extended `tenant id get` with retrieving the ID of the current tenant [#1378](https://github.com/pnp/office365-cli/issues/1378)
 - changed communicating no need to upgrade spfx project as a non-error [#1407](https://github.com/pnp/office365-cli/issues/1407)
 - moved the 'consent' command to the 'cli' namespace [#1336](https://github.com/pnp/office365-cli/issues/1336)
@@ -202,9 +202,9 @@
 
 - [graph subscription add](../cmd/graph/subscription/subscription-add.md) - creates a Microsoft Graph subscription [#1100](https://github.com/pnp/office365-cli/issues/1100)
 
-**Office 365:**
+**Microsoft 365:**
 
-- [tenant report activeuserdetail](../cmd/tenant/report/report-activeuserdetail.md) - gets details about Office 365 active users [#1300](https://github.com/pnp/office365-cli/issues/1300)
+- [tenant report activeuserdetail](../cmd/tenant/report/report-activeuserdetail.md) - gets details about Microsoft 365 active users [#1300](https://github.com/pnp/office365-cli/issues/1300)
 - [tenant report servicesusercounts](../cmd/tenant/report/report-servicesusercounts.md) - gets the count of users by activity type and service [#1299](https://github.com/pnp/office365-cli/issues/1299)
 
 **SharePoint:**
@@ -228,7 +228,7 @@
 ### Changes
 
 - added 'Add App Catalog to SharePoint site' sample [#1413](https://github.com/pnp/office365-cli/pull/1413)
-- added 'Delete all Office 365 groups' sample [#1140](https://github.com/pnp/office365-cli/issues/1140)
+- added 'Delete all Microsoft 365 groups' sample [#1140](https://github.com/pnp/office365-cli/issues/1140)
 - added 'Delete custom SharePoint site scripts' sample [#1139](https://github.com/pnp/office365-cli/issues/1139)
 - added 'Hide SharePoint list from Site Contents' sample [#1413](https://github.com/pnp/office365-cli/pull/1413)
 - extended team channel name validation to allow 'tacv2'. [#1401](https://github.com/pnp/office365-cli/issues/1401)
@@ -240,13 +240,13 @@
 **Azure Active Directory:**
 
 - [aad approleassignment list](../cmd/aad/approleassignment/approleassignment-list.md) - lists app role assignments for the specified application registration [#1270](https://github.com/pnp/office365-cli/issues/1270)
-- [aad o365group report activityfilecounts](../cmd/aad/o365group/o365group-report-activityfilecounts.md) - get the total number of files and how many of them were active across all group sites associated with an Office 365 Group [#1285](https://github.com/pnp/office365-cli/issues/1285)
+- [aad o365group report activityfilecounts](../cmd/aad/o365group/o365group-report-activityfilecounts.md) - get the total number of files and how many of them were active across all group sites associated with an Microsoft 365 Group [#1285](https://github.com/pnp/office365-cli/issues/1285)
 
 **Microsoft Graph:**
 
 - [graph schemaextension set](../cmd/graph/schemaextension/schemaextension-set.md) - updates a Microsoft Graph schema extension [#15](https://github.com/pnp/office365-cli/issues/15)
 
-**Office 365:**
+**Microsoft 365:**
 
 - [tenant report activeusercounts](../cmd/tenant/report/report-activeusercounts.md) - gets the count of daily active users in the reporting period by product [#1298](https://github.com/pnp/office365-cli/issues/1298)
 
@@ -402,7 +402,7 @@
 
 **Azure Active Directory:**
 
-- [aad o365group report activitydetail](../cmd/aad/o365group/o365group-report-activitydetail.md) - get details about Office 365 Groups activity by group [#1130](https://github.com/pnp/office365-cli/issues/1130)
+- [aad o365group report activitydetail](../cmd/aad/o365group/o365group-report-activitydetail.md) - get details about Microsoft 365 Groups activity by group [#1130](https://github.com/pnp/office365-cli/issues/1130)
 - [aad o365group report activitycounts](../cmd/aad/o365group/o365group-report-activitycounts.md) - get the number of group activities across group workloads [#1159](https://github.com/pnp/office365-cli/issues/1159)
 - [aad o365group report activitygroupcounts](../cmd/aad/o365group/o365group-report-activitygroupcounts.md) - get the daily total number of groups and how many of them were active based on email conversations, Yammer posts, and SharePoint file activities [#1160](https://github.com/pnp/office365-cli/issues/1160)
 
@@ -498,9 +498,9 @@
 - [flow disable](../cmd/flow/flow-disable.md) - disables Microsoft Flow [#1055](https://github.com/pnp/office365-cli/issues/1055)
 - [flow enable](../cmd/flow/flow-enable.md) - enables Microsoft Flow [#1054](https://github.com/pnp/office365-cli/issues/1054)
 
-**Office 365 groups:**
+**Microsoft 365 groups:**
 
-- [aad o365group teamify](../cmd/aad/o365group/o365group-teamify.md) - creates a new Microsoft Teams team under existing Office 365 group [#872](https://github.com/pnp/office365-cli/issues/872)
+- [aad o365group teamify](../cmd/aad/o365group/o365group-teamify.md) - creates a new Microsoft Teams team under existing Microsoft 365 group [#872](https://github.com/pnp/office365-cli/issues/872)
 
 **Microsoft Graph:**
 
@@ -532,14 +532,14 @@
 
 **Microsoft Graph:**
 
-- [graph o365group user set](../cmd/aad/o365group/o365group-user-set.md) - updates role of the specified user in the specified Office 365 Group or Microsoft Teams team [#982](https://github.com/pnp/office365-cli/issues/982)
+- [graph o365group user set](../cmd/aad/o365group/o365group-user-set.md) - updates role of the specified user in the specified Microsoft 365 Group or Microsoft Teams team [#982](https://github.com/pnp/office365-cli/issues/982)
 - [graph planner task list](../cmd/planner/task/task-list.md) - lists Planner tasks for the currently logged in user [#990](https://github.com/pnp/office365-cli/issues/990)
 - [graph report teamsdeviceusageuserdetail](../cmd/teams/report/report-deviceusageuserdetail.md) - gets information about Microsoft Teams device usage by user [#960](https://github.com/pnp/office365-cli/issues/960)
 - [graph teams funsettings set](../cmd/teams/funsettings/funsettings-set.md) - updates fun settings of a Microsoft Teams team [#817](https://github.com/pnp/office365-cli/issues/817)
 
-**Office 365:**
+**Microsoft 365:**
 
-- [tenant id get](../cmd/tenant/id/id-get.md) - gets Office 365 tenant ID for the specified domain [#998](https://github.com/pnp/office365-cli/issues/998)
+- [tenant id get](../cmd/tenant/id/id-get.md) - gets Microsoft 365 tenant ID for the specified domain [#998](https://github.com/pnp/office365-cli/issues/998)
 
 ### Changes
 
@@ -574,7 +574,7 @@
 
 **Microsoft Graph:**
 
-- [graph o365group user list](../cmd/aad/o365group/o365group-user-list.md) - lists users for the specified Office 365 group or Microsoft Teams team [#802](https://github.com/pnp/office365-cli/issues/802)
+- [graph o365group user list](../cmd/aad/o365group/o365group-user-list.md) - lists users for the specified Microsoft 365 group or Microsoft Teams team [#802](https://github.com/pnp/office365-cli/issues/802)
 - [graph teams clone](../cmd/teams/team/team-clone.md) - creates a clone of a Microsoft Teams team [#924](https://github.com/pnp/office365-cli/issues/924)
 
 ### Changes
@@ -598,8 +598,8 @@
 
 **Microsoft Graph:**
 
-- [graph o365group renew](../cmd/aad/o365group/o365group-renew.md) - renews Office 365 group's expiration [#870](https://github.com/pnp/office365-cli/issues/870)
-- [graph o365group user remove](../cmd/aad/o365group/o365group-user-remove.md) - removes the specified user from specified Office 365 Group or Microsoft Teams team [#846](https://github.com/pnp/office365-cli/issues/846)
+- [graph o365group renew](../cmd/aad/o365group/o365group-renew.md) - renews Microsoft 365 group's expiration [#870](https://github.com/pnp/office365-cli/issues/870)
+- [graph o365group user remove](../cmd/aad/o365group/o365group-user-remove.md) - removes the specified user from specified Microsoft 365 Group or Microsoft Teams team [#846](https://github.com/pnp/office365-cli/issues/846)
 
 ### Changes
 
@@ -644,7 +644,7 @@
 
 **Microsoft Graph:**
 
-- [graph o365group user add](../cmd/aad/o365group/o365group-user-add.md) - adds user to specified Office 365 Group or Microsoft Teams team [#847](https://github.com/pnp/office365-cli/issues/847)
+- [graph o365group user add](../cmd/aad/o365group/o365group-user-add.md) - adds user to specified Microsoft 365 Group or Microsoft Teams team [#847](https://github.com/pnp/office365-cli/issues/847)
 - [graph schemaextension add](../cmd/graph/schemaextension/schemaextension-add.md) - creates a Microsoft Graph schema extension [#13](https://github.com/pnp/office365-cli/issues/13)
 - [graph teams add](../cmd/teams/team/team-add.md) - adds a new Microsoft Teams team [#615](https://github.com/pnp/office365-cli/issues/615)
 - [graph teams app uninstall](../cmd/teams/app/app-uninstall.md) - uninstalls an app from a Microsoft Team team [#843](https://github.com/pnp/office365-cli/issues/843)
@@ -973,7 +973,7 @@
 - [spo folder remove](../cmd/spo/folder/folder-remove.md) - deletes the specified folder [#426](https://github.com/pnp/office365-cli/issues/426)
 - [spo hidedefaultthemes get](../cmd/spo/hidedefaultthemes/hidedefaultthemes-get.md) - gets the current value of the HideDefaultThemes setting [#341](https://github.com/pnp/office365-cli/issues/341)
 - [spo hidedefaultthemes set](../cmd/spo/hidedefaultthemes/hidedefaultthemes-set.md) - sets the value of the HideDefaultThemes setting [#342](https://github.com/pnp/office365-cli/issues/342)
-- [spo site o365group set](../cmd/spo/site/site-groupify.md) - connects site collection to an Office 365 Group [#431](https://github.com/pnp/office365-cli/issues/431)
+- [spo site o365group set](../cmd/spo/site/site-groupify.md) - connects site collection to an Microsoft 365 Group [#431](https://github.com/pnp/office365-cli/issues/431)
 - [spo theme apply](../cmd/spo/theme/theme-apply.md) - applies theme to the specified site [#343](https://github.com/pnp/office365-cli/issues/343)
 
 **Microsoft Graph:**
@@ -1038,8 +1038,8 @@
 
 **Microsoft Graph:**
 
-- [graph o365group remove](../cmd/aad/o365group/o365group-remove.md) - removes an Office 365 Group [#309](https://github.com/pnp/office365-cli/issues/309)
-- [graph o365group restore](../cmd/aad/o365group/o365group-restore.md) - restores a deleted Office 365 Group [#346](https://github.com/pnp/office365-cli/issues/346)
+- [graph o365group remove](../cmd/aad/o365group/o365group-remove.md) - removes an Microsoft 365 Group [#309](https://github.com/pnp/office365-cli/issues/309)
+- [graph o365group restore](../cmd/aad/o365group/o365group-restore.md) - restores a deleted Microsoft 365 Group [#346](https://github.com/pnp/office365-cli/issues/346)
 - [graph siteclassification get](../cmd/aad/siteclassification/siteclassification-get.md) - gets site classification configuration [#303](https://github.com/pnp/office365-cli/issues/303)
 
 **Azure Management Service:**
@@ -1056,17 +1056,17 @@
 
 **Microsoft Graph:**
 
-- [graph o365group list](../cmd/aad/o365group/o365group-list.md) - added support for listing deleted Office 365 Groups [#347](https://github.com/pnp/office365-cli/issues/347)
+- [graph o365group list](../cmd/aad/o365group/o365group-list.md) - added support for listing deleted Microsoft 365 Groups [#347](https://github.com/pnp/office365-cli/issues/347)
 
 ### Changes
 
-- fixed bug in retrieving Office 365 groups in immersive mode solving [#351](https://github.com/pnp/office365-cli/issues/351)
+- fixed bug in retrieving Microsoft 365 groups in immersive mode solving [#351](https://github.com/pnp/office365-cli/issues/351)
 
 ## [v1.0.0](https://github.com/pnp/office365-cli/releases/tag/v1.0.0)
 
 ### Breaking changes
 
-- switched to a custom Azure AD application for communicating with Office 365. After installing this version you have to reconnect to Office 365
+- switched to a custom Azure AD application for communicating with Microsoft 365. After installing this version you have to reconnect to Microsoft 365
 
 ### New commands
 
@@ -1093,10 +1093,10 @@
 - graph - log in to the Microsoft Graph [#10](https://github.com/pnp/office365-cli/issues/10)
 - graph - log out from the Microsoft Graph [#10](https://github.com/pnp/office365-cli/issues/10)
 - graph - shows Microsoft Graph login status [#10](https://github.com/pnp/office365-cli/issues/10)
-- [graph o365group add](../cmd/aad/o365group/o365group-add.md) - creates Office 365 Group [#308](https://github.com/pnp/office365-cli/issues/308)
-- [graph o365group get](../cmd/aad/o365group/o365group-get.md) - gets information about the specified Office 365 Group [#306](https://github.com/pnp/office365-cli/issues/306)
-- [graph o365group list](../cmd/aad/o365group/o365group-list.md) - lists Office 365 Groups in the current tenant [#305](https://github.com/pnp/office365-cli/issues/305)
-- [graph o365group set](../cmd/aad/o365group/o365group-set.md) - updates Office 365 Group properties [#307](https://github.com/pnp/office365-cli/issues/307)
+- [graph o365group add](../cmd/aad/o365group/o365group-add.md) - creates Microsoft 365 Group [#308](https://github.com/pnp/office365-cli/issues/308)
+- [graph o365group get](../cmd/aad/o365group/o365group-get.md) - gets information about the specified Microsoft 365 Group [#306](https://github.com/pnp/office365-cli/issues/306)
+- [graph o365group list](../cmd/aad/o365group/o365group-list.md) - lists Microsoft 365 Groups in the current tenant [#305](https://github.com/pnp/office365-cli/issues/305)
+- [graph o365group set](../cmd/aad/o365group/o365group-set.md) - updates Microsoft 365 Group properties [#307](https://github.com/pnp/office365-cli/issues/307)
 
 ### Changes
 
@@ -1246,13 +1246,13 @@ Initial release.
 
 **SharePoint Online:**
 
-- [spo cdn get](../cmd/spo/cdn/cdn-get.md) - get Office 365 CDN status
-- [spo cdn origin list](../cmd/spo/cdn/cdn-origin-list.md) - list Office 365 CDN origins
-- [spo cdn origin remove](../cmd/spo/cdn/cdn-origin-remove.md) - remove Office 365 CDN origin
-- [spo cdn origin add](../cmd/spo/cdn/cdn-origin-add.md) - add Office 365 CDN origin
-- [spo cdn policy list](../cmd/spo/cdn/cdn-policy-list.md) - list Office 365 CDN policies
-- [spo cdn policy set](../cmd/spo/cdn/cdn-policy-set.md) - set Office 365 CDN policy
-- [spo cdn set](../cmd/spo/cdn/cdn-set.md) - enable/disable Office 365 CDN
+- [spo cdn get](../cmd/spo/cdn/cdn-get.md) - get Microsoft 365 CDN status
+- [spo cdn origin list](../cmd/spo/cdn/cdn-origin-list.md) - list Microsoft 365 CDN origins
+- [spo cdn origin remove](../cmd/spo/cdn/cdn-origin-remove.md) - remove Microsoft 365 CDN origin
+- [spo cdn origin add](../cmd/spo/cdn/cdn-origin-add.md) - add Microsoft 365 CDN origin
+- [spo cdn policy list](../cmd/spo/cdn/cdn-policy-list.md) - list Microsoft 365 CDN policies
+- [spo cdn policy set](../cmd/spo/cdn/cdn-policy-set.md) - set Microsoft 365 CDN policy
+- [spo cdn set](../cmd/spo/cdn/cdn-set.md) - enable/disable Microsoft 365 CDN
 - spo login - log in to a SharePoint Online site
 - spo logout - log out from SharePoint
 - spo status - show SharePoint Online login status

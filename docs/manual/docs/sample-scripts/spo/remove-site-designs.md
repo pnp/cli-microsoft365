@@ -6,7 +6,7 @@ Site designs and especially site scripts can be something that ends up just hang
 
 ```powershell tab="PowerShell Core"
 $sparksjoy = "Cat Lovers United", "Multicolored theme"
-$sitedesigns = o365 spo sitedesign list -o json | ConvertFrom-Json
+$sitedesigns = m365 spo sitedesign list -o json | ConvertFrom-Json
 $sitedesigns = $sitedesigns | where {-not ($sparksjoy -contains $_.Title)}
 $sitedesigns | Format-Table Title, SiteScriptIds, Description
 if ($sitedesigns.Count -eq 0) { break }
@@ -17,7 +17,7 @@ foreach ($sitedesign in $sitedesigns)
 {
   $progress++
   write-host $progress / $total":" $sitedesign.Title
-  o365 spo sitedesign remove --id "$($sitedesign.Id)" --confirm
+  m365 spo sitedesign remove --id "$($sitedesign.Id)" --confirm
 }
 ```
 
@@ -40,7 +40,7 @@ while read sitedesign; do
   if [ "$exists" = false ]; then
     sitedesignstoremove+=("$sitedesign")
   fi
-done < <(o365 spo sitedesign list -o json | jq -r '.[].Title + ";" + .[].Id')
+done < <(m365 spo sitedesign list -o json | jq -r '.[].Title + ";" + .[].Id')
 
 if [ ${#sitedesignstoremove[@]} = 0 ]; then
   exit 1
@@ -53,7 +53,7 @@ read foo
 for sitedesign in "${sitedesignstoremove[@]}"; do
   designinfo=(${sitedesign//;/ })
   echo "Deleting ${designinfo[0]}..."
-  o365 spo sitedesign remove --id "${designinfo[1]}" --confirm
+  m365 spo sitedesign remove --id "${designinfo[1]}" --confirm
 done
 ```
 

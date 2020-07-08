@@ -1,6 +1,6 @@
 # cli reconsent
 
-Returns Azure AD URL to open in the browser to re-consent Office 365 CLI permissions
+Returns Azure AD URL to open in the browser to re-consent CLI for Microsoft 365 permissions
 
 ## Usage
 
@@ -20,7 +20,7 @@ Option|Description
 
 ## Examples
 
-Get the URL to open in the browser to re-consent Office 365 CLI permissions
+Get the URL to open in the browser to re-consent CLI for Microsoft 365 permissions
 
 ```sh
 cli reconsent
@@ -28,4 +28,4 @@ cli reconsent
 
 ## More information
 
-- Re-consent the PnP Office 365 Management Shell Azure AD application: [https://pnp.github.io/office365-cli/user-guide/connecting-office-365/#re-consent-the-pnp-office-365-management-shell-azure-ad-application](https://pnp.github.io/office365-cli/user-guide/connecting-office-365/#re-consent-the-pnp-office-365-management-shell-azure-ad-application)
+- Re-consent the PnP Microsoft 365 Management Shell Azure AD application: [https://pnp.github.io/office365-cli/user-guide/connecting-office-365/#re-consent-the-pnp-office-365-management-shell-azure-ad-application](https://pnp.github.io/office365-cli/user-guide/connecting-office-365/#re-consent-the-pnp-office-365-management-shell-azure-ad-application)

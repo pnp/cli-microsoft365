@@ -25,7 +25,7 @@ Option|Description
 
 ## Examples
 
-Get information about the Office 365 Tenant site classification
+Get information about the Microsoft 365 Tenant site classification
 
 ```sh
 aad siteclassification get

@@ -1,6 +1,6 @@
 # aad o365group teamify
 
-Creates a new Microsoft Teams team under existing Office 365 group
+Creates a new Microsoft Teams team under existing Microsoft 365 group
 
 ## Usage
 
@@ -13,7 +13,7 @@ aad o365group teamify [options]
 Option|Description
 ------|-----------
 `--help`|output usage information
-`-i, --groupId <groupId>`|The ID of the Office 365 Group to connect to Microsoft Teams
+`-i, --groupId <groupId>`|The ID of the Microsoft 365 Group to connect to Microsoft Teams
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json,text`. Default `text`
 `--verbose`|Runs command with verbose logging
@@ -26,7 +26,7 @@ Option|Description
 
 ## Examples
 
-Creates a new Microsoft Teams team under existing Office 365 group
+Creates a new Microsoft Teams team under existing Microsoft 365 group
 
 ```sh
 aad o365group teamify --groupId e3f60f99-0bad-481f-9e9f-ff0f572fbd03

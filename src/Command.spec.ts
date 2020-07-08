@@ -564,8 +564,8 @@ describe('Command', () => {
     });
     sinon.stub(process, 'exit');
     cmd.init(vorpal);
-    process.argv = ['node', 'o365', 'mock-command', '--option3', '00123'];
-    vorpal.parse(['node', 'o365', 'mock-command', '--option3', '00123']);
+    process.argv = ['node', 'm365', 'mock-command', '--option3', '00123'];
+    vorpal.parse(['node', 'm365', 'mock-command', '--option3', '00123']);
   });
 
   it('removes leading zeroes from known options that aren\'t a string', (done) => {
@@ -588,8 +588,8 @@ describe('Command', () => {
     });
     sinon.stub(process, 'exit');
     cmd.init(vorpal);
-    process.argv = ['node', 'o365', 'mock-command', '--option1', '00123'];
-    vorpal.parse(['node', 'o365', 'mock-command', '--option1', '00123']);
+    process.argv = ['node', 'm365', 'mock-command', '--option1', '00123'];
+    vorpal.parse(['node', 'm365', 'mock-command', '--option1', '00123']);
   });
 
   it('doesn\'t remove leading zeroes from known options that are a string', (done) => {
@@ -612,8 +612,8 @@ describe('Command', () => {
     });
     sinon.stub(process, 'exit');
     cmd.init(vorpal);
-    process.argv = ['node', 'o365', 'mock-command', '--option2', '00123'];
-    vorpal.parse(['node', 'o365', 'mock-command', '--option2', '00123']);
+    process.argv = ['node', 'm365', 'mock-command', '--option2', '00123'];
+    vorpal.parse(['node', 'm365', 'mock-command', '--option2', '00123']);
   });
 
   it('doesn\'t remove leading zeroes from unknown options where no types specified', (done) => {
@@ -636,8 +636,8 @@ describe('Command', () => {
     });
     sinon.stub(process, 'exit');
     cmd.init(vorpal);
-    process.argv = ['node', 'o365', 'mock-command', '--option1', '00123'];
-    vorpal.parse(['node', 'o365', 'mock-command', '--option1', '00123']);
+    process.argv = ['node', 'm365', 'mock-command', '--option1', '00123'];
+    vorpal.parse(['node', 'm365', 'mock-command', '--option1', '00123']);
   });
 
   it('removes leading zeroes from known options when the command doesn\'t support unknown options', (done) => {
@@ -660,8 +660,8 @@ describe('Command', () => {
     });
     sinon.stub(process, 'exit');
     cmd.init(vorpal);
-    process.argv = ['node', 'o365', 'mock-command', '--option1', '00123'];
-    vorpal.parse(['node', 'o365', 'mock-command', '--option1', '00123']);
+    process.argv = ['node', 'm365', 'mock-command', '--option1', '00123'];
+    vorpal.parse(['node', 'm365', 'mock-command', '--option1', '00123']);
   });
 
   it('correctly handles error when instance of error returned from the promise', (done) => {

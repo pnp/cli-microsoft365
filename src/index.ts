@@ -17,7 +17,7 @@ const readdirR = (dir: string): string | string[] => {
 };
 
 const loadAllCommands = (rootFolder: string): void => {
-  const commandsDir: string = path.join(rootFolder, './o365');
+  const commandsDir: string = path.join(rootFolder, './m365');
   const files: string[] = readdirR(commandsDir) as string[];
 
   files.forEach(file => {
@@ -63,14 +63,14 @@ const loadCommandFromArgs = (args: string[], rootFolder: string): void => {
 
   let commandFilePath = '';
   if (cliArgs.length === 1) {
-    commandFilePath = path.join(rootFolder, 'o365', 'commands', `${cliArgs[0]}.js`);
+    commandFilePath = path.join(rootFolder, 'm365', 'commands', `${cliArgs[0]}.js`);
   }
   else {
     if (cliArgs.length === 2) {
-      commandFilePath = path.join(rootFolder, 'o365', cliArgs[0], 'commands', `${cliArgs.join('-')}.js`);
+      commandFilePath = path.join(rootFolder, 'm365', cliArgs[0], 'commands', `${cliArgs.join('-')}.js`);
     }
     else {
-      commandFilePath = path.join(rootFolder, 'o365', cliArgs[0], 'commands', cliArgs[1], cliArgs.slice(1).join('-') + '.js');
+      commandFilePath = path.join(rootFolder, 'm365', cliArgs[0], 'commands', cliArgs[1], cliArgs.slice(1).join('-') + '.js');
     }
   }
 
@@ -104,7 +104,7 @@ fs.realpath(__dirname, (err: NodeJS.ErrnoException | null, resolvedPath: string)
   vorpal.isCommandArgKeyPairNormalized = false;
 
   vorpal
-    .title('Office 365 CLI')
+    .title('CLI for Microsoft 365')
     .description(packageJSON.description)
     .version(packageJSON.version);
 

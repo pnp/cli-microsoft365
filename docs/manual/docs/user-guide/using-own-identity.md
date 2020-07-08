@@ -1,14 +1,14 @@
 # Using your own Azure AD identity
 
-When you use the Office 365 CLI to connect to your tenant for the first time, you are presented with a `Permissions requested` prompt from Azure, by accepting this prompt you are consenting to using the `PnP Office 365 Management Shell` Azure AD application with your tenant as well as the permissions that it requires.
+When you use the CLI for Microsoft 365 to connect to your tenant for the first time, you are presented with a `Permissions requested` prompt from Azure, by accepting this prompt you are consenting to using the `PnP Microsoft 365 Management Shell` Azure AD application with your tenant as well as the permissions that it requires.
 
-We ask for a wide range to permissions upfront, including permissions that require administrative level consent, so that it is easy to get started with the CLI and try out the commands across many Office 365 CLI workloads in your tenant without having to handle the complexity of managing the permissions for the different commands manually in Azure.
+We ask for a wide range to permissions upfront, including permissions that require administrative level consent, so that it is easy to get started with the CLI and try out the commands across many CLI for Microsoft 365 workloads in your tenant without having to handle the complexity of managing the permissions for the different commands manually in Azure.
 
 Whilst this is fine for working against development and test environments, using these levels of permissions against production environments is inconvenient and administrators are not comfortable with granting such permissions to a multi-tenant application within their environment.
 
 In this scenario, administrators will want to provide their own Azure AD app registration to use with the CLI to enable greater control over the permissions that are granted.
 
-This tutorial will walk you through how to create your own Azure AD application with permissions restricted to only read information about SharePoint Online Site Collections and how to use this custom application with the Office 365 CLI.
+This tutorial will walk you through how to create your own Azure AD application with permissions restricted to only read information about SharePoint Online Site Collections and how to use this custom application with the CLI for Microsoft 365.
 
 ## Register Azure AD application in your tenant
 
@@ -18,7 +18,7 @@ Select `Azure Active Directory` from the global menu, select `App registrations`
 
 [![New app registration](../images/using-own-identity/new-app-registration.png)](../images/using-own-identity/new-app-registration.png)
 
-In the form, enter a name for your new application, for the purpose of this tutorial let's use `Custom PnP Office 365 CLI`. You can always change this later if you want. Leave the `Supported account types` and `Redirect URI` values as they are and select the `Register` button at the foot of the form to create your custom application.
+In the form, enter a name for your new application, for the purpose of this tutorial let's use `Custom PnP CLI for Microsoft 365`. You can always change this later if you want. Leave the `Supported account types` and `Redirect URI` values as they are and select the `Register` button at the foot of the form to create your custom application.
 
 [![Register an application](../images/using-own-identity/register-an-application.png)](../images/using-own-identity/register-an-application.png)
 
@@ -30,7 +30,7 @@ Take a copy of both the `Application (client) ID` and `Directory (tenant) ID` va
 
 ## Configure Authentication settings
 
-We next need to configure our new application so that it can be used with the Office 365 CLI. To do this we need to select `Authentication` in the `Custom PnP Office 365 CLI` blade menu.
+We next need to configure our new application so that it can be used with the CLI for Microsoft 365. To do this we need to select `Authentication` in the `Custom PnP CLI for Microsoft 365` blade menu.
 
 This will present you with three sections: `Platform configuration`, `Supported account type` and `Advanced settings`.
 
@@ -47,9 +47,9 @@ This will refresh the `Authentication` blade and will display the Redirect URI w
 [![Mobile and desktop applications](../images/using-own-identity/mobile-and-desktop-applications.png)](../images/using-own-identity/mobile-and-desktop-applications.png)
 
 !!! info
-    This Redirect URI is specific to the use of authentication methods that do not use a web interface for authenticating users and are therefore called `Native Clients`. This is the category that the Office 365 CLI falls into.
+    This Redirect URI is specific to the use of authentication methods that do not use a web interface for authenticating users and are therefore called `Native Clients`. This is the category that the CLI for Microsoft 365 falls into.
 
-Moving on, we can skip over the `Supported account type` section, as this is defaulted to `Accounts in this organizational directory only (<tenant> only - Single tenant)` meaning, that only users within the current tenant directory can use this application. In the `Advanced settings` section, we need to enable the `Default client type` toggle, as we are using the `Device code flow` method to authenticate to our tenant using the Office 365 CLI.
+Moving on, we can skip over the `Supported account type` section, as this is defaulted to `Accounts in this organizational directory only (<tenant> only - Single tenant)` meaning, that only users within the current tenant directory can use this application. In the `Advanced settings` section, we need to enable the `Default client type` toggle, as we are using the `Device code flow` method to authenticate to our tenant using the CLI for Microsoft 365.
 
 [![Advanced settings](../images/using-own-identity/advanced-settings.png)](../images/using-own-identity/advanced-settings.png)
 
@@ -57,7 +57,7 @@ To make sure all these changes are applied, select the `Save` button before movi
 
 ## Configure API Permissions
 
-Now that we have configured the application to work with the Office 365 CLI, we next need to grant what permissions the CLI will have within our tenant. Select the `API permissions` in the `Custom PnP Office 365 CLI` blade menu.
+Now that we have configured the application to work with the CLI for Microsoft 365, we next need to grant what permissions the CLI will have within our tenant. Select the `API permissions` in the `Custom PnP CLI for Microsoft 365` blade menu.
 
 You will see a section called `Configured permissions` with one permission already granted. This is the default permission which allows the application to sign in the user account used when authenticating to the Microsoft Graph.
 
@@ -80,11 +80,11 @@ You will be presented with the `Configured permissions` section again but this t
 
 [![SharePoint Online Configured permissions](../images/using-own-identity/spo-configured-permissions.png)](../images/using-own-identity/spo-configured-permissions.png)
 
-This completes the configuration required in the Azure portal. We can now move onto configuring the Office 365 CLI to use our custom application to login to Office 365.
+This completes the configuration required in the Azure portal. We can now move onto configuring the CLI for Microsoft 365 to use our custom application to login to Microsoft 365.
 
 ## Create environment variables
 
-To configure the Office 365 CLI to use our newly created custom application, we need to tell it the Client ID of our custom application and the Tenant ID of where the custom application has been created.
+To configure the CLI for Microsoft 365 to use our newly created custom application, we need to tell it the Client ID of our custom application and the Tenant ID of where the custom application has been created.
 
 To do that, we need to create two environment variables, named `OFFICE365CLI_AADAPPID` and `OFFICE365CLI_TENANT`, giving them the values that you saved earlier.
 
@@ -110,17 +110,17 @@ export OFFICE365CLI_TENANT=e8954f17-a373-4b61-b54d-45c038fe3188
 !!! tip
     Execute `printenv` to verify that the environment variables have been created correctly
 
-Now that we have set our environment variables, we are now ready to use our custom application to log in with using the Office 365 CLI.
+Now that we have set our environment variables, we are now ready to use our custom application to log in with using the CLI for Microsoft 365.
 
 ## Login and consent
 
-For the purpose of this tutorial, we will be using the `Device code flow` to interactively authenticate with an Office 365 tenant. As this is the first time that we will have used the custom application to authenticate, we will also be required to give our consent.
+For the purpose of this tutorial, we will be using the `Device code flow` to interactively authenticate with an Microsoft 365 tenant. As this is the first time that we will have used the custom application to authenticate, we will also be required to give our consent.
 
-At your terminal session, execute `o365 login` to start the authentication process, a login device code will be displayed along with a link to a web page where it needs to be entered. Navigate to [https://microsoft.com/devicelogin](https://microsoft.com/devicelogin), enter the code into the input field and select `Next`. You will then be presented with either a login screen or accounts that you have already logged in to Office 365 with. Login with or choose the account from the list that you want to use with Office 365 CLI.
+At your terminal session, execute `m365 login` to start the authentication process, a login device code will be displayed along with a link to a web page where it needs to be entered. Navigate to [https://microsoft.com/devicelogin](https://microsoft.com/devicelogin), enter the code into the input field and select `Next`. You will then be presented with either a login screen or accounts that you have already logged in to Microsoft 365 with. Login with or choose the account from the list that you want to use with CLI for Microsoft 365.
 
-You will now be prompted to consent that the custom application, `Custom PnP Office 365 CLI`, can use the two permissions that we configure earlier, `Read items in all site collections` and `Sign you in and read your profile` on your behalf. Select `Accept` to consent and complete the sign-in process.
+You will now be prompted to consent that the custom application, `Custom PnP CLI for Microsoft 365`, can use the two permissions that we configure earlier, `Read items in all site collections` and `Sign you in and read your profile` on your behalf. Select `Accept` to consent and complete the sign-in process.
 
-Returning back to your command line, you can now verify that the sign in has been successful by executing the `o365 status` command.
+Returning back to your command line, you can now verify that the sign in has been successful by executing the `m365 status` command.
 
 Finally, to test that we can indeed read SharePoint Online site collections, let's invoke the following command
 
@@ -130,7 +130,7 @@ m365 spo site get --url https://trinder365dev.sharepoint.com -o json
 
 The JSON representation of the SharePoint Online site will be returned to the console.
 
-Congratulations! You have just configured the Office 365 CLI to use your own custom application with custom permissions from your own Azure Active Directory.
+Congratulations! You have just configured the CLI for Microsoft 365 to use your own custom application with custom permissions from your own Azure Active Directory.
 
 [![Congratulations](../images/using-own-identity/congratulations.png)](../images/using-own-identity/congratulations.png)
 

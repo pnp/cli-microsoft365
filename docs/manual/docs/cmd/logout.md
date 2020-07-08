@@ -1,6 +1,6 @@
 # logout
 
-Log out from Office 365
+Log out from Microsoft 365
 
 ## Usage
 
@@ -20,17 +20,17 @@ Option|Description
 
 ## Remarks
 
-The `logout` command logs out from Office 365 and removes any access and refresh tokens from memory
+The `logout` command logs out from Microsoft 365 and removes any access and refresh tokens from memory
 
 ## Examples
 
-Log out from Office 365
+Log out from Microsoft 365
 
 ```sh
 logout
 ```
 
-Log out from Office 365 in debug mode including detailed debug information in the console output
+Log out from Microsoft 365 in debug mode including detailed debug information in the console output
 
 ```sh
 logout --debug

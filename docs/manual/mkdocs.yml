@@ -1,10 +1,10 @@
-site_name: Office 365 CLI
+site_name: CLI for Microsoft 365
 nav:
   - Home: 'index.md'
   - User Guide:
     - 'Installing the CLI': 'user-guide/installing-cli.md'
     - 'Using the CLI': 'user-guide/using-cli.md'
-    - 'Logging in to Office 365': 'user-guide/connecting-office-365.md'
+    - 'Logging in to Microsoft 365': 'user-guide/connecting-office-365.md'
     - 'CLI output mode': 'user-guide/cli-output-mode.md'
     - 'Using your own Azure AD identity': 'user-guide/using-own-identity.md'
   - Commands:
@@ -449,7 +449,7 @@ nav:
         - user set: 'cmd/aad/o365group/o365group-user-set.md'
         - user app add: 'cmd/teams/user/user-app-add.md'
         - user app remove: 'cmd/teams/user/user-app-remove.md'
-    - Office 365 (tenant):
+    - Microsoft 365 (tenant):
       - id:
         - id get: 'cmd/tenant/id/id-get.md'
       - report:
@@ -494,14 +494,14 @@ nav:
     - 'Persisting connection': 'concepts/persisting-connection.md'
     - 'Authorization and access tokens': 'concepts/authorization-tokens.md'
     - 'Command completion': 'concepts/completion.md'
-    - 'Communication with Office 365': 'concepts/communicating-o365.md'
+    - 'Communication with Microsoft 365': 'concepts/communicating-m365.md'
     - 'GitHub Actions': 'concepts/github-actions.md'
   - Sample Scripts:
     - 'Introduction': 'sample-scripts/index.md'
     - Azure Active Directory:
-      - 'Bulk add/remove users to Microsoft Teams and Office 365 Groups' : 'sample-scripts/aad/manage-group-users.md'
-      - 'Delete all Office 365 groups' : 'sample-scripts/aad/delete-o365-groups.md'
-      - 'Scan for Office 365 Groups created with user''s first or last name' : 'sample-scripts/aad/flag-groups-with-user-names.md'
+      - 'Bulk add/remove users to Microsoft Teams and Microsoft 365 Groups' : 'sample-scripts/aad/manage-group-users.md'
+      - 'Delete all Microsoft 365 groups' : 'sample-scripts/aad/delete-m365-groups.md'
+      - 'Scan for Microsoft 365 Groups created with user''s first or last name' : 'sample-scripts/aad/flag-groups-with-user-names.md'
     - Microsoft Graph:
       - 'Authenticate with and call the Microsoft Graph' : 'sample-scripts/graph/call-graph.md'
     - Power Automate:
@@ -527,14 +527,14 @@ nav:
       - 'Remove Wiki tab in a Microsoft Teams channel': 'sample-scripts/teams/remove-wikitab-teams.md'
   - About:
     - 'Why this CLI': 'about/why-cli.md'
-    - 'Comparison to SharePoint and Office 365 PowerShell': 'about/comparison-powershell.md'
+    - 'Comparison to SharePoint and Microsoft 365 PowerShell': 'about/comparison-powershell.md'
     - 'Release notes': 'about/release-notes.md'
     - License: 'about/license.md'
 theme:
   name: 'material'
   palette:
     primary: 'red'
-  logo: 'images/pnp-office365-cli-white.svg'
+  logo: 'images/pnp-cli-microsoft365-white.svg'
   feature:
     tabs: true
 google_analytics:

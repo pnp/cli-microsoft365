@@ -29,7 +29,7 @@ Option|Description
 
 ## Examples
 
-Update Office 365 Tenant site classification configuration
+Update Microsoft 365 Tenant site classification configuration
 
 ```sh
 aad siteclassification set --classifications "High, Medium, Low" --defaultClassification "Medium"
