@@ -23,7 +23,7 @@ $webPartPropsJson = $webPartProps | ConvertTo-Json -Compress
 # Make sure to add the backticks, double the JSON double-quotes and escape double quotes in properties'values
 $webPartPropsJson = '`"{0}"`' -f $webPartPropsJson.Replace('\','\\').Replace('"', '""')
 
-o365 spo page clientsidewebpart add -u $site -n $pageName --webPartId $webPartId --webPartProperties $webPartPropsJson
+m365 spo page clientsidewebpart add -u $site -n $pageName --webPartId $webPartId --webPartProperties $webPartPropsJson
 ```
 
 ```bash tab="Bash"
@@ -40,7 +40,7 @@ description='My "Super Awesome" web part';
 # Make sure not to ommit the surrounding back ticks and surrounding double quotes for each arguments
 printf -v webPartPropsJson '`{"myChoices":["%s","%s"], "description":"%s"}`' "${choice1//\"/\\\"}" "${choice2//\"/\\\"}" "${description//\"/\\\"}"
 
-o365 spo page clientsidewebpart add -u $site -n $pageName --webPartId $webPartId --webPartProperties $webPartPropsJson
+m365 spo page clientsidewebpart add -u $site -n $pageName --webPartId $webPartId --webPartProperties $webPartPropsJson
 ```
 
 Keywords:

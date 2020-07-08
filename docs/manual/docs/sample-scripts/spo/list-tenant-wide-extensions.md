@@ -8,8 +8,8 @@ The following script lists all tenant-wide extensions deployed in the tenant. Th
 $listName = "Tenant Wide Extensions"
 $fields = "Id, Title, TenantWideExtensionDisabled, TenantWideExtensionLocation"
 
-$appcatalogurl = o365 spo tenant appcatalogurl get
-o365 spo listitem list --title $listName --webUrl $appcatalogurl --fields $fields
+$appcatalogurl = m365 spo tenant appcatalogurl get
+m365 spo listitem list --title $listName --webUrl $appcatalogurl --fields $fields
 ```
 
 ```bash tab="Bash"
@@ -18,8 +18,8 @@ o365 spo listitem list --title $listName --webUrl $appcatalogurl --fields $field
 listName="Tenant Wide Extensions"
 fields="Id, Title, TenantWideExtensionLocation, TenantWideExtensionDisabled"
 
-appcatalogurl=$(o365 spo tenant appcatalogurl get)
-o365 spo listitem list --title "$listName" --webUrl $appcatalogurl --fields  "$fields"
+appcatalogurl=$(m365 spo tenant appcatalogurl get)
+m365 spo listitem list --title "$listName" --webUrl $appcatalogurl --fields  "$fields"
 ```
 
 !!! note

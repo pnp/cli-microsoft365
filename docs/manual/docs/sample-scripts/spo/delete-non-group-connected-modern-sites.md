@@ -2,14 +2,14 @@
 
 Author: [Laura Kokkarinen](https://laurakokkarinen.com/does-it-spark-joy-powershell-scripts-for-keeping-your-development-environment-tidy-and-spotless/#delete-all-non-group-connected-modern-sharepoint-sites)
 
-When you delete Office 365 groups, the modern group-connected team sites get deleted with them. The script below handles the remaining modern sites: communication sites and groupless team sites.
+When you delete Microsoft 365 groups, the modern group-connected team sites get deleted with them. The script below handles the remaining modern sites: communication sites and groupless team sites.
 
 !!! attention
     There is a known issue running this script using PowerShell Core on macOS, see issue [#1266](https://github.com/pnp/office365-cli/issues/1266) for further detail
 
 ```powershell tab="PowerShell Core"
 $sparksjoy = "Cat Lovers United", "Extranet", "Hub"
-$sites = o365 spo site classic list -o json |ConvertFrom-Json
+$sites = m365 spo site classic list -o json |ConvertFrom-Json
 $sites = $sites | where {  $_.template -eq "SITEPAGEPUBLISHING#0" -or $_.template -eq "STS#3" -and -not ($sparksjoy -contains $_.Title)}
 if ($sites.Count -eq 0) { break }
 $sites | Format-Table Title, Url, Template
@@ -21,7 +21,7 @@ foreach ($site in $sites)
     $progress++
     write-host $progress / $total":" $site.Title
     write-host $site.Url
-    o365 spo site classic remove --url $site.Url
+    m365 spo site classic remove --url $site.Url
 }
 ```
 
@@ -48,7 +48,7 @@ while read site; do
     sitestoremove+=("$site")
   fi
 
-done < <(o365 spo site classic list -o json | jq -c '.[] | select(.Template == "SITEPAGEPUBLISHING#0" or .Template == "STS#3")')
+done < <(m365 spo site classic list -o json | jq -c '.[] | select(.Template == "SITEPAGEPUBLISHING#0" or .Template == "STS#3")')
 
 if [ ${#sitestoremove[@]} = 0 ]; then
   exit 1
@@ -62,11 +62,11 @@ for site in "${sitestoremove[@]}"; do
    siteUrl=$(echo ${site} | jq -r '.Url')
   echo "Deleting site..."
   echo $siteUrl
-   o365 spo site classic remove --url $siteUrl
+   m365 spo site classic remove --url $siteUrl
 done
 ```
 
 Keywords:
 
 - SharePoint Online
-- Office 365 groups
+- Microsoft 365 groups

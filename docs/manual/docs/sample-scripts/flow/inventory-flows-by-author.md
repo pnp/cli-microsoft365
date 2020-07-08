@@ -24,7 +24,7 @@ function CleanDistFolder {
     }
 }
 
-$CURRENT_USER = $(o365 status).Split(':')[1]
+$CURRENT_USER = $(m365 status).Split(':')[1]
 Write-Host "Logged in as $CURRENT_USER"
 
 try {
@@ -35,13 +35,13 @@ try {
 
     #Step 1 - Get the default environment
     Write-Host "Querying for default Flow environment..."
-    $flowEnvironments = o365 flow environment list --output json | ConvertFrom-Json
+    $flowEnvironments = m365 flow environment list --output json | ConvertFrom-Json
     $defaultEnvironment = $flowEnvironments[0].name
     Write-Host "Found default environment $defaultEnvironment, querying Flows..."
 
     # Step 2 - Get all of the flows using the cli and write flows json to a tmp file 
     # Use a JMESPath query to filter the size of the file. See https://github.com/pnp/office365-cli/issues/1266
-    o365 flow list --environment $defaultEnvironment `
+    m365 flow list --environment $defaultEnvironment `
         --query '[].{name: name, displayName: properties.displayName,owner: properties.creator.userId, state: properties.state, created: properties.createdTime, lastModified: properties.lastModifiedTime, trigger: properties.definitionSummary.triggers[0].swaggerOperationId,  triggerType: properties.definitionSummary.triggers[0].type }' --asAdmin --output json |
         Out-File "$TMP_FLOWS" -Encoding ASCII
     $flows = Get-Content "$TMP_FLOWS" | ConvertFrom-Json
@@ -57,7 +57,7 @@ try {
     $userMap = @{}
     $uniqueOwners | ForEach-Object {
         Write-Host "Querying graph for userid $_..."
-        o365 aad user get --id $_ --output json  | ConvertFrom-Json
+        m365 aad user get --id $_ --output json  | ConvertFrom-Json
     } | ForEach-Object {
         $userMap.Add($_.id, @{
                 upn = $_.userPrincipalName
@@ -117,7 +117,7 @@ function cleanup {
 # Configure trap to call finish whenever EXIT is called to ensure cleanup of tmp
 trap cleanup EXIT
 
-CURRENT_USER=$(o365 status --output json | jq '.connectedAs')
+CURRENT_USER=$(m365 status --output json | jq '.connectedAs')
 echo "Logged in as $CURRENT_USER"
 
 if [[ ! -z tmp ]]; then
@@ -127,12 +127,12 @@ fi
 
 #Step 1 - Get the default environment
 echo "Querying for default Flow environment..."
-DEFAULT_ENVIRONMENT=$(o365 flow environment list --output json | jq -r '.[] | select(.name | contains("'"Default"'")) | .name')
+DEFAULT_ENVIRONMENT=$(m365 flow environment list --output json | jq -r '.[] | select(.name | contains("'"Default"'")) | .name')
 echo "Found default environment $DEFAULT_ENVIRONMENT, querying Flows..."
 
 #Step 2 - Get all of the flows using the cli and write flows json to a tmp file
 #See https://github.com/pnp/office365-cli/issues/1266 for temp file usage reason
-o365 flow list --environment $DEFAULT_ENVIRONMENT --asAdmin --output json > $TMP_FLOWS
+m365 flow list --environment $DEFAULT_ENVIRONMENT --asAdmin --output json > $TMP_FLOWS
 
 #Step 3 - Get a unique list of the flow owners from the tmp file
 echo "Flows found, searching for owner values..."
@@ -147,7 +147,7 @@ echo "[" > $TMP_OWNERS
 i=0
 for ownerId in $uniqueOwners; do
     echo "Querying graph for userid $ownerId..."
-    echo $(o365 aad user get --id $ownerId --output json) >> $TMP_OWNERS
+    echo $(m365 aad user get --id $ownerId --output json) >> $TMP_OWNERS
     if [[ $i -lt $ownerCount-1 ]]; then
         echo "," >> $TMP_OWNERS
     fi

@@ -6,8 +6,8 @@ When you just want to deploy certain SharePoint solution to a specific site, it'
 
 ```powershell tab="PowerShell Core"
 $site = "https://contoso.sharepoint.com/sites/site"
-o365 login
-o365 spo site appcatalog add --url $site
+m365 login
+m365 spo site appcatalog add --url $site
 Write-output "App Catalog Created on " $site
 ```
 
@@ -16,8 +16,8 @@ Write-output "App Catalog Created on " $site
 
 site=https://tricks365.sharepoint.com/sites/site
 
-o365 login
-o365 spo site appcatalog add --url $site
+m365 login
+m365 spo site appcatalog add --url $site
 echo "App Catalog Created on $site"
 ```
 

@@ -1,6 +1,6 @@
 ---
 name: Sample Script
-about: Created an awesome script using the Office 365 CLI? Let us know by submitting it to our Sample Scripts gallery
+about: Created an awesome script using the CLI for Microsoft 365? Let us know by submitting it to our Sample Scripts gallery
 title: 'New sample script: <short description>'
 labels: ''
 assignees: ''

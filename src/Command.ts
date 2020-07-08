@@ -2,7 +2,7 @@ import appInsights from './appInsights';
 import GlobalOptions from './GlobalOptions';
 import request from './request';
 import auth from './Auth';
-import { GraphResponseError } from './o365/base/GraphResponseError';
+import { GraphResponseError } from './m365/base/GraphResponseError';
 
 const vorpal: Vorpal = require('./vorpal-init');
 
@@ -110,7 +110,7 @@ export default abstract class Command {
           cmd.initAction(args, this);
 
           if (!auth.service.connected) {
-            cb(new CommandError('Log in to Office 365 first'));
+            cb(new CommandError('Log in to Microsoft 365 first'));
             return;
           }
 

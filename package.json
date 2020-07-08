@@ -1,13 +1,10 @@
 {
-  "name": "@pnp/office365-cli",
+  "name": "@pnp/cli-microsoft365",
   "version": "3.0.0",
-  "description": "Manage Microsoft Office 365 and SharePoint Framework projects on any platform",
+  "description": "Manage Microsoft 365 and SharePoint Framework projects on any platform",
   "license": "MIT",
   "main": "./dist/index.js",
   "bin": {
-    "office365": "./dist/index.js",
-    "o365": "./dist/index.js",
-    "o365_comp": "./dist/autocomplete.js",
     "microsoft365": "./dist/index.js",
     "m365": "./dist/index.js",
     "m365_comp": "./dist/autocomplete.js"

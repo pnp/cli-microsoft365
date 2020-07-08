@@ -1,8 +1,8 @@
-# Comparison to SharePoint and Office 365 PowerShell
+# Comparison to SharePoint and Microsoft 365 PowerShell
 
-Following table lists the different Office 365 CLI commands and how they map to PowerShell cmdlets for SharePoint and Office 365.
+Following table lists the different CLI for Microsoft 365 commands and how they map to PowerShell cmdlets for SharePoint and Microsoft 365.
 
-PowerShell Cmdlet|Source|Office 365 CLI command
+PowerShell Cmdlet|Source|CLI for Microsoft 365 command
 -----------------|------|----------------------
 Add-SPOGeoAdministrator|Microsoft.Online.SharePoint.PowerShell|
 Add-SPOHubSiteAssociation|Microsoft.Online.SharePoint.PowerShell|[spo hubsite connect](../cmd/spo/hubsite/hubsite-connect.md)

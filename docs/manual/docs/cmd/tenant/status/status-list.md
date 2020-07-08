@@ -1,6 +1,6 @@
 # tenant status list
 
-Gets health status of the different services in Office 365
+Gets health status of the different services in Microsoft 365
 
 ## Usage
 
@@ -21,7 +21,7 @@ Option|Description
 
 ## Examples
 
-Get health status of the different services in Office 365
+Get health status of the different services in Microsoft 365
 
 ```sh
 tenant status list
@@ -29,4 +29,4 @@ tenant status list
 
 ## More information
 
-- Office 365 Service Communications API reference: [https://docs.microsoft.com/en-us/office/office-365-management-api/office-365-service-communications-api-reference#get-current-status](https://docs.microsoft.com/en-us/office/office-365-management-api/office-365-service-communications-api-reference#get-current-status)
+- Microsoft 365 Service Communications API reference: [https://docs.microsoft.com/en-us/office/office-365-management-api/office-365-service-communications-api-reference#get-current-status](https://docs.microsoft.com/en-us/office/office-365-management-api/office-365-service-communications-api-reference#get-current-status)

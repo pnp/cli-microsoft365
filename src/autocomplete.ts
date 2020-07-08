@@ -23,7 +23,7 @@ class Autocomplete {
       catch { }
     }
 
-    this.omelette = omelette('o365_comp|o365|office365|m365_comp|m365|microsoft365');
+    this.omelette = omelette('m365_comp|m365|microsoft365');
     this.omelette.on('complete', this.handleAutocomplete.bind(this));
     this.omelette.init();
   }
@@ -96,17 +96,17 @@ class Autocomplete {
     const lua: string[] = ['local parser = clink.arg.new_parser'];
     const functions: any = {};
 
-    this.buildClinkForBranch(cmd, functions, 'o365');
+    this.buildClinkForBranch(cmd, functions, 'm365');
 
     Object.keys(functions).forEach(k => {
       functions[k] = functions[k].replace(/#([^#]+)#/g, (m: string, p1: string): string => functions[p1]);
     });
 
     lua.push(
-      'local o365_parser = ' + functions['o365'],
+      'local m365_parser = ' + functions['m365'],
       '',
-      'clink.arg.register_parser("o365", o365_parser)',
-      'clink.arg.register_parser("office365", o365_parser)'
+      'clink.arg.register_parser("m365", m365_parser)',
+      'clink.arg.register_parser("microsoft365", m365_parser)'
     );
 
     return lua.join(os.EOL);

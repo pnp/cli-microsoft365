@@ -125,10 +125,10 @@ describe('autocomplete', () => {
 
     assert.equal(clink, [
       'local parser = clink.arg.new_parser',
-      'local o365_parser = parser({"spo"..parser({"connect"..parser({},"--help")})})',
+      'local m365_parser = parser({"spo"..parser({"connect"..parser({},"--help")})})',
       '',
-      'clink.arg.register_parser("o365", o365_parser)',
-      'clink.arg.register_parser("office365", o365_parser)'
+      'clink.arg.register_parser("m365", m365_parser)',
+      'clink.arg.register_parser("microsoft365", m365_parser)'
     ].join(os.EOL));
   });
 
@@ -154,10 +154,10 @@ describe('autocomplete', () => {
 
     assert.equal(clink, [
       'local parser = clink.arg.new_parser',
-      'local o365_parser = parser({"spo"..parser({"connect"..parser({},"--help")})})',
+      'local m365_parser = parser({"spo"..parser({"connect"..parser({},"--help")})})',
       '',
-      'clink.arg.register_parser("o365", o365_parser)',
-      'clink.arg.register_parser("office365", o365_parser)'
+      'clink.arg.register_parser("m365", m365_parser)',
+      'clink.arg.register_parser("microsoft365", m365_parser)'
     ].join(os.EOL));
   });
 
@@ -183,10 +183,10 @@ describe('autocomplete', () => {
 
     assert.equal(clink, [
       'local parser = clink.arg.new_parser',
-      'local o365_parser = parser({"spo"..parser({"connect"..parser({},"--help")})})',
+      'local m365_parser = parser({"spo"..parser({"connect"..parser({},"--help")})})',
       '',
-      'clink.arg.register_parser("o365", o365_parser)',
-      'clink.arg.register_parser("office365", o365_parser)'
+      'clink.arg.register_parser("m365", m365_parser)',
+      'clink.arg.register_parser("microsoft365", m365_parser)'
     ].join(os.EOL));
   });
 
@@ -211,10 +211,10 @@ describe('autocomplete', () => {
 
     assert.equal(clink, [
       'local parser = clink.arg.new_parser',
-      'local o365_parser = parser({"spo"..parser({"app"..parser({"list"..parser({},"--appCatalogUrl", "--help")})})})',
+      'local m365_parser = parser({"spo"..parser({"app"..parser({"list"..parser({},"--appCatalogUrl", "--help")})})})',
       '',
-      'clink.arg.register_parser("o365", o365_parser)',
-      'clink.arg.register_parser("office365", o365_parser)'
+      'clink.arg.register_parser("m365", m365_parser)',
+      'clink.arg.register_parser("microsoft365", m365_parser)'
     ].join(os.EOL));
   });
 
@@ -239,10 +239,10 @@ describe('autocomplete', () => {
 
     assert.equal(clink, [
       'local parser = clink.arg.new_parser',
-      'local o365_parser = parser({"spo"..parser({"app"..parser({"list"..parser({},"--help", "-u")})})})',
+      'local m365_parser = parser({"spo"..parser({"app"..parser({"list"..parser({},"--help", "-u")})})})',
       '',
-      'clink.arg.register_parser("o365", o365_parser)',
-      'clink.arg.register_parser("office365", o365_parser)'
+      'clink.arg.register_parser("m365", m365_parser)',
+      'clink.arg.register_parser("microsoft365", m365_parser)'
     ].join(os.EOL));
   });
 
@@ -267,10 +267,10 @@ describe('autocomplete', () => {
 
     assert.equal(clink, [
       'local parser = clink.arg.new_parser',
-      'local o365_parser = parser({"spo"..parser({"app"..parser({"list"..parser({},"--help", "-o"..parser({"json","text"}))})})})',
+      'local m365_parser = parser({"spo"..parser({"app"..parser({"list"..parser({},"--help", "-o"..parser({"json","text"}))})})})',
       '',
-      'clink.arg.register_parser("o365", o365_parser)',
-      'clink.arg.register_parser("office365", o365_parser)'
+      'clink.arg.register_parser("m365", m365_parser)',
+      'clink.arg.register_parser("microsoft365", m365_parser)'
     ].join(os.EOL));
   });
 
@@ -289,10 +289,10 @@ describe('autocomplete', () => {
 
     assert.equal(clink, [
       'local parser = clink.arg.new_parser',
-      'local o365_parser = parser({"spo"..parser({"c"..parser({},"--help"),"connect"..parser({},"--help")})})',
+      'local m365_parser = parser({"spo"..parser({"c"..parser({},"--help"),"connect"..parser({},"--help")})})',
       '',
-      'clink.arg.register_parser("o365", o365_parser)',
-      'clink.arg.register_parser("office365", o365_parser)'
+      'clink.arg.register_parser("m365", m365_parser)',
+      'clink.arg.register_parser("microsoft365", m365_parser)'
     ].join(os.EOL));
   });
 
@@ -338,9 +338,9 @@ describe('autocomplete', () => {
 
   it('correctly lists available services when completing first fragment and it\'s empty', () => {
     const evtData = {
-      before: "o365",
+      before: "m365",
       fragment: 1,
-      line: "o365 ",
+      line: "m365 ",
       reply: (data: Object | string[]) => { }
     };
     const replies: any[] = [];
@@ -356,7 +356,7 @@ describe('autocomplete', () => {
     const evtData = {
       before: "spo",
       fragment: 2,
-      line: "o365 spo ",
+      line: "m365 spo ",
       reply: (data: Object | string[]) => { }
     };
     const replies: any[] = [];
@@ -383,7 +383,7 @@ describe('autocomplete', () => {
     const evtData = {
       before: "status",
       fragment: 3,
-      line: "o365 spo status ",
+      line: "m365 spo status ",
       reply: (data: Object | string[]) => { }
     };
     const replies: any[] = [];
@@ -399,7 +399,7 @@ describe('autocomplete', () => {
     const evtData = {
       before: "--output",
       fragment: 4,
-      line: "o365 spo status --output ",
+      line: "m365 spo status --output ",
       reply: (data: Object | string[]) => { }
     };
     const replies: any[] = [];
@@ -415,7 +415,7 @@ describe('autocomplete', () => {
     const evtData = {
       before: "json",
       fragment: 5,
-      line: "o365 spo status --output json ",
+      line: "m365 spo status --output json ",
       reply: (data: Object | string[]) => { }
     };
     const replies: any[] = [];
@@ -431,7 +431,7 @@ describe('autocomplete', () => {
     const evtData = {
       before: "--debug",
       fragment: 6,
-      line: "o365 spo status --output json --debug ",
+      line: "m365 spo status --output json --debug ",
       reply: (data: Object | string[]) => { }
     };
     const replies: any[] = [];
@@ -447,7 +447,7 @@ describe('autocomplete', () => {
     const evtData = {
       before: "def",
       fragment: 2,
-      line: "o365 abc def",
+      line: "m365 abc def",
       reply: (data: Object | string[]) => { }
     };
     const replies: any[] = [];
@@ -463,7 +463,7 @@ describe('autocomplete', () => {
     const evtData = {
       before: "def",
       fragment: 3,
-      line: "o365 abc def ",
+      line: "m365 abc def ",
       reply: (data: Object | string[]) => { }
     };
     const replies: any[] = [];

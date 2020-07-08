@@ -42,7 +42,7 @@ assignees: ''
 
 ### Environment
 
-> Provide details of the environment in which this issue was discovered, please include the operating system, shell and version of CLI used (`o365 version`), for example, "_MacOS Catalina, bash, 2.0.0_"
+> Provide details of the environment in which this issue was discovered, please include the operating system, shell and version of CLI used (`m365 version`), for example, "_MacOS Catalina, bash, 2.0.0_"
 >
 > _(DELETE THIS PARAGRAPH AFTER READING)_
 >

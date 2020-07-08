@@ -5,14 +5,14 @@ Author: [Matti Paukkonen](https://mattipaukkonen.com/2019/10/09/govern-orphaned-
 Every team needs an owner, at least one. Common best practice is that you should have at least two users in owner role. Teams is not allowing the last owner to leave the team, but there might occasions when last owner is removed, example when people are leaving the organization and account gets deleted. This script finds those teams that no longer have an owner.
 
 ```powershell tab="PowerShell Core"
-$availableTeams = o365 teams team list -o json | ConvertFrom-Json
+$availableTeams = m365 teams team list -o json | ConvertFrom-Json
 $teams = @()
 foreach ($team in $availableTeams) {
 
     Write-host "Handling team: " -NoNewline -ForegroundColor Yellow
     Write-host $team.DisplayName -ForegroundColor Yellow
-    $group = o365 aad o365group get --id $team.id -o json | ConvertFrom-Json
-    $users = o365 teams user list --teamId $team.id -o json | ConvertFrom-Json
+    $group = m365 aad o365group get --id $team.id -o json | ConvertFrom-Json
+    $users = m365 teams user list --teamId $team.id -o json | ConvertFrom-Json
     $owners = @($users | Where-Object { $_.userType -eq "Owner" })
     $members = @($users | Where-Object { $_.userType -eq "Member" }).Length
     $guests = @($users | Where-Object { $_.userType -eq "Guest" }).Length
@@ -42,7 +42,7 @@ $teams | Format-Table -AutoSize
 defaultIFS=$IFS
 IFS=$'\n'
 
-availableTeams=`o365 teams team list -o json`
+availableTeams=`m365 teams team list -o json`
 teams=()
 
 for team in `echo $availableTeams | jq -c '.[]'`; do
@@ -51,8 +51,8 @@ for team in `echo $availableTeams | jq -c '.[]'`; do
     echo "Handling team: ${displayName}"
 
     teamId=`echo $team | jq '.id'`
-    group=`o365 aad o365group get --id ${teamId} -o json`
-    users=`o365 teams user list --teamId ${teamId} -o json`
+    group=`m365 aad o365group get --id ${teamId} -o json`
+    users=`m365 teams user list --teamId ${teamId} -o json`
 
     groupId=`echo $team | jq '.id'`
     alias=`echo $group | jq '.mailNickName'`

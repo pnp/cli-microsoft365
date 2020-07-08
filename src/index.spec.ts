@@ -2,21 +2,21 @@ import * as assert from 'assert';
 import * as path from 'path';
 import * as fs from 'fs';
 
-import * as globalCommands from './o365/commands/commands';
-import * as aadCommands from './o365/aad/commands';
-import * as cliCommands from './o365/cli/commands';
-import * as flowCommands from './o365/flow/commands';
-import * as graphCommands from './o365/graph/commands';
-import * as oneDriveCommands from './o365/onedrive/commands';
-import * as outlookCommands from './o365/outlook/commands';
-import * as paCommands from './o365/pa/commands';
-import * as plannerCommands from './o365/planner/commands';
-import * as spfxCommands from './o365/spfx/commands';
-import * as spoCommands from './o365/spo/commands';
-import * as teamsCommands from './o365/teams/commands';
-import * as tenantCommands from './o365/tenant/commands';
-import * as utilCommands from './o365/util/commands';
-import * as yammerCommands from './o365/yammer/commands';
+import * as globalCommands from './m365/commands/commands';
+import * as aadCommands from './m365/aad/commands';
+import * as cliCommands from './m365/cli/commands';
+import * as flowCommands from './m365/flow/commands';
+import * as graphCommands from './m365/graph/commands';
+import * as oneDriveCommands from './m365/onedrive/commands';
+import * as outlookCommands from './m365/outlook/commands';
+import * as paCommands from './m365/pa/commands';
+import * as plannerCommands from './m365/planner/commands';
+import * as spfxCommands from './m365/spfx/commands';
+import * as spoCommands from './m365/spo/commands';
+import * as teamsCommands from './m365/teams/commands';
+import * as tenantCommands from './m365/tenant/commands';
+import * as utilCommands from './m365/util/commands';
+import * as yammerCommands from './m365/yammer/commands';
 
 describe('Lazy loading commands', () => {
   it('has all commands stored in correct paths that allow lazy loading', () => {
@@ -73,14 +73,14 @@ describe('Lazy loading commands', () => {
       const words: string[] = commandName.split(' ');
       let commandFilePath: string = '';
       if (words.length === 1) {
-        commandFilePath = path.join('o365', 'commands', `${commandName}.js`);
+        commandFilePath = path.join('m365', 'commands', `${commandName}.js`);
       }
       else {
         if (words.length === 2) {
-          commandFilePath = path.join('o365', words[0], 'commands', `${words.join('-')}.js`);
+          commandFilePath = path.join('m365', words[0], 'commands', `${words.join('-')}.js`);
         }
         else {
-          commandFilePath = path.join('o365', words[0], 'commands', words[1], words.slice(1).join('-') + '.js');
+          commandFilePath = path.join('m365', words[0], 'commands', words[1], words.slice(1).join('-') + '.js');
         }
       }
 

@@ -1,5 +1,5 @@
 defaults: &defaults
-  working_directory: ~/office365-cli
+  working_directory: ~/cli-microsoft365
   docker:
     - image: circleci/node:12.14.0
 
@@ -10,7 +10,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: ~/office365-cli
+          at: ~/cli-microsoft365
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
       - run:
@@ -30,7 +30,7 @@ jobs:
     <<: *defaults
     steps:
       - attach_workspace:
-          at: ~/office365-cli
+          at: ~/cli-microsoft365
       - run:
           name: Test
           command: npm test
@@ -47,7 +47,7 @@ jobs:
     <<: *defaults
     steps:
       - attach_workspace:
-          at: ~/office365-cli
+          at: ~/cli-microsoft365
       - run:
           name: Write .npmrc
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
@@ -61,7 +61,7 @@ jobs:
     <<: *defaults
     steps:
       - attach_workspace:
-          at: ~/office365-cli
+          at: ~/cli-microsoft365
       - run:
           name: Write .npmrc
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
@@ -75,7 +75,7 @@ jobs:
     <<: *defaults
     steps:
       - attach_workspace:
-          at: ~/office365-cli
+          at: ~/cli-microsoft365
       - run:
           name: Write .npmrc
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
@@ -83,12 +83,12 @@ jobs:
           name: Publish
           command: npm publish --access public
   deploy_docs:
-    working_directory: ~/office365-cli/docs/manual
+    working_directory: ~/cli-microsoft365/docs/manual
     docker:
       - image: circleci/python:3.6.6-jessie-node
     steps:
       - attach_workspace:
-          at: ~/office365-cli
+          at: ~/cli-microsoft365
       - add_ssh_keys:
           fingerprints:
             - "06:39:32:e4:a1:64:01:19:0e:61:a0:ad:6a:53:37:32"

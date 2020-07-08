@@ -6,7 +6,7 @@ Site designs and especially site scripts can be something that ends up just hang
 
 ```powershell tab="PowerShell Core"
 $sparksjoy = "Project Site", "Issues List"
-$siteScripts = o365 spo sitescript list -o json | ConvertFrom-Json
+$siteScripts = m365 spo sitescript list -o json | ConvertFrom-Json
 $siteScripts = $siteScripts | where {  -not ($sparksjoy -contains $_.Title)}
 if ($siteScripts.Count -eq 0) { break }
 $siteScripts | Format-Table Title, SiteScriptIds, Description
@@ -17,7 +17,7 @@ foreach ($siteScript in $siteScripts)
 {
   $progress++
   Write-Host $progress / $total":" $siteScript.Title
-  o365 spo sitescript remove -i $siteScript.Id --confirm
+  m365 spo sitescript remove -i $siteScript.Id --confirm
 }
 ```
 
@@ -42,7 +42,7 @@ while read script; do
     sitesscriptstoremove+=("$script")
   fi
 
-done < <(o365 spo sitescript list -o json | jq -c '.[]')
+done < <(m365 spo sitescript list -o json | jq -c '.[]')
 
 if [ ${#sitesscriptstoremove[@]} = 0 ]; then
   exit 1
@@ -55,7 +55,7 @@ for script in "${sitesscriptstoremove[@]}"; do
   scriptTitle=$(echo ${script} | jq -r '.Title')
   scriptId=$(echo ${script} | jq -r '.Id')
   echo "Deleting Site script..."  $scriptTitle
-  o365 spo sitescript remove --id $scriptId --confirm
+  m365 spo sitescript remove --id $scriptId --confirm
 done
 ```
 
