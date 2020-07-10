@@ -136,7 +136,7 @@ class SpoUserGetCommand extends SpoCommand {
 
     Get user with login name ${chalk.grey('i:0#.f|membership|john.doe@mytenant.onmicrosoft.com')}
     for web  ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.USER_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --loginName i:0#.f|membership|john.doe@mytenant.onmicrosoft.com
+      ${commands.USER_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --loginName "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
     `);
   }
 }
