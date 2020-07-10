@@ -40,5 +40,5 @@ spo user get --webUrl https://contoso.sharepoint.com/sites/project-x --id 6
 Get user with login name 'i:0#.f|membership|john.doe@mytenant.onmicrosoft.com' for web _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo user get --webUrl https://contoso.sharepoint.com/sites/project-x --loginName i:0#.f|membership|john.doe@mytenant.onmicrosoft.com
+spo user get --webUrl https://contoso.sharepoint.com/sites/project-x --loginName "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
 ```
