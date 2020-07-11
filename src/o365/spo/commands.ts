@@ -214,6 +214,7 @@ export default {
   THEME_REMOVE: `${prefix} theme remove`,
   THEME_SET: `${prefix} theme set`,
   USER_GET: `${prefix} user get`,
+  USER_LIST:`${prefix} user list`,
   USER_REMOVE:`${prefix} user remove`,
   USERPROFILE_SET: `${prefix} userprofile set`,
   WEB_ADD: `${prefix} web add`,

@@ -379,6 +379,7 @@ nav:
         - theme set: 'cmd/spo/theme/theme-set.md'
       - user:
         - user get: 'cmd/spo/user/user-get.md'
+        - user list: 'cmd/spo/user/user-list.md'
         - user remove: 'cmd/spo/user/user-remove.md'
       - userprofile:
         - userprofile set: 'cmd/spo/userprofile/userprofile-set.md'
