@@ -533,20 +533,37 @@ ${f.resolution}
       // Make severity uppercase for the markdown
       const sev: string = f.severity.toUpperCase();
 
+      // Clean up the file name
+      let file: string | undefined = fs.existsSync(path.join(project.path, f.file)) ? f.file : undefined;
+
+      if (file !== undefined) {
+        // CodeTour expects the files to be relative from root (i.e.: no './')
+        file = file.replace(/\.\//g, '');
+
+        // CodeTour also expects forward slashes as directory separators
+        file = file.replace(/\\/g, '/');
+      }
+
       // Create a tour step entry
       const step: FindingTourStep = {
-        file: fs.existsSync(path.join(project.path, f.file)) ? f.file : 'package.json',
         title: `${sev}: ${f.title}`,
         description: `### ${sev}\r\n\r\n${f.description}\r\n\r\n${resolution}`,
         line: lineNumber
       };
+
+      // Point to a directory if there is no file
+      if (file !== undefined) {
+        step.file = file;
+      } else {
+        step.directory = "";
+      }
 
       tourFindings.steps.push(step);
     });
 
     // Add the finale
     tourFindings.steps.push({
-      file: "./.tours/upgrade.tour",
+      file: ".tours/upgrade.tour",
       title: "RECOMMENDED: Delete tour",
       description: "### THAT'S IT!!!\r\nOnce you have tested that your upgrade is successful, you can delete the `.tour` folder and its contents. Otherwise, you'll be prompted to launch this CodeTour every time you open this project."
     });
@@ -556,7 +573,7 @@ ${f.resolution}
 
   private getLineToModify(finding: FindingToReport, rootPath: string): number {
     const filePath: string = path.resolve(path.join(rootPath, finding.file));
-  
+
     // Don't cause an issue if the file isn't there
     if (!fs.existsSync(filePath)) {
       return 1;
@@ -564,7 +581,7 @@ ${f.resolution}
 
     // Read the file content
     const fileContent: string = fs.readFileSync(filePath, 'utf-8');
-  
+
     // Try to find the line this relates to
     const lines: string[] = fileContent.split('\n'); // os.EOL doesn't work here
 
@@ -741,6 +758,7 @@ ${f.resolution}
         }
       }
 
+      // If we're not using a CodeTour, make sure the path exists
       if (args.options.outputFile && args.options.output !== 'tour') {
         const dirPath: string = path.dirname(path.resolve(args.options.outputFile));
         if (!fs.existsSync(dirPath)) {
