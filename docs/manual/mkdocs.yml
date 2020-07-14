@@ -209,6 +209,7 @@ nav:
         - folder rename: 'cmd/spo/folder/folder-rename.md'
       - group:
         - group get: 'cmd/spo/group/group-get.md'
+        - group remove: 'cmd/spo/group/group-remove.md'
       - hidedefaultthemes:
         - hidedefaultthemes get: 'cmd/spo/hidedefaultthemes/hidedefaultthemes-get.md'
         - hidedefaultthemes set: 'cmd/spo/hidedefaultthemes/hidedefaultthemes-set.md'

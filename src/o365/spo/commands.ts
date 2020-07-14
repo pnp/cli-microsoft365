@@ -56,6 +56,7 @@ export default {
   FOLDER_RENAME: `${prefix} folder rename`,
   GET: `${prefix} get`,
   GROUP_GET: `${prefix} group get`,
+  GROUP_REMOVE: `${prefix} group remove`,
   HIDEDEFAULTTHEMES_GET: `${prefix} hidedefaultthemes get`,
   HIDEDEFAULTTHEMES_SET: `${prefix} hidedefaultthemes set`,
   HOMESITE_GET: `${prefix} homesite get`,
