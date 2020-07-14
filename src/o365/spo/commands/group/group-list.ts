@@ -55,7 +55,7 @@ class SpoGroupListCommand extends SpoCommand {
               Id:g.Id,
               Title:g.Title,
               LoginName:g.LoginName,
-              Description:g.Description,
+              Description:g.Description == null?" ":g.Description,
               IsHiddenInUI:g.IsHiddenInUI,
               PrincipalType:g.PrincipalType
             };
