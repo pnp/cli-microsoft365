@@ -10,6 +10,7 @@
 
 **SharePoint:**
 
+- [spo group get](../cmd/spo/group/group-get.md) - gets site group [#1692](https://github.com/pnp/office365-cli/issues/1692)
 - [spo tenant appcatalog add](../cmd/spo/tenant/tenant-appcatalog-add.md) - creates new tenant app catalog site [#1646](https://github.com/pnp/office365-cli/issues/1646)
 - [spo user get](../cmd/spo/user/user-get.md) - gets a site user within specific web [#1673](https://github.com/pnp/office365-cli/issues/1673)
 - [spo user remove](../cmd/spo/user/user-remove.md) - removes user from specific web [#1674](https://github.com/pnp/office365-cli/issues/1674)
@@ -17,6 +18,10 @@
 **SharePoint Framework:**
 
 - [spfx project rename](../cmd/spfx/project/project-rename.md) - renames SharePoint Framework project [#1349](https://github.com/pnp/office365-cli/issues/1349)
+
+### Changes
+
+- added the 'Sync SharePoint Document Library Documents with Azure Storage Container' sample script [#1685](https://github.com/pnp/office365-cli/issues/1685)
 
 ## [v2.11.0](https://github.com/pnp/office365-cli/releases/tag/v2.11.0)
 
