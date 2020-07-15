@@ -542,8 +542,6 @@ ${f.resolution}
 
         // CodeTour also expects forward slashes as directory separators
         file = file.replace(/\\/g, '/');
-
-        console.log("File:", f.file, file);
       }
 
       // Create a tour step entry
