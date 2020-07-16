@@ -447,6 +447,7 @@ nav:
         - user remove: 'cmd/aad/o365group/o365group-user-remove.md'
         - user set: 'cmd/aad/o365group/o365group-user-set.md'
         - user app add: 'cmd/teams/user/user-app-add.md'
+        - user app remove: 'cmd/teams/user/user-app-remove.md'
     - Office 365 (tenant):
       - id:
         - id get: 'cmd/tenant/id/id-get.md'
