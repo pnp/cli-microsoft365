@@ -23,6 +23,7 @@
 
 - added the 'Sync SharePoint Document Library Documents with Azure Storage Container' sample script [#1685](https://github.com/pnp/office365-cli/issues/1685)
 - added support for upgrading projects built using SharePoint Framework v1.11.0 [#1714](https://github.com/pnp/office365-cli/issues/1714)
+- added the 'List app usage in Microsoft Teams' sample script [#1640](https://github.com/pnp/office365-cli/issues/1640)
 
 ## [v2.11.0](https://github.com/pnp/office365-cli/releases/tag/v2.11.0)
 
