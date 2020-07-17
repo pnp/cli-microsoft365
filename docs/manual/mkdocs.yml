@@ -503,6 +503,7 @@ nav:
       - 'Hide SharePoint list from Site Contents': 'sample-scripts/spo/hide-list-from-site-contents.md'
       - 'Lists active SharePoint site collection application catalogs': 'sample-scripts/spo/list-site-app-catalogs.md'
       - 'Lists all tenant-wide extensions': 'sample-scripts/spo/list-tenant-wide-extensions.md'
+      - 'Lists orphaned redirect sites': 'sample-scripts/spo/list-orphaned-redirect-sites.md'
     - Microsoft Teams:
       - 'Deploy Microsoft Teams app from Azure DevOps': 'sample-scripts/teams/deploy-teams-app.md'
       - 'Govern orphaned Microsoft Teams': 'sample-scripts/teams/govern-orphan-teams.md'
