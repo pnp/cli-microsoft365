@@ -113,6 +113,7 @@ class SpoUserprofileSetCommand extends SpoCommand {
   }
 
   public commandHelp(args: CommandArgs, log: (help: string) => void): void {
+    const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
       `  Remarks:
@@ -121,10 +122,10 @@ class SpoUserprofileSetCommand extends SpoCommand {
 
   Examples:
   
-    Updates single value property of a user profile with property name SPS-JobTitle and property value 'Senior Developer'
-      ${commands.USERPROFILE_SET} --userName 'john.doe@mytenant.onmicrosoft.com' --propertyName 'SPS-JobTitle' --propertyValue 'Senior Developer'
+    Updates single value property of a user profile with property name ${chalk.grey('AboutMe')} and property value 'Working as a Microsoft 365 developer'
+      ${commands.USERPROFILE_SET} --userName 'john.doe@mytenant.onmicrosoft.com' --propertyName 'AboutMe' --propertyValue 'Working as a Microsoft 365 developer'
   
-    Updates multi value property of a user profile with property name SPS-Skills and property values 'CSS', 'HTML'
+    Updates multi value property of a user profile with property name ${chalk.grey('SPS-Skills')} and property values 'CSS', 'HTML'
       ${commands.USERPROFILE_SET} --userName 'john.doe@mytenant.onmicrosoft.com' --propertyName 'SPS-Skills' --propertyValue 'CSS, HTML'
 `);
   }

@@ -28,10 +28,10 @@ This command requires tenant admin permissions in case of updating properties ot
 
 ## Examples
 
-Updates single value property of a user profile with property name *SPS-JobTitle* and property value 'Senior Developer'
+Updates single value property of a user profile with property name *AboutMe* and property value 'Working as a Microsoft 365 developer'
 
 ```sh
-spo userprofile set --userName 'john.doe@mytenant.onmicrosoft.com' --propertyName 'SPS-JobTitle' --propertyValue 'Senior Developer'
+spo userprofile set --userName 'john.doe@mytenant.onmicrosoft.com' --propertyName 'AboutMe' --propertyValue 'Working as a Microsoft 365 developer'
 ```
 
 Updates multi value property of a user profile with property name *SPS-Skills* and property values 'CSS', 'HTML'
