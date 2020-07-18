@@ -1,5 +1,13 @@
 # Release notes
 
+## [v2.13.0](https://github.com/pnp/office365-cli/releases/tag/v2.13.0)
+
+### New commands
+
+**SharePoint:**
+
+- [spo userprofile set](../cmd/spo/userprofile/userprofile-set.md) - sets user profile property for a SharePoint user [#1671](https://github.com/pnp/office365-cli/issues/1671)
+
 ## [v2.12.0](https://github.com/pnp/office365-cli/releases/tag/v2.12.0)
 
 ### New commands
