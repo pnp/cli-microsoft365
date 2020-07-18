@@ -143,6 +143,58 @@ describe(commands.USER_LIST, () => {
     });
   });
 
+  it('retrieves lists of site users without output option', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf('/_api/web/siteusers') > -1) {
+        return Promise.resolve(
+          {
+            "value": [{
+              "Id":6,
+              "Title":"John Doe",
+              "Email":"john.deo@mytenant.onmicrosoft.com",
+              "LoginName":"i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
+              },
+              {
+                "Id":7,
+                "Title":"FName Lname",
+                "Email":"abc@mytenant.onmicrosoft.com",
+                "LoginName":"i:0#.f|membership|abc@mytenant.onmicrosoft.com"
+              }]
+            }
+        );
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({
+      options: {      
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com'
+      }
+    }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(
+          [{
+            Id:6,
+            Title:"John Doe",
+            Email:"john.deo@mytenant.onmicrosoft.com",
+            LoginName:"i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
+            },
+            {
+              Id:7,
+              Title:"FName Lname",
+              Email:"abc@mytenant.onmicrosoft.com",
+              LoginName:"i:0#.f|membership|abc@mytenant.onmicrosoft.com"
+            }]
+        ));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('supports specifying URL', () => {
     const options = (command.options() as CommandOption[]);
     let containsTypeOption = false;
