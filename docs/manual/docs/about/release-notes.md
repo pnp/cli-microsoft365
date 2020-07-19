@@ -9,6 +9,9 @@
 - removed immersive mode [#1600](https://github.com/pnp/office365-cli/issues/1600)
 - removed '-h' as option [#1680](https://github.com/pnp/office365-cli/issues/1680)
 - removed deprecated 'accesstoken get' alias [#1368](https://github.com/pnp/office365-cli/issues/1368)
+- removed '--pretty' global option [#1338](https://github.com/pnp/office365-cli/issues/1338)
+- removed deprecated aliases [#1339](https://github.com/pnp/office365-cli/issues/1339)
+- renamed 'Office 365 CLI' to 'CLI for Microsoft 365' [#1635](https://github.com/pnp/office365-cli/issues/1635)
 
 ## [v2.14.0](https://github.com/pnp/office365-cli/releases/tag/v2.14.0)
 
