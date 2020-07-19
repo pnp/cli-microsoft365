@@ -8,6 +8,12 @@
 
 - [spo userprofile set](../cmd/spo/userprofile/userprofile-set.md) - sets user profile property for a SharePoint user [#1671](https://github.com/pnp/office365-cli/issues/1671)
 
+### Changes
+
+- added the 'List app usage in Microsoft Teams' sample script [#1640](https://github.com/pnp/office365-cli/issues/1640)
+- fixed the 'Get user with login name' example for 'spo user get' command
+- updated CodeTour SPFx upgrade report schema
+
 ## [v2.12.0](https://github.com/pnp/office365-cli/releases/tag/v2.12.0)
 
 ### New commands
@@ -31,7 +37,6 @@
 
 - added the 'Sync SharePoint Document Library Documents with Azure Storage Container' sample script [#1685](https://github.com/pnp/office365-cli/issues/1685)
 - added support for upgrading projects built using SharePoint Framework v1.11.0 [#1714](https://github.com/pnp/office365-cli/issues/1714)
-- added the 'List app usage in Microsoft Teams' sample script [#1640](https://github.com/pnp/office365-cli/issues/1640)
 
 ## [v2.11.0](https://github.com/pnp/office365-cli/releases/tag/v2.11.0)
 
