@@ -13,7 +13,7 @@ spo search [options]
 Option|Description
 ------|-----------
 `--help`|output usage information
-`-q, --query <query>`|Query to be executed in KQL format
+`-q, --queryText <queryText>`|Query to be executed in KQL format
 `-p, --selectProperties [selectProperties]`|Comma-separated list of properties to retrieve. Will retrieve all properties if not specified and json output is requested.
 `-u, --webUrl [webUrl]`|The web against which we want to execute the query. If the parameter is not defined, the query is executed against the web that's used when logging in to the SPO environment.
 `--allResults`|Set, to get all results of the search query, instead of the number specified by the `rowlimit` (default: 10)
@@ -47,23 +47,23 @@ Option|Description
 Execute search query to retrieve all Document Sets (ContentTypeId = _0x0120D520_) for the English locale
 
 ```sh
-spo search --query "ContentTypeId:0x0120D520" --culture 1033
+spo search --queryText "ContentTypeId:0x0120D520" --culture 1033
 ```
 
 Retrieve all documents. For each document, retrieve the _Path_, _Author_ and _FileType_.
 
 ```sh
-spo search --query "IsDocument:1" --selectProperties "Path,Author,FileType" --allResults
+spo search --queryText "IsDocument:1" --selectProperties "Path,Author,FileType" --allResults
 ```
 
 Return the top 50 items of which the title starts with _Marketing_ while trimming duplicates.
 
 ```sh
-spo search --query "Title:Marketing*" --rowLimit=50 --trimDuplicates
+spo search --queryText "Title:Marketing*" --rowLimit=50 --trimDuplicates
 ```
 
 Return only items from a specific result source (using the source id).
 
 ```sh
-spo search --query "*" --sourceId "6e71030e-5e16-4406-9bff-9c1829843083"
+spo search --queryText "*" --sourceId "6e71030e-5e16-4406-9bff-9c1829843083"
 ```
