@@ -28,7 +28,7 @@ interface Options extends GlobalOptions {
   processBestBets?: boolean;
   processPersonalFavorites?: boolean;
   properties?: string;
-  query: string;
+  queryText: string;
   queryTemplate?: string;
   rankingModelId?: string;
   rawOutput?: boolean;
@@ -96,7 +96,7 @@ class SpoSearchCommand extends SpoCommand {
         webUrl = _webUrl;
 
         if (this.verbose) {
-          cmd.log(`Executing search query '${args.options.query}' on site at ${webUrl}...`);
+          cmd.log(`Executing search query '${args.options.queryText}' on site at ${webUrl}...`);
         }
 
         const startRow = args.options.startRow ? args.options.startRow : 0;
@@ -165,7 +165,7 @@ class SpoSearchCommand extends SpoCommand {
     const processPersonalFavoritesRequestString: string = typeof (args.options.processPersonalFavorites) === 'undefined' ? `` : `&processpersonalfavorites=${args.options.processPersonalFavorites}`;
 
     // construct single requestUrl
-    const requestUrl = `${webUrl}/_api/search/query?querytext='${args.options.query}'`.concat(
+    const requestUrl = `${webUrl}/_api/search/query?querytext='${args.options.queryText}'`.concat(
       propertySelectRequestString,
       startRowRequestString,
       rowLimitRequestString,
@@ -217,7 +217,7 @@ class SpoSearchCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-q, --query <query>',
+        option: '-q, --queryText <queryText>',
         description: 'Query to be executed in KQL format'
       },
       {
@@ -320,8 +320,8 @@ class SpoSearchCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.query) {
-        return 'Required parameter query missing';
+      if (!args.options.queryText) {
+        return 'Required parameter queryText missing';
       }
 
       if (args.options.sourceId && !Utils.isValidGuid(args.options.sourceId)) {
@@ -412,18 +412,18 @@ class SpoSearchCommand extends SpoCommand {
 
     Execute search query to retrieve all Document Sets
     (ContentTypeId = '${chalk.grey('0x0120D520')}') for the English locale
-      ${commands.SEARCH} --query "ContentTypeId:0x0120D520" --culture 1033
+      ${commands.SEARCH} --queryText "ContentTypeId:0x0120D520" --culture 1033
 
     Retrieve all documents. For each document, retrieve the Path, Author
     and FileType.
-      ${commands.SEARCH} --query "IsDocument:1" --selectProperties "Path,Author,FileType" --allResults
+      ${commands.SEARCH} --queryText "IsDocument:1" --selectProperties "Path,Author,FileType" --allResults
 
     Return the top 50 items of which the title starts with 'Marketing' while
     trimming duplicates.
-      ${commands.SEARCH} --query "Title:Marketing*" --rowLimit=50 --trimDuplicates
+      ${commands.SEARCH} --queryText "Title:Marketing*" --rowLimit=50 --trimDuplicates
 
     Return only items from a specific result source (using the source id).
-      ${commands.SEARCH} --query "*" --sourceId "6e71030e-5e16-4406-9bff-9c1829843083"
+      ${commands.SEARCH} --queryText "*" --sourceId "6e71030e-5e16-4406-9bff-9c1829843083"
       `);
   }
 }
