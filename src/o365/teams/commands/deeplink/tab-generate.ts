@@ -59,16 +59,14 @@ class TeamsDeeplinkTabGenerateCommand extends GraphCommand {
 
         let tabTypeInput: string = args.options.tabType ? args.options.tabType.trim() : TabTypeOptions.Static;
 
-        switch (TabTypeOptions[(tabTypeInput as keyof typeof TabTypeOptions)].valueOf()) {
-          case TabTypeOptions.Configurable:
+        if (TabTypeOptions[(tabTypeInput as keyof typeof TabTypeOptions)].valueOf() == TabTypeOptions.Configurable) {         
             let context: string = `{"channelId": "${args.options.channelId}"}`;
             deeplink = { deeplink: `https://teams.microsoft.com/l/entity/${appId}/${entityId}?webUrl=${contentUrl}&label=${args.options.label}&context=${context}` };
             cmd.log(deeplink);
-            break;
-          case TabTypeOptions.Static:
+        }
+        else if (TabTypeOptions[(tabTypeInput as keyof typeof TabTypeOptions)].valueOf() == TabTypeOptions.Static) {
             deeplink = { deeplink: `https://teams.microsoft.com/l/entity/${appId}/${entityId}?webUrl=${contentUrl}&label=${args.options.label}` };
             cmd.log(deeplink);
-            break;
         }
 
         if (this.verbose) {
