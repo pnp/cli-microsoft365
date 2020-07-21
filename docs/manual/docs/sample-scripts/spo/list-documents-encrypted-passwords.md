@@ -1,4 +1,4 @@
-# SharePoint - Script to locate documents encrypted with passwords
+# List to find documents stored with passwords
 
 Author: [Mike Lee (BOSTON)](https://techcommunity.microsoft.com/t5/user/viewprofilepage/user-id/96057)
 
