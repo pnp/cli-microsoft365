@@ -90,7 +90,7 @@ find-docpasswords $ctx $fileurl
 ```
 
 You will need a few things to make this works.
-- Installed the SharePoint Online Client Components SDK
+- Installed the [SharePoint Online Client Components SDK](https://www.microsoft.com/en-us/download/details.aspx?id=42038)
 - Specify the “$SiteURL, $Listname, and $username in the script.
 
 Keywords:
