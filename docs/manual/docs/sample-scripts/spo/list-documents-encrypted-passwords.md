@@ -1,4 +1,4 @@
-#SharePoint - Script to locate documents encrypted with passwords
+# SharePoint - Script to locate documents encrypted with passwords
 
 Author: [Mike Lee (BOSTON)](https://techcommunity.microsoft.com/t5/user/viewprofilepage/user-id/96057)
 
@@ -17,7 +17,6 @@ Dependencies:
 [System.Reflection.Assembly]::LoadWithPartialName("Microsoft.SharePoint.Client")
 [System.Reflection.Assembly]::LoadWithPartialName("WindowsBase")
 
-
 #Your SPO Tenant
 $SiteURL = "https://tenant.sharepoint.com"
 
@@ -32,7 +31,6 @@ $password = Read-Host "Enter Password" -AsSecureString
 $ctx = New-Object Microsoft.SharePoint.Client.ClientContext($SiteURL)
 $ctx.Credentials = New-Object Microsoft.SharePoint.Client.SharePointOnlineCredentials($userName, $password)
 $List = $ctx.Web.Lists.GetByTitle($ListName) 
-
 
 #CAML Query to recursively look at all items in the library with a 5000 item row limit. 
 $camlQuery = New-Object Microsoft.SharePoint.Client.CamlQuery
@@ -78,7 +76,6 @@ $stream.Close()
 $fileinfo.Dispose()
 $ctx.Dispose()
 }
-
 
 #Run the function to loop through all items in the library and find documents stored with passwords
 
