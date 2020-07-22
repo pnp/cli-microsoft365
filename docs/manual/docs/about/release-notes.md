@@ -11,8 +11,9 @@
 ### Changes
 
 - added the 'List app usage in Microsoft Teams' sample script [#1640](https://github.com/pnp/office365-cli/issues/1640)
-- fixed the 'Get user with login name' example for 'spo user get' command
-- updated CodeTour SPFx upgrade report schema
+- fixed the 'Get user with login name' example for 'spo user get' command [#1707](https://github.com/pnp/office365-cli/pull/1707)
+- updated CodeTour SPFx upgrade report schema [#1708](https://github.com/pnp/office365-cli/pull/1708)
+- consolidates 'spo site add' and 'spo site classic add' commands [#1493](https://github.com/pnp/office365-cli/issues/1493)
 
 ## [v2.12.0](https://github.com/pnp/office365-cli/releases/tag/v2.12.0)
 
