@@ -1,6 +1,6 @@
 # Export Configurations of Tenant Wide Extensions
 
-Author: [Joseph Velliah](https://sprider.blog/)
+Author: [Joseph Velliah](https://sprider.blog/export-configs-tenant-wide-extensions)
 
 The SharePoint Admin Center provides various governance features, but there is no way to easily export Configurations of Tenant Wide Extensions from the SharePoint admin center for governance activities. This script retrieves Tenant Wide Extension configurations from the App Catalog and exports the same in a comma-separated values (CSV) file.
 
