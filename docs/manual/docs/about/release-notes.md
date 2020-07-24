@@ -6,6 +6,7 @@
 
 **SharePoint:**
 
+- [spo group remove](../cmd/spo/group/group-remove.md) - removes group from specific web [#1693](https://github.com/pnp/office365-cli/issues/1693)
 - [spo user list](../cmd/spo/user/user-list.md) - lists all the users within specific web [#1672](https://github.com/pnp/office365-cli/issues/1672)
 - [spo userprofile set](../cmd/spo/userprofile/userprofile-set.md) - sets user profile property for a SharePoint user [#1671](https://github.com/pnp/office365-cli/issues/1671)
 
