@@ -5,10 +5,8 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
 import GlobalOptions from '../../../../GlobalOptions';
-import { PageItem } from './PageItem';
 import { ClientSidePage } from './clientsidepages';
 import Utils from '../../../../Utils';
-//import { relative } from 'path';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -50,8 +48,8 @@ class SpoPageGetCommand extends SpoCommand {
     };
 
     request
-      .get<PageItem>(requestOptions)
-      .then((res: PageItem): void => {
+      .get(requestOptions)
+      .then((res: any): void => {
         if (res.ListItemAllFields.ClientSideApplicationId !== 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec') {
           cb(new CommandError(`Page ${args.options.name} is not a modern page.`));
           return;
@@ -65,7 +63,7 @@ class SpoPageGetCommand extends SpoCommand {
           });
         });
 
-        const page: any = {
+        let page: any = {
           commentsDisabled: res.ListItemAllFields.CommentsDisabled,
           numSections: clientSidePage.sections.length,
           numControls: numControls,
@@ -76,6 +74,10 @@ class SpoPageGetCommand extends SpoCommand {
           page.layoutType = res.ListItemAllFields.PageLayoutType;
         }
 
+        if (args.options.output === 'json') {
+          page = Object.assign(res, page);
+        }
+          
         cmd.log(page);
 
         if (this.verbose) {
